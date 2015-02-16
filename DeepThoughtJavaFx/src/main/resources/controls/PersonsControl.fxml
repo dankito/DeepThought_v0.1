@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+<fx:root animated="false" maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <graphic>
+      <HBox fx:id="pnPersonsGraphic" alignment="CENTER_LEFT">
+         <children>
+            <Label text="%persons">
+               <HBox.margin>
+                  <Insets right="6.0" />
+               </HBox.margin>
+            </Label>
+            <VBox fx:id="pnSelectedPersonsPreview" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </graphic>
+   <content>
+      <VBox fx:id="pnContent" prefHeight="200.0">
+         <children>
+            <HBox fx:id="hboxSearchForPerson" alignment="CENTER_LEFT" prefHeight="40.0">
+               <children>
+                  <Label text="%search">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin>
+                  </Label>
+                  <CustomTextField fx:id="txtfldSearchForPerson" prefHeight="35.0" promptText="search.for.person" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNewPerson" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonNewPersonAction" prefHeight="40.0" text="%new...">
+                     <HBox.margin>
+                        <Insets left="6.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <ListView fx:id="lstvwAllPersons" minHeight="150.0" />
+         </children>
+      </VBox>
+   </content>
+</fx:root>

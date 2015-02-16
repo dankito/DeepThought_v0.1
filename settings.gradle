@@ -1,0 +1,44 @@
+include ':DeepThoughtLib'
+include ':DeepThoughtJavaFx'
+//include ':JavaFxControls'
+include ':DeepThoughtAndroid'
+include ':JpaEntityManager' /*, ':EclipseLink' */
+include ':AndroidOrmLiteEntityManager', ':ormlite-android', ':ormlite-core'
+include ':json-io'
+//include ':VideoDownloader'
+//include ':JsonIoPersistenceManager', ':JacksonPersistenceManager'
+//include ':KeywordExtractor'
+//include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
+//        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
+//        ':SymmetricDS-Server'
+
+//project(':EclipseLink').projectDir = new File('libs/persistence/database/EclipseLink')
+project(':JpaEntityManager').projectDir = new File('libs/persistence/database/JpaEntityManager')
+
+project(':ormlite-core').projectDir = new File('libs/persistence/database/ormlite-core')
+project(':ormlite-android').projectDir = new File('libs/persistence/database/ormlite-android')
+project(':AndroidOrmLiteEntityManager').projectDir = new File('libs/persistence/database/AndroidOrmLiteEntityManager')
+
+project(':json-io').projectDir = new File('libs/persistence/json/json-io')
+//project(':JsonIoPersistenceManager').projectDir = new File('libs/persistence/json/JsonIoPersistenceManager')
+//project(':JacksonPersistenceManager').projectDir = new File('libs/persistence/json/JacksonPersistenceManager')
+
+//project(':JavaFxControls').projectDir = new File('libs/JavaFX/JavaFxControls')
+
+//project(':KeywordExtractor').projectDir = new File('libs/KeywordExtractor')
+
+//project(':SymmetricDS-Core').projectDir = new File('libs/sync/SymmetricDS-Core')
+//project(':SymmetricDS-CSV').projectDir = new File('libs/sync/SymmetricDS-CSV')
+//project(':SymmetricDS-IO').projectDir = new File('libs/sync/SymmetricDS-IO')
+//project(':SymmetricDS-Util').projectDir = new File('libs/sync/SymmetricDS-Util')
+//project(':SymmetricDS-DB').projectDir = new File('libs/sync/SymmetricDS-DB')
+//project(':SymmetricDS-JDBC').projectDir = new File('libs/sync/SymmetricDS-JDBC')
+////project(':SymmetricDS-Wrapper').projectDir = new File('libs/sync/SymmetricDS-Wrapper')
+//project(':SymmetricDS-FTP').projectDir = new File('libs/sync/SymmetricDS-FTP')
+//project(':SymmetricDS-Mongo').projectDir = new File('libs/sync/SymmetricDS-Mongo')
+////project(':SymmetricDS-Mssql').projectDir = new File('libs/sync/SymmetricDS-Mssql')
+////project(':SymmetricDS-Oracle').projectDir = new File('libs/sync/SymmetricDS-Oracle')
+//project(':SymmetricDS-Postgres').projectDir = new File('libs/sync/SymmetricDS-Postgres')
+//project(':SymmetricDS-Client').projectDir = new File('libs/sync/SymmetricDS-Client')
+//project(':SymmetricDS-Server').projectDir = new File('libs/sync/SymmetricDS-Server')
+//project(':SymmetricDSDataSyncManager').projectDir = new File('libs/sync/SymmetricDSDataSyncManager')

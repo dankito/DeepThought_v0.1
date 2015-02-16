@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/list_item_search_result_height"
+              android:minHeight="@dimen/list_item_search_result_min_height"
+    >
+
+    <TextView
+        android:id="@+id/txtvwListItemSearchResultTitle"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_search_result_title_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textSize="@dimen/list_item_search_result_title_text_size"/>
+
+    <TextView
+        android:id="@+id/txtvwListItemSearchResultText"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_search_result_text_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/txtvwListItemEntryTitle"
+        android:layout_marginTop="4dp"
+        android:gravity="left|top"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:textSize="@dimen/list_item_search_result_text_text_size"/>
+
+</RelativeLayout>

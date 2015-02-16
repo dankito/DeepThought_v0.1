@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import net.deepthought.controls.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditSeriesTitleDialogController">
+   <bottom>
+      <HBox alignment="CENTER_RIGHT" prefHeight="40.0">
+         <children>
+            <Button alignment="CENTER" cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="120.0" text="%cancel">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button fx:id="btnApplyChanges" alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Button>
+            <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="6.0" />
+         </BorderPane.margin>
+      </HBox>
+   </bottom>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="774.0" prefViewportWidth="948.0">
+         <content>
+            <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+               <center>
+                  <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
+                     <children>
+                        <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                              <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                              <Label text="%category">
+                                 <HBox.margin>
+                                    <Insets left="12.0" right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cmbxSeriesTitleCategory" prefHeight="35.0" prefWidth="200.0">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin></ComboBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox fx:id="paneSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                              <TextField fx:id="txtfldSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox fx:id="paneTitleSupplement" alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefHeight="40.0" prefWidth="120.0" text="%title.supplement" />
+                              <TextField fx:id="txtfldTitleSupplement" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <TitledPane fx:id="ttldpnAbstract" animated="false" expanded="false" text="%abstract">
+                           <content>
+                              <TextArea fx:id="txtarAbstract" minHeight="120.0" wrapText="true" />
+                           </content>
+                           <VBox.margin>
+                              <Insets bottom="6.0" />
+                           </VBox.margin>
+                        </TitledPane>
+                        <TitledPane fx:id="ttldpnTableOfContents" animated="false" expanded="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
+                           <content>
+                              <HTMLEditor fx:id="htmledTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
+                           </content>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </TitledPane>
+                        <HBox alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefWidth="160.0" text="%first.day.of.publication">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <DatePicker fx:id="dtpckFirstDayOfPublication" HBox.hgrow="ALWAYS" />
+                              <Label prefWidth="160.0" text="%last.day.of.publication">
+                                 <HBox.margin>
+                                    <Insets left="18.0" right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <DatePicker fx:id="dtpckLastDayOfPublication" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox fx:id="pnPublisher" alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefWidth="130.0" text="%publisher">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ComboBox fx:id="cmbxPublisher" maxWidth="1.7976931348623157E308" prefHeight="35.0" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin></ComboBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label text="%standard.abbreviation">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="txtfldStandardAbbreviation" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                              <Label text="%user.abbreviation1">
+                                 <HBox.margin>
+                                    <Insets left="18.0" right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="txtfldUserAbbreviation1" prefHeight="35.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
+                              <Label text="%user.abbreviation2">
+                                 <HBox.margin>
+                                    <Insets left="12.0" right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="txtfldUserAbbreviation2" prefHeight="35.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="40.0">
+                           <children>
+                              <Label prefWidth="130.0" text="%online.address">
+                                 <HBox.margin>
+                                    <Insets right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="txtfldOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                              <Label text="%last.access">
+                                 <HBox.margin>
+                                    <Insets left="18.0" right="6.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <DatePicker fx:id="dtpckLastAccess" prefHeight="35.0" />
+                           </children>
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <TitledPane fx:id="ttldpnSerialParts" animated="false" expanded="false" text="%serial.parts">
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </TitledPane>
+                     </children>
+                  </VBox>
+               </center>
+               <bottom>
+                  <VBox BorderPane.alignment="CENTER">
+                     <children>
+                        <TitledPane fx:id="ttldpnNotes" animated="false" expanded="false" text="%notes">
+                           <content>
+                              <TextArea fx:id="txtarNotes" minHeight="120.0" wrapText="true" />
+                           </content>
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
+                        </TitledPane>
+                        <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
+                           <graphic>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label text="%files" />
+                                    <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
+                                       <HBox.margin>
+                                          <Insets left="6.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </graphic>
+                           <content>
+                              <VBox>
+                                 <children>
+                                    <TreeTableView fx:id="trtblvwFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
+                                      <columns>
+                                        <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TreeTableView>
+                                 </children>
+                              </VBox>
+                           </content>
+                           <VBox.margin>
+                              <Insets top="12.0" />
+                           </VBox.margin>
+                        </TitledPane>
+                     </children>
+                  </VBox>
+               </bottom>
+            </BorderPane>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

@@ -1,0 +1,54 @@
+package net.deepthought.android.db;
+
+import android.test.AndroidTestCase;
+
+import com.j256.ormlite.dao.cda.jointable.JoinTableDaoRegistry;
+
+import net.deepthought.Application;
+import net.deepthought.DefaultDependencyResolver;
+import net.deepthought.android.db.helper.TestJoinTableDaoRegistry;
+import net.deepthought.data.persistence.IEntityManager;
+
+import java.io.File;
+
+/**
+ * Created by ganymed on 10/11/14.
+ */
+public class EntitiesTestBase extends AndroidTestCase {
+
+  protected IEntityManager entityManager = null;
+
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+
+//    clearDatabase();
+
+    entityManager = new OrmLiteAndroidEntityManager(this.getContext());
+
+    Application.instantiate(new DefaultDependencyResolver(entityManager));
+    JoinTableDaoRegistry.setJoinTableRegistry(new TestJoinTableDaoRegistry());
+
+//    entityManager.clearData();
+//    entityManager.setPersistUpdatedEntitiesAfterMilliseconds(0);
+//    Data.createInstance(entityManager, false);
+  }
+
+  @Override
+  public void tearDown() throws Exception {
+//    entityManager.close();
+    super.tearDown();
+
+    Application.shutdown();
+//    clearDatabase();
+  }
+
+  protected void clearDatabase() {
+    try {
+//    new File(((OrmLiteAndroidEntityManager) entityManager).getDatabasePath()).delete();
+      new File("/data/data/net.deepthought.android.test/databases/DeepThought.db").delete();
+    } catch(Exception ex) {
+
+    }
+  }
+}

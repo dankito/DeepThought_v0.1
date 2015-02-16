@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
+   <center>
+      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="496.0" prefWidth="734.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Title" />
+                  <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="First name" />
+                  <TextField fx:id="txtfldFirstName" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Middle name(s)" />
+                  <TextField fx:id="txtfldMiddleNames" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Prefix" />
+                  <TextField fx:id="txtfldPrefix" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Last name" />
+                  <TextField fx:id="txtfldLastName" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Suffix" />
+                  <TextField fx:id="txtfldSuffix" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Abbreviation" />
+                  <TextField fx:id="txtfldAbbreviation" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox prefHeight="40.0">
+               <children>
+                  <Label prefHeight="40.0" prefWidth="120.0" text="Gender" />
+                  <ComboBox fx:id="cmbxGender" prefHeight="35.0" prefWidth="250.0" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label prefHeight="40.0" text="Notes">
+                     <VBox.margin>
+                        <Insets bottom="6.0" top="12.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextArea fx:id="txtarNotes" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+               </children>
+            </VBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0">
+               <children>
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="100.0" text="%cancel">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnApply" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="100.0" text="%apply">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="100.0" text="%ok" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" top="12.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </center>
+   <right>
+      <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <WebView fx:id="wbvwContextHelp" prefHeight="400.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+         </children>
+         <padding>
+            <Insets left="12.0" />
+         </padding>
+      </VBox>
+   </right>
+</BorderPane>

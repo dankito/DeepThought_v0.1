@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Deep Thought</string>
+
+    <string name="title_section_overview">Sammlung</string>
+    <string name="title_section_search">Suche</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="action_settings">Einstellungen</string>
+
+    <string name="loading_data_wait_message">Lade daten ...</string>
+
+    <string name="error_message_tag_with_that_name_already_exists">Ein Schlagwort mit diesem Namen existiert bereits</string>
+    <string name="error_message_tag_name_must_be_a_non_empty_string">Der Schlagwortname muss ein nicht-leerer String sein</string>
+
+    <string name="list_item_entry_context_menu_edit_title">Bearbeiten</string>
+    <string name="list_item_entry_context_menu_delete_title">Löschen</string>
+
+    <string name="edit_entry_action_bar_title_new_entry">Neuen Eintrag erstellen</string>
+    <string name="edit_entry_action_bar_title_entry_format">Bearbeite %1$s</string>
+    <string name="edit_entry_title_label">Titel</string>
+    <string name="edit_entry_tags_label">Schlagwörter:</string>
+    <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
+    <string name="edit_entry_button_new_tag_text">Neu</string>
+    <string name="edit_entry_entry_label">Eintrag</string>
+    <string name="edit_entry_button_ok_text">OK</string>
+    <string name="edit_entry_button_cancel_text">Abbrechen</string>
+
+    <string name="search">Suche</string>
+    <string name="search_section_tag_title">Schlagwortsuche</string>
+    <string name="search_section_tag_label">Schlagwörter:</string>
+    <string name="search_select_tags"><![CDATA[<Schlagwörter auswählen>]]></string>
+    <string name="search_section_title_title">Titelsuche</string>
+    <string name="search_contains_text">Enthält</string>
+    <string name="search_starts_with_text">Beginnt mit</string>
+    <string name="search_ends_with_text">Ended mit</string>
+    <string name="search_equals_text">Exakt</string>
+    <string name="search_section_content_title">Inhaltssuche</string>
+    <string name="search_section_results_title">Ergebnisse:</string>
+
+</resources>

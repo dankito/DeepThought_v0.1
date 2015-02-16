@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Deep Thought</string>
+
+    <string name="title_section_overview">All entries</string>
+    <string name="title_section_search">Search</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="loading_data_wait_message">Loading data ...</string>
+
+    <string name="error_message_tag_with_that_name_already_exists">A Tag with that name already exists</string>
+    <string name="error_message_tag_name_must_be_a_non_empty_string">Tag name must be a non-empty string</string>
+
+    <string name="list_item_entry_context_menu_edit_title">Edit</string>
+    <string name="list_item_entry_context_menu_delete_title">Delete</string>
+
+    <string name="edit_entry_action_bar_title_new_entry">Create new Entry</string>
+    <string name="edit_entry_action_bar_title_entry_format">Edit %1$s</string>
+    <string name="edit_entry_title_label">Title</string>
+    <string name="edit_entry_tags_label">Tags:</string>
+    <string name="edit_entry_button_new_tag_text">New</string>
+    <string name="edit_entry_no_tags_set"><![CDATA[<empty>]]></string>
+    <string name="edit_entry_entry_label">Entry</string>
+    <string name="edit_entry_button_ok_text">OK</string>
+    <string name="edit_entry_button_cancel_text">Cancel</string>
+
+    <string name="search">Search</string>
+    <string name="search_section_tag_title">Tag Search</string>
+    <string name="search_section_tag_label">Tag:</string>
+    <string name="search_select_tags"><![CDATA[<Select Tags>]]></string>
+    <string name="search_section_title_title">Title Search</string>
+    <string name="search_contains_text">Contains</string>
+    <string name="search_starts_with_text">Starts with</string>
+    <string name="search_ends_with_text">Ends with</string>
+    <string name="search_equals_text">Equals</string>
+    <string name="search_section_content_title">Content Search</string>
+    <string name="search_section_results_title">Results:</string>
+
+
+</resources>

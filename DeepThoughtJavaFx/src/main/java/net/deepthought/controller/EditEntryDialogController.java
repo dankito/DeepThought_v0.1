@@ -1,0 +1,614 @@
+package net.deepthought.controller;
+
+import net.deepthought.Application;
+import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.categories.EntryCategoriesControl;
+import net.deepthought.controls.event.FieldChangedEvent;
+import net.deepthought.controls.file.FileRootTreeItem;
+import net.deepthought.controls.file.FileTreeTableCell;
+import net.deepthought.controls.person.EntryPersonsControl;
+import net.deepthought.controls.reference.EntryReferenceControl;
+import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.data.model.Category;
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.enums.EntryTemplate;
+import net.deepthought.data.model.enums.PersonRole;
+import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
+
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.controlsfx.dialog.Dialogs;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Callback;
+
+/**
+ * Created by ganymed on 21/12/14.
+ */
+public class EditEntryDialogController extends ChildWindowsController implements Initializable {
+
+  private final static Logger log = LoggerFactory.getLogger(EditEntryDialogController.class);
+
+
+  protected Entry entry = null;
+
+  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
+
+  protected ObservableList<FileLink> listViewFilesItems;
+
+
+  @FXML
+  protected Button btnApplyChanges;
+
+  @FXML
+  protected Pane contentPane;
+
+  @FXML
+  protected Pane paneFirstLine;
+
+  @FXML
+  protected Pane paneTitle;
+  @FXML
+  protected TextField txtfldTitle;
+
+  @FXML
+  protected Pane paneViewConfig;
+  @FXML
+  protected Hyperlink hyplnkSelectEntryTemplate;
+  @FXML
+  protected Button btnChooseFieldsToShow;
+  @FXML
+  protected ToggleButton tglbtnShowHideContextHelp;
+
+  @FXML
+  protected Pane paneSubTitle;
+  @FXML
+  protected TextField txtfldSubTitle;
+
+  @FXML
+  protected TitledPane ttldpnAbstract;
+  @FXML
+  protected TextArea txtarAbstract;
+
+  @FXML
+  protected TitledPane ttldpnContent;
+  @FXML
+  protected TextArea txtarContent;
+  @FXML
+  protected HTMLEditor htmledContent;
+
+  @FXML
+  protected EntryReferenceControl entryReferenceControl;
+
+
+  protected EntryPersonsControl entryPersonsControl = null;
+
+  protected EntryTagsControl entryTagsControl = null;
+
+  protected EntryCategoriesControl entryCategoriesControl = null;
+
+  @FXML
+  protected TitledPane ttldpnFiles;
+  @FXML
+  protected FlowPane flpnFilesPreview;
+  @FXML
+  protected TreeTableView<FileLink> trtblvwFiles;
+  @FXML
+  protected TreeTableColumn<FileLink, String> clmnFile;
+
+  @FXML
+  protected Control paneContextHelp;
+  @FXML
+  protected WebView wbvwContextHelp;
+
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
+      @Override
+      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
+        btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
+      }
+    });
+
+//    Application.getDeepThought().addPersonsChangedListener(personsChangedListener);
+    Application.getDeepThought().addEntityListener(deepThoughtListener);
+    // TODO: what to do when DeepThought changes -> close dialog
+  }
+
+  protected void setupControls() {
+    ensureNodeOnlyUsesSpaceIfVisible(btnApplyChanges);
+
+    ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
+    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
+      updateWindowTitle(newValue);
+    });
+
+    ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
+    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntrySubTitle));
+
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
+    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
+
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
+    txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
+
+    entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
+    ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    contentPane.getChildren().add(entryReferenceControl);
+
+    entryPersonsControl = new EntryPersonsControl(entry);
+    entryPersonsControl.setPrefHeight(250);
+    entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
+    entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
+    ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
+    contentPane.getChildren().add(entryPersonsControl);
+
+//    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
+    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
+
+    entryTagsControl = new EntryTagsControl(entry);
+    entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setPrefHeight(250);
+    ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
+    contentPane.getChildren().add(entryTagsControl);
+    entryTagsControl.setExpanded(true);
+
+    entryCategoriesControl = new EntryCategoriesControl(entry);
+    entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setPrefHeight(250);
+    ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
+    contentPane.getChildren().addAll(entryCategoriesControl);
+
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
+    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+      @Override
+      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+        return new FileTreeTableCell(entry);
+      }
+    });
+
+    ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
+    paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+  }
+
+  protected void referenceControlFieldChanged(FieldChangedEvent event) {
+    fieldsWithUnsavedChanges.add(event.getFieldWithUnsavedChanges());
+  }
+
+  protected Boolean doesSearchTermMatchReference(FXUtils.DoesItemMatchSearchTermParam<Reference> param) {
+    return param.getItem().getTitle().toLowerCase().contains(param.getSearchTerm().toLowerCase());
+  }
+
+  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
+    node.managedProperty().bind(node.visibleProperty());
+  }
+
+  protected void setEntryValues(final Entry entry) {
+    btnApplyChanges.setVisible(entry.getId() != null);
+
+    txtfldTitle.setText(entry.getTitle());
+
+    txtfldSubTitle.setText(entry.getSubTitle());
+
+//
+//    if(template.showPersons())
+//      updatePersonsSetOnEntityPreview();
+
+    txtarAbstract.setText(entry.getAbstract());
+
+    txtarContent.setText(entry.getContent());
+    // TODO: check which Content format Content has
+
+    trtblvwFiles.setRoot(new FileRootTreeItem(entry));
+
+    fieldsWithUnsavedChanges.clear();
+
+    showFieldsAccordingToEntryTemplate(entry, entry.getTemplate());
+  }
+
+  protected void showFieldsAccordingToEntryTemplate(Entry entry, EntryTemplate template) {
+    hyplnkSelectEntryTemplate.setText(template.getName());
+
+    paneTitle.setVisible(entry.getTemplate().showTitle() || StringUtils.isNotNullOrEmpty(entry.getTitle()));
+    paneSubTitle.setVisible(entry.getTemplate().showSubTitle() || StringUtils.isNotNullOrEmpty(entry.getSubTitle()));
+    ttldpnAbstract.setVisible(entry.getTemplate().showAbstract() || StringUtils.isNotNullOrEmpty(entry.getAbstract()));
+    ttldpnContent.setVisible(entry.getTemplate().showContent() || StringUtils.isNotNullOrEmpty(entry.getContent()));
+
+    entryReferenceControl.setVisible(entry.getTemplate().showReference() || entry.getReference() != null || entry.getTemplate().showSeriesTitle() || entry.getSeries() != null);
+    entryPersonsControl.setVisible(entry.getTemplate().showPersons() || entry.hasPersons() == true);
+    entryTagsControl.setVisible(entry.getTemplate().showTags() || entry.hasTags() == true);
+    entryCategoriesControl.setVisible(entry.getTemplate().showPersons() || entry.hasCategories() == true);
+
+    ttldpnFiles.setVisible(entry.getTemplate().showFiles() || entry.hasFiles());
+  }
+
+
+  @FXML
+  public void handleButtonApplyAction(ActionEvent actionEvent) {
+    saveEditedFieldsOnEntry();
+
+    if(entry.getId() == null) // a new Entry
+      Application.getDeepThought().addEntry(entry);
+  }
+
+  @FXML
+  public void handleButtonCancelAction(ActionEvent actionEvent) {
+    setDialogResult(DialogResult.Cancel);
+    closeDialog();
+  }
+
+  @FXML
+  public void handleButtonOkAction(ActionEvent actionEvent) {
+    setDialogResult(DialogResult.Ok);
+    saveEditedFieldsOnEntry();
+    closeDialog();
+  }
+
+  @Override
+  protected void closeDialog() {
+    entry.removeEntityListener(entryListener);
+    Application.getDeepThought().removeEntityListener(deepThoughtListener);
+
+    super.closeDialog();
+  }
+
+  protected void saveEditedFieldsOnEntry() {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTemplate)) {
+      entry.setTemplate((EntryTemplate) hyplnkSelectEntryTemplate.getUserData());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTemplate);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTitle)) {
+      entry.setTitle(txtfldTitle.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTitle);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySubTitle)) {
+      entry.setSubTitle(txtfldSubTitle.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySubTitle);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
+      entry.setAbstract(txtarAbstract.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
+      entry.setContent(txtarContent.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySeriesTitle)) {
+      entry.setSeries(entryReferenceControl.getSeriesTitle());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySeriesTitle);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReference)) {
+      entry.setReference(entryReferenceControl.getReference());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReference);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceSubDivision)) {
+      entry.setReferenceSubDivision(entryReferenceControl.getReferenceSubDivision());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStart)) {
+      entry.setReferenceStart(entryReferenceControl.getReferenceStart());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStart);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStartUnit)) {
+      entry.setReferenceStartUnit(entryReferenceControl.getReferenceStartUnit());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStartUnit);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEnd)) {
+      entry.setReferenceEnd(entryReferenceControl.getReferenceEnd());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEnd);
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEndUnit)) {
+      entry.setReferenceEndUnit(entryReferenceControl.getReferenceEndUnit());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEndUnit);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryPersons)) {
+      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(entryPersonsControl.getRemovedPersons());
+      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
+        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
+          entry.removePerson(removedPerson, removedPersonsInRole);
+      }
+      entryPersonsControl.getRemovedPersons().clear();
+
+      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(entryPersonsControl.getAddedPersons());
+      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
+        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
+          entry.addPerson(addedPerson, addedPersonsInRole);
+      }
+      entryPersonsControl.getAddedPersons().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryPersons);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTags)) {
+      for(Tag removedTag : entryTagsControl.getRemovedTags())
+        entry.removeTag(removedTag);
+      entryTagsControl.getRemovedTags().clear();
+
+      for(Tag addedTag : entryTagsControl.getAddedTags())
+        entry.addTag(addedTag);
+      entryTagsControl.getAddedTags().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTags);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryCategories)) {
+      for(Category removedCategory : entryCategoriesControl.getRemovedCategories())
+        removedCategory.removeEntry(entry);
+      entryCategoriesControl.getRemovedCategories().clear();
+
+      for(Category addedCategory : entryCategoriesControl.getAddedCategories())
+        addedCategory.addEntry(entry);
+      entryCategoriesControl.getAddedCategories().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryCategories);
+    }
+  }
+
+  protected void askIfStageShouldBeClosed(WindowEvent event) {
+    if(hasUnsavedChanges()) {
+      Action response = Dialogs.create()
+          .owner(windowStage)
+          .title("Entry contains unsaved changes")
+          .message("Entry contains unsaved changes. Do you like to save changes now?")
+          .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
+          .showConfirm();
+
+      if(response.equals(Dialog.ACTION_CANCEL))
+        event.consume(); // consume event so that stage doesn't get closed
+      else if(response.equals(Dialog.ACTION_YES)) {
+        saveEditedFieldsOnEntry();
+        closeDialog();
+      }
+      else
+        closeDialog();
+    }
+  }
+
+
+  @FXML
+  public void handleHyperLinkSelectEntryTemplateAction(ActionEvent event) {
+    ContextMenu otherEntryTemplatesMenu = new ContextMenu();
+
+    for(EntryTemplate template : Application.getDeepThought().getEntryTemplates()) {
+      if(template.equals(entry.getTemplate()) == false) {
+        final MenuItem templateMenuItem = new MenuItem(template.getName());
+        templateMenuItem.setUserData(template);
+        otherEntryTemplatesMenu.getItems().add(templateMenuItem);
+
+        templateMenuItem.setOnAction((menuEvent) -> {
+//          entry.setTemplate((EntryTemplate)templateMenuItem.getUserData());
+          fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTemplate);
+          hyplnkSelectEntryTemplate.setUserData(templateMenuItem.getUserData());
+          showFieldsAccordingToEntryTemplate(entry, (EntryTemplate) templateMenuItem.getUserData());
+        });
+      }
+    }
+
+    otherEntryTemplatesMenu.show(hyplnkSelectEntryTemplate, Side.BOTTOM, 0, 0);
+  }
+
+  @FXML
+  public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
+    ContextMenu hiddenFieldsMenu = new ContextMenu();
+
+    if(paneTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
+    if(paneSubTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
+    if(ttldpnAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
+    if(ttldpnContent.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnContent, "content");
+
+    if(entryReferenceControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, entryReferenceControl, "reference");
+    if(entryPersonsControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, entryPersonsControl, "persons");
+    if(entryTagsControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, entryTagsControl, "tags");
+    if(entryCategoriesControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, entryCategoriesControl, "categories");
+
+    if(ttldpnFiles.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+
+    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+  }
+
+  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
+    MenuItem titleMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
+    hiddenFieldsMenu.getItems().add(titleMenuItem);
+    titleMenuItem.setOnAction(event -> nodeToShowOnClick.setVisible(true));
+  }
+
+
+  @FXML
+  public void handleButtonAddFileAction(ActionEvent event) {
+    final FileLink newFile = new FileLink();
+
+    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+      @Override
+      public void windowClosing(Stage stage, ChildWindowsController controller) {
+
+      }
+
+      @Override
+      public void windowClosed(Stage stage, ChildWindowsController controller) {
+        if (controller.getDialogResult() == DialogResult.Ok) {
+          entry.addFile(newFile);
+        }
+      }
+    });
+  }
+
+
+  public Entry getEntry() {
+    return entry;
+  }
+
+  public void setWindowStageAndEntry(Stage windowStage, Entry entry) {
+    super.setWindowStage(windowStage);
+    this.entry = entry;
+
+    updateWindowTitle(entry.getPreview());
+    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+      @Override
+      public void handle(WindowEvent event) {
+        askIfStageShouldBeClosed(event);
+      }
+    });
+
+    setupControls();
+    txtfldTitle.requestFocus();
+
+    setEntryValues(entry);
+    entry.addEntityListener(entryListener);
+
+    showContextHelp("test");
+  }
+
+  protected void showContextHelpForTarget(MouseEvent event) {
+    EventTarget target = event.getTarget();
+    log.debug("Target has been {}, source {}", target, event.getSource());
+    if(target instanceof Node && ("txtfldSearchForPerson".equals(((Node)target).getId()) || isNodeChildOf((Node)target, entryPersonsControl)))
+      showContextHelp("search.person");
+    else  // TODO: add Context Help for other fields
+      showContextHelp("test");
+  }
+
+  protected void showContextHelp(String contextHelpResourceKey) {
+    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.entry." + contextHelpResourceKey));
+  }
+
+  protected boolean isNodeChildOf(Node node, Node parentToSearchFor) {
+    Parent parent = node.getParent();
+
+    while(parent != null) {
+      if(parent.equals(parentToSearchFor))
+        return true;
+
+      parent = parent.getParent();
+    }
+
+    return false;
+  }
+
+  public boolean hasUnsavedChanges() {
+    return fieldsWithUnsavedChanges.size() > 0;
+  }
+
+  protected void updateWindowTitle(String entryTitle) {
+    if(this.entry.getId() == null)
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.entry", entryTitle));
+    else
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.entry", entryTitle));
+  }
+
+
+  protected EntityListener entryListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(propertyName.equals(TableConfig.EntryEntryTemplateJoinColumnName))
+        showFieldsAccordingToEntryTemplate((Entry) entity, ((Entry) entity).getTemplate());
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
+    }
+  };
+
+
+  protected EntityListener deepThoughtListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
+    }
+  };
+
+}

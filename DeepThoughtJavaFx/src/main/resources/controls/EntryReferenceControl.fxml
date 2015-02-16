@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <VBox fx:id="paneSeriesTitleReferenceAndSubDivisionSettings" HBox.hgrow="ALWAYS">
+            <children>
+                <HBox fx:id="paneSeriesTitle" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
+                    <children>
+                        <Label minWidth="85.0" prefHeight="40.0" prefWidth="85.0" text="%series.title">
+                            <HBox.margin>
+                                <Insets right="6.0" />
+                            </HBox.margin>
+                        </Label>
+                        <ComboBox fx:id="cmbxSeriesTitle" editable="true" maxWidth="1.7976931348623157E308" prefHeight="34.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin></ComboBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="6.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox fx:id="paneReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
+                    <children>
+                        <Label minWidth="85.0" prefHeight="40.0" prefWidth="85.0" text="%reference">
+                            <HBox.margin>
+                                <Insets right="6.0" />
+                            </HBox.margin>
+                        </Label>
+                        <ComboBox fx:id="cmbxReference" editable="true" maxWidth="1.7976931348623157E308" prefHeight="34.0" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin></ComboBox>
+                    </children>
+                </HBox>
+                <HBox fx:id="paneReferenceSubDivision" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
+                    <children>
+                        <Label prefHeight="40.0" prefWidth="160.0" text="%reference.sub.division">
+                            <HBox.margin>
+                                <Insets right="6.0" />
+                            </HBox.margin>
+                        </Label>
+                  <Label prefHeight="40.0" text="(Sendebeitrag, Kapitel, ... To Do)" />
+                    </children>
+                    <VBox.margin>
+                        <Insets top="6.0" />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+        <VBox fx:id="paneReferenceIndicationSettings" alignment="TOP_RIGHT" minWidth="350.0" prefWidth="432.0">
+            <HBox.margin>
+                <Insets left="12.0" />
+            </HBox.margin>
+            <children>
+                <HBox fx:id="paneReferenceIndicationStartSettings" alignment="CENTER_LEFT" prefHeight="40.0">
+                    <children>
+                        <Label prefHeight="40.0" prefWidth="60.0" text="%start" />
+                        <TextField fx:id="txtfldReferenceIndicationStart" prefHeight="34.0" prefWidth="90.0">
+                            <HBox.margin>
+                                <Insets left="6.0" right="6.0" />
+                            </HBox.margin>
+                        </TextField>
+                        <ComboBox fx:id="cmbxReferenceIndicationStartUnit" prefHeight="34.0" prefWidth="170.0">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin></ComboBox>
+                    </children>
+                </HBox>
+                <HBox fx:id="paneReferenceIndicationEndSettings" alignment="CENTER_LEFT" prefHeight="40.0">
+                    <children>
+                        <Label prefHeight="40.0" prefWidth="60.0" text="%end" />
+                        <TextField fx:id="txtfldReferenceIndicationEnd" prefHeight="34.0" prefWidth="90.0">
+                            <HBox.margin>
+                                <Insets left="6.0" right="6.0" />
+                            </HBox.margin>
+                        </TextField>
+                        <ComboBox fx:id="cmbxReferenceIndicationEndUnit" prefHeight="34.0" prefWidth="170.0">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin></ComboBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="6.0" />
+                    </VBox.margin>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</fx:root>

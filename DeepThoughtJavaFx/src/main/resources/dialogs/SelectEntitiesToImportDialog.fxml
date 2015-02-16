@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="721.0" prefWidth="1052.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.SelectEntitiesToImportDialogController">
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <center>
+            <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                  <SplitPane dividerPositions="0.6606397774687065" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <items>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                              <TreeTableView fx:id="trtblvwDataToImportEntities" BorderPane.alignment="CENTER_LEFT">
+                                <columns>
+                                  <TreeTableColumn fx:id="clmDataToImportEntity" editable="false" minWidth="80.0" text="%entity" />
+                                  <TreeTableColumn fx:id="clmDataToImportState" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="%state" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TreeTableView>
+                           </center>
+                           <top>
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label text="%select.entities.to.import" />
+                                 </children>
+                              </HBox>
+                           </top>
+                        </BorderPane>
+                        <BorderPane fx:id="brdpnDataToImportSelectedEntityProperties">
+                           <top>
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label fx:id="lblDataToImportSelectedEntityName" />
+                                 </children>
+                              </HBox>
+                           </top>
+                           <padding>
+                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                           </padding>
+                        </BorderPane>
+                    </items>
+                  </SplitPane>
+                  <SplitPane dividerPositions="0.6606397774687065" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <items>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                              <TreeTableView fx:id="trtblvwCurrentDataEntities" BorderPane.alignment="CENTER_LEFT">
+                                 <columnResizePolicy>
+                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                                 <columns>
+                                    <TreeTableColumn fx:id="clmCurrentDataEntity" editable="false" minWidth="80.0" text="%entity" />
+                                    <TreeTableColumn fx:id="clmCurrentDataState" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" text="%state" />
+                                 </columns>
+                              </TreeTableView>
+                           </center>
+                           <top>
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label text="%current.data" />
+                                 </children>
+                              </HBox>
+                           </top>
+                        </BorderPane>
+                        <BorderPane fx:id="brdpnCurrentDataSelectedEntityProperties">
+                           <padding>
+                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+                           </padding>
+                           <top>
+                              <HBox alignment="CENTER_LEFT" prefHeight="35.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label fx:id="lblCurrentDataSelectedEntityName" />
+                                 </children>
+                              </HBox>
+                           </top>
+                        </BorderPane>
+                    </items>
+                  </SplitPane>
+              </items>
+            </SplitPane>
+         </center>
+         <bottom>
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="120.0" text="%cancel">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnOk" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
+               </children>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </center>
+</BorderPane>

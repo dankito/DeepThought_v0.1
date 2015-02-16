@@ -1,0 +1,453 @@
+package net.deepthought.controls.tag;
+
+import net.deepthought.Application;
+import net.deepthought.controls.event.EntryTagsEditedEvent;
+import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
+
+import org.controlsfx.control.textfield.TextFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+
+/**
+ * Created by ganymed on 01/02/15.
+ */
+public class EntryTagsControl extends TitledPane {
+
+  private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
+
+
+  protected Entry entry = null;
+
+  protected DeepThought deepThought = null;
+
+  protected Set<Tag> editedTags = new HashSet<>();
+  protected Set<Tag> addedTags = new HashSet<>();
+  protected Set<Tag> removedTags = new HashSet<>();
+
+  protected ObservableList<Tag> listViewAllTagsItems = null;
+  protected FilteredList<Tag> filteredTags = null;
+  protected SortedList<Tag> sortedFilteredTags = null;
+
+  protected List<TagListCell> tagListCells = new ArrayList<>();
+
+  protected EventHandler<EntryTagsEditedEvent> tagAddedEventHandler = null;
+  protected EventHandler<EntryTagsEditedEvent> tagRemovedEventHandler = null;
+
+
+  @FXML
+  protected Pane pnGraphicsPane;
+  @FXML
+  protected FlowPane pnSelectedTagsPreview;
+
+  @FXML
+  protected Pane pnContent;
+  @FXML
+  protected Pane pnFilterTags;
+  @FXML
+  protected TextField txtfldFilterTags;
+  @FXML
+  protected Button btnCreateTag;
+  @FXML
+  protected ListView<Tag> lstvwAllTags;
+
+
+  public EntryTagsControl() {
+    this(null);
+  }
+
+  public EntryTagsControl(Entry entry) {
+    this.entry = entry;
+    if(entry != null) {
+      editedTags = new TreeSet<>(entry.getTags());
+      entry.addEntityListener(entryListener);
+    }
+
+    setDisable(entry == null);
+    deepThought = Application.getDeepThought();
+
+    Application.addApplicationListener(new ApplicationListener() {
+      @Override
+      public void deepThoughtChanged(DeepThought deepThought) {
+        EntryTagsControl.this.deepThoughtChanged(deepThought);
+      }
+
+      @Override
+      public void errorOccurred(DeepThoughtError error) {
+
+      }
+    });
+
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryTagsControl.fxml"));
+    fxmlLoader.setRoot(this);
+    fxmlLoader.setController(this);
+    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+
+    try {
+      fxmlLoader.load();
+      setupControl();
+
+      if(deepThought != null)
+        deepThought.addEntityListener(deepThoughtListener);
+    } catch (IOException ex) {
+      log.error("Could not load EntryTagsControl", ex);
+    }
+  }
+
+  protected void deepThoughtChanged(DeepThought newDeepThought) {
+    if(this.deepThought != null)
+      this.deepThought.removeEntityListener(deepThoughtListener);
+
+    this.deepThought = newDeepThought;
+
+    listViewAllTagsItems.clear();
+
+    if(newDeepThought != null) {
+      newDeepThought.addEntityListener(deepThoughtListener);
+      listViewAllTagsItems.addAll(deepThought.getTags());
+    }
+  }
+
+  protected void setupControl() {
+    this.setExpanded(false);
+
+    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
+
+    // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)
+    pnFilterTags.getChildren().remove(txtfldFilterTags);
+    txtfldFilterTags = TextFields.createClearableTextField();
+    pnFilterTags.getChildren().add(0, txtfldFilterTags);
+    HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
+    txtfldFilterTags.setPromptText("Find tags to add");
+
+    lstvwAllTags.setCellFactory(listView -> {
+      TagListCell cell = new TagListCell(entry, this);
+      tagListCells.add(cell);
+      return cell;
+    });
+
+    listViewAllTagsItems = lstvwAllTags.getItems();
+    if(deepThought != null)
+      listViewAllTagsItems.addAll(deepThought.getTags());
+    filteredTags = new FilteredList<>(listViewAllTagsItems, tag -> true);
+    sortedFilteredTags = new SortedList<>(filteredTags, tagComparator);
+    lstvwAllTags.setItems(sortedFilteredTags);
+
+    txtfldFilterTags.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        setControlsForEnteredTagsFilter(newValue);
+      }
+    });
+    txtfldFilterTags.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        if (checkIfTagOfThatNameExists(txtfldFilterTags.getText()) == false)
+          addNewTagToEntry();
+      }
+    });
+
+    showEntryTags(entry);
+
+//    this.sceneProperty().addListener(new ChangeListener<Scene>() {
+//      @Override
+//      public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
+//        newValue.getWindow().widthProperty().addListener(new ChangeListener<Number>() {
+//          @Override
+//          public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//            pnGraphicsPane.setPrefWidth(newValue.doubleValue() - 50);
+//          }
+//        });
+//      }
+//    });
+  }
+
+  protected void showEntryTags(Entry entry) {
+    pnSelectedTagsPreview.getChildren().clear();
+
+    if(entry != null) {
+//      for(final Tag tag : entry.getTagsSorted()) {
+      for(final Tag tag : editedTags) {
+        pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> {
+          removeTagFromEntry(tag);
+          for(TagListCell cell : tagListCells) {
+            if(tag.equals(cell.tag)) {
+              cell.setComboBoxToUnselected();
+              break;
+            }
+          }
+        }));
+      }
+    }
+  }
+
+
+  protected void setControlsForEnteredTagsFilter(String newValue) {
+    filterTags(newValue);
+    btnCreateTag.setDisable(checkIfTagOfThatNameExists(newValue));
+  }
+
+  protected boolean checkIfTagOfThatNameExists(String tagName) {
+    if(tagName == null || tagName.isEmpty())
+      return true;
+
+    if(checkIfSystemTagOfThatNameExists(tagName))
+      return true;
+
+    for(Tag tag : Application.getDeepThought().getTags()) {
+      if(tagName.equals(tag.getName()))
+        return true;
+    }
+
+    return false;
+  }
+
+  protected boolean checkIfSystemTagOfThatNameExists(String tagName) {
+    return Localization.getLocalizedStringForResourceKey("system.tag.all").equals(tagName) ||
+        Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags").equals(tagName);
+  }
+
+  protected void addTagToEntry(Tag tag) {
+    if(removedTags.contains(tag)) {
+      removedTags.remove(tag);
+    }
+    else {
+      addedTags.add(tag);
+    }
+
+    editedTags.add(tag);
+
+    showEntryTags(entry);
+    fireTagAddedEvent(entry, tag);
+
+  }
+
+  protected void removeTagFromEntry(Tag tag) {
+    if(addedTags.contains(tag)) {
+      addedTags.remove(tag);
+    }
+    else {
+      removedTags.add(tag);
+    }
+
+    editedTags.remove(tag);
+
+    showEntryTags(entry);
+    fireTagRemovedEvent(entry, tag);
+  }
+
+  protected void filterTags(String filterConstraint) {
+    filteredTags.setPredicate((tag) -> {
+      // If filter text is empty, display all Tags.
+      if (filterConstraint == null || filterConstraint.isEmpty()) {
+        return true;
+      }
+
+      String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
+
+      if (tag.getName().toLowerCase().contains(lowerCaseFilterConstraint)) {
+        return true; // Filter matches Tag's name
+      }
+      return false; // Does not match.
+    });
+  }
+
+  protected void addNewTagToEntry() {
+    String newTagName = txtfldFilterTags.getText();
+    Tag newTag = new Tag(newTagName);
+    Application.getDeepThought().addTag(newTag);
+
+    //entry.addTag(newTag);
+    addTagToEntry(newTag);
+
+    btnCreateTag.setDisable(true);
+  }
+
+  protected Comparator<Tag> tagComparator = new Comparator<Tag>() {
+    @Override
+    public int compare(Tag tag1, Tag tag2) {
+      if(tag1 == null || tag2 == null) {
+//        log.debug("This should actually never be the case, both tag's name are null");
+        return 0;
+      }
+      if(tag1 == null || tag1.getName() == null) {
+//        log.debug("tag1 {} or its name is null", tag1);
+        return -1;
+      }
+      if(tag2 == null || tag2.getName() == null) {
+//        log.debug("tag2 {} or its name is null", tag2);
+        return 1;
+      }
+
+      return tag1.getName().compareTo(tag2.getName());
+    }
+  };
+
+
+  public void setEntry(Entry entry) {
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    this.entry = entry;
+
+    editedTags.clear();
+    addedTags.clear();
+    removedTags.clear();
+
+    if(this.entry != null) {
+      editedTags = new TreeSet<>(entry.getTags());
+      this.entry.addEntityListener(entryListener);
+    }
+
+    setDisable(entry == null);
+    txtfldFilterTags.clear();
+    showEntryTags(entry);
+
+    for(TagListCell cell : tagListCells)
+      cell.setEntry(this.entry);
+  }
+
+
+  @FXML
+  public void handleButtonCreateTagAction(ActionEvent event) {
+    addNewTagToEntry();
+  }
+
+
+  protected EntityListener entryListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      if(addedEntity instanceof Tag)
+        editedTags.add((Tag) addedEntity);
+      showEntryTags(entry);
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      if(removedEntity instanceof Tag)
+        editedTags.remove((Tag)removedEntity);
+      showEntryTags(entry);
+    }
+  };
+
+  protected EntityListener deepThoughtListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      checkIfTagsHaveBeenUpdated(collectionHolder, addedEntity);
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+      checkIfTagsHaveBeenUpdated(collectionHolder, updatedEntity);
+
+//      if(updatedEntity instanceof Tag && entry != null && entry.getTags().contains((Tag)updatedEntity))
+      if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity))
+        showEntryTags(entry);
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      checkIfTagsHaveBeenUpdated(collectionHolder, removedEntity);
+    }
+  };
+
+  protected void checkIfTagsHaveBeenUpdated(BaseEntity collectionHolder, BaseEntity entity) {
+    if(collectionHolder instanceof DeepThought && entity instanceof Tag) {
+      DeepThought deepThought = (DeepThought)collectionHolder;
+      resetListViewAllTagsItems(deepThought);
+    }
+  }
+
+  protected void resetListViewAllTagsItems(DeepThought deepThought) {
+    listViewAllTagsItems.clear();
+    listViewAllTagsItems.addAll(deepThought.getTags());
+  }
+
+
+  protected void fireTagAddedEvent(Entry entry, Tag tag) {
+    if(tagAddedEventHandler != null)
+      tagAddedEventHandler.handle(new EntryTagsEditedEvent(this, entry, tag));
+  }
+
+  protected void fireTagRemovedEvent(Entry entry, Tag tag) {
+    if(tagRemovedEventHandler != null)
+      tagRemovedEventHandler.handle(new EntryTagsEditedEvent(this, entry, tag));
+  }
+
+  public EventHandler<EntryTagsEditedEvent> getTagAddedEventHandler() {
+    return tagAddedEventHandler;
+  }
+
+  public void setTagAddedEventHandler(EventHandler<EntryTagsEditedEvent> tagAddedEventHandler) {
+    this.tagAddedEventHandler = tagAddedEventHandler;
+  }
+
+  public EventHandler<EntryTagsEditedEvent> getTagRemovedEventHandler() {
+    return tagRemovedEventHandler;
+  }
+
+
+  public void setTagRemovedEventHandler(EventHandler<EntryTagsEditedEvent> tagRemovedEventHandler) {
+    this.tagRemovedEventHandler = tagRemovedEventHandler;
+  }
+
+  public Set<Tag> getAddedTags() {
+    return addedTags;
+  }
+
+  public Set<Tag> getRemovedTags() {
+    return removedTags;
+  }
+
+  public Set<Tag> getEditedTags() {
+    return editedTags;
+  }
+}

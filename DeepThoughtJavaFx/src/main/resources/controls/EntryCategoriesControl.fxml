@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+<fx:root maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <graphic>
+      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefWidth="600.0">
+         <children>
+            <Label text="%categories">
+               <HBox.margin>
+                  <Insets right="12.0" />
+               </HBox.margin>
+            </Label>
+            <FlowPane fx:id="pnSelectedCategoriesPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" vgap="6.0" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </graphic>
+   <content>
+      <VBox fx:id="pnContent" maxWidth="1.7976931348623157E308" prefHeight="230.0">
+         <children>
+            <HBox fx:id="pnFilterCategories" alignment="CENTER_LEFT" prefHeight="40.0">
+               <children>
+                  <CustomTextField fx:id="txtfldFilterCategories" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnCreateCategory" mnemonicParsing="false" onAction="#handleButtonCreateCategoryAction" text="%new...">
+                     <HBox.margin>
+                        <Insets left="6.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <TreeView fx:id="trvwCategories" minHeight="150.0" showRoot="false" />
+         </children>
+      </VBox>
+   </content>
+</fx:root>

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="592.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+   <right>
+      <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
+         <content>
+            <WebView fx:id="wbvwContextHelp" fontScale="0.85" prefHeight="200.0" prefWidth="200.0" />
+         </content>
+      </ScrollPane>
+   </right>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <bottom>
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button alignment="CENTER" cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="120.0" text="%cancel">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnApplyChanges" alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="6.0" />
+               </BorderPane.margin>
+            </HBox>
+         </bottom>
+         <center>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="546.0" prefViewportWidth="948.0" BorderPane.alignment="CENTER">
+               <content>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <center>
+                        <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
+                           <children>
+                              <HBox fx:id="paneFirstLine" alignment="CENTER_RIGHT">
+                                 <children>
+                                    <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                          <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                          </TextField>
+                                          <Rectangle arcHeight="5.0" arcWidth="5.0" height="34.0" stroke="BLACK" strokeType="INSIDE" width="3.0">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Rectangle>
+                                       </children>
+                                    </HBox>
+                                    <HBox fx:id="paneViewConfig" alignment="CENTER_RIGHT" prefHeight="40.0">
+                                       <children>
+                                          <Hyperlink fx:id="hyplnkSelectEntryTemplate" onAction="#handleHyperLinkSelectEntryTemplateAction" prefHeight="40.0" text="Template">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Hyperlink>
+                                          <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
+                                             <HBox.margin>
+                                                <Insets left="6.0" right="6.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Button>
+                                          <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </ToggleButton>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <TextField fx:id="txtfldSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TitledPane fx:id="ttldpnAbstract" animated="false" expanded="false" prefHeight="250.0" text="%abstract">
+                                 <content>
+                                    <TextArea fx:id="txtarAbstract" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <TitledPane fx:id="ttldpnContent" animated="false" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <TextArea fx:id="txtarContent" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                           </children>
+                        </VBox>
+                     </center>
+                     <bottom>
+                        <VBox BorderPane.alignment="CENTER">
+                           <children>
+                              <TitledPane fx:id="ttldpnFiles" contentDisplay="GRAPHIC_ONLY" expanded="false" prefHeight="250.0">
+                                 <graphic>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="%files" />
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
+                                             <HBox.margin>
+                                                <Insets left="6.0" right="6.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </graphic>
+                                 <content>
+                                    <VBox>
+                                       <children>
+                                          <TreeTableView fx:id="trtblvwFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
+                                            <columns>
+                                              <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
+                                            </columns>
+                                             <columnResizePolicy>
+                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TreeTableView>
+                                       </children>
+                                    </VBox>
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets top="12.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                           </children>
+                        </VBox>
+                     </bottom>
+                  </BorderPane>
+               </content>
+            </ScrollPane>
+         </center>
+      </BorderPane>
+   </center>
+</BorderPane>

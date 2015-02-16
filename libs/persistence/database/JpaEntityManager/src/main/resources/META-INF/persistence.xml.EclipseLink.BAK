@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<persistence xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="1.0" xmlns="http://java.sun.com/xml/ns/persistence">
+
+    <persistence-unit name="deep_thought" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!--<provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>-->
+
+        <class>net.deepthought.data.model.DeepThoughtApplication</class>
+        <class>net.deepthought.data.model.AppSettings</class>
+        <class>net.deepthought.data.model.User</class>
+        <class>net.deepthought.data.model.Device</class>
+        <class>net.deepthought.data.model.Group</class>
+
+        <class>net.deepthought.data.model.DeepThought</class>
+        <class>net.deepthought.data.model.DeepThoughtFavoriteEntryTemplateRelation</class>
+        <class>net.deepthought.data.model.Category</class>
+        <class>net.deepthought.data.model.Entry</class>
+        <class>net.deepthought.data.model.Entry</class>
+        <class>net.deepthought.data.model.EntriesLinkGroup</class>
+        <!--<class>EntryTemplate</class>-->
+        <class>net.deepthought.data.model.Tag</class>
+        <class>net.deepthought.data.model.Keyword</class>
+        <class>net.deepthought.data.model.Person</class>
+
+        <class>net.deepthought.data.model.FileLink</class>
+        <class>net.deepthought.data.model.Note</class>
+        <class>net.deepthought.data.model.Book</class>
+        <class>net.deepthought.data.model.SeriesTitle</class>
+        <class>net.deepthought.data.model.Periodical</class>
+        <class>net.deepthought.data.model.Publisher</class>
+
+        <properties>
+
+            <property name="javax.persistence.jdbc.driver" value="org.sqlite.JDBC" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:sqlite:data/DeepThoughtDb_SQLite.db" />
+            <property name="eclipselink.target-database" value="net.deepthought.persistence.toplink.SQLiteDatabasePlatform" />
+
+            <!--<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />-->
+            <!--<property name="javax.persistence.jdbc.url"-->
+                      <!--value="jdbc:derby:data/DeepThoughtDb_Derby;create=true" />-->
+
+            <!--<property name="toplink.jdbc.url" value="jdbc:sqlite:data/DeepThoughtDb_SQLite.db"/>-->
+            <!--<property name="toplink.jdbc.driver" value="org.sqlite.JDBC"/>-->
+            <!--<property name="toplink.target-database" value="net.deepthought.persistence.toplink.SQLiteDatabasePlatform" />-->
+
+            <!--<property name="javax.persistence.jdbc.user" value="Silias" />-->
+            <!--<property name="javax.persistence.jdbc.password" value="BastiRocktGewaltig" />-->
+
+            <!--<property name="toplink.ddl-generation" value="create-tables"/>-->
+            <property name="eclipselink.ddl-generation" value="create-or-extend-tables" />
+            <property name="eclipselink.ddl-generation.output-mode" value="database" />
+
+            <!--<property name="eclipselink.weaving.internal" value="true" />-->
+            <property name="eclipselink.weaving" value="static"/>
+
+            <!--<property name="eclipselink.logging.file" value="/tmp/output.log"/>-->
+            <!--<property name="eclipselink.logging.logger" value="JavaLogger"/>-->
+            <!--<property name="eclipselink.logging.level" value="SEVERE"/>-->
+            <property name="eclipselink.logging.level" value="ALL" />
+
+            <!--<property name="show_sql" value="true" />-->
+            <!--<property name="format_sql" value="true" />-->
+
+            <!-- TODO -->
+            <!--<property name="hibernate.ejb.event.post-load" value="net.deepthought.event.LoadEventListener" />-->
+            <!--<property name="toplink.session-event-listener" value="net.deepthought.persistence.toplink.ToplinkEventListener"/>-->
+            <!--<property name="toplink.exception-handler-class" value="net.deepthought.persistence.toplink.ToplinkExceptionHandler"/>-->
+
+            <!--<property name="eventListeners">-->
+            <!--<map>-->
+                <!--<entry key="post-update">-->
+                <!--<bean class="com.zhengqiucai.UpdateItemListener" />-->
+            <!--</entry>-->
+        <!--</map>-->
+            <!--</property>-->
+        </properties>
+
+    </persistence-unit>
+
+</persistence>

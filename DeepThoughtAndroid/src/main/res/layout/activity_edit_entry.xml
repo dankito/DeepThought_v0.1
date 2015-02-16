@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/txtvwEditEntryTitleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edit_entry_title_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="4dp"
+        android:textSize="@dimen/edit_entry_labels_text_size"
+        android:text="@string/edit_entry_title_label"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEditEntryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edit_entry_title_height"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/txtvwEditEntryTitleLabel"
+        android:textSize="@dimen/edit_entry_edit_texts_text_size"
+        />
+
+    <RelativeLayout
+        android:id="@+id/rlydTags"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtvwEditEntryTitleLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true">
+
+        <TextView
+            android:id="@+id/txtvwEditEntryTagsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/edit_entry_tags_height"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="4dp"
+            android:textSize="@dimen/edit_entry_labels_text_size"
+            android:text="@string/edit_entry_tags_label"
+            />
+
+        <TextView
+            android:id="@+id/txtvwEditEntryTags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/txtvwEditEntryTagsLabel"
+            android:layout_marginRight="4dp"
+            android:textSize="@dimen/edit_entry_labels_text_size"
+            android:ellipsize="none"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rlydEditEntryEditTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/txtvwEditEntryTagsLabel"
+            android:visibility="visible"
+            >
+
+            <!--<LinearLayout-->
+                <!--android:id="@+id/llydEditEntryTags"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"-->
+                <!--/>-->
+
+            <EditText
+                android:id="@+id/edtxtEditEntrySearchTag"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/edit_entry_search_tags_height"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/btnEditEntryNewTag"
+                android:layout_marginRight="6dp"
+                android:textSize="@dimen/edit_entry_edit_texts_text_size"
+                />
+
+            <Button
+                android:id="@+id/btnEditEntryNewTag"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/edit_entry_search_tags_height"
+                android:minWidth="70dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:text="@string/edit_entry_button_new_tag_text"
+                />
+
+            <ListView
+                android:id="@+id/lstvwEditEntryTags"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_entry_list_view_tags_height"
+                android:minHeight="@dimen/edit_entry_list_view_tags_min_height"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/edtxtEditEntrySearchTag"
+                />
+
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txtvwEditEntryTextLabel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_entry_entry_label_height"
+        android:layout_below="@+id/rlydTags"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="6dp"
+        android:textSize="@dimen/edit_entry_labels_text_size"
+        android:text="@string/edit_entry_entry_label"
+        />
+
+    <EditText
+        android:id="@+id/edtxtEditEntryText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtvwEditEntryTextLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/btnEditEntryOk"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="start"
+        />
+
+    <Button
+        android:id="@+id/btnEditEntryOk"
+        android:text="@string/edit_entry_button_ok_text"
+        android:layout_width="@dimen/edit_entry_buttons_width"
+        android:layout_height="@dimen/edit_entry_buttons_height"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
+    <Button
+        android:id="@+id/btnEditEntryCancel"
+        android:text="@string/edit_entry_button_cancel_text"
+        android:layout_width="@dimen/edit_entry_buttons_width"
+        android:layout_height="@dimen/edit_entry_buttons_height"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/btnEditEntryOk"
+        android:layout_toLeftOf="@+id/btnEditEntryOk"
+        />
+
+</RelativeLayout>

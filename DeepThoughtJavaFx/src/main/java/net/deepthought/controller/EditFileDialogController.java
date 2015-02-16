@@ -1,0 +1,397 @@
+package net.deepthought.controller;
+
+import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controller.enums.FileLinkOptions;
+import net.deepthought.data.model.FileLink;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.FileNameSuggestion;
+import net.deepthought.util.FileUtils;
+import net.deepthought.util.Localization;
+import net.deepthought.util.enums.ExistingFileHandling;
+import net.deepthought.util.listener.FileOperationListener;
+
+import org.controlsfx.control.action.Action;
+import org.controlsfx.dialog.Dialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+
+/**
+ * Created by ganymed on 31/12/14.
+ */
+public class EditFileDialogController extends ChildWindowsController implements Initializable {
+
+  private final static Logger log = LoggerFactory.getLogger(EditFileDialogController.class);
+
+
+  protected FileLink file;
+
+  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
+
+  protected String previousUriString = null;
+
+
+  @FXML
+  protected Button btnApply;
+
+  @FXML
+  protected RadioButton rdbtnFileOrUrl;
+  @FXML
+  protected Pane pnFileSettings;
+  @FXML
+  protected TextField txtfldFileLocation;
+  @FXML
+  protected ComboBox<FileLinkOptions> cmbxLocalFileLinkOptions;
+
+  @FXML
+  protected RadioButton rdbtnFolder;
+  @FXML
+  protected Pane pnFolderSettings;
+  @FXML
+  protected TextField txtfldFolderLocation;
+
+  @FXML
+  protected TextField txtfldFileName;
+
+  @FXML
+  protected TextArea txtarNotes;
+
+
+  @Override
+  public void initialize(URL location, ResourceBundle resources) {
+    btnApply.managedProperty().bind(btnApply.visibleProperty());
+
+    setupFields();
+
+    cmbxLocalFileLinkOptions.setItems(FXCollections.observableArrayList(FileLinkOptions.values()));
+    cmbxLocalFileLinkOptions.getSelectionModel().select(FileLinkOptions.Link);
+
+    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
+      @Override
+      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
+        btnApply.setDisable(fieldsWithUnsavedChanges.size() == 0);
+      }
+    });
+  }
+
+  protected void setupFields() {
+    rdbtnFileOrUrl.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileIsFolder);
+      pnFileSettings.setDisable(false);
+      pnFolderSettings.setDisable(true);
+      updateWindowTitle();
+    });
+
+    txtfldFileLocation.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileFileLocation);
+      updateWindowTitle();
+      updateFileName(txtfldFileLocation.getText());
+      try {
+        String scheme = new URI(txtfldFileLocation.getText()).getScheme();
+        cmbxLocalFileLinkOptions.setDisable(scheme != null && "file".equals(scheme) == false);
+      } catch(Exception ex) { }
+    });
+
+    rdbtnFolder.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileIsFolder);
+      pnFileSettings.setDisable(true);
+      pnFolderSettings.setDisable(false);
+      updateWindowTitle();
+    });
+
+    txtfldFolderLocation.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileFolderLocation);
+      updateWindowTitle();
+      updateFileName(txtfldFolderLocation.getText());
+    });
+
+    txtfldFileName.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileName);
+      updateWindowTitle();
+    });
+
+    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
+  }
+
+  protected void updateFileName(String uriString) {
+    if(uriString == null)
+      return;
+
+    try {
+        if(previousUriString == null || previousUriString.endsWith(txtfldFileName.getText())) {
+          java.io.File file = new java.io.File(uriString);
+          txtfldFileName.setText(file.getName());
+        }
+        else if(previousUriString != null && previousUriString.endsWith("/") &&
+            (txtfldFileName.getText() == null || txtfldFileName.getText().isEmpty() || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
+          java.io.File file = new java.io.File(uriString);
+          txtfldFileName.setText(file.getName());
+        }
+    } catch(Exception ex) {
+      log.debug("Could not extract file's name from uriString " + uriString, ex);
+    }
+
+    previousUriString = uriString;
+  }
+
+  public void setEditFile(Stage dialogStage, FileLink file) {
+    setWindowStage(dialogStage);
+    this.file = file;
+
+    updateWindowTitle();
+    btnApply.setVisible(file.getId() != null);
+
+    fileToEditSet(file);
+    fieldsWithUnsavedChanges.clear();
+  }
+
+  protected void fileToEditSet(FileLink file) {
+    if(file.isFolder() == false) {
+      rdbtnFileOrUrl.setSelected(true);
+      txtfldFileLocation.setText(file.getUriString());
+      txtfldFileLocation.selectAll();
+      txtfldFileLocation.requestFocus();
+    }
+    else {
+      rdbtnFolder.setSelected(true);
+      txtfldFolderLocation.setText(file.getUriString());
+      txtfldFolderLocation.selectAll();
+      txtfldFolderLocation.requestFocus();
+    }
+
+    txtarNotes.setText(file.getNotes());
+  }
+
+  public boolean hasUnsavedChanges() {
+    return fieldsWithUnsavedChanges.size() > 0;
+  }
+
+  protected void updateWindowTitle() {
+    if(file.getId() == null)
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("add.file", file.getTextRepresentation()));
+    else
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.file", file.getTextRepresentation()));
+  }
+
+
+  @FXML
+  public void handleButtonSelectFileAction(ActionEvent event) {
+    FileChooser fileChooser = new FileChooser();
+
+    if(txtfldFileLocation.getText() != null) {
+      try {
+        java.io.File currentFile = new java.io.File(txtfldFileLocation.getText());
+        if(currentFile.exists())
+          fileChooser.setInitialFileName(currentFile.getName());
+        if(currentFile.getParentFile().exists())
+          fileChooser.setInitialDirectory(currentFile.getParentFile());
+      } catch (Exception ex) {
+        log.debug("Could not extract file name and directory from " + txtfldFileLocation.getText(), ex);
+      }
+    }
+
+    java.io.File selectedFile = fileChooser.showOpenDialog(windowStage);
+    if(selectedFile != null) {
+      txtfldFileLocation.setText(selectedFile.getAbsolutePath());
+      txtfldFileLocation.positionCaret(txtfldFileLocation.getText().length());
+      txtfldFileLocation.requestFocus();
+    }
+  }
+
+  @FXML
+  public void handleButtonSelectFolderAction(ActionEvent event) {
+    DirectoryChooser directoryChooser = new DirectoryChooser();
+
+    if(txtfldFolderLocation.getText() != null) {
+      try {
+        java.io.File currentFolder = new java.io.File(txtfldFolderLocation.getText());
+        if(currentFolder.exists())
+          directoryChooser.setInitialDirectory(currentFolder);
+      } catch (Exception ex) {
+        log.debug("Could not extract current directory from " + txtfldFolderLocation.getText(), ex);
+      }
+    }
+
+    java.io.File selectedFolder = directoryChooser.showDialog(windowStage);
+    if(selectedFolder != null) {
+      txtfldFolderLocation.setText(selectedFolder.getAbsolutePath());
+      txtfldFolderLocation.positionCaret(txtfldFolderLocation.getText().length());
+      txtfldFolderLocation.requestFocus();
+    }
+  }
+
+  @FXML
+  public void handleButtonApplyAction(ActionEvent actionEvent) {
+    saveEditedFields();
+  }
+
+  @FXML
+  public void handleButtonCancelAction(ActionEvent actionEvent) {
+    setDialogResult(DialogResult.Cancel);
+    closeDialog();
+  }
+
+  @FXML
+  public void handleButtonOkAction(ActionEvent actionEvent) {
+    setDialogResult(DialogResult.Ok);
+    saveEditedFields();
+    closeDialog();
+  }
+
+  @Override
+  protected void closeDialog() {
+//    if(person != null)
+//      person.removePersonListener(personListener);
+
+    super.closeDialog();
+  }
+
+  protected void saveEditedFields() {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileIsFolder)) {
+      file.setIsFolder(rdbtnFolder.isSelected());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileIsFolder);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileFileLocation)) {
+      if(rdbtnFileOrUrl.isSelected())
+        file.setUriString(txtfldFileLocation.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileFileLocation);
+
+      if(cmbxLocalFileLinkOptions.isDisabled() == false) {
+        FileLinkOptions fileLinkOption = cmbxLocalFileLinkOptions.getSelectionModel().getSelectedItem();
+        if(fileLinkOption == FileLinkOptions.CopyToDataFolder)
+          copyFileToDataFolder();
+        else if(fileLinkOption == FileLinkOptions.MoveToDataFolder)
+          moveFileToDataFolder();
+      }
+    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileFolderLocation)) {
+      if(rdbtnFolder.isSelected())
+        file.setUriString(txtfldFolderLocation.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileFolderLocation);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileName)) {
+      file.setName(txtfldFileName.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileName);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileNotes)) {
+      file.setNotes(txtarNotes.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileNotes);
+    }
+  }
+
+  protected void copyFileToDataFolder() {
+    FileUtils.copyFileToDataFolder(file, new FileOperationListener() {
+      @Override
+      public ExistingFileHandling destinationFileAlreadyExists(File existingFile, File newFile, FileNameSuggestion suggestion) {
+        // TODO: ask user what to do
+        return ExistingFileHandling.RenameNewFile;
+      }
+
+      @Override
+      public void errorOccurred(final DeepThoughtError error) {
+        Platform.runLater(new Runnable() {
+          @Override
+          public void run() {
+            org.controlsfx.dialog.Dialogs.create()
+                                         .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
+                                         .message(error.getErrorMessage())
+                                         .showError();
+          }
+        });
+      }
+
+      @Override
+      public void fileOperationDone(boolean successful, File destinationFile) {
+
+      }
+    });
+  }
+
+  protected void moveFileToDataFolder() {
+    FileUtils.moveFileToDataFolder(file, new FileOperationListener() {
+      @Override
+      public ExistingFileHandling destinationFileAlreadyExists(File existingFile, File newFile, FileNameSuggestion suggestion) {
+        // TODO: ask user what to do
+        return ExistingFileHandling.RenameNewFile;
+      }
+
+      @Override
+      public void errorOccurred(final DeepThoughtError error) {
+        Platform.runLater(new Runnable() {
+          @Override
+          public void run() {
+            org.controlsfx.dialog.Dialogs.create()
+                .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
+                .message(error.getErrorMessage())
+                .showError();
+          }
+        });
+      }
+
+      @Override
+      public void fileOperationDone(boolean successful, File destinationFile) {
+
+      }
+    });
+  }
+
+  @Override
+  public void setWindowStage(Stage windowStage) {
+    super.setWindowStage(windowStage);
+
+    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+      @Override
+      public void handle(WindowEvent event) {
+        askIfStageShouldBeClosed(event);
+      }
+    });
+  }
+
+  protected void askIfStageShouldBeClosed(WindowEvent event) {
+    if(hasUnsavedChanges()) {
+      Action response = org.controlsfx.dialog.Dialogs.create()
+          .owner(windowStage)
+          .title("File contains unsaved changes")
+          .message("File contains unsaved changes. Do you like to save changes now?")
+          .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
+          .showConfirm();
+
+      if(response.equals(Dialog.ACTION_CANCEL))
+        event.consume(); // consume event so that stage doesn't get closed
+      else if(response.equals(Dialog.ACTION_YES)) {
+        saveEditedFields();
+        closeDialog();
+      }
+      else
+        closeDialog();
+    }
+  }
+
+}
