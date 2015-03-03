@@ -17,11 +17,12 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -48,13 +49,14 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -63,9 +65,13 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -104,16 +110,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected Pane paneViewConfig;
   @FXML
-  protected Hyperlink hyplnkSelectEntryTemplate;
-  @FXML
   protected Button btnChooseFieldsToShow;
   @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
-
-  @FXML
-  protected Pane paneSubTitle;
-  @FXML
-  protected TextField txtfldSubTitle;
 
   @FXML
   protected TitledPane ttldpnAbstract;
@@ -127,15 +126,24 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected HTMLEditor htmledContent;
 
+//  @FXML
+//  protected BorderPane paneTagsAndCategories;
+//  @FXML
+//  protected SplitPane paneTagsAndCategories;
+  @FXML
+  protected HBox paneTagsAndCategories;
+//  @FXML
+//  protected FlowPane paneTagsAndCategories;
+
+  protected EntryTagsControl entryTagsControl = null;
+
+  protected EntryCategoriesControl entryCategoriesControl = null;
+
   @FXML
   protected EntryReferenceControl entryReferenceControl;
 
 
   protected EntryPersonsControl entryPersonsControl = null;
-
-  protected EntryTagsControl entryTagsControl = null;
-
-  protected EntryCategoriesControl entryCategoriesControl = null;
 
   @FXML
   protected TitledPane ttldpnFiles;
@@ -161,6 +169,24 @@ public class EditEntryDialogController extends ChildWindowsController implements
       }
     });
 
+    Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
+      @Override
+      public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+        if(setting == Setting.UserDeviceShowCategories) {
+          entryCategoriesControl.setVisible((boolean) newValue);
+          if((boolean)newValue) {
+            paneTagsAndCategories.getChildren().add(entryCategoriesControl);
+//            contentPane.getChildren().add(entryCategoriesControl);
+          }
+          else
+            paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
+//            contentPane.getChildren().remove(entryCategoriesControl);
+        }
+        else if(setting == Setting.UserDeviceDialogFieldsDisplay)
+          dialogFieldsDisplayChanged((DialogsFieldsDisplay)newValue);
+      }
+    });
+
 //    Application.getDeepThought().addPersonsChangedListener(personsChangedListener);
     Application.getDeepThought().addEntityListener(deepThoughtListener);
     // TODO: what to do when DeepThought changes -> close dialog
@@ -169,14 +195,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected void setupControls() {
     ensureNodeOnlyUsesSpaceIfVisible(btnApplyChanges);
 
+    ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
+
     ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
       updateWindowTitle(newValue);
     });
-
-    ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
-    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntrySubTitle));
 
     ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
@@ -186,7 +211,28 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    VBox.setMargin(entryReferenceControl, new Insets(6, 0, 6, 0));
     contentPane.getChildren().add(entryReferenceControl);
+
+    entryTagsControl = new EntryTagsControl(entry);
+    entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setPrefWidth(250);
+    ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
+    entryTagsControl.setExpanded(true);
+//    contentPane.getChildren().add(entryTagsControl);
+    HBox.setHgrow(entryTagsControl, Priority.ALWAYS);
+    paneTagsAndCategories.getChildren().add(entryTagsControl);
+
+    entryCategoriesControl = new EntryCategoriesControl(entry);
+    entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
+    entryCategoriesControl.setVisible(Application.getSettings().showCategories());
+    entryCategoriesControl.setExpanded(true);
+//    contentPane.getChildren().addAll(entryCategoriesControl);
+    HBox.setHgrow(entryCategoriesControl, Priority.ALWAYS);
+    paneTagsAndCategories.getChildren().add(entryCategoriesControl);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setPrefHeight(250);
@@ -198,21 +244,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
 
-    entryTagsControl = new EntryTagsControl(entry);
-    entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
-    entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
-    entryTagsControl.setPrefHeight(250);
-    ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
-    contentPane.getChildren().add(entryTagsControl);
-    entryTagsControl.setExpanded(true);
-
-    entryCategoriesControl = new EntryCategoriesControl(entry);
-    entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
-    entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
-    entryCategoriesControl.setPrefHeight(250);
-    ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
-    contentPane.getChildren().addAll(entryCategoriesControl);
-
     ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
       @Override
@@ -223,6 +254,15 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
     paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
+    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+  }
+
+  protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+
+    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
   protected void referenceControlFieldChanged(FieldChangedEvent event) {
@@ -242,38 +282,23 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     txtfldTitle.setText(entry.getTitle());
 
-    txtfldSubTitle.setText(entry.getSubTitle());
-
-//
-//    if(template.showPersons())
-//      updatePersonsSetOnEntityPreview();
 
     txtarAbstract.setText(entry.getAbstract());
 
     txtarContent.setText(entry.getContent());
     // TODO: check which Content format Content has
 
+    entryTagsControl.setExpanded(entry.hasTags() == false);
+    entryCategoriesControl.setExpanded(entryTagsControl.isExpanded());
+
+    ttldpnFiles.setExpanded(entry.hasFiles());
     trtblvwFiles.setRoot(new FileRootTreeItem(entry));
+
+    entryReferenceControl.setVisible(true);
 
     fieldsWithUnsavedChanges.clear();
 
-    showFieldsAccordingToEntryTemplate(entry, entry.getTemplate());
-  }
-
-  protected void showFieldsAccordingToEntryTemplate(Entry entry, EntryTemplate template) {
-    hyplnkSelectEntryTemplate.setText(template.getName());
-
-    paneTitle.setVisible(entry.getTemplate().showTitle() || StringUtils.isNotNullOrEmpty(entry.getTitle()));
-    paneSubTitle.setVisible(entry.getTemplate().showSubTitle() || StringUtils.isNotNullOrEmpty(entry.getSubTitle()));
-    ttldpnAbstract.setVisible(entry.getTemplate().showAbstract() || StringUtils.isNotNullOrEmpty(entry.getAbstract()));
-    ttldpnContent.setVisible(entry.getTemplate().showContent() || StringUtils.isNotNullOrEmpty(entry.getContent()));
-
-    entryReferenceControl.setVisible(entry.getTemplate().showReference() || entry.getReference() != null || entry.getTemplate().showSeriesTitle() || entry.getSeries() != null);
-    entryPersonsControl.setVisible(entry.getTemplate().showPersons() || entry.hasPersons() == true);
-    entryTagsControl.setVisible(entry.getTemplate().showTags() || entry.hasTags() == true);
-    entryCategoriesControl.setVisible(entry.getTemplate().showPersons() || entry.hasCategories() == true);
-
-    ttldpnFiles.setVisible(entry.getTemplate().showFiles() || entry.hasFiles());
+    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
 
@@ -294,6 +319,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
+
+    if(entry.getId() == null) // a new entry
+      Application.getDeepThought().addEntry(entry);
+
     saveEditedFieldsOnEntry();
     closeDialog();
   }
@@ -307,18 +336,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void saveEditedFieldsOnEntry() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTemplate)) {
-      entry.setTemplate((EntryTemplate) hyplnkSelectEntryTemplate.getUserData());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTemplate);
-    }
-
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTitle)) {
       entry.setTitle(txtfldTitle.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTitle);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySubTitle)) {
-      entry.setSubTitle(txtfldSubTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySubTitle);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
@@ -344,19 +364,19 @@ public class EditEntryDialogController extends ChildWindowsController implements
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStart)) {
-      entry.setReferenceStart(entryReferenceControl.getReferenceStart());
+      entry.setIndicationStart(entryReferenceControl.getReferenceStart());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStart);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStartUnit)) {
-      entry.setReferenceStartUnit(entryReferenceControl.getReferenceStartUnit());
+      entry.setIndicationStartUnit(entryReferenceControl.getReferenceStartUnit());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStartUnit);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEnd)) {
-      entry.setReferenceEnd(entryReferenceControl.getReferenceEnd());
+      entry.setIndicationEnd(entryReferenceControl.getReferenceEnd());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEnd);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEndUnit)) {
-      entry.setReferenceEndUnit(entryReferenceControl.getReferenceEndUnit());
+      entry.setIndicationEndUnit(entryReferenceControl.getReferenceEndUnit());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEndUnit);
     }
 
@@ -425,35 +445,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
   @FXML
-  public void handleHyperLinkSelectEntryTemplateAction(ActionEvent event) {
-    ContextMenu otherEntryTemplatesMenu = new ContextMenu();
-
-    for(EntryTemplate template : Application.getDeepThought().getEntryTemplates()) {
-      if(template.equals(entry.getTemplate()) == false) {
-        final MenuItem templateMenuItem = new MenuItem(template.getName());
-        templateMenuItem.setUserData(template);
-        otherEntryTemplatesMenu.getItems().add(templateMenuItem);
-
-        templateMenuItem.setOnAction((menuEvent) -> {
-//          entry.setTemplate((EntryTemplate)templateMenuItem.getUserData());
-          fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTemplate);
-          hyplnkSelectEntryTemplate.setUserData(templateMenuItem.getUserData());
-          showFieldsAccordingToEntryTemplate(entry, (EntryTemplate) templateMenuItem.getUserData());
-        });
-      }
-    }
-
-    otherEntryTemplatesMenu.show(hyplnkSelectEntryTemplate, Side.BOTTOM, 0, 0);
-  }
-
-  @FXML
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
     if(paneTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
-    if(paneSubTitle.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
     if(ttldpnAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
     if(ttldpnContent.isVisible() == false)
@@ -568,8 +564,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected EntityListener entryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(propertyName.equals(TableConfig.EntryEntryTemplateJoinColumnName))
-        showFieldsAccordingToEntryTemplate((Entry) entity, ((Entry) entity).getTemplate());
+
     }
 
     @Override

@@ -35,10 +35,10 @@ public class EntryPersonListCell extends PersonListCell {
     if(entry != null) {
       entry.addEntityListener(entryListener);
       entry.addEntryPersonListener(entryPersonListener);
-      setDefaultPersonRole(entry.getTemplate().getDefaultPersonRole());
+//      setDefaultPersonRole(entry.getTemplate().getDefaultPersonRole());
     }
     else {
-      setDefaultPersonRole(null);
+//      setDefaultPersonRole(null);
     }
   }
 

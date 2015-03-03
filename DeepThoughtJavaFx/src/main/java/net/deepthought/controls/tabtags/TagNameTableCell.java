@@ -133,7 +133,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == tag.getEntries()) {
+      if(collectionHolder.equals(tag)) {
         if(Platform.isFxApplicationThread())
           tagUpdated();
         else {

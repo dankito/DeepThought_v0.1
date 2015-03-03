@@ -201,11 +201,16 @@ public abstract class PersonsControl extends TitledPane {
   protected void addPersonRolePreviewPane(PersonRole role) {
     HBox rolePreviewPane = new HBox();
     rolePreviewPane.setAlignment(Pos.CENTER_LEFT);
-    pnSelectedPersonsPreview.getChildren().add(rolePreviewPane);
+    if(role != PersonRole.getWithoutRolePersonRole())
+      pnSelectedPersonsPreview.getChildren().add(rolePreviewPane);
+    else
+      pnSelectedPersonsPreview.getChildren().add(0, rolePreviewPane);
 
-    Label roleLabel = new Label(role.getName());
-    HBox.setMargin(roleLabel, new Insets(0, 6, 0, 0));
-    rolePreviewPane.getChildren().add(roleLabel);
+    if(role != PersonRole.getWithoutRolePersonRole()) {
+      Label roleLabel = new Label(role.getName());
+      HBox.setMargin(roleLabel, new Insets(0, 6, 0, 0));
+      rolePreviewPane.getChildren().add(roleLabel);
+    }
 
     FlowPane roleFlowPane = new FlowPane(Orientation.HORIZONTAL);
     roleFlowPane.setRowValignment(VPos.CENTER);

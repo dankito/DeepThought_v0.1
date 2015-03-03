@@ -112,7 +112,7 @@
                 </Tab>
               </tabs>
             </TabPane>
-            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+            <SplitPane fx:id="splpnEntries" dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
               <items>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
@@ -145,28 +145,23 @@
                                           <Insets bottom="2.0" left="6.0" top="2.0" />
                                        </HBox.margin>
                                     </Button>
-                                    <SplitMenuButton fx:id="spltbtnAddEntry" mnemonicParsing="false" onAction="#handleButtonAddEntryAction" prefHeight="30.0" text="+" textFill="#117219">
-                                      <items>
-                                        <MenuItem mnemonicParsing="false" text="Action 1" />
-                                        <MenuItem mnemonicParsing="false" text="Action 2" />
-                                      </items>
-                                       <HBox.margin>
-                                          <Insets bottom="2.0" left="6.0" top="2.0" />
-                                       </HBox.margin>
+                                    <Button fx:id="AddEntry" mnemonicParsing="false" onAction="#handleButtonAddEntryAction" prefHeight="30.0" prefWidth="50.0" text="+" textFill="#117219">
                                        <font>
                                           <Font name="System Bold" size="18.0" />
                                        </font>
-                                    </SplitMenuButton>
+                                       <HBox.margin>
+                                          <Insets bottom="2.0" left="6.0" top="2.0" />
+                                       </HBox.margin>
+                                    </Button>
                                  </children>
                               </HBox>
                            </right>
                         </BorderPane>
                         <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                           <columns>
-                            <TableColumn fx:id="clmnId" prefWidth="37.0" text="%id" />
-                              <TableColumn fx:id="clmnEntryTemplate" prefWidth="92.0" text="%template" />
-                            <TableColumn fx:id="clmnEntryPreview" prefWidth="305.0" text="%preview" />
-                              <TableColumn fx:id="clmnTags" prefWidth="183.0" text="%tags" />
+                            <TableColumn fx:id="clmnId" prefWidth="46.0" text="%id" />
+                            <TableColumn fx:id="clmnEntryPreview" prefWidth="358.0" text="%preview" />
+                              <TableColumn fx:id="clmnTags" prefWidth="121.0" text="%tags" />
                               <TableColumn fx:id="clmnCreated" minWidth="0.0" prefWidth="176.0" text="%created" />
                               <TableColumn fx:id="clmnModified" minWidth="0.0" prefWidth="176.0" text="%modified" />
                           </columns>
@@ -177,8 +172,8 @@
                      <children>
                         <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
                            <children>
-                              <Label text="%title" />
-                              <TextField fx:id="txtfldEntryTitle" HBox.hgrow="ALWAYS">
+                              <Label text="%abstract" />
+                              <TextField fx:id="txtfldEntryAbstract" HBox.hgrow="ALWAYS">
                                  <HBox.margin>
                                     <Insets left="12.0" />
                                  </HBox.margin>
@@ -219,6 +214,19 @@
                     <MenuItem disable="true" mnemonicParsing="false" text="Delete" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="%view">
+                    <items>
+                        <Menu mnemonicParsing="false" text="%dialogs.fields.display">
+                          <items>
+                              <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowImportantOnes" mnemonicParsing="false" text="%dialogs.fields.display.show.important.ones" />
+                              <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowAll" mnemonicParsing="false" text="%dialogs.fields.display.show.all" />
+                          </items>
+                        </Menu>
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" />
+                        <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />
+                    </items>
+                  </Menu>
                   <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
                      <items>
                       <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups..." />

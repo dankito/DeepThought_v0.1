@@ -6,21 +6,25 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<fx:root maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root animated="false" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefWidth="600.0">
+      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0">
          <children>
-            <Label text="%tags">
+            <Label fx:id="lblTags" minHeight="25.0" text="%tags">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Label>
-            <FlowPane fx:id="pnSelectedTagsPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" vgap="6.0" HBox.hgrow="ALWAYS" />
+            <AnchorPane HBox.hgrow="ALWAYS">
+               <children>
+                  <FlowPane fx:id="pnSelectedTagsPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefWrapLength="200.0" vgap="6.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" HBox.hgrow="ALWAYS" />
+               </children>
+            </AnchorPane>
          </children>
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" maxWidth="1.7976931348623157E308" prefHeight="230.0">
+      <VBox fx:id="pnContent" prefHeight="230.0">
          <children>
             <HBox fx:id="pnFilterTags" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>

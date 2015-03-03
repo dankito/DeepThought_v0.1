@@ -110,18 +110,6 @@ public class Dialogs {
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(controller.getDialogResult() == DialogResult.Ok) {
-            if(entry.getId() == null) { // a new Entry
-              Application.getDeepThought().addEntry(entry);
-//              new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                  Application.getDeepThought().addEntry(entry);
-//                }
-//              }).start();
-            }
-          }
-
           if(listener != null)
             listener.windowClosing(stage, controller);
         }
@@ -335,12 +323,6 @@ public class Dialogs {
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(controller.getDialogResult() == DialogResult.Ok) {
-            if(reference.getId() == null) { // a new Reference
-              Application.getDeepThought().addReference(reference);
-            }
-          }
-
           if(listener != null)
             listener.windowClosing(stage, controller);
         }

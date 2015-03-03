@@ -79,7 +79,7 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
       public void handle(Event t) {
         getTreeItem().setExpanded(true);
 
-        Category newCategory = new Category(getItem().getDefaultEntryTemplate());
+        Category newCategory = new Category();
         getItem().addSubCategory(newCategory);
       }
     });

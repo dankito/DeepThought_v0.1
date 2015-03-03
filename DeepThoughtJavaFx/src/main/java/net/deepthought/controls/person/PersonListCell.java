@@ -51,6 +51,7 @@ public class PersonListCell extends ListCell<Person> {
 
   protected Label personDisplayNameLabel = new Label();
 
+  protected Button btnAddPersonWithoutRole = new Button();
   protected Button btnAddPersonInDefaultRole = new Button();
   protected MenuButton btnSelectPersonRole = new MenuButton();
   protected Button btnEditPerson = new Button();
@@ -59,6 +60,8 @@ public class PersonListCell extends ListCell<Person> {
 
   public PersonListCell(PersonsControl personsControl) {
     this.personsControl = personsControl;
+
+    this.defaultPersonRole = PersonRole.getAuthorPersonRole();
 
     setText(null);
     setupGraphic();
@@ -85,6 +88,19 @@ public class PersonListCell extends ListCell<Person> {
     personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(personDisplayNameLabel);
 
+    JavaFxLocalization.bindLabeledText(btnAddPersonWithoutRole, "person.role.without.role");
+    btnAddPersonWithoutRole.setMinWidth(80);
+    HBox.setMargin(btnAddPersonWithoutRole, new Insets(0, 6, 0, 0));
+    graphicPane.getChildren().add(btnAddPersonWithoutRole);
+
+    btnAddPersonWithoutRole.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        selectCurrentCell();
+        handleButtonAddPersonWithoutRoleAction();
+      }
+    });
+
     if(defaultPersonRole != null)
       JavaFxLocalization.bindLabeledText(btnAddPersonInDefaultRole, "add.as.default.role", defaultPersonRole.getName());
     btnAddPersonInDefaultRole.setVisible(defaultPersonRole != null);
@@ -100,7 +116,7 @@ public class PersonListCell extends ListCell<Person> {
       }
     });
 
-    JavaFxLocalization.bindLabeledText(btnSelectPersonRole, "role...");
+    JavaFxLocalization.bindLabeledText(btnSelectPersonRole, "as...");
     btnSelectPersonRole.setMinWidth(80);
     HBox.setMargin(btnSelectPersonRole, new Insets(0, 6, 0, 0));
     graphicPane.getChildren().add(btnSelectPersonRole);
@@ -139,7 +155,7 @@ public class PersonListCell extends ListCell<Person> {
 
     if(defaultPersonRole != null)
       JavaFxLocalization.bindLabeledText(btnAddPersonInDefaultRole, "add.as.default.role", defaultPersonRole.getName());
-    setButtonAddPersonInDefaultRoleVisibleState();
+    setDefaultRoleButtonsVisibleState();
   }
 
 
@@ -153,11 +169,12 @@ public class PersonListCell extends ListCell<Person> {
     else {
       setGraphic(graphicPane);
       personDisplayNameLabel.setText(item.getNameRepresentation());
-      setButtonAddPersonInDefaultRoleVisibleState();
+      setDefaultRoleButtonsVisibleState();
     }
   }
 
-  protected void setButtonAddPersonInDefaultRoleVisibleState() {
+  protected void setDefaultRoleButtonsVisibleState() {
+    btnAddPersonWithoutRole.setVisible(getItem() != null && isPersonSetInPersonRoleOnEntity(PersonRole.getWithoutRolePersonRole(), getItem()) == false);
     btnAddPersonInDefaultRole.setVisible(defaultPersonRole != null && getItem() != null && isPersonSetInPersonRoleOnEntity(defaultPersonRole, getItem()) == false);
   }
 
@@ -189,6 +206,10 @@ public class PersonListCell extends ListCell<Person> {
     updateItem(newValue, newValue == null);
   }
 
+
+  protected void handleButtonAddPersonWithoutRoleAction() {
+    addPersonInRoleToEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+  }
 
   protected void handleButtonAddPersonInDefaultRoleAction() {
     addPersonInRoleToEntity(getItem(), defaultPersonRole);
@@ -222,8 +243,7 @@ public class PersonListCell extends ListCell<Person> {
 
   protected void addPersonInRoleToEntity(Person person, PersonRole role) {
     personsControl.addPersonToEntity(role, person);
-    if(role == defaultPersonRole)
-      setButtonAddPersonInDefaultRoleVisibleState();
+    setDefaultRoleButtonsVisibleState();
   }
 
   protected void handleButtonEditPersonAction() {

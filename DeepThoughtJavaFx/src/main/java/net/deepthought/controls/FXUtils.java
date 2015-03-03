@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.Callback;
@@ -17,6 +18,12 @@ import javafx.util.Callback;
 public class FXUtils {
 
   private final static Logger log = LoggerFactory.getLogger(FXUtils.class);
+
+
+  public static void showSplitPaneDividers(SplitPane splitPane, boolean show) {
+    splitPane.lookupAll(".split-pane-divider").stream()
+        .forEach(div ->  div.setMouseTransparent(!show) );
+  }
 
 
   public static<T> void autoCompleteComboBox(ComboBox<T> comboBox) {

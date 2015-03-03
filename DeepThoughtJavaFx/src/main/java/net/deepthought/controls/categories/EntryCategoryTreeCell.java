@@ -243,7 +243,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
 
   protected void handleAddSubCategoryToCategoryButtonAction() {
     if(category != null)
-      category.addSubCategory(new Category(category.getDefaultEntryTemplate()));
+      category.addSubCategory(new Category());
   }
 
   protected void handleDeleteCategoryButtonAction() {

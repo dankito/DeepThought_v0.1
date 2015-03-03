@@ -17,10 +17,14 @@ import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceCategory;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.DateConvertUtils;
 import net.deepthought.util.Empty;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
@@ -50,16 +54,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
@@ -98,6 +110,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Button btnNewSeriesTitle;
   @FXML
   protected NewOrEditButton btnNewOrEditSeriesTitle;
+  @FXML
+  protected Button btnChooseFieldsToShow;
+  @FXML
+  protected ToggleButton tglbtnShowHideContextHelp;
 
   @FXML
   protected Pane paneTitle;
@@ -132,15 +148,19 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected ReferencePersonsControl referencePersonsControl;
 
   @FXML
+  protected Pane paneEditionAndVolume;
+  @FXML
   protected TextField txtfldEdition;
   @FXML
   protected TextField txtfldVolume;
+  @FXML
+  protected Pane panePublishingDateAndPlaceOfPublication;
   @FXML
   protected DatePicker dtpckPublishingDate;
   @FXML
   protected TextField txtfldPlaceOfPublication;
   @FXML
-  protected Pane pnPublisher;
+  protected Pane panePublisher;
   @FXML
   protected ComboBox<Publisher> cmbxPublisher;
   @FXML
@@ -158,6 +178,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected NewOrEditButton btnNewOrEditReferenceLengthUnit;
 
   @FXML
+  protected Pane paneIssue;
+  @FXML
   protected TextField txtfldIssue;
   @FXML
   protected TextField txtfldYear;
@@ -167,11 +189,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @FXML
   protected TextField txtfldPrice;
   @FXML
-  protected Pane pnLanguage;
+  protected Pane panePriceAndLanguage;
   @FXML
   protected ComboBox<Language> cmbxLanguage;
   @FXML
   protected NewOrEditButton btnNewOrEditLanguage;
+  @FXML
+  protected Pane paneOnlineAddress;
   @FXML
   protected TextField txtfldOnlineAddress;
   @FXML
@@ -195,6 +219,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @FXML
   protected TreeTableColumn<FileLink, String> clmnFile;
 
+  @FXML
+  protected ScrollPane paneContextHelp;
+
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -204,6 +231,14 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       @Override
       public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
         btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
+      }
+    });
+
+    Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
+      @Override
+      public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+        if (setting == Setting.UserDeviceDialogFieldsDisplay)
+          dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
       }
     });
 
@@ -238,7 +273,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnNewOrEditSeriesTitle = new NewOrEditButton();
     btnNewOrEditSeriesTitle.setOnAction(event -> handleButtonNewOrEditSeriesTitleAction(event));
     btnNewOrEditSeriesTitle.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewSeriesTitleAction(event));
-    pnSeriesTitle.getChildren().add(btnNewOrEditSeriesTitle);
+    pnSeriesTitle.getChildren().add(2, btnNewOrEditSeriesTitle);
 
 
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -274,12 +309,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnNewOrEditReferenceCategory.setDisable(true); // TODO: unset as soon as editing is possible
     paneTitle.getChildren().add(btnNewOrEditReferenceCategory);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
     txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
     txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitleSupplement));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
     // TODO: how to set HtmlEditor text changed listener? (https://stackoverflow.com/questions/22128153/javafx-htmleditor-text-change-listener)
     htmledTableOfContents.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
@@ -289,17 +328,21 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     });
 
     referencePersonsControl = new ReferencePersonsControl();
+    referencePersonsControl.setExpanded(true);
     referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     contentPane.getChildren().add(6, referencePersonsControl);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneEditionAndVolume);
     txtfldEdition.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceEdition));
     txtfldVolume.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceVolume));
 
+    ensureNodeOnlyUsesSpaceIfVisible(panePublishingDateAndPlaceOfPublication);
     dtpckPublishingDate.setConverter(localeDateStringConverter);
     dtpckPublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePublishingDate));
     txtfldPlaceOfPublication.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePlaceOfPublication));
 
+    ensureNodeOnlyUsesSpaceIfVisible(panePublisher);
     resetComboBoxPublisherItems();
 //    cmbxPublisher.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanged.ReferencePublisher));
     cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
@@ -327,8 +370,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    btnNewOrEditPublisher.setPrefWidth(115);
     btnNewOrEditPublisher.setOnAction(event -> handleButtonNewOrEditPublisherAction(event));
     btnNewOrEditPublisher.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewPublisherAction(event));
-    pnPublisher.getChildren().add(btnNewOrEditPublisher);
+    panePublisher.getChildren().add(btnNewOrEditPublisher);
 
+    ensureNodeOnlyUsesSpaceIfVisible(pnReferenceLength);
     txtfldIsbnOrIssn.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIsbnOrIssn));
     txtfldReferenceLength.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceReferenceLength));
 
@@ -361,10 +405,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnNewOrEditReferenceLengthUnit.setDisable(true); // TODO: unset as soon as editing is possible
     pnReferenceLength.getChildren().add(btnNewOrEditReferenceLengthUnit);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneIssue);
     txtfldIssue.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIssue));
     txtfldYear.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceYear));
     txtfldDoi.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceDoi));
 
+    ensureNodeOnlyUsesSpaceIfVisible(panePriceAndLanguage);
     txtfldPrice.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePrice));
     resetComboBoxLanguageItems();
 //    cmbxLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanged.ReferenceLanguage));
@@ -392,20 +438,56 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnNewOrEditLanguage.setOnAction(event -> handleButtonNewOrEditLanguageAction(event));
     btnNewOrEditLanguage.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewLanguageAction(event));
     btnNewOrEditLanguage.setDisable(true); // TODO: unset as soon as editing is possible
-    pnLanguage.getChildren().add(btnNewOrEditLanguage);
+    panePriceAndLanguage.getChildren().add(btnNewOrEditLanguage);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress));
     dtpckLastAccess.setConverter(localeDateStringConverter);
     dtpckLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseLastAccess));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseNotes));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
 //      @Override
 //      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
 //        return new FileTreeTableCell(reference);
 //      }
 //    });
+
+    ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
+    paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
+    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+  }
+
+  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
+    node.managedProperty().bind(node.visibleProperty());
+  }
+
+  protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+
+    paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(reference.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    paneEditionAndVolume.setVisible(StringUtils.isNotNullOrEmpty(reference.getEdition()) || StringUtils.isNotNullOrEmpty(reference.getVolume()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    panePublishingDateAndPlaceOfPublication.setVisible(reference.getPublishingDate() != null || StringUtils.isNotNullOrEmpty(reference.getPlaceOfPublication()) ||
+        dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    panePublisher.setVisible(reference.getPublisher() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    pnReferenceLength.setVisible(StringUtils.isNotNullOrEmpty(reference.getIsbnOrIssn()) || StringUtils.isNotNullOrEmpty(reference.getLength()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneIssue.setVisible(StringUtils.isNotNullOrEmpty(reference.getIssue()) || reference.getYear() != null || StringUtils.isNotNullOrEmpty(reference.getDoi()) ||
+        dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    panePriceAndLanguage.setVisible(StringUtils.isNotNullOrEmpty(reference.getPrice()) || reference.getLanguage() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || reference.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
   protected ChangeListener<SeriesTitle> cmbxSeriesTitleValueChangeListener = new ChangeListener<SeriesTitle>() {
@@ -523,6 +605,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
+
+    if(reference.getId() == null) { // a new Reference
+      Application.getDeepThought().addReference(reference);
+    }
+
     saveEditedFieldsOnEntry();
     closeDialog();
   }
@@ -725,6 +812,63 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       net.deepthought.controller.Dialogs.showEditSeriesTitleDialog(cmbxSeriesTitle.getValue());
     else
       createNewSeriesTitle();
+  }
+
+  public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
+    ContextMenu hiddenFieldsMenu = new ContextMenu();
+
+    if(paneSubTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
+    if(paneTitleSupplement.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitleSupplement, "title.supplement");
+
+    if(ttldpnAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
+    if(ttldpnTableOfContents.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnTableOfContents, "table.of.contents");
+
+    if(paneEditionAndVolume.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneEditionAndVolume, "edition");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneEditionAndVolume, "volume");
+    }
+    if(panePublishingDateAndPlaceOfPublication.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePublishingDateAndPlaceOfPublication, "publishing.date");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePublishingDateAndPlaceOfPublication, "place.of.publication");
+    }
+    if(panePublisher.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePublisher, "publisher");
+
+    if(pnReferenceLength.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, pnReferenceLength, "isbn.or.issn");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, pnReferenceLength, "length");
+    }
+    if(paneIssue.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIssue, "issue");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIssue, "year");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIssue, "doi");
+    }
+    if(panePriceAndLanguage.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePriceAndLanguage, "price");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePriceAndLanguage, "language");
+    }
+    if(paneOnlineAddress.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "online.address");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "last.access");
+    }
+
+    if(ttldpnNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnNotes, "notes");
+    if(ttldpnFiles.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+
+    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+  }
+
+  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
+    MenuItem titleMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
+    hiddenFieldsMenu.getItems().add(titleMenuItem);
+    titleMenuItem.setOnAction(event -> nodeToShowOnClick.setVisible(true));
   }
 
   protected void handleMenuItemNewSeriesTitleAction(NewOrEditButtonMenuActionEvent event) {
@@ -958,6 +1102,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
 
     fieldsWithUnsavedChanges.clear();
+
+    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
   public boolean hasUnsavedChanges() {

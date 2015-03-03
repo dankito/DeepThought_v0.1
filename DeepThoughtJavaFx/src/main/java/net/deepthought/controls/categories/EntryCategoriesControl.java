@@ -133,7 +133,9 @@ public class EntryCategoriesControl extends TitledPane {
   protected void setupControl() {
     this.setExpanded(false);
 
-    pnSelectedCategoriesPreview.setMaxWidth(Double.MAX_VALUE);
+//    pnSelectedCategoriesPreview.setMaxWidth(Double.MAX_VALUE);
+
+    pnContent.setPrefHeight(175);
 
     pnFilterCategories.setVisible(false);
     pnFilterCategories.setManaged(false);
@@ -295,6 +297,15 @@ public class EntryCategoriesControl extends TitledPane {
   @FXML
   public void handleButtonCreateCategoryAction(ActionEvent event) {
     addNewCategoryToEntry();
+  }
+
+  @FXML
+  public void handleButtonAddCategoryAction(ActionEvent event) {
+    Category newCategory = new Category();
+    Application.getDeepThought().addCategory(newCategory);
+
+//    newCategory.addEntry(entry);
+    addCategoryToEntry(entry, newCategory);
   }
 
 

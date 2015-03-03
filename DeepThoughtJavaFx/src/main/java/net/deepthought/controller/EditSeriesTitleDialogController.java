@@ -11,11 +11,16 @@ import net.deepthought.data.model.Publisher;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.DateConvertUtils;
 import net.deepthought.util.Empty;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
@@ -40,16 +45,24 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
@@ -86,6 +99,10 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected ComboBox<SeriesTitleCategory> cmbxSeriesTitleCategory;
   @FXML
   protected NewOrEditButton btnNewOrEditSeriesTitleCategory;
+  @FXML
+  protected Button btnChooseFieldsToShow;
+  @FXML
+  protected ToggleButton tglbtnShowHideContextHelp;
 
   @FXML
   protected Pane paneSubTitle;
@@ -108,16 +125,20 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected HTMLEditor htmledTableOfContents;
 
   @FXML
+  protected Pane paneFirstAndLastDayOfPublication;
+  @FXML
   protected DatePicker dtpckFirstDayOfPublication;
   @FXML
   protected DatePicker dtpckLastDayOfPublication;
   @FXML
-  protected Pane pnPublisher;
+  protected Pane panePublisher;
   @FXML
   protected ComboBox<Publisher> cmbxPublisher;
   @FXML
   protected NewOrEditButton btnNewOrEditPublisher;
 
+  @FXML
+  protected Pane paneAbbreviation;
   @FXML
   protected TextField txtfldStandardAbbreviation;
   @FXML
@@ -125,6 +146,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   protected TextField txtfldUserAbbreviation2;
 
+  @FXML
+  protected Pane paneOnlineAddress;
   @FXML
   protected TextField txtfldOnlineAddress;
   @FXML
@@ -148,6 +171,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   protected TreeTableColumn<FileLink, String> clmnFile;
 
+  @FXML
+  protected ScrollPane paneContextHelp;
+
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -157,6 +183,14 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       @Override
       public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
         btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
+      }
+    });
+
+    Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
+      @Override
+      public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+        if (setting == Setting.UserDeviceDialogFieldsDisplay)
+          dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
       }
     });
 
@@ -195,14 +229,18 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditSeriesTitleCategory.setOnAction(event -> handleButtonNewOrEditSeriesTitleCategoryAction(event));
     btnNewOrEditSeriesTitleCategory.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewSeriesTitleCategoryAction(event));
     btnNewOrEditSeriesTitleCategory.setDisable(true); // TODO: unset as soon as editing is possible
-    paneTitle.getChildren().add(btnNewOrEditSeriesTitleCategory);
+    paneTitle.getChildren().add(4, btnNewOrEditSeriesTitleCategory);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
     txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
     txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitleSupplement));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
     // TODO: how to set HtmlEditor text changed listener? (https://stackoverflow.com/questions/22128153/javafx-htmleditor-text-change-listener)
     htmledTableOfContents.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
@@ -211,11 +249,13 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       }
     });
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
     dtpckFirstDayOfPublication.setConverter(localeDateStringConverter);
     dtpckFirstDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication));
     dtpckLastDayOfPublication.setConverter(localeDateStringConverter);
     dtpckLastDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication));
 
+    ensureNodeOnlyUsesSpaceIfVisible(panePublisher);
     resetComboBoxPublisherItems();
     cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
 
@@ -240,16 +280,19 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditPublisher = new NewOrEditButton();
     btnNewOrEditPublisher.setOnAction(event -> handleButtonNewOrEditPublisherAction(event));
     btnNewOrEditPublisher.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewPublisherAction(event));
-    pnPublisher.getChildren().add(btnNewOrEditPublisher);
+    panePublisher.getChildren().add(btnNewOrEditPublisher);
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneAbbreviation);
     txtfldStandardAbbreviation.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation));
     txtfldUserAbbreviation1.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1));
     txtfldUserAbbreviation2.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2));
 
+    ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress));
     dtpckLastAccess.setConverter(localeDateStringConverter);
     dtpckLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseLastAccess));
 
+    ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseNotes));
 
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -258,6 +301,35 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 //        return new FileTreeTableCell(seriesTitle);
 //      }
 //    });
+
+    ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
+    paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
+    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+  }
+
+  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
+    node.managedProperty().bind(node.visibleProperty());
+  }
+
+  protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+
+    paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    paneFirstAndLastDayOfPublication.setVisible(seriesTitle.getFirstDayOfPublication() != null || seriesTitle.getLastDayOfPublication() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    panePublisher.setVisible(seriesTitle.getPublisher() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    paneAbbreviation.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getStandardAbbreviation()) || StringUtils.isNotNullOrEmpty(seriesTitle.getUserAbbreviation1()) ||
+        StringUtils.isNotNullOrEmpty(seriesTitle.getUserAbbreviation2()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || seriesTitle.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
 
@@ -463,6 +535,51 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 //      createNewSeriesTitleCategory();
   }
 
+  public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
+    ContextMenu hiddenFieldsMenu = new ContextMenu();
+
+    if(paneSubTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
+    if(paneTitleSupplement.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitleSupplement, "title.supplement");
+
+    if(ttldpnAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
+    if(ttldpnTableOfContents.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnTableOfContents, "table.of.contents");
+
+    if(paneFirstAndLastDayOfPublication.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneFirstAndLastDayOfPublication, "first.day.of.publication");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneFirstAndLastDayOfPublication, "last.day.of.publication");
+    }
+    if(panePublisher.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, panePublisher, "publisher");
+
+    if(paneAbbreviation.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "standard.abbreviation");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "user.abbreviation1");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "user.abbreviation2");
+    }
+    if(paneOnlineAddress.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "online.address");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "last.access");
+    }
+
+    if(ttldpnNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnNotes, "notes");
+    if(ttldpnFiles.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+
+    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+  }
+
+  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
+    MenuItem titleMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
+    hiddenFieldsMenu.getItems().add(titleMenuItem);
+    titleMenuItem.setOnAction(event -> nodeToShowOnClick.setVisible(true));
+  }
+
   protected void handleMenuItemNewSeriesTitleCategoryAction(NewOrEditButtonMenuActionEvent event) {
     createNewSeriesTitleCategory();
   }
@@ -582,6 +699,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 //    trtblvwFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
     fieldsWithUnsavedChanges.clear();
+
+    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
   public boolean hasUnsavedChanges() {

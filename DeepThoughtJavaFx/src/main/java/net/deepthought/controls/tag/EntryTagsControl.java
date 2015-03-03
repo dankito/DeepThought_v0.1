@@ -26,7 +26,9 @@ import java.util.TreeSet;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -34,9 +36,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -54,7 +59,7 @@ public class EntryTagsControl extends TitledPane {
 
   protected DeepThought deepThought = null;
 
-  protected Set<Tag> editedTags = new HashSet<>();
+  protected ObservableSet<Tag> editedTags = FXCollections.observableSet();
   protected Set<Tag> addedTags = new HashSet<>();
   protected Set<Tag> removedTags = new HashSet<>();
 
@@ -70,6 +75,8 @@ public class EntryTagsControl extends TitledPane {
 
   @FXML
   protected Pane pnGraphicsPane;
+  @FXML
+  protected Label lblTags;
   @FXML
   protected FlowPane pnSelectedTagsPreview;
 
@@ -92,7 +99,7 @@ public class EntryTagsControl extends TitledPane {
   public EntryTagsControl(Entry entry) {
     this.entry = entry;
     if(entry != null) {
-      editedTags = new TreeSet<>(entry.getTags());
+      editedTags.addAll(entry.getTags());
       entry.addEntityListener(entryListener);
     }
 
@@ -144,7 +151,9 @@ public class EntryTagsControl extends TitledPane {
   protected void setupControl() {
     this.setExpanded(false);
 
-    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
+//    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
+
+    pnContent.setPrefHeight(175);
 
     // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)
     pnFilterTags.getChildren().remove(txtfldFilterTags);
@@ -179,6 +188,12 @@ public class EntryTagsControl extends TitledPane {
           addNewTagToEntry();
       }
     });
+    txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+      if(event.getCode() == KeyCode.ESCAPE) {
+        txtfldFilterTags.clear();
+        event.consume();
+      }
+    });
 
     showEntryTags(entry);
 
@@ -193,6 +208,10 @@ public class EntryTagsControl extends TitledPane {
 //        });
 //      }
 //    });
+
+//    widthProperty().addListener((observable, oldValue, newValue) -> {
+//      pnSelectedTagsPreview.setPrefWrapLength(newValue.doubleValue() - lblTags.getWidth() - 50);
+//    });
   }
 
   protected void showEntryTags(Entry entry) {
@@ -200,7 +219,7 @@ public class EntryTagsControl extends TitledPane {
 
     if(entry != null) {
 //      for(final Tag tag : entry.getTagsSorted()) {
-      for(final Tag tag : editedTags) {
+      for(final Tag tag : new TreeSet<>(editedTags)) {
         pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> {
           removeTagFromEntry(tag);
           for(TagListCell cell : tagListCells) {
@@ -248,11 +267,21 @@ public class EntryTagsControl extends TitledPane {
       addedTags.add(tag);
     }
 
-    editedTags.add(tag);
+    addTagToEditedTags(tag);
 
     showEntryTags(entry);
     fireTagAddedEvent(entry, tag);
 
+  }
+
+  protected void addTagToEditedTags(Tag tag) {
+//    SortedSet<Tag> sortedTags = new TreeSet<>(editedTags);
+//    sortedTags.add(tag);
+//
+//    editedTags.clear();
+//    editedTags.addAll(sortedTags);
+
+    editedTags.add(tag);
   }
 
   protected void removeTagFromEntry(Tag tag) {
@@ -277,10 +306,14 @@ public class EntryTagsControl extends TitledPane {
       }
 
       String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
+      String[] parts = lowerCaseFilterConstraint.split(",");
 
-      if (tag.getName().toLowerCase().contains(lowerCaseFilterConstraint)) {
-        return true; // Filter matches Tag's name
+      for(String part : parts) {
+        if (tag.getName().toLowerCase().contains(part.trim())) {
+          return true; // Filter matches Tag's name
+        }
       }
+
       return false; // Does not match.
     });
   }
@@ -299,7 +332,7 @@ public class EntryTagsControl extends TitledPane {
   protected Comparator<Tag> tagComparator = new Comparator<Tag>() {
     @Override
     public int compare(Tag tag1, Tag tag2) {
-      if(tag1 == null || tag2 == null) {
+      if(tag1 == null && tag2 == null) {
 //        log.debug("This should actually never be the case, both tag's name are null");
         return 0;
       }
@@ -312,7 +345,7 @@ public class EntryTagsControl extends TitledPane {
         return 1;
       }
 
-      return tag1.getName().compareTo(tag2.getName());
+      return tag1.compareTo(tag2);
     }
   };
 
@@ -328,7 +361,7 @@ public class EntryTagsControl extends TitledPane {
     removedTags.clear();
 
     if(this.entry != null) {
-      editedTags = new TreeSet<>(entry.getTags());
+      editedTags.addAll(entry.getTags());
       this.entry.addEntityListener(entryListener);
     }
 
@@ -356,7 +389,7 @@ public class EntryTagsControl extends TitledPane {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Tag)
-        editedTags.add((Tag) addedEntity);
+        addTagToEditedTags((Tag) addedEntity);
       showEntryTags(entry);
     }
 
@@ -447,7 +480,7 @@ public class EntryTagsControl extends TitledPane {
     return removedTags;
   }
 
-  public Set<Tag> getEditedTags() {
+  public ObservableSet<Tag> getEditedTags() {
     return editedTags;
   }
 }

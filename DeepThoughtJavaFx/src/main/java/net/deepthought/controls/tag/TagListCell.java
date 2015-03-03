@@ -11,6 +11,7 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -45,6 +46,13 @@ public class TagListCell extends ListCell<Tag> {
   public TagListCell(Entry entry, EntryTagsControl entryTagsControl) {
     this.entry = entry;
     this.entryTagsControl = entryTagsControl;
+//    entryTagsControl.getEditedTags().addListener(new SetChangeListener<Tag>() {
+//      @Override
+//      public void onChanged(Change<? extends Tag> change) {
+//
+//      }
+//    });
+    entryTagsControl.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
 
     if(entry != null)
       entry.addEntityListener(entryListener);
@@ -63,6 +71,12 @@ public class TagListCell extends ListCell<Tag> {
     setText(null);
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
+//    setMaxHeight(16);
+//    graphicsPane.setMaxHeight(16);
+//
+//    String style = getStyle();
+//    style += ".table-row-cell { -fx-cell-size: 16px; }";
+//    setStyle(style);
 
     graphicsPane.setAlignment(Pos.CENTER_LEFT);
 
@@ -86,6 +100,15 @@ public class TagListCell extends ListCell<Tag> {
     chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
     btnEditTag.setOnAction((event) -> handleButtonEditTagAction(event));
     btnDeleteTag.setOnAction((event) -> handleButtonDeleteTagAction(event));
+
+    setOnMouseClicked(event -> {
+//      if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) { // add Tag to Entry on Double Click
+//        if(entryTagsControl.getEditedTags().contains(getItem()) == false)
+//          entryTagsControl.addTagToEntry(getItem());
+//        else
+//          entryTagsControl.removeTagFromEntry(getItem());
+//      }
+    });
   }
 
   @Override
@@ -100,7 +123,7 @@ public class TagListCell extends ListCell<Tag> {
       chkbxIsTagSelected.selectedProperty().removeListener(checkBoxIsTagSelectedChangeListener);
 
       if(entry != null)
-        chkbxIsTagSelected.setSelected(entry.getTags().contains(item));
+        chkbxIsTagSelected.setSelected(entryTagsControl.getEditedTags().contains(item));
       else
         chkbxIsTagSelected.setSelected(false);
 

@@ -9,11 +9,11 @@ package net.deepthought;
 import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntryCreatedTableCell;
 import net.deepthought.controls.entries.EntryModifiedTableCell;
 import net.deepthought.controls.entries.EntryPreviewTableCell;
 import net.deepthought.controls.entries.EntryTagsTableCell;
-import net.deepthought.controls.entries.EntryTemplateTableCell;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TagFilterTableCell;
@@ -24,9 +24,12 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.enums.EntryTemplate;
-import net.deepthought.data.model.enums.SelectedTab;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.UserDeviceSettings;
+import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.SelectedTab;
+import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -49,14 +52,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -76,12 +77,13 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SplitMenuButton;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
@@ -95,6 +97,8 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -125,10 +129,13 @@ public class MainWindowController implements Initializable {
   protected FilteredList<Tag> filteredTags = null;
   protected SortedList<Tag> sortedFilteredTags = null;
   protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
+
   protected ObservableSet<Tag> tagsToFilterFor = FXCollections.observableSet();
+  protected ObservableSet<Entry> entriesWithFilteredTags = FXCollections.observableSet();
 
   protected ObservableList<Entry> tableViewEntriesItems = null;
   protected FilteredList<Entry> filteredEntries = null;
+  protected SortedList<Entry> sortedFilteredEntries = null;
 //  protected Entry selectedEntryInTableViewEntries = null;
 
 
@@ -141,6 +148,16 @@ public class MainWindowController implements Initializable {
   protected Label statusLabel;
   @FXML
   protected Label statusLabelCountEntries;
+
+
+  @FXML
+  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowImportantOnes;
+  @FXML
+  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowAll;
+  @FXML
+  protected CheckMenuItem chkmnitmViewShowCategories;
+  @FXML
+  protected CheckMenuItem chkmnitmViewShowQuickEditEntryPane;
 
 
   @FXML
@@ -180,6 +197,8 @@ public class MainWindowController implements Initializable {
   protected TableColumn<Tag, Boolean> clmnTagFilter;
 
 
+  @FXML
+  protected SplitPane splpnEntries;
 
   @FXML
   protected HBox hboxEntriesBar;
@@ -191,8 +210,6 @@ public class MainWindowController implements Initializable {
   ToggleButton tglbtnEntriesQuickFilterContent;
   @FXML
   protected Button btnRemoveSelectedEntries;
-  @FXML
-  protected SplitMenuButton spltbtnAddEntry;
 
   @FXML
   protected TableView<Entry> tblvwEntries;
@@ -203,8 +220,6 @@ public class MainWindowController implements Initializable {
   @FXML
   protected TableColumn<Entry, String> clmnTags;
   @FXML
-  protected TableColumn<Entry, String> clmnEntryTemplate;
-  @FXML
   protected TableColumn<Entry, String> clmnCreated;
   @FXML
   protected TableColumn<Entry, String> clmnModified;
@@ -213,7 +228,7 @@ public class MainWindowController implements Initializable {
   @FXML
   protected Pane pnQuickEditEntry;
   @FXML
-  protected TextField txtfldEntryTitle;
+  protected TextField txtfldEntryAbstract;
 
   protected EntryTagsControl currentEditedEntryTagsControl = null;
   @FXML
@@ -249,22 +264,8 @@ public class MainWindowController implements Initializable {
     Application.instantiateAsync(new DefaultDependencyResolver() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-//        try {
-//          return new JpaEntityManager(configuration);
-//        } catch (Exception ex) {
-//          log.error("Could not create JpaEntityManager, going to quit application ...", ex);
-//          // TODO: show error message and quit Application
-//        }
-//
-//        return null;
-
         return new JpaEntityManager(configuration);
       }
-
-//      @Override
-//      public IDataManager createDataManager(IEntityManager entityManager) {
-//        return new DefaultDataManager(entityManager);
-//      }
     });
   }
 
@@ -319,8 +320,8 @@ public class MainWindowController implements Initializable {
     log.debug("DeepThought changed from {} to {}", this.deepThought, deepThought);
 
     if(this.deepThought != null) {
-//      this.deepThought.removeTagsChangedListener(tagsChangedListener);
-      this.deepThought.addEntityListener(deepThoughtListener);
+      this.deepThought.removeEntityListener(deepThoughtListener);
+      Application.getSettings().removeSettingsChangedListener(userDeviceSettingsChangedListener);
     }
 
     this.deepThought = deepThought;
@@ -330,8 +331,9 @@ public class MainWindowController implements Initializable {
     clearAllData();
 
     if(deepThought != null) {
-//      deepThought.addTagsChangedListener(tagsChangedListener);
       deepThought.addEntityListener(deepThoughtListener);
+
+      userDeviceSettingsChanged();
 
       trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
       selectedCategoryChanged(deepThought.getTopLevelCategory());
@@ -352,6 +354,31 @@ public class MainWindowController implements Initializable {
       if (deepThought.getSettings().getLastViewedEntry() != null)
         tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
     }
+  }
+
+  protected void userDeviceSettingsChanged() {
+    Application.getSettings().addSettingsChangedListener(userDeviceSettingsChangedListener);
+
+    UserDeviceSettings settings = Application.getSettings();
+
+    showCategoriesChanged(settings.showCategories());
+    showPaneQuickEditEntryChanged(settings.showEntryQuickEditPane());
+
+    chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+    chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(settings.getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
+    chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+
+    chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+    chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(settings.getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
+    chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+
+    chkmnitmViewShowCategories.selectedProperty().removeListener(checkMenuItemViewShowCategoriesSelectedChangeListener);
+    chkmnitmViewShowCategories.setSelected(settings.showCategories());
+    chkmnitmViewShowCategories.selectedProperty().addListener(checkMenuItemViewShowCategoriesSelectedChangeListener);
+
+    chkmnitmViewShowQuickEditEntryPane.selectedProperty().removeListener(checkMenuItemViewShowQuickEditEntrySelectedChangeListener);
+    chkmnitmViewShowQuickEditEntryPane.setSelected(settings.showEntryQuickEditPane());
+    chkmnitmViewShowQuickEditEntryPane.selectedProperty().addListener(checkMenuItemViewShowQuickEditEntrySelectedChangeListener);
   }
 
   protected void setControlsEnabledState(boolean enabled) {
@@ -401,11 +428,17 @@ public class MainWindowController implements Initializable {
   protected void setupControls() {
     contentPane.setDisable(true); // don't enable controls as no DeepThought is received / deserialized
 
+    setupMainMenu();
+
     setupTabPaneOverview();
 
     setupEntriesOverviewSection();
 
-    setupEntryEditSection();
+    setupQuickEditEntrySection();
+  }
+
+  protected void setupMainMenu() {
+
   }
 
   private void setupTabPaneOverview() {
@@ -448,6 +481,10 @@ public class MainWindowController implements Initializable {
     txtfldTagsQuickFilter.setPromptText("Quickly filter Tags");
     txtfldTagsQuickFilter.setPrefWidth(80);
     txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> quickFilterTags());
+    txtfldTagsQuickFilter.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+      if (event.getCode() == KeyCode.ESCAPE)
+        txtfldTagsQuickFilter.clear();
+    });
 
     btnRemoveTagsFilter.setGraphic(new ImageView("icons/filter_delete_16x16.gif"));
     JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
@@ -481,7 +518,11 @@ public class MainWindowController implements Initializable {
         cell.isFilteredProperty().addListener(new ChangeListener<Boolean>() {
           @Override
           public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-            filterTags(cell.getTag(), newValue);
+            if(newValue == true)
+              addTagToTagFilter(cell.getTag());
+            else
+              removeTagFromTagFilter(cell.getTag());
+
             btnRemoveTagsFilter.setDisable(tagsToFilterFor.size() == 0);
           }
         });
@@ -494,6 +535,9 @@ public class MainWindowController implements Initializable {
   protected void selectedTagChanged(Tag tag) {
     log.debug("Selected Tag changed to {}", tag);
 
+    if(deepThought.getSettings().getLastViewedTag() != null)
+      deepThought.getSettings().getLastViewedTag().removeEntityListener(selectedTagListener);
+
     if(tag instanceof SystemTag)
       deepThought.getSettings().setLastViewedTag(null); // TODO: i think setting to null is a bad solution
     else
@@ -502,15 +546,26 @@ public class MainWindowController implements Initializable {
     Tag selectedTag = deepThought.getSettings().getLastViewedTag();
     btnRemoveSelectedTag.setDisable(selectedTag == null || selectedTag instanceof SystemTag);
 
-    if(tagsToFilterFor.size() > 0) {
+    if(tag != null)
+      tag.addEntityListener(selectedTagListener);
 
+    showEntriesForSelectedTag(tag);
+  }
+
+  protected void showEntriesForSelectedTag(Tag tag) {
+    if(tagsToFilterFor.size() > 0) {
+      Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
+      for(Entry filteredEntry : entriesWithFilteredTags) {
+        if(filteredEntry.hasTag(tag))
+          filteredEntriesWithThisTag.add(filteredEntry);
+      }
+
+      showEntries(filteredEntriesWithThisTag);
     }
     else if(tag != null)
       showEntries(tag.getEntries());
     else
       showEntries(new HashSet<>());
-
-    // TODO: add TagListener to be able to react to Tag changes (e.g. rename -> sort ListView)
   }
 
   protected void setupCategoriesTab() {
@@ -544,6 +599,15 @@ public class MainWindowController implements Initializable {
     });
   }
 
+  protected void showCategoriesChanged(boolean showCategories) {
+    if (showCategories == false)
+      tbpnOverview.getTabs().remove(tabCategories);
+    else tbpnOverview.getTabs().add(0, tabCategories);
+
+    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories)
+      tbpnOverview.getSelectionModel().select(tabTags);
+  }
+
   private ContextMenu createTreeViewCategoriesContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
@@ -551,7 +615,7 @@ public class MainWindowController implements Initializable {
     contextMenu.getItems().add(addCategoryMenuItem);
 
     addCategoryMenuItem.setOnAction(event -> {
-      deepThought.addCategory(new Category(deepThought.getSettings().getDefaultEntryTemplate()));
+      deepThought.addCategory(new Category());
     });
 
     return contextMenu;
@@ -571,16 +635,9 @@ public class MainWindowController implements Initializable {
       }
     });
 
-    spltbtnAddEntry.showingProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        if(newValue == true)
-          showAllEntryTemplates();
-      }
-    });
-
     tableViewEntriesItems = tblvwEntries.getItems();
     filteredEntries = new FilteredList<>(tableViewEntriesItems, entry -> true);
+    sortedFilteredEntries = new SortedList<Entry>(filteredEntries, entriesComparator);
     tblvwEntries.setItems(filteredEntries);
 
     tblvwEntries.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -601,9 +658,6 @@ public class MainWindowController implements Initializable {
     clmnTags.setCellFactory((param) -> {
       return new EntryTagsTableCell();
     });
-    clmnEntryTemplate.setCellFactory((param) -> {
-      return new EntryTemplateTableCell();
-    });
     clmnCreated.setCellFactory((param) -> {
       return new EntryCreatedTableCell();
     });
@@ -612,27 +666,13 @@ public class MainWindowController implements Initializable {
     });
   }
 
-  protected void showAllEntryTemplates() {
-    spltbtnAddEntry.getItems().clear();
+  protected void setupQuickEditEntrySection() {
+    pnQuickEditEntry.managedProperty().bind(pnQuickEditEntry.visibleProperty());
 
-    for(final EntryTemplate template : Application.getDeepThought().getEntryTemplates()) {
-      MenuItem templateMenuItem = new MenuItem(template.getName());
-      spltbtnAddEntry.getItems().add(templateMenuItem);
-
-      templateMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event) {
-          showEditEntryDialogToCreateNewEntry(template);
-        }
-      });
-    }
-  }
-
-  protected void setupEntryEditSection() {
-    txtfldEntryTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+    txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
       Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
       if(selectedEntry != null)
-        selectedEntry.setTitle(txtfldEntryTitle.getText());
+        selectedEntry.setAbstract(txtfldEntryAbstract.getText());
     });
 
     txtarEntryContent.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -648,11 +688,37 @@ public class MainWindowController implements Initializable {
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
   }
 
+  protected void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {
+    pnQuickEditEntry.setVisible(showPaneQuickEditEntry);
+
+    if(showPaneQuickEditEntry) {
+      if(splpnEntries.getItems().contains(pnQuickEditEntry) == false) {
+//      pnQuickEditEntry.setVisible(true);
+        splpnEntries.getItems().add(pnQuickEditEntry);
+        splpnEntries.setDividerPositions(0.5);
+      }
+    }
+    else {
+//      pnQuickEditEntry.setVisible(false);
+      splpnEntries.getItems().remove(pnQuickEditEntry);
+      splpnEntries.setDividerPosition(0, 1);
+      try {
+        FXUtils.showSplitPaneDividers(splpnEntries, false);
+        splpnEntries.getDividers().remove(0);
+//        splpnEntries.getDividers().clear();
+//        splpnEntries.getDividers().removeAll(splpnEntries.getDividers());
+//        for(SplitPane.Divider divider : new ArrayList<>(splpnEntries.getDividers())) {
+//          splpnEntries.getDividers().remove(divider);
+//        }
+      } catch(Exception ex) { } // throws an exception but does exactly what i want
+    }
+  }
+
   protected EntityListener currentlyEditedEntryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.EntryTitleColumnName)) {
-        txtfldEntryTitle.setText(((Entry)entity).getTitle());
+        txtfldEntryAbstract.setText(((Entry) entity).getAbstract());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
         txtarEntryContent.setText(((Entry)entity).getContent());
@@ -672,6 +738,38 @@ public class MainWindowController implements Initializable {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
 
+    }
+  };
+
+  protected EntityListener selectedTagListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
+          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
+        if(filteredTags.size() > 0)
+          reapplyTagsFilter();
+        showEntriesForSelectedTag((Tag)collectionHolder);
+      }
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
+          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
+        if(filteredTags.size() > 0)
+          reapplyTagsFilter();
+        showEntriesForSelectedTag((Tag)collectionHolder);
+      }
     }
   };
 
@@ -741,6 +839,8 @@ public class MainWindowController implements Initializable {
   }
 
   protected void quickFilterTags() {
+    Tag selectedTag = deepThought.getSettings().getLastViewedTag();
+
     String filter = txtfldTagsQuickFilter.getText();
 
     filteredTags.setPredicate((tag) -> {
@@ -750,34 +850,52 @@ public class MainWindowController implements Initializable {
       }
 
       String lowerCaseFilter = filter.toLowerCase();
+      String[] parts = lowerCaseFilter.split(",");
+      String lowerCaseTagName = tag.getName().toLowerCase();
 
-      if (tag.getName().toLowerCase().contains(lowerCaseFilter)) {
-        return true; // Filter matches tag name
+      for(String part : parts) {
+        if (lowerCaseTagName.contains(part.trim())) {
+          return true; // Filter matches Tag's name
+        }
       }
 
       return false; // Does not match.
     });
+
+    if(filteredTags.contains(selectedTag))
+      tblvwTags.getSelectionModel().select(selectedTag);
   }
 
-  protected void filterTags(Tag tag, Boolean filter) {
-    log.debug("filterTags called for {}", tag);
-    if(filter == true)
-      tagsToFilterFor.add(tag);
-    else
-      tagsToFilterFor.remove(tag);
+  protected void addTagToTagFilter(Tag tag) {
+    tagsToFilterFor.add(tag);
+    reapplyTagsFilter();
+
+    tblvwTags.getSelectionModel().select(tag);
+  }
+
+  protected void removeTagFromTagFilter(Tag tag) {
+    tagsToFilterFor.remove(tag);
+    reapplyTagsFilter();
+
+    tblvwTags.getSelectionModel().select(tag);
+  }
+
+  protected void reapplyTagsFilter() {
+    entriesWithFilteredTags.clear();
 
     if(tagsToFilterFor.size() == 0) {
       showAllTagsInListViewTags(deepThought);
     }
     else {
-      final Set<Entry> entriesContainingFilteredTags = new HashSet<>();
+//      final Set<Entry> entriesContainingFilteredTags = new HashSet<>();
       final Set<Tag> tagsWithEntriesContainingFilteredTags = new HashSet<>();
       tagsWithEntriesContainingFilteredTags.addAll(tagsToFilterFor);
 
       for (Tag filteredTag : tagsToFilterFor) {
         for (Entry entry : filteredTag.getEntries()) {
           if (entry.hasTags(tagsToFilterFor)) {
-            entriesContainingFilteredTags.add(entry);
+//            entriesContainingFilteredTags.add(entry);
+            entriesWithFilteredTags.add(entry);
             tagsWithEntriesContainingFilteredTags.addAll(entry.getTags());
           }
         }
@@ -787,22 +905,20 @@ public class MainWindowController implements Initializable {
 //      return tagsWithEntriesContainingFilteredTags.contains(tagToCheck);
 //    });
 
-      List<Entry> sortedEntriesContainingFilteredTags = new ArrayList<>(entriesContainingFilteredTags);
-      Collections.sort(sortedEntriesContainingFilteredTags, new Comparator<Entry>() {
-        @Override
-        public int compare(Entry o1, Entry o2) {
-          return ((Integer)o2.getEntryIndex()).compareTo(o1.getEntryIndex());
-        }
-      });
-      showEntries(sortedEntriesContainingFilteredTags);
+//      List<Entry> sortedEntriesContainingFilteredTags = new ArrayList<>(entriesContainingFilteredTags);
+//      Collections.sort(sortedEntriesContainingFilteredTags, new Comparator<Entry>() {
+//        @Override
+//        public int compare(Entry o1, Entry o2) {
+//          return ((Integer)o2.getEntryIndex()).compareTo(o1.getEntryIndex());
+//        }
+//      });
+//      showEntries(sortedEntriesContainingFilteredTags);
 
       tableViewTagsItems.clear();
       tableViewTagsItems.addAll(tagsWithEntriesContainingFilteredTags);
     }
 
     quickFilterTags();
-
-    tblvwTags.getSelectionModel().select(tag); // TODO: ??
   }
 
   protected void filterEntries() {
@@ -865,13 +981,41 @@ public class MainWindowController implements Initializable {
     _stage.close();
   }
 
+  protected ChangeListener<Boolean> checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.ShowImportantOnes);
+    }
+  };
+
+  protected ChangeListener<Boolean> checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.ShowAll);
+    }
+  };
+
+  protected ChangeListener<Boolean> checkMenuItemViewShowCategoriesSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setShowCategories(newValue);
+    }
+  };
+
+  protected ChangeListener<Boolean> checkMenuItemViewShowQuickEditEntrySelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setShowQuickEditEntryPane(newValue);
+    }
+  };
+
   @FXML
   protected void handleButtonAddCategoryAction(ActionEvent event) {
 //    if(selectedCategoryTreeItem != null)
 //      selectedCategoryTreeItem.getChildren().addListener(categoriesTreeItemsChanged);
 
     Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
-    Category newCategory = new Category(selectedCategory.getDefaultEntryTemplate());
+    Category newCategory = new Category();
 //    deepThought.addCategory(newCategory);
     selectedCategory.addSubCategory(newCategory);
 
@@ -923,14 +1067,14 @@ public class MainWindowController implements Initializable {
 
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
-      txtfldEntryTitle.setText(selectedEntry.getTitle());
+      txtfldEntryAbstract.setText(selectedEntry.getAbstract());
       txtarEntryContent.setText(selectedEntry.getContent());
 
-      txtfldEntryTitle.requestFocus();
-      txtfldEntryTitle.selectAll();
+      txtfldEntryAbstract.requestFocus();
+      txtfldEntryAbstract.selectAll();
     }
     else {
-      txtfldEntryTitle.setText("");
+      txtfldEntryAbstract.setText("");
       txtarEntryContent.setText("");
     }
   }
@@ -1000,30 +1144,6 @@ public class MainWindowController implements Initializable {
     filterEntries();
   }
 
-  @FXML
-  public void handleButtonAddEntryAction(ActionEvent actionEvent) {
-    EntryTemplate template = Application.getDeepThought().getSettings().getDefaultEntryTemplate();
-
-    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories) {
-      Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
-      if(selectedCategory != null) {
-        template = selectedCategory.getDefaultEntryTemplate();
-      }
-    }
-
-
-    createNewEntry(template);
-  }
-
-  protected void createNewEntry(EntryTemplate template) {
-    Entry newEntry = new Entry(template);
-    deepThought.addEntry(newEntry);
-
-    addEntryToSelectedCategory(newEntry);
-
-    addAndSelectEntry(newEntry);
-  }
-
   protected void addEntryToSelectedCategory(Entry newEntry) {
     if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories) {
       Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
@@ -1042,26 +1162,12 @@ public class MainWindowController implements Initializable {
     tblvwEntries.getSelectionModel().select(entry);
     deepThought.getSettings().setLastViewedEntry(entry); // TODO: can this ever be not already set to this Entry?
 
-    txtfldEntryTitle.requestFocus();
+    txtfldEntryAbstract.requestFocus();
   }
 
-  protected void showEditEntryDialogToCreateNewEntry(EntryTemplate template) {
-    Entry newEntry = new Entry(template);
-
-    // TODO: add Tag or Category if in Dialog Ok button gets pressed
-//    if(deepThought.getLastSelectedTab() == SelectedTab.Tags) {
-//      Tag selectedTag = deepThought.getLastViewedTag();
-//      if(selectedTag != null && selectedTag instanceof SystemTag == false)
-//        newEntry.addTag(selectedTag);
-//    }
-//    else if(deepThought.getLastSelectedTab() == SelectedTab.Categories) {
-//      Category selectedCategory = deepThought.getLastViewedCategory();
-//      if(selectedCategory != null) {
-//        selectedCategory.addEntry(newEntry);
-//      }
-//    }
-
-    showEditEntryDialog(newEntry);
+  @FXML
+  public void handleButtonAddEntryAction(ActionEvent actionEvent) {
+    showEditEntryDialog(new Entry());
   }
 
   @FXML
@@ -1101,12 +1207,12 @@ public class MainWindowController implements Initializable {
       @Override
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if(controller.getDialogResult() == DialogResult.Ok) {
-          if (tableViewEntriesItems.contains(entry) == false) { // a new Entry
-            addEntryToSelectedCategory(entry);
-            addAndSelectEntry(entry);
-          } else {
-            selectEntry(entry);
-          }
+//          if (tableViewEntriesItems.contains(entry) == false) { // a new Entry
+//            addEntryToSelectedCategory(entry);
+//            addAndSelectEntry(entry);
+//          } else {
+//            selectEntry(entry);
+//          }
         }
       }
 
@@ -1237,7 +1343,10 @@ public class MainWindowController implements Initializable {
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
+      if(collection == deepThought.getTags()) {
+//        FXCollections.sort(tableViewTagsItems);
+        quickFilterTags();
+      }
     }
 
     @Override
@@ -1255,36 +1364,17 @@ public class MainWindowController implements Initializable {
     }
   };
 
-//  protected TagsChangedListener tagsChangedListener = new TagsChangedListener() {
-//    @Override
-//    public void tagAdded(Tag tag) {
-//      if(Platform.isFxApplicationThread()) {
-//        tagHasBeenAdded(tag);
-//      }
-//      else {
-//        Platform.runLater(() -> {
-//          tagHasBeenAdded(tag);
-//        });
-//      }
-//    }
-//
-//    @Override
-//    public void tagUpdated(Tag tag) {
-//      sortTags();
-//    }
-//
-//    @Override
-//    public void tagRemoved(Tag tag) {
-//      if(Platform.isFxApplicationThread()) {
-//        tagHasBeenRemoved(tag);
-//      }
-//      else {
-//        Platform.runLater(() -> {
-//          tagHasBeenRemoved(tag);
-//        });
-//      }
-//    }
-//  };
+  protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {
+    @Override
+    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+      if(setting == Setting.UserDeviceShowQuickEditEntryPane)
+        showPaneQuickEditEntryChanged((boolean) newValue);
+      else if(setting == Setting.UserDeviceShowCategories) {
+        showCategoriesChanged((boolean) newValue);
+      }
+    }
+  };
+
 
   protected boolean isAddingTag = false;
 
@@ -1331,6 +1421,20 @@ public class MainWindowController implements Initializable {
       }
 
       return tag1.getName().compareTo(tag2.getName());
+    }
+  };
+
+  protected Comparator<Entry> entriesComparator = new Comparator<Entry>() {
+    @Override
+    public int compare(Entry entry1, Entry entry2) {
+      if(entry1 == null && entry2 == null)
+        return 0;
+      else if(entry1 == null && entry2 != null)
+        return -1;
+      else if(entry1 != null && entry2 == null)
+        return 1;
+
+      return ((Integer)entry2.getEntryIndex()).compareTo(entry1.getEntryIndex());
     }
   };
 

@@ -33,10 +33,10 @@ public class ReferencePersonListCell extends PersonListCell {
 
     if(reference != null) {
       reference.addEntityListener(referenceListener);
-      setDefaultPersonRole(null);
+//      setDefaultPersonRole(null);
     }
     else {
-      setDefaultPersonRole(null);
+//      setDefaultPersonRole(null);
     }
   }
 
