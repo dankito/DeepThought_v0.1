@@ -1,11 +1,8 @@
 package net.deepthought.util;
 
-import net.deepthought.Application;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,7 +42,7 @@ public class DeepThoughtProperties {
   protected static Properties loadDeepThoughtProperties() {
     try {
       Properties deepThoughtProperties = new Properties();
-      deepThoughtProperties.load(new InputStreamReader(new FileInputStream(new File(Application.getDataFolderPath(), DeepThoughtPropertiesFileName)), "UTF-8"));
+      deepThoughtProperties.load(new InputStreamReader(new FileInputStream(DeepThoughtPropertiesFileName), "UTF-8"));
       doesPropertiesFileExist = true;
       return deepThoughtProperties;
     } catch(Exception ex) {
@@ -58,7 +55,7 @@ public class DeepThoughtProperties {
 
   protected static void saveDeepThoughtProperties() throws IOException {
     if(deepThoughtProperties != null) {
-      deepThoughtProperties.store(new OutputStreamWriter(new FileOutputStream(new File(Application.getDataFolderPath(), DeepThoughtPropertiesFileName)), "UTF-8"), null);
+      deepThoughtProperties.store(new OutputStreamWriter(new FileOutputStream( DeepThoughtPropertiesFileName), "UTF-8"), null);
     }
   }
 

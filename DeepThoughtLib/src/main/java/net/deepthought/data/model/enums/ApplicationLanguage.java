@@ -1,5 +1,6 @@
 package net.deepthought.data.model.enums;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.persistence.db.TableConfig;
@@ -61,6 +62,26 @@ public class ApplicationLanguage extends ExtensibleEnumeration {
   @Override
   public String toString() {
     return "ApplicationLanguage " + getTextRepresentation();
+  }
+
+
+  public static ApplicationLanguage ApplicationLanguageWithThatNameNotFound = new ApplicationLanguage("ApplicationLanguage with that name not found");
+
+  protected static ApplicationLanguage defaultApplicationLanguage = null;
+
+  public static ApplicationLanguage getDefaultApplicationLanguage() {
+    if(defaultApplicationLanguage == null)
+      defaultApplicationLanguage = findByNameResourceKey("application.language.english");
+    return defaultApplicationLanguage;
+  }
+
+  public static ApplicationLanguage findByNameResourceKey(String nameResourceKey) {
+    for(ApplicationLanguage language : Application.getApplication().getApplicationLanguages()) {
+      if(nameResourceKey.equals(language.nameResourceKey))
+        return language;
+    }
+
+    return ApplicationLanguageWithThatNameNotFound;
   }
 
 }

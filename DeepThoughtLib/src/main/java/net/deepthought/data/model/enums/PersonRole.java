@@ -150,6 +150,24 @@ public class PersonRole extends ExtensibleEnumeration {
   }
 
 
+
+  protected static PersonRole withoutRolePersonRole = null;
+
+  protected static PersonRole authorPersonRole = null;
+
+  public static PersonRole getWithoutRolePersonRole() {
+    if(withoutRolePersonRole == null)
+      withoutRolePersonRole = findByNameResourceKey("person.role.without.role");
+    return withoutRolePersonRole;
+  }
+
+  public static PersonRole getAuthorPersonRole() {
+    if(authorPersonRole == null)
+      authorPersonRole = findByNameResourceKey("person.role.author");
+    return authorPersonRole;
+  }
+
+
   public final static PersonRole RoleWithThatNameNotFound = new PersonRole("Role with that name not found");
 
   public static PersonRole findByName(String name) {
@@ -162,9 +180,11 @@ public class PersonRole extends ExtensibleEnumeration {
   }
 
   public static PersonRole findByNameResourceKey(String nameResourceKey) {
-    for(PersonRole role : Application.getDeepThought().getPersonRoles()) {
-      if(nameResourceKey.equals(role.nameResourceKey))
-        return role;
+    if(Application.getDeepThought() != null) {
+      for (PersonRole role : Application.getDeepThought().getPersonRoles()) {
+        if (nameResourceKey.equals(role.nameResourceKey))
+          return role;
+      }
     }
 
     return RoleWithThatNameNotFound;

@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * Created by ganymed on 13/10/14.
@@ -51,20 +50,20 @@ public class Application {
 
 
   public static void instantiateAsync(final IDependencyResolver dependencyResolver) {
-//    new Thread(new Runnable() {
-//      @Override
-//      public void run() {
-//        instantiate(dependencyResolver);
-//      }
-//    }).start();
-
-    ForkJoinPool pool = new ForkJoinPool();
-    pool.execute(new Runnable() {
+    new Thread(new Runnable() {
       @Override
       public void run() {
         instantiate(dependencyResolver);
       }
-    });
+    }).start();
+
+//    ForkJoinPool pool = new ForkJoinPool();
+//    pool.execute(new Runnable() {
+//      @Override
+//      public void run() {
+//        instantiate(dependencyResolver);
+//      }
+//    });
   }
 
   public static void instantiate(IDependencyResolver dependencyResolver) {

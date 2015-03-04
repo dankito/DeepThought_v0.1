@@ -71,7 +71,7 @@ public class OverviewFragment extends Fragment {
   }
 
   protected void onActionAddEntrySelected() {
-    Entry entry = new Entry("");
+    Entry entry = new Entry();
     ActivityManager.getInstance().showEditEntryActivity(entry);
   }
 

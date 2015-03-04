@@ -2,6 +2,7 @@ package net.deepthought.data.model.settings;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.ApplicationLanguage;
+import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 
 import java.io.Serializable;
@@ -23,6 +24,12 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
   protected int autoSaveChangesAfterMilliseconds = 10 * 1000;
 
   protected int maxBackupsToKeep = 7;
+
+  protected DialogsFieldsDisplay dialogsFieldsDisplay = DialogsFieldsDisplay.ShowImportantOnes;
+
+  protected boolean showCategories = true;
+
+  protected boolean showQuickEditEntryPane = true;
 
 
   public UserDeviceSettings() {
@@ -75,5 +82,34 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
     callSettingsChangedListeners(Setting.UserDeviceMaxBackupsToKeep, previousValue, maxBackupsToKeep);
   }
 
+  public DialogsFieldsDisplay getDialogsFieldsDisplay() {
+    return dialogsFieldsDisplay;
+  }
+
+  public void setDialogsFieldsDisplay(DialogsFieldsDisplay dialogsFieldsDisplay) {
+    Object previousValue = this.dialogsFieldsDisplay;
+    this.dialogsFieldsDisplay = dialogsFieldsDisplay;
+    callSettingsChangedListeners(Setting.UserDeviceDialogFieldsDisplay, previousValue, dialogsFieldsDisplay);
+  }
+
+  public boolean showCategories() {
+    return showCategories;
+  }
+
+  public void setShowCategories(boolean showCategories) {
+    Object previousValue = this.showCategories;
+    this.showCategories = showCategories;
+    callSettingsChangedListeners(Setting.UserDeviceShowCategories, previousValue, showCategories);
+  }
+
+  public boolean showEntryQuickEditPane() {
+    return showQuickEditEntryPane;
+  }
+
+  public void setShowQuickEditEntryPane(boolean showEntryQuickEditPane) {
+    Object previousValue = this.showQuickEditEntryPane;
+    this.showQuickEditEntryPane = showEntryQuickEditPane;
+    callSettingsChangedListeners(Setting.UserDeviceShowQuickEditEntryPane, previousValue, showEntryQuickEditPane);
+  }
 
 }

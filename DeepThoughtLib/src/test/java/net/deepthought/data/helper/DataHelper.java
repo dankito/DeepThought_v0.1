@@ -14,8 +14,8 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.SelectedAndroidTab;
-import net.deepthought.data.model.enums.SelectedTab;
+import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
+import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 
 import org.junit.Assert;

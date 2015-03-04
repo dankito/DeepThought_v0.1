@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
@@ -238,26 +237,6 @@ public abstract class CategoryTestBase extends DataModelTestBase {
 
     Assert.assertFalse(category.isDeleted());
     Assert.assertFalse(entry.isDeleted());
-  }
-
-
-  @Test
-  public void setDefaultEntryTemplate_EntryTemplateKeyGetsPersistedInDb() throws Exception {
-    String defaultEntryTemplateKey = "TestCategoryDefaultEntryTemplate";
-
-    DeepThought deepThought = Application.getDeepThought();
-
-    Category category = new Category("test");
-    deepThought.addCategory(category);
-
-    EntryTemplate template = new EntryTemplate(defaultEntryTemplateKey, "", "");
-    deepThought.addEntryTemplate(template);
-    category.setDefaultEntryTemplate(template);
-
-    // assert default entry template key really got written to database
-//    Assert.assertEquals(defaultEntryTemplateKey, getValueFromTable(TableConfig.CategoryTableName, TableConfig.CategoryDefaultEntryTemplateJoinColumnName, category.getId()));
-    Object persistedEntryTemplateId = getValueFromTable(TableConfig.CategoryTableName, TableConfig.CategoryDefaultEntryTemplateJoinColumnName, category.getId());
-    Assert.assertTrue(doIdsEqual(template.getId(), persistedEntryTemplateId));
   }
 
 }

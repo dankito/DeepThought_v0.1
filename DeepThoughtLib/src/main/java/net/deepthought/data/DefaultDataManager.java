@@ -129,8 +129,8 @@ public class DefaultDataManager implements IDataManager {
 
     entityManager.persistEntity(application);
     entityManager.persistEntity(newDeepThought);
+    Application.getSettings().setLanguage(Application.getSettings().getLanguage());
     newDeepThought.getSettings().setLastViewedCategory(newDeepThought.getSettings().getLastViewedCategory());
-    newDeepThought.getSettings().setDefaultEntryTemplate(newDeepThought.getSettings().getDefaultEntryTemplate());
 
     addNewlyCreatedApplicationEntityListeners();
     setCurrentDeepThought(newDeepThought);

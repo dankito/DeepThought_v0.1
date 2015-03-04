@@ -1,5 +1,6 @@
 package net.deepthought.data.persistence.db;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.listener.EntityListener;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
@@ -114,6 +116,12 @@ public class BaseEntity implements Serializable {
   @PreRemove
   protected void preRemove() {
     modifiedOn = new Date();
+  }
+
+  @PostLoad
+  protected void postLoad() {
+    if(Application.getDeepThought() != null)
+      Application.getDeepThought().lazyLoadedEntityMapped(this);
   }
 
 

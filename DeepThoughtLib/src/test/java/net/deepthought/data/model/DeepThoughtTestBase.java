@@ -3,18 +3,17 @@ package net.deepthought.data.model;
 import net.deepthought.Application;
 import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.enums.BackupFileServiceType;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceCategory;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
-import net.deepthought.data.model.enums.SelectedAndroidTab;
-import net.deepthought.data.model.enums.SelectedTab;
 import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.SettingsBase;
+import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
+import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -410,7 +409,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
   public void updateLastSelectedTab_UpdatedLastSelectedTabGetsPersistedInDb() throws Exception {
     DeepThought deepThought = Application.getDeepThought();
 
-    SelectedTab newLastSelectedTab = SelectedTab.AdvancedSearch;
+    SelectedTab newLastSelectedTab = SelectedTab.Search;
     deepThought.getSettings().setLastSelectedTab(newLastSelectedTab);
 
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
@@ -430,20 +429,6 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertNotNull(settings);
     Assert.assertEquals(newLastSelectedAndroidTab, settings.getLastSelectedAndroidTab());
-  }
-
-  @Test
-  public void updateDefaultEntryTemplate_UpdatedValueGetsPersistedInDb() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    EntryTemplate newValue = new EntryTemplate("Nuovo templato", "", "");
-    deepThought.addEntryTemplate(newValue);
-    deepThought.getSettings().setDefaultEntryTemplate(newValue);
-
-    DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
-
-    Assert.assertNotNull(settings);
-    Assert.assertTrue(doIdsEqual(newValue.getId(), settings.getDefaultEntryTemplate().getId()));
   }
 
 

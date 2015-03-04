@@ -1,4 +1,4 @@
-package net.deepthought.data.model.enums;
+package net.deepthought.data.model.settings.enums;
 
 /**
  * <p>
@@ -10,10 +10,11 @@ package net.deepthought.data.model.enums;
  */
 public enum SelectedAndroidTab {
 
-  Tags(0),
-  Categories(1),
-  AdvancedSearch(2),
-  EntriesOverview(3),
+  Categories(0),
+  Tags(1),
+  Search(2),
+  Lists(3),
+  EntriesOverview(100),
   Unknown(-1);
 
 
@@ -27,12 +28,14 @@ public enum SelectedAndroidTab {
   @Override
   public String toString() {
     switch(this) {
-      case Tags:
-        return "Tags";
       case Categories:
         return "Categories";
-      case AdvancedSearch:
-        return "AdvancedSearch";
+      case Tags:
+        return "Tags";
+      case Search:
+        return "Search";
+      case Lists:
+        return "Lists";
       case EntriesOverview:
         return "EntriesOverview";
       default:
@@ -42,18 +45,12 @@ public enum SelectedAndroidTab {
 
 
   public static SelectedAndroidTab fromOrdinal(int ordinal) {
-    switch(ordinal) {
-      case 0:
-        return Tags;
-      case 1:
-        return Categories;
-      case 2:
-        return AdvancedSearch;
-      case 3:
-        return EntriesOverview;
-      default:
-        return Unknown;
+    for(SelectedAndroidTab tab : SelectedAndroidTab.values()) {
+      if(((Integer)tab.value).equals(ordinal))
+        return tab;
     }
+
+    return Unknown;
   }
 
 }

@@ -10,11 +10,9 @@
         <class>net.deepthought.data.model.Group</class>
 
         <class>net.deepthought.data.model.DeepThought</class>
-        <!--<class>net.deepthought.data.model.DeepThoughtFavoriteEntryTemplateRelation</class>-->
         <class>net.deepthought.data.model.Category</class>
         <class>net.deepthought.data.model.Entry</class>
         <class>net.deepthought.data.model.EntriesLinkGroup</class>
-        <class>net.deepthought.data.model.enums.EntryTemplate</class>
         <class>net.deepthought.data.model.Tag</class>
         <class>net.deepthought.data.model.IndexTerm</class>
         <class>net.deepthought.data.model.Person</class>

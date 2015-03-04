@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
@@ -48,13 +47,6 @@ public class Category extends UserDataEntity {
   @Column(name = TableConfig.CategoryCategoryOrderColumnName)
   protected int categoryOrder;
 
-  @ManyToOne(fetch =  FetchType.LAZY)
-  @JoinColumn(name = TableConfig.CategoryDefaultEntryTemplateJoinColumnName)
-  protected EntryTemplate defaultEntryTemplate;
-
-//  @Column(name = TableConfig.CategoryDefaultEntryTemplateKeyColumnName)
-//  protected String defaultEntryTemplateKey;
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.CategoryParentCategoryJoinColumnName)
   protected Category parentCategory;
@@ -79,24 +71,12 @@ public class Category extends UserDataEntity {
   protected DeepThought deepThought;
 
 
-//  protected transient List<CategoryListener> categoryListeners = new CopyOnWriteArrayList<>();
-
-
-  protected Category() {
-
+  public Category() {
+    this(Localization.getLocalizedStringForResourceKey("new.category.default.name"));
   }
 
   public Category(String name) {
-    this(name, Application.getDeepThought().getSettings().getDefaultEntryTemplate());
-  }
-
-  public Category(EntryTemplate defaultEntryTemplate) {
-    this(Localization.getLocalizedStringForResourceKey("new.category.default.name"), defaultEntryTemplate);
-  }
-
-  public Category(String name, EntryTemplate defaultEntryTemplate) {
     this.name = name;
-    setDefaultEntryTemplate(defaultEntryTemplate);
   }
 
 
@@ -140,16 +120,6 @@ public class Category extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.CategoryCategoryOrderColumnName, previousCategoryIndex, categoryOrder);
   }
 
-  public EntryTemplate getDefaultEntryTemplate() {
-    return defaultEntryTemplate;
-  }
-
-  public void setDefaultEntryTemplate(EntryTemplate defaultEntryTemplate) {
-    Object previousValue = this.defaultEntryTemplate;
-    this.defaultEntryTemplate = defaultEntryTemplate;
-    callPropertyChangedListeners(TableConfig.CategoryDefaultEntryTemplateJoinColumnName, previousValue, defaultEntryTemplate);
-  }
-
   public Category getParentCategory() {
     return parentCategory;
   }
@@ -170,10 +140,6 @@ public class Category extends UserDataEntity {
 
     boolean result = subCategories.add(subCategory);
     if(result) {
-
-      if(subCategory.getDefaultEntryTemplate() == Application.getDeepThought().getSettings().getDefaultEntryTemplate())
-        subCategory.setDefaultEntryTemplate(getDefaultEntryTemplate());
-
       callEntityAddedListeners(subCategories, subCategory);
     }
 
@@ -277,7 +243,7 @@ public class Category extends UserDataEntity {
 
 
   public static Category createTopLevelCategory() {
-    Category topLevelCategory = new Category(Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing"), null);
+    Category topLevelCategory = new Category(Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing"));
 
     return topLevelCategory;
   }

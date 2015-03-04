@@ -102,6 +102,6 @@ public class ReferenceBasePersonAssociation extends AssociationEntity {
   @Override
   @Transient
   public String getTextRepresentation() {
-    return "ReferenceBasePersonAssociation: Person = " + person + ", Entry = " + referenceBase;
+    return "ReferenceBasePersonAssociation: Person = " + person + ", ReferenceBase = " + referenceBase;
   }
 }

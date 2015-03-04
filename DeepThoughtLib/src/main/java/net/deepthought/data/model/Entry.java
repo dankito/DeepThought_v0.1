@@ -1,14 +1,13 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.model.enums.EntryContentFormat;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.listener.EntryPersonListener;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ import javax.persistence.Transient;
  * Created by ganymed on 16/12/14.
  */
 @Entity(name = TableConfig.EntryTableName)
-public class Entry extends UserDataEntity implements Serializable {
+public class Entry extends UserDataEntity implements Serializable, Comparable<Entry> {
 
   private static final long serialVersionUID = 596730656893495215L;
 
@@ -53,9 +52,6 @@ public class Entry extends UserDataEntity implements Serializable {
   @Column(name = TableConfig.EntryTitleColumnName, length = 512)
   protected String title = "";
 
-  @Column(name = TableConfig.EntrySubTitleColumnName, length = 512)
-  protected String subTitle = "";
-
   //  @Column(name = TableConfig.EntryAbstractColumnName, length = 2048)
   @Column(name = TableConfig.EntryAbstractColumnName)
   @Lob
@@ -68,13 +64,6 @@ public class Entry extends UserDataEntity implements Serializable {
 
   @Column(name = TableConfig.EntryContentFormatColumnName)
   protected EntryContentFormat contentFormat = EntryContentFormat.PlainText;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = TableConfig.EntryEntryTemplateJoinColumnName)
-  protected EntryTemplate template;
-
-//  @Column(name =  TableConfig.EntryEntryTemplateKeyColumnName)
-//  protected String templateKey;
 
   @Column(name = TableConfig.EntryEntryIndexColumnName)
   protected int entryIndex;
@@ -142,19 +131,19 @@ public class Entry extends UserDataEntity implements Serializable {
   @JoinColumn(name = TableConfig.EntryReferenceSubDivisionJoinColumnName)
   protected ReferenceSubDivision referenceSubDivision;
 
-  @Column(name = TableConfig.EntryReferenceStartColumnName)
-  protected String referenceStart;
+  @Column(name = TableConfig.EntryIndicationStartColumnName)
+  protected String indicationStart;
 
   @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.EntryReferenceStartUnitJoinColumnName)
-  protected ReferenceIndicationUnit referenceStartUnit;
+  @JoinColumn(name = TableConfig.EntryIndicationStartUnitJoinColumnName)
+  protected ReferenceIndicationUnit indicationStartUnit;
 
-  @Column(name = TableConfig.EntryReferenceEndColumnName)
-  protected String referenceEnd;
+  @Column(name = TableConfig.EntryIndicationEndColumnName)
+  protected String indicationEnd;
 
   @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.EntryReferenceEndUnitJoinColumnName)
-  protected ReferenceIndicationUnit referenceEndUnit;
+  @JoinColumn(name = TableConfig.EntryIndicationEndUnitJoinColumnName)
+  protected ReferenceIndicationUnit indicationEndUnit;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntryLanguageJoinColumnName)
@@ -217,26 +206,17 @@ public class Entry extends UserDataEntity implements Serializable {
 
 
 
-  protected Entry() {
+  public Entry() {
 
-  }
-
-  public Entry(EntryTemplate template) {
-    setTemplate(template);
   }
 
   public Entry(String title) {
-    this(title, "");
+    this.title = title;
   }
 
   public Entry(String title, String content) {
-    this(Application.getDeepThought().getSettings().getDefaultEntryTemplate(), title, content);
-  }
-
-  public Entry(EntryTemplate template, String title, String content) {
-    this.title = title;
+    this(title);
     this.content = content;
-    setTemplate(template);
   }
 
 
@@ -248,16 +228,6 @@ public class Entry extends UserDataEntity implements Serializable {
     String previousTitle = this.title;
     this.title = title;
     callPropertyChangedListeners(TableConfig.EntryTitleColumnName, previousTitle, title);
-  }
-
-  public String getSubTitle() {
-    return subTitle;
-  }
-
-  public void setSubTitle(String subTitle) {
-    String previousSubTitle = this.subTitle;
-    this.subTitle = subTitle;
-    callPropertyChangedListeners(TableConfig.EntrySubTitleColumnName, previousSubTitle, subTitle);
   }
 
   public String getAbstract() {
@@ -373,44 +343,44 @@ public class Entry extends UserDataEntity implements Serializable {
     callPropertyChangedListeners(TableConfig.EntryReferenceSubDivisionJoinColumnName, previousValue, referenceSubDivision);
   }
 
-  public String getReferenceStart() {
-    return referenceStart;
+  public String getIndicationStart() {
+    return indicationStart;
   }
 
-  public void setReferenceStart(String referenceStart) {
-    Object previousValue = this.referenceStart;
-    this.referenceStart = referenceStart;
-    callPropertyChangedListeners(TableConfig.EntryReferenceStartColumnName, previousValue, referenceStart);
+  public void setIndicationStart(String indicationStart) {
+    Object previousValue = this.indicationStart;
+    this.indicationStart = indicationStart;
+    callPropertyChangedListeners(TableConfig.EntryIndicationStartColumnName, previousValue, indicationStart);
   }
 
-  public ReferenceIndicationUnit getReferenceStartUnit() {
-    return referenceStartUnit;
+  public ReferenceIndicationUnit getIndicationStartUnit() {
+    return indicationStartUnit;
   }
 
-  public void setReferenceStartUnit(ReferenceIndicationUnit referenceStartUnit) {
-    Object previousValue = this.referenceStartUnit;
-    this.referenceStartUnit = referenceStartUnit;
-    callPropertyChangedListeners(TableConfig.EntryReferenceStartUnitJoinColumnName, previousValue, referenceStartUnit);
+  public void setIndicationStartUnit(ReferenceIndicationUnit indicationStartUnit) {
+    Object previousValue = this.indicationStartUnit;
+    this.indicationStartUnit = indicationStartUnit;
+    callPropertyChangedListeners(TableConfig.EntryIndicationStartUnitJoinColumnName, previousValue, indicationStartUnit);
   }
 
-  public String getReferenceEnd() {
-    return referenceEnd;
+  public String getIndicationEnd() {
+    return indicationEnd;
   }
 
-  public void setReferenceEnd(String referenceEnd) {
-    Object previousValue = this.referenceEnd;
-    this.referenceEnd = referenceEnd;
-    callPropertyChangedListeners(TableConfig.EntryReferenceEndColumnName, previousValue, referenceEnd);
+  public void setIndicationEnd(String indicationEnd) {
+    Object previousValue = this.indicationEnd;
+    this.indicationEnd = indicationEnd;
+    callPropertyChangedListeners(TableConfig.EntryIndicationEndColumnName, previousValue, indicationEnd);
   }
 
-  public ReferenceIndicationUnit getReferenceEndUnit() {
-    return referenceEndUnit;
+  public ReferenceIndicationUnit getIndicationEndUnit() {
+    return indicationEndUnit;
   }
 
-  public void setReferenceEndUnit(ReferenceIndicationUnit referenceEndUnit) {
-    Object previousValue = this.referenceEndUnit;
-    this.referenceEndUnit = referenceEndUnit;
-    callPropertyChangedListeners(TableConfig.EntryReferenceEndUnitJoinColumnName, previousValue, referenceEndUnit);
+  public void setIndicationEndUnit(ReferenceIndicationUnit indicationEndUnit) {
+    Object previousValue = this.indicationEndUnit;
+    this.indicationEndUnit = indicationEndUnit;
+    callPropertyChangedListeners(TableConfig.EntryIndicationEndUnitJoinColumnName, previousValue, indicationEndUnit);
   }
 
   public String getEvaluation() {
@@ -783,30 +753,6 @@ public class Entry extends UserDataEntity implements Serializable {
   }
 
 
-  public EntryTemplate getTemplate() {
-//    if(template == null || templateKey.equals(template.getKey()) == false) { // after loading from DB Template is not set correctly
-//      this.template = EntryTemplateRegistry.getEntryTemplateByKey(templateKey);
-//    }
-
-    return template;
-  }
-
-  public void setTemplate(EntryTemplate template) {
-    Object previousValue = this.template;
-    this.template = template;
-    callPropertyChangedListeners(TableConfig.EntryEntryTemplateJoinColumnName, previousValue, template);
-  }
-
-//  protected String getTemplateKey() {
-//    return templateKey;
-//  }
-//
-//  protected void setTemplateKey(String templateKey) {
-//    this.templateKey = templateKey;
-//    this.template = EntryTemplateRegistry.getEntryTemplateByKey(templateKey);
-//  }
-
-
   public int getEntryIndex() {
     return entryIndex;
   }
@@ -975,18 +921,33 @@ public class Entry extends UserDataEntity implements Serializable {
   }
 
 
-
-//  @Override
-//  public boolean equals(Object obj) {
-//    if(id == null || obj instanceof Entry == false)
-//      return false;
-//
-//    return id.equals(((Entry)obj).id); // TODO: this makes no sense if Json serialization is used
-//  }
+  private final static int PreviewMaxLength = 100;
 
   @Transient
   public String getPreview() {
-    return getTitle(); // TODO
+    String preview = "";
+
+    if(StringUtils.isNotNullOrEmpty(title)) {
+      preview += title;
+    }
+    if(StringUtils.isNotNullOrEmpty(abstractString)) {
+      if(preview.length() > 0)
+        preview += ": ";
+      preview += abstractString;
+    }
+
+    if(preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
+      if(preview.length() > 0)
+        preview += " - ";
+      preview += content;
+    }
+
+    if(preview.length() >= PreviewMaxLength)
+      preview = preview.substring(0, PreviewMaxLength) + " ...";
+
+    preview = preview.replace("\r", "").replace("\n", "");
+
+    return preview;
   }
 
   @Override
@@ -1000,4 +961,10 @@ public class Entry extends UserDataEntity implements Serializable {
     return "Entry " + getTitle() + " (" + getContent() + ")";
   }
 
+  @Override
+  public int compareTo(Entry other) {
+    if(other == null)
+      return 1;
+    return ((Integer)other.getEntryIndex()).compareTo(getEntryIndex());
+  }
 }

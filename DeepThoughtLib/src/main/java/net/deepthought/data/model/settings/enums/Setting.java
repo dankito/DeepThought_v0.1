@@ -9,10 +9,14 @@ public enum Setting {
   UserDeviceAutoSaveChanges,
   UserDeviceAutoSaveChangesAfterMilliseconds,
   UserDeviceMaxBackupsToKeep,
+  UserDeviceDialogFieldsDisplay,
+  UserDeviceShowCategories,
+  UserDeviceShowQuickEditEntryPane,
 
 
   DeepThoughtLastSelectedTab,
   DeepThoughtLastSelectedAndroidTab,
+  DeepThoughtLastSelectedList,
   DeepThoughtLastViewedCategory,
   DeepThoughtLastViewedTag,
   DeepThoughtLastViewedEntry,

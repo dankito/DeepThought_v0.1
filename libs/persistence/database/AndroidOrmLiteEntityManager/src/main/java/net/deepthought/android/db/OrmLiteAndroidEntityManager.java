@@ -37,7 +37,6 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
@@ -114,11 +113,9 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
     mapEntityClassesToDaos.put(Group.class, null);
 
     mapEntityClassesToDaos.put(DeepThought.class, null);
-//    mapEntityClassesToDaos.put(DeepThoughtFavoriteEntryTemplateRelation.class, null);
     mapEntityClassesToDaos.put(Category.class, null);
     mapEntityClassesToDaos.put(Entry.class, null);
     mapEntityClassesToDaos.put(EntriesLinkGroup.class, null);
-    mapEntityClassesToDaos.put(EntryTemplate.class, null);
     mapEntityClassesToDaos.put(Tag.class, null);
     mapEntityClassesToDaos.put(IndexTerm.class, null);
     mapEntityClassesToDaos.put(Person.class, null);

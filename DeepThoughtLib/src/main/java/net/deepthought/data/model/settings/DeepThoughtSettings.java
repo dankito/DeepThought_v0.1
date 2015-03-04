@@ -4,9 +4,9 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.enums.EntryTemplate;
-import net.deepthought.data.model.enums.SelectedAndroidTab;
-import net.deepthought.data.model.enums.SelectedTab;
+import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
+import net.deepthought.data.model.settings.enums.SelectedList;
+import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.settings.enums.Setting;
 
 import java.io.Serializable;
@@ -23,6 +23,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected SelectedAndroidTab lastSelectedAndroidTab = SelectedAndroidTab.EntriesOverview;
 
+  protected SelectedList lastSelectedList = SelectedList.Persons;
+
   protected transient Category lastViewedCategory;
 
   protected Long lastViewedCategoryId;
@@ -34,10 +36,6 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
   protected transient Entry lastViewedEntry;
 
   protected Long lastViewedEntryId;
-
-  protected transient EntryTemplate defaultEntryTemplate;
-
-  protected Long defaultEntryTemplateId;
 
 
   public DeepThoughtSettings() {
@@ -66,6 +64,16 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     if(lastSelectedAndroidTab.ordinal() <= 2)
       this.lastSelectedTab = SelectedTab.fromOrdinal(lastSelectedAndroidTab.ordinal());
     callSettingsChangedListeners(Setting.DeepThoughtLastSelectedAndroidTab, previousLastSelectedAndroidTab, lastSelectedAndroidTab);
+  }
+
+  public SelectedList getLastSelectedList() {
+    return lastSelectedList;
+  }
+
+  public void setLastSelectedList(SelectedList lastSelectedList) {
+    Object previousValue = this.lastSelectedList;
+    this.lastSelectedList = lastSelectedList;
+    callSettingsChangedListeners(Setting.DeepThoughtLastSelectedList, previousValue, lastSelectedList);
   }
 
   public Category getLastViewedCategory() {
@@ -111,21 +119,6 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     this.lastViewedEntryId = lastViewedEntry == null ? null : lastViewedEntry.getId();
 
     callSettingsChangedListeners(Setting.DeepThoughtLastViewedEntry, previousLastViewedEntry, lastViewedEntry);
-  }
-
-  public EntryTemplate getDefaultEntryTemplate() {
-    if(defaultEntryTemplate == null && defaultEntryTemplateId != null)
-      defaultEntryTemplate = Application.getEntityManager().getEntityById(EntryTemplate.class, defaultEntryTemplateId);
-    return defaultEntryTemplate;
-  }
-
-  public void setDefaultEntryTemplate(EntryTemplate defaultEntryTemplate) {
-    EntryTemplate previousValue = this.defaultEntryTemplate;
-    this.defaultEntryTemplate = defaultEntryTemplate;
-
-    this.defaultEntryTemplateId = defaultEntryTemplate == null ? null : defaultEntryTemplate.getId();
-
-    callSettingsChangedListeners(Setting.DeepThoughtDefaultEntryTemplate, previousValue, defaultEntryTemplate);
   }
 
 

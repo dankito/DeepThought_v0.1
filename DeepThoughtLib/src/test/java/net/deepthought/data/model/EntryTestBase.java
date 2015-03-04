@@ -2,7 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.EntryContentFormat;
-import net.deepthought.data.model.enums.EntryTemplate;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
@@ -1041,24 +1040,6 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
 
   @Test
-  public void updateEntryTemplate_UpdatedValueGetsPersisted() throws Exception {
-    String testTemplateKey = "UnitTestKey";
-
-    Entry entry = new Entry("test", "no content");
-    EntryTemplate template = new EntryTemplate(testTemplateKey, "", "");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-    deepThought.addEntryTemplate(template);
-
-    entry.setTemplate(template);
-
-    Object persistedEntryTemplateId = getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryEntryTemplateJoinColumnName, entry.getId());
-    Assert.assertTrue(doIdsEqual(template.getId(), persistedEntryTemplateId));
-  }
-
-
-  @Test
   public void setPreviewImage_RelationGetsPersistedInDb() throws Exception {
     Entry entry = new Entry("test", "no content");
     FileLink previewImage = new FileLink("/tmp/dummy.png");
@@ -1496,15 +1477,15 @@ public abstract class EntryTestBase extends DataModelTestBase {
   @Test
   public void updateReferenceStart_UpdatedValueGetsPersistedInDb() throws Exception {
     Entry entry = new Entry("test", "no content");
-    entry.setReferenceStart("41");
+    entry.setIndicationStart("41");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
     String newReferenceStart = "42"; // the Application is after all called DeepThought
-    entry.setReferenceStart(newReferenceStart);
+    entry.setIndicationStart(newReferenceStart);
 
-    Assert.assertEquals(newReferenceStart, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryReferenceStartColumnName, entry.getId()));
+    Assert.assertEquals(newReferenceStart, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartColumnName, entry.getId()));
   }
 
   @Test
@@ -1513,27 +1494,27 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     List<ReferenceIndicationUnit> referenceIndicationUnits = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    entry.setReferenceStartUnit(referenceIndicationUnits.get(0));
+    entry.setIndicationStartUnit(referenceIndicationUnits.get(0));
     deepThought.addEntry(entry);
 
     ReferenceIndicationUnit newReferenceStartUnit = referenceIndicationUnits.get(1);
-    entry.setReferenceStartUnit(newReferenceStartUnit);
+    entry.setIndicationStartUnit(newReferenceStartUnit);
 
-    Assert.assertTrue(doIdsEqual(newReferenceStartUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryReferenceStartUnitJoinColumnName, entry.getId())));
+    Assert.assertTrue(doIdsEqual(newReferenceStartUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartUnitJoinColumnName, entry.getId())));
   }
 
   @Test
   public void updateReferenceEnd_UpdatedValueGetsPersistedInDb() throws Exception {
     Entry entry = new Entry("test", "no content");
-    entry.setReferenceEnd("41");
+    entry.setIndicationEnd("41");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
     String newReferenceEnd = "42"; // the Application is after all called DeepThought
-    entry.setReferenceEnd(newReferenceEnd);
+    entry.setIndicationEnd(newReferenceEnd);
 
-    Assert.assertEquals(newReferenceEnd, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryReferenceEndColumnName, entry.getId()));
+    Assert.assertEquals(newReferenceEnd, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndColumnName, entry.getId()));
   }
 
   @Test
@@ -1542,13 +1523,13 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     List<ReferenceIndicationUnit> referenceIndicationUnits = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    entry.setReferenceEndUnit(referenceIndicationUnits.get(0));
+    entry.setIndicationEndUnit(referenceIndicationUnits.get(0));
     deepThought.addEntry(entry);
 
     ReferenceIndicationUnit newReferenceEndUnit = referenceIndicationUnits.get(1);
-    entry.setReferenceEndUnit(newReferenceEndUnit);
+    entry.setIndicationEndUnit(newReferenceEndUnit);
 
-    Assert.assertTrue(doIdsEqual(newReferenceEndUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryReferenceEndUnitJoinColumnName, entry.getId())));
+    Assert.assertTrue(doIdsEqual(newReferenceEndUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndUnitJoinColumnName, entry.getId())));
   }
 
 

@@ -1,13 +1,14 @@
-package net.deepthought.data.model.enums;
+package net.deepthought.data.model.settings.enums;
 
 /**
  * Created by ganymed on 15/12/14.
  */
 public enum SelectedTab {
 
-  Tags(0),
-  Categories(1),
-  AdvancedSearch(2),
+  Categories(0),
+  Tags(1),
+  Search(2),
+  Lists(3),
   Unknown(-1);
 
 
@@ -26,12 +27,14 @@ public enum SelectedTab {
   @Override
   public String toString() {
     switch(this) {
-      case Tags:
-        return "Tags";
       case Categories:
         return "Categories";
-      case AdvancedSearch:
-        return "AdvancedSearch";
+      case Tags:
+        return "Tags";
+      case Search:
+        return "Search";
+      case Lists:
+        return "Lists";
       default:
         return "Unknown";
     }
@@ -39,16 +42,12 @@ public enum SelectedTab {
 
 
   public static SelectedTab fromOrdinal(int ordinal) {
-    switch(ordinal) {
-      case 0:
-        return Tags;
-      case 1:
-        return Categories;
-      case 2:
-        return AdvancedSearch;
-      default:
-        return Unknown;
+    for(SelectedTab tab : SelectedTab.values()) {
+      if(((Integer)tab.value).equals(ordinal))
+        return tab;
     }
+
+    return Unknown;
   }
 
 }

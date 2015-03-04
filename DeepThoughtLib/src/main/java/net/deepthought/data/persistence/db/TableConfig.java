@@ -186,10 +186,10 @@ public class TableConfig {
   public final static String EntrySeriesTitleJoinColumnName = "series_title_id";
   public final static String EntryReferenceJoinColumnName = "reference_id";
   public final static String EntryReferenceSubDivisionJoinColumnName = "reference_sub_division_id";
-  public final static String EntryReferenceStartColumnName = "reference_start";
-  public final static String EntryReferenceStartUnitJoinColumnName = "reference_start_unit_id";
-  public final static String EntryReferenceEndColumnName = "reference_end";
-  public final static String EntryReferenceEndUnitJoinColumnName = "reference_end_unit_id";
+  public final static String EntryIndicationStartColumnName = "indication_start";
+  public final static String EntryIndicationStartUnitJoinColumnName = "indication_start_unit_id";
+  public final static String EntryIndicationEndColumnName = "indication_end";
+  public final static String EntryIndicationEndUnitJoinColumnName = "indication_end_unit_id";
   public final static String EntryPreviewImageJoinColumnName = "preview_image_id";
   public final static String EntryEvaluationColumnName = "evaluation";
   public final static String EntryRatingColumnName = "rating";
