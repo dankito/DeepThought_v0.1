@@ -62,7 +62,7 @@
                                     </ToggleButton>
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" top="6.0" />
+                                    <Insets bottom="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0">
@@ -327,7 +327,7 @@
    <right>
       <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" BorderPane.alignment="TOP_LEFT">
          <content>
-            <WebView prefHeight="200.0" prefWidth="200.0" />
+            <WebView fx:id="wbvwContextHelp" prefHeight="200.0" prefWidth="200.0" />
          </content>
       </ScrollPane>
    </right>

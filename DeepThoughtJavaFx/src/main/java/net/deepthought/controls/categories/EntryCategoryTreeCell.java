@@ -58,9 +58,9 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
 
   protected HBox categoryOptionsButtonsPane = new HBox();
 
-  protected Button addSubCategoryToCategoryButton = new Button();
-  protected Button deleteCategoryButton = new Button();
   protected Button editCategoryButton = new Button();
+  protected Button deleteCategoryButton = new Button();
+  protected Button addSubCategoryToCategoryButton = new Button();
 
 
   public EntryCategoryTreeCell(Entry entry, EntryCategoriesControl entryCategoriesControl) {
@@ -105,19 +105,19 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
     categoryOptionsButtonsPane.managedProperty().bind(categoryOptionsButtonsPane.visibleProperty());
     graphicPane.getChildren().add(categoryOptionsButtonsPane);
 
-    addSubCategoryToCategoryButton.setText("+");
-    addSubCategoryToCategoryButton.setTextFill(Color.GREEN);
-    addSubCategoryToCategoryButton.setFont(new Font(15));
-    addSubCategoryToCategoryButton.setPrefWidth(50);
-    JavaFxLocalization.bindControlToolTip(addSubCategoryToCategoryButton, "add.sub.category.to.category.tool.tip");
-    categoryOptionsButtonsPane.getChildren().add(addSubCategoryToCategoryButton);
-    addSubCategoryToCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
+    JavaFxLocalization.bindLabeledText(editCategoryButton, "edit");
+    JavaFxLocalization.bindControlToolTip(editCategoryButton, "edit.category.tool.tip");
+    editCategoryButton.setMinWidth(80);
+    categoryOptionsButtonsPane.getChildren().add(editCategoryButton);
+    editCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         selectCurrentCell();
-        handleAddSubCategoryToCategoryButtonAction();
+        handleEditFileButtonAction();
       }
     });
+
+    editCategoryButton.setDisable(true);
 
     deleteCategoryButton.setText("-");
     deleteCategoryButton.setTextFill(Color.RED);
@@ -133,19 +133,19 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
       }
     });
 
-    JavaFxLocalization.bindLabeledText(editCategoryButton, "edit");
-    JavaFxLocalization.bindControlToolTip(editCategoryButton, "edit.category.tool.tip");
-    editCategoryButton.setMinWidth(80);
-    categoryOptionsButtonsPane.getChildren().add(editCategoryButton);
-    editCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
+    addSubCategoryToCategoryButton.setText("+");
+    addSubCategoryToCategoryButton.setTextFill(Color.GREEN);
+    addSubCategoryToCategoryButton.setFont(new Font(15));
+    addSubCategoryToCategoryButton.setPrefWidth(50);
+    JavaFxLocalization.bindControlToolTip(addSubCategoryToCategoryButton, "add.sub.category.to.category.tool.tip");
+    categoryOptionsButtonsPane.getChildren().add(addSubCategoryToCategoryButton);
+    addSubCategoryToCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         selectCurrentCell();
-        handleEditFileButtonAction();
+        handleAddSubCategoryToCategoryButtonAction();
       }
     });
-
-    editCategoryButton.setDisable(true);
 
     disclosureNodeProperty().addListener(new ChangeListener<Node>() {
       @Override
@@ -197,7 +197,15 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-      Dialogs.showEditCategoryDialog(category);
+      //Dialogs.showEditCategoryDialog(category);
+
+//      if(category != null) {
+//        if (entryCategoriesControl.getEditedEntryCategories().contains(category) == false)
+//          entryCategoriesControl.addCategoryToEntry(entry, category);
+//        else
+//          entryCategoriesControl.removeCategoryFromEntry(entry, category);
+//      }
+      isEntryInCategoryCheckBox.setSelected(!isEntryInCategoryCheckBox.isSelected()); // simply toggle selected state
     }
   }
 

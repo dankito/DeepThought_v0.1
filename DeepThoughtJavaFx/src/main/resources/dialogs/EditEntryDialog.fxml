@@ -13,7 +13,7 @@
    <right>
       <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
          <content>
-            <WebView fx:id="wbvwContextHelp" fontScale="0.85" prefHeight="200.0" prefWidth="200.0" />
+            <WebView fx:id="wbvwContextHelp" fontScale="0.85" prefHeight="-1.0" prefWidth="-1.0" />
          </content>
       </ScrollPane>
    </right>
@@ -63,7 +63,7 @@
                                           </Rectangle>
                                        </children>
                                     </HBox>
-                                    <HBox fx:id="paneViewConfig" alignment="CENTER_RIGHT" prefHeight="40.0">
+                                    <HBox fx:id="paneViewConfig" alignment="CENTER_RIGHT" maxHeight="40.0" prefHeight="40.0">
                                        <children>
                                           <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
                                              <HBox.margin>
@@ -73,7 +73,7 @@
                                                 <Font name="System Bold" size="15.0" />
                                              </font>
                                           </Button>
-                                          <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
+                                          <ToggleButton fx:id="tglbtnShowHideContextHelp" maxHeight="40.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
                                              <font>
                                                 <Font name="System Bold" size="15.0" />
                                              </font>

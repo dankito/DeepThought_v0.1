@@ -27,6 +27,10 @@ public class NewOrEditButton extends SplitMenuButton {
   public enum ButtonFunction { New, Edit }
 
 
+  protected String newText = "new...";
+
+  protected String editText = "edit";
+
   protected ButtonFunction buttonFunction = ButtonFunction.New;
 
   private BooleanProperty showNewMenuItem;
@@ -75,7 +79,7 @@ public class NewOrEditButton extends SplitMenuButton {
     setButtonText();
 
     newMenuItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(newMenuItem, "new...");
+    JavaFxLocalization.bindMenuItemText(newMenuItem, newText);
     newMenuItem.setOnAction((event) -> onNewMenuItemAction(event));
     this.getItems().add(newMenuItem);
     newMenuItem.setVisible(false);
@@ -90,7 +94,7 @@ public class NewOrEditButton extends SplitMenuButton {
     });
 
     editMenuItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(editMenuItem, "edit");
+    JavaFxLocalization.bindMenuItemText(editMenuItem, editText);
     editMenuItem.setOnAction((event) -> onEditMenuItemAction(event));
     this.getItems().add(editMenuItem);
     editMenuItem.setVisible(false);
@@ -100,11 +104,29 @@ public class NewOrEditButton extends SplitMenuButton {
 
   protected void setButtonText() {
     if(buttonFunction == ButtonFunction.New)
-      JavaFxLocalization.bindLabeledText(this, "new...");
+      JavaFxLocalization.bindLabeledText(this, newText);
     else
-      JavaFxLocalization.bindLabeledText(this, "edit");
+      JavaFxLocalization.bindLabeledText(this, editText);
   }
 
+
+  public String getNewText() {
+    return newText;
+  }
+
+  public void setNewText(String newText) {
+    this.newText = newText;
+    JavaFxLocalization.bindMenuItemText(newMenuItem, newText);
+  }
+
+  public String getEditText() {
+    return editText;
+  }
+
+  public void setEditText(String editText) {
+    this.editText = editText;
+    JavaFxLocalization.bindMenuItemText(editMenuItem, editText);
+  }
 
   public ButtonFunction getButtonFunction() {
     return buttonFunction;

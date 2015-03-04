@@ -1,8 +1,11 @@
 package net.deepthought.controller;
 
+import com.sun.webkit.WebPage;
+
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -16,6 +19,9 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
@@ -32,7 +38,9 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,6 +48,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -209,11 +219,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
     ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
     txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
 
-    entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
-    ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
-    VBox.setMargin(entryReferenceControl, new Insets(6, 0, 6, 0));
-    contentPane.getChildren().add(entryReferenceControl);
-
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -232,7 +237,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setExpanded(true);
 //    contentPane.getChildren().addAll(entryCategoriesControl);
     HBox.setHgrow(entryCategoriesControl, Priority.ALWAYS);
+    HBox.setMargin(entryCategoriesControl, new Insets(0, 0, 0, 12));
     paneTagsAndCategories.getChildren().add(entryCategoriesControl);
+
+    entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
+    ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    VBox.setMargin(entryReferenceControl, new Insets(6, 0, 6, 0));
+    contentPane.getChildren().add(entryReferenceControl);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setPrefHeight(250);
@@ -243,6 +254,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
+    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> showContextHelp("default")); // TODO: remove as soon as other context help texts are implemented
 
     ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -254,8 +266,23 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
     paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
+
+    try {
+      // Use reflection to retrieve the WebEngine's private 'page' field.
+      Field f = wbvwContextHelp.getEngine().getClass().getDeclaredField("page");
+      f.setAccessible(true);
+      final WebPage page = (WebPage) f.get(wbvwContextHelp.getEngine());
+      wbvwContextHelp.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
+        @Override
+        public void changed(ObservableValue<? extends Document> observable, Document oldValue, Document newValue) {
+          page.setBackgroundColor(Constants.ContextHelpBackgroundColor);
+        }
+      });
+    } catch (Exception e) { }
+
+    showContextHelp("default");
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
@@ -351,33 +378,41 @@ public class EditEntryDialogController extends ChildWindowsController implements
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySeriesTitle)) {
-      entry.setSeries(entryReferenceControl.getSeriesTitle());
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySeriesTitle) || fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReference)) {
+      ReferenceBase referenceBase = entryReferenceControl.getReferenceBase();
+      ReferenceSubDivision subDivision = entryReferenceControl.getReferenceSubDivision();
+
+      if(referenceBase instanceof SeriesTitle)
+        entry.setSeries((SeriesTitle)referenceBase);
+      else {
+        entry.setReference((Reference) referenceBase);
+      }
+
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySeriesTitle);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReference)) {
-      entry.setReference(entryReferenceControl.getReference());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReference);
+
+      entry.setReferenceSubDivision(subDivision);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceSubDivision)) {
       entry.setReferenceSubDivision(entryReferenceControl.getReferenceSubDivision());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStart)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationStart)) {
       entry.setIndicationStart(entryReferenceControl.getReferenceStart());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStart);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationStart);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceStartUnit)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationStartUnit)) {
       entry.setIndicationStartUnit(entryReferenceControl.getReferenceStartUnit());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceStartUnit);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationStartUnit);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEnd)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationEnd)) {
       entry.setIndicationEnd(entryReferenceControl.getReferenceEnd());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEnd);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationEnd);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceEndUnit)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationEndUnit)) {
       entry.setIndicationEndUnit(entryReferenceControl.getReferenceEndUnit());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceEndUnit);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationEndUnit);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryPersons)) {
@@ -519,8 +554,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
-
-    showContextHelp("test");
   }
 
   protected void showContextHelpForTarget(MouseEvent event) {
@@ -529,7 +562,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     if(target instanceof Node && ("txtfldSearchForPerson".equals(((Node)target).getId()) || isNodeChildOf((Node)target, entryPersonsControl)))
       showContextHelp("search.person");
     else  // TODO: add Context Help for other fields
-      showContextHelp("test");
+      showContextHelp("default");
   }
 
   protected void showContextHelp(String contextHelpResourceKey) {

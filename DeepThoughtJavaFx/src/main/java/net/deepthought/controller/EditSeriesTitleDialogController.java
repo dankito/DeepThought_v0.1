@@ -1,14 +1,20 @@
 package net.deepthought.controller;
 
+import com.sun.webkit.WebPage;
+
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.BaseEntityListCell;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
+import net.deepthought.controls.person.SeriesTitlePersonsControl;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Publisher;
 import net.deepthought.data.model.SeriesTitle;
+import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
@@ -27,13 +33,18 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javafx.beans.value.ChangeListener;
@@ -67,6 +78,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -105,6 +117,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected ToggleButton tglbtnShowHideContextHelp;
 
   @FXML
+  protected WebView wbvwContextHelp;
+
+  @FXML
   protected Pane paneSubTitle;
   @FXML
   protected TextField txtfldSubTitle;
@@ -123,6 +138,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected TitledPane ttldpnTableOfContents;
   @FXML
   protected HTMLEditor htmledTableOfContents;
+
+
+  protected SeriesTitlePersonsControl seriesTitlePersonsControl;
 
   @FXML
   protected Pane paneFirstAndLastDayOfPublication;
@@ -249,6 +267,12 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       }
     });
 
+    seriesTitlePersonsControl = new SeriesTitlePersonsControl();
+    seriesTitlePersonsControl.setExpanded(true);
+    seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
+    seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
+    contentPane.getChildren().add(5, seriesTitlePersonsControl);
+
     ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
     dtpckFirstDayOfPublication.setConverter(localeDateStringConverter);
     dtpckFirstDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication));
@@ -304,8 +328,27 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 
     ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
     paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+    try {
+      // Use reflection to retrieve the WebEngine's private 'page' field.
+      Field f = wbvwContextHelp.getEngine().getClass().getDeclaredField("page");
+      f.setAccessible(true);
+      final WebPage page = (WebPage) f.get(wbvwContextHelp.getEngine());
+      wbvwContextHelp.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
+        @Override
+        public void changed(ObservableValue<? extends Document> observable, Document oldValue, Document newValue) {
+            page.setBackgroundColor(Constants.ContextHelpBackgroundColor);
+        }
+      });
+    } catch (Exception e) { }
+
+    showContextHelp("default");
+  }
+
+  protected void showContextHelp(String contextHelpResourceKey) {
+    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.series.title." + contextHelpResourceKey));
   }
 
   protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
@@ -432,6 +475,22 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
       seriesTitle.setTableOfContents(htmledTableOfContents.getHtmlText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
+    }
+
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBasePersons)) {
+      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(seriesTitlePersonsControl.getRemovedPersons());
+      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
+        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
+          seriesTitle.removePerson(removedPerson, removedPersonsInRole);
+      }
+
+      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(seriesTitlePersonsControl.getAddedPersons());
+      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
+        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
+          seriesTitle.addPerson(addedPerson, addedPersonsInRole);
+      }
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBasePersons);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication)) {
@@ -683,6 +742,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 
     txtarAbstract.setText(seriesTitle.getAbstract());
     htmledTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
+
+    seriesTitlePersonsControl.setSeries(seriesTitle);
 
     dtpckFirstDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getFirstDayOfPublication()));
     dtpckLastDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastDayOfPublication()));

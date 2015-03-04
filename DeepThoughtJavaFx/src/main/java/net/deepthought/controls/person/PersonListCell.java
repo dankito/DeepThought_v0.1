@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -185,7 +187,15 @@ public class PersonListCell extends ListCell<Person> {
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-      Dialogs.showEditPersonDialog(getItem());
+      //Dialogs.showEditPersonDialog(getItem());
+
+      if(getItem() != null) {
+        Map<PersonRole, Set<Person>> editedPersons = personsControl.getEditedEntityPersons();
+        if (editedPersons.containsKey(PersonRole.getWithoutRolePersonRole()) == false || editedPersons.get(PersonRole.getWithoutRolePersonRole()).contains(getItem()) == false)
+          addPersonInRoleToEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+        else
+          removePersonInRoleFromEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+      }
     }
   }
 
@@ -243,6 +253,11 @@ public class PersonListCell extends ListCell<Person> {
 
   protected void addPersonInRoleToEntity(Person person, PersonRole role) {
     personsControl.addPersonToEntity(role, person);
+    setDefaultRoleButtonsVisibleState();
+  }
+
+  protected void removePersonInRoleFromEntity(Person person, PersonRole role) {
+    personsControl.removePersonFromEntity(role, person);
     setDefaultRoleButtonsVisibleState();
   }
 

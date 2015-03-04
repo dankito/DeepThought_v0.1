@@ -246,7 +246,7 @@
          <right>
             <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" BorderPane.alignment="CENTER">
                <content>
-                  <WebView prefHeight="200.0" prefWidth="200.0" />
+                  <WebView fx:id="wbvwContextHelp" prefHeight="200.0" prefWidth="200.0" />
                </content>
             </ScrollPane>
          </right>

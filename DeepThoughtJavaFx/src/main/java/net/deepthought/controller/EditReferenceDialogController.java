@@ -1,9 +1,12 @@
 package net.deepthought.controller;
 
+import com.sun.webkit.WebPage;
+
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.BaseEntityListCell;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.controls.person.ReferencePersonsControl;
@@ -33,7 +36,9 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DateFormat;
 import java.time.LocalDate;
@@ -76,6 +81,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -114,6 +120,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Button btnChooseFieldsToShow;
   @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
+
+  @FXML
+  protected WebView wbvwContextHelp;
 
   @FXML
   protected Pane paneTitle;
@@ -329,8 +338,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     referencePersonsControl = new ReferencePersonsControl();
     referencePersonsControl.setExpanded(true);
-    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
-    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
+    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
+    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
     contentPane.getChildren().add(6, referencePersonsControl);
 
     ensureNodeOnlyUsesSpaceIfVisible(paneEditionAndVolume);
@@ -458,8 +467,27 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
     paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_32x34.png")));
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
+    try {
+      // Use reflection to retrieve the WebEngine's private 'page' field.
+      Field f = wbvwContextHelp.getEngine().getClass().getDeclaredField("page");
+      f.setAccessible(true);
+      final WebPage page = (WebPage) f.get(wbvwContextHelp.getEngine());
+      wbvwContextHelp.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
+        @Override
+        public void changed(ObservableValue<? extends Document> observable, Document oldValue, Document newValue) {
+          page.setBackgroundColor(Constants.ContextHelpBackgroundColor);
+        }
+      });
+    } catch (Exception e) { }
+
+    showContextHelp("default");
+  }
+
+  protected void showContextHelp(String contextHelpResourceKey) {
+    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.reference." + contextHelpResourceKey));
   }
 
   protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
@@ -660,7 +688,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferencePersons)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBasePersons)) {
       Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(referencePersonsControl.getRemovedPersons());
       for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
         for(Person removedPerson : removedPersons.get(removedPersonsInRole))
@@ -673,7 +701,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
           reference.addPerson(addedPerson, addedPersonsInRole);
       }
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBasePersons);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceEdition)) {

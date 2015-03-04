@@ -20,6 +20,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
@@ -65,6 +67,8 @@ public class TagListCell extends ListCell<Tag> {
         tagChanged(newValue);
       }
     });
+
+    setOnMouseClicked(event -> mouseClicked(event));
   }
 
   protected void setupGraphics() {
@@ -177,6 +181,19 @@ public class TagListCell extends ListCell<Tag> {
 
   protected void handleButtonEditTagAction(ActionEvent event) {
     // TODO: show EditTag dialog
+  }
+
+  protected void mouseClicked(MouseEvent event) {
+    if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+      //Dialogs.showEditTagDialog(getItem());
+
+      if(getItem() != null) {
+        if (entryTagsControl.getEditedTags().contains(getItem()) == false)
+          entryTagsControl.addTagToEntry(getItem());
+        else
+          entryTagsControl.removeTagFromEntry(getItem());
+      }
+    }
   }
 
 
