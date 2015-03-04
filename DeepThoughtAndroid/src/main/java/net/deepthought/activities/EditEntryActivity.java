@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -35,7 +37,7 @@ public class EditEntryActivity extends Activity {
   protected Entry entry;
   protected List<Tag> entryTags = new ArrayList<>();
 
-  protected EditText edtxtEditEntryTitle;
+  protected EditText edtxtEditEntryAbstract;
   protected EditText edtxtEditEntryText;
 
   protected RelativeLayout rlydTags;
@@ -52,7 +54,7 @@ public class EditEntryActivity extends Activity {
 
     getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_new_entry));
 
-    edtxtEditEntryTitle = (EditText)findViewById(R.id.edtxtEditEntryTitle);
+    edtxtEditEntryAbstract = (EditText)findViewById(R.id.edtxtEditEntryAbstract);
     edtxtEditEntryText = (EditText)findViewById(R.id.edtxtEditEntryText);
 
     rlydTags = (RelativeLayout)findViewById(R.id.rlydTags);
@@ -64,6 +66,7 @@ public class EditEntryActivity extends Activity {
     txtvwEditEntryTags = (TextView)findViewById(R.id.txtvwEditEntryTags);
     edtxtEditEntrySearchTag = (EditText)findViewById(R.id.edtxtEditEntrySearchTag);
     edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
+    edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
 
     Button btnEditEntryNewTag = (Button)findViewById(R.id.btnEditEntryNewTag);
     btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
@@ -82,7 +85,7 @@ public class EditEntryActivity extends Activity {
       entryTags = new ArrayList<>(entry.getTagsSorted());
       setTextViewEditEntryTags();
 
-      edtxtEditEntryTitle.setText(entry.getTitle());
+      edtxtEditEntryAbstract.setText(entry.getTitle());
       edtxtEditEntryText.setText(entry.getContent());
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
@@ -111,11 +114,11 @@ public class EditEntryActivity extends Activity {
     txtvwEditEntryTags.setText(tags);
   }
 
-  View.OnClickListener btnOkOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener btnOkOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       Intent resultIntent = new Intent();
-      entry.setTitle(edtxtEditEntryTitle.getText().toString());
+      entry.setAbstract(edtxtEditEntryAbstract.getText().toString());
       entry.setContent(edtxtEditEntryText.getText().toString());
 
       if(entry.getId() == null) // a new Entry
@@ -128,7 +131,7 @@ public class EditEntryActivity extends Activity {
     }
   };
 
-  View.OnClickListener btnCancelOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener btnCancelOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       setResult(RESULT_CANCELED);
@@ -136,7 +139,7 @@ public class EditEntryActivity extends Activity {
     }
   };
 
-  View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       if(rlydEditEntryEditTags.getVisibility() == View.GONE)
@@ -146,7 +149,7 @@ public class EditEntryActivity extends Activity {
     }
   };
 
-  TextWatcher edtxtEditEntrySearchTagTextChangedListener = new TextWatcher() {
+  protected TextWatcher edtxtEditEntrySearchTagTextChangedListener = new TextWatcher() {
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -163,22 +166,39 @@ public class EditEntryActivity extends Activity {
     }
   };
 
-  View.OnClickListener btnEditEntryNewTagOnClickListener = new View.OnClickListener() {
+  protected TextView.OnEditorActionListener edtxtEditEntrySearchTagActionListener = new TextView.OnEditorActionListener() {
     @Override
-    public void onClick(View v) {
-      String tagName = edtxtEditEntrySearchTag.getText().toString();
-
-      if(tagName == null || tagName.isEmpty())
-        Toast.makeText(EditEntryActivity.this, getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG);
-      else if(Application.getDeepThought().containsTagOfName(tagName))
-        Toast.makeText(EditEntryActivity.this, getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG);
-      else {
-        Tag newTag = new Tag(tagName);
-        Application.getDeepThought().addTag(newTag);
-        entryTags.add(newTag);
-        Collections.sort(entryTags);
-        setTextViewEditEntryTags();
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+      if (actionId == EditorInfo.IME_NULL
+          && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+        createNewTag();
+        return true;
       }
+      return false;
     }
   };
+
+
+  protected View.OnClickListener btnEditEntryNewTagOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      createNewTag();
+    }
+  };
+
+  protected void createNewTag() {
+    String tagName = edtxtEditEntrySearchTag.getText().toString();
+
+    if(tagName == null || tagName.isEmpty())
+      Toast.makeText(this, getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG).show();
+    else if(Application.getDeepThought().containsTagOfName(tagName))
+      Toast.makeText(this, getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
+    else {
+      Tag newTag = new Tag(tagName);
+      Application.getDeepThought().addTag(newTag);
+      entryTags.add(newTag);
+      Collections.sort(entryTags);
+      setTextViewEditEntryTags();
+    }
+  }
 }

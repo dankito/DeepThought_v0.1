@@ -5,23 +5,23 @@
                 android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/txtvwEditEntryTitleLabel"
+        android:id="@+id/txtvwEditEntryAbstractLabel"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/edit_entry_title_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="4dp"
         android:textSize="@dimen/edit_entry_labels_text_size"
-        android:text="@string/edit_entry_title_label"
+        android:text="@string/edit_entry_abstract_label"
         />
 
     <EditText
-        android:id="@+id/edtxtEditEntryTitle"
+        android:id="@+id/edtxtEditEntryAbstract"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/edit_entry_title_height"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/txtvwEditEntryTitleLabel"
+        android:layout_toRightOf="@+id/txtvwEditEntryAbstractLabel"
         android:textSize="@dimen/edit_entry_edit_texts_text_size"
         />
 
@@ -29,7 +29,7 @@
         android:id="@+id/rlydTags"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtvwEditEntryTitleLabel"
+        android:layout_below="@+id/txtvwEditEntryAbstractLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true">
 

@@ -20,26 +20,26 @@ import java.util.Collection;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntryOverviewAdapter extends BaseAdapter {
+public class EntriesOverviewAdapter extends BaseAdapter {
 
   protected DeepThought deepThought;
   protected Activity context;
 
-  public EntryOverviewAdapter(Activity context) {
+  public EntriesOverviewAdapter(Activity context) {
     this.context = context;
 
     Application.addApplicationListener(new ApplicationListener() {
       @Override
       public void deepThoughtChanged(DeepThought deepThought) {
-        if (EntryOverviewAdapter.this.deepThought != null)
+        if (EntriesOverviewAdapter.this.deepThought != null)
 //          EntryOverviewAdapter.this.deepThought.removeEntriesChangedListener(EntryOverviewAdapter.this);
-          EntryOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
+          EntriesOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
 
-        EntryOverviewAdapter.this.deepThought = deepThought;
+        EntriesOverviewAdapter.this.deepThought = deepThought;
 
-        if (EntryOverviewAdapter.this.deepThought != null)
+        if (EntriesOverviewAdapter.this.deepThought != null)
 //          EntryOverviewAdapter.this.deepThought.addEntriesChangedListener(EntryOverviewAdapter.this);
-          EntryOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
+          EntriesOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
 
         notifyDataSetChangedThreadSafe();
       }
@@ -85,11 +85,14 @@ public class EntryOverviewAdapter extends BaseAdapter {
 
     Entry entry = getEntryAt(position);
 
-    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTitle);
-    txtvwTitle.setText(entry.getTitle());
+//    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTitle);
+//    txtvwTitle.setText(entry.getTitle());
 
-    TextView txtvwText = (TextView)convertView.findViewById(R.id.txtvwListItemEntryText);
-    txtvwText.setText(entry.getContent());
+    TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
+    txtvwPreview.setText(entry.getPreview());
+
+    TextView txtvwTags = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTags);
+    txtvwTags.setText(entry.getTagsPreview());
 
     return convertView;
   }

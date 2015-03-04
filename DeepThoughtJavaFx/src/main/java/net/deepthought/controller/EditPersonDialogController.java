@@ -2,6 +2,9 @@ package net.deepthought.controller;
 
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.Constants;
+import net.deepthought.controls.ContextHelpControl;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.enums.Gender;
 import net.deepthought.data.model.listener.EntityListener;
@@ -26,9 +29,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.web.WebView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -43,10 +49,19 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
 
   @FXML
+  protected BorderPane dialogPane;
+
+  @FXML
   protected Button btnApply;
 
   @FXML
   protected TextField txtfldTitle;
+
+  @FXML
+  protected ToggleButton tglbtnShowHideContextHelp;
+
+  protected ContextHelpControl contextHelpControl;
+
   @FXML
   protected TextField txtfldFirstName;
   @FXML
@@ -63,9 +78,6 @@ public class EditPersonDialogController extends ChildWindowsController implement
   protected ComboBox<Gender> cmbxGender;
   @FXML
   protected TextArea txtarNotes;
-
-  @FXML
-  protected WebView wbvwContextHelp;
 
 
   @Override
@@ -111,10 +123,19 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonNotes));
     txtarNotes.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("notes"));
+
+    contextHelpControl = new ContextHelpControl("context.help.person.");
+    dialogPane.setRight(contextHelpControl);
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
+    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+
+    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void fieldFocused(String fieldName) {
-    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.person." + fieldName));
+    contextHelpControl.showContextHelpForResourceKey(fieldName);
   }
 
 

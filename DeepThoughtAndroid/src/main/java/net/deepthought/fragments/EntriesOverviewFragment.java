@@ -15,14 +15,14 @@ import android.widget.ListView;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.activities.ActivityManager;
-import net.deepthought.adapter.EntryOverviewAdapter;
+import net.deepthought.adapter.EntriesOverviewAdapter;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 
 /**
  * Created by ganymed on 01/10/14.
  */
-public class OverviewFragment extends Fragment {
+public class EntriesOverviewFragment extends Fragment {
 
 
 
@@ -37,7 +37,7 @@ public class OverviewFragment extends Fragment {
     View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
 
     ListView lstvwEntries = (ListView)rootView.findViewById(R.id.lstvwEntries);
-    lstvwEntries.setAdapter(new EntryOverviewAdapter(getActivity()));
+    lstvwEntries.setAdapter(new EntriesOverviewAdapter(getActivity()));
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
 

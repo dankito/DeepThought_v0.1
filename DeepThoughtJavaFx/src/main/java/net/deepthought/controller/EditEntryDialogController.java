@@ -203,27 +203,27 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void setupControls() {
-    ensureNodeOnlyUsesSpaceIfVisible(btnApplyChanges);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnApplyChanges);
 
-    ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
       updateWindowTitle(newValue);
     });
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
     txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setPrefWidth(250);
-    ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
 //    contentPane.getChildren().add(entryTagsControl);
     HBox.setHgrow(entryTagsControl, Priority.ALWAYS);
@@ -232,7 +232,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
-    ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setVisible(Application.getSettings().showCategories());
     entryCategoriesControl.setExpanded(true);
 //    contentPane.getChildren().addAll(entryCategoriesControl);
@@ -241,7 +241,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     paneTagsAndCategories.getChildren().add(entryCategoriesControl);
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
-    ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 6, 0));
     contentPane.getChildren().add(entryReferenceControl);
 
@@ -249,14 +249,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryPersonsControl.setPrefHeight(250);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
-    ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
     contentPane.getChildren().add(entryPersonsControl);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> showContextHelp("default")); // TODO: remove as soon as other context help texts are implemented
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
       @Override
       public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
@@ -264,7 +264,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
       }
     });
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
     paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
@@ -298,10 +298,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected Boolean doesSearchTermMatchReference(FXUtils.DoesItemMatchSearchTermParam<Reference> param) {
     return param.getItem().getTitle().toLowerCase().contains(param.getSearchTerm().toLowerCase());
-  }
-
-  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
-    node.managedProperty().bind(node.visibleProperty());
   }
 
   protected void setEntryValues(final Entry entry) {

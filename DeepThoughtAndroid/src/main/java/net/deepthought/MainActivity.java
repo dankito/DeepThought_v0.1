@@ -27,7 +27,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.fragments.OverviewFragment;
+import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
 import net.deepthought.util.DeepThoughtError;
 
@@ -251,7 +251,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public Fragment getItem(int position) {
           if(position == 0) {
-            return new OverviewFragment();
+            return new EntriesOverviewFragment();
           }
           else if(position == 1) {
             return new SearchFragment();
@@ -272,7 +272,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section_overview).toUpperCase(l);
+                    return getString(R.string.title_section_entries_overview).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section_search).toUpperCase(l);
                 case 2:

@@ -48,15 +48,22 @@ public class SearchResultsAdapter extends BaseAdapter {
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
     if(convertView == null)
-      convertView = context.getLayoutInflater().inflate(R.layout.list_item_search_result, parent, false);
+//      convertView = context.getLayoutInflater().inflate(R.layout.list_item_search_result, parent, false);
+      convertView = context.getLayoutInflater().inflate(R.layout.list_item_entry, parent, false);
 
     Entry entry = getSearchResultAt(position);
 
-    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultTitle);
-    txtvwTitle.setText(entry.getTitle());
+//    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultTitle);
+//    txtvwTitle.setText(entry.getTitle());
+//
+//    TextView txtvwText = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultText);
+//    txtvwText.setText(entry.getContent());
 
-    TextView txtvwText = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultText);
-    txtvwText.setText(entry.getContent());
+    TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
+    txtvwPreview.setText(entry.getPreview());
+
+    TextView txtvwTags = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTags);
+    txtvwTags.setText(entry.getTagsPreview());
 
     return convertView;
   }

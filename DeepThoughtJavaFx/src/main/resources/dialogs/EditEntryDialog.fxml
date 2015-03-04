@@ -11,7 +11,7 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="663.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
    <right>
-      <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
+      <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" pannable="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
          <content>
             <WebView fx:id="wbvwContextHelp" fontScale="0.85" prefHeight="-1.0" prefWidth="-1.0" />
          </content>

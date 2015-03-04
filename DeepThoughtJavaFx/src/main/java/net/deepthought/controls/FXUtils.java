@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCode;
@@ -19,6 +20,10 @@ public class FXUtils {
 
   private final static Logger log = LoggerFactory.getLogger(FXUtils.class);
 
+
+  public static void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
+    node.managedProperty().bind(node.visibleProperty());
+  }
 
   public static void showSplitPaneDividers(SplitPane splitPane, boolean show) {
     splitPane.lookupAll(".split-pane-divider").stream()

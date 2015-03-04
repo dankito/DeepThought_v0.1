@@ -950,6 +950,22 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return preview;
   }
 
+  @Transient
+  public String getTagsPreview() {
+    String tagsPreview = "";
+    for(Tag tag : getTagsSorted())
+      tagsPreview += tag.getName() + ", ";
+    if(tagsPreview.length() > 1)
+      tagsPreview = tagsPreview.substring(0, tagsPreview.length() - 2);
+
+    if(tagsPreview.length() >= PreviewMaxLength)
+      tagsPreview = tagsPreview.substring(0, PreviewMaxLength) + " ...";
+
+    tagsPreview = tagsPreview.replace("\r", "").replace("\n", "");
+
+    return tagsPreview;
+  }
+
   @Override
   @Transient
   public String getTextRepresentation() {

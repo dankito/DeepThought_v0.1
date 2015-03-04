@@ -46,7 +46,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -176,7 +175,7 @@ public class EntryReferenceControl extends VBox {
   }
 
   protected void setupControl() {
-    ensureNodeOnlyUsesSpaceIfVisible(this);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(this);
 
     setupPaneSeriesTitle();
 
@@ -228,7 +227,7 @@ public class EntryReferenceControl extends VBox {
   }
 
   protected void setupPaneReference() {
-    ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOrReference);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOrReference);
 
     btnNewOrEditReference = new NewOrEditButton();// create btnNewOrEditReference before cmbxSeriesTitleOrReference's value gets set (otherwise cmbxSeriesTitleOrReferenceValueChangedListener causes a NullPointerException)
     btnNewOrEditReference.setOnAction(event -> handleButtonEditOrNewReferenceAction(event));
@@ -349,7 +348,7 @@ public class EntryReferenceControl extends VBox {
 //  }
 
   protected void setupPaneReferenceSubDivision() {
-    ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
 
     if(entry.getReferenceSubDivision() != null)
       txtfldReferenceSubDivision.setText(entry.getReferenceSubDivision().getTitle());
@@ -363,11 +362,11 @@ public class EntryReferenceControl extends VBox {
   }
 
   protected void setupPaneReferenceIndicationSettings() {
-    //    ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationSettings);
+    //    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationSettings);
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationStartSettings);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationStartSettings);
 
-    ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationStart);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationStart);
     lblReferenceIndicationStart.setVisible(false);
 
     txtfldReferenceIndicationStart.setText(entry.getIndicationStart());
@@ -379,7 +378,7 @@ public class EntryReferenceControl extends VBox {
 //        paneReferenceIndicationEndSettings.setVisible(true);
     });
 
-    ensureNodeOnlyUsesSpaceIfVisible(cmbxReferenceIndicationStartUnit);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(cmbxReferenceIndicationStartUnit);
     cmbxReferenceIndicationStartUnit.setVisible(false);
     cmbxReferenceIndicationStartUnit.getItems().addAll(Application.getDeepThought().getReferenceIndicationUnits());
     cmbxReferenceIndicationStartUnit.setValue(entry.getIndicationStartUnit());
@@ -405,16 +404,16 @@ public class EntryReferenceControl extends VBox {
     btnNewOrEditReferenceIndicationStartUnit.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceIndicationStartUnitAction(event));
     paneReferenceIndicationStartSettings.getChildren().add(btnNewOrEditReferenceIndicationStartUnit);
     btnNewOrEditReferenceIndicationStartUnit.setDisable(true);
-    ensureNodeOnlyUsesSpaceIfVisible(btnNewOrEditReferenceIndicationStartUnit);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnNewOrEditReferenceIndicationStartUnit);
     btnNewOrEditReferenceIndicationStartUnit.setVisible(false);
 
     txtfldReferenceIndicationEnd.setText(entry.getIndicationEnd());
     txtfldReferenceIndicationEnd.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryReferenceIndicationEnd));
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationEndSettings);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationEndSettings);
     paneReferenceIndicationEndSettings.setVisible(false);
 
-    ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationEnd);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationEnd);
 
     cmbxReferenceIndicationEndUnit.getItems().addAll(Application.getDeepThought().getReferenceIndicationUnits());
     cmbxReferenceIndicationEndUnit.setValue(entry.getIndicationEndUnit());
@@ -453,10 +452,6 @@ public class EntryReferenceControl extends VBox {
     }
 
     return suggestions;
-  }
-
-  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
-    node.managedProperty().bind(node.visibleProperty());
   }
 
 //  protected void setFieldsVisibility(Entry entry) {

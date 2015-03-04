@@ -7,14 +7,19 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
+<BorderPane fx:id="dialogPane" prefHeight="520.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
    <center>
-      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="496.0" prefWidth="734.0" BorderPane.alignment="CENTER">
+      <VBox BorderPane.alignment="CENTER">
          <children>
-            <HBox prefHeight="40.0">
+            <HBox alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
                   <Label prefHeight="40.0" prefWidth="120.0" text="Title" />
                   <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                  <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
+                     <HBox.margin>
+                        <Insets left="12.0" />
+                     </HBox.margin>
+                  </ToggleButton>
                </children>
                <VBox.margin>
                   <Insets bottom="6.0" />
@@ -83,14 +88,14 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox>
                <children>
                   <Label prefHeight="40.0" text="Notes">
                      <VBox.margin>
                         <Insets bottom="6.0" top="12.0" />
                      </VBox.margin>
                   </Label>
-                  <TextArea fx:id="txtarNotes" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                  <TextArea fx:id="txtarNotes" prefHeight="125.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="40.0">
@@ -114,14 +119,4 @@
          </children>
       </VBox>
    </center>
-   <right>
-      <VBox prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <WebView fx:id="wbvwContextHelp" prefHeight="400.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-         </children>
-         <padding>
-            <Insets left="12.0" />
-         </padding>
-      </VBox>
-   </right>
 </BorderPane>

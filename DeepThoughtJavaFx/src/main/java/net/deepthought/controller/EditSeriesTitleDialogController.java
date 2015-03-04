@@ -1,12 +1,12 @@
 package net.deepthought.controller;
 
-import com.sun.webkit.WebPage;
-
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.BaseEntityListCell;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.ContextHelpControl;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.controls.person.SeriesTitlePersonsControl;
@@ -33,9 +33,7 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.text.DateFormat;
 import java.time.LocalDate;
@@ -66,7 +64,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -75,10 +72,10 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -98,6 +95,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 
 
   @FXML
+  protected BorderPane dialogPane;
+
+  @FXML
   protected Button btnApplyChanges;
 
   @FXML
@@ -113,11 +113,11 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected NewOrEditButton btnNewOrEditSeriesTitleCategory;
   @FXML
   protected Button btnChooseFieldsToShow;
+
   @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
 
-  @FXML
-  protected WebView wbvwContextHelp;
+  protected ContextHelpControl contextHelpControl;
 
   @FXML
   protected Pane paneSubTitle;
@@ -189,9 +189,6 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   protected TreeTableColumn<FileLink, String> clmnFile;
 
-  @FXML
-  protected ScrollPane paneContextHelp;
-
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -249,16 +246,16 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditSeriesTitleCategory.setDisable(true); // TODO: unset as soon as editing is possible
     paneTitle.getChildren().add(4, btnNewOrEditSeriesTitleCategory);
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
     txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
     txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitleSupplement));
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
     // TODO: how to set HtmlEditor text changed listener? (https://stackoverflow.com/questions/22128153/javafx-htmleditor-text-change-listener)
     htmledTableOfContents.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
@@ -273,13 +270,13 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
     contentPane.getChildren().add(5, seriesTitlePersonsControl);
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
     dtpckFirstDayOfPublication.setConverter(localeDateStringConverter);
     dtpckFirstDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication));
     dtpckLastDayOfPublication.setConverter(localeDateStringConverter);
     dtpckLastDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication));
 
-    ensureNodeOnlyUsesSpaceIfVisible(panePublisher);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublisher);
     resetComboBoxPublisherItems();
     cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
 
@@ -306,17 +303,17 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditPublisher.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewPublisherAction(event));
     panePublisher.getChildren().add(btnNewOrEditPublisher);
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneAbbreviation);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneAbbreviation);
     txtfldStandardAbbreviation.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation));
     txtfldUserAbbreviation1.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1));
     txtfldUserAbbreviation2.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2));
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress));
     dtpckLastAccess.setConverter(localeDateStringConverter);
     dtpckLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseLastAccess));
 
-    ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseNotes));
 
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -326,33 +323,15 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 //      }
 //    });
 
-    ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
-    paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
+    contextHelpControl = new ContextHelpControl("context.help.series.title.");
+    dialogPane.setRight(contextHelpControl);
+//    contextHelpControl.showContextHelpForResourceKey("default");
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
+    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
-    try {
-      // Use reflection to retrieve the WebEngine's private 'page' field.
-      Field f = wbvwContextHelp.getEngine().getClass().getDeclaredField("page");
-      f.setAccessible(true);
-      final WebPage page = (WebPage) f.get(wbvwContextHelp.getEngine());
-      wbvwContextHelp.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
-        @Override
-        public void changed(ObservableValue<? extends Document> observable, Document oldValue, Document newValue) {
-            page.setBackgroundColor(Constants.ContextHelpBackgroundColor);
-        }
-      });
-    } catch (Exception e) { }
-
-    showContextHelp("default");
-  }
-
-  protected void showContextHelp(String contextHelpResourceKey) {
-    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.series.title." + contextHelpResourceKey));
-  }
-
-  protected void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
-    node.managedProperty().bind(node.visibleProperty());
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {

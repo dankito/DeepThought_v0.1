@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.*?>
 <?import net.deepthought.controls.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
+<BorderPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
    <center>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <bottom>
@@ -324,11 +324,4 @@
          </center>
       </BorderPane>
    </center>
-   <right>
-      <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" prefWidth="200.0" BorderPane.alignment="TOP_LEFT">
-         <content>
-            <WebView fx:id="wbvwContextHelp" prefHeight="200.0" prefWidth="200.0" />
-         </content>
-      </ScrollPane>
-   </right>
 </BorderPane>

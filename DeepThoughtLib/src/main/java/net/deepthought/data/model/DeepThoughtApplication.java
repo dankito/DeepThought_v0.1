@@ -34,7 +34,7 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
   @Column(name = TableConfig.DeepThoughtApplicationDataModelVersionColumnName)
   protected int dataModelVersion = 0;
 
-  @OneToOne(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST } )
   @JoinColumn(name = TableConfig.DeepThoughtApplicationLastLoggedOnUserJoinColumnName)
   protected User lastLoggedOnUser;
 

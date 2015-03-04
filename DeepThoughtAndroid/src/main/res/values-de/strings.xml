@@ -3,7 +3,7 @@
 
     <string name="app_name">Deep Thought</string>
 
-    <string name="title_section_overview">Sammlung</string>
+    <string name="title_section_entries_overview">Sammlung</string>
     <string name="title_section_search">Suche</string>
     <string name="title_section3">Section 3</string>
 
@@ -19,7 +19,7 @@
 
     <string name="edit_entry_action_bar_title_new_entry">Neuen Eintrag erstellen</string>
     <string name="edit_entry_action_bar_title_entry_format">Bearbeite %1$s</string>
-    <string name="edit_entry_title_label">Titel</string>
+    <string name="edit_entry_abstract_label">Zusammenfassung</string>
     <string name="edit_entry_tags_label">Schlagwörter:</string>
     <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
     <string name="edit_entry_button_new_tag_text">Neu</string>

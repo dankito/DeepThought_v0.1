@@ -66,7 +66,7 @@ public class User extends BaseEntity implements Serializable {
   @Lob
   protected String settingsString = "";
 
-  @OneToOne(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST } )
   @JoinColumn(name = TableConfig.UserLastViewedDeepThoughtColumnName)
   protected DeepThought lastViewedDeepThought = null;
 

@@ -50,9 +50,9 @@ android {
         exclude 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
         exclude 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
 
-//        exclude 'Strings.properties'
-//        exclude 'Strings_de.properties'
-        exclude 'DeepThought.properties'
+        exclude 'Strings.properties'
+        exclude 'Strings_de.properties'
+        exclude 'DeepThoughtFx.properties'
     }
 }
 
