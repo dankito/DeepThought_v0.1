@@ -7,7 +7,6 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -311,9 +310,7 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     String newValue = "New value";
     series.setTableOfContents(newValue);
 
-    Clob clob = (Clob)getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTableOfContentsColumnName, series.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, referenceBase.getId());
+    String actual = getClobFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTableOfContentsColumnName, series.getId());
     Assert.assertEquals(newValue, actual);
   }
 
@@ -328,9 +325,7 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     series.setTableOfContents(tableOfContents);
 
     // assert content really got written to database
-    Clob clob = (Clob)getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTableOfContentsColumnName, series.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, referenceBase.getId());
+    String actual = getClobFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTableOfContentsColumnName, series.getId());
     Assert.assertEquals(tableOfContents, actual);
   }
 
@@ -344,7 +339,7 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     Date newValue = new Date();
     series.setFirstDayOfPublication(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleFirstDayOfPublicationColumnName, series.getId()));
+    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleFirstDayOfPublicationColumnName, series.getId()));
   }
 
   @Test
@@ -357,7 +352,7 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     Date newValue = new Date();
     series.setLastDayOfPublication(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleLastDayOfPublicationColumnName, series.getId()));
+    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleLastDayOfPublicationColumnName, series.getId()));
   }
 
   @Test

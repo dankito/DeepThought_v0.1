@@ -78,16 +78,16 @@ public class User extends BaseEntity implements Serializable {
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.UserDeviceJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.UserDeviceJoinTableUserIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.UserDeviceJoinTableDeviceIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.UserDeviceJoinTableUserIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.UserDeviceJoinTableDeviceIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<Device> devices = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.UserGroupJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.UserGroupJoinTableUserIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.UserGroupJoinTableGroupIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.UserGroupJoinTableUserIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.UserGroupJoinTableGroupIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<Group> groups = new HashSet<>();
 

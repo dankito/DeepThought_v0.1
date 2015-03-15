@@ -2,6 +2,7 @@ package net.deepthought.data.persistence;
 
 import net.deepthought.data.persistence.db.BaseEntity;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public interface IEntityManager {
    */
   public void resolveAllLazyRelations(BaseEntity entity) throws Exception;
 
-  public List doNativeQuery(String query);
+  public List doNativeQuery(String query) throws SQLException;
 
   public void close();
 

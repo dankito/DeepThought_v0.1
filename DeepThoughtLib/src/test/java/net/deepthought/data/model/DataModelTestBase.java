@@ -14,6 +14,11 @@ import org.junit.Before;
 import java.io.File;
 import java.math.BigInteger;
 import java.sql.Clob;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 
@@ -41,9 +46,10 @@ public abstract class DataModelTestBase {
 
   @After
   public void tearDown() {
+    entityManager.deleteEntity(Application.getApplication()); // damn, why doesn't it close the db properly? So next try: delete DeepThoughtApplication object
 //    String databasePath = Application.getDataManager().getDataCollectionSavePath();
     Application.shutdown();
-//    FileUtils.deleteFile(databasePath);
+//    FileUtils.deleteFile(entityManager.getDatabasePath());
   }
 
 
@@ -71,11 +77,11 @@ public abstract class DataModelTestBase {
 //  }
 
 
-  protected Object[] getRowFromTable(String tableName, Long entityId) {
+  protected Object[] getRowFromTable(String tableName, Long entityId) throws SQLException {
     return getRowFromTable(tableName, entityId, TableConfig.BaseEntityIdColumnName);
   }
 
-  protected Object[] getRowFromTable(String tableName, Long entityId, String idColumnName) {
+  protected Object[] getRowFromTable(String tableName, Long entityId, String idColumnName) throws SQLException {
     List queryResult = entityManager.doNativeQuery("SELECT * FROM " + tableName + " WHERE " + idColumnName + "=" + entityId);
     Assert.assertEquals(1, queryResult.size()); // only one row fetched
 
@@ -87,21 +93,50 @@ public abstract class DataModelTestBase {
     return queryResult.toArray(new Object[queryResult.size()]);
   }
 
-  protected Object getValueFromTable(String tableName, String columnName, Long entityId) {
+  protected String getClobFromTable(String tableName, String columnName, Long entityId) throws SQLException {
+    Object rawObject = getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
+
+    String actual = null;
+    if(rawObject instanceof Clob) {
+      Clob clob = (Clob)rawObject;
+      actual = clob.getSubString(1, (int)clob.length());
+    }
+    else if(rawObject != null)
+      actual = rawObject.toString();
+
+    return actual;
+  }
+
+  protected Object getValueFromTable(String tableName, String columnName, Long entityId) throws SQLException {
     return getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
   }
 
-  protected Object getValueFromTable(String tableName, String columnName, Long entityId, String idColumnName) {
+  protected Object getValueFromTable(String tableName, String columnName, Long entityId, String idColumnName) throws SQLException {
     return DatabaseHelper.getValueFromTable(entityManager, tableName, columnName, entityId, idColumnName);
   }
 
-  protected boolean doesJoinTableEntryExist(String tableName, String owningSideColumnName, Long owningSideId, String inverseSideColumnName, Long inverseSideId) {
+  protected boolean doesJoinTableEntryExist(String tableName, String owningSideColumnName, Long owningSideId, String inverseSideColumnName, Long inverseSideId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + tableName + " WHERE " + owningSideColumnName + "=" + owningSideId +
                                                              " AND " + inverseSideColumnName + "=" + inverseSideId);
     return result.size() == 1;
   }
 
-  protected List<Object> getJoinTableEntries(String tableName, String entityColumnName, Long entityId, String otherSideColumnName) {
+
+  protected static final DateFormat defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+
+  protected Date getDateValueFromTable(String tableName, String columnName, Long entityId) throws SQLException, ParseException {
+    Object storedValue = getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
+
+    if(storedValue instanceof String) {
+      return defaultDateFormat.parse((String)storedValue);
+    }
+    else if(storedValue instanceof Long)
+      return new Date((Long)storedValue);
+
+    return (Date)storedValue;
+  }
+
+  protected List getJoinTableEntries(String tableName, String entityColumnName, Long entityId, String otherSideColumnName) throws SQLException {
     return entityManager.doNativeQuery("SELECT " + otherSideColumnName + " FROM " + tableName + " WHERE " + entityColumnName + "=" + entityId);
   }
 
@@ -109,6 +144,8 @@ public abstract class DataModelTestBase {
     for(Object id : joinTableEntries) {
       if(id instanceof Vector) // Toplink
         id = ((Vector)id).get(0);
+      else if(id instanceof String[]) // OrmLite
+        id = Long.parseLong(((String[])id)[0]);
 
       if(doIdsEqual(entityId, id))
         return true;
@@ -129,8 +166,25 @@ public abstract class DataModelTestBase {
   }
 
   protected String getClobString(String tableName, String columnName, Long entityId) throws Exception {
-    Clob clob = (Clob)getValueFromTable(tableName, columnName, entityId);
-    return clob.getSubString(1, (int)clob.length());
+    Object storedValue = getValueFromTable(tableName, columnName, entityId);
+
+    if(storedValue instanceof Clob) {
+      Clob clob = (Clob) storedValue;
+      return clob.getSubString(1, (int) clob.length());
+    }
+
+    return storedValue.toString();
+  }
+
+  protected void compareBoolValue(boolean expectedValue, Object storedValue) {
+    if(storedValue instanceof Integer) {
+      if(expectedValue == true)
+        Assert.assertEquals(1, storedValue);
+      else
+        Assert.assertEquals(0, storedValue);
+    }
+    else
+      Assert.assertEquals(expectedValue, storedValue);
   }
 
 }

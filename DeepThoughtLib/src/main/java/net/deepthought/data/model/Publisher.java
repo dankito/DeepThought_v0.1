@@ -91,7 +91,7 @@ public class Publisher extends UserDataEntity implements Comparable<Publisher> {
     return result;
   }
 
-  public Set<SeriesTitle> getSeriesTitle() {
+  public Set<SeriesTitle> getSeriesTitles() {
     return seriesTitles;
   }
 

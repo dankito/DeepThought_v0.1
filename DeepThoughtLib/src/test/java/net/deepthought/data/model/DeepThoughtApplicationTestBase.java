@@ -32,7 +32,8 @@ public abstract class DeepThoughtApplicationTestBase extends DataModelTestBase {
     boolean newValue = !application.autoLogOnLastLoggedOnUser();
     application.setAutoLogOnLastLoggedOnUser(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.DeepThoughtApplicationTableName, TableConfig.DeepThoughtApplicationAutoLogOnLastLoggedOnUserColumnName, application.getId()));
+    Object storedValue = getValueFromTable(TableConfig.DeepThoughtApplicationTableName, TableConfig.DeepThoughtApplicationAutoLogOnLastLoggedOnUserColumnName, application.getId());
+    compareBoolValue(newValue, storedValue);
   }
 
   @Test

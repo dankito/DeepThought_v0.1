@@ -115,7 +115,7 @@ public abstract class PersonTestBase extends DataModelTestBase {
     Date newValue = new Date();
     person.setBirthDate(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.PersonTableName, TableConfig.PersonBirthDayColumnName, person.getId()));
+    Assert.assertEquals(newValue.getTime(), getDateValueFromTable(TableConfig.PersonTableName, TableConfig.PersonBirthDayColumnName, person.getId()).getTime());
   }
 
   @Test

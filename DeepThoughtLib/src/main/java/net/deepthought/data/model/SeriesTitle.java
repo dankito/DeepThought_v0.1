@@ -130,6 +130,9 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   }
 
   public boolean removeSerialPart(Reference serialPart) {
+    if(containsSerialParts(serialPart) == false)
+      return false;
+
     int removeIndex = serialPart.getSeriesOrder();
 
     if(serialParts.remove(serialPart)) {

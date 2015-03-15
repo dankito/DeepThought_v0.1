@@ -18,7 +18,9 @@ public class TestDataManager extends DefaultDataManager {
     DeepThought deepThought = super.retrieveDeepThoughtApplication();
 
     // ensure that changes get persisted at once
-    getSettings().setAutoSaveChangesAfterMilliseconds(0);
+    try {
+      loggedOnUser.getSettings().setAutoSaveChangesAfterMilliseconds(0);
+    } catch(Exception ex) { }
 
     return deepThought;
   }

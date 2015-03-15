@@ -34,10 +34,10 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.model.AllEntriesSystemTag;
 import net.deepthought.model.EntriesWithoutTagsSystemTag;
 import net.deepthought.model.SystemTag;
-import net.deepthought.persistence.JpaEntityManager;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.JavaFxLocalization;
@@ -264,7 +264,8 @@ public class MainWindowController implements Initializable {
     Application.instantiateAsync(new DefaultDependencyResolver() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new JpaEntityManager(configuration);
+//        return new JpaEntityManager(configuration);
+        return new OrmLiteJavaSeEntityManager(configuration);
       }
     });
   }

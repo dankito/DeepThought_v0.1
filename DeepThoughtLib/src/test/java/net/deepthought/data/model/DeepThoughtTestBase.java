@@ -20,6 +20,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -236,6 +237,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
   }
 
   @Test
+  // this cannot work with a in memory database
   public void addEntry_ClosePersistenceManager_NextEntryIndexHasBeenIncremented() throws Exception {
     Entry entry = new Entry("test", "no content");
 
@@ -990,7 +992,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesDeepThoughtFavoriteEntryTemplateJoinTableEntryExist(Long deepThoughtId, Long entryTemplateId) {
+  protected boolean doesDeepThoughtFavoriteEntryTemplateJoinTableEntryExist(Long deepThoughtId, Long entryTemplateId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableName, TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableDeepThoughtIdColumnName,
         deepThoughtId, TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableEntryTemplateIdColumnName, entryTemplateId);
   }

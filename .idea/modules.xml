@@ -7,10 +7,12 @@
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtAndroid/DeepThoughtAndroid.iml" filepath="$PROJECT_DIR$/DeepThoughtAndroid/DeepThoughtAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtJavaFx/DeepThoughtJavaFx.iml" filepath="$PROJECT_DIR$/DeepThoughtJavaFx/DeepThoughtJavaFx.iml" />
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" filepath="$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/JpaEntityManager/JpaEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/JpaEntityManager/JpaEntityManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" />
     </modules>
   </component>
 </project>

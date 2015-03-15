@@ -712,7 +712,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   }
 
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
-    btnApplyChanges.setVisible(seriesTitle.getId() != null);
+    btnApplyChanges.setVisible(seriesTitle.isPersisted());
 
     txtfldTitle.setText(seriesTitle.getTitle());
     cmbxSeriesTitleCategory.setValue(seriesTitle.getCategory());
@@ -748,7 +748,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   }
 
   protected void updateWindowTitle(String seriesTitle) {
-    if(this.seriesTitle.getId() == null)
+    if(this.seriesTitle.isPersisted() == false)
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.series.title", seriesTitle));
     else
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.series.title", seriesTitle));

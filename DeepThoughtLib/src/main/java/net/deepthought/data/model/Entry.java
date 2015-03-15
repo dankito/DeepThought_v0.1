@@ -74,8 +74,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.EntryTagJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryTagJoinTableEntryIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryTagJoinTableTagIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.EntryTagJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryTagJoinTableTagIdColumnName/*, referencedColumnName = "id"*/) }
   )
 //  @OrderBy("name ASC")
   protected Set<Tag> tags = new HashSet<>();
@@ -83,8 +83,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.EntryIndexTermJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableEntryIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableIndexTermIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableIndexTermIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<IndexTerm> indexTerms = new HashSet<>();
 
@@ -99,8 +99,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinTable(
       name = TableConfig.EntryEntriesLinkGroupJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<EntriesLinkGroup> linkGroups = new HashSet<>();
 

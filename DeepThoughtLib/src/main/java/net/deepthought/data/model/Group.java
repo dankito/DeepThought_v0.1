@@ -41,8 +41,8 @@ public class Group extends UserDataEntity {
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.GroupDeviceJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.GroupDeviceJoinTableGroupIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.GroupDeviceJoinTableDeviceIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.GroupDeviceJoinTableGroupIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.GroupDeviceJoinTableDeviceIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<Device> devices = new HashSet<>();
 

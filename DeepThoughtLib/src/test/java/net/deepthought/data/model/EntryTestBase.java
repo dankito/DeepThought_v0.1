@@ -5,13 +5,15 @@ import net.deepthought.data.model.enums.EntryContentFormat;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
+import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.sql.Clob;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,22 +21,22 @@ import java.util.List;
  */
 public abstract class EntryTestBase extends DataModelTestBase {
 
-  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) {
+  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableCategoryIdColumnName, categoryId,
         TableConfig.CategoryEntryJoinTableEntryIdColumnName, entryId);
   }
 
-  protected boolean doesEntryTagJoinTableEntryExist(Long entryId, Long tagId) {
+  protected boolean doesEntryTagJoinTableEntryExist(Long entryId, Long tagId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryTagJoinTableName, TableConfig.EntryTagJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryTagJoinTableTagIdColumnName, tagId);
   }
 
-  protected boolean doesEntryIndexTermJoinTableEntryExist(Long entryId, Long indexTermId) {
+  protected boolean doesEntryIndexTermJoinTableEntryExist(Long entryId, Long indexTermId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryIndexTermJoinTableName, TableConfig.EntryIndexTermJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryIndexTermJoinTableIndexTermIdColumnName, indexTermId);
   }
 
-  protected boolean doesEntryPersonRoleJoinTableEntryExist(Long entryId, Long personRoleId, Long personId) {
+  protected boolean doesEntryPersonRoleJoinTableEntryExist(Long entryId, Long personRoleId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.EntryPersonAssociationTableName + " WHERE " +
         TableConfig.EntryPersonAssociationEntryJoinColumnName +  "=" + entryId +
         " AND " + TableConfig.EntryPersonAssociationPersonJoinColumnName + "=" + personId +
@@ -44,17 +46,17 @@ public abstract class EntryTestBase extends DataModelTestBase {
 //        TableConfig.EntryPersonRolesPersonRoleJoinColumnName, personId);
   }
 
-  protected boolean isNoteEntryJoinColumnValueSet(Long noteId, Long entryId) {
+  protected boolean isNoteEntryJoinColumnValueSet(Long noteId, Long entryId) throws SQLException {
     Object persistedEntryId = getValueFromTable(TableConfig.NoteTableName, TableConfig.NoteEntryJoinColumnName, noteId);
     return doIdsEqual(entryId, persistedEntryId);
   }
 
-  protected boolean doesEntryGroupLinkJoinTableEntryExist(Long entryId, Long linkGroupId) {
+  protected boolean doesEntryGroupLinkJoinTableEntryExist(Long entryId, Long linkGroupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryEntriesLinkGroupJoinTableName, TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName, linkGroupId);
   }
 
-  protected boolean isFileEntryJoinTableValueSet(Long fileId, Long entryId) {
+  protected boolean isFileEntryJoinTableValueSet(Long fileId, Long entryId) throws SQLException {
     Object persistedEntryId = getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkEntryJoinColumnName, fileId);
     return doIdsEqual(entryId, persistedEntryId);
   }
@@ -98,9 +100,9 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setAbstract(newAbstract);
 
     // assert content really got written to database
-    Clob clob = (Clob)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryAbstractColumnName, entry.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
+//    Clob clob = (Clob)getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryAbstractColumnName, entry.getId());
+//    String actual = clob.getSubString(1, (int)clob.length());
+    String actual = getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryAbstractColumnName, entry.getId());
     Assert.assertEquals(newAbstract, actual);
   }
 
@@ -115,9 +117,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setAbstract(abstractString);
 
     // assert abstractString really got written to database
-    Clob clob = (Clob)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryAbstractColumnName, entry.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
+    String actual = getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryAbstractColumnName, entry.getId());
     Assert.assertEquals(abstractString, actual);
   }
 
@@ -132,9 +132,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setContent(newContent);
 
     // assert content really got written to database
-    Clob clob = (Clob)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
+    String actual = getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
     Assert.assertEquals(newContent, actual);
   }
 
@@ -150,9 +148,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setContent(content);
 
     // assert content really got written to database
-    Clob clob = (Clob)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
-//    String actual = (String)getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
+    String actual = getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
     Assert.assertEquals(content, actual);
   }
 
@@ -196,6 +192,59 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
     Assert.assertEquals(1, entry1.getEntryIndex());
     Assert.assertEquals(2, entry2.getEntryIndex());
+  }
+
+  @Test
+  public void addEntriesWithTagsToDeepThought_EntriesGetQueriedCorrectly() throws Exception {
+    DeepThought deepThought = Application.getDeepThought();
+
+    Entry entry1 = new Entry("Test Entry 1", "Just for EntryIndex testing");
+    Entry entry2 = new Entry("Test Entry 2", "Just for EntryIndex testing");
+
+    deepThought.addEntry(entry1);
+    deepThought.addEntry(entry2);
+
+    Tag tag1 = new Tag("one");
+    Tag tag2 = new Tag("two");
+    Tag tag3 = new Tag("three");
+
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+    deepThought.addTag(tag3);
+
+    entry1.addTag(tag1);
+    entry1.addTag(tag2);
+    entry2.addTag(tag2);
+    entry2.addTag(tag3);
+
+    IEntityManager newEntityManager = getEntityManager(configuration);
+    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
+    Assert.assertEquals(1, queriedDeepThoughts.size());
+
+    DeepThought queriedDeepThought = queriedDeepThoughts.get(0);
+    Assert.assertEquals(2, queriedDeepThought.getEntries().size());
+    Assert.assertEquals(3, queriedDeepThought.getTags().size());
+
+    List<String> tagNames = new ArrayList<>();
+    for(Tag tag : queriedDeepThought.getTags()) {
+      Assert.assertFalse(tagNames.contains(tag.getName()));
+      tagNames.add(tag.getName());
+    }
+    Assert.assertEquals(3, tagNames.size());
+
+    List<String> entry1TagNames = new ArrayList<>(Arrays.asList(new String[] { "one", "two" }));
+    for(Tag tag : entry1.getTags()) {
+      Assert.assertTrue(entry1TagNames.contains(tag.getName()));
+      entry1TagNames.remove(tag.getName());
+    }
+    Assert.assertEquals(0, entry1TagNames.size());
+
+    List<String> entry2TagNames = new ArrayList<>(Arrays.asList(new String[] { "two", "three" }));
+    for(Tag tag : entry2.getTags()) {
+      Assert.assertTrue(entry2TagNames.contains(tag.getName()));
+      entry2TagNames.remove(tag.getName());
+    }
+    Assert.assertEquals(0, entry2TagNames.size());
   }
 
 
@@ -652,6 +701,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(firstPerson);
+    deepThought.addPerson(secondPerson);
     deepThought.addPersonRole(role);
 
     entry.addPerson(firstPerson, role);
@@ -677,6 +727,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
     deepThought.addPersonRole(firstRole);
+    deepThought.addPersonRole(secondRole);
 
     entry.addPerson(person, firstRole);
 
@@ -746,6 +797,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(firstPerson);
+    deepThought.addPerson(secondPerson);
     deepThought.addPersonRole(role);
 
     entry.addPerson(firstPerson, role);
@@ -775,6 +827,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
     deepThought.addPersonRole(firstRole);
+    deepThought.addPersonRole(secondRole);
 
     entry.addPerson(person, firstRole);
 
@@ -1482,10 +1535,10 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    String newReferenceStart = "42"; // the Application is after all called DeepThought
+    String newReferenceStart = "42"; // the Application is called after all DeepThought
     entry.setIndicationStart(newReferenceStart);
 
-    Assert.assertEquals(newReferenceStart, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartColumnName, entry.getId()));
+    Assert.assertEquals(newReferenceStart, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartColumnName, entry.getId()).toString());
   }
 
   @Test
@@ -1514,7 +1567,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     String newReferenceEnd = "42"; // the Application is after all called DeepThought
     entry.setIndicationEnd(newReferenceEnd);
 
-    Assert.assertEquals(newReferenceEnd, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndColumnName, entry.getId()));
+    Assert.assertEquals(newReferenceEnd, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndColumnName, entry.getId()).toString());
   }
 
   @Test

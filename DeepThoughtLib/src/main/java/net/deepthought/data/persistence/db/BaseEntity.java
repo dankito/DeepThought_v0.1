@@ -185,6 +185,11 @@ public class BaseEntity implements Serializable {
       listener.entityRemovedFromCollection(collectionHolder, collection, removedEntity);
   }
 
+  @Transient
+  public boolean isPersisted() {
+    return id != null;
+  }
+
 
   //  private final static Logger log = LoggerFactory.getLogger(BaseEntity.class);
 

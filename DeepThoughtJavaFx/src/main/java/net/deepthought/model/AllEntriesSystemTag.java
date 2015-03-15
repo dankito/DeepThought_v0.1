@@ -64,7 +64,7 @@ public class AllEntriesSystemTag extends SystemTag {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collection == deepThought.getEntries()) {
-        filteredEntries.add((Entry) addedEntity);
+        filteredEntries.add((Entry) addedEntity); // TODO: this is not the correct sort order afterwards as new Entries should be shown first in list, not last
         callEntityAddedListeners(entries, (Entry) addedEntity);
       }
     }

@@ -12,10 +12,9 @@ apply plugin:'application'
 defaultTasks 'run'
 
 dependencies {
-    //    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':DeepThoughtLib')
-//    compile project(':JavaFxControls')
     compile project(':JpaEntityManager')
+    compile project(':JavaSeOrmLiteEntityManager')
 
     compile 'ch.qos.logback:logback-classic:1.1.1'
     compile 'ch.qos.logback:logback-core:1.1.1'

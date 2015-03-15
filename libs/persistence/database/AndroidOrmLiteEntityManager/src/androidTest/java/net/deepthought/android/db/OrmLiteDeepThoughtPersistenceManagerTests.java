@@ -7,6 +7,7 @@ import net.deepthought.DefaultDependencyResolver;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 
 import java.io.File;
@@ -26,7 +27,8 @@ public class OrmLiteDeepThoughtPersistenceManagerTests extends AndroidTestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    entityManager = new OrmLiteAndroidEntityManager(this.getContext());
+    EntityManagerConfiguration configuration = EntityManagerConfiguration.createTestConfiguration();
+    entityManager = new OrmLiteAndroidEntityManager(this.getContext(), configuration);
 
     Application.instantiate(new DefaultDependencyResolver(entityManager));
 

@@ -180,7 +180,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-      if(file.getId() == null) // a Folder sub file, not a file added to Entry
+      if(file.isPersisted() == false) // a Folder sub file, not a file added to Entry
         viewFile();
       else
         Dialogs.showEditFileDialog(file);
@@ -199,7 +199,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
     }
     else {
       fileNameLabel.setText(newValue.getTextRepresentation());
-      entryFileOptionsButtonsPane.setVisible(newValue.getId() != null);
+      entryFileOptionsButtonsPane.setVisible(newValue.isPersisted());
       setTooltip(new Tooltip(file.getUriString()));
     }
   }

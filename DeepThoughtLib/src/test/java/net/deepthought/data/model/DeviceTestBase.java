@@ -6,6 +6,8 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 /**
  * Created by ganymed on 10/11/14.
  */
@@ -191,12 +193,12 @@ public abstract class DeviceTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesUserDeviceJoinTableEntryExist(Long userId, Long deviceId) {
+  protected boolean doesUserDeviceJoinTableEntryExist(Long userId, Long deviceId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserDeviceJoinTableName, TableConfig.UserDeviceJoinTableUserIdColumnName, userId,
         TableConfig.UserDeviceJoinTableDeviceIdColumnName, deviceId);
   }
 
-  protected boolean doesGroupDeviceJoinTableEntryExist(Long groupId, Long deviceId) {
+  protected boolean doesGroupDeviceJoinTableEntryExist(Long groupId, Long deviceId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.GroupDeviceJoinTableName, TableConfig.GroupDeviceJoinTableGroupIdColumnName, groupId,
         TableConfig.GroupDeviceJoinTableDeviceIdColumnName, deviceId);
   }

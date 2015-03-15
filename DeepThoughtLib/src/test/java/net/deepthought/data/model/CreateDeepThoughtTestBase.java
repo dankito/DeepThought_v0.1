@@ -37,7 +37,10 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
     Assert.assertEquals(15, deepThought.getPersonRoles().size());
 
     for(PersonRole personRole : deepThought.getPersonRoles()) {
-      testExtensibleEnumerationFields(personRole, true);
+      if(personRole != PersonRole.getWithoutRolePersonRole())
+        testExtensibleEnumerationFields(personRole, true);
+      else
+        testExtensibleEnumerationFields(personRole, false);
     }
   }
 
@@ -56,7 +59,7 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
   public void testDefaultReferenceCategoriesGetCreatedCorrectly() throws Exception {
     DeepThought deepThought = Application.getDeepThought();
 
-    Assert.assertEquals(7, deepThought.getReferenceCategories().size());
+    Assert.assertEquals(8, deepThought.getReferenceCategories().size());
 
     for(ReferenceCategory referenceCategory : deepThought.getReferenceCategories()) {
       testExtensibleEnumerationFields(referenceCategory, true);

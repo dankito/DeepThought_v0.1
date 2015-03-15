@@ -163,7 +163,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
     this.file = file;
 
     updateWindowTitle();
-    btnApply.setVisible(file.getId() != null);
+    btnApply.setVisible(file.isPersisted());
 
     fileToEditSet(file);
     fieldsWithUnsavedChanges.clear();

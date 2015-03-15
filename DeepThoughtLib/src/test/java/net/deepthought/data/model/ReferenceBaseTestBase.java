@@ -7,6 +7,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -65,7 +66,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     Date newValue = new Date();
     referenceBase.setLastAccessDate(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceBaseTableName, TableConfig.ReferenceBaseLastAccessDateColumnName, referenceBase.getId()));
+    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.ReferenceBaseTableName, TableConfig.ReferenceBaseLastAccessDateColumnName, referenceBase.getId()));
   }
 
   @Test
@@ -163,6 +164,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(firstPerson);
+    deepThought.addPerson(secondPerson);
     deepThought.addPersonRole(role);
 
     referenceBase.addPerson(firstPerson, role);
@@ -197,6 +199,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person);
     deepThought.addPersonRole(firstRole);
+    deepThought.addPersonRole(secondRole);
 
     referenceBase.addPerson(person, firstRole);
 
@@ -273,6 +276,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(firstPerson);
+    deepThought.addPerson(secondPerson);
     deepThought.addPersonRole(role);
 
     referenceBase.addPerson(firstPerson, role);
@@ -415,7 +419,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personRoleId, Long personId) {
+  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personRoleId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.ReferenceBasePersonAssociationTableName + " WHERE " +
         TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName +  "=" + referenceBaseId +
         " AND " + TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName + "=" + personId +
@@ -423,7 +427,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     return result.size() == 1;
   }
 
-  protected boolean isFileReferenceJoinTableValueSet(Long fileId, Long referenceBaseId) {
+  protected boolean isFileReferenceJoinTableValueSet(Long fileId, Long referenceBaseId) throws SQLException {
     Object persistedEntryId = getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkReferenceBaseJoinColumnName, fileId);
     return doIdsEqual(referenceBaseId, persistedEntryId);
   }

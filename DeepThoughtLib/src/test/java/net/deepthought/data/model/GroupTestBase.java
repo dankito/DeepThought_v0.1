@@ -6,6 +6,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -171,12 +172,12 @@ public abstract class GroupTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesGroupDeviceJoinTableEntryExist(Long userId, Long groupId) {
+  protected boolean doesGroupDeviceJoinTableEntryExist(Long userId, Long groupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.GroupDeviceJoinTableName, TableConfig.GroupDeviceJoinTableGroupIdColumnName, userId,
         TableConfig.GroupDeviceJoinTableDeviceIdColumnName, groupId);
   }
 
-  protected boolean doesUserGroupJoinTableEntryExist(Long userId, Long groupId) {
+  protected boolean doesUserGroupJoinTableEntryExist(Long userId, Long groupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserGroupJoinTableName, TableConfig.UserGroupJoinTableUserIdColumnName, userId,
         TableConfig.UserGroupJoinTableGroupIdColumnName, groupId);
   }

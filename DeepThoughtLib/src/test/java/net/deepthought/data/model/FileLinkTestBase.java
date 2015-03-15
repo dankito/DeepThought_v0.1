@@ -56,7 +56,8 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     boolean newValue = !file.isFolder();
     file.setIsFolder(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkIsFolderColumnName, file.getId()));
+    Object storedValue = getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkIsFolderColumnName, file.getId());
+    compareBoolValue(newValue, storedValue);
   }
 
   @Test

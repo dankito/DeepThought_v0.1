@@ -150,7 +150,7 @@ public class Dialogs {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
           if(controller.getDialogResult() == DialogResult.Ok) {
-            if(person.getId() == null) { // a new Person
+            if(person.isPersisted() == false) { // a new Person
               Application.getDeepThought().addPerson(person);
             }
           }
@@ -234,7 +234,7 @@ public class Dialogs {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
           if(controller.getDialogResult() == DialogResult.Ok) {
-            if(publisher.getId() == null) { // a new Reference
+            if(publisher.isPersisted() == false) { // a new Reference
               Application.getDeepThought().addPublisher(publisher);
             }
           }
@@ -279,7 +279,7 @@ public class Dialogs {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
           if(controller.getDialogResult() == DialogResult.Ok) {
-            if(seriesTitle.getId() == null) { // a new SeriesTitle
+            if(seriesTitle.isPersisted() == false) { // a new SeriesTitle
               Application.getDeepThought().addSeriesTitle(seriesTitle);
             }
           }

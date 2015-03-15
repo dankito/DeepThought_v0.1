@@ -10,9 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,8 +56,8 @@ public class Category extends UserDataEntity {
   @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.CategoryEntryJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableCategoryIdColumnName, referencedColumnName = "id") },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableEntryIdColumnName, referencedColumnName = "id") }
+      joinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableCategoryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) }
   )
   @OrderBy("entryIndex DESC")
   protected Collection<Entry> entries = new ArrayList<>();
@@ -183,7 +181,7 @@ public class Category extends UserDataEntity {
     if(entries.contains(entry) == false) {
       if (entries.add(entry)) {
         entry.addCategory(this);
-        Collections.sort((List) entries, entriesByIndexComparator);
+//        Collections.sort((List) entries, entriesByIndexComparator); // throws an UnsupportedException // TODO: sort Category's Entries
 
         if (entry.deepThought == null)
           deepThought.addEntry(entry);

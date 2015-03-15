@@ -606,11 +606,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
-    if(reference.getId() == null) { // a new Reference
+    // TODO: save async while closing the dialog? Would make Dialog closing faster
+    if(reference.isPersisted() == false) { // a new Reference
       Application.getDeepThought().addReference(reference);
     }
 
     saveEditedFieldsOnEntry();
+
     closeDialog();
   }
 
@@ -1049,7 +1051,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void setReferenceValues(final Reference reference) {
-    btnApplyChanges.setVisible(reference.getId() != null);
+    btnApplyChanges.setVisible(reference.isPersisted());
 
     if(reference.getSeries() == null)
       cmbxSeriesTitle.setValue(Empty.Series);
@@ -1111,7 +1113,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void updateWindowTitle(String referenceTitle) {
-    if(this.reference.getId() == null)
+    if(this.reference.isPersisted() == false)
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.reference", referenceTitle));
     else
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.reference", referenceTitle));

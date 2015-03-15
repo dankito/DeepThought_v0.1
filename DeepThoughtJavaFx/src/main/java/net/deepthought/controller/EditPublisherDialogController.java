@@ -67,7 +67,7 @@ public class EditPublisherDialogController extends ChildWindowsController implem
     this.publisher = publisher;
 
     updateWindowTitle();
-    btnApply.setVisible(publisher.getId() != null);
+    btnApply.setVisible(publisher.isPersisted());
     btnApply.setDisable(true);
 
     setPublisherValues(publisher);
@@ -79,7 +79,7 @@ public class EditPublisherDialogController extends ChildWindowsController implem
   }
 
   protected void updateWindowTitle() {
-    if(publisher.getId() == null)
+    if(publisher.isPersisted() == false)
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.publisher"));
     else
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.publisher", publisher.getTextRepresentation()));

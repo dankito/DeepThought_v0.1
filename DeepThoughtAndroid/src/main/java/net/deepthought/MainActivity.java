@@ -62,6 +62,49 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+      Application.addApplicationListener(new ApplicationListener() {
+        @Override
+        public void deepThoughtChanged(final DeepThought deepThought) {
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              setControlsEnabledState(deepThought != null);
+            }
+          });
+        }
+
+        @Override
+        public void errorOccurred(DeepThoughtError error) {
+          // TODO: show error message
+        }
+      });
+
+      // TODO: create Android Dependency Resolver
+      Application.instantiateAsync(new DefaultDependencyResolver() {
+        @Override
+        public IEntityManager createEntityManager(EntityManagerConfiguration configuration) {
+          try {
+            return new OrmLiteAndroidEntityManager(MainActivity.this.getApplicationContext(), configuration);
+          } catch(Exception ex) {
+            Log.e("MainActivity", "Could not create OrmLiteAndroidEntityManager", ex);
+          }
+
+          return null; // TODO: what to do in this case?
+        }
+
+        @Override
+        public IDataManager createDataManager(IEntityManager entityManager) {
+          return new AndroidDataManager(entityManager);
+        }
+      });
+
+      loadingDataProgressDialog = new ProgressDialog(this);
+      loadingDataProgressDialog.setMessage(getString(R.string.loading_data_wait_message));
+      loadingDataProgressDialog.setIndeterminate(true);
+      loadingDataProgressDialog.setCancelable(false);
+      loadingDataProgressDialog.show();
+
         setContentView(R.layout.activity_main);
 
         // Set up the action bar.
@@ -101,48 +144,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
       ActivityManager.createInstance(this);
 
-      Application.addApplicationListener(new ApplicationListener() {
-        @Override
-        public void deepThoughtChanged(final DeepThought deepThought) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              setControlsEnabledState(deepThought != null);
-            }
-          });
-        }
-
-        @Override
-        public void errorOccurred(DeepThoughtError error) {
-          // TODO: show error message
-        }
-      });
-
-      // TODO: create Android Dependency Resolver
-        Application.instantiateAsync(new DefaultDependencyResolver() {
-          @Override
-          public IEntityManager createEntityManager(EntityManagerConfiguration configuration) {
-            try {
-              return new OrmLiteAndroidEntityManager(MainActivity.this.getApplicationContext());
-            } catch(Exception ex) {
-              Log.e("MainActivity", "Could not create OrmLiteAndroidEntityManager", ex);
-            }
-
-            return null; // TODO: what to do in this case?
-          }
-
-          @Override
-          public IDataManager createDataManager(IEntityManager entityManager) {
-            return new AndroidDataManager(entityManager);
-          }
-        });
-
-      loadingDataProgressDialog = new ProgressDialog(this);
-      loadingDataProgressDialog.setMessage(getString(R.string.loading_data_wait_message));
-      loadingDataProgressDialog.setIndeterminate(true);
-      loadingDataProgressDialog.setCancelable(false);
-      loadingDataProgressDialog.show();
-
 //      testLucene();
     }
 
@@ -175,6 +176,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
   @Override
   protected void onDestroy() {
+    loadingDataProgressDialog = null;
     Application.shutdown();
     super.onDestroy();
   }

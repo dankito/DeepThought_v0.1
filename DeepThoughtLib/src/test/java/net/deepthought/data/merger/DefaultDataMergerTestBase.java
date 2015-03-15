@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -56,7 +57,7 @@ public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystem
 
 
   @Test
-  public void mergeWithCurrentData_MergeCopiedEntity_EntityGetsMergedWithCurrentData() {
+  public void mergeWithCurrentData_MergeCopiedEntity_EntityGetsMergedWithCurrentData() throws SQLException {
     DeepThought deepThought = Application.getDeepThought();
     Tag tagToMergeWith = new Tag("Tag to merge with");
     deepThought.addTag(tagToMergeWith);
@@ -94,7 +95,7 @@ public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystem
   }
 
   @Test
-  public void mergeWithCurrentData_MergeCopiedEntityWithSubEntities_EntityGetsMergedWithCurrentData() {
+  public void mergeWithCurrentData_MergeCopiedEntityWithSubEntities_EntityGetsMergedWithCurrentData() throws SQLException {
     DeepThought deepThought = Application.getDeepThought();
     final Entry entry1 = new Entry("Entry 1", "");
     deepThought.addEntry(entry1);

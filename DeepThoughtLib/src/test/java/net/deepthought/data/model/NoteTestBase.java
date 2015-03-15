@@ -7,7 +7,6 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +27,7 @@ public abstract class NoteTestBase extends DataModelTestBase {
     String newValue = "Updated note";
     note.setNote(newValue);
 
-    Clob clob = (Clob)getValueFromTable(TableConfig.NoteTableName, TableConfig.NoteNoteColumnName, note.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
+    String actual = getClobFromTable(TableConfig.NoteTableName, TableConfig.NoteNoteColumnName, note.getId());
     Assert.assertEquals(newValue, actual);
   }
 
@@ -45,8 +43,7 @@ public abstract class NoteTestBase extends DataModelTestBase {
     String longNote = DataModelTestBase.StringWithMoreThan2048CharactersLength;
     note.setNote(longNote);
 
-    Clob clob = (Clob)getValueFromTable(TableConfig.NoteTableName, TableConfig.NoteNoteColumnName, note.getId());
-    String actual = clob.getSubString(1, (int)clob.length());
+    String actual = getClobFromTable(TableConfig.NoteTableName, TableConfig.NoteNoteColumnName, note.getId());
     Assert.assertEquals(longNote, actual);
   }
 

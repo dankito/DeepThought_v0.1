@@ -21,6 +21,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -62,7 +64,7 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   protected Gender gender = Gender.Unset;
 
   @Column(name = TableConfig.PersonBirthDayColumnName)
-//  @Transient
+  @Temporal(TemporalType.DATE)
   protected Date birthDate;
 
   @Column(name = TableConfig.PersonNotesColumnName)

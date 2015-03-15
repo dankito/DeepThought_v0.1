@@ -85,7 +85,7 @@ public class EditEntryActivity extends Activity {
       entryTags = new ArrayList<>(entry.getTagsSorted());
       setTextViewEditEntryTags();
 
-      edtxtEditEntryAbstract.setText(entry.getTitle());
+      edtxtEditEntryAbstract.setText(entry.getAbstract());
       edtxtEditEntryText.setText(entry.getContent());
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
@@ -94,7 +94,7 @@ public class EditEntryActivity extends Activity {
         }
       }));
 
-      if(entry.getId() != null) // not a new entry, entry is already persisted in db
+      if(entry.isPersisted()) // not a new entry, entry is already persisted in db
         getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_entry_format, entry.getTitle()));
     }
   }
@@ -121,7 +121,7 @@ public class EditEntryActivity extends Activity {
       entry.setAbstract(edtxtEditEntryAbstract.getText().toString());
       entry.setContent(edtxtEditEntryText.getText().toString());
 
-      if(entry.getId() == null) // a new Entry
+      if(entry.isPersisted() == false) // a new Entry
         Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
 
       entry.setTags(entryTags);

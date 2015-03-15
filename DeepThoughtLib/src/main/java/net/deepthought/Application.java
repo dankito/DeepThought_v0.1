@@ -88,17 +88,17 @@ public class Application {
       return;
 
     try {
-      startTime = new Date();
+//      startTime = new Date();
       Application.backupManager = dependencyResolver.createBackupManager();
-      logResolvingDependencyDuration("BackupManager", startTime);
+//      logResolvingDependencyDuration("BackupManager", startTime);
 
-      startTime = new Date();
+//      startTime = new Date();
       Application.dataComparer = dependencyResolver.createDataComparer();
-      logResolvingDependencyDuration("DataComparer", startTime);
+//      logResolvingDependencyDuration("DataComparer", startTime);
 
-      startTime = new Date();
+//      startTime = new Date();
       Application.dataMerger = dependencyResolver.createDataMerger();
-      logResolvingDependencyDuration("DataMerger", startTime);
+//      logResolvingDependencyDuration("DataMerger", startTime);
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
@@ -126,7 +126,7 @@ public class Application {
 
   private static boolean isDatabaseAlreadyInUseException(Throwable ex) {
     Throwable exception = ex;
-    while(exception != null) {
+    while(exception != null && exception.getMessage() != null) {
       if(exception.getMessage().toLowerCase().contains("already in use"))
         return true;
       exception = exception.getCause();
@@ -167,6 +167,8 @@ public class Application {
     }
 
     dataManager = null;
+
+    entityManager = null;
   }
 
 

@@ -29,10 +29,11 @@
     <orderEntry type="library" exported="" scope="PROVIDED" name="_usr_lib_jvm_java_8_jdk_jre_lib_jfxrt_jar" level="project" />
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="module" module-name="JpaEntityManager" exported="" />
+    <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
     <orderEntry type="library" exported="" name="logback-classic-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="logback-core-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="controlsfx-8.20.8" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-api-1.7.6" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="openjfx-dialogs-1.0.2" level="project" />
   </component>
 </module>

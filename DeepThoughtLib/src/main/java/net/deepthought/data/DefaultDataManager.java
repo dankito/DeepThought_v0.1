@@ -127,6 +127,7 @@ public class DefaultDataManager implements IDataManager {
 
     DeepThought newDeepThought = loggedOnUser.getLastViewedDeepThought();
 
+//    entityManager.persistEntity(loggedOnUser);
     entityManager.persistEntity(application);
     entityManager.persistEntity(newDeepThought);
     Application.getSettings().setLanguage(Application.getSettings().getLanguage());
@@ -171,13 +172,13 @@ public class DefaultDataManager implements IDataManager {
 
   // Created Entities get persisted immediately
   protected void entityCreated(BaseEntity entity) {
-    log.debug("Entity {} has been created", entity);
+    log.info("Entity {} has been created", entity);
     entityManager.persistEntity(entity);
   }
 
   // On updated Entities it depends if autoSaveChanges is set to true and after which time changes should be persisted
   protected synchronized void entityUpdated(BaseEntity entity) {
-    log.debug("Entity {} has been updated", entity);
+    log.info("Entity {} has been updated", entity);
 
     if(getSettings().autoSaveChanges() == true) {
       if (getSettings().getAutoSaveChangesAfterMilliseconds() == 0) // persist modified entities immediately
@@ -194,7 +195,7 @@ public class DefaultDataManager implements IDataManager {
 
   // Deleted Entities also get persisted immediately (we don't delete any Entities physically, we only set its 'Deleted' flag to true)
   protected void entityDeleted(BaseEntity entity) {
-    log.debug("Entity {} has been deleted", entity);
+    log.info("Entity {} has been deleted", entity);
 
     if(entity instanceof AssociationEntity) { // AssociationEntities really get deleted from Database
       if(entity.isDeleted() == false) {
@@ -228,7 +229,7 @@ public class DefaultDataManager implements IDataManager {
   }
 
   protected void persistUpdatedEntity(BaseEntity entity) {
-    log.debug("persistUpdatedEntity() has been called for entity {}", entity);
+    log.info("Persisting updated Entity {}", entity);
     entityManager.updateEntity(entity);
   }
 
@@ -242,7 +243,8 @@ public class DefaultDataManager implements IDataManager {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
 //      addedEntity.addEntityListener(baseEntityListener);
-      DefaultDataManager.this.entityCreated(addedEntity);
+      if(addedEntity.isPersisted() == false)
+        DefaultDataManager.this.entityCreated(addedEntity);
     }
 
     @Override

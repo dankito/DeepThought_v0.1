@@ -37,7 +37,8 @@ android {
 
         exclude 'Strings.properties'
         exclude 'Strings_de.properties'
-        exclude 'DeepThought.properties'
+        exclude 'DeepThoughtFx.properties'
+        exclude 'logback-test.xml'
     }
 }
 
@@ -47,7 +48,7 @@ dependencies {
     compile project(':ormlite-android')
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
-    androidTestCompile 'org.slf4j:slf4j-android:1.7.7'
+    androidTestCompile 'org.slf4j:slf4j-android:1.7.10'
 
     // to include test cases from DeepThoughtLib
 //    androidTestCompile project(':DeepThoughtLib').sourceSets.test.output

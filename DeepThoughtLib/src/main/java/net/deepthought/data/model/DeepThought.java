@@ -818,11 +818,15 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   protected transient EntityListener subEntitiesListener = new EntityListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, final Object newValue) {
       log.debug("SubEntity's property {} changed to {}; {}", propertyName, newValue, entity);
       if(entity instanceof Tag) {// a Tag has been updated -> reapply Tag sorting
         sortedTags = null;
       }
+
+      // TODO: bad solution
+      if(isEntityNotOwnedByDeepThought(newValue) && ((BaseEntity)newValue).isPersisted() == false)
+        callEntityAddedListeners(entity, new ArrayList<BaseEntity>() {{ add((BaseEntity)newValue); }}, (BaseEntity)newValue);
 
       entityUpdated(entity);
     }
@@ -845,6 +849,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
       entityUpdated(collectionHolder);
     }
   };
+
+  protected boolean isEntityNotOwnedByDeepThought(Object entity) {
+    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision;
+  }
 
   protected boolean isCollectionOnDeepThought(BaseEntity collectionEntity) {
     return collectionEntity instanceof Category || collectionEntity instanceof Entry || collectionEntity instanceof Tag || collectionEntity instanceof IndexTerm ||
@@ -884,8 +892,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       callEntityOfCollectionUpdatedListeners(getLanguages(), entity);
     else if(entity instanceof BackupFileServiceType)
       callEntityOfCollectionUpdatedListeners(getBackupFileServiceTypes(), entity);
-    // TODO: bad solution
-    else if(entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision)
+    else if(isEntityNotOwnedByDeepThought(entity))
       callEntityOfCollectionUpdatedListeners(new ArrayList<BaseEntity>() {{ add(entity); }}, entity);
     else
       log.warn("Updated entity of type " + entity.getClass() + " retrieved, but don't know what to do with this type");

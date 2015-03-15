@@ -132,13 +132,13 @@ public class DefaultDataMerger implements IDataMerger {
     entity.resetId();
 
     for(BaseEntity baseEntityChild : ReflectionHelper.getBaseEntityChildren(entity)) {
-      if(baseEntityChild.getId() != null)
+      if(baseEntityChild.isPersisted() == true)
         resetEntityAndSubEntitiesIds(baseEntityChild);
     }
 
     for(Collection<BaseEntity> childCollection : ReflectionHelper.getCollectionsChildren(entity)) {
       for(BaseEntity childCollectionItem : childCollection) {
-        if(childCollectionItem.getId() != null)
+        if(childCollectionItem.isPersisted() == true)
           resetEntityAndSubEntitiesIds(childCollectionItem);
       }
     }
@@ -193,7 +193,7 @@ public class DefaultDataMerger implements IDataMerger {
 
     IEntityManager entityManager = Application.getEntityManager();
 
-    if(entity.getId() == null) {
+    if(entity.isPersisted() == false) {
       if (entityManager.persistEntity(entity) == true) {
         if(listener != null)
           listener.mergeEntityResult(entity, true, DeepThoughtError.Success);

@@ -29,7 +29,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
   protected boolean showCategories = true;
 
-  protected boolean showQuickEditEntryPane = true;
+  protected boolean showQuickEditEntryPane = false;
 
 
   public UserDeviceSettings() {

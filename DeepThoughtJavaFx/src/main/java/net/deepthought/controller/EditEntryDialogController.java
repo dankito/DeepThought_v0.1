@@ -301,7 +301,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void setEntryValues(final Entry entry) {
-    btnApplyChanges.setVisible(entry.getId() != null);
+    btnApplyChanges.setVisible(entry.isPersisted());
 
     txtfldTitle.setText(entry.getTitle());
 
@@ -329,7 +329,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonApplyAction(ActionEvent actionEvent) {
     saveEditedFieldsOnEntry();
 
-    if(entry.getId() == null) // a new Entry
+    if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry);
   }
 
@@ -343,7 +343,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
-    if(entry.getId() == null) // a new entry
+    if(entry.isPersisted() == false) // a new entry
       Application.getDeepThought().addEntry(entry);
 
     saveEditedFieldsOnEntry();
@@ -583,7 +583,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void updateWindowTitle(String entryTitle) {
-    if(this.entry.getId() == null)
+    if(this.entry.isPersisted() == false)
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.entry", entryTitle));
     else
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.entry", entryTitle));

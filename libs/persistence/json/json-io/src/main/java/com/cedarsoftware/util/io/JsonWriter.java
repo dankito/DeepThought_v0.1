@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
@@ -491,7 +492,7 @@ public class JsonWriter implements Closeable, Flushable
 
         if (showType)
         {
-            writeType(o, out);
+            writeType(o, out, arrayComponentClass);
         }
 
         if (referenced || showType)
@@ -779,7 +780,7 @@ public class JsonWriter implements Closeable, Flushable
     {
         traceReferences(obj);
         objVisited.clear();
-        writeImpl(obj, true);
+        writeImpl(obj, true, null);
         flush();
         objVisited.clear();
         objsReferenced.clear();
@@ -955,7 +956,7 @@ public class JsonWriter implements Closeable, Flushable
         return false;
     }
 
-    protected void writeImpl(Object obj, boolean showType) throws IOException
+    protected void writeImpl(Object obj, boolean showType, Class type) throws IOException
     {
         if (obj == null)
         {
@@ -969,7 +970,7 @@ public class JsonWriter implements Closeable, Flushable
         }
         else if (obj instanceof Collection)
         {
-            writeCollection((Collection) obj, showType);
+            writeCollection((Collection) obj, showType, type);
         }
         else if (obj instanceof JsonObject)
         {   // symmetric support for writing Map of Maps representation back as identical JSON format.
@@ -1011,49 +1012,60 @@ public class JsonWriter implements Closeable, Flushable
         out.write(id == null ? "0" : id);
     }
 
-    private static void writeType(Object obj, Writer out) throws IOException
+    private static void writeType(Object obj, Writer out, Class type) throws IOException
     {
         out.write("\"@type\":\"");
         final Class c = obj.getClass();
-        switch (c.getName())
-        {
-            case "java.lang.Boolean":
-                out.write("boolean");
-                break;
-            case "java.lang.Byte":
-                out.write("byte");
-                break;
-            case "java.lang.Character":
-                out.write("char");
-                break;
-            case "java.lang.Class":
-                out.write("class");
-                break;
-            case "java.lang.Double":
-                out.write("double");
-                break;
-            case "java.lang.Float":
-                out.write("float");
-                break;
-            case "java.lang.Integer":
-                out.write("int");
-                break;
-            case "java.lang.Long":
-                out.write("long");
-                break;
-            case "java.lang.Short":
-                out.write("short");
-                break;
-            case "java.lang.String":
-                out.write("string");
-                break;
-            case "java.util.Date":
-                out.write("date");
-                break;
-            default:
-                out.write(c.getName());
-                break;
+
+      // cda: to circumvent lazy loading collections
+      if(type != null && List.class.isAssignableFrom(type))
+        out.write("java.util.List");
+      else if(type != null && Set.class.isAssignableFrom(type))
+        out.write("java.util.Set");
+      else if(type != null && Queue.class.isAssignableFrom(type))
+        out.write("java.util.Queue");
+      else if(type != null && Collection.class.isAssignableFrom(type))
+        out.write("java.util.Collection");
+      else {
+        switch (c.getName()) {
+          case "java.lang.Boolean":
+            out.write("boolean");
+            break;
+          case "java.lang.Byte":
+            out.write("byte");
+            break;
+          case "java.lang.Character":
+            out.write("char");
+            break;
+          case "java.lang.Class":
+            out.write("class");
+            break;
+          case "java.lang.Double":
+            out.write("double");
+            break;
+          case "java.lang.Float":
+            out.write("float");
+            break;
+          case "java.lang.Integer":
+            out.write("int");
+            break;
+          case "java.lang.Long":
+            out.write("long");
+            break;
+          case "java.lang.Short":
+            out.write("short");
+            break;
+          case "java.lang.String":
+            out.write("string");
+            break;
+          case "java.util.Date":
+            out.write("date");
+            break;
+          default:
+            out.write(c.getName());
+            break;
         }
+      }
 
         out.write('"');
     }
@@ -1099,7 +1111,7 @@ public class JsonWriter implements Closeable, Flushable
 
         if (typeWritten)
         {
-            writeType(array, out);
+            writeType(array, out, arrayType);
             out.write(',');
             newLine(out);
         }
@@ -1190,14 +1202,14 @@ public class JsonWriter implements Closeable, Flushable
                     if (writeIfMatching(value, true, out)) { }
                     else
                     {
-                        writeImpl(value, true);
+                        writeImpl(value, true, componentClass);
                     }
                 }
                 else
                 {   // Specific Class-type arrays - only force type when
                     // the instance is derived from array base class.
                     boolean forceType = !(value.getClass() == componentClass);
-                    writeImpl(value, forceType || alwaysShowType());
+                    writeImpl(value, forceType || alwaysShowType(), componentClass);
                 }
 
                 if (i != lenMinus1)
@@ -1302,7 +1314,7 @@ public class JsonWriter implements Closeable, Flushable
         out.write((char[]) byteStrs[bytes[lenMinus1] + 128]);
     }
 
-    private void writeCollection(Collection col, boolean showType) throws IOException
+    private void writeCollection(Collection col, boolean showType, Class type) throws IOException
     {
         if (writeOptionalReference(col))
         {
@@ -1335,7 +1347,7 @@ public class JsonWriter implements Closeable, Flushable
                 out.write(',');
                 newLine(out);
             }
-            writeType(col, out);
+            writeType(col, out, type);
         }
 
         if (isEmpty)
@@ -1487,7 +1499,7 @@ public class JsonWriter implements Closeable, Flushable
                 if (writeIfMatching(value, true, out)) { }
                 else
                 {
-                    writeImpl(value, true);
+                    writeImpl(value, true, componentClass);
                 }
             }
             else if (writeArrayElementIfMatching(componentClass, value, false, out)) { }
@@ -1495,7 +1507,7 @@ public class JsonWriter implements Closeable, Flushable
             {   // Specific Class-type arrays - only force type when
                 // the instance is derived from array base class.
                 boolean forceType = !(value.getClass() == componentClass);
-                writeImpl(value, forceType || alwaysShowType());
+                writeImpl(value, forceType || alwaysShowType(), componentClass);
             }
 
             if (i != lenMinus1)
@@ -1826,7 +1838,7 @@ public class JsonWriter implements Closeable, Flushable
             }
             else if (value instanceof BigDecimal || value instanceof BigInteger)
             {
-                writeImpl(value, !doesValueTypeMatchFieldType(type, fieldName, value));
+                writeImpl(value, !doesValueTypeMatchFieldType(type, fieldName, value), type);
             }
             else if (value instanceof Number || value instanceof Boolean)
             {
@@ -1842,7 +1854,7 @@ public class JsonWriter implements Closeable, Flushable
             }
             else
             {
-                writeImpl(value, !doesValueTypeMatchFieldType(type, fieldName, value));
+                writeImpl(value, !doesValueTypeMatchFieldType(type, fieldName, value), type);
             }
             if (i.hasNext())
             {
@@ -1889,7 +1901,7 @@ public class JsonWriter implements Closeable, Flushable
                 out.write(',');
                 newLine(out);
             }
-            writeType(map, out);
+            writeType(map, out, null); // TODO: or set to map.getClass() ?
         }
 
         if (map.isEmpty())
@@ -1974,7 +1986,7 @@ public class JsonWriter implements Closeable, Flushable
                 out.write(',');
                 newLine(out);
             }
-            writeType(map, out);
+            writeType(map, out, null); // TODO: or set to map.getClass() ?
         }
 
         if (map.isEmpty())
@@ -2047,7 +2059,7 @@ public class JsonWriter implements Closeable, Flushable
         }
         else
         {
-            writeImpl(o, true);
+            writeImpl(o, true, null);
         }
     }
 
@@ -2090,7 +2102,7 @@ public class JsonWriter implements Closeable, Flushable
 
         if (showType)
         {
-            writeType(obj, out);
+            writeType(obj, out, null);
         }
 
         boolean first = !showType;
@@ -2170,7 +2182,7 @@ public class JsonWriter implements Closeable, Flushable
         else if (writeIfMatching(o, forceType, out)) { }
         else
         {
-            writeImpl(o, forceType || alwaysShowType());
+            writeImpl(o, forceType || alwaysShowType(), type);
         }
         return false;
     }

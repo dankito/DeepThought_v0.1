@@ -29,6 +29,8 @@ public class TestDependencyResolver extends DefaultDependencyResolver {
 
   @Override
   public IBackupManager createBackupManager() {
+    if(backupManager != null)
+      return backupManager;
     return new NoOperationBackupManager();
   }
 }

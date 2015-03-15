@@ -2,7 +2,7 @@ package net.deepthought.android.db.helper;
 
 import com.j256.ormlite.dao.cda.jointable.JoinTableDao;
 import com.j256.ormlite.dao.cda.jointable.JoinTableDaoRegistry;
-import com.j256.ormlite.field.config.ManyToManyConfig;
+import com.j256.ormlite.jpa.relationconfig.ManyToManyConfig;
 
 import java.lang.reflect.Field;
 

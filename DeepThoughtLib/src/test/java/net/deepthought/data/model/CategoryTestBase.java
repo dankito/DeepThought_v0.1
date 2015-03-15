@@ -6,12 +6,14 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 /**
  * Created by ganymed on 10/11/14.
  */
 public abstract class CategoryTestBase extends DataModelTestBase {
 
-  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) {
+  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableCategoryIdColumnName, categoryId,
         TableConfig.CategoryEntryJoinTableEntryIdColumnName, entryId);
   }
@@ -58,6 +60,8 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     // assert helpText really got updated in database
 //    Assert.assertTrue((boolean) getValueFromTable(TableConfig.CategoryTableName, TableConfig.CategoryIsExpandedColumnName, category.getId()));
     Object dbValue = getValueFromTable(TableConfig.CategoryTableName, TableConfig.CategoryIsExpandedColumnName, category.getId());
+    if(dbValue instanceof String)
+      dbValue = Short.parseShort((String)dbValue);
     if(dbValue instanceof Short)
       dbValue = ((Short)dbValue).intValue();
     Assert.assertTrue(dbValue.equals(1));
@@ -182,6 +186,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
 
     Entry entry = new Entry("test", "no content");
+    deepThought.addEntry(entry);
     category.addEntry(entry);
 
     // assert entry really got written to database
@@ -197,6 +202,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
 
     Entry entry = new Entry("test", "no content");
+    deepThought.addEntry(entry);
     category.addEntry(entry);
 
     Assert.assertNotNull(entry.getId());
@@ -211,6 +217,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
 
     Entry entry = new Entry("test", "no content");
+    deepThought.addEntry(entry);
     category.addEntry(entry);
 
     Long entryId = entry.getId();
@@ -228,6 +235,8 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
 
     Entry entry = new Entry("test", "no content");
+    deepThought.addEntry(entry);
+
     category.addEntry(entry);
 
     category.removeEntry(entry);

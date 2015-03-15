@@ -144,7 +144,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
     this.person = personToEdit;
 
     updateStageTitle();
-    btnApply.setVisible(personToEdit.getId() != null);
+    btnApply.setVisible(personToEdit.isPersisted());
 
     personToEditSet(personToEdit);
     fieldsWithUnsavedChanges.clear();
@@ -171,7 +171,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   protected void updateStageTitle() {
-    if(person.getId() == null)
+    if(person.isPersisted() == false)
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.person", person.getNameRepresentation()));
     else
       windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.person", person.getNameRepresentation()));

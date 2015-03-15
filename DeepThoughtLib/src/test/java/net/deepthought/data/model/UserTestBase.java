@@ -9,6 +9,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,12 +253,12 @@ public abstract class UserTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesUserDeviceJoinTableEntryExist(Long userId, Long deviceId) {
+  protected boolean doesUserDeviceJoinTableEntryExist(Long userId, Long deviceId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserDeviceJoinTableName, TableConfig.UserDeviceJoinTableUserIdColumnName, userId,
         TableConfig.UserDeviceJoinTableDeviceIdColumnName, deviceId);
   }
 
-  protected boolean doesUserGroupJoinTableEntryExist(Long userId, Long groupId) {
+  protected boolean doesUserGroupJoinTableEntryExist(Long userId, Long groupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserGroupJoinTableName, TableConfig.UserGroupJoinTableUserIdColumnName, userId,
         TableConfig.UserGroupJoinTableGroupIdColumnName, groupId);
   }
