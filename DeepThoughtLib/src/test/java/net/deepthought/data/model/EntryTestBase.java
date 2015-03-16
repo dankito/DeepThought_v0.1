@@ -1,6 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
+import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.EntryContentFormat;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
@@ -180,6 +181,76 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Assert.assertEquals(newValue, actual);
   }
 
+
+  @Test
+  public void addSubCategory_SubCategoryGetsPersisted() throws Exception {
+    Entry entry = new Entry("test");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+
+    Entry subEntry = new Entry("sub");
+    entry.addSubEntry(subEntry);
+
+    // assert entries really got written to database
+    Object[] queryResult = getRowFromTable(TableConfig.EntryTableName, subEntry.getId());
+    Assert.assertNotEquals(0, queryResult.length);
+  }
+
+  @Test
+  public void addSubCategory_RelationsGetSet() throws Exception {
+    Entry entry = new Entry("test");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+
+    Entry subEntry = new Entry("sub");
+    entry.addSubEntry(subEntry);
+
+    Assert.assertNotNull(subEntry.getId());
+    Assert.assertEquals(entry, subEntry.getParentEntry());
+    Assert.assertTrue(entry.getSubEntries().contains(subEntry));
+  }
+
+  @Test
+  public void removeSubCategory_SubCategoryGetsDeletedFromDB() throws Exception {
+    Entry entry = new Entry("test");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+
+    Entry subEntry = new Entry("sub");
+    entry.addSubEntry(subEntry);
+
+    Long subEntryId = subEntry.getId();
+    entry.removeSubEntry(subEntry);
+
+    // assert categories really didn't get deleted from database
+    Object[] queryResult = getRowFromTable(TableConfig.EntryTableName, subEntryId);
+    Assert.assertNotEquals(0, queryResult.length);
+
+    Assert.assertFalse(entry.isDeleted());
+    Assert.assertTrue(subEntry.isDeleted());
+  }
+
+  @Test
+  public void removeSubCategory_RelationsGetRemoved() throws Exception {
+    Entry entry = new Entry("test");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+
+    Entry subEntry = new Entry("sub");
+    entry.addSubEntry(subEntry);
+
+    entry.removeSubEntry(subEntry);
+
+    Assert.assertNotNull(subEntry.getId()); // subCategories is not a Composition -> subCategory stays in DB till it gets removed from DeepThought
+    Assert.assertNull(subEntry.getParentEntry());
+    Assert.assertFalse(entry.getSubEntries().contains(subEntry));
+  }
+
+
   @Test
   public void add2EntriesToDeepThought_EntryIndicesGetCorrectlySet() throws Exception {
     DeepThought deepThought = Application.getDeepThought();
@@ -218,10 +289,11 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry2.addTag(tag3);
 
     IEntityManager newEntityManager = getEntityManager(configuration);
-    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
-    Assert.assertEquals(1, queriedDeepThoughts.size());
-
-    DeepThought queriedDeepThought = queriedDeepThoughts.get(0);
+//    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
+//    Assert.assertEquals(1, queriedDeepThoughts.size());
+//
+//    DeepThought queriedDeepThought = queriedDeepThoughts.get(0);
+    DeepThought queriedDeepThought = newEntityManager.getEntityById(DeepThought.class, deepThought.getId());
     Assert.assertEquals(2, queriedDeepThought.getEntries().size());
     Assert.assertEquals(3, queriedDeepThought.getTags().size());
 
@@ -1599,6 +1671,135 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setLanguage(newLanguage);
 
     Assert.assertTrue(doIdsEqual(newLanguage.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryLanguageJoinColumnName, entry.getId())));
+  }
+
+
+  @Test
+  public void addCustomField_RelationGetsPersisted() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    CustomField customField = new CustomField(customFieldName, "test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    entry.addCustomField(customField);
+
+    Assert.assertNotNull(customField.getId());
+    Assert.assertTrue(doIdsEqual(entry.getId(), getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldEntryJoinColumnName, customField.getId())));
+  }
+
+  @Test
+  public void addCustomField_EntitiesGetAddedToRelatedCollections() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    CustomField customField = new CustomField(customFieldName, "test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    entry.addCustomField(customField);
+
+    Assert.assertEquals(entry, customField.getEntry());
+    Assert.assertTrue(entry.getCustomFields().contains(customField));
+    Assert.assertEquals(1, customField.getOrder());
+  }
+
+  @Test
+  public void addMultipleCustomFields() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    CustomField customField1 = new CustomField(customFieldName, "test1");
+    entry.addCustomField(customField1);
+    CustomField customField2 = new CustomField(customFieldName, "test2");
+    entry.addCustomField(customField2);
+    CustomField customField3 = new CustomField(customFieldName, "test3");
+    entry.addCustomField(customField3);
+    CustomField customField4 = new CustomField(customFieldName, "test4");
+    entry.addCustomField(customField4);
+
+    Assert.assertEquals(4, entry.getCustomFields().size());
+
+    int index = 0;
+    for(CustomField customField : entry.getCustomFields()) {
+      Assert.assertEquals(entry, customField.getEntry());
+      Assert.assertEquals(++index, customField.getOrder());
+    }
+  }
+
+  @Test
+  public void removeCustomField_RelationGetsDeleted() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    CustomField customField = new CustomField(customFieldName, "test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    entry.addCustomField(customField);
+    entry.removeCustomField(customField);
+
+    // assert CustomField really got deleted from database
+    Assert.assertNull(getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldEntryJoinColumnName, customField.getId()));
+
+    Assert.assertFalse(entry.isDeleted());
+    Assert.assertFalse(customFieldName.isDeleted());
+    Assert.assertTrue(customField.isDeleted());
+  }
+
+  @Test
+  public void removeCustomField_EntitiesGetRemovedFromRelatedCollections() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    CustomField customField = new CustomField(customFieldName, "test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    entry.addCustomField(customField);
+    entry.removeCustomField(customField);
+
+    Assert.assertNull(customField.getEntry());
+    Assert.assertFalse(entry.getCustomFields().contains(customField));
+  }
+
+  @Test
+  public void addMultipleCustomFields_ThenRemove2_OrderGetsAdjustedCorrectly() throws Exception {
+    CustomFieldName customFieldName = new CustomFieldName("test");
+    Entry entry = new Entry("test", "no content");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addCustomFieldName(customFieldName);
+    deepThought.addEntry(entry);
+
+    CustomField customField1 = new CustomField(customFieldName, "test1");
+    entry.addCustomField(customField1);
+    CustomField customField2 = new CustomField(customFieldName, "test2");
+    entry.addCustomField(customField2);
+    CustomField customField3 = new CustomField(customFieldName, "test3");
+    entry.addCustomField(customField3);
+    CustomField customField4 = new CustomField(customFieldName, "test4");
+    entry.addCustomField(customField4);
+
+    entry.removeCustomField(customField1);
+    entry.removeCustomField(customField3);
+
+    Assert.assertEquals(2, entry.getCustomFields().size());
+
+    Assert.assertEquals(1, customField2.getOrder());
+    Assert.assertEquals(2, customField4.getOrder());
+
+    Assert.assertNull(customField1.getEntry());
+    Assert.assertNull(customField3.getEntry());
   }
 
 }

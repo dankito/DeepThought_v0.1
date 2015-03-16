@@ -1,6 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
@@ -61,6 +62,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
 //  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
   protected Set<Category> categories = new HashSet<>();
 
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = TableConfig.DeepThoughtTopLevelEntryJoinColumnName)
+  protected Entry topLevelEntry;
+
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 //  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //  protected Set<Entry> entries = new HashSet<>();
@@ -112,6 +117,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<BackupFileServiceType> backupFileServiceTypes = new HashSet<>();
+
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OrderBy(value = "sortOrder")
+  protected Set<CustomFieldName> customFieldNames = new HashSet<>();
 
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -202,7 +211,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public boolean containsCategory(Category category) {
     return categories.contains(category);
   }
-  
+
+
+  public Entry getTopLevelEntry() {
+    return topLevelEntry;
+  }
 
   public Collection<Entry> getEntries() {
     return entries;
@@ -221,6 +234,9 @@ public class DeepThought extends UserDataEntity implements Serializable {
 //      if(entry.getCategories() == null)
 //        entry.addCategory(getTopLevelCategory());
 
+    if(entry.getParentEntry() == null && entry.equals(topLevelEntry) == false)
+      topLevelEntry.addSubEntry(entry);
+
     callEntityAddedListeners(entries, entry);
     return true;
   }
@@ -228,6 +244,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public boolean removeEntry(Entry entry) {
     if(entries.remove(entry)) {
       entry.deepThought = null;
+      if(entry.getParentEntry() != null)
+        entry.getParentEntry().removeSubEntry(entry);
 
       for(Category category : new ArrayList<>(entry.getCategories()))
         category.removeEntry(entry);
@@ -607,6 +625,35 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return result;
   }
 
+  public Collection<CustomFieldName> getCustomFieldNames() {
+    return customFieldNames;
+  }
+
+  public boolean addCustomFieldName(CustomFieldName customField) {
+    boolean result = customFieldNames.add(customField);
+
+    if(result) {
+      customField.setDeepThought(this);
+      callEntityAddedListeners(customFieldNames, customField);
+    }
+
+    return result;
+  }
+
+  public boolean removeCustomFieldName(CustomFieldName customFieldName) {
+    if(customFieldName.isDeletable() == false)
+      return false;
+
+    boolean result = customFieldNames.remove(customFieldName);
+
+    if(result) {
+      customFieldName.setDeepThought(null);
+      callEntityRemovedListeners(customFieldNames, customFieldName);
+    }
+
+    return result;
+  }
+
 
   public Collection<Person> getPersons() {
     return persons;
@@ -851,7 +898,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   };
 
   protected boolean isEntityNotOwnedByDeepThought(Object entity) {
-    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision;
+    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision || entity instanceof CustomField;
   }
 
   protected boolean isCollectionOnDeepThought(BaseEntity collectionEntity) {
@@ -892,6 +939,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       callEntityOfCollectionUpdatedListeners(getLanguages(), entity);
     else if(entity instanceof BackupFileServiceType)
       callEntityOfCollectionUpdatedListeners(getBackupFileServiceTypes(), entity);
+    else if(entity instanceof CustomFieldName)
+      callEntityOfCollectionUpdatedListeners(getCustomFieldNames(), entity);
     else if(isEntityNotOwnedByDeepThought(entity))
       callEntityOfCollectionUpdatedListeners(new ArrayList<BaseEntity>() {{ add(entity); }}, entity);
     else
@@ -937,7 +986,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean isComposition(BaseEntity collectionHolder, BaseEntity entity) {
     if(collectionHolder instanceof Entry) {
-      if(entity instanceof FileLink || entity instanceof Note)
+      if(entity instanceof FileLink || entity instanceof Note || entity instanceof CustomField)
         return true;
     }
     else if(collectionHolder instanceof Reference) {
@@ -950,7 +999,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
 
     if(collectionHolder instanceof ReferenceBase) {
-      if(entity instanceof FileLink)
+      if(entity instanceof FileLink || entity instanceof CustomField)
         return true;
     }
 
@@ -976,6 +1025,9 @@ public class DeepThought extends UserDataEntity implements Serializable {
     Category topLevelCategory = Category.createTopLevelCategory();
     emptyDeepThought.topLevelCategory = topLevelCategory;
     emptyDeepThought.getSettings().setLastViewedCategory(topLevelCategory);
+
+    Entry topLevelEntry = Entry.createTopLevelEntry();
+    emptyDeepThought.topLevelEntry = topLevelEntry;
 
     createEnumerationsDefaultValues(emptyDeepThought);
 
@@ -1051,11 +1103,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   protected static void createNoteTypeDefaultValues(DeepThought deepThought) {
-//    deepThought.addNoteType(new NoteType("note.type.unset", true, false, 1));
-    deepThought.addNoteType(new NoteType("note.type.comment", true, false, 2));
-    deepThought.addNoteType(new NoteType("note.type.info", true, false, 3));
-    deepThought.addNoteType(new NoteType("note.type.to.do", true, false, 4));
-    deepThought.addNoteType(new NoteType("note.type.thought", true, false, 5));
+    deepThought.addNoteType(new NoteType("note.type.comment", true, false, 1));
+    deepThought.addNoteType(new NoteType("note.type.info", true, false, 2));
+    deepThought.addNoteType(new NoteType("note.type.to.do", true, false, 3));
+    deepThought.addNoteType(new NoteType("note.type.thought", true, false, 4));
+//    deepThought.addNoteType(new NoteType("note.type.unset", true, false, 5));
   }
 
   protected static void createBackupFileServiceTypeDefaultValues(DeepThought deepThought) {

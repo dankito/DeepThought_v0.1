@@ -1,0 +1,608 @@
+package net.deepthought.controls.entries;
+
+import net.deepthought.Application;
+import net.deepthought.MainWindowController;
+import net.deepthought.controller.ChildWindowsController;
+import net.deepthought.controller.ChildWindowsControllerListener;
+import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.IMainWindowControl;
+import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.data.model.Category;
+import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.settings.enums.SelectedTab;
+import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
+
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Comparator;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+/**
+ * Created by ganymed on 01/02/15.
+ */
+public class EntriesOverviewControl extends SplitPane implements IMainWindowControl {
+
+  private final static Logger log = LoggerFactory.getLogger(EntriesOverviewControl.class);
+
+
+  protected Entry entry = null;
+
+  protected DeepThought deepThought = null;
+
+  protected ObservableList<Entry> tableViewEntriesItems = null;
+  protected FilteredList<Entry> filteredEntries = null;
+  protected SortedList<Entry> sortedFilteredEntries = null;
+//  protected Entry selectedEntryInTableViewEntries = null;
+
+
+  protected MainWindowController mainWindowController;
+
+
+  @FXML
+  protected SplitPane splpnEntries;
+
+  @FXML
+  protected HBox hboxEntriesBar;
+  @FXML
+  protected CustomTextField txtfldEntriesQuickFilter;
+  @FXML
+  ToggleButton tglbtnEntriesQuickFilterAbstract;
+  @FXML
+  ToggleButton tglbtnEntriesQuickFilterContent;
+  @FXML
+  protected Button btnRemoveSelectedEntries;
+
+  @FXML
+  protected TableView<Entry> tblvwEntries;
+  @FXML
+  protected TableColumn<Entry, Long> clmnId;
+  @FXML
+  protected TableColumn<Entry, String> clmnEntryPreview;
+  @FXML
+  protected TableColumn<Entry, String> clmnTags;
+  @FXML
+  protected TableColumn<Entry, String> clmnCreated;
+  @FXML
+  protected TableColumn<Entry, String> clmnModified;
+
+
+  @FXML
+  protected Pane pnQuickEditEntry;
+  @FXML
+  protected TextField txtfldEntryAbstract;
+
+  protected EntryTagsControl currentEditedEntryTagsControl = null;
+  @FXML
+  protected TextArea txtarEntryContent;
+
+
+
+  public EntriesOverviewControl(MainWindowController mainWindowController) {
+    this.mainWindowController = mainWindowController;
+    deepThought = Application.getDeepThought();
+
+    if(FXUtils.loadControl(this, "EntriesOverviewControl"))
+      setupControl();
+
+    if(deepThought != null)
+      deepThought.addEntityListener(deepThoughtListener);
+
+//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntriesOverviewControl.fxml"));
+//    fxmlLoader.setRoot(this);
+//    fxmlLoader.setController(this);
+//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+//
+//    try {
+//      fxmlLoader.load();
+//      setupControl();
+//
+//      if(deepThought != null)
+//        deepThought.addEntityListener(deepThoughtListener);
+//    } catch (IOException ex) {
+//      log.error("Could not load EntriesOverviewControl", ex);
+//    }
+  }
+
+  public void deepThoughtChanged(DeepThought newDeepThought) {
+    if(this.deepThought != null)
+      this.deepThought.removeEntityListener(deepThoughtListener);
+
+    this.deepThought = newDeepThought;
+
+    if(newDeepThought != null) {
+      newDeepThought.addEntityListener(deepThoughtListener);
+
+      if (deepThought.getSettings().getLastViewedEntry() != null)
+        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
+    }
+  }
+
+  public void clearData() {
+    tableViewEntriesItems.clear();
+    currentEditedEntryTagsControl.setEntry(null);
+  }
+
+  protected void setupControl() {
+    // replace normal TextField txtfldEntriesQuickFilter with a SearchTextField (with a cross to clear selection)
+    hboxEntriesBar.getChildren().remove(txtfldEntriesQuickFilter);
+    txtfldEntriesQuickFilter = (CustomTextField) TextFields.createClearableTextField();
+    hboxEntriesBar.getChildren().add(1, txtfldEntriesQuickFilter);
+    HBox.setHgrow(txtfldEntriesQuickFilter, Priority.ALWAYS);
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldEntriesQuickFilter, "quickly.filter.entries");
+    txtfldEntriesQuickFilter.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        filterEntries();
+      }
+    });
+
+    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "quickly.filter.entries.abstract.tool.tip");
+    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
+
+    tableViewEntriesItems = tblvwEntries.getItems();
+    filteredEntries = new FilteredList<>(tableViewEntriesItems, entry -> true);
+    sortedFilteredEntries = new SortedList<Entry>(filteredEntries, entriesComparator);
+    tblvwEntries.setItems(sortedFilteredEntries);
+
+    sortedFilteredEntries.comparatorProperty().bind(tblvwEntries.comparatorProperty());
+
+    tblvwEntries.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    tblvwEntries.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Entry>() {
+      @Override
+      public void changed(ObservableValue<? extends Entry> observable, Entry oldValue, Entry newValue) {
+        if(oldValue != null)
+          oldValue.removeEntityListener(currentlyEditedEntryListener);
+
+        selectedEntryChanged(newValue);
+      }
+    });
+
+    clmnId.setCellValueFactory(new PropertyValueFactory<Entry, Long>("entryIndex"));
+//    clmnEntryPreview.setCellFactory((param) -> {
+//      return new EntryPreviewTableCell();
+//    });
+    clmnEntryPreview.setCellValueFactory(new PropertyValueFactory<Entry, String>("preview"));
+//    clmnTags.setCellFactory((param) -> {
+//      return new EntryTagsTableCell();
+//    });
+    clmnTags.setCellValueFactory(new PropertyValueFactory<Entry, String>("tagsStringRepresentation"));
+    clmnCreated.setCellFactory((param) -> {
+      return new EntryCreatedTableCell();
+    });
+    clmnModified.setCellFactory((param) -> {
+      return new EntryModifiedTableCell();
+    });
+
+    setupQuickEditEntrySection();
+  }
+
+  protected void setupQuickEditEntrySection() {
+    pnQuickEditEntry.managedProperty().bind(pnQuickEditEntry.visibleProperty());
+
+    txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
+      Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+      if(selectedEntry != null)
+        selectedEntry.setAbstract(txtfldEntryAbstract.getText());
+    });
+
+    txtarEntryContent.textProperty().addListener((observable, oldValue, newValue) -> {
+      Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+      if (selectedEntry != null)
+        selectedEntry.setContent(txtarEntryContent.getText());
+    });
+
+    currentEditedEntryTagsControl = new EntryTagsControl();
+    currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
+    currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
+    VBox.setMargin(currentEditedEntryTagsControl, new Insets(6, 0, 6, 0));
+    pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
+  }
+
+  public void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {
+    pnQuickEditEntry.setVisible(showPaneQuickEditEntry);
+
+    if(showPaneQuickEditEntry) {
+      if(splpnEntries.getItems().contains(pnQuickEditEntry) == false) {
+//      pnQuickEditEntry.setVisible(true);
+        splpnEntries.getItems().add(pnQuickEditEntry);
+        splpnEntries.setDividerPositions(0.5);
+      }
+    }
+    else {
+//      pnQuickEditEntry.setVisible(false);
+      splpnEntries.getItems().remove(pnQuickEditEntry);
+      splpnEntries.setDividerPosition(0, 1);
+      try {
+        FXUtils.showSplitPaneDividers(splpnEntries, false);
+        splpnEntries.getDividers().remove(0);
+//        splpnEntries.getDividers().clear();
+//        splpnEntries.getDividers().removeAll(splpnEntries.getDividers());
+//        for(SplitPane.Divider divider : new ArrayList<>(splpnEntries.getDividers())) {
+//          splpnEntries.getDividers().remove(divider);
+//        }
+      } catch(Exception ex) { } // throws an exception but does exactly what i want
+    }
+  }
+
+
+  public void showEntries(Collection<Entry> entries) {
+    tableViewEntriesItems.clear();
+    tableViewEntriesItems.addAll(entries);
+  }
+
+  protected void selectedEntryChanged(Entry selectedEntry) {
+    log.debug("Selected Entry changed to {}", selectedEntry);
+
+    if(deepThought.getSettings().getLastViewedEntry() != null)
+      deepThought.getSettings().getLastViewedEntry().removeEntityListener(currentlyEditedEntryListener);
+
+    deepThought.getSettings().setLastViewedEntry(selectedEntry);
+
+    btnRemoveSelectedEntries.setDisable(selectedEntry == null);
+    pnQuickEditEntry.setDisable(selectedEntry == null);
+    currentEditedEntryTagsControl.setEntry(selectedEntry);
+
+    if(selectedEntry != null) {
+      selectedEntry.addEntityListener(currentlyEditedEntryListener);
+      txtfldEntryAbstract.setText(selectedEntry.getAbstract());
+      txtarEntryContent.setText(selectedEntry.getContent());
+
+      txtfldEntryAbstract.requestFocus();
+      txtfldEntryAbstract.selectAll();
+    }
+    else {
+      txtfldEntryAbstract.setText("");
+      txtarEntryContent.setText("");
+    }
+  }
+
+  @FXML
+  public void handleToggleButtonEntriesQuickFilterOptionsAction(ActionEvent actionEvent) {
+    filterEntries();
+  }
+
+  protected void addEntryToSelectedCategory(Entry newEntry) {
+    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories) {
+      Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
+      if(selectedCategory != null && selectedCategory != deepThought.getTopLevelCategory()) {
+        selectedCategory.addEntry(newEntry);
+      }
+    }
+  }
+
+  protected void addAndSelectEntry(Entry newEntry) {
+    tableViewEntriesItems.add(0, newEntry);
+    selectEntry(newEntry);
+  }
+
+  private void selectEntry(Entry entry) {
+    tblvwEntries.getSelectionModel().select(entry);
+    deepThought.getSettings().setLastViewedEntry(entry); // TODO: can this ever be not already set to this Entry?
+
+    txtfldEntryAbstract.requestFocus();
+  }
+
+  @FXML
+  public void handleButtonAddEntryAction(ActionEvent actionEvent) {
+    showEditEntryDialog(new Entry());
+  }
+
+  @FXML
+  public void handleButtonRemoveSelectedEntriesAction(ActionEvent actionEvent) {
+    removeSelectedEntries();
+  }
+
+  protected void removeSelectedEntries() {
+    ObservableList<Entry> selectedItems = tblvwEntries.getSelectionModel().getSelectedItems();
+    for(Entry selectedEntry : selectedItems) {
+      if(selectedEntry instanceof Entry)
+        deepThought.removeEntry((Entry)selectedEntry);
+    }
+
+    tableViewEntriesItems.removeAll(selectedItems);
+  }
+
+  @FXML
+  public void handleTableViewEntriesOverviewMouseClickedAction(MouseEvent mouseEvent) {
+    if(mouseEvent.getClickCount() == 2 && mouseEvent.getButton() == MouseButton.PRIMARY) {
+      editCurrentlySelectedEntry();
+    }
+  }
+
+  @FXML
+  public void handleEditCurrentSelectedEntryAction(ActionEvent actionEvent) {
+    editCurrentlySelectedEntry();
+  }
+
+  protected void editCurrentlySelectedEntry() {
+    if(deepThought.getSettings().getLastViewedEntry() instanceof Entry)
+      showEditEntryDialog(deepThought.getSettings().getLastViewedEntry());
+  }
+
+  protected void showEditEntryDialog(final Entry entry) {
+    net.deepthought.controller.Dialogs.showEditEntryDialog(entry, new ChildWindowsControllerListener() {
+      @Override
+      public void windowClosing(Stage stage, ChildWindowsController controller) {
+        if(controller.getDialogResult() == DialogResult.Ok) {
+//          if (tableViewEntriesItems.contains(entry) == false) { // a new Entry
+//            addEntryToSelectedCategory(entry);
+//            addAndSelectEntry(entry);
+//          } else {
+//            selectEntry(entry);
+//          }
+        }
+      }
+
+      @Override
+      public void windowClosed(Stage stage, ChildWindowsController controller) {
+
+      }
+    });
+
+//    try {
+//      FXMLLoader loader = new FXMLLoader();
+//      loader.setResources(Localization.getStringsResourceBundle());
+//      loader.setLocation(getClass().getClassLoader().getResource("dialogs/EditEntryDialog.fxml"));
+//      Parent parent = loader.load();
+//
+//      // Create the dialog Stage.
+//      Stage dialogStage = new Stage();
+////      dialogStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.entry"));
+//      dialogStage.initModality(Modality.NONE);
+////      windowStage.initOwner(stage);
+//      Scene scene = new Scene(parent);
+//      dialogStage.setScene(scene);
+//
+//      // Set the person into the controller.
+//      EditEntryDialogController controller = loader.getController();
+//      controller.setWindowStage(dialogStage);
+//      controller.setEntry(entry);
+//
+//      controller.setListener(new ChildWindowsControllerListener() {
+//        @Override
+//        public void windowClosing(Stage stage, ChildWindowsController controller) {
+//          if(controller.getDialogResult() == DialogResult.Ok) {
+//            if(entry.getId() == null) { // a new Entry
+//              deepThought.addEntry(entry);
+//              addEntryToSelectedCategory(entry);
+//              addAndSelectEntry(entry);
+//            }
+//            else {
+//              selectEntry(entry);
+//            }
+//          }
+//        }
+//
+//        @Override
+//        public void windowClosed(Stage stage, ChildWindowsController controller) {
+//          removeClosedChildWindow(stage);
+//        }
+//      });
+//
+//      addOpenedChildWindow(dialogStage);
+//      dialogStage.show();
+//    } catch(Exception ex) {
+//      log.error("Could not load / show dialog", ex);
+//    }
+  }
+
+
+  protected EntityListener currentlyEditedEntryListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(propertyName.equals(TableConfig.EntryTitleColumnName)) {
+        txtfldEntryAbstract.setText(((Entry) entity).getAbstract());
+      }
+      else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
+        txtarEntryContent.setText(((Entry)entity).getContent());
+      }
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
+    }
+  };
+
+
+  protected ListChangeListener<Tag> entryTagSuggestionListChangeListener = new ListChangeListener<Tag>() {
+    @Override
+    public void onChanged(Change<? extends Tag> c) {
+      Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+      if(currentlyEditedEntry == null || c.next() == false)
+        return;
+
+      for(Tag addedTag : c.getAddedSubList()) {
+        addTagToEntry(currentlyEditedEntry, addedTag);
+        if(c.next() == false)
+          return;
+      }
+
+      for(Tag removedTag : c.getRemoved()) {
+        removeTagFromEntry(currentlyEditedEntry, removedTag);
+        if(c.next() == false)
+          return;
+      }
+    }
+  };
+
+  protected SetChangeListener<Tag> entryTagSuggestionSetChangeListener = new SetChangeListener<Tag>() {
+    @Override
+    public void onChanged(Change<? extends Tag> c) {
+      Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+
+      if(c.wasAdded()) {
+        addTagToEntry(currentlyEditedEntry, c.getElementAdded());
+      }
+      else if(c.wasRemoved()) {
+        removeTagFromEntry(currentlyEditedEntry, c.getElementRemoved());
+      }
+
+//      if(currentlyEditedEntry == null || c.next() == false)
+//        return;
+//
+//      for(Tag addedTag : c.getElementAdded()) {
+//        addTagToEntry(currentlyEditedEntry, addedTag);
+//        if(c.next() == false)
+//          return;
+//      }
+//
+//      for(Tag removedTag : c.getRemoved()) {
+//        removeTagFromEntry(currentlyEditedEntry, removedTag);
+//        if(c.next() == false)
+//          return;
+//      }
+    }
+  };
+
+  protected void addTagToEntry(Entry entry, Tag addedTag) {
+    entry.addTag(addedTag);
+  }
+
+  protected void removeTagFromCurrentlyEditedEntry(Tag removedTag) {
+    Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+    if(currentlyEditedEntry != null)
+      removeTagFromEntry(currentlyEditedEntry, removedTag);
+  }
+
+  protected void removeTagFromEntry(Entry entry, Tag removedTag) {
+    entry.removeTag(removedTag);
+  }
+
+  protected void filterEntries() {
+    log.debug("Going to filter Entries ...");
+    String filter = txtfldEntriesQuickFilter.getText();
+    String lowerCaseFilter = filter.toLowerCase(); // TODO: can txtfldEntriesQuickFilter.getText() ever be null?
+
+    filteredEntries.setPredicate((entry) -> {
+      // If filter text is empty, display all Entries.
+      if (filter == null || filter.isEmpty()) {
+        return true;
+      }
+
+      if(tglbtnEntriesQuickFilterAbstract.isSelected() && entry.getAbstract().toLowerCase().contains(lowerCaseFilter)) {
+        return true; // Filter matches Abstract
+      }
+      else if (tglbtnEntriesQuickFilterContent.isSelected() && entry.getContent().toLowerCase().contains(lowerCaseFilter)) {
+        return true; // Filter matches Content
+      }
+      return false; // Does not match.
+    });
+
+    log.debug("Filtering Entries done");
+  }
+
+
+
+  protected EntityListener entryListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
+    }
+  };
+
+  protected EntityListener deepThoughtListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
+    }
+  };
+
+
+  protected Comparator<Entry> entriesComparator = new Comparator<Entry>() {
+    @Override
+    public int compare(Entry entry1, Entry entry2) {
+      if(entry1 == null && entry2 == null)
+        return 0;
+      else if(entry1 == null && entry2 != null)
+        return -1;
+      else if(entry1 != null && entry2 == null)
+        return 1;
+
+      return ((Integer)entry2.getEntryIndex()).compareTo(entry1.getEntryIndex());
+    }
+  };
+
+
+}

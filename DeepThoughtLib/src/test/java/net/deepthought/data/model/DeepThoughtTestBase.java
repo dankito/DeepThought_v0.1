@@ -162,6 +162,65 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     Assert.assertNotNull(entry.getId());
     Assert.assertEquals(deepThought, entry.getDeepThought());
     Assert.assertTrue(deepThought.getEntries().contains(entry));
+    Assert.assertEquals(deepThought.getTopLevelEntry(), entry.getParentEntry());
+    Assert.assertTrue(deepThought.getTopLevelEntry().getSubEntries().contains(entry));
+  }
+
+  @Test
+  public void addEntryHierarchy_RelationsGetSet() throws Exception {
+    Entry topLevelEntry1 = new Entry("Top Level 1");
+    Entry topLevelEntry2 = new Entry("Top Level 2");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(topLevelEntry1);
+    deepThought.addEntry(topLevelEntry2);
+
+    for(int i = 1; i < 5; i++) {
+      Entry subLevel1Entry = new Entry("Sub Level 1-" + i);
+      topLevelEntry1.addSubEntry(subLevel1Entry);
+
+      Entry subLevel2Entry = new Entry("Sub Level 2-" + i);
+      topLevelEntry2.addSubEntry(subLevel2Entry);
+
+      for(int j = 1; j < 4; j++) {
+        subLevel1Entry.addSubEntry(new Entry("Sub sub 1-" + j));
+        subLevel2Entry.addSubEntry(new Entry("Sub sub 2-" + j));
+      }
+    }
+
+
+    Assert.assertNotNull(deepThought.getTopLevelEntry());
+    Assert.assertNotNull(deepThought.getTopLevelEntry().getId());
+    Assert.assertNull(deepThought.getTopLevelEntry().getParentEntry());
+
+    Assert.assertEquals(deepThought.getTopLevelEntry(), topLevelEntry1.getParentEntry());
+    Assert.assertEquals(deepThought.getTopLevelEntry(), topLevelEntry2.getParentEntry());
+
+    for(Entry subEntry : topLevelEntry1.getSubEntries()) {
+      Assert.assertNotNull(subEntry.getId());
+      Assert.assertEquals(topLevelEntry1, subEntry.getParentEntry());
+      Assert.assertTrue(topLevelEntry1.containsSubEntry(subEntry));
+
+      for(Entry subSubEntry : subEntry.getSubEntries()) {
+        Assert.assertNotNull(subSubEntry.getId());
+        Assert.assertEquals(subEntry, subSubEntry.getParentEntry());
+        Assert.assertTrue(subEntry.containsSubEntry(subSubEntry));
+        Assert.assertEquals(0, subSubEntry.getSubEntries().size());
+      }
+    }
+
+    for(Entry subEntry : topLevelEntry2.getSubEntries()) {
+      Assert.assertNotNull(subEntry.getId());
+      Assert.assertEquals(topLevelEntry2, subEntry.getParentEntry());
+      Assert.assertTrue(topLevelEntry2.containsSubEntry(subEntry));
+
+      for(Entry subSubEntry : subEntry.getSubEntries()) {
+        Assert.assertNotNull(subSubEntry.getId());
+        Assert.assertEquals(subEntry, subSubEntry.getParentEntry());
+        Assert.assertTrue(subEntry.containsSubEntry(subSubEntry));
+        Assert.assertEquals(0, subSubEntry.getSubEntries().size());
+      }
+    }
   }
 
   @Test

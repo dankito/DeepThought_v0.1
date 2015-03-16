@@ -255,7 +255,7 @@ public class EntryTagsControl extends TitledPane {
   }
 
   protected boolean checkIfSystemTagOfThatNameExists(String tagName) {
-    return Localization.getLocalizedStringForResourceKey("system.tag.all").equals(tagName) ||
+    return Localization.getLocalizedStringForResourceKey("system.tag.all.entries").equals(tagName) ||
         Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags").equals(tagName);
   }
 

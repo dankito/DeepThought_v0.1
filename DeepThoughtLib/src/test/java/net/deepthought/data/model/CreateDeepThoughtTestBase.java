@@ -1,6 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
+import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.ExtensibleEnumeration;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
@@ -25,8 +26,11 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(2, deepThought.getLanguages().size());
 
+    int index = 1;
     for(Language language : deepThought.getLanguages()) {
       testExtensibleEnumerationFields(language, true);
+      Assert.assertEquals(index, language.getSortOrder());
+      index++;
     }
   }
 
@@ -36,11 +40,16 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(15, deepThought.getPersonRoles().size());
 
+    int index = 1;
     for(PersonRole personRole : deepThought.getPersonRoles()) {
-      if(personRole != PersonRole.getWithoutRolePersonRole())
-        testExtensibleEnumerationFields(personRole, true);
-      else
+      if(personRole == PersonRole.getWithoutRolePersonRole())
         testExtensibleEnumerationFields(personRole, false);
+      else {
+        testExtensibleEnumerationFields(personRole, true);
+
+        Assert.assertEquals(index, personRole.getSortOrder());
+        index++;
+      }
     }
   }
 
@@ -50,8 +59,11 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(7, deepThought.getSeriesTitleCategories().size());
 
+    int index = 1;
     for(SeriesTitleCategory seriesTitleCategory : deepThought.getSeriesTitleCategories()) {
       testExtensibleEnumerationFields(seriesTitleCategory, true);
+      Assert.assertEquals(index, seriesTitleCategory.getSortOrder());
+      index++;
     }
   }
 
@@ -61,8 +73,11 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(8, deepThought.getReferenceCategories().size());
 
+    int index = 1;
     for(ReferenceCategory referenceCategory : deepThought.getReferenceCategories()) {
       testExtensibleEnumerationFields(referenceCategory, true);
+      Assert.assertEquals(index, referenceCategory.getSortOrder());
+      index++;
     }
   }
 
@@ -72,8 +87,11 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(4, deepThought.getReferenceSubDivisionCategories().size());
 
+    int index = 1;
     for(ReferenceSubDivisionCategory referenceSubDivisionCategory : deepThought.getReferenceSubDivisionCategories()) {
       testExtensibleEnumerationFields(referenceSubDivisionCategory, true);
+      Assert.assertEquals(index, referenceSubDivisionCategory.getSortOrder());
+      index++;
     }
   }
 
@@ -83,8 +101,11 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(3, deepThought.getReferenceIndicationUnits().size());
 
-    for(ReferenceIndicationUnit referenceSubDivisionCategory : deepThought.getReferenceIndicationUnits()) {
-      testExtensibleEnumerationFields(referenceSubDivisionCategory, false);
+    int index = 1;
+    for(ReferenceIndicationUnit unit : deepThought.getReferenceIndicationUnits()) {
+      testExtensibleEnumerationFields(unit, false);
+      Assert.assertEquals(index, unit.getSortOrder());
+      index++;
     }
   }
 
@@ -94,8 +115,25 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertEquals(4, deepThought.getNoteTypes().size());
 
+    int index = 1;
     for(NoteType noteType : deepThought.getNoteTypes()) {
       testExtensibleEnumerationFields(noteType, false);
+      Assert.assertEquals(index, noteType.getSortOrder());
+      index++;
+    }
+  }
+
+  @Test
+  public void testDefaultBackupFileServiceTypesGetCreatedCorrectly() throws Exception {
+    DeepThought deepThought = Application.getDeepThought();
+
+    Assert.assertEquals(3, deepThought.getBackupFileServiceTypes().size());
+
+    int index = 1;
+    for(BackupFileServiceType backupFileServiceType : deepThought.getBackupFileServiceTypes()) {
+      testExtensibleEnumerationFields(backupFileServiceType, false);
+      Assert.assertEquals(index, backupFileServiceType.getSortOrder());
+      index++;
     }
   }
 

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.controlsfx.control.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<fx:root fx:id="splpnEntries" dividerPositions="0.5" orientation="VERTICAL" prefHeight="469.0" prefWidth="778.0" type="javafx.scene.control.SplitPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <items>
+        <VBox prefHeight="200.0" prefWidth="100.0">
+            <children>
+                <BorderPane prefHeight="40.0" prefWidth="200.0">
+                    <center>
+                        <HBox fx:id="hboxEntriesBar" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <Label text="%quick.filter">
+                                    <HBox.margin>
+                                        <Insets right="6.0" />
+                                    </HBox.margin>
+                                </Label>
+                                <CustomTextField fx:id="txtfldEntriesQuickFilter" promptText="Quickly filter Entries" HBox.hgrow="ALWAYS" />
+                                <ToggleButton fx:id="tglbtnEntriesQuickFilterAbstract" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%abstract">
+                                    <HBox.margin>
+                                        <Insets left="6.0" right="6.0" />
+                                    </HBox.margin>
+                                </ToggleButton>
+                                <ToggleButton fx:id="tglbtnEntriesQuickFilterContent" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" text="%content" />
+                            </children></HBox>
+                    </center>
+                    <right>
+                        <HBox prefHeight="100.0" prefWidth="106.0" BorderPane.alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="btnRemoveSelectedEntries" disable="true" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedEntriesAction" prefHeight="30.0" prefWidth="50.0" text="-" textFill="RED">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets bottom="2.0" left="6.0" top="2.0" />
+                                    </HBox.margin>
+                                </Button>
+                                <Button fx:id="AddEntry" mnemonicParsing="false" onAction="#handleButtonAddEntryAction" prefHeight="30.0" prefWidth="50.0" text="+" textFill="#117219">
+                                    <font>
+                                        <Font name="System Bold" size="18.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets bottom="2.0" left="6.0" top="2.0" />
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </right>
+                </BorderPane>
+                <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="clmnId" prefWidth="46.0" text="%id" />
+                        <TableColumn fx:id="clmnEntryPreview" prefWidth="358.0" text="%preview" />
+                        <TableColumn fx:id="clmnTags" prefWidth="121.0" text="%tags" />
+                        <TableColumn fx:id="clmnCreated" minWidth="0.0" prefWidth="176.0" text="%created" />
+                        <TableColumn fx:id="clmnModified" minWidth="0.0" prefWidth="176.0" text="%modified" />
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+        <VBox fx:id="pnQuickEditEntry" disable="true" prefHeight="200.0" prefWidth="100.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
+                    <children>
+                        <Label text="%abstract" />
+                        <TextField fx:id="txtfldEntryAbstract" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets left="12.0" />
+                            </HBox.margin>
+                        </TextField>
+                        <Button minWidth="80.0" mnemonicParsing="false" onAction="#handleEditCurrentSelectedEntryAction" text="%edit">
+                            <HBox.margin>
+                                <Insets left="12.0" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                    <VBox.margin>
+                        <Insets bottom="6.0" />
+                    </VBox.margin>
+                </HBox>
+                <TextArea fx:id="txtarEntryContent" wrapText="true" VBox.vgrow="ALWAYS">
+                    <VBox.margin>
+                        <Insets top="6.0" />
+                    </VBox.margin></TextArea>
+            </children>
+        </VBox>
+    </items>
+</fx:root>

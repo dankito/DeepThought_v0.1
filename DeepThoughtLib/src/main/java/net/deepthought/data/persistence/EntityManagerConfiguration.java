@@ -1,6 +1,7 @@
 package net.deepthought.data.persistence;
 
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.CustomField;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.Device;
@@ -22,6 +23,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
@@ -355,6 +357,7 @@ public class EntityManagerConfiguration {
         NoteType.class,
         FileLink.class,
         EntriesLinkGroup.class,
+        CustomField.class,
     
         ReferenceBase.class,
         ReferenceBasePersonAssociation.class,
@@ -369,7 +372,8 @@ public class EntityManagerConfiguration {
     
         ApplicationLanguage.class,
         Language.class,
-        BackupFileServiceType.class
+        BackupFileServiceType.class,
+        CustomFieldName.class
 
     };
     

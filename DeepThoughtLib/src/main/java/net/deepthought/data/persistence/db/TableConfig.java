@@ -129,6 +129,7 @@ public class TableConfig {
 
   public final static String DeepThoughtNextEntryIndexColumnName = "next_entry_index";
   public final static String DeepThoughtTopLevelCategoryJoinColumnName = "top_level_category_id";
+  public final static String DeepThoughtTopLevelEntryJoinColumnName = "top_level_entry_id";
   public final static String DeepThoughtDeepThoughtOwnerJoinColumnName = "owner_id";
   public final static String DeepThoughtDefaultEntryTemplateJoinColumnName = "default_entry_template_id";
   public final static String DeepThoughtDeepThoughtSettingsColumnName = "settings";
@@ -600,6 +601,22 @@ public class TableConfig {
   /*          BackupFileServiceType Table Config        */
 
   public final static String BackupFileServiceTypeTableName = "backup_file_service_type";
+
+
+  /*          CustomFieldName Table Config        */
+
+  public final static String CustomFieldNameTableName = "custom_field_name";
+
+
+  /*          CustomField Table Config        */
+
+  public final static String CustomFieldTableName = "custom_field";
+
+  public final static String CustomFieldNameJoinColumnName = "name_id";
+  public final static String CustomFieldValueColumnName = "value";
+  public final static String CustomFieldEntryJoinColumnName = "entry_id";
+  public final static String CustomFieldReferenceBaseJoinColumnName = "reference_base_id";
+  public final static String CustomFieldOrderColumnName = "sort_order";
 
 
 

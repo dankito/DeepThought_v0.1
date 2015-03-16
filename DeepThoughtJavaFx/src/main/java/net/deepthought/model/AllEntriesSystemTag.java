@@ -15,7 +15,7 @@ import java.util.Collection;
 public class AllEntriesSystemTag extends SystemTag {
 
   public AllEntriesSystemTag(DeepThought deepThought) {
-    super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.all"));
+    super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.all.entries")); // TODO: this will not react on Language change
 
     deepThought.addEntityListener(entityListener);
     this.filteredEntries = new ArrayList<>(deepThought.getEntries());

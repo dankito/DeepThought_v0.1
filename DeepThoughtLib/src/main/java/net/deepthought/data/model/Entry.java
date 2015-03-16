@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.enums.EntryContentFormat;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
@@ -7,6 +8,7 @@ import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.listener.EntryPersonListener;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
 import java.io.Serializable;
@@ -30,6 +32,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 /**
@@ -55,7 +58,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   //  @Column(name = TableConfig.EntryAbstractColumnName, length = 2048)
   @Column(name = TableConfig.EntryAbstractColumnName)
   @Lob
-  protected String abstractString; // field cannot be named 'abstract' as this is a Java Keyword. So i named field abstractString but getter is called getAbstract()
+  protected String abstractString = ""; // field cannot be named 'abstract' as this is a Java Keyword. So i named field abstractString but getter is called getAbstract()
 
   @Column(name = TableConfig.EntryContentColumnName)
 //  @Column(name = TableConfig.EntryContentColumnName, columnDefinition = "clob") // Derby needs explicitly clob column definition
@@ -149,53 +152,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @JoinColumn(name = TableConfig.EntryLanguageJoinColumnName)
   protected Language language;
 
-  @Column(name = TableConfig.EntrySpecificField01ColumnName)
-  protected String specificField01;
-
-  @Column(name = TableConfig.EntrySpecificField02ColumnName)
-  protected String specificField02;
-
-  @Column(name = TableConfig.EntrySpecificField03ColumnName)
-  protected String specificField03;
-
-  @Column(name = TableConfig.EntrySpecificField04ColumnName)
-  protected String specificField04;
-
-  @Column(name = TableConfig.EntrySpecificField05ColumnName)
-  protected String specificField05;
-
-  @Column(name = TableConfig.EntrySpecificField06ColumnName)
-  protected String specificField06;
-
-  @Column(name = TableConfig.EntrySpecificField07ColumnName)
-  protected String specificField07;
-
-  @Column(name = TableConfig.EntryCustomField01ColumnName)
-  protected String customField01;
-
-  @Column(name = TableConfig.EntryCustomField02ColumnName)
-  protected String customField02;
-
-  @Column(name = TableConfig.EntryCustomField03ColumnName)
-  protected String customField03;
-
-  @Column(name = TableConfig.EntryCustomField04ColumnName)
-  protected String customField04;
-
-  @Column(name = TableConfig.EntryCustomField05ColumnName)
-  protected String customField05;
-
-  @Column(name = TableConfig.EntryCustomField06ColumnName)
-  protected String customField06;
-
-  @Column(name = TableConfig.EntryCustomField07ColumnName)
-  protected String customField07;
-
-  @Column(name = TableConfig.EntryCustomField08ColumnName)
-  protected String customField08;
-
-  @Column(name = TableConfig.EntryCustomField09ColumnName)
-  protected String customField09;
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "entry")
+  @OrderBy(value = "order")
+  protected Collection<CustomField> customFields = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntryDeepThoughtJoinColumnName)
@@ -417,6 +376,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   public boolean addSubEntry(Entry subEntry) {
     subEntry.parentEntry = this;
+    if(subEntry.deepThought == null)
+      Application.getDeepThought().addEntry(subEntry);
 
     boolean result = subEntries.add(subEntry);
     if(result) {
@@ -430,6 +391,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     boolean result = subEntries.remove(subEntry);
     if(result) {
       subEntry.parentEntry = null;
+
+      if(deepThought != null /*&& this.equals(subEntry.getParentEntry())*/) // TODO: what is this.equals(subCategory.getParentCategory()) good for?
+        deepThought.removeEntry(subEntry);
+
       callEntityRemovedListeners(subEntries, subEntry);
     }
 
@@ -773,132 +738,36 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryLanguageJoinColumnName, previousValue, language);
   }
 
-  public String getSpecificField01() {
-    return specificField01;
+  public Collection<CustomField> getCustomFields() {
+    return customFields;
   }
 
-  public void setSpecificField01(String specificField01) {
-    this.specificField01 = specificField01;
+  public boolean addCustomField(CustomField customField) {
+    boolean result = customFields.add(customField);
+    if(result) {
+      customField.setEntry(this);
+      callEntityAddedListeners(customFields, customField);
+    }
+
+    return result;
   }
 
-  public String getSpecificField02() {
-    return specificField02;
-  }
+  public boolean removeCustomField(CustomField customField) {
+    int removeCustomFieldOrder = customField.getOrder();
 
-  public void setSpecificField02(String specificField02) {
-    this.specificField02 = specificField02;
-  }
+    boolean result = customFields.remove(customField);
+    if(result) {
+      customField.setEntry(null);
 
-  public String getSpecificField03() {
-    return specificField03;
-  }
+      for(CustomField customFieldIter : getCustomFields()) {
+        if(customFieldIter.getOrder() > removeCustomFieldOrder)
+          customFieldIter.setOrder(customFieldIter.getOrder() - 1);
+      }
 
-  public void setSpecificField03(String specificField03) {
-    this.specificField03 = specificField03;
-  }
+      callEntityRemovedListeners(customFields, customField);
+    }
 
-  public String getSpecificField04() {
-    return specificField04;
-  }
-
-  public void setSpecificField04(String specificField04) {
-    this.specificField04 = specificField04;
-  }
-
-  public String getSpecificField05() {
-    return specificField05;
-  }
-
-  public void setSpecificField05(String specificField05) {
-    this.specificField05 = specificField05;
-  }
-
-  public String getSpecificField06() {
-    return specificField06;
-  }
-
-  public void setSpecificField06(String specificField06) {
-    this.specificField06 = specificField06;
-  }
-
-  public String getSpecificField07() {
-    return specificField07;
-  }
-
-  public void setSpecificField07(String specificField07) {
-    this.specificField07 = specificField07;
-  }
-
-  public String getCustomField01() {
-    return customField01;
-  }
-
-  public void setCustomField01(String customField01) {
-    this.customField01 = customField01;
-  }
-
-  public String getCustomField02() {
-    return customField02;
-  }
-
-  public void setCustomField02(String customField02) {
-    this.customField02 = customField02;
-  }
-
-  public String getCustomField03() {
-    return customField03;
-  }
-
-  public void setCustomField03(String customField03) {
-    this.customField03 = customField03;
-  }
-
-  public String getCustomField04() {
-    return customField04;
-  }
-
-  public void setCustomField04(String customField04) {
-    this.customField04 = customField04;
-  }
-
-  public String getCustomField05() {
-    return customField05;
-  }
-
-  public void setCustomField05(String customField05) {
-    this.customField05 = customField05;
-  }
-
-  public String getCustomField06() {
-    return customField06;
-  }
-
-  public void setCustomField06(String customField06) {
-    this.customField06 = customField06;
-  }
-
-  public String getCustomField07() {
-    return customField07;
-  }
-
-  public void setCustomField07(String customField07) {
-    this.customField07 = customField07;
-  }
-
-  public String getCustomField08() {
-    return customField08;
-  }
-
-  public void setCustomField08(String customField08) {
-    this.customField08 = customField08;
-  }
-
-  public String getCustomField09() {
-    return customField09;
-  }
-
-  public void setCustomField09(String customField09) {
-    this.customField09 = customField09;
+    return result;
   }
 
 
@@ -969,12 +838,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Override
   @Transient
   public String getTextRepresentation() {
-    return "Entry " + getTitle();
+    return getPreview();
   }
 
   @Override
   public String toString() {
-    return "Entry " + getTitle() + " (" + getContent() + ")";
+    return "Entry " + getTextRepresentation();
   }
 
   @Override
@@ -983,4 +852,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       return 1;
     return ((Integer)other.getEntryIndex()).compareTo(getEntryIndex());
   }
+
+
+  public static Entry createTopLevelEntry() {
+    Entry topLevelEntry = new Entry(Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing"));
+
+    return topLevelEntry;
+  }
+
 }

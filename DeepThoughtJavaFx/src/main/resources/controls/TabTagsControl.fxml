@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.controlsfx.control.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" >
+    <children>
+        <HBox fx:id="hboxTagsBar" alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
+            <children>
+                <Label text="%quick.filter">
+                    <HBox.margin>
+                        <Insets right="6.0" />
+                    </HBox.margin></Label>
+                <CustomTextField fx:id="txtfldTagsQuickFilter" minWidth="70.0" promptText="Quickly filter Tags" HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnRemoveTagsFilter" disable="true" maxHeight="29.0" maxWidth="40.0" mnemonicParsing="false" onAction="#handleButtonRemoveTagsFilterAction" prefWidth="40.0" textFill="#b90909">
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets left="6.0" />
+                    </HBox.margin>
+                </Button>
+                <Button fx:id="btnRemoveSelectedTag" disable="true" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedTagsAction" prefWidth="40.0" text="-" textFill="#b90909">
+                    <HBox.margin>
+                        <Insets left="6.0" />
+                    </HBox.margin>
+                    <font>
+                        <Font size="15.0" />
+                    </font>
+                </Button>
+                <Button mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="40.0" text="+" textFill="#068606">
+                    <font>
+                        <Font name="System Bold" size="15.0" />
+                    </font>
+                    <HBox.margin>
+                        <Insets left="6.0" />
+                    </HBox.margin>
+                </Button>
+            </children>
+        </HBox>
+        <TableView fx:id="tblvwTags" editable="true" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="clmnTagName" text="%name" />
+                <TableColumn fx:id="clmnTagFilter" maxWidth="80.0" minWidth="80.0" resizable="false" sortable="false" text="%filter" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </children>
+</fx:root>

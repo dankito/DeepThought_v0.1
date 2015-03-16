@@ -88,7 +88,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
     this.lastViewedCategoryId = lastViewedCategory == null ? null : lastViewedCategory.getId();
 
-    callSettingsChangedListeners(Setting.DeepThoughtLastViewedCategory, previousLastViewedCategory, lastViewedCategory);
+    // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedCategory, this would be overkill
+//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedCategory, previousLastViewedCategory, lastViewedCategory);
   }
 
   public Tag getLastViewedTag() {
@@ -103,7 +104,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
     this.lastViewedTagId = lastViewedTag == null ? null : lastViewedTag.getId();
 
-    callSettingsChangedListeners(Setting.DeepThoughtLastViewedTag, previousLastViewedTag, lastViewedTag);
+    // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedTag, this would be overkill
+//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedTag, previousLastViewedTag, lastViewedTag);
   }
 
   public Entry getLastViewedEntry() {
@@ -118,7 +120,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
     this.lastViewedEntryId = lastViewedEntry == null ? null : lastViewedEntry.getId();
 
-    callSettingsChangedListeners(Setting.DeepThoughtLastViewedEntry, previousLastViewedEntry, lastViewedEntry);
+    // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedEntry, this would be overkill
+//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedEntry, previousLastViewedEntry, lastViewedEntry);
   }
 
 

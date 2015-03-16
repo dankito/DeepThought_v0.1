@@ -213,8 +213,8 @@ public class EntryCategoriesControl extends TitledPane {
     return false;
   }
 
-  protected boolean checkIfSystemCategoryOfThatNameExists(String tagName) {
-    return Localization.getLocalizedStringForResourceKey("system.tag.all").equals(tagName) ||
+  protected boolean checkIfSystemCategoryOfThatNameExists(String tagName) { // dankl, you're so dumb: We're in Categories, not Tags
+    return Localization.getLocalizedStringForResourceKey("system.tag.all.entries").equals(tagName) ||
         Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags").equals(tagName);
   }
 

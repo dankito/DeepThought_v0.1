@@ -1,11 +1,16 @@
 package net.deepthought.controls;
 
+import net.deepthought.util.Localization;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
@@ -24,6 +29,24 @@ public class FXUtils {
   public static void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
     node.managedProperty().bind(node.visibleProperty());
   }
+
+
+  public static boolean loadControl(Object controller, String controlName) {
+    FXMLLoader fxmlLoader = new FXMLLoader(controller.getClass().getClassLoader().getResource("controls/" + controlName + ".fxml"));
+    fxmlLoader.setRoot(controller);
+    fxmlLoader.setController(controller);
+    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+
+    try {
+      fxmlLoader.load();
+      return true;
+    } catch (IOException ex) {
+      log.error("Could not load " + controlName, ex);
+    }
+
+    return false;
+  }
+
 
   public static void showSplitPaneDividers(SplitPane splitPane, boolean show) {
     splitPane.lookupAll(".split-pane-divider").stream()

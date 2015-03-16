@@ -99,7 +99,7 @@ public class Dialogs {
 //      // Create the dialog Stage.
 //      Stage dialogStage = new Stage();
 //      dialogStage.initModality(Modality.NONE);
-////      windowStage.initOwner(_stage);
+////      windowStage.initOwner(stage);
 //      Scene scene = new Scene(parent);
 //      dialogStage.setScene(scene);
 
