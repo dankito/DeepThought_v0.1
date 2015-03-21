@@ -1,20 +1,17 @@
-include ':DeepThoughtLib', ':ormlite-jdbc'
+include ':DeepThoughtLib'
 include ':DeepThoughtJavaFx'
-//include ':JavaFxControls'
 include ':DeepThoughtAndroid'
-include ':JpaEntityManager' /*, ':EclipseLink' */
+include ':JpaEntityManager'
 include ':ormlite-core',':ormlite-android',':ormlite-jdbc'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
 include ':json-io'
+include ':LuceneSearchEngine'
 //include ':VideoDownloader'
-//include ':JsonIoPersistenceManager', ':JacksonPersistenceManager'
-//include ':KeywordExtractor'
 //include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
 //        ':SymmetricDS-Server'
 
-//project(':EclipseLink').projectDir = new File('libs/persistence/database/EclipseLink')
 project(':JpaEntityManager').projectDir = new File('libs/persistence/database/JpaEntityManager')
 
 project(':ormlite-core').projectDir = new File('libs/persistence/database/ormlite-core')
@@ -24,12 +21,8 @@ project(':AndroidOrmLiteEntityManager').projectDir = new File('libs/persistence/
 project(':JavaSeOrmLiteEntityManager').projectDir = new File('libs/persistence/database/JavaSeOrmLiteEntityManager')
 
 project(':json-io').projectDir = new File('libs/persistence/json/json-io')
-//project(':JsonIoPersistenceManager').projectDir = new File('libs/persistence/json/JsonIoPersistenceManager')
-//project(':JacksonPersistenceManager').projectDir = new File('libs/persistence/json/JacksonPersistenceManager')
 
-//project(':JavaFxControls').projectDir = new File('libs/JavaFX/JavaFxControls')
-
-//project(':KeywordExtractor').projectDir = new File('libs/KeywordExtractor')
+project(':LuceneSearchEngine').projectDir = new File('libs/search/LuceneSearchEngine')
 
 //project(':SymmetricDS-Core').projectDir = new File('libs/sync/SymmetricDS-Core')
 //project(':SymmetricDS-CSV').projectDir = new File('libs/sync/SymmetricDS-CSV')

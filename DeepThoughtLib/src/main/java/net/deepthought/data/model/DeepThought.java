@@ -75,7 +75,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @Column(name = TableConfig.DeepThoughtNextEntryIndexColumnName)
   protected int nextEntryIndex = 1;
 
-  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "deepThought", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   protected Set<Tag> tags = new HashSet<>();
 
   protected transient List<Tag> sortedTags = new ArrayList<>();
@@ -844,8 +844,12 @@ public class DeepThought extends UserDataEntity implements Serializable {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
       String serializationResult = SettingsBase.serializeSettings(settings);
+
       if(serializationResult != null)
-        setSettingsString(serializationResult);
+        // setSettingsString() would call PropertyChangedListeners, DeepThought would therefor get updated in Db, i think this is overkill
+        // setSettingsString(serializationResult);
+        // -> set Settings String directly so when DeepThought gets the next time written to Db, also Settings get written to Db
+        settingsString = serializationResult;
     }
   };
 

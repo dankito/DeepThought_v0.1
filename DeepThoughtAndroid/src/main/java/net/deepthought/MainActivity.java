@@ -21,6 +21,7 @@ import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.android.db.OrmLiteAndroidEntityManager;
 import net.deepthought.data.AndroidDataManager;
+import net.deepthought.data.DeepThoughtAndroidApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -81,7 +82,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
       });
 
       // TODO: create Android Dependency Resolver
-      Application.instantiateAsync(new DefaultDependencyResolver() {
+      Application.instantiateAsync(new DeepThoughtAndroidApplicationConfiguration(this), new DefaultDependencyResolver() {
         @Override
         public IEntityManager createEntityManager(EntityManagerConfiguration configuration) {
           try {

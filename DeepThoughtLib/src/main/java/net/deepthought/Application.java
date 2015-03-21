@@ -1,5 +1,6 @@
 package net.deepthought;
 
+import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -12,7 +13,6 @@ import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.DeepThoughtProperties;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -49,11 +49,11 @@ public class Application {
 
 
 
-  public static void instantiateAsync(final IDependencyResolver dependencyResolver) {
+  public static void instantiateAsync(final ApplicationConfiguration applicationConfiguration, final IDependencyResolver dependencyResolver) {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        instantiate(dependencyResolver);
+        instantiate(applicationConfiguration, dependencyResolver);
       }
     }).start();
 
@@ -66,13 +66,14 @@ public class Application {
 //    });
   }
 
-  public static void instantiate(IDependencyResolver dependencyResolver) {
-    EntityManagerConfiguration configuration = EntityManagerConfiguration.createDefaultConfiguration(DeepThoughtProperties.getDataFolderOrCreateDefaultValuesOnNull());
+  public static void instantiate(ApplicationConfiguration applicationConfiguration, IDependencyResolver dependencyResolver) {
+//    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(DeepThoughtFxProperties.getDataFolderOrCreateDefaultValuesOnNull());
+    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration.getDataFolder());
 
-    instantiate(dependencyResolver, configuration);
+    instantiate(entityManagerConfiguration, dependencyResolver);
   }
 
-  public static void instantiate(IDependencyResolver dependencyResolver, EntityManagerConfiguration configuration) {
+  public static void instantiate(EntityManagerConfiguration configuration, IDependencyResolver dependencyResolver) {
     Date startTime = new Date();
     log.info("Starting to resolve dependencies ...");
 

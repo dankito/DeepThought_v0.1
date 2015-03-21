@@ -37,6 +37,10 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected Long lastViewedEntryId;
 
+  protected double mainWindowTabsAndEntriesOverviewDividerPosition = 0.3;
+
+  protected double entriesOverviewDividerPosition = 0.5;
+
 
   public DeepThoughtSettings() {
 
@@ -89,7 +93,7 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     this.lastViewedCategoryId = lastViewedCategory == null ? null : lastViewedCategory.getId();
 
     // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedCategory, this would be overkill
-//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedCategory, previousLastViewedCategory, lastViewedCategory);
+    callSettingsChangedListeners(Setting.DeepThoughtLastViewedCategory, previousLastViewedCategory, lastViewedCategory);
   }
 
   public Tag getLastViewedTag() {
@@ -105,7 +109,7 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     this.lastViewedTagId = lastViewedTag == null ? null : lastViewedTag.getId();
 
     // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedTag, this would be overkill
-//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedTag, previousLastViewedTag, lastViewedTag);
+    callSettingsChangedListeners(Setting.DeepThoughtLastViewedTag, previousLastViewedTag, lastViewedTag);
   }
 
   public Entry getLastViewedEntry() {
@@ -121,8 +125,27 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     this.lastViewedEntryId = lastViewedEntry == null ? null : lastViewedEntry.getId();
 
     // As SettingsChangedListener triggers DeepThought to be saved in Database, don't call listener for LastViewedEntry, this would be overkill
-//    callSettingsChangedListeners(Setting.DeepThoughtLastViewedEntry, previousLastViewedEntry, lastViewedEntry);
+    callSettingsChangedListeners(Setting.DeepThoughtLastViewedEntry, previousLastViewedEntry, lastViewedEntry);
   }
 
+  public double getMainWindowTabsAndEntriesOverviewDividerPosition() {
+    return mainWindowTabsAndEntriesOverviewDividerPosition;
+  }
+
+  public void setMainWindowTabsAndEntriesOverviewDividerPosition(double mainWindowTabsAndEntriesOverviewDividerPosition) {
+    Object previousValue = this.mainWindowTabsAndEntriesOverviewDividerPosition;
+    this.mainWindowTabsAndEntriesOverviewDividerPosition = mainWindowTabsAndEntriesOverviewDividerPosition;
+    callSettingsChangedListeners(Setting.DeepThoughtLastSelectedList, previousValue, mainWindowTabsAndEntriesOverviewDividerPosition);
+  }
+
+  public double getEntriesOverviewDividerPosition() {
+    return entriesOverviewDividerPosition;
+  }
+
+  public void setEntriesOverviewDividerPosition(double entriesOverviewDividerPosition) {
+    Object previousValue = this.entriesOverviewDividerPosition;
+    this.entriesOverviewDividerPosition = entriesOverviewDividerPosition;
+    callSettingsChangedListeners(Setting.DeepThoughtEntriesOverviewDividerPosition, previousValue, entriesOverviewDividerPosition);
+  }
 
 }

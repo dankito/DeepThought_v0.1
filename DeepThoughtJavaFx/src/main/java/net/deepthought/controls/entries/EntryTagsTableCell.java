@@ -11,7 +11,7 @@ public class EntryTagsTableCell extends EntryTableCell {
   @Override
   protected String getTextRepresentationForCell(Entry entry) {
     if(entry != null)
-      return entry.getTagsStringRepresentation();
+      return entry.getTagsPreview();
     else
       return "";
   }

@@ -42,7 +42,7 @@ public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystem
 
     dataMerger = new DefaultDataMerger();
 
-    Application.instantiate(new TestDependencyResolver(null) {
+    Application.instantiate(databaseOnFileSystemConfiguration, new TestDependencyResolver(null) {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return DefaultDataMergerTestBase.this.createEntityManager(configuration);
@@ -52,7 +52,7 @@ public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystem
       public IDataMerger createDataMerger() {
         return DefaultDataMergerTestBase.this.dataMerger;
       }
-    }, databaseOnFileSystemConfiguration);
+    });
   }
 
 

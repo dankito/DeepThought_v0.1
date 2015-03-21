@@ -1,6 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
+import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.helper.DatabaseHelper;
 import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -41,7 +42,7 @@ public abstract class DataModelTestBase {
 
     entityManager = getEntityManager(configuration);
 
-    Application.instantiate(new TestDependencyResolver(entityManager));
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager));
   }
 
   @After

@@ -5,6 +5,7 @@ import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.ReferenceCategory;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.Localization;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,6 +139,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
       this.series.removeSerialPart(this);
 
     this.series = series;
+    preview = null;
 
     if(series != null) {
       series.addSerialPart(this); // causes a Stackoverflow
@@ -237,11 +239,18 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
     Object previousValue = this.category;
     this.category = category;
+    preview = null;
 
     if(this.category != null)
       this.category.addReference(this);
 
     callPropertyChangedListeners(TableConfig.ReferenceCategoryJoinColumnName, previousValue, category);
+  }
+
+  @Override
+  public void setTitle(String title) {
+    preview = null;
+    super.setTitle(title);
   }
 
   public String getTitleSupplement() {
@@ -406,11 +415,35 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
 
+  protected transient String preview = null;
 
-  @Override
   @Transient
-  public String getTextRepresentation() {
-    return title;
+  public String getPreview() {
+    if(preview == null) {
+      preview = getTextRepresentation();
+      addCategorySpecificInfo();
+    }
+
+    return preview;
+  }
+
+  public void addCategorySpecificInfo() {
+    if (category != null) {
+      if (title == null) {
+        // for Newpapers and Magazine, if no Title for this reference is set but Issue and Year, display <Series> <Issus>/<Year> as preview
+        // TODO: for Radio and Television broadcasts as well?
+        if (category == ReferenceCategory.getNewsPaperIssueCategory() || category == ReferenceCategory.getMagazineIssueCategory()) {
+          if (issue != null && year != null) {
+            preview = issue + "/" + year;
+
+            if (series != null)
+              preview = series.getTextRepresentation() + " " + preview;
+          }
+          else if(publishingDate != null && series != null)
+            preview = Localization.getLocalizedStringForResourceKey("reference.issue.of", series.getTitle(), publishingDate);
+        }
+      }
+    }
   }
 
   @Override

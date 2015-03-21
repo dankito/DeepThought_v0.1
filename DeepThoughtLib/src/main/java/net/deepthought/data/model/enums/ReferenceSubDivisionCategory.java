@@ -1,5 +1,6 @@
 package net.deepthought.data.model.enums;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -62,6 +63,54 @@ public class ReferenceSubDivisionCategory extends ExtensibleEnumeration {
   @Override
   public String toString() {
     return "ReferenceSubDivisionCategory " + getTextRepresentation();
+  }
+
+
+  protected static ReferenceSubDivisionCategory newsPaperArticleCategory = null;
+
+  protected static ReferenceSubDivisionCategory magazineArticleCategory = null;
+
+  protected static ReferenceSubDivisionCategory articleCategory = null;
+
+  public static ReferenceSubDivisionCategory getNewsPaperArticleCategory() {
+    if(newsPaperArticleCategory == null)
+      newsPaperArticleCategory = findByNameResourceKey("reference.sub.division.category.newspaper.article");
+    return newsPaperArticleCategory;
+  }
+
+  public static ReferenceSubDivisionCategory getMagazineArticleCategory() {
+    if(magazineArticleCategory == null)
+      magazineArticleCategory = findByNameResourceKey("reference.sub.division.category.magazine.article");
+    return magazineArticleCategory;
+  }
+
+  public static ReferenceSubDivisionCategory getArticleCategory() {
+    if(magazineArticleCategory == null)
+      magazineArticleCategory = findByNameResourceKey("reference.sub.division.category.article");
+    return magazineArticleCategory;
+  }
+
+
+  public final static ReferenceSubDivisionCategory CategoryWithThatNameNotFound = new ReferenceSubDivisionCategory("Category with that name not found");
+
+  public static ReferenceSubDivisionCategory findByName(String name) {
+    for(ReferenceSubDivisionCategory category : Application.getDeepThought().getReferenceSubDivisionCategories()) {
+      if(category.getName().equals(name))
+        return category;
+    }
+
+    return CategoryWithThatNameNotFound;
+  }
+
+  public static ReferenceSubDivisionCategory findByNameResourceKey(String nameResourceKey) {
+    if(Application.getDeepThought() != null) {
+      for (ReferenceSubDivisionCategory category : Application.getDeepThought().getReferenceSubDivisionCategories()) {
+        if (nameResourceKey.equals(category.nameResourceKey))
+          return category;
+      }
+    }
+
+    return CategoryWithThatNameNotFound;
   }
 
 }

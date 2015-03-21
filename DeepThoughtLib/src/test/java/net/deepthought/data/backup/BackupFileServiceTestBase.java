@@ -57,12 +57,12 @@ public abstract class BackupFileServiceTestBase extends TestsRequiringFileSystem
 
     backupFileService = createBackupFileService();
 
-    Application.instantiate(new TestDependencyResolver(null, backupManager) {
+    Application.instantiate(databaseOnFileSystemConfiguration, new TestDependencyResolver(null, backupManager) {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return BackupFileServiceTestBase.this.createTestEntityManager(configuration);
       }
-    }, databaseOnFileSystemConfiguration);
+    });
   }
 
   @After

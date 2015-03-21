@@ -83,6 +83,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 //  @OrderBy("name ASC")
   protected Set<Tag> tags = new HashSet<>();
 
+  protected transient Collection<Tag> sortedTags = null;
+
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.EntryIndexTermJoinTableName,
@@ -186,6 +188,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setTitle(String title) {
     String previousTitle = this.title;
     this.title = title;
+    preview = null;
     callPropertyChangedListeners(TableConfig.EntryTitleColumnName, previousTitle, title);
   }
 
@@ -196,6 +199,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setAbstract(String abstractString) {
     String previousAbstract = this.abstractString;
     this.abstractString = abstractString;
+    preview = null;
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
   }
 
@@ -206,6 +210,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setContent(String content) {
     String previousContent = this.content;
     this.content = content;
+    preview = null;
     callPropertyChangedListeners(TableConfig.EntryContentColumnName, previousContent, content);
   }
 
@@ -240,6 +245,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.series.removeEntry(this);
 
     this.series = series;
+    preview = null;
 
     if(series != null) {
       series.addEntry(this);
@@ -264,6 +270,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.reference.removeEntry(this);
 
     this.reference = reference;
+    preview = null;
 
     if(reference != null) {
       reference.addEntry(this);
@@ -291,6 +298,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.referenceSubDivision.removeEntry(this);
 
     this.referenceSubDivision = referenceSubDivision;
+    preview = null;
 
     if(referenceSubDivision != null) {
       referenceSubDivision.addEntry(this);
@@ -437,12 +445,18 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   @Transient
   public Collection<Tag> getTagsSorted() {
-    List<Tag> sortedTags = new ArrayList<>(getTags());
-    Collections.sort(sortedTags);
+    if(sortedTags == null) {
+      sortedTags = new ArrayList<>(getTags());
+      Collections.sort((List)sortedTags);
+    }
+
     return sortedTags;
   }
 
   public void setTags(Collection<Tag> newTags) {
+    sortedTags = null;
+    tagsPreview = null;
+
     for(Tag currentTag : new ArrayList<>(getTags())) {
       if(newTags.contains(currentTag) == false)
         removeTag(currentTag);
@@ -455,6 +469,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean addTag(Tag tag) {
+    sortedTags = null;
+    tagsPreview = null;
+
     boolean result = tags.add(tag);
     if(result) {
       tag.addEntry(this);
@@ -465,6 +482,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean removeTag(Tag tag) {
+    sortedTags = null;
+    tagsPreview = null;
+
     boolean result = tags.remove(tag);
     if(result) {
       tag.removeEntry(this);
@@ -485,18 +505,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       result &= hasTag(tag);
 
     return result;
-  }
-
-  @Transient
-  public String getTagsStringRepresentation() {
-    String tagsString = "";
-    for(Tag tag : getTagsSorted())
-      tagsString += tag.getName() + ", ";
-
-    if(tagsString.length() > 2)
-      tagsString = tagsString.substring(0, tagsString.length() - 2);
-
-    return tagsString;
   }
 
   public boolean hasIndexTerms() {
@@ -790,28 +798,40 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
-  private final static int PreviewMaxLength = 100;
+  private final static int PreviewMaxLength = 150;
+
+  protected transient String preview = null;
 
   @Transient
   public String getPreview() {
-    String preview = "";
+    if(preview == null)
+      preview = determinePreview();
 
-    if(StringUtils.isNotNullOrEmpty(title)) {
+    return preview;
+  }
+
+  protected String determinePreview() {
+    String preview = determineReferencePreview();
+
+    if (StringUtils.isNotNullOrEmpty(title)) {
+      if (preview.length() > 0)
+        preview += " - ";
       preview += title;
     }
-    if(StringUtils.isNotNullOrEmpty(abstractString)) {
-      if(preview.length() > 0)
+
+    if (StringUtils.isNotNullOrEmpty(abstractString)) {
+      if (preview.length() > 0)
         preview += ": ";
       preview += abstractString;
     }
 
-    if(preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
-      if(preview.length() > 0)
+    if (preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
+      if (preview.length() > 0)
         preview += " - ";
       preview += content;
     }
 
-    if(preview.length() >= PreviewMaxLength)
+    if (preview.length() >= PreviewMaxLength)
       preview = preview.substring(0, PreviewMaxLength) + " ...";
 
     preview = preview.replace("\r", "").replace("\n", "");
@@ -820,7 +840,29 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   @Transient
+  protected String determineReferencePreview() {
+    if(referenceSubDivision != null /*&& (referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getNewsPaperArticleCategory() ||
+        referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getMagazineArticleCategory() || referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getArticleCategory())*/)
+      return referenceSubDivision.getTextRepresentation();
+    else if(reference != null)
+      return reference.getPreview();
+    else if(series != null)
+      return series.getTextRepresentation();
+
+    return "";
+  }
+
+
+  protected transient String tagsPreview = null;
+
+  @Transient
   public String getTagsPreview() {
+    if(tagsPreview == null)
+      tagsPreview = determineTagsPreview();
+    return tagsPreview;
+  }
+
+  protected String determineTagsPreview() {
     String tagsPreview = "";
     for(Tag tag : getTagsSorted())
       tagsPreview += tag.getName() + ", ";

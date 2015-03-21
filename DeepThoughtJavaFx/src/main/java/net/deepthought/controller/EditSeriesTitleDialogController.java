@@ -414,6 +414,11 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
+
+    if(seriesTitle.isPersisted() == false) { // a new SeriesTitle
+      Application.getDeepThought().addSeriesTitle(seriesTitle);
+    }
+
     saveEditedFieldsOnEntry();
     closeDialog();
   }

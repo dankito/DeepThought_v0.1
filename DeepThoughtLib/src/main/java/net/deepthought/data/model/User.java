@@ -71,7 +71,7 @@ public class User extends BaseEntity implements Serializable {
   protected DeepThought lastViewedDeepThought = null;
 
   // TODO: make lazy again if an user really can have multiple DeepThoughts
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThoughtOwner", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThoughtOwner", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
   protected Set<DeepThought> deepThoughts = new HashSet<>();
 
 //  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deviceOwner"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)

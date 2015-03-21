@@ -196,6 +196,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     }
   };
 
+  public void setSelectedTagToAllEntriesSystemTag() {
+    selectedTagChanged(allEntriesSystemTag);
+  }
+
   public void selectedTagChanged(Tag selectedTag) {
 //    if(selectedTag == tblvwTags.getSelectionModel().getSelectedItem()) // this Tag is already selected, nothing to do
 //      return;
@@ -372,8 +376,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     log.debug("Going to sort sortedFilteredTags containing {} items", sortedFilteredTags.size());
 
     try {
-//      FXCollections.sort(tableViewTagsItems, tagComparator);
-      sortedFilteredTags.sort(tagComparator);
+      FXCollections.sort(tableViewTagsItems, tagComparator);
     } catch(Exception ex) {
       log.error("Could not sort Tags", ex);
     }

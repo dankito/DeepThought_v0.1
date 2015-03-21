@@ -1173,7 +1173,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       else if(propertyName.equals(TableConfig.ReferenceIssueColumnName))
         issueChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceYearColumnName))
-        yearChanged((String) previousValue, (String) newValue);
+        yearChanged(previousValue == null ? "" : previousValue.toString(), newValue.toString());
       else if(propertyName.equals(TableConfig.ReferenceDoiColumnName))
         doiChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferencePriceColumnName))

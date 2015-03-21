@@ -1,5 +1,6 @@
 package net.deepthought.data.model.enums;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -62,6 +63,46 @@ public class ReferenceCategory extends ExtensibleEnumeration {
   @Override
   public String toString() {
     return "ReferenceCategory " + getTextRepresentation();
+  }
+
+
+  protected static ReferenceCategory newsPaperIssueCategory = null;
+
+  protected static ReferenceCategory magazineIssueCategory = null;
+
+  public static ReferenceCategory getNewsPaperIssueCategory() {
+    if(newsPaperIssueCategory == null)
+      newsPaperIssueCategory = findByNameResourceKey("reference.category.newspaper.issue");
+    return newsPaperIssueCategory;
+  }
+
+  public static ReferenceCategory getMagazineIssueCategory() {
+    if(magazineIssueCategory == null)
+      magazineIssueCategory = findByNameResourceKey("reference.category.magazine.issue");
+    return magazineIssueCategory;
+  }
+
+
+  public final static ReferenceCategory CategoryWithThatNameNotFound = new ReferenceCategory("Category with that name not found");
+
+  public static ReferenceCategory findByName(String name) {
+    for(ReferenceCategory category : Application.getDeepThought().getReferenceCategories()) {
+      if(category.getName().equals(name))
+        return category;
+    }
+
+    return CategoryWithThatNameNotFound;
+  }
+
+  public static ReferenceCategory findByNameResourceKey(String nameResourceKey) {
+    if(Application.getDeepThought() != null) {
+      for (ReferenceCategory category : Application.getDeepThought().getReferenceCategories()) {
+        if (nameResourceKey.equals(category.nameResourceKey))
+          return category;
+      }
+    }
+
+    return CategoryWithThatNameNotFound;
   }
 
 }

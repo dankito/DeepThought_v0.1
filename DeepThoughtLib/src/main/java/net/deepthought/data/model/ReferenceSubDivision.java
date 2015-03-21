@@ -17,7 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.Transient;
 
 /**
  * Created by ganymed on 21/01/15.
@@ -202,9 +201,8 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
 
 
   @Override
-  @Transient
-  public String getTextRepresentation() {
-    return "ReferenceSubDivision " + title;
+  public String toString() {
+    return "ReferenceSubDivision " + getTextRepresentation();
   }
 
   @Override

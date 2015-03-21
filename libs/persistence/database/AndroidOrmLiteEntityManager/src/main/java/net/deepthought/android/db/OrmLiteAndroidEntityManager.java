@@ -72,7 +72,7 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 //  }
 
   public OrmLiteAndroidEntityManager(Context context, EntityManagerConfiguration configuration) throws SQLException {
-    super(context, getDatabasePath(DATABASE_NAME), null, Application.CurrentDataModelVersion/*, R.raw.ormlite_config*/);
+    super(context, getDatabasePath(DATABASE_NAME), null, Application.CurrentDataModelVersion/*, R.raw.ormlite_config*/); // TODO: get real database path (e.g. on SD Card) according to EntityManagerConfiguration
 
     this.databasePath = getDatabasePath(DATABASE_NAME);
 

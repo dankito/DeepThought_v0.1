@@ -24,6 +24,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 /**
  * Created by ganymed on 21/01/15.
@@ -288,5 +289,13 @@ public abstract class ReferenceBase extends UserDataEntity {
 
     return result;
   }
+
+
+  @Override
+  @Transient
+  public String getTextRepresentation() {
+    return title;
+  }
+
 
 }

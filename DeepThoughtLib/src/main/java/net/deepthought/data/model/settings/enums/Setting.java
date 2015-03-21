@@ -20,6 +20,7 @@ public enum Setting {
   DeepThoughtLastViewedCategory,
   DeepThoughtLastViewedTag,
   DeepThoughtLastViewedEntry,
-  DeepThoughtDefaultEntryTemplate,
+  DeepThoughtMainWindowTabsAndEntriesOverviewDividerPosition,
+  DeepThoughtEntriesOverviewDividerPosition,
 
 }

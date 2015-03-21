@@ -21,7 +21,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 /**
  * Created by ganymed on 16/12/14.
@@ -277,11 +276,6 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     return deepThought;
   }
 
-  @Override
-  @Transient
-  public String getTextRepresentation() {
-    return title;
-  }
 
   @Override
   public String toString() {

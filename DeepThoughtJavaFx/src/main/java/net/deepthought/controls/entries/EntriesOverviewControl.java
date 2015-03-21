@@ -206,7 +206,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 //    clmnTags.setCellFactory((param) -> {
 //      return new EntryTagsTableCell();
 //    });
-    clmnTags.setCellValueFactory(new PropertyValueFactory<Entry, String>("tagsStringRepresentation"));
+    clmnTags.setCellValueFactory(new PropertyValueFactory<Entry, String>("tagsPreview"));
     clmnCreated.setCellFactory((param) -> {
       return new EntryCreatedTableCell();
     });

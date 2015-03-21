@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-core" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc" />
             <option value="$PROJECT_DIR$/libs/persistence/json/json-io" />
+            <option value="$PROJECT_DIR$/libs/search/LuceneSearchEngine" />
           </set>
         </option>
       </GradleProjectSettings>

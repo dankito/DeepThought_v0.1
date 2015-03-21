@@ -1,4 +1,4 @@
-package net.deepthought.util;
+package net.deepthought.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,18 +13,22 @@ import java.util.Properties;
 /**
  * Created by ganymed on 01/01/15.
  */
-public class DeepThoughtProperties {
+public class DeepThoughtFxProperties {
 
   public final static String DeepThoughtPropertiesFileName = "DeepThoughtFx.properties";
 
   public final static String DataFolderKey = "data.folder";
 
+  public final static String DataModelVersionKey = "data.model.version";
+
   public final static String CouldNotLoadDeepThoughtProperties = "Could not load Deep Thought Properties";
 
   public final static String DefaultDataFolder = "data/";
 
+  public final static int DefaultDataModelVersion = 0;
 
-  private final static Logger log = LoggerFactory.getLogger(DeepThoughtProperties.class);
+
+  private final static Logger log = LoggerFactory.getLogger(DeepThoughtFxProperties.class);
 
 
   protected static Properties deepThoughtProperties = null;
@@ -91,6 +95,18 @@ public class DeepThoughtProperties {
 
   public static void setDataFolder(String dataFolder) {
     setValue(DataFolderKey, dataFolder);
+  }
+
+  public static int getDataModelVersion() {
+    if(getDeepThoughtProperties() != null)
+      return (int)getDeepThoughtProperties().getOrDefault(DataModelVersionKey, DefaultDataModelVersion);
+
+    return DefaultDataModelVersion;
+  }
+
+  public static void setDataModelVersion(int newDataModelVersion) {
+    if(getDeepThoughtProperties() != null)
+      getDeepThoughtProperties().put(DataModelVersionKey, newDataModelVersion);
   }
 
 

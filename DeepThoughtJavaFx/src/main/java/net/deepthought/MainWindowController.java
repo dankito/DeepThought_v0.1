@@ -6,24 +6,15 @@
 
 package net.deepthought;
 
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
-import net.deepthought.controller.enums.DialogResult;
-import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
-import net.deepthought.controls.entries.EntryCreatedTableCell;
-import net.deepthought.controls.entries.EntryModifiedTableCell;
-import net.deepthought.controls.entries.EntryPreviewTableCell;
-import net.deepthought.controls.entries.EntryTagsTableCell;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
-import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.data.DeepThoughtFxApplicationConfiguration;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -33,11 +24,9 @@ import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
 import org.controlsfx.control.action.Action;
@@ -50,23 +39,18 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -74,20 +58,14 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -158,7 +136,19 @@ public class MainWindowController implements Initializable {
 
   @Override
   public void initialize(URL url, ResourceBundle rb) {
-    Application.instantiateAsync(new DefaultDependencyResolver() {
+    Application.addApplicationListener(new ApplicationListener() {
+      @Override
+      public void deepThoughtChanged(DeepThought deepThought) {
+        deepThoughtChangedThreadSafe(deepThought);
+      }
+
+      @Override
+      public void errorOccurred(DeepThoughtError error) {
+        showErrorOccurredMessageThreadSafe(error);
+      }
+    });
+
+    Application.instantiateAsync(new DeepThoughtFxApplicationConfiguration(), new DefaultDependencyResolver() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
 //        return new JpaEntityManager(configuration);
@@ -175,18 +165,6 @@ public class MainWindowController implements Initializable {
           addMenuItemToWindowMenu(c.getElementAdded());
         if (c.wasRemoved())
           removeMenuItemFromWindowMenu(c.getElementRemoved());
-      }
-    });
-
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        deepThoughtChangedThreadSafe(deepThought);
-      }
-
-      @Override
-      public void errorOccurred(DeepThoughtError error) {
-        showErrorOccurredMessageThreadSafe(error);
       }
     });
   }
@@ -263,6 +241,8 @@ public class MainWindowController implements Initializable {
 
       setSelectedTab(deepThought.getSettings().getLastSelectedTab());
 
+      contentPane.setDividerPositions(deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition());
+
       userDeviceSettingsChanged(); // TODO: isn't this redundant with selecting Tab and current category?
 
 //    if(deepThought.getLastViewedCategory() != null)
@@ -329,7 +309,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupControls() {
-    contentPane.setDisable(true); // don't enable controls as no DeepThought is received / deserialized
+    contentPane.setDisable(true); // don't enable controls as no DeepThought is received / deserialized yet
 
     setupMainMenu();
 
@@ -354,7 +334,10 @@ public class MainWindowController implements Initializable {
   protected void tabpaneOverviewSelectedTabChanged(Tab selectedTab) {
     if(selectedTab == tabTags) {
       deepThought.getSettings().setLastSelectedTab(SelectedTab.Tags);
-      tabTagsControl.selectedTagChanged(deepThought.getSettings().getLastViewedTag());
+      if(deepThought.getSettings().getLastViewedTag() != null)
+        tabTagsControl.selectedTagChanged(deepThought.getSettings().getLastViewedTag());
+      else
+        tabTagsControl.setSelectedTagToAllEntriesSystemTag();
     }
     else if(selectedTab == tabCategories) {
       deepThought.getSettings().setLastSelectedTab(SelectedTab.Categories);
@@ -367,9 +350,12 @@ public class MainWindowController implements Initializable {
   protected void setSelectedTab(SelectedTab selectedTab) {
     if(selectedTab == SelectedTab.Tags) {
       tbpnOverview.getSelectionModel().select(tabTags);
+//      if (deepThought.getSettings().getLastViewedEntry() != null)
+//        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
     }
     else if(selectedTab == SelectedTab.Categories) {
-      tbpnOverview.getSelectionModel().select(tabCategories);
+//      tbpnOverview.getSelectionModel().select(tabCategories);
+//      selectedCategoryChanged(deepThought.getTopLevelCategory());
     }
   }
 
@@ -434,6 +420,12 @@ public class MainWindowController implements Initializable {
   protected void setupEntriesOverviewSection() {
     entriesOverviewControl = new EntriesOverviewControl(this);
     contentPane.getItems().add(entriesOverviewControl);
+
+    contentPane.setDividerPositions(0.3);
+    contentPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
+      if(deepThought != null)
+        deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newValue.doubleValue());
+    });
   }
 
   @FXML

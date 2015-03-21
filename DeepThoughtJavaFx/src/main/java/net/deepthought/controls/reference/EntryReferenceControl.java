@@ -260,14 +260,18 @@ public class EntryReferenceControl extends VBox {
       @Override
       public String toString(ReferenceBase reference) {
         log.debug("toString called for {}", reference);
-        if (reference != null)
-          return reference.getTextRepresentation();
+        if (reference != null) {
+          if(reference instanceof Reference)
+            return ((Reference)reference).getPreview(); // Reference
+          return reference.getTextRepresentation(); // SeriesTitle
+        }
         return cmbxSeriesTitleOrReference.getEditor().getText();
       }
 
       @Override
       public ReferenceBase fromString(String string) {
         log.debug("fromString called for {}", string);
+        // TODO: ComboBox contains SeriesTitles as well!
         Reference reference = Reference.findReferenceFromStringRepresentation(string);
         if (reference != null)
           return reference;

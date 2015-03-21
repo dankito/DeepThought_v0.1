@@ -278,12 +278,6 @@ public class Dialogs {
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(controller.getDialogResult() == DialogResult.Ok) {
-            if(seriesTitle.isPersisted() == false) { // a new SeriesTitle
-              Application.getDeepThought().addSeriesTitle(seriesTitle);
-            }
-          }
-
           if(listener != null)
             listener.windowClosing(stage, controller);
         }
