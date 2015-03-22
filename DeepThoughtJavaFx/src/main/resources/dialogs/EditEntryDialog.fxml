@@ -9,7 +9,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="663.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="777.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
    <right>
       <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" pannable="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
          <content>
@@ -85,7 +85,7 @@
                                     <Insets bottom="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnAbstract" animated="false" text="%abstract">
+                              <TitledPane fx:id="ttldpnAbstract" animated="false" text="%entry.abstract">
                                  <content>
                                     <TextArea fx:id="txtarAbstract" minHeight="120.0" prefHeight="120.0" wrapText="true" />
                                  </content>
@@ -98,7 +98,7 @@
                                     <Insets bottom="6.0" />
                                  </VBox.margin>
                                  <content>
-                                    <TextArea fx:id="txtarContent" minHeight="175.0" wrapText="true" />
+                                    <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
                                  </content>
                               </TitledPane>
                               <HBox fx:id="paneTagsAndCategories" />

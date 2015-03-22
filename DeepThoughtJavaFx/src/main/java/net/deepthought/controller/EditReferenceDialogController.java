@@ -124,6 +124,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @FXML
   protected TextField txtfldTitle;
   @FXML
+  protected Pane paneReferenceCategory;
+  @FXML
   protected ComboBox<ReferenceCategory> cmbxReferenceCategory;
   @FXML
   protected NewOrEditButton btnNewOrEditReferenceCategory;
@@ -282,6 +284,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       updateWindowTitle(newValue);
     });
 
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceCategory);
+    paneReferenceCategory.setVisible(false);
+
     resetComboBoxReferenceCategoryItems();
 //    cmbxReferenceCategory.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanged.ReferenceReferenceCategory));
     cmbxReferenceCategory.valueProperty().addListener(cmbxReferenceCategoryValueChangeListener);
@@ -308,7 +313,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnNewOrEditReferenceCategory.setOnAction(event -> handleButtonNewOrEditReferenceCategoryAction(event));
     btnNewOrEditReferenceCategory.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceCategoryAction(event));
     btnNewOrEditReferenceCategory.setDisable(true); // TODO: unset as soon as editing is possible
-    paneTitle.getChildren().add(btnNewOrEditReferenceCategory);
+    paneReferenceCategory.getChildren().add(btnNewOrEditReferenceCategory);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
     txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
@@ -320,13 +325,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
-    // TODO: how to set HtmlEditor text changed listener? (https://stackoverflow.com/questions/22128153/javafx-htmleditor-text-change-listener)
-    htmledTableOfContents.setOnKeyPressed(new EventHandler<KeyEvent>() {
-      @Override
-      public void handle(KeyEvent event) {
-        fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents);
-      }
-    });
+    FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents));
 
     referencePersonsControl = new ReferencePersonsControl();
     referencePersonsControl.setExpanded(true);
@@ -468,6 +467,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
     btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+
+    paneReferenceCategory.setVisible(reference.getCategory() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     paneTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(reference.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -658,7 +659,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseAbstract);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtmlText().equals(reference.getTableOfContents()) == false) {
-      reference.setTableOfContents(htmledTableOfContents.getHtmlText());
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledTableOfContents.getHtmlText())) {
+        if(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()))
+          reference.setTableOfContents("");
+      }
+      else
+        reference.setTableOfContents(htmledTableOfContents.getHtmlText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
     }
 
@@ -818,6 +824,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
+
+    if(paneReferenceCategory.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceCategory, "reference.category");
 
     if(paneSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");

@@ -183,7 +183,6 @@ public class TableConfig {
   public final static String EntrySubTitleColumnName = "sub_title";
   public final static String EntryAbstractColumnName = "abstract";
   public final static String EntryContentColumnName = "content";
-  public final static String EntryContentFormatColumnName = "content_format";
   public final static String EntrySeriesTitleJoinColumnName = "series_title_id";
   public final static String EntryReferenceJoinColumnName = "reference_id";
   public final static String EntryReferenceSubDivisionJoinColumnName = "reference_sub_division_id";

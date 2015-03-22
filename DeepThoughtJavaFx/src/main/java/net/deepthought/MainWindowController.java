@@ -646,6 +646,16 @@ public class MainWindowController implements Initializable {
       else if(setting == Setting.UserDeviceShowCategories) {
         showCategoriesChanged((boolean) newValue);
       }
+      else if(setting == Setting.UserDeviceDialogFieldsDisplay) {
+        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+        chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+
+        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
+        chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
+
+        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+        chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+      }
     }
   };
 

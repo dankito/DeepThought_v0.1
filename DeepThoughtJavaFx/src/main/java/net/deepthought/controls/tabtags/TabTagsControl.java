@@ -266,14 +266,17 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     String filter = txtfldTagsQuickFilter.getText();
     String lowerCaseFilter = filter.toLowerCase(); // TODO: can filter ever be null?
+    String[] parts = lowerCaseFilter.split(",");
 
     filteredTags.setPredicate((tag) -> {
       // If filter text is empty, display all Tags.
-      if (filter == null || filter.isEmpty()) {
+      if (/*filter == null || */filter.isEmpty()) {
         return true;
       }
 
-      String[] parts = lowerCaseFilter.split(",");
+      if(tag instanceof SystemTag)
+        return false;
+
       String lowerCaseTagName = tag.getName().toLowerCase();
 
       for (String part : parts) {
@@ -292,6 +295,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void addTagToTagFilter(Tag tag) {
+    if(tagsToFilterFor.contains(tag))
+      return;
+
     tagsToFilterFor.add(tag);
     reapplyTagsFilter();
 
@@ -299,6 +305,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void removeTagFromTagFilter(Tag tag) {
+    if(tagsToFilterFor.contains(tag) == false)
+      return;
+
     tagsToFilterFor.remove(tag);
     reapplyTagsFilter();
 

@@ -30,11 +30,11 @@ public class DefaultBackupManager implements IBackupManager {
   public DefaultBackupManager() {
     mapBackupFileServices.put(AllBackupsFileService.getFileServiceType(), AllBackupsFileService);
 
-    IBackupFileService jsonBackupFileService = new JsonIoBackupFileService();
-    mapBackupFileServices.put(jsonBackupFileService.getFileServiceType(), jsonBackupFileService);
-
     IBackupFileService copyDatabaseBackupFileService = new DatabaseBackupFileService();
     mapBackupFileServices.put(copyDatabaseBackupFileService.getFileServiceType(), copyDatabaseBackupFileService);
+
+    IBackupFileService jsonBackupFileService = new JsonIoBackupFileService();
+    mapBackupFileServices.put(jsonBackupFileService.getFileServiceType(), jsonBackupFileService);
   }
 
 

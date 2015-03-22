@@ -1,7 +1,6 @@
 include ':DeepThoughtLib'
 include ':DeepThoughtJavaFx'
 include ':DeepThoughtAndroid'
-include ':JpaEntityManager'
 include ':ormlite-core',':ormlite-android',':ormlite-jdbc'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
@@ -12,7 +11,6 @@ include ':LuceneSearchEngine'
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
 //        ':SymmetricDS-Server'
 
-project(':JpaEntityManager').projectDir = new File('libs/persistence/database/JpaEntityManager')
 
 project(':ormlite-core').projectDir = new File('libs/persistence/database/ormlite-core')
 project(':ormlite-android').projectDir = new File('libs/persistence/database/ormlite-android')

@@ -86,9 +86,9 @@
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="javax.persistence-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
-    <orderEntry type="library" exported="" name="hibernate-jpa-2.1-api-1.0.0.Draft-16" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="tika-core-1.6" level="project" />
     <orderEntry type="module" module-name="AndroidOrmLiteEntityManager" exported="" />

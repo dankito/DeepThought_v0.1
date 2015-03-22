@@ -13,13 +13,12 @@ defaultTasks 'run'
 
 dependencies {
     compile project(':DeepThoughtLib')
-    compile project(':JpaEntityManager')
     compile project(':JavaSeOrmLiteEntityManager')
+
+    compile 'org.controlsfx:controlsfx:8.20.8'
 
     compile 'ch.qos.logback:logback-classic:1.1.1'
     compile 'ch.qos.logback:logback-core:1.1.1'
-
-    compile 'org.controlsfx:controlsfx:8.20.8'
 }
 
 mainClassName = 'net.deepthought.DeepThoughtFx'

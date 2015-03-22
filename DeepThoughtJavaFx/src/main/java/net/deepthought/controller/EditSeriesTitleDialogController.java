@@ -108,6 +108,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   protected TextField txtfldTitle;
   @FXML
+  protected Pane paneSeriesTitleCategory;
+  @FXML
   protected ComboBox<SeriesTitleCategory> cmbxSeriesTitleCategory;
   @FXML
   protected NewOrEditButton btnNewOrEditSeriesTitleCategory;
@@ -219,6 +221,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       updateWindowTitle(newValue);
     });
 
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleCategory);
+    paneSeriesTitleCategory.setVisible(false);
+
     resetComboBoxSeriesTitleCategoryItems();
     cmbxSeriesTitleCategory.valueProperty().addListener(cmbxSeriesTitleCategoryValueChangeListener);
 
@@ -244,31 +249,28 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditSeriesTitleCategory.setOnAction(event -> handleButtonNewOrEditSeriesTitleCategoryAction(event));
     btnNewOrEditSeriesTitleCategory.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewSeriesTitleCategoryAction(event));
     btnNewOrEditSeriesTitleCategory.setDisable(true); // TODO: unset as soon as editing is possible
-    paneTitle.getChildren().add(4, btnNewOrEditSeriesTitleCategory);
+    paneSeriesTitleCategory.getChildren().add(btnNewOrEditSeriesTitleCategory);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
     txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
-    txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitleSupplement));
+    txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitleSupplement));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
-    // TODO: how to set HtmlEditor text changed listener? (https://stackoverflow.com/questions/22128153/javafx-htmleditor-text-change-listener)
-    htmledTableOfContents.setOnKeyPressed(new EventHandler<KeyEvent>() {
-      @Override
-      public void handle(KeyEvent event) {
-        fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents);
-      }
-    });
+    FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents));
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
     seriesTitlePersonsControl.setExpanded(true);
     seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
     seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
     contentPane.getChildren().add(5, seriesTitlePersonsControl);
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
+    seriesTitlePersonsControl.setVisible(false);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
     dtpckFirstDayOfPublication.setConverter(localeDateStringConverter);
@@ -337,11 +339,15 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
     btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
+    paneSeriesTitleCategory.setVisible(seriesTitle.getCategory() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
     paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     paneTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    seriesTitlePersonsControl.setVisible(seriesTitle.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     paneFirstAndLastDayOfPublication.setVisible(seriesTitle.getFirstDayOfPublication() != null || seriesTitle.getLastDayOfPublication() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     panePublisher.setVisible(seriesTitle.getPublisher() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -447,7 +453,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       seriesTitle.setSubTitle(txtfldSubTitle.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseSubTitle);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTitleSupplement)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTitleSupplement)) {
       seriesTitle.setTitleSupplement(txtfldTitleSupplement.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTitleSupplement);
     }
@@ -456,9 +462,14 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       seriesTitle.setAbstract(txtarAbstract.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseAbstract);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
-      seriesTitle.setTableOfContents(htmledTableOfContents.getHtmlText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledTableOfContents.getHtmlText())) {
+        if(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()))
+          seriesTitle.setTableOfContents("");
+      }
+      else
+        seriesTitle.setTableOfContents(htmledTableOfContents.getHtmlText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBasePersons)) {
@@ -581,6 +592,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
+    if(paneSeriesTitleCategory.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleCategory, "series.title.category");
+
     if(paneSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
     if(paneTitleSupplement.isVisible() == false)
@@ -590,6 +604,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
     if(ttldpnTableOfContents.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnTableOfContents, "table.of.contents");
+
+    if(seriesTitlePersonsControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, seriesTitlePersonsControl, "persons");
 
     if(paneFirstAndLastDayOfPublication.isVisible() == false) {
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneFirstAndLastDayOfPublication, "first.day.of.publication");

@@ -13,7 +13,6 @@
             <option value="$PROJECT_DIR$/DeepThoughtLib" />
             <option value="$PROJECT_DIR$/libs/persistence/database/AndroidOrmLiteEntityManager" />
             <option value="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager" />
-            <option value="$PROJECT_DIR$/libs/persistence/database/JpaEntityManager" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-android" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-core" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc" />

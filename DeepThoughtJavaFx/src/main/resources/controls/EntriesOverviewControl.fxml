@@ -26,12 +26,12 @@
                                     </HBox.margin>
                                 </Label>
                                 <CustomTextField fx:id="txtfldEntriesQuickFilter" promptText="Quickly filter Entries" HBox.hgrow="ALWAYS" />
-                                <ToggleButton fx:id="tglbtnEntriesQuickFilterAbstract" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="70.0" selected="true" text="%abstract">
+                                <ToggleButton fx:id="tglbtnEntriesQuickFilterAbstract" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%entry.abstract" visible="false">
                                     <HBox.margin>
                                         <Insets left="6.0" right="6.0" />
                                     </HBox.margin>
                                 </ToggleButton>
-                                <ToggleButton fx:id="tglbtnEntriesQuickFilterContent" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="70.0" text="%content" />
+                                <ToggleButton fx:id="tglbtnEntriesQuickFilterContent" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%content" visible="false" />
                             </children></HBox>
                     </center>
                     <right>
@@ -59,10 +59,11 @@
                 </BorderPane>
                 <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="clmnId" prefWidth="46.0" text="%id" />
-                        <TableColumn fx:id="clmnEntryPreview" prefWidth="358.0" text="%preview" />
-                        <TableColumn fx:id="clmnTags" prefWidth="121.0" text="%tags" />
-                        <TableColumn fx:id="clmnCreated" minWidth="0.0" prefWidth="176.0" text="%created" />
+                        <TableColumn fx:id="clmnId" prefWidth="46.0" text="%id" visible="false" />
+                  <TableColumn fx:id="clmnReferencePreview" prefWidth="140.0" text="%reference" />
+                        <TableColumn fx:id="clmnEntryPreview" prefWidth="265.0" text="%preview" />
+                        <TableColumn fx:id="clmnTags" prefWidth="150.0" text="%tags" />
+                        <TableColumn fx:id="clmnCreated" minWidth="0.0" prefWidth="176.0" text="%created" visible="false" />
                         <TableColumn fx:id="clmnModified" minWidth="0.0" prefWidth="176.0" text="%modified" />
                     </columns>
                 </TableView>
@@ -72,7 +73,7 @@
             <children>
                 <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
                     <children>
-                        <Label text="%abstract" />
+                        <Label text="%entry.abstract" />
                         <TextField fx:id="txtfldEntryAbstract" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets left="12.0" />
@@ -88,10 +89,11 @@
                         <Insets bottom="6.0" />
                     </VBox.margin>
                 </HBox>
-                <TextArea fx:id="txtarEntryContent" wrapText="true" VBox.vgrow="ALWAYS">
-                    <VBox.margin>
-                        <Insets top="6.0" />
-                    </VBox.margin></TextArea>
+            <HTMLEditor fx:id="htmledEntryContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets top="6.0" />
+               </VBox.margin>
+            </HTMLEditor>
             </children>
         </VBox>
     </items>

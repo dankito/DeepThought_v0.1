@@ -56,6 +56,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
 /**
@@ -98,6 +99,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   @FXML
   protected TableColumn<Entry, Long> clmnId;
   @FXML
+  protected TableColumn<Entry, String> clmnReferencePreview;
+  @FXML
   protected TableColumn<Entry, String> clmnEntryPreview;
   @FXML
   protected TableColumn<Entry, String> clmnTags;
@@ -114,7 +117,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
   protected EntryTagsControl currentEditedEntryTagsControl = null;
   @FXML
-  protected TextArea txtarEntryContent;
+  protected HTMLEditor htmledEntryContent;
 
 
 
@@ -177,7 +180,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       }
     });
 
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterAbstract);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "quickly.filter.entries.abstract.tool.tip");
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
 
     tableViewEntriesItems = tblvwEntries.getItems();
@@ -199,14 +204,17 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
     clmnId.setCellValueFactory(new PropertyValueFactory<Entry, Long>("entryIndex"));
-//    clmnEntryPreview.setCellFactory((param) -> {
-//      return new EntryPreviewTableCell();
-//    });
-    clmnEntryPreview.setCellValueFactory(new PropertyValueFactory<Entry, String>("preview"));
-//    clmnTags.setCellFactory((param) -> {
-//      return new EntryTagsTableCell();
-//    });
-    clmnTags.setCellValueFactory(new PropertyValueFactory<Entry, String>("tagsPreview"));
+    clmnReferencePreview.setCellFactory((param) -> {
+      return new EntryReferencePreviewTableCell();
+    });
+    clmnEntryPreview.setCellFactory((param) -> {
+      return new EntryPreviewTableCell();
+    });
+//    clmnEntryPreview.setCellValueFactory(new PropertyValueFactory<Entry, String>("preview"));
+    clmnTags.setCellFactory((param) -> {
+      return new EntryTagsTableCell();
+    });
+//    clmnTags.setCellValueFactory(new PropertyValueFactory<Entry, String>("tagsPreview"));
     clmnCreated.setCellFactory((param) -> {
       return new EntryCreatedTableCell();
     });
@@ -226,10 +234,10 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         selectedEntry.setAbstract(txtfldEntryAbstract.getText());
     });
 
-    txtarEntryContent.textProperty().addListener((observable, oldValue, newValue) -> {
+    FXUtils.addHtmlEditorTextChangedListener(htmledEntryContent, event -> {
       Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
       if (selectedEntry != null)
-        selectedEntry.setContent(txtarEntryContent.getText());
+        selectedEntry.setContent(htmledEntryContent.getHtmlText());
     });
 
     currentEditedEntryTagsControl = new EntryTagsControl();
@@ -286,14 +294,14 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
       txtfldEntryAbstract.setText(selectedEntry.getAbstract());
-      txtarEntryContent.setText(selectedEntry.getContent());
+      htmledEntryContent.setHtmlText(selectedEntry.getContent());
 
       txtfldEntryAbstract.requestFocus();
       txtfldEntryAbstract.selectAll();
     }
     else {
       txtfldEntryAbstract.setText("");
-      txtarEntryContent.setText("");
+      htmledEntryContent.setHtmlText("");
     }
   }
 
@@ -435,7 +443,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         txtfldEntryAbstract.setText(((Entry) entity).getAbstract());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
-        txtarEntryContent.setText(((Entry)entity).getContent());
+        htmledEntryContent.setHtmlText(((Entry) entity).getContent());
       }
     }
 

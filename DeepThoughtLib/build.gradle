@@ -73,20 +73,19 @@ else {
 
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.10'
-//    compile 'com.cedarsoftware:json-io:2.7.6'
+    //    compile 'com.cedarsoftware:json-io:2.7.6'
     compile project(':json-io')
-
     //            compile 'javax.persistence:persistence-api:1.0.2'
     // only needed if the newest version of Hibernate is used (as this requires the lastest JPA 2.1 annotations (which are Drafts!)
-    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Draft-16'
-//        compile 'org.eclipse.persistence:javax.persistence:2.1.0'
-
+//    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Draft-16'
+    compile 'org.eclipse.persistence:javax.persistence:2.1.0'
     compile 'org.apache.tika:tika-core:1.6'
+
     testCompile 'junit:junit:4.11'
     testCompile 'ch.qos.logback:logback-core:1.1.2'
     testCompile 'ch.qos.logback:logback-classic:1.1.2'
-//    testCompile project(':JpaEntityManager')
-//    compile 'com.thoughtworks.xstream:xstream:1.4.7'
+    //    testCompile project(':JpaEntityManager')
+    //    compile 'com.thoughtworks.xstream:xstream:1.4.7'
 }
 
 task testJar(type: Jar, dependsOn: testClasses) {

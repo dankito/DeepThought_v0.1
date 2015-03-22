@@ -112,10 +112,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected Pane paneFirstLine;
 
-  @FXML
-  protected Pane paneTitle;
-  @FXML
-  protected TextField txtfldTitle;
+//  @FXML
+//  protected Pane paneTitle;
+//  @FXML
+//  protected TextField txtfldTitle;
 
   @FXML
   protected Pane paneViewConfig;
@@ -207,17 +207,20 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
-    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
-      updateWindowTitle(newValue);
-    });
+//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
+//    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+//      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
+//      updateWindowTitle(newValue);
+//    });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
-    txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
+//    txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
+    FXUtils.addHtmlEditorTextChangedListener(htmledContent, editor -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
+    });
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -288,7 +291,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
     btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
-    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+//    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    entryPersonsControl.setVisible(entry.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
@@ -303,12 +307,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected void setEntryValues(final Entry entry) {
     btnApplyChanges.setVisible(entry.isPersisted());
 
-    txtfldTitle.setText(entry.getTitle());
+//    txtfldTitle.setText(entry.getTitle());
 
 
     txtarAbstract.setText(entry.getAbstract());
 
-    txtarContent.setText(entry.getContent());
+    htmledContent.setHtmlText(entry.getContent());
     // TODO: check which Content format Content has
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
@@ -360,7 +364,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected void saveEditedFieldsOnEntry() {
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTitle)) {
-      entry.setTitle(txtfldTitle.getText());
+//      entry.setTitle(txtfldTitle.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTitle);
     }
 
@@ -370,7 +374,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
-      entry.setContent(txtarContent.getText());
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledContent.getHtmlText())) {
+        if(StringUtils.isNotNullOrEmpty(entry.getContent()))
+          entry.setContent("");
+      }
+      else
+        entry.setContent(htmledContent.getHtmlText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
 
@@ -479,10 +488,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
-    if(paneTitle.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
+//    if(paneTitle.isVisible() == false)
+//      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
     if(ttldpnAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "entry.abstract");
     if(ttldpnContent.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnContent, "content");
 
@@ -546,7 +555,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     });
 
     setupControls();
-    txtfldTitle.requestFocus();
+    htmledContent.requestFocus();
 
     setEntryValues(entry);
     entry.addEntityListener(entryListener);

@@ -840,19 +840,35 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
+  protected transient boolean settingsHaveChanged = false;
+
   protected transient SettingsChangedListener deepThoughtSettingsChangedListener = new SettingsChangedListener() {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      String serializationResult = SettingsBase.serializeSettings(settings);
+      // do not serialize at all, it takes to much time to serialize, simply set flag an serialize in PreUpdate life cycle event handler
+//      String serializationResult = SettingsBase.serializeSettings(settings);
+//
+//      if(serializationResult != null)
+//        // setSettingsString() would call PropertyChangedListeners, DeepThought would therefor get updated in Db, i think this is overkill
+//        // setSettingsString(serializationResult);
+//        // -> set Settings String directly so when DeepThought gets the next time written to Db, also Settings get written to Db
+//        settingsString = serializationResult;
 
-      if(serializationResult != null)
-        // setSettingsString() would call PropertyChangedListeners, DeepThought would therefor get updated in Db, i think this is overkill
-        // setSettingsString(serializationResult);
-        // -> set Settings String directly so when DeepThought gets the next time written to Db, also Settings get written to Db
-        settingsString = serializationResult;
+      settingsHaveChanged = true;
     }
   };
 
+  @Override
+  protected void preUpdate() {
+    super.preUpdate();
+
+    if(settingsHaveChanged == true) {
+      settingsHaveChanged = false;
+      String serializationResult = SettingsBase.serializeSettings(settings);
+      if (serializationResult != null)
+        settingsString = serializationResult;
+    }
+  }
 
   /**
    * <p>

@@ -5,7 +5,6 @@ import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.ReferenceCategory;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.util.Localization;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -420,8 +419,16 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Transient
   public String getPreview() {
     if(preview == null) {
-      preview = getTextRepresentation();
-      addCategorySpecificInfo();
+//      preview = getTextRepresentation();
+//      addCategorySpecificInfo();
+      preview = title;
+      if (issue != null && year != null)
+        preview = issue + "/" + year;
+      else if(title == null && publishingDate != null)
+        preview = publishingDate.toString();
+
+      if (series != null)
+        preview = series.getTextRepresentation() + " " + preview;
     }
 
     return preview;
@@ -440,7 +447,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
               preview = series.getTextRepresentation() + " " + preview;
           }
           else if(publishingDate != null && series != null)
-            preview = Localization.getLocalizedStringForResourceKey("reference.issue.of", series.getTitle(), publishingDate);
+            preview = series.getTitle() + publishingDate;
         }
       }
     }

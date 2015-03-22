@@ -2,7 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.CustomFieldName;
-import net.deepthought.data.model.enums.EntryContentFormat;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
@@ -151,19 +150,6 @@ public abstract class EntryTestBase extends DataModelTestBase {
     // assert content really got written to database
     String actual = getClobFromTable(TableConfig.EntryTableName, TableConfig.EntryContentColumnName, entry.getId());
     Assert.assertEquals(content, actual);
-  }
-
-  @Test
-  public void updateContentFormat_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-
-    EntryContentFormat newValue = EntryContentFormat.Html;
-    entry.setContentFormat(newValue);
-
-    Assert.assertEquals(newValue.ordinal(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryContentFormatColumnName, entry.getId()));
   }
 
   @Test

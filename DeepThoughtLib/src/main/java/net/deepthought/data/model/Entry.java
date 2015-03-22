@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.EntryContentFormat;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.enums.ReferenceIndicationUnit;
@@ -64,9 +63,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 //  @Column(name = TableConfig.EntryContentColumnName, columnDefinition = "clob") // Derby needs explicitly clob column definition
   @Lob
   protected String content = "";
-
-  @Column(name = TableConfig.EntryContentFormatColumnName)
-  protected EntryContentFormat contentFormat = EntryContentFormat.PlainText;
 
   @Column(name = TableConfig.EntryEntryIndexColumnName)
   protected int entryIndex;
@@ -214,16 +210,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryContentColumnName, previousContent, content);
   }
 
-  public EntryContentFormat getContentFormat() {
-    return contentFormat;
-  }
-
-  public void setContentFormat(EntryContentFormat contentFormat) {
-    EntryContentFormat previousContentFormat = this.contentFormat;
-    this.contentFormat = contentFormat;
-    callPropertyChangedListeners(TableConfig.EntryContentFormatColumnName, previousContentFormat, contentFormat);
-  }
-
   public FileLink getPreviewImage() {
     return previewImage;
   }
@@ -245,7 +231,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.series.removeEntry(this);
 
     this.series = series;
-    preview = null;
+    referencePreview = null;
 
     if(series != null) {
       series.addEntry(this);
@@ -270,7 +256,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.reference.removeEntry(this);
 
     this.reference = reference;
-    preview = null;
+    referencePreview = null;
 
     if(reference != null) {
       reference.addEntry(this);
@@ -298,7 +284,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.referenceSubDivision.removeEntry(this);
 
     this.referenceSubDivision = referenceSubDivision;
-    preview = null;
+    referencePreview = null;
 
     if(referenceSubDivision != null) {
       referenceSubDivision.addEntry(this);
@@ -811,13 +797,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   protected String determinePreview() {
-    String preview = determineReferencePreview();
+    String preview = "";
 
-    if (StringUtils.isNotNullOrEmpty(title)) {
-      if (preview.length() > 0)
-        preview += " - ";
+    if (StringUtils.isNotNullOrEmpty(title))
       preview += title;
-    }
 
     if (StringUtils.isNotNullOrEmpty(abstractString)) {
       if (preview.length() > 0)
@@ -837,6 +820,16 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     preview = preview.replace("\r", "").replace("\n", "");
 
     return preview;
+  }
+
+  protected transient String referencePreview = null;
+
+  @Transient
+  public String getReferencePreview() {
+    if(referencePreview == null)
+      referencePreview = determineReferencePreview();
+
+    return referencePreview;
   }
 
   @Transient
