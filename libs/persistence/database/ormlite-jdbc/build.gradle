@@ -1,0 +1,19 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':ormlite-core')
+//    compile 'org.slf4j:slf4j-api:1.7.10'
+    //    compile 'javax.persistence:persistence-api:1.0'
+    // only needed if the newest version of Hibernate is used (as this requires the latest JPA 2.1 annotations (which are Drafts!)
+//    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Draft-16'
+
+    testCompile 'junit:junit:4.8.1'
+    testCompile 'org.easymock:easymock:2.3'
+    testCompile 'com.h2database:h2:1.2.128'
+    testCompile 'commons-lang:commons-lang:2.1'
+//    testCompile 'org.slf4j:slf4j-log4j12:1.7.10'
+    testCompile 'joda-time:joda-time:1.5'
+//    compile 'commons-logging:commons-logging:1.1'
+//    compile 'log4j:log4j:1.2.12'
+    testCompile project(path: ':ormlite-core', configuration: 'tests')
+}
