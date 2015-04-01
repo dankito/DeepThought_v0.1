@@ -35,8 +35,12 @@ public class BaseEntityListCell<T extends BaseEntity> extends ListCell<T> {
       setText(null);
     }
     else {
-      setText(item.getTextRepresentation());
+      setText(getItemTextRepresentation(item));
     }
+  }
+
+  protected String getItemTextRepresentation(T item) {
+    return item.getTextRepresentation();
   }
 
   protected void itemChanged(T newValue) {

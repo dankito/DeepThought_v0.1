@@ -218,9 +218,9 @@ public class EntryReferenceControl extends VBox {
     btnNewOrEditSeriesTitle = new NewOrEditButton(); // create btnNewOrEditSeriesTitle before cmbxSeriesTitle's value gets set (otherwise cmbxSeriesTitleValueChangedListener causes a NullPointerException)
     btnNewOrEditSeriesTitle.setOnAction(event -> handleButtonEditOrNewSeriesTitleAction(event));
     btnNewOrEditSeriesTitle.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewSeriesTitleAction(event));
-    paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditSeriesTitle);
+//    paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditSeriesTitle);
 
-    HBox.setMargin(btnNewOrEditSeriesTitle, new Insets(0, 12, 0, 6));
+    HBox.setMargin(btnNewOrEditSeriesTitle, new Insets(0, 0, 0, 6));
     btnNewOrEditSeriesTitle.setPrefWidth(162);
     btnNewOrEditSeriesTitle.setNewText("series.title.new");
     btnNewOrEditSeriesTitle.setEditText("series.title.edit");
@@ -235,8 +235,8 @@ public class EntryReferenceControl extends VBox {
     paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditReference);
 
     btnNewOrEditReference.setPrefWidth(162);
-    btnNewOrEditReference.setNewText("reference.new");
-    btnNewOrEditReference.setEditText("reference.edit");
+//    btnNewOrEditReference.setNewText("reference.new");
+//    btnNewOrEditReference.setEditText("reference.edit");
 
     setupComboBoxSeriesTitleOrReference();
   }
@@ -251,7 +251,7 @@ public class EntryReferenceControl extends VBox {
     cmbxSeriesTitleOrReference.setCellFactory(new Callback<ListView<ReferenceBase>, ListCell<ReferenceBase>>() {
       @Override
       public ListCell<ReferenceBase> call(ListView<ReferenceBase> param) {
-        return new BaseEntityListCell<ReferenceBase>();
+        return new ReferenceListCell();
       }
     });
 
@@ -353,6 +353,7 @@ public class EntryReferenceControl extends VBox {
 
   protected void setupPaneReferenceSubDivision() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+    paneReferenceSubDivision.setVisible(false);
 
     if(entry.getReferenceSubDivision() != null)
       txtfldReferenceSubDivision.setText(entry.getReferenceSubDivision().getTitle());

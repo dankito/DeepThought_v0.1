@@ -71,7 +71,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
@@ -104,9 +103,9 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected Pane contentPane;
 
   @FXML
-  protected Pane paneTitle;
+  protected Pane paneSeriesTitleTitle;
   @FXML
-  protected TextField txtfldTitle;
+  protected TextField txtfldSeriesTitleTitle;
   @FXML
   protected Pane paneSeriesTitleCategory;
   @FXML
@@ -114,7 +113,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   @FXML
   protected NewOrEditButton btnNewOrEditSeriesTitleCategory;
   @FXML
-  protected Button btnChooseFieldsToShow;
+  protected Button btnChooseSeriesTitleFieldsToShow;
 
   @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
@@ -122,74 +121,74 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected ContextHelpControl contextHelpControl;
 
   @FXML
-  protected Pane paneSubTitle;
+  protected Pane paneSeriesTitleSubTitle;
   @FXML
-  protected TextField txtfldSubTitle;
+  protected TextField txtfldSeriesTitleSubTitle;
 
   @FXML
-  protected Pane paneTitleSupplement;
+  protected Pane paneSeriesTitleTitleSupplement;
   @FXML
-  protected TextField txtfldTitleSupplement;
+  protected TextField txtfldSeriesTitleTitleSupplement;
 
   @FXML
-  protected TitledPane ttldpnAbstract;
+  protected TitledPane ttldpnSeriesTitleAbstract;
   @FXML
-  protected TextArea txtarAbstract;
+  protected TextArea txtarSeriesTitleAbstract;
 
   @FXML
-  protected TitledPane ttldpnTableOfContents;
+  protected TitledPane ttldpnSeriesTitleTableOfContents;
   @FXML
-  protected HTMLEditor htmledTableOfContents;
+  protected HTMLEditor htmledSeriesTitleTableOfContents;
 
 
   protected SeriesTitlePersonsControl seriesTitlePersonsControl;
 
   @FXML
-  protected Pane paneFirstAndLastDayOfPublication;
+  protected Pane paneSeriesTitleFirstAndLastDayOfPublication;
   @FXML
-  protected DatePicker dtpckFirstDayOfPublication;
+  protected DatePicker dtpckSeriesTitleFirstDayOfPublication;
   @FXML
-  protected DatePicker dtpckLastDayOfPublication;
+  protected DatePicker dtpckSeriesTitleLastDayOfPublication;
   @FXML
-  protected Pane panePublisher;
+  protected Pane paneSeriesTitlePublisher;
   @FXML
-  protected ComboBox<Publisher> cmbxPublisher;
+  protected ComboBox<Publisher> cmbxSeriesTitlePublisher;
   @FXML
-  protected NewOrEditButton btnNewOrEditPublisher;
+  protected NewOrEditButton btnSeriesTitleNewOrEditPublisher;
 
   @FXML
-  protected Pane paneAbbreviation;
+  protected Pane paneSeriesTitleAbbreviation;
   @FXML
-  protected TextField txtfldStandardAbbreviation;
+  protected TextField txtfldSeriesTitleStandardAbbreviation;
   @FXML
-  protected TextField txtfldUserAbbreviation1;
+  protected TextField txtfldSeriesTitleUserAbbreviation1;
   @FXML
-  protected TextField txtfldUserAbbreviation2;
+  protected TextField txtfldSeriesTitleUserAbbreviation2;
 
   @FXML
-  protected Pane paneOnlineAddress;
+  protected Pane paneSeriesTitleOnlineAddress;
   @FXML
-  protected TextField txtfldOnlineAddress;
+  protected TextField txtfldSeriesTitleOnlineAddress;
   @FXML
-  protected DatePicker dtpckLastAccess;
+  protected DatePicker dtpckSeriesTitleLastAccess;
 
   @FXML
   protected TitledPane ttldpnSerialParts;
 
   @FXML
-  protected TitledPane ttldpnNotes;
+  protected TitledPane ttldpnSeriesTitleNotes;
   @FXML
-  protected TextArea txtarNotes;
+  protected TextArea txtarSeriesTitleNotes;
 
 
   @FXML
-  protected TitledPane ttldpnFiles;
+  protected TitledPane ttldpnSeriesTitleFiles;
   @FXML
-  protected FlowPane flpnFilesPreview;
+  protected FlowPane flpnFilesSeriesTitlePreview;
   @FXML
-  protected TreeTableView<FileLink> trtblvwFiles;
+  protected TreeTableView<FileLink> trtblvwSeriesTitleFiles;
   @FXML
-  protected TreeTableColumn<FileLink, String> clmnFile;
+  protected TreeTableColumn<FileLink, String> clmnSeriesTitleFile;
 
 
   @Override
@@ -216,8 +215,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   }
 
   protected void setupControls() {
-    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseTitle);
+    txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
       updateWindowTitle(newValue);
     });
 
@@ -251,38 +250,38 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     btnNewOrEditSeriesTitleCategory.setDisable(true); // TODO: unset as soon as editing is possible
     paneSeriesTitleCategory.getChildren().add(btnNewOrEditSeriesTitleCategory);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
-    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseSubTitle));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
+    txtfldSeriesTitleSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleSubTitle));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitleSupplement);
-    txtfldTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitleSupplement));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleTitleSupplement);
+    txtfldSeriesTitleTitleSupplement.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitleSupplement));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseAbstract));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleAbstract);
+    txtarSeriesTitleAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
-    FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleTableOfContents);
+    FXUtils.addHtmlEditorTextChangedListener(htmledSeriesTitleTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents));
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
     seriesTitlePersonsControl.setExpanded(true);
-    seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
-    seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBasePersons));
+    seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
+    seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     contentPane.getChildren().add(5, seriesTitlePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
     seriesTitlePersonsControl.setVisible(false);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneFirstAndLastDayOfPublication);
-    dtpckFirstDayOfPublication.setConverter(localeDateStringConverter);
-    dtpckFirstDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication));
-    dtpckLastDayOfPublication.setConverter(localeDateStringConverter);
-    dtpckLastDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleFirstAndLastDayOfPublication);
+    dtpckSeriesTitleFirstDayOfPublication.setConverter(localeDateStringConverter);
+    dtpckSeriesTitleFirstDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication));
+    dtpckSeriesTitleLastDayOfPublication.setConverter(localeDateStringConverter);
+    dtpckSeriesTitleLastDayOfPublication.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublisher);
-    resetComboBoxPublisherItems();
-    cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitlePublisher);
+    resetComboBoxSeriesTitlePublisherItems();
+    cmbxSeriesTitlePublisher.valueProperty().addListener(cmbxSeriesTitlePublisherValueChangeListener);
 
-    cmbxPublisher.setConverter(new StringConverter<Publisher>() {
+    cmbxSeriesTitlePublisher.setConverter(new StringConverter<Publisher>() {
       @Override
       public String toString(Publisher publisher) {
         return publisher.getTextRepresentation();
@@ -293,32 +292,32 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
         return null;
       }
     });
-    cmbxPublisher.setCellFactory(new Callback<ListView<Publisher>, ListCell<Publisher>>() {
+    cmbxSeriesTitlePublisher.setCellFactory(new Callback<ListView<Publisher>, ListCell<Publisher>>() {
       @Override
       public ListCell<Publisher> call(ListView<Publisher> param) {
         return new BaseEntityListCell<Publisher>();
       }
     });
 
-    btnNewOrEditPublisher = new NewOrEditButton();
-    btnNewOrEditPublisher.setOnAction(event -> handleButtonNewOrEditPublisherAction(event));
-    btnNewOrEditPublisher.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewPublisherAction(event));
-    panePublisher.getChildren().add(btnNewOrEditPublisher);
+    btnSeriesTitleNewOrEditPublisher = new NewOrEditButton();
+    btnSeriesTitleNewOrEditPublisher.setOnAction(event -> handleButtonNewOrEditPublisherAction(event));
+    btnSeriesTitleNewOrEditPublisher.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewPublisherAction(event));
+    paneSeriesTitlePublisher.getChildren().add(btnSeriesTitleNewOrEditPublisher);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneAbbreviation);
-    txtfldStandardAbbreviation.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation));
-    txtfldUserAbbreviation1.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1));
-    txtfldUserAbbreviation2.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleAbbreviation);
+    txtfldSeriesTitleStandardAbbreviation.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation));
+    txtfldSeriesTitleUserAbbreviation1.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1));
+    txtfldSeriesTitleUserAbbreviation2.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
-    txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress));
-    dtpckLastAccess.setConverter(localeDateStringConverter);
-    dtpckLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseLastAccess));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
+    txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
+    dtpckSeriesTitleLastAccess.setConverter(localeDateStringConverter);
+    dtpckSeriesTitleLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastAccess));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
-    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceBaseNotes));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleNotes);
+    txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
 
-//    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+//    clmnSeriesTitleFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
 //      @Override
 //      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
 //        return new FileTreeTableCell(seriesTitle);
@@ -337,27 +336,27 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+    btnChooseSeriesTitleFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
     paneSeriesTitleCategory.setVisible(seriesTitle.getCategory() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    paneTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitleSubTitle.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitleTitleSupplement.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTitleSupplement()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnSeriesTitleAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnSeriesTitleTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     seriesTitlePersonsControl.setVisible(seriesTitle.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneFirstAndLastDayOfPublication.setVisible(seriesTitle.getFirstDayOfPublication() != null || seriesTitle.getLastDayOfPublication() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    panePublisher.setVisible(seriesTitle.getPublisher() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitleFirstAndLastDayOfPublication.setVisible(seriesTitle.getFirstDayOfPublication() != null || seriesTitle.getLastDayOfPublication() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitlePublisher.setVisible(seriesTitle.getPublisher() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneAbbreviation.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getStandardAbbreviation()) || StringUtils.isNotNullOrEmpty(seriesTitle.getUserAbbreviation1()) ||
+    paneSeriesTitleAbbreviation.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getStandardAbbreviation()) || StringUtils.isNotNullOrEmpty(seriesTitle.getUserAbbreviation1()) ||
         StringUtils.isNotNullOrEmpty(seriesTitle.getUserAbbreviation2()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || seriesTitle.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || seriesTitle.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
 
@@ -377,18 +376,18 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     }
   };
 
-  protected ChangeListener<Publisher> cmbxPublisherValueChangeListener = new ChangeListener<Publisher>() {
+  protected ChangeListener<Publisher> cmbxSeriesTitlePublisherValueChangeListener = new ChangeListener<Publisher>() {
     @Override
     public void changed(ObservableValue<? extends Publisher> observable, Publisher oldValue, Publisher newValue) {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePublisher);
 
       if(newValue == null || newValue == Empty.Publisher) {
-        btnNewOrEditPublisher.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditPublisher.setShowNewMenuItem(false);
+        btnSeriesTitleNewOrEditPublisher.setButtonFunction(NewOrEditButton.ButtonFunction.New);
+        btnSeriesTitleNewOrEditPublisher.setShowNewMenuItem(false);
       }
       else {
-        btnNewOrEditPublisher.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-        btnNewOrEditPublisher.setShowNewMenuItem(true);
+        btnSeriesTitleNewOrEditPublisher.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
+        btnSeriesTitleNewOrEditPublisher.setShowNewMenuItem(true);
       }
     }
   };
@@ -399,16 +398,16 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     cmbxSeriesTitleCategory.getItems().addAll(Application.getDeepThought().getSeriesTitleCategories());
   }
 
-  protected void resetComboBoxPublisherItems() {
-    cmbxPublisher.getItems().clear();
-    cmbxPublisher.getItems().add(Empty.Publisher);
-    cmbxPublisher.getItems().addAll(new TreeSet<Publisher>(Application.getDeepThought().getPublishers()));
+  protected void resetComboBoxSeriesTitlePublisherItems() {
+    cmbxSeriesTitlePublisher.getItems().clear();
+    cmbxSeriesTitlePublisher.getItems().add(Empty.Publisher);
+    cmbxSeriesTitlePublisher.getItems().addAll(new TreeSet<Publisher>(Application.getDeepThought().getPublishers()));
   }
 
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEditedFieldsOnEntry();
+    saveEditedFieldsOnSeriesTitle();
   }
 
   @FXML
@@ -425,7 +424,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       Application.getDeepThought().addSeriesTitle(seriesTitle);
     }
 
-    saveEditedFieldsOnEntry();
+    saveEditedFieldsOnSeriesTitle();
     closeDialog();
   }
 
@@ -437,10 +436,10 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     super.closeDialog();
   }
 
-  protected void saveEditedFieldsOnEntry() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseTitle)) {
-      seriesTitle.setTitle(txtfldTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseTitle);
+  protected void saveEditedFieldsOnSeriesTitle() {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTitle)) {
+      seriesTitle.setTitle(txtfldSeriesTitleTitle.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSeriesTitleCategory)) {
       if(Empty.SeriesCategory.equals(cmbxSeriesTitleCategory.getValue()))
@@ -449,30 +448,30 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
         seriesTitle.setCategory(cmbxSeriesTitleCategory.getValue());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSeriesTitleCategory);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseSubTitle)) {
-      seriesTitle.setSubTitle(txtfldSubTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseSubTitle);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSubTitle)) {
+      seriesTitle.setSubTitle(txtfldSeriesTitleSubTitle.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTitleSupplement)) {
-      seriesTitle.setTitleSupplement(txtfldTitleSupplement.getText());
+      seriesTitle.setTitleSupplement(txtfldSeriesTitleTitleSupplement.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTitleSupplement);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseAbstract)) {
-      seriesTitle.setAbstract(txtarAbstract.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseAbstract);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleAbstract)) {
+      seriesTitle.setAbstract(txtarSeriesTitleAbstract.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
-      if(FXUtils.HtmlEditorDefaultText.equals(htmledTableOfContents.getHtmlText())) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledSeriesTitleTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledSeriesTitleTableOfContents.getHtmlText())) {
         if(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()))
           seriesTitle.setTableOfContents("");
       }
       else
-        seriesTitle.setTableOfContents(htmledTableOfContents.getHtmlText());
+        seriesTitle.setTableOfContents(htmledSeriesTitleTableOfContents.getHtmlText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBasePersons)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitlePersons)) {
       Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(seriesTitlePersonsControl.getRemovedPersons());
       for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
         for(Person removedPerson : removedPersons.get(removedPersonsInRole))
@@ -485,45 +484,45 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
           seriesTitle.addPerson(addedPerson, addedPersonsInRole);
       }
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBasePersons);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePersons);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication)) {
-      seriesTitle.setFirstDayOfPublication(DateConvertUtils.asUtilDate(dtpckFirstDayOfPublication.getValue()));
+      seriesTitle.setFirstDayOfPublication(DateConvertUtils.asUtilDate(dtpckSeriesTitleFirstDayOfPublication.getValue()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication)) {
-      seriesTitle.setLastDayOfPublication(DateConvertUtils.asUtilDate(dtpckLastDayOfPublication.getValue()));
+      seriesTitle.setLastDayOfPublication(DateConvertUtils.asUtilDate(dtpckSeriesTitleLastDayOfPublication.getValue()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitlePublisher)) {
-      if(Empty.Publisher.equals(cmbxPublisher.getValue()))
+      if(Empty.Publisher.equals(cmbxSeriesTitlePublisher.getValue()))
         seriesTitle.setPublisher(null);
       else
-        seriesTitle.setPublisher(cmbxPublisher.getValue());
+        seriesTitle.setPublisher(cmbxSeriesTitlePublisher.getValue());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePublisher);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation)) {
-      seriesTitle.setStandardAbbreviation(txtfldStandardAbbreviation.getText());
+      seriesTitle.setStandardAbbreviation(txtfldSeriesTitleStandardAbbreviation.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1)) {
-      seriesTitle.setUserAbbreviation1(txtfldUserAbbreviation1.getText());
+      seriesTitle.setUserAbbreviation1(txtfldSeriesTitleUserAbbreviation1.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2)) {
-      seriesTitle.setUserAbbreviation2(txtfldUserAbbreviation2.getText());
+      seriesTitle.setUserAbbreviation2(txtfldSeriesTitleUserAbbreviation2.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress)) {
-      seriesTitle.setOnlineAddress(txtfldOnlineAddress.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleOnlineAddress)) {
+      seriesTitle.setOnlineAddress(txtfldSeriesTitleOnlineAddress.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseLastAccess)) {
-      seriesTitle.setLastAccessDate(DateConvertUtils.asUtilDate(dtpckLastAccess.getValue()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseLastAccess);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleLastAccess)) {
+      seriesTitle.setLastAccessDate(DateConvertUtils.asUtilDate(dtpckSeriesTitleLastAccess.getValue()));
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastAccess);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSerialParts)) {
@@ -531,14 +530,14 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSerialParts);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseNotes)) {
-      seriesTitle.setNotes(txtarNotes.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseNotes);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleNotes)) {
+      seriesTitle.setNotes(txtarSeriesTitleNotes.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceBaseFiles)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleFiles)) {
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseFiles);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleFiles);
     }
   }
 
@@ -573,7 +572,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
       if(response.equals(Dialog.ACTION_CANCEL))
         event.consume(); // consume event so that stage doesn't get closed
       else if(response.equals(Dialog.ACTION_YES)) {
-        saveEditedFieldsOnEntry();
+        saveEditedFieldsOnSeriesTitle();
         closeDialog();
       }
       else
@@ -595,42 +594,42 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     if(paneSeriesTitleCategory.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleCategory, "series.title.category");
 
-    if(paneSubTitle.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
-    if(paneTitleSupplement.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitleSupplement, "title.supplement");
+    if(paneSeriesTitleSubTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleSubTitle, "subtitle");
+    if(paneSeriesTitleTitleSupplement.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleTitleSupplement, "title.supplement");
 
-    if(ttldpnAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
-    if(ttldpnTableOfContents.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnTableOfContents, "table.of.contents");
+    if(ttldpnSeriesTitleAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleAbstract, "abstract");
+    if(ttldpnSeriesTitleTableOfContents.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleTableOfContents, "table.of.contents");
 
     if(seriesTitlePersonsControl.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, seriesTitlePersonsControl, "persons");
 
-    if(paneFirstAndLastDayOfPublication.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneFirstAndLastDayOfPublication, "first.day.of.publication");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneFirstAndLastDayOfPublication, "last.day.of.publication");
+    if(paneSeriesTitleFirstAndLastDayOfPublication.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleFirstAndLastDayOfPublication, "first.day.of.publication");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleFirstAndLastDayOfPublication, "last.day.of.publication");
     }
-    if(panePublisher.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, panePublisher, "publisher");
+    if(paneSeriesTitlePublisher.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitlePublisher, "publisher");
 
-    if(paneAbbreviation.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "standard.abbreviation");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "user.abbreviation1");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneAbbreviation, "user.abbreviation2");
+    if(paneSeriesTitleAbbreviation.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleAbbreviation, "standard.abbreviation");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleAbbreviation, "user.abbreviation1");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleAbbreviation, "user.abbreviation2");
     }
-    if(paneOnlineAddress.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "online.address");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "last.access");
+    if(paneSeriesTitleOnlineAddress.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleOnlineAddress, "online.address");
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleOnlineAddress, "last.access");
     }
 
-    if(ttldpnNotes.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnNotes, "notes");
-    if(ttldpnFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+    if(ttldpnSeriesTitleNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleNotes, "notes");
+    if(ttldpnSeriesTitleFiles.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleFiles, "files");
 
-    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+    hiddenFieldsMenu.show(btnChooseSeriesTitleFieldsToShow, Side.BOTTOM, 0, 0);
   }
 
   protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
@@ -680,8 +679,8 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 
   @FXML
   public void handleButtonNewOrEditPublisherAction(ActionEvent event) {
-    if(btnNewOrEditPublisher.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-      net.deepthought.controller.Dialogs.showEditPublisherDialog(cmbxPublisher.getValue());
+    if(btnSeriesTitleNewOrEditPublisher.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
+      net.deepthought.controller.Dialogs.showEditPublisherDialog(cmbxSeriesTitlePublisher.getValue());
     else
       createNewPublisher();
   }
@@ -727,7 +726,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     });
 
     setupControls();
-    txtfldTitle.requestFocus();
+    txtfldSeriesTitleTitle.requestFocus();
 
     setSeriesTitleValues(seriesTitle);
     seriesTitle.addEntityListener(seriesTitleListener);
@@ -736,29 +735,29 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
     btnApplyChanges.setVisible(seriesTitle.isPersisted());
 
-    txtfldTitle.setText(seriesTitle.getTitle());
+    txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
     cmbxSeriesTitleCategory.setValue(seriesTitle.getCategory());
-    txtfldSubTitle.setText(seriesTitle.getSubTitle());
-    txtfldTitleSupplement.setText(seriesTitle.getTitleSupplement());
+    txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
+    txtfldSeriesTitleTitleSupplement.setText(seriesTitle.getTitleSupplement());
 
-    txtarAbstract.setText(seriesTitle.getAbstract());
-    htmledTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
+    txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
+    htmledSeriesTitleTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
 
     seriesTitlePersonsControl.setSeries(seriesTitle);
 
-    dtpckFirstDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getFirstDayOfPublication()));
-    dtpckLastDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastDayOfPublication()));
+    dtpckSeriesTitleFirstDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getFirstDayOfPublication()));
+    dtpckSeriesTitleLastDayOfPublication.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastDayOfPublication()));
 
-    txtfldStandardAbbreviation.setText(seriesTitle.getStandardAbbreviation());
-    txtfldUserAbbreviation1.setText(seriesTitle.getUserAbbreviation1());
-    txtfldUserAbbreviation2.setText(seriesTitle.getUserAbbreviation2());
+    txtfldSeriesTitleStandardAbbreviation.setText(seriesTitle.getStandardAbbreviation());
+    txtfldSeriesTitleUserAbbreviation1.setText(seriesTitle.getUserAbbreviation1());
+    txtfldSeriesTitleUserAbbreviation2.setText(seriesTitle.getUserAbbreviation2());
 
-    txtfldOnlineAddress.setText(seriesTitle.getOnlineAddress());
-    dtpckLastAccess.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastAccessDate()));
+    txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
+    dtpckSeriesTitleLastAccess.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastAccessDate()));
 
-    txtarNotes.setText(seriesTitle.getNotes());
+    txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
 
-//    trtblvwFiles.setRoot(new FileRootTreeItem(seriesTitle));
+//    trtblvwSeriesTitleFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
     fieldsWithUnsavedChanges.clear();
 
@@ -798,35 +797,35 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.ReferenceBaseTitleColumnName))
-        titleChanged((String) previousValue, (String) newValue);
+        seriesTitleTitleChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleCategoryJoinColumnName))
-      seriesTitleceCategoryChanged((SeriesTitleCategory) previousValue, (SeriesTitleCategory) newValue);
+        seriesTitleCategoryChanged((SeriesTitleCategory) previousValue, (SeriesTitleCategory) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseSubTitleColumnName))
-        subTitleChanged((String) previousValue, (String) newValue);
+        seriesTitleSubTitleChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleTitleSupplementColumnName))
-        titleSupplementChanged((String) previousValue, (String) newValue);
+        seriesTitleTitleSupplementChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseAbstractColumnName))
-        abstractChanged((String) previousValue, (String) newValue);
+        seriesTitleAbstractChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleTableOfContentsColumnName))
-        tableOfContentsChanged((String) previousValue, (String) newValue);
+        seriesTitleTableOfContentsChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleFirstDayOfPublicationColumnName))
-        firstDayOfPublicationChanged((Date) previousValue, (Date) newValue);
+        seriesTitleFirstDayOfPublicationChanged((Date) previousValue, (Date) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleLastDayOfPublicationColumnName))
-        lastDayOfPublicationChanged((Date) previousValue, (Date) newValue);
+        seriesTitleLastDayOfPublicationChanged((Date) previousValue, (Date) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitlePublisherJoinColumnName))
-        publisherChanged((Publisher) previousValue, (Publisher) newValue);
+        seriesTitlePublisherChanged((Publisher) previousValue, (Publisher) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleStandardAbbreviationColumnName))
-        standardAbbreviationChanged((String) previousValue, (String) newValue);
+        seriesTitleStandardAbbreviationChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleUserAbbreviation1ColumnName))
-        userAbbreviation1Changed((String) previousValue, (String) newValue);
+        seriesTitleUserAbbreviation1Changed((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.SeriesTitleUserAbbreviation2ColumnName))
-        userAbbreviation2Changed((String) previousValue, (String) newValue);
+        seriesTitleUserAbbreviation2Changed((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
-        onlineAddressChanged((String) previousValue, (String) newValue);
+        seriesTitleOnlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseLastAccessDateColumnName))
-        lastAccessChanged((Date) previousValue, (Date) newValue);
+        seriesTitleLastAccessChanged((Date) previousValue, (Date) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
-        notesChanged((String) previousValue, (String) newValue);
+        seriesTitleNotesChanged((String) previousValue, (String) newValue);
     }
 
     @Override
@@ -846,13 +845,13 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
   };
 
 
-  protected void titleChanged(String previousValue, String newValue) {
+  protected void seriesTitleTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseTitle);
+    txtfldSeriesTitleTitle.setText(newValue);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
   }
 
-  protected void seriesTitleceCategoryChanged(SeriesTitleCategory previousValue, SeriesTitleCategory newValue) {
+  protected void seriesTitleCategoryChanged(SeriesTitleCategory previousValue, SeriesTitleCategory newValue) {
     // TODO: if current value != previousValue, ask User what to do?
 //    cmbxSeriesTitleCategory.valueProperty().removeListener(cmbxSeriesTitleCategoryValueChangeListener);
     if(newValue != null)
@@ -863,87 +862,87 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
 //    cmbxSeriesTitleCategory.valueProperty().addListener(cmbxSeriesTitleCategoryValueChangeListener);
   }
 
-  protected void subTitleChanged(String previousValue, String newValue) {
+  protected void seriesTitleSubTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldSubTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseSubTitle);
+    txtfldSeriesTitleSubTitle.setText(newValue);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
   }
 
-  protected void titleSupplementChanged(String previousValue, String newValue) {
+  protected void seriesTitleTitleSupplementChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldTitleSupplement.setText(newValue);
+    txtfldSeriesTitleTitleSupplement.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitleSupplement);
   }
 
-  protected void abstractChanged(String previousValue, String newValue) {
+  protected void seriesTitleAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarAbstract.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseAbstract);
+    txtarSeriesTitleAbstract.setText(newValue);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
   }
 
-  protected void tableOfContentsChanged(String previousValue, String newValue) {
+  protected void seriesTitleTableOfContentsChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    htmledTableOfContents.setHtmlText(newValue);
+    htmledSeriesTitleTableOfContents.setHtmlText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
   }
 
-  protected void firstDayOfPublicationChanged(Date previousValue, Date newValue) {
+  protected void seriesTitleFirstDayOfPublicationChanged(Date previousValue, Date newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    dtpckFirstDayOfPublication.setValue(DateConvertUtils.asLocalDate(newValue));
+    dtpckSeriesTitleFirstDayOfPublication.setValue(DateConvertUtils.asLocalDate(newValue));
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleFirstDayOfPublication);
   }
 
-  protected void lastDayOfPublicationChanged(Date previousValue, Date newValue) {
+  protected void seriesTitleLastDayOfPublicationChanged(Date previousValue, Date newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    dtpckLastDayOfPublication.setValue(DateConvertUtils.asLocalDate(newValue));
+    dtpckSeriesTitleLastDayOfPublication.setValue(DateConvertUtils.asLocalDate(newValue));
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastDayOfPublication);
   }
 
-  protected void publisherChanged(Publisher previousValue, Publisher newValue) {
+  protected void seriesTitlePublisherChanged(Publisher previousValue, Publisher newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-//    cmbxPublisher.valueProperty().removeListener(cmbxPublisherValueChangeListener);
+//    cmbxSeriesTitlePublisher.valueProperty().removeListener(cmbxSeriesTitlePublisherValueChangeListener);
     if(newValue != null)
-      cmbxPublisher.setValue(newValue);
+      cmbxSeriesTitlePublisher.setValue(newValue);
     else
-      cmbxPublisher.setValue(Empty.Publisher);
+      cmbxSeriesTitlePublisher.setValue(Empty.Publisher);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePublisher);
-//    cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
+//    cmbxSeriesTitlePublisher.valueProperty().addListener(cmbxSeriesTitlePublisherValueChangeListener);
   }
 
-  protected void standardAbbreviationChanged(String previousValue, String newValue) {
+  protected void seriesTitleStandardAbbreviationChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldStandardAbbreviation.setText(newValue);
+    txtfldSeriesTitleStandardAbbreviation.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleStandardAbbreviation);
   }
 
-  protected void userAbbreviation1Changed(String previousValue, String newValue) {
+  protected void seriesTitleUserAbbreviation1Changed(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldUserAbbreviation1.setText(newValue);
+    txtfldSeriesTitleUserAbbreviation1.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation1);
   }
 
-  protected void userAbbreviation2Changed(String previousValue, String newValue) {
+  protected void seriesTitleUserAbbreviation2Changed(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldUserAbbreviation2.setText(newValue);
+    txtfldSeriesTitleUserAbbreviation2.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleUserAbbreviation2);
   }
 
-  protected void onlineAddressChanged(String previousValue, String newValue) {
+  protected void seriesTitleOnlineAddressChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldOnlineAddress.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseOnlineAddress);
+    txtfldSeriesTitleOnlineAddress.setText(newValue);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
   }
 
-  protected void lastAccessChanged(Date previousValue, Date newValue) {
+  protected void seriesTitleLastAccessChanged(Date previousValue, Date newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    dtpckLastAccess.setValue(DateConvertUtils.asLocalDate(newValue));
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseLastAccess);
+    dtpckSeriesTitleLastAccess.setValue(DateConvertUtils.asLocalDate(newValue));
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastAccess);
   }
 
-  protected void notesChanged(String previousValue, String newValue) {
+  protected void seriesTitleNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarNotes.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceBaseNotes);
+    txtarSeriesTitleNotes.setText(newValue);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
   }
 
 
@@ -959,7 +958,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
         resetComboBoxSeriesTitleCategoryItems();
       }
       else if(collection == Application.getDeepThought().getPublishers()) {
-        resetComboBoxPublisherItems();
+        resetComboBoxSeriesTitlePublisherItems();
       }
     }
 
@@ -971,11 +970,11 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
         cmbxSeriesTitleCategory.setValue((SeriesTitleCategory) updatedEntity);
         cmbxSeriesTitleCategory.valueProperty().addListener(cmbxSeriesTitleCategoryValueChangeListener);
       }
-      else if(updatedEntity instanceof Publisher && updatedEntity.equals(cmbxPublisher.getValue())) {
-        cmbxPublisher.valueProperty().removeListener(cmbxPublisherValueChangeListener);
-        cmbxPublisher.setValue(Empty.Publisher);
-        cmbxPublisher.setValue((Publisher) updatedEntity);
-        cmbxPublisher.valueProperty().addListener(cmbxPublisherValueChangeListener);
+      else if(updatedEntity instanceof Publisher && updatedEntity.equals(cmbxSeriesTitlePublisher.getValue())) {
+        cmbxSeriesTitlePublisher.valueProperty().removeListener(cmbxSeriesTitlePublisherValueChangeListener);
+        cmbxSeriesTitlePublisher.setValue(Empty.Publisher);
+        cmbxSeriesTitlePublisher.setValue((Publisher) updatedEntity);
+        cmbxSeriesTitlePublisher.valueProperty().addListener(cmbxSeriesTitlePublisherValueChangeListener);
       }
     }
 
@@ -985,7 +984,7 @@ public class EditSeriesTitleDialogController extends ChildWindowsController impl
         resetComboBoxSeriesTitleCategoryItems();
       }
       else if(collection == Application.getDeepThought().getPublishers()) {
-        resetComboBoxPublisherItems();
+        resetComboBoxSeriesTitlePublisherItems();
       }
     }
   };

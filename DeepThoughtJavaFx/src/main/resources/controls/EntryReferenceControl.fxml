@@ -6,12 +6,11 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-
-  <fx:root maxWidth="1.7976931348623157E308" prefHeight="86.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxWidth="1.7976931348623157E308" prefHeight="86.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
       <children>
           <HBox fx:id="paneSeriesTitleOrReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
               <children>
-                  <Label minWidth="115.0" prefHeight="40.0" prefWidth="135.0" text="%series.title.or.reference">
+                  <Label minWidth="115.0" prefHeight="40.0" prefWidth="80.0" text="%reference">
                       <HBox.margin>
                           <Insets right="6.0" />
                       </HBox.margin>
@@ -25,7 +24,7 @@
                <children>
                   <Label prefHeight="40.0" prefWidth="72.0" text="%indication">
                      <HBox.margin>
-                        <Insets right="6.0" />
+                        <Insets left="12.0" right="6.0" />
                      </HBox.margin>
                   </Label>
                   <HBox fx:id="paneReferenceIndicationStartSettings" alignment="CENTER_LEFT" prefHeight="40.0">

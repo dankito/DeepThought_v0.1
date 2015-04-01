@@ -434,6 +434,12 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return preview;
   }
 
+  @Override
+  @Transient
+  public String getTextRepresentation() {
+    return getPreview();
+  }
+
   public void addCategorySpecificInfo() {
     if (category != null) {
       if (title == null) {
@@ -468,7 +474,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     if(other == null)
       return 1;
 
-    return getTitle().compareTo(other.getTitle()); // TODO
+    return getPreview().compareTo(other.getPreview()); // TODO
   }
 
   public static Reference findReferenceFromStringRepresentation(String stringRepresentation) {

@@ -35,7 +35,7 @@
                   <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
                </children>
                <BorderPane.margin>
-                  <Insets bottom="6.0" />
+                  <Insets bottom="6.0" top="6.0" />
                </BorderPane.margin>
             </HBox>
          </bottom>

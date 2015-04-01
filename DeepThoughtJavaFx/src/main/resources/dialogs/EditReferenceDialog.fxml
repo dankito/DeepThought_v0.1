@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.*?>
 <?import net.deepthought.controls.*?>
 
-<BorderPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="820.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
+<BorderPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="938.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
    <center>
       <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <bottom>
@@ -28,7 +28,7 @@
                   <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
                </children>
                <BorderPane.margin>
-                  <Insets bottom="6.0" />
+                  <Insets bottom="6.0" top="6.0" />
                </BorderPane.margin>
             </HBox>
          </bottom>
@@ -39,7 +39,21 @@
                      <center>
                         <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
                            <children>
-                              <HBox fx:id="pnSeriesTitle" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="40.0">
+                              <AnchorPane prefHeight="40.0">
+                                 <children>
+                                    <Label text="%reference" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                              <HBox fx:id="pnSeriesTitle" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="40.0" visible="false">
                                  <children>
                                     <Label prefHeight="40.0" prefWidth="120.0" text="%series.title" />
                                     <ComboBox fx:id="cmbxSeriesTitle" maxWidth="1.7976931348623157E308" prefHeight="35.0" HBox.hgrow="ALWAYS">
@@ -47,19 +61,6 @@
                                           <Insets right="6.0" />
                                        </HBox.margin>
                                     </ComboBox>
-                                    <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                       <HBox.margin>
-                                          <Insets left="6.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                    <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                    </ToggleButton>
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="6.0" />
@@ -268,17 +269,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnReferenceSubDivisions" animated="false" expanded="false" text="%reference.sub.divisions">
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
-                           </children>
-                        </VBox>
-                     </center>
-                     <bottom>
-                        <VBox BorderPane.alignment="CENTER">
-                           <children>
                               <TitledPane fx:id="ttldpnNotes" animated="false" expanded="false" text="%notes">
                                  <content>
                                     <TextArea fx:id="txtarNotes" minHeight="120.0" wrapText="true" />
@@ -321,7 +311,235 @@
                               </TitledPane>
                            </children>
                         </VBox>
+                     </center>
+                     <bottom>
+                        <VBox fx:id="paneReferenceSubDivision" BorderPane.alignment="CENTER">
+                           <children>
+                              <AnchorPane prefHeight="40.0">
+                                 <children>
+                                    <Label text="%reference.sub.division" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="btnChooseFieldsToShowForReferenceSubDivision" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                              </AnchorPane>
+                              <HBox fx:id="paneReferenceSubDivisionTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                    <TextField fx:id="txtfldReferenceSubDivisionTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
                      </bottom>
+                     <top>
+                        <VBox fx:id="paneSeriesTitle" BorderPane.alignment="CENTER">
+                           <children>
+                              <AnchorPane fx:id="paneSeriesTitleHeader">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%series.title" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="btnChooseSeriesTitleFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
+                                    <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </ToggleButton>
+                                 </children>
+                              </AnchorPane>
+                              <HBox fx:id="paneSeriesTitleTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                    <TextField fx:id="txtfldSeriesTitleTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <HBox fx:id="paneSeriesTitleCategory" alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="%category">
+                                             <HBox.margin>
+                                                <Insets left="12.0" right="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <ComboBox fx:id="cmbxSeriesTitleCategory" prefHeight="35.0" prefWidth="200.0">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ComboBox>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSeriesTitleSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <TextField fx:id="txtfldSeriesTitleSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSeriesTitleTitleSupplement" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title.supplement" />
+                                    <TextField fx:id="txtfldSeriesTitleTitleSupplement" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TitledPane fx:id="ttldpnSeriesTitleAbstract" animated="false" expanded="false" text="%abstract">
+                                 <content>
+                                    <TextArea fx:id="txtarSeriesTitleAbstract" minHeight="120.0" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <TitledPane fx:id="ttldpnSeriesTitleTableOfContents" animated="false" expanded="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
+                                 <content>
+                                    <HTMLEditor fx:id="htmledSeriesTitleTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <HBox fx:id="paneSeriesTitleFirstAndLastDayOfPublication" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefWidth="160.0" text="%first.day.of.publication">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dtpckSeriesTitleFirstDayOfPublication" HBox.hgrow="ALWAYS" />
+                                    <Label prefWidth="160.0" text="%last.day.of.publication">
+                                       <HBox.margin>
+                                          <Insets left="18.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dtpckSeriesTitleLastDayOfPublication" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSeriesTitlePublisher" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefWidth="130.0" text="%publisher">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <ComboBox fx:id="cmbxSeriesTitlePublisher" maxWidth="1.7976931348623157E308" prefHeight="35.0" HBox.hgrow="ALWAYS">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </ComboBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSeriesTitleAbbreviation" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label text="%standard.abbreviation">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtfldSeriesTitleStandardAbbreviation" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="%user.abbreviation1">
+                                       <HBox.margin>
+                                          <Insets left="18.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtfldSeriesTitleUserAbbreviation1" prefHeight="35.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="%user.abbreviation2">
+                                       <HBox.margin>
+                                          <Insets left="12.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtfldSeriesTitleUserAbbreviation2" prefHeight="35.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="paneSeriesTitleOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefWidth="130.0" text="%online.address">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtfldSeriesTitleOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="%last.access">
+                                       <HBox.margin>
+                                          <Insets left="18.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dtpckSeriesTitleLastAccess" prefHeight="35.0" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TitledPane fx:id="ttldpnSeriesTitleNotes" animated="false" expanded="false" text="%notes">
+                                 <content>
+                                    <TextArea fx:id="txtarSeriesTitleNotes" minHeight="120.0" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <TitledPane fx:id="ttldpnSeriesTitleFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
+                                 <content>
+                                    <VBox>
+                                       <children>
+                                          <TreeTableView fx:id="trtblvwSeriesTitleFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
+                                             <columnResizePolicy>
+                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                             <columns>
+                                                <TreeTableColumn fx:id="clmnSeriesTitleFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
+                                             </columns>
+                                          </TreeTableView>
+                                       </children>
+                                    </VBox>
+                                 </content>
+                                 <graphic>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="%files" />
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonSeriesTitleAddFileAction" text="%add...">
+                                             <HBox.margin>
+                                                <Insets left="6.0" right="6.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <FlowPane fx:id="flpnSeriesTitleFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </graphic>
+                                 <VBox.margin>
+                                    <Insets top="12.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                           </children>
+                        </VBox>
+                     </top>
                   </BorderPane>
                </content>
             </ScrollPane>
