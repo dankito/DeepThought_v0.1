@@ -9,7 +9,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="777.0" prefWidth="948.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
    <right>
       <ScrollPane fx:id="paneContextHelp" fitToHeight="true" fitToWidth="true" pannable="true" prefWidth="200.0" visible="false" BorderPane.alignment="TOP_LEFT">
          <content>
@@ -18,7 +18,7 @@
       </ScrollPane>
    </right>
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <BorderPane BorderPane.alignment="CENTER">
          <bottom>
             <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
                <children>
@@ -40,15 +40,15 @@
             </HBox>
          </bottom>
          <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="546.0" prefViewportWidth="948.0" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="550.0" prefViewportWidth="650.0" BorderPane.alignment="CENTER">
                <content>
-                  <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                  <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                      <center>
                         <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
                            <children>
-                              <HBox fx:id="paneFirstLine" alignment="CENTER_RIGHT">
+                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
                                  <children>
-                                    <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" HBox.hgrow="ALWAYS">
+                                    <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                                        <children>
                                           <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
                                           <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS">
@@ -63,23 +63,21 @@
                                           </Rectangle>
                                        </children>
                                     </HBox>
-                                    <HBox fx:id="paneViewConfig" alignment="CENTER_RIGHT" maxHeight="40.0" prefHeight="40.0">
-                                       <children>
-                                          <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
-                                             <HBox.margin>
-                                                <Insets left="6.0" right="6.0" />
-                                             </HBox.margin>
-                                             <font>
-                                                <Font name="System Bold" size="15.0" />
-                                             </font>
-                                          </Button>
-                                          <ToggleButton fx:id="tglbtnShowHideContextHelp" maxHeight="40.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
-                                             <font>
-                                                <Font name="System Bold" size="15.0" />
-                                             </font>
-                                          </ToggleButton>
-                                       </children>
-                                    </HBox>
+                                    <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
+                                    <ToggleButton fx:id="tglbtnShowHideContextHelp" maxHeight="40.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </ToggleButton>
+                                 </children>
+                              </AnchorPane>
+                              <HBox fx:id="paneFirstLine" alignment="CENTER_RIGHT">
+                                 <children>
+                                    <HBox fx:id="paneViewConfig" alignment="CENTER_RIGHT" maxHeight="40.0" prefHeight="40.0" />
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="6.0" />
@@ -122,23 +120,19 @@
                                        </children>
                                     </HBox>
                                  </graphic>
-                                 <content>
-                                    <VBox prefHeight="150.0">
-                                       <children>
-                                          <TreeTableView fx:id="trtblvwFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
-                                            <columns>
-                                              <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
-                                            </columns>
-                                             <columnResizePolicy>
-                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TreeTableView>
-                                       </children>
-                                    </VBox>
-                                 </content>
                                  <VBox.margin>
                                     <Insets top="12.0" />
                                  </VBox.margin>
+                                 <content>
+                                    <TreeTableView fx:id="trtblvwFiles" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
+                                      <columns>
+                                        <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
+                                      </columns>
+                                       <columnResizePolicy>
+                                          <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                       </columnResizePolicy>
+                                    </TreeTableView>
+                                 </content>
                               </TitledPane>
                            </children>
                         </VBox>

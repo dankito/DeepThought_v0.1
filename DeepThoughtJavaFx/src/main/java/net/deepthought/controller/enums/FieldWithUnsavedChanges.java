@@ -8,7 +8,6 @@ public enum FieldWithUnsavedChanges {
   EntryTitle,
   EntryAbstract,
   EntryContent,
-  EntryContentFormat,
   EntrySeriesTitle,
   EntryReference,
   EntryReferenceIndicationStart,

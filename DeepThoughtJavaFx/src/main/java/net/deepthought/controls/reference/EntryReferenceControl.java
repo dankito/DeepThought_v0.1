@@ -234,6 +234,7 @@ public class EntryReferenceControl extends VBox {
     btnNewOrEditReference.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceAction(event));
     paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditReference);
 
+    btnNewOrEditReference.setMinWidth(100);
     btnNewOrEditReference.setPrefWidth(162);
 //    btnNewOrEditReference.setNewText("reference.new");
 //    btnNewOrEditReference.setEditText("reference.edit");

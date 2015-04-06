@@ -1,6 +1,7 @@
 package net.deepthought.data.search;
 
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -13,6 +14,7 @@ import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsEnum;
@@ -25,6 +27,8 @@ import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -42,6 +46,9 @@ import java.util.List;
 import java.util.Set;
 
 public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
+
+  public static final String NoTagsFieldValue = "NOTAGS";
+
 
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
 
@@ -135,6 +142,34 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
 //    writer.updateDocument(new Term("path", file.toString()), doc);
     // TODO: get Document by id field
 //    writer.updateDocument(new Term("id", entry.getId()), doc);
+
+    Analyzer analyzer = new StandardAnalyzer();
+
+    IndexWriterConfig config = new IndexWriterConfig(analyzer);
+    config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+
+    try {
+      IndexWriter indexWriter = new IndexWriter(directory, config);
+
+      Document doc = new Document();
+
+      doc.add(new LongField(FieldName.Id.toString(), entry.getId(), Field.Store.YES));
+
+      doc.add(new Field(FieldName.Abstract.toString(), entry.getAbstract(), TextField.TYPE_NOT_STORED));
+      doc.add(new Field(FieldName.Content.toString(), entry.getContent(), TextField.TYPE_NOT_STORED));
+
+      if(entry.hasTags()) {
+        for (Tag tag : entry.getTags())
+          doc.add(new Field(FieldName.Tags.toString(), tag.getName(), TextField.TYPE_NOT_STORED));
+      }
+      else
+        doc.add(new Field(FieldName.NoTags.toString(), NoTagsFieldValue, TextField.TYPE_NOT_STORED));
+
+      indexWriter.addDocument(doc);
+      indexWriter.close();
+    } catch(Exception ex) {
+      log.error("Could not index Entry " + entry, ex);
+    }
   }
 
   public void search(String term) throws IOException, ParseException {
@@ -153,6 +188,55 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
     }
 
     ireader.close();
+  }
+
+  public List<Long> fndEntriesWithTags(String[] tagNames) throws IOException, ParseException {
+    List<Long> entriesWithTags = new ArrayList<>();
+
+    DirectoryReader reader = DirectoryReader.open(directory);
+    IndexSearcher searcher = new IndexSearcher(reader);
+
+    // find docs without tags
+//    ScoreDoc[] hits = searcher.search(new TermQuery(new Term(FieldName.NoTags.toString(), NoTagsFieldValue)), 100000).scoreDocs;
+    QueryParser parser = new QueryParser(FieldName.Tags.toString(), analyzer);
+    BooleanQuery query = new BooleanQuery();
+    for(int i = 0; i < tagNames.length; i++) {
+      query.add(parser.parse(tagNames[i]), BooleanClause.Occur.MUST);
+    }
+    ScoreDoc[] hits = searcher.search(query, 100000).scoreDocs;
+
+    // Iterate through the results:
+    for (int i = 0; i < hits.length; i++) {
+      Document hitDoc = searcher.doc(hits[i].doc);
+      entriesWithTags.add(hitDoc.getField(FieldName.Id.toString()).numericValue().longValue());
+    }
+
+    reader.close();
+
+    return entriesWithTags;
+  }
+
+  public List<Long> getEntriesWithoutTags() throws IOException, ParseException {
+    List<Long> entriesWithoutTags = new ArrayList<>();
+
+    DirectoryReader reader = DirectoryReader.open(directory);
+    IndexSearcher searcher = new IndexSearcher(reader);
+
+    // find docs without tags
+//    ScoreDoc[] hits = searcher.search(new TermQuery(new Term(FieldName.NoTags.toString(), NoTagsFieldValue)), 100000).scoreDocs;
+    QueryParser parser = new QueryParser(FieldName.NoTags.toString(), analyzer);
+    Query query = parser.parse(NoTagsFieldValue);
+    ScoreDoc[] hits = searcher.search(query, 100000).scoreDocs;
+
+    // Iterate through the results:
+    for (int i = 0; i < hits.length; i++) {
+      Document hitDoc = searcher.doc(hits[i].doc);
+      entriesWithoutTags.add(hitDoc.getField(FieldName.Id.toString()).numericValue().longValue());
+    }
+
+    reader.close();
+
+    return entriesWithoutTags;
   }
 
 //  public void test() throws IOException {

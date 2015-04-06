@@ -1,6 +1,11 @@
 package net.deepthought.data.search;
 
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.search.helper.IdSettableEntry;
+
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,4 +42,104 @@ public class LuceneSearchEngineTest {
 
     List<IndexTerm> terms = searchEngine.getAllTerms();
   }
+
+
+  @Test
+  public void findAllEntriesWithoutTags() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag1");
+    Tag tag2 = new Tag("tag2");
+    Tag tag3 = new Tag("tag3");
+
+    Entry entryWithoutTags1 = new IdSettableEntry(1);
+    Entry entryWithoutTags2 = new IdSettableEntry(3);
+    Entry entryWithoutTags3 = new IdSettableEntry(5);
+
+    Entry entryWithTags1 = new IdSettableEntry(2);
+    Entry entryWithTags2 = new IdSettableEntry(4);
+
+    entryWithTags1.addTag(tag1);
+    entryWithTags1.addTag(tag2);
+    entryWithTags2.addTag(tag2);
+    entryWithTags2.addTag(tag3);
+
+    searchEngine.updateIndex(entryWithoutTags1);
+    searchEngine.updateIndex(entryWithTags1);
+    searchEngine.updateIndex(entryWithoutTags2);
+    searchEngine.updateIndex(entryWithTags2);
+    searchEngine.updateIndex(entryWithoutTags3);
+
+    List<Long> entriesWithoutTags = searchEngine.getEntriesWithoutTags();
+    Assert.assertEquals(3, entriesWithoutTags.size());
+
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1.getId()));
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags2.getId()));
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags3.getId()));
+
+    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags1.getId()));
+    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags2.getId()));
+  }
+
+
+  @Test
+  public void findEntriesWithTags() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag1");
+    Tag tag2 = new Tag("tag2");
+    Tag tag3 = new Tag("tag3");
+
+    Entry entryWithoutTags1 = new IdSettableEntry(1);
+    Entry entryWithoutTags2 = new IdSettableEntry(3);
+    Entry entryWithoutTags3 = new IdSettableEntry(5);
+
+    Entry entryWithTags1 = new IdSettableEntry(2);
+    Entry entryWithTags2 = new IdSettableEntry(4);
+
+    entryWithTags1.addTag(tag1);
+    entryWithTags1.addTag(tag2);
+    entryWithTags2.addTag(tag2);
+    entryWithTags2.addTag(tag3);
+
+    searchEngine.updateIndex(entryWithoutTags1);
+    searchEngine.updateIndex(entryWithTags1);
+    searchEngine.updateIndex(entryWithoutTags2);
+    searchEngine.updateIndex(entryWithTags2);
+    searchEngine.updateIndex(entryWithoutTags3);
+
+    List<Long> entriesWithTag1 = searchEngine.fndEntriesWithTags(new String[] { "tag1"});
+    Assert.assertEquals(1, entriesWithTag1.size());
+
+    Assert.assertTrue(entriesWithTag1.contains(entryWithTags1.getId()));
+    Assert.assertFalse(entriesWithTag1.contains(entryWithTags2.getId()));
+    Assert.assertFalse(entriesWithTag1.contains(entryWithoutTags1.getId()));
+    Assert.assertFalse(entriesWithTag1.contains(entryWithoutTags2.getId()));
+    Assert.assertFalse(entriesWithTag1.contains(entryWithoutTags3.getId()));
+
+    List<Long> entriesWithTag2 = searchEngine.fndEntriesWithTags(new String[] { "tag2"});
+    Assert.assertEquals(2, entriesWithTag2.size());
+
+    Assert.assertTrue(entriesWithTag2.contains(entryWithTags1.getId()));
+    Assert.assertTrue(entriesWithTag2.contains(entryWithTags2.getId()));
+    Assert.assertFalse(entriesWithTag2.contains(entryWithoutTags1.getId()));
+    Assert.assertFalse(entriesWithTag2.contains(entryWithoutTags2.getId()));
+    Assert.assertFalse(entriesWithTag2.contains(entryWithoutTags3.getId()));
+
+    List<Long> entriesWithTag3 = searchEngine.fndEntriesWithTags(new String[] { "tag3"});
+    Assert.assertEquals(1, entriesWithTag3.size());
+
+    Assert.assertFalse(entriesWithTag3.contains(entryWithTags1.getId()));
+    Assert.assertTrue(entriesWithTag3.contains(entryWithTags2.getId()));
+    Assert.assertFalse(entriesWithTag3.contains(entryWithoutTags1.getId()));
+    Assert.assertFalse(entriesWithTag3.contains(entryWithoutTags2.getId()));
+    Assert.assertFalse(entriesWithTag3.contains(entryWithoutTags3.getId()));
+
+    List<Long> entriesWithTags2And3 = searchEngine.fndEntriesWithTags(new String[] { "tag2", "tag3"});
+    Assert.assertEquals(1, entriesWithTags2And3.size());
+
+    Assert.assertFalse(entriesWithTags2And3.contains(entryWithTags1.getId()));
+    Assert.assertTrue(entriesWithTags2And3.contains(entryWithTags2.getId()));
+    Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags1.getId()));
+    Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags2.getId()));
+    Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags3.getId()));
+
+  }
+
 }

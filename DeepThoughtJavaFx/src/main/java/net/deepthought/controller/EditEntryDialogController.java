@@ -77,6 +77,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -112,10 +113,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected Pane paneFirstLine;
 
-//  @FXML
-//  protected Pane paneTitle;
-//  @FXML
-//  protected TextField txtfldTitle;
+  @FXML
+  protected Pane paneTitle;
+  @FXML
+  protected TextField txtfldTitle;
 
   @FXML
   protected Pane paneViewConfig;
@@ -207,11 +208,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
 
-//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
-//    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-//      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
-//      updateWindowTitle(newValue);
-//    });
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
+    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
+      updateWindowTitle(newValue);
+    });
+    paneTitle.setVisible(false);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
@@ -225,7 +227,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
-    entryTagsControl.setPrefWidth(250);
+    entryTagsControl.setMinWidth(150);
+//    entryTagsControl.setPrefWidth(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
 //    contentPane.getChildren().add(entryTagsControl);
@@ -235,6 +238,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setMinWidth(150);
+//    entryCategoriesControl.setPrefWidth(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setVisible(Application.getSettings().showCategories());
     entryCategoriesControl.setExpanded(true);
@@ -488,8 +493,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
-//    if(paneTitle.isVisible() == false)
-//      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
+    if(paneTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
     if(ttldpnAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "entry.abstract");
     if(ttldpnContent.isVisible() == false)

@@ -10,12 +10,12 @@
       <children>
           <HBox fx:id="paneSeriesTitleOrReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
               <children>
-                  <Label minWidth="115.0" prefHeight="40.0" prefWidth="80.0" text="%reference">
+                  <Label minWidth="80.0" prefHeight="40.0" prefWidth="80.0" text="%reference">
                       <HBox.margin>
                           <Insets right="6.0" />
                       </HBox.margin>
                   </Label>
-                  <ComboBox fx:id="cmbxSeriesTitleOrReference" editable="true" maxWidth="1.7976931348623157E308" prefHeight="34.0" HBox.hgrow="ALWAYS">
+                  <ComboBox fx:id="cmbxSeriesTitleOrReference" editable="true" maxWidth="1.7976931348623157E308" minWidth="40.0" prefHeight="34.0" HBox.hgrow="ALWAYS">
                <HBox.margin>
                   <Insets right="6.0" />
                </HBox.margin>
@@ -34,7 +34,7 @@
                               <Insets right="6.0" />
                            </HBox.margin>
                         </Label>
-                        <TextField fx:id="txtfldReferenceIndicationStart" prefHeight="34.0" prefWidth="90.0">
+                        <TextField fx:id="txtfldReferenceIndicationStart" minWidth="60.0" prefHeight="34.0" prefWidth="90.0">
                            <HBox.margin>
                               <Insets right="6.0" />
                            </HBox.margin>

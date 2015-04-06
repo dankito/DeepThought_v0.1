@@ -9,9 +9,9 @@
 <?import javafx.scene.layout.*?>
 <?import net.deepthought.controls.*?>
 
-<BorderPane fx:id="dialogPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="938.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
+<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
    <center>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <BorderPane BorderPane.alignment="CENTER">
          <bottom>
             <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
                <children>
@@ -33,25 +33,37 @@
             </HBox>
          </bottom>
          <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="774.0" prefViewportWidth="948.0" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
                <content>
                   <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                      <center>
                         <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
                            <children>
-                              <AnchorPane prefHeight="40.0">
+                              <AnchorPane>
                                  <children>
-                                    <Label text="%reference" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <font>
-                                          <Font name="System Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Button fx:id="btnChooseFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Label minWidth="60.0" text="%reference">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%reference.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="btnChooseFieldsToShow" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
                                     </Button>
                                  </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
                               </AnchorPane>
                               <HBox fx:id="pnSeriesTitle" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefHeight="40.0" visible="false">
                                  <children>
@@ -68,7 +80,7 @@
                               </HBox>
                               <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%reference.title" />
                                     <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                     <HBox fx:id="paneReferenceCategory" alignment="CENTER_LEFT">
                                        <children>
@@ -310,19 +322,31 @@
                                  </VBox.margin>
                               </TitledPane>
                            </children>
+                           <BorderPane.margin>
+                              <Insets top="12.0" />
+                           </BorderPane.margin>
                         </VBox>
                      </center>
                      <bottom>
                         <VBox fx:id="paneReferenceSubDivision" BorderPane.alignment="CENTER">
                            <children>
-                              <AnchorPane prefHeight="40.0">
+                              <AnchorPane>
                                  <children>
-                                    <Label text="%reference.sub.division" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <font>
-                                          <Font name="System Bold" size="13.0" />
-                                       </font>
-                                    </Label>
-                                    <Button fx:id="btnChooseFieldsToShowForReferenceSubDivision" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Label text="%reference.sub.division">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%reference.sub.division.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="btnChooseFieldsToShowForReferenceSubDivision" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -331,11 +355,90 @@
                               </AnchorPane>
                               <HBox fx:id="paneReferenceSubDivisionTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%reference.sub.division.title" />
                                     <TextField fx:id="txtfldReferenceSubDivisionTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
                               </HBox>
+                              <HBox fx:id="paneReferenceSubDivisionSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <TextField fx:id="txtfldReferenceSubDivisionSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TitledPane fx:id="ttldpnReferenceSubDivisionAbstract" animated="false" text="%abstract">
+                                 <content>
+                                    <TextArea fx:id="txtarReferenceSubDivisionAbstract" minHeight="120.0" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <HBox fx:id="paneReferenceSubDivisionOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefWidth="130.0" text="%online.address">
+                                       <HBox.margin>
+                                          <Insets right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <Label text="%last.access">
+                                       <HBox.margin>
+                                          <Insets left="18.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dtpckReferenceSubDivisionLastAccess" prefHeight="35.0" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <TitledPane fx:id="ttldpnReferenceSubDivisionNotes" animated="false" expanded="false" text="%notes">
+                                 <content>
+                                    <TextArea fx:id="txtarReferenceSubDivisionNotes" minHeight="120.0" wrapText="true" />
+                                 </content>
+                                 <VBox.margin>
+                                    <Insets bottom="6.0" />
+                                 </VBox.margin>
+                              </TitledPane>
+                              <TitledPane fx:id="ttldpnReferenceSubDivisionFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
+                                 <content>
+                                    <VBox>
+                                       <children>
+                                          <TreeTableView fx:id="trtblvwReferenceSubDivisionFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
+                                             <columnResizePolicy>
+                                                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                             <columns>
+                                                <TreeTableColumn fx:id="clmnReferenceSubDivisionFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
+                                             </columns>
+                                          </TreeTableView>
+                                       </children>
+                                    </VBox>
+                                 </content>
+                                 <graphic>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <Label text="%files" />
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonReferenceSubDivisionAddFileAction" text="%add...">
+                                             <HBox.margin>
+                                                <Insets left="6.0" right="6.0" />
+                                             </HBox.margin>
+                                          </Button>
+                                          <FlowPane fx:id="flpnReferenceSubDivisionFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                    </HBox>
+                                 </graphic>
+                              </TitledPane>
                            </children>
+                           <BorderPane.margin>
+                              <Insets top="12.0" />
+                           </BorderPane.margin>
                         </VBox>
                      </bottom>
                      <top>
@@ -343,11 +446,20 @@
                            <children>
                               <AnchorPane fx:id="paneSeriesTitleHeader">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%series.title" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                       <font>
-                                          <Font name="System Bold" size="13.0" />
-                                       </font>
-                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Label minWidth="60.0" prefHeight="40.0" text="%series.title">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%series.title.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
                                     <Button fx:id="btnChooseSeriesTitleFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
@@ -362,7 +474,7 @@
                               </AnchorPane>
                               <HBox fx:id="paneSeriesTitleTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                                    <Label prefHeight="40.0" prefWidth="120.0" text="%series.title.title" />
                                     <TextField fx:id="txtfldSeriesTitleTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                     <HBox fx:id="paneSeriesTitleCategory" alignment="CENTER_LEFT">
                                        <children>

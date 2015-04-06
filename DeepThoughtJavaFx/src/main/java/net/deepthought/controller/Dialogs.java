@@ -92,6 +92,8 @@ public class Dialogs {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditEntryDialog.fxml");
+      dialogStage.setMinHeight(500);
+      dialogStage.setMinWidth(500);
 //      loader.setResources(Localization.getStringsResourceBundle());
 //      loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + "EditEntryDialog.fxml"));
 //      Parent parent = loader.load();
@@ -309,6 +311,8 @@ public class Dialogs {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditReferenceDialog.fxml");
+      dialogStage.setMinHeight(500);
+      dialogStage.setMinWidth(500);
 
       // Set the reference into the controller.
       EditReferenceDialogController controller = loader.getController();
