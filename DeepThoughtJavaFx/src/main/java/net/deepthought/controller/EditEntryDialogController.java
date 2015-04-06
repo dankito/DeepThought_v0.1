@@ -77,7 +77,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -408,21 +407,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
       entry.setReferenceSubDivision(entryReferenceControl.getReferenceSubDivision());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationStart)) {
-      entry.setIndicationStart(entryReferenceControl.getReferenceStart());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationStart);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationStartUnit)) {
-      entry.setIndicationStartUnit(entryReferenceControl.getReferenceStartUnit());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationStartUnit);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationEnd)) {
-      entry.setIndicationEnd(entryReferenceControl.getReferenceEnd());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationEnd);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndicationEndUnit)) {
-      entry.setIndicationEndUnit(entryReferenceControl.getReferenceEndUnit());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationEndUnit);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndication)) {
+      entry.setIndication(entryReferenceControl.getReferenceIndication());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndication);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryPersons)) {

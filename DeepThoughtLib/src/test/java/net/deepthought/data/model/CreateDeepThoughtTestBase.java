@@ -5,11 +5,6 @@ import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.ExtensibleEnumeration;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
-import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.ReferenceCategory;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
-import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
-import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
 import org.junit.Assert;
@@ -30,81 +25,6 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
     for(Language language : deepThought.getLanguages()) {
       testExtensibleEnumerationFields(language, true);
       Assert.assertEquals(index, language.getSortOrder());
-      index++;
-    }
-  }
-
-  @Test
-  public void testDefaultPersonRolesGetCreatedCorrectly() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    Assert.assertEquals(15, deepThought.getPersonRoles().size());
-
-    int index = 1;
-    for(PersonRole personRole : deepThought.getPersonRoles()) {
-      if(personRole == PersonRole.getWithoutRolePersonRole())
-        testExtensibleEnumerationFields(personRole, false);
-      else {
-        testExtensibleEnumerationFields(personRole, true);
-
-        Assert.assertEquals(index, personRole.getSortOrder());
-        index++;
-      }
-    }
-  }
-
-  @Test
-  public void testDefaultSeriesTitleCategoriesGetCreatedCorrectly() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    Assert.assertEquals(7, deepThought.getSeriesTitleCategories().size());
-
-    int index = 1;
-    for(SeriesTitleCategory seriesTitleCategory : deepThought.getSeriesTitleCategories()) {
-      testExtensibleEnumerationFields(seriesTitleCategory, true);
-      Assert.assertEquals(index, seriesTitleCategory.getSortOrder());
-      index++;
-    }
-  }
-
-  @Test
-  public void testDefaultReferenceCategoriesGetCreatedCorrectly() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    Assert.assertEquals(8, deepThought.getReferenceCategories().size());
-
-    int index = 1;
-    for(ReferenceCategory referenceCategory : deepThought.getReferenceCategories()) {
-      testExtensibleEnumerationFields(referenceCategory, true);
-      Assert.assertEquals(index, referenceCategory.getSortOrder());
-      index++;
-    }
-  }
-
-  @Test
-  public void testDefaultReferenceSubDivisionCategoriesGetCreatedCorrectly() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    Assert.assertEquals(4, deepThought.getReferenceSubDivisionCategories().size());
-
-    int index = 1;
-    for(ReferenceSubDivisionCategory referenceSubDivisionCategory : deepThought.getReferenceSubDivisionCategories()) {
-      testExtensibleEnumerationFields(referenceSubDivisionCategory, true);
-      Assert.assertEquals(index, referenceSubDivisionCategory.getSortOrder());
-      index++;
-    }
-  }
-
-  @Test
-  public void testDefaultReferenceIndicationUnitsGetCreatedCorrectly() throws Exception {
-    DeepThought deepThought = Application.getDeepThought();
-
-    Assert.assertEquals(3, deepThought.getReferenceIndicationUnits().size());
-
-    int index = 1;
-    for(ReferenceIndicationUnit unit : deepThought.getReferenceIndicationUnits()) {
-      testExtensibleEnumerationFields(unit, false);
-      Assert.assertEquals(index, unit.getSortOrder());
       index++;
     }
   }

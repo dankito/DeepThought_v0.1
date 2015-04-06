@@ -20,7 +20,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -69,10 +68,6 @@ public abstract class ReferenceBase extends UserDataEntity {
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
   protected Set<FileLink> files = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "referenceBase")
-  @OrderBy(value = "order")
-  protected Collection<CustomField> customFields = new HashSet<>();
 
 
   public ReferenceBase() {
@@ -253,38 +248,6 @@ public abstract class ReferenceBase extends UserDataEntity {
     if(result) {
       file.setReferenceBase(null);
       callEntityRemovedListeners(files, file);
-    }
-
-    return result;
-  }
-
-  public Collection<CustomField> getCustomFields() {
-    return customFields;
-  }
-
-  public boolean addCustomField(CustomField customField) {
-    boolean result = customFields.add(customField);
-    if(result) {
-      customField.setReferenceBase(this);
-      callEntityAddedListeners(customFields, customField);
-    }
-
-    return result;
-  }
-
-  public boolean removeCustomField(CustomField customField) {
-    int removeCustomFieldOrder = customField.getOrder();
-
-    boolean result = customFields.remove(customField);
-    if(result) {
-      customField.setReferenceBase(null);
-
-      for(CustomField customFieldIter : getCustomFields()) {
-        if(customFieldIter.getOrder() > removeCustomFieldOrder)
-          customFieldIter.setOrder(customFieldIter.getOrder() - 1);
-      }
-
-      callEntityRemovedListeners(customFields, customField);
     }
 
     return result;

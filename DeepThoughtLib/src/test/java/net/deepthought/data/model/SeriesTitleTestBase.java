@@ -1,15 +1,10 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by ganymed on 10/11/14.
@@ -24,37 +19,6 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     deepThought.addSeriesTitle(series);
 
     return series;
-  }
-
-
-  @Test
-  public void setSeriesTitleCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<SeriesTitleCategory> categories = new ArrayList<>(deepThought.getSeriesTitleCategories());
-    SeriesTitleCategory category =categories.get(0);
-    series.setCategory(category);
-
-    deepThought.addSeriesTitle(series);
-
-    Assert.assertTrue(doIdsEqual(category.getId(), getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleCategoryJoinColumnName, series.getId())));
-  }
-
-  @Test
-  public void updateSeriesTitleCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<SeriesTitleCategory> categories = new ArrayList<>(deepThought.getSeriesTitleCategories());
-    series.setCategory(categories.get(0));
-
-    deepThought.addSeriesTitle(series);
-
-    SeriesTitleCategory newValue = categories.get(1);
-    series.setCategory(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleCategoryJoinColumnName, series.getId())));
   }
 
 
@@ -288,19 +252,6 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
 
 
   @Test
-  public void updateTitleSupplement_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    String newValue = "New value";
-    series.setTitleSupplement(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTitleSupplementColumnName, series.getId()));
-  }
-
-  @Test
   public void updateTableOfContents_UpdatedValueGetsPersistedInDb() throws Exception {
     SeriesTitle series = new SeriesTitle("test");
 
@@ -327,103 +278,6 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
     // assert content really got written to database
     String actual = getClobFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleTableOfContentsColumnName, series.getId());
     Assert.assertEquals(tableOfContents, actual);
-  }
-
-  @Test
-  public void updateFirstDayOfPublication_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    Date newValue = new Date();
-    series.setFirstDayOfPublication(newValue);
-
-    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleFirstDayOfPublicationColumnName, series.getId()));
-  }
-
-  @Test
-  public void updateLastDayOfPublication_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    Date newValue = new Date();
-    series.setLastDayOfPublication(newValue);
-
-    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleLastDayOfPublicationColumnName, series.getId()));
-  }
-
-  @Test
-  public void updateStandardAbbreviation_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    String newValue = "New value";
-    series.setStandardAbbreviation(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleStandardAbbreviationColumnName, series.getId()));
-  }
-
-  @Test
-  public void updateUserAbbreviation1_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    String newValue = "New value";
-    series.setUserAbbreviation1(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleUserAbbreviation1ColumnName, series.getId()));
-  }
-
-  @Test
-  public void updateUserAbbreviation2_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-
-    String newValue = "New value";
-    series.setUserAbbreviation2(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitleUserAbbreviation2ColumnName, series.getId()));
-  }
-
-  @Test
-  public void setPublisher_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-    Publisher publisher = new Publisher("Suhrkamp");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-    deepThought.addPublisher(publisher);
-
-    series.setPublisher(publisher);
-
-    Assert.assertTrue(doIdsEqual(publisher.getId(), getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitlePublisherJoinColumnName, series.getId())));
-  }
-
-  @Test
-  public void updatePublisher_UpdatedValueGetsPersistedInDb() throws Exception {
-    SeriesTitle series = new SeriesTitle("test");
-    Publisher publisher = new Publisher("Suhrkamp");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addSeriesTitle(series);
-    deepThought.addPublisher(publisher);
-
-    series.setPublisher(publisher);
-
-    Publisher newValue = new Publisher("Hanser");
-    deepThought.addPublisher(newValue);
-    series.setPublisher(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.SeriesTitleTableName, TableConfig.SeriesTitlePublisherJoinColumnName, series.getId())));
   }
 
 }

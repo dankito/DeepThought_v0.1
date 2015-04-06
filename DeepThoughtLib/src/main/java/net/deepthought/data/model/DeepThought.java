@@ -1,14 +1,9 @@
 package net.deepthought.data.model;
 
 import net.deepthought.data.model.enums.BackupFileServiceType;
-import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.ReferenceCategory;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
-import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
-import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
@@ -96,31 +91,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
-  protected Set<SeriesTitleCategory> seriesTitleCategories = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<ReferenceCategory> referenceCategories = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<ReferenceSubDivisionCategory> referenceSubDivisionCategories = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<ReferenceIndicationUnit> referenceIndicationUnits = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
   protected Set<NoteType> noteTypes = new HashSet<>();
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<BackupFileServiceType> backupFileServiceTypes = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<CustomFieldName> customFieldNames = new HashSet<>();
 
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -137,11 +112,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected Set<Reference> references = new HashSet<>();
 
   protected transient SortedSet<Reference> referencesSorted = null;
-
-  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  protected Set<Publisher> publishers = new HashSet<>();
-
-  protected transient SortedSet<Publisher> publishersSorted = null;
 
 //  @JsonIgnore
   @ManyToOne(fetch = FetchType.EAGER)
@@ -459,114 +429,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
     personRolesSorted = new TreeSet<>(getPersonRoles());
   }
 
-
-  public Collection<SeriesTitleCategory> getSeriesTitleCategories() {
-    return seriesTitleCategories;
-  }
-
-  public boolean addSeriesTitleCategory(SeriesTitleCategory seriesTitleCategory) {
-    boolean result = seriesTitleCategories.add(seriesTitleCategory);
-
-    if(result) {
-      seriesTitleCategory.setDeepThought(this);
-      callEntityAddedListeners(seriesTitleCategories, seriesTitleCategory);
-    }
-
-    return result;
-  }
-
-  public boolean removeSeriesTitleCategory(SeriesTitleCategory seriesTitleCategory) {
-    boolean result = seriesTitleCategories.remove(seriesTitleCategory);
-
-    if(result) {
-      seriesTitleCategory.setDeepThought(null);
-      callEntityRemovedListeners(seriesTitleCategories, seriesTitleCategory);
-    }
-
-    return result;
-  }
-
-  public Collection<ReferenceCategory> getReferenceCategories() {
-    return referenceCategories;
-  }
-
-  public boolean addReferenceCategory(ReferenceCategory referenceCategory) {
-    boolean result = referenceCategories.add(referenceCategory);
-
-    if(result) {
-      referenceCategory.setDeepThought(this);
-      callEntityAddedListeners(referenceCategories, referenceCategory);
-    }
-
-    return result;
-  }
-
-  public boolean removeReferenceCategory(ReferenceCategory referenceCategory) {
-    boolean result = referenceCategories.remove(referenceCategory);
-
-    if(result) {
-      referenceCategory.setDeepThought(null);
-      callEntityRemovedListeners(referenceCategories, referenceCategory);
-    }
-
-    return result;
-  }
-
-  public Collection<ReferenceSubDivisionCategory> getReferenceSubDivisionCategories() {
-    return referenceSubDivisionCategories;
-  }
-
-  public boolean addReferenceSubDivisionCategory(ReferenceSubDivisionCategory referenceSubDivisionCategory) {
-    boolean result = referenceSubDivisionCategories.add(referenceSubDivisionCategory);
-
-    if(result) {
-      referenceSubDivisionCategory.setDeepThought(this);
-      callEntityAddedListeners(referenceSubDivisionCategories, referenceSubDivisionCategory);
-    }
-
-    return result;
-  }
-
-  public boolean removeReferenceSubDivisionCategory(ReferenceSubDivisionCategory referenceSubDivisionCategory) {
-    boolean result = referenceSubDivisionCategories.remove(referenceSubDivisionCategory);
-
-    if(result) {
-      referenceSubDivisionCategory.setDeepThought(null);
-      callEntityRemovedListeners(referenceSubDivisionCategories, referenceSubDivisionCategory);
-    }
-
-    return result;
-  }
-
-  public Collection<ReferenceIndicationUnit> getReferenceIndicationUnits() {
-    return referenceIndicationUnits;
-  }
-
-  public boolean addReferenceIndicationUnit(ReferenceIndicationUnit referenceIndicationUnit) {
-    boolean result = referenceIndicationUnits.add(referenceIndicationUnit);
-
-    if(result) {
-      referenceIndicationUnit.setDeepThought(this);
-      callEntityAddedListeners(referenceIndicationUnits, referenceIndicationUnit);
-    }
-
-    return result;
-  }
-
-  public boolean removeReferenceIndicationUnit(ReferenceIndicationUnit referenceIndicationUnit) {
-    if(referenceIndicationUnit.isDeletable() == false)
-      return false;
-
-    boolean result = referenceIndicationUnits.remove(referenceIndicationUnit);
-
-    if(result) {
-      referenceIndicationUnit.setDeepThought(null);
-      callEntityRemovedListeners(referenceIndicationUnits, referenceIndicationUnit);
-    }
-
-    return result;
-  }
-
   public Collection<NoteType> getNoteTypes() {
     return noteTypes;
   }
@@ -620,35 +482,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(result) {
       fileServiceType.setDeepThought(null);
       callEntityRemovedListeners(backupFileServiceTypes, fileServiceType);
-    }
-
-    return result;
-  }
-
-  public Collection<CustomFieldName> getCustomFieldNames() {
-    return customFieldNames;
-  }
-
-  public boolean addCustomFieldName(CustomFieldName customField) {
-    boolean result = customFieldNames.add(customField);
-
-    if(result) {
-      customField.setDeepThought(this);
-      callEntityAddedListeners(customFieldNames, customField);
-    }
-
-    return result;
-  }
-
-  public boolean removeCustomFieldName(CustomFieldName customFieldName) {
-    if(customFieldName.isDeletable() == false)
-      return false;
-
-    boolean result = customFieldNames.remove(customFieldName);
-
-    if(result) {
-      customFieldName.setDeepThought(null);
-      callEntityRemovedListeners(customFieldNames, customFieldName);
     }
 
     return result;
@@ -781,39 +614,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
-  public Collection<Publisher> getPublishers() {
-    return publishers;
-  }
-
-  public boolean addPublisher(Publisher publisher) {
-    if(publishers.add(publisher)) {
-      publisher.deepThought = this;
-      publishersSorted = null;
-
-      callEntityAddedListeners(publishers, publisher);
-      return true;
-    }
-
-    return false;
-  }
-
-  public boolean removePublisher(Publisher publisher) {
-    if(publishers.remove(publisher)) {
-      publishersSorted = null;
-      publisher.deepThought = null;
-
-      callEntityRemovedListeners(publishers, publisher);
-      return true;
-    }
-
-    return false;
-  }
-
-  public Collection<Publisher> getPublishersSorted() {
-    return publishersSorted;
-  }
-
-
   public DeepThoughtSettings getSettings() {
     if(settings == null) {
       settings = SettingsBase.createSettingsFromString(settingsString, DeepThoughtSettings.class);
@@ -918,7 +718,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   };
 
   protected boolean isEntityNotOwnedByDeepThought(Object entity) {
-    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision || entity instanceof CustomField;
+    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision;
   }
 
   protected boolean isCollectionOnDeepThought(BaseEntity collectionEntity) {
@@ -937,30 +737,16 @@ public class DeepThought extends UserDataEntity implements Serializable {
       callEntityOfCollectionUpdatedListeners(getIndexTerms(), entity);
     else if(entity instanceof Person)
       callEntityOfCollectionUpdatedListeners(getPersons(), entity);
-    else if(entity instanceof PersonRole)
-      callEntityOfCollectionUpdatedListeners(getPersonRoles(), entity);
-    else if(entity instanceof Publisher)
-      callEntityOfCollectionUpdatedListeners(getPublishers(), entity);
     else if(entity instanceof SeriesTitle)
       callEntityOfCollectionUpdatedListeners(getSeriesTitles(), entity);
-    else if(entity instanceof SeriesTitleCategory)
-      callEntityOfCollectionUpdatedListeners(getSeriesTitleCategories(), entity);
     else if(entity instanceof Reference)
       callEntityOfCollectionUpdatedListeners(getReferences(), entity);
-    else if(entity instanceof ReferenceCategory)
-      callEntityOfCollectionUpdatedListeners(getReferenceCategories(), entity);
-    else if(entity instanceof ReferenceSubDivisionCategory)
-      callEntityOfCollectionUpdatedListeners(getReferenceSubDivisionCategories(), entity);
-    else if(entity instanceof ReferenceIndicationUnit)
-      callEntityOfCollectionUpdatedListeners(getReferenceIndicationUnits(), entity);
     else if(entity instanceof NoteType)
       callEntityOfCollectionUpdatedListeners(getNoteTypes(), entity);
     else if(entity instanceof Language)
       callEntityOfCollectionUpdatedListeners(getLanguages(), entity);
     else if(entity instanceof BackupFileServiceType)
       callEntityOfCollectionUpdatedListeners(getBackupFileServiceTypes(), entity);
-    else if(entity instanceof CustomFieldName)
-      callEntityOfCollectionUpdatedListeners(getCustomFieldNames(), entity);
     else if(isEntityNotOwnedByDeepThought(entity))
       callEntityOfCollectionUpdatedListeners(new ArrayList<BaseEntity>() {{ add(entity); }}, entity);
     else
@@ -1006,7 +792,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean isComposition(BaseEntity collectionHolder, BaseEntity entity) {
     if(collectionHolder instanceof Entry) {
-      if(entity instanceof FileLink || entity instanceof Note || entity instanceof CustomField)
+      if(entity instanceof FileLink || entity instanceof Note)
         return true;
     }
     else if(collectionHolder instanceof Reference) {
@@ -1019,7 +805,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
 
     if(collectionHolder instanceof ReferenceBase) {
-      if(entity instanceof FileLink || entity instanceof CustomField)
+      if(entity instanceof FileLink)
         return true;
     }
 
@@ -1056,11 +842,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   protected static void createEnumerationsDefaultValues(DeepThought deepThought) {
     createLanguageDefaultValues(deepThought);
-    createPersonRolesDefaultValues(deepThought);
-    createSeriesTitleCategoryDefaultValues(deepThought);
-    createReferenceCategoryDefaultValues(deepThought);
-    createReferenceSubDivisionCategoryDefaultValues(deepThought);
-    createReferenceIndicationUnitsDefaultValues(deepThought);
     createNoteTypeDefaultValues(deepThought);
     createBackupFileServiceTypeDefaultValues(deepThought);
   }
@@ -1068,58 +849,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected static void createLanguageDefaultValues(DeepThought deepThought) {
     deepThought.addLanguage(new Language("language.english", true, true, 1));
     deepThought.addLanguage(new Language("language.german", true, true, 2));
-  }
-
-  protected static void createPersonRolesDefaultValues(DeepThought deepThought) {
-    deepThought.addPersonRole(new PersonRole("person.role.author", true, true, 1));
-    deepThought.addPersonRole(new PersonRole("person.role.editor", true, true, 2));
-    deepThought.addPersonRole(new PersonRole("person.role.contributor", true, true, 3));
-    deepThought.addPersonRole(new PersonRole("person.role.announcer", true, true, 4));
-    deepThought.addPersonRole(new PersonRole("person.role.moderator", true, true, 5));
-    deepThought.addPersonRole(new PersonRole("person.role.guest", true, true, 6));
-    deepThought.addPersonRole(new PersonRole("person.role.talk.participant", true, true, 7));
-    deepThought.addPersonRole(new PersonRole("person.role.discussion.participant", true, true, 8));
-    deepThought.addPersonRole(new PersonRole("person.role.interviewed.person", true, true, 9));
-    deepThought.addPersonRole(new PersonRole("person.role.portrayed.person", true, true, 10));
-    deepThought.addPersonRole(new PersonRole("person.role.actor", true, true, 11));
-    deepThought.addPersonRole(new PersonRole("person.role.director", true, true, 12));
-    deepThought.addPersonRole(new PersonRole("person.role.producer", true, true, 13));
-    deepThought.addPersonRole(new PersonRole("person.role.screenplay.writer", true, true, 14));
-    deepThought.addPersonRole(new PersonRole("person.role.without.role", true, false, Integer.MAX_VALUE));
-  }
-
-  protected static void createSeriesTitleCategoryDefaultValues(DeepThought deepThought) {
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.newspaper", true, true, 1));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.magazine", true, true, 2));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.book.series", true, true, 3));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.movie.series", true, true, 4));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.television.program", true, true, 5));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.radio.program", true, true, 6));
-    deepThought.addSeriesTitleCategory(new SeriesTitleCategory("series.title.category.podcast.series", true, true, 7));
-  }
-
-  protected static void createReferenceCategoryDefaultValues(DeepThought deepThought) {
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.book", true, true, 1));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.newspaper.issue", true, true, 2));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.magazine.issue", true, true, 3));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.online.article", true, true, 4));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.web.page", true, true, 5));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.television.program", true, true, 6));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.radio.program", true, true, 7));
-    deepThought.addReferenceCategory(new ReferenceCategory("reference.category.series", true, true, 8));
-  }
-
-  protected static void createReferenceSubDivisionCategoryDefaultValues(DeepThought deepThought) {
-    deepThought.addReferenceSubDivisionCategory(new ReferenceSubDivisionCategory("reference.sub.division.category.chapter", true, true, 1));
-    deepThought.addReferenceSubDivisionCategory(new ReferenceSubDivisionCategory("reference.sub.division.category.newspaper.article", true, true, 2));
-    deepThought.addReferenceSubDivisionCategory(new ReferenceSubDivisionCategory("reference.sub.division.category.magazine.article", true, true, 3));
-    deepThought.addReferenceSubDivisionCategory(new ReferenceSubDivisionCategory("reference.sub.division.category.article", true, true, 4));
-  }
-
-  protected static void createReferenceIndicationUnitsDefaultValues(DeepThought deepThought) {
-    deepThought.addReferenceIndicationUnit(new ReferenceIndicationUnit("reference.indication.unit.arabic.numbers", true, false, 1));
-    deepThought.addReferenceIndicationUnit(new ReferenceIndicationUnit("reference.indication.unit.roman.numbers", true, false, 2));
-    deepThought.addReferenceIndicationUnit(new ReferenceIndicationUnit("reference.indication.unit.time", true, false, 3));
   }
 
   protected static void createNoteTypeDefaultValues(DeepThought deepThought) {

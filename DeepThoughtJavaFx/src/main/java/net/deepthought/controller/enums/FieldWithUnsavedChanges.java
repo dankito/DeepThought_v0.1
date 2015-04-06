@@ -10,7 +10,7 @@ public enum FieldWithUnsavedChanges {
   EntryContent,
   EntrySeriesTitle,
   EntryReference,
-  EntryReferenceIndicationStart,
+  EntryReferenceIndication,
   EntryReferenceIndicationStartUnit,
   EntryReferenceIndicationEnd,
   EntryReferenceIndicationEndUnit,

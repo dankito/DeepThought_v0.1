@@ -1,7 +1,6 @@
 package net.deepthought.data.persistence;
 
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.CustomField;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.Device;
@@ -13,7 +12,6 @@ import net.deepthought.data.model.Group;
 import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Publisher;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceBasePersonAssociation;
@@ -23,14 +21,9 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
-import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.ReferenceCategory;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
-import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
-import net.deepthought.data.model.enums.SeriesTitleCategory;
 
 import java.io.File;
 import java.util.HashMap;
@@ -357,23 +350,16 @@ public class EntityManagerConfiguration {
         NoteType.class,
         FileLink.class,
         EntriesLinkGroup.class,
-        CustomField.class,
     
         ReferenceBase.class,
         ReferenceBasePersonAssociation.class,
-        Reference.class,
-        ReferenceCategory.class,
-        ReferenceSubDivision.class,
-        ReferenceSubDivisionCategory.class,
         SeriesTitle.class,
-        SeriesTitleCategory.class,
-        ReferenceIndicationUnit.class,
-        Publisher.class,
+        Reference.class,
+        ReferenceSubDivision.class,
     
         ApplicationLanguage.class,
         Language.class,
         BackupFileServiceType.class,
-        CustomFieldName.class
 
     };
     

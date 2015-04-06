@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -417,129 +416,6 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     referenceBase.removeFile(internetFileAttachment);
 
     Assert.assertFalse(referenceBase.getFiles().contains(internetFileAttachment));
-  }
-
-
-  @Test
-  public void addCustomField_RelationGetsPersisted() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    referenceBase.addCustomField(customField);
-
-    Assert.assertNotNull(customField.getId());
-    Assert.assertTrue(doIdsEqual(referenceBase.getId(), getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldReferenceBaseJoinColumnName, customField.getId())));
-  }
-
-  @Test
-  public void addCustomField_EntitiesGetAddedToRelatedCollections() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    referenceBase.addCustomField(customField);
-
-    Assert.assertEquals(referenceBase, customField.getReferenceBase());
-    Assert.assertTrue(referenceBase.getCustomFields().contains(customField));
-    Assert.assertEquals(1, customField.getOrder());
-  }
-
-  @Test
-  public void addMultipleCustomFields() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    CustomField customField1 = new CustomField(customFieldName, "test1");
-    referenceBase.addCustomField(customField1);
-    CustomField customField2 = new CustomField(customFieldName, "test2");
-    referenceBase.addCustomField(customField2);
-    CustomField customField3 = new CustomField(customFieldName, "test3");
-    referenceBase.addCustomField(customField3);
-    CustomField customField4 = new CustomField(customFieldName, "test4");
-    referenceBase.addCustomField(customField4);
-
-    Assert.assertEquals(4, referenceBase.getCustomFields().size());
-
-    int index = 0;
-    for(CustomField customField : referenceBase.getCustomFields()) {
-      Assert.assertEquals(referenceBase, customField.getReferenceBase());
-      Assert.assertEquals(++index, customField.getOrder());
-    }
-  }
-
-  @Test
-  public void removeCustomField_RelationGetsDeleted() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    referenceBase.addCustomField(customField);
-    referenceBase.removeCustomField(customField);
-
-    // assert CustomField really got deleted from database
-    Assert.assertNull(getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldReferenceBaseJoinColumnName, customField.getId()));
-
-    Assert.assertFalse(referenceBase.isDeleted());
-    Assert.assertFalse(customFieldName.isDeleted());
-    Assert.assertTrue(customField.isDeleted());
-  }
-
-  @Test
-  public void removeCustomField_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    referenceBase.addCustomField(customField);
-    referenceBase.removeCustomField(customField);
-
-    Assert.assertNull(customField.getReferenceBase());
-    Assert.assertFalse(referenceBase.getCustomFields().contains(customField));
-  }
-
-  @Test
-  public void addMultipleCustomFields_ThenRemove2_OrderGetsAdjustedCorrectly() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-
-    CustomField customField1 = new CustomField(customFieldName, "test1");
-    referenceBase.addCustomField(customField1);
-    CustomField customField2 = new CustomField(customFieldName, "test2");
-    referenceBase.addCustomField(customField2);
-    CustomField customField3 = new CustomField(customFieldName, "test3");
-    referenceBase.addCustomField(customField3);
-    CustomField customField4 = new CustomField(customFieldName, "test4");
-    referenceBase.addCustomField(customField4);
-
-    referenceBase.removeCustomField(customField1);
-    referenceBase.removeCustomField(customField3);
-
-    Assert.assertEquals(2, referenceBase.getCustomFields().size());
-
-    Assert.assertEquals(1, customField2.getOrder());
-    Assert.assertEquals(2, customField4.getOrder());
-
-    Assert.assertNull(customField1.getReferenceBase());
-    Assert.assertNull(customField3.getReferenceBase());
   }
 
 

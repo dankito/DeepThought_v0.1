@@ -1,15 +1,10 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
-import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ganymed on 10/11/14.
@@ -27,40 +22,6 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
     reference.addSubDivision(subDivision);
 
     return subDivision;
-  }
-
-
-  @Test
-  public void seReferenceSubDivisionCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("War on People");
-    ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceSubDivisionCategory> categories = new ArrayList<>(deepThought.getReferenceSubDivisionCategories());
-    deepThought.addReference(reference);
-    reference.addSubDivision(subDivision);
-
-    ReferenceSubDivisionCategory category = categories.get(0);
-    subDivision.setCategory(category);
-
-    Assert.assertTrue(doIdsEqual(category.getId(), getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionCategoryJoinColumnName, subDivision.getId())));
-  }
-
-  @Test
-  public void updateReferenceSubDivisionCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("War on People");
-    ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceSubDivisionCategory> categories = new ArrayList<>(deepThought.getReferenceSubDivisionCategories());
-    subDivision.setCategory(categories.get(0));
-    deepThought.addReference(reference);
-    reference.addSubDivision(subDivision);
-
-    ReferenceSubDivisionCategory newValue = categories.get(1);
-    subDivision.setCategory(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionCategoryJoinColumnName, subDivision.getId())));
   }
 
 
@@ -322,55 +283,6 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     Assert.assertEquals(0, subDivision1.getSubDivisionOrder());
     Assert.assertEquals(1, subDivision3.getSubDivisionOrder());
-  }
-
-
-  @Test
-  public void updateLength_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("War on People");
-    ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-    reference.addSubDivision(subDivision);
-
-    String newValue = "New value";
-    subDivision.setLength(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionLengthColumnName, subDivision.getId()));
-  }
-
-  @Test
-  public void setLengthUnit_ValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("War on People");
-    ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> units = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    deepThought.addReference(reference);
-    reference.addSubDivision(subDivision);
-
-    ReferenceIndicationUnit unit = units.get(0);
-    subDivision.setLengthUnit(unit);
-
-    Assert.assertTrue(doIdsEqual(unit.getId(), getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionLengthUnitJoinColumnName, subDivision.getId())));
-  }
-
-  @Test
-  public void updateLengthUnit_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("War on People");
-    ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> units = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    subDivision.setLengthUnit(units.get(0));
-    deepThought.addReference(reference);
-    reference.addSubDivision(subDivision);
-
-    ReferenceIndicationUnit newValue = units.get(1);
-    subDivision.setLengthUnit(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionLengthUnitJoinColumnName, subDivision.getId())));
   }
 
 }

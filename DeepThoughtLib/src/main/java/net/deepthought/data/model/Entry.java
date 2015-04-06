@@ -3,7 +3,6 @@ package net.deepthought.data.model;
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.listener.EntryPersonListener;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
@@ -31,7 +30,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 /**
@@ -112,12 +110,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @JoinColumn(name = TableConfig.EntryPreviewImageJoinColumnName)
   protected FileLink previewImage;
 
-  @Column(name = TableConfig.EntryEvaluationColumnName)
-  protected String evaluation;
-
-  @Column(name = TableConfig.EntryRatingColumnName)
-  protected Integer rating;
-
   // Reference
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -132,27 +124,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @JoinColumn(name = TableConfig.EntryReferenceSubDivisionJoinColumnName)
   protected ReferenceSubDivision referenceSubDivision;
 
-  @Column(name = TableConfig.EntryIndicationStartColumnName)
-  protected String indicationStart;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.EntryIndicationStartUnitJoinColumnName)
-  protected ReferenceIndicationUnit indicationStartUnit;
-
-  @Column(name = TableConfig.EntryIndicationEndColumnName)
-  protected String indicationEnd;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.EntryIndicationEndUnitJoinColumnName)
-  protected ReferenceIndicationUnit indicationEndUnit;
+  @Column(name = TableConfig.EntryIndicationColumnName)
+  protected String indication;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntryLanguageJoinColumnName)
   protected Language language;
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "entry")
-  @OrderBy(value = "order")
-  protected Collection<CustomField> customFields = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntryDeepThoughtJoinColumnName)
@@ -296,64 +273,14 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryReferenceSubDivisionJoinColumnName, previousValue, referenceSubDivision);
   }
 
-  public String getIndicationStart() {
-    return indicationStart;
+  public String getIndication() {
+    return indication;
   }
 
-  public void setIndicationStart(String indicationStart) {
-    Object previousValue = this.indicationStart;
-    this.indicationStart = indicationStart;
-    callPropertyChangedListeners(TableConfig.EntryIndicationStartColumnName, previousValue, indicationStart);
-  }
-
-  public ReferenceIndicationUnit getIndicationStartUnit() {
-    return indicationStartUnit;
-  }
-
-  public void setIndicationStartUnit(ReferenceIndicationUnit indicationStartUnit) {
-    Object previousValue = this.indicationStartUnit;
-    this.indicationStartUnit = indicationStartUnit;
-    callPropertyChangedListeners(TableConfig.EntryIndicationStartUnitJoinColumnName, previousValue, indicationStartUnit);
-  }
-
-  public String getIndicationEnd() {
-    return indicationEnd;
-  }
-
-  public void setIndicationEnd(String indicationEnd) {
-    Object previousValue = this.indicationEnd;
-    this.indicationEnd = indicationEnd;
-    callPropertyChangedListeners(TableConfig.EntryIndicationEndColumnName, previousValue, indicationEnd);
-  }
-
-  public ReferenceIndicationUnit getIndicationEndUnit() {
-    return indicationEndUnit;
-  }
-
-  public void setIndicationEndUnit(ReferenceIndicationUnit indicationEndUnit) {
-    Object previousValue = this.indicationEndUnit;
-    this.indicationEndUnit = indicationEndUnit;
-    callPropertyChangedListeners(TableConfig.EntryIndicationEndUnitJoinColumnName, previousValue, indicationEndUnit);
-  }
-
-  public String getEvaluation() {
-    return evaluation;
-  }
-
-  public void setEvaluation(String evaluation) {
-    Object previousValue = this.evaluation;
-    this.evaluation = evaluation;
-    callPropertyChangedListeners(TableConfig.EntryEvaluationColumnName, previousValue, evaluation);
-  }
-
-  public Integer getRating() {
-    return rating;
-  }
-
-  public void setRating(Integer rating) {
-    Object previousValue = this.rating;
-    this.rating = rating;
-    callPropertyChangedListeners(TableConfig.EntryRatingColumnName, previousValue, rating);
+  public void setIndication(String indication) {
+    Object previousValue = this.indication;
+    this.indication = indication;
+    callPropertyChangedListeners(TableConfig.EntryIndicationColumnName, previousValue, indication);
   }
 
   public Entry getParentEntry() {
@@ -730,38 +657,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     Object previousValue = this.language;
     this.language = language;
     callPropertyChangedListeners(TableConfig.EntryLanguageJoinColumnName, previousValue, language);
-  }
-
-  public Collection<CustomField> getCustomFields() {
-    return customFields;
-  }
-
-  public boolean addCustomField(CustomField customField) {
-    boolean result = customFields.add(customField);
-    if(result) {
-      customField.setEntry(this);
-      callEntityAddedListeners(customFields, customField);
-    }
-
-    return result;
-  }
-
-  public boolean removeCustomField(CustomField customField) {
-    int removeCustomFieldOrder = customField.getOrder();
-
-    boolean result = customFields.remove(customField);
-    if(result) {
-      customField.setEntry(null);
-
-      for(CustomField customFieldIter : getCustomFields()) {
-        if(customFieldIter.getOrder() > removeCustomFieldOrder)
-          customFieldIter.setOrder(customFieldIter.getOrder() - 1);
-      }
-
-      callEntityRemovedListeners(customFields, customField);
-    }
-
-    return result;
   }
 
 

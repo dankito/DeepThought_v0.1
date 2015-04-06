@@ -2,8 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
-import net.deepthought.data.model.enums.ReferenceCategory;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
@@ -26,38 +24,6 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
     deepThought.addReference(reference);
 
     return reference;
-  }
-
-
-  @Test
-  public void setReferenceCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceCategory> categories = new ArrayList<>(deepThought.getReferenceCategories());
-    ReferenceCategory category = categories.get(0);
-    reference.setCategory(category);
-
-    deepThought.addReference(reference);
-
-    Assert.assertTrue(doIdsEqual(category.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceCategoryJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updateReferenceCategory_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceCategory> categories = new ArrayList<>(deepThought.getReferenceCategories());
-    ReferenceCategory category = categories.get(0);
-    reference.setCategory(category);
-
-    deepThought.addReference(reference);
-
-    ReferenceCategory newValue = categories.get(1);
-    reference.setCategory(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceCategoryJoinColumnName, reference.getId())));
   }
 
 
@@ -323,19 +289,6 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
 
 
   @Test
-  public void updateTitleSupplement_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setTitleSupplement(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceTitleSupplementColumnName, reference.getId()));
-  }
-
-  @Test
   public void updateTableOfContents_UpdatedValueGetsPersistedInDb() throws Exception {
     Reference reference = new Reference("test");
 
@@ -414,145 +367,6 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
     reference.setYear(newValue);
 
     Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceYearColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateDoi_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setDoi(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceDoiColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateEdition_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setEdition(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceEditionColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateVolume_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setVolume(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceVolumeColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updatePlaceOfPublication_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setPlaceOfPublication(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferencePlaceOfPublicationColumnName, reference.getId()));
-  }
-
-  @Test
-  public void setPublisher_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-    Publisher publisher = new Publisher("Suhrkamp");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-    deepThought.addPublisher(publisher);
-
-    reference.setPublisher(publisher);
-
-    Assert.assertTrue(doIdsEqual(publisher.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferencePublisherJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updatePublisher_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-    Publisher publisher = new Publisher("Suhrkamp");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-    deepThought.addPublisher(publisher);
-
-    reference.setPublisher(publisher);
-
-    Publisher newValue = new Publisher("Hanser");
-    deepThought.addPublisher(newValue);
-    reference.setPublisher(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferencePublisherJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updateLength_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setLength(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceLengthColumnName, reference.getId()));
-  }
-
-  @Test
-  public void setLengthUnit_ValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> units = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    deepThought.addReference(reference);
-
-    ReferenceIndicationUnit unit = units.get(0);
-    reference.setLengthUnit(unit);
-
-    Assert.assertTrue(doIdsEqual(unit.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceLengthUnitJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updateLengthUnit_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> units = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    deepThought.addReference(reference);
-    reference.setLengthUnit(units.get(0));
-
-    ReferenceIndicationUnit newValue = units.get(1);
-    reference.setLengthUnit(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceLengthUnitJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updatePrice_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setPrice(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferencePriceColumnName, reference.getId()));
   }
 
   @Test

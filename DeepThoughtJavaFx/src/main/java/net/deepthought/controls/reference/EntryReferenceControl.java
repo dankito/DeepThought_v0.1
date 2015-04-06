@@ -6,7 +6,6 @@ import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.BaseEntityListCell;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -18,14 +17,12 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Empty;
 import net.deepthought.util.Localization;
-import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.slf4j.Logger;
@@ -45,13 +42,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -83,35 +77,9 @@ public class EntryReferenceControl extends VBox {
   protected ComboBox<ReferenceBase> cmbxSeriesTitleOrReference;
   @FXML
   protected NewOrEditButton btnNewOrEditReference;
-  @FXML
-  protected NewOrEditButton btnNewOrEditSeriesTitle;
-  @FXML
-  protected Pane paneReferenceSubDivision;
-  @FXML
-  protected TextField txtfldReferenceSubDivision;
 
   @FXML
-  protected Pane paneReferenceIndicationSettings;
-  @FXML
-  protected Pane paneReferenceIndicationStartSettings;
-  @FXML
-  protected Label lblReferenceIndicationStart;
-  @FXML
-  protected TextField txtfldReferenceIndicationStart;
-  @FXML
-  protected ComboBox<ReferenceIndicationUnit> cmbxReferenceIndicationStartUnit;
-  @FXML
-  protected Label lblReferenceIndicationEnd;
-  @FXML
-  protected NewOrEditButton btnNewOrEditReferenceIndicationStartUnit;
-  @FXML
-  protected Pane paneReferenceIndicationEndSettings;
-  @FXML
-  protected TextField txtfldReferenceIndicationEnd;
-  @FXML
-  protected ComboBox<ReferenceIndicationUnit> cmbxReferenceIndicationEndUnit;
-  @FXML
-  protected NewOrEditButton btnNewOrEditReferenceIndicationEndUnit;
+  protected TextField txtfldReferenceIndication;
 
 
   public EntryReferenceControl() {
@@ -170,20 +138,13 @@ public class EntryReferenceControl extends VBox {
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
       resetComboBoxSeriesTitleOrReferencesItems(deepThought);
-      resetComboBoxesReferenceIndicationUnitItems(deepThought);
     }
   }
 
   protected void setupControl() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(this);
 
-    setupPaneSeriesTitle();
-
     setupPaneReference();
-
-    setupPaneReferenceSubDivision();
-
-    setupPaneReferenceIndicationSettings();
 
 
 //    final TextField txtfldReference = new TextField();
@@ -212,18 +173,6 @@ public class EntryReferenceControl extends VBox {
 //    paneSeriesTitleReferenceAndSubDivisionSettings.getChildren().add(txtfldReference);
 
 //    setFieldsVisibility(entry);
-  }
-
-  protected void setupPaneSeriesTitle() {
-    btnNewOrEditSeriesTitle = new NewOrEditButton(); // create btnNewOrEditSeriesTitle before cmbxSeriesTitle's value gets set (otherwise cmbxSeriesTitleValueChangedListener causes a NullPointerException)
-    btnNewOrEditSeriesTitle.setOnAction(event -> handleButtonEditOrNewSeriesTitleAction(event));
-    btnNewOrEditSeriesTitle.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewSeriesTitleAction(event));
-//    paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditSeriesTitle);
-
-    HBox.setMargin(btnNewOrEditSeriesTitle, new Insets(0, 0, 0, 6));
-    btnNewOrEditSeriesTitle.setPrefWidth(162);
-    btnNewOrEditSeriesTitle.setNewText("series.title.new");
-    btnNewOrEditSeriesTitle.setEditText("series.title.edit");
   }
 
   protected void setupPaneReference() {
@@ -352,100 +301,6 @@ public class EntryReferenceControl extends VBox {
 ////    updateComboBoxSeriesTitleOrReferenceSelectedItem(newReference);
 //  }
 
-  protected void setupPaneReferenceSubDivision() {
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
-    paneReferenceSubDivision.setVisible(false);
-
-    if(entry.getReferenceSubDivision() != null)
-      txtfldReferenceSubDivision.setText(entry.getReferenceSubDivision().getTitle());
-
-    txtfldReferenceSubDivision.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, null);
-      }
-    });
-  }
-
-  protected void setupPaneReferenceIndicationSettings() {
-    //    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationSettings);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationStartSettings);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationStart);
-    lblReferenceIndicationStart.setVisible(false);
-
-    txtfldReferenceIndicationStart.setText(entry.getIndicationStart());
-    txtfldReferenceIndicationStart.textProperty().addListener((observable, oldValue, newValue) -> {
-      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndicationStart, newValue);
-
-      // TODO: uncomment again if setting reference indication end is possible again
-//      if(StringUtils.isNotNullOrEmpty(txtfldReferenceIndicationStart.getText()))
-//        paneReferenceIndicationEndSettings.setVisible(true);
-    });
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(cmbxReferenceIndicationStartUnit);
-    cmbxReferenceIndicationStartUnit.setVisible(false);
-    cmbxReferenceIndicationStartUnit.getItems().addAll(Application.getDeepThought().getReferenceIndicationUnits());
-    cmbxReferenceIndicationStartUnit.setValue(entry.getIndicationStartUnit());
-    cmbxReferenceIndicationStartUnit.valueProperty().addListener(cmbxReferenceIndicationStartUnitValueChangedListener);
-    cmbxReferenceIndicationStartUnit.setCellFactory(param -> new BaseEntityListCell<ReferenceIndicationUnit>());
-    cmbxReferenceIndicationStartUnit.setConverter(new StringConverter<ReferenceIndicationUnit>() {
-      @Override
-      public String toString(ReferenceIndicationUnit unit) {
-        return unit.getTextRepresentation();
-      }
-
-      @Override
-      public ReferenceIndicationUnit fromString(String string) {
-        return null;
-      }
-    });
-
-    btnNewOrEditReferenceIndicationStartUnit = new NewOrEditButton();
-    btnNewOrEditReferenceIndicationStartUnit.setPrefWidth(100);
-    btnNewOrEditReferenceIndicationStartUnit.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-    btnNewOrEditReferenceIndicationStartUnit.setShowEditMenuItem(true);
-    btnNewOrEditReferenceIndicationStartUnit.setOnAction(event -> handleButtonEditOrNewReferenceIndicationStartUnitAction(event));
-    btnNewOrEditReferenceIndicationStartUnit.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceIndicationStartUnitAction(event));
-    paneReferenceIndicationStartSettings.getChildren().add(btnNewOrEditReferenceIndicationStartUnit);
-    btnNewOrEditReferenceIndicationStartUnit.setDisable(true);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnNewOrEditReferenceIndicationStartUnit);
-    btnNewOrEditReferenceIndicationStartUnit.setVisible(false);
-
-    txtfldReferenceIndicationEnd.setText(entry.getIndicationEnd());
-    txtfldReferenceIndicationEnd.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryReferenceIndicationEnd));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceIndicationEndSettings);
-    paneReferenceIndicationEndSettings.setVisible(false);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceIndicationEnd);
-
-    cmbxReferenceIndicationEndUnit.getItems().addAll(Application.getDeepThought().getReferenceIndicationUnits());
-    cmbxReferenceIndicationEndUnit.setValue(entry.getIndicationEndUnit());
-    cmbxReferenceIndicationEndUnit.valueProperty().addListener(cmbxReferenceIndicationEndUnitValueChangedListener);
-    cmbxReferenceIndicationEndUnit.setCellFactory(param -> new BaseEntityListCell<ReferenceIndicationUnit>());
-    cmbxReferenceIndicationEndUnit.setConverter(new StringConverter<ReferenceIndicationUnit>() {
-      @Override
-      public String toString(ReferenceIndicationUnit unit) {
-        return unit.getTextRepresentation();
-      }
-
-      @Override
-      public ReferenceIndicationUnit fromString(String string) {
-        return null;
-      }
-    });
-
-    btnNewOrEditReferenceIndicationEndUnit = new NewOrEditButton();
-    btnNewOrEditReferenceIndicationEndUnit.setPrefWidth(100);
-    btnNewOrEditReferenceIndicationEndUnit.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-    btnNewOrEditReferenceIndicationEndUnit.setShowEditMenuItem(true);
-    btnNewOrEditReferenceIndicationEndUnit.setOnAction(event -> handleButtonEditOrNewReferenceIndicationEndUnitAction(event));
-    btnNewOrEditReferenceIndicationEndUnit.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceIndicationEndUnitAction(event));
-    paneReferenceIndicationEndSettings.getChildren().add(btnNewOrEditReferenceIndicationEndUnit);
-  }
-
   protected Collection<Reference> findReferencesToSuggestion(AutoCompletionBinding.ISuggestionRequest suggestionProvider) {
     List<Reference> suggestions = new ArrayList<>();
 
@@ -470,7 +325,7 @@ public class EntryReferenceControl extends VBox {
 //    paneReferenceIndicationSettings.setVisible(paneSeriesTitleOrReference.isVisible());
 //
 //    paneReferenceIndicationStartSettings.setVisible(template.showReferenceStart() || entry.getReferenceBase() != null);
-//    paneReferenceIndicationEndSettings.setVisible(template.showReferenceStart() || StringUtils.isNotNullOrEmpty(entry.getReferenceStart()));
+//    paneReferenceIndicationEndSettings.setVisible(template.showReferenceStart() || StringUtils.isNotNullOrEmpty(entry.getReferenceIndication()));
 //
 //    this.setVisible(paneSeriesTitleOrReference.isVisible());
 //  }
@@ -489,7 +344,7 @@ public class EntryReferenceControl extends VBox {
 //    paneReferenceIndicationSettings.setVisible(paneSeriesTitleOrReference.isVisible());
 //
 //    paneReferenceIndicationStartSettings.setVisible(reference != Empty.Reference);
-//    paneReferenceIndicationEndSettings.setVisible(StringUtils.isNotNullOrEmpty(txtfldReferenceIndicationStart.getText()));
+//    paneReferenceIndicationEndSettings.setVisible(StringUtils.isNotNullOrEmpty(txtfldReferenceIndication.getText()));
 //
 //    this.setVisible(paneSeriesTitleOrReference.isVisible());
 //  }
@@ -540,80 +395,6 @@ public class EntryReferenceControl extends VBox {
   }
 
 
-  public void handleButtonEditOrNewReferenceIndicationStartUnitAction(ActionEvent event) {
-    if(btnNewOrEditReferenceIndicationStartUnit.getButtonFunction() == NewOrEditButton.ButtonFunction.New)
-      createNewReferenceIndicationUnitForReferenceStart();
-//    else
-//      Dialogs.showEditReferenceIndicationUnitDialog(cmbxReferenceIndicationStartUnit.getSelectionModel().getSelectedItem());
-  }
-
-  public void handleMenuItemNewReferenceIndicationStartUnitAction(NewOrEditButtonMenuActionEvent event) {
-    createNewReferenceIndicationUnitForReferenceStart();
-  }
-
-  protected void createNewReferenceIndicationUnitForReferenceStart() {
-    final ReferenceIndicationUnit newReferenceIndicationUnit = new ReferenceIndicationUnit();
-//    Dialogs.showEditReferenceIndicationUnitDialog(newReferenceIndicationUnit, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//        if (controller.getDialogResult() == DialogResult.Ok)
-//          entry.setReferenceStartUnit(newReferenceIndicationUnit);
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//    });
-  }
-
-
-  public void handleButtonEditOrNewReferenceIndicationEndUnitAction(ActionEvent event) {
-    if(btnNewOrEditReferenceIndicationEndUnit.getButtonFunction() == NewOrEditButton.ButtonFunction.New)
-      createNewReferenceIndicationUnitForReferenceEnd();
-//    else
-//      Dialogs.showEditReferenceIndicationUnitDialog(cmbxReferenceIndicationEndUnit.getSelectionModel().getSelectedItem());
-  }
-
-  public void handleMenuItemNewReferenceIndicationEndUnitAction(NewOrEditButtonMenuActionEvent event) {
-    createNewReferenceIndicationUnitForReferenceEnd();
-  }
-
-  protected void createNewReferenceIndicationUnitForReferenceEnd() {
-    final ReferenceIndicationUnit newReferenceIndicationUnit = new ReferenceIndicationUnit();
-//    Dialogs.showEditReferenceIndicationUnitDialog(newReferenceIndicationUnit, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//        if (controller.getDialogResult() == DialogResult.Ok)
-//          entry.setReferenceEndUnit(newReferenceIndicationUnit);
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//    });
-  }
-
-
-  protected ChangeListener<SeriesTitle> cmbxSeriesTitleValueChangedListener = new ChangeListener<SeriesTitle>() {
-    @Override
-    public void changed(ObservableValue<? extends SeriesTitle> observable, SeriesTitle oldValue, SeriesTitle newValue) {
-      if(newValue != entry.getSeries())
-        //entry.setSeries(newValue);
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newValue);
-
-      if(newValue == null || Empty.Series.equals(newValue)) {
-        btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditSeriesTitle.setShowNewMenuItem(false);
-      }
-      else {
-        btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-        btnNewOrEditSeriesTitle.setShowNewMenuItem(true);
-      }
-    }
-  };
-
   protected ChangeListener<ReferenceBase> cmbxSeriesTitleOrReferenceValueChangedListener = new ChangeListener<ReferenceBase>() {
     @Override
     public void changed(ObservableValue<? extends ReferenceBase> observable, ReferenceBase oldValue, ReferenceBase newValue) {
@@ -635,46 +416,17 @@ public class EntryReferenceControl extends VBox {
       if(newValue == null || Empty.Reference.equals(newValue)) {
         btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
         btnNewOrEditReference.setShowNewMenuItem(false);
-        btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditSeriesTitle.setShowNewMenuItem(false);
       }
       else {
         if(newValue instanceof SeriesTitle) {
-          btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-          btnNewOrEditSeriesTitle.setShowNewMenuItem(true);
-          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-          btnNewOrEditReference.setShowNewMenuItem(false);
+          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
+          btnNewOrEditReference.setShowNewMenuItem(true);
         }
         else {
           btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
           btnNewOrEditReference.setShowNewMenuItem(true);
-
-          if(((Reference)newValue).getSeries() != null) {
-            btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-            btnNewOrEditSeriesTitle.setShowNewMenuItem(true);
-          }
-          else {
-            btnNewOrEditSeriesTitle.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-            btnNewOrEditSeriesTitle.setShowNewMenuItem(false);
-          }
         }
       }
-    }
-  };
-
-  protected ChangeListener<ReferenceIndicationUnit> cmbxReferenceIndicationStartUnitValueChangedListener = new ChangeListener<ReferenceIndicationUnit>() {
-    @Override
-    public void changed(ObservableValue<? extends ReferenceIndicationUnit> observable, ReferenceIndicationUnit oldValue, ReferenceIndicationUnit newValue) {
-//      entry.setReferenceStartUnit(newValue);
-      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndicationStartUnit, newValue);
-    }
-  };
-
-  protected ChangeListener<ReferenceIndicationUnit> cmbxReferenceIndicationEndUnitValueChangedListener = new ChangeListener<ReferenceIndicationUnit>() {
-    @Override
-    public void changed(ObservableValue<? extends ReferenceIndicationUnit> observable, ReferenceIndicationUnit oldValue, ReferenceIndicationUnit newValue) {
-//      entry.setReferenceEndUnit(newValue);
-      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndicationEndUnit, newValue);
     }
   };
 
@@ -689,23 +441,11 @@ public class EntryReferenceControl extends VBox {
         updateComboBoxSeriesTitleOrReferenceSelectedItem();
       }
       else if(propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {
-        referenceSubDivisionUpdated();
+        updateComboBoxSeriesTitleOrReferenceSelectedItem();
       }
-      else if(propertyName.equals(TableConfig.EntryIndicationStartColumnName)) {
-        referenceIndicationStartUpdated();
+      else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
+        referenceIndicationUpdated();
       }
-      else if(propertyName.equals(TableConfig.EntryIndicationStartUnitJoinColumnName)) {
-        updateComboBoxReferenceStartUnitSelectedItem((ReferenceIndicationUnit) newValue);
-      }
-      else if(propertyName.equals(TableConfig.EntryIndicationEndColumnName)) {
-        referenceIndicationEndUpdated();
-      }
-      else if(propertyName.equals(TableConfig.EntryIndicationEndUnitJoinColumnName)) {
-        updateComboBoxReferenceEndUnitSelectedItem((ReferenceIndicationUnit) newValue);
-      }
-//      else if(propertyName.equals(TableConfig.EntryEntryTemplateJoinColumnName)) {
-//        setFieldsVisibility((Entry) entity);
-//      }
     }
 
     @Override
@@ -737,38 +477,9 @@ public class EntryReferenceControl extends VBox {
 //    cmbxSeriesTitleOrReference.valueProperty().addListener(cmbxSeriesTitleOrReferenceValueChangedListener);
   }
 
-  protected void referenceSubDivisionUpdated() {
-    if(entry.getReferenceSubDivision() == null)
-      txtfldReferenceSubDivision.setText("");
-    else
-      txtfldReferenceSubDivision.setText(entry.getReferenceSubDivision().getTitle());
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
-  }
-
-  protected void referenceIndicationStartUpdated() {
-    txtfldReferenceIndicationStart.setText(entry.getIndicationStart());
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationStart);
-  }
-
-  protected void referenceIndicationEndUpdated() {
-    txtfldReferenceIndicationEnd.setText(entry.getIndicationEnd());
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndicationEnd);
-  }
-
-  protected void updateComboBoxReferenceStartUnitSelectedItem(ReferenceIndicationUnit newValue) {
-    cmbxReferenceIndicationStartUnit.valueProperty().removeListener(cmbxReferenceIndicationStartUnitValueChangedListener);
-
-    cmbxReferenceIndicationStartUnit.setValue(newValue);
-
-    cmbxReferenceIndicationStartUnit.valueProperty().addListener(cmbxReferenceIndicationStartUnitValueChangedListener);
-  }
-
-  protected void updateComboBoxReferenceEndUnitSelectedItem(ReferenceIndicationUnit newValue) {
-    cmbxReferenceIndicationEndUnit.valueProperty().removeListener(cmbxReferenceIndicationEndUnitValueChangedListener);
-
-    cmbxReferenceIndicationEndUnit.setValue(newValue);
-
-    cmbxReferenceIndicationEndUnit.valueProperty().addListener(cmbxReferenceIndicationEndUnitValueChangedListener);
+  protected void referenceIndicationUpdated() {
+    txtfldReferenceIndication.setText(entry.getIndication());
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndication);
   }
 
   protected EntityListener deepThoughtListener = new EntityListener() {
@@ -807,10 +518,6 @@ public class EntryReferenceControl extends VBox {
         DeepThought deepThought = (DeepThought)collectionHolder;
         resetComboBoxSeriesTitleOrReferencesItems(deepThought);
       }
-      else if(entity instanceof ReferenceIndicationUnit) {
-        DeepThought deepThought = (DeepThought)collectionHolder;
-        resetComboBoxesReferenceIndicationUnitItems(deepThought);
-      }
     };
   }
 
@@ -826,14 +533,6 @@ public class EntryReferenceControl extends VBox {
     cmbxSeriesTitleOrReference.setVisibleRowCount(10);
 
     log.debug("Selected Reference after {}", cmbxSeriesTitleOrReference.getValue());
-  }
-
-  protected void resetComboBoxesReferenceIndicationUnitItems(DeepThought deepThought) {
-    cmbxReferenceIndicationStartUnit.getItems().clear();
-    cmbxReferenceIndicationStartUnit.getItems().addAll(deepThought.getReferenceIndicationUnits());
-
-    cmbxReferenceIndicationEndUnit.getItems().clear();
-    cmbxReferenceIndicationEndUnit.getItems().addAll(deepThought.getReferenceIndicationUnits());
   }
 
 
@@ -859,47 +558,13 @@ public class EntryReferenceControl extends VBox {
   }
 
   public ReferenceSubDivision getReferenceSubDivision() {
-    if(StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivision.getText())) {
-      if (entry.getReferenceSubDivision() != null && txtfldReferenceSubDivision.getText().equals(entry.getReferenceSubDivision().getTitle())) {
-        if(cmbxSeriesTitleOrReference.getValue() == entry.getReferenceSubDivision().getReference())
-          return entry.getReferenceSubDivision();
-        else
-          return createNewReferenceSubDivision();
-      }
-      else
-        return createNewReferenceSubDivision();
-    }
-
+    if(cmbxSeriesTitleOrReference.getValue() instanceof ReferenceSubDivision)
+      return (ReferenceSubDivision)cmbxSeriesTitleOrReference.getValue();
     return null;
   }
 
-  protected ReferenceSubDivision createNewReferenceSubDivision() {
-    ReferenceSubDivision newSubDivision = new ReferenceSubDivision(txtfldReferenceSubDivision.getText());
-
-    if(cmbxSeriesTitleOrReference.getValue() instanceof Reference)
-      ((Reference)cmbxSeriesTitleOrReference.getValue()).addSubDivision(newSubDivision);
-
-    return newSubDivision;
-  }
-
-  public String getReferenceStart() {
-    return txtfldReferenceIndicationStart.getText();
-  }
-
-  public ReferenceIndicationUnit getReferenceStartUnit() {
-    if(cmbxReferenceIndicationStartUnit.getValue() == Empty.ReferenceIndicationUnit)
-      return null;
-    return cmbxReferenceIndicationStartUnit.getValue();
-  }
-
-  public String getReferenceEnd() {
-    return txtfldReferenceIndicationEnd.getText();
-  }
-
-  public ReferenceIndicationUnit getReferenceEndUnit() {
-    if(cmbxReferenceIndicationEndUnit.getValue() == Empty.ReferenceIndicationUnit)
-      return null;
-    return cmbxReferenceIndicationEndUnit.getValue();
+  public String getReferenceIndication() {
+    return txtfldReferenceIndication.getText();
   }
 
 }

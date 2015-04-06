@@ -2,8 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
-import net.deepthought.data.model.enums.ReferenceCategory;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import java.util.ArrayList;
@@ -23,7 +21,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
@@ -37,10 +34,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   private static final long serialVersionUID = -7176298227016698447L;
 
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferenceCategoryJoinColumnName)
-  protected ReferenceCategory category;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = TableConfig.ReferenceSeriesTitleJoinColumnName)
@@ -58,9 +51,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   protected Set<Entry> entries = new HashSet<>();
 
 
-  @Column(name = TableConfig.ReferenceTitleSupplementColumnName)
-  protected String titleSupplement;
-
   @Column(name = TableConfig.ReferenceTableOfContentsColumnName)
   @Lob
   protected String tableOfContents;
@@ -77,32 +67,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   @Column(name = TableConfig.ReferenceYearColumnName)
   protected Integer year;
-
-  @Column(name = TableConfig.ReferenceDoiColumnName)
-  protected String doi;
-
-  @Column(name = TableConfig.ReferenceEditionColumnName)
-  protected String edition;
-
-  @Column(name = TableConfig.ReferenceVolumeColumnName)
-  protected String volume;
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferencePublisherJoinColumnName)
-  protected Publisher publisher;
-
-  @Column(name = TableConfig.ReferencePlaceOfPublicationColumnName)
-  protected String placeOfPublication;
-
-  @Column(name = TableConfig.ReferenceLengthColumnName)
-  protected String length;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferenceLengthUnitJoinColumnName)
-  protected ReferenceIndicationUnit lengthUnit;
-
-  @Column(name = TableConfig.ReferencePriceColumnName)
-  protected String price;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceLanguageJoinColumnName)
@@ -228,38 +192,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return false;
   }
 
-  public ReferenceCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(ReferenceCategory category) {
-    if(this.category != null)
-      this.category.removeReference(this);
-
-    Object previousValue = this.category;
-    this.category = category;
-    preview = null;
-
-    if(this.category != null)
-      this.category.addReference(this);
-
-    callPropertyChangedListeners(TableConfig.ReferenceCategoryJoinColumnName, previousValue, category);
-  }
-
   @Override
   public void setTitle(String title) {
     preview = null;
     super.setTitle(title);
-  }
-
-  public String getTitleSupplement() {
-    return titleSupplement;
-  }
-
-  public void setTitleSupplement(String titleSupplement) {
-    Object previousValue = this.titleSupplement;
-    this.titleSupplement = titleSupplement;
-    callPropertyChangedListeners(TableConfig.ReferenceTitleSupplementColumnName, previousValue, titleSupplement);
   }
 
   public String getTableOfContents() {
@@ -312,93 +248,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     callPropertyChangedListeners(TableConfig.ReferenceYearColumnName, previousValue, year);
   }
 
-  public String getDoi() {
-    return doi;
-  }
-
-  public void setDoi(String doi) {
-    Object previousValue = this.doi;
-    this.doi = doi;
-    callPropertyChangedListeners(TableConfig.ReferenceDoiColumnName, previousValue, doi);
-  }
-
-  public String getEdition() {
-    return edition;
-  }
-
-  public void setEdition(String edition) {
-    Object previousValue = this.edition;
-    this.edition = edition;
-    callPropertyChangedListeners(TableConfig.ReferenceEditionColumnName, previousValue, edition);
-  }
-
-  public String getVolume() {
-    return volume;
-  }
-
-  public void setVolume(String volume) {
-    Object previousValue = this.volume;
-    this.volume = volume;
-    callPropertyChangedListeners(TableConfig.ReferenceVolumeColumnName, previousValue, volume);
-  }
-
-  public Publisher getPublisher() {
-    return publisher;
-  }
-
-  public void setPublisher(Publisher publisher) {
-    Object previousValue = this.publisher;
-    if(this.publisher != null)
-      this.publisher.removeReference(this);
-
-    this.publisher = publisher;
-
-    if(publisher != null)
-      publisher.addReference(this);
-
-    callPropertyChangedListeners(TableConfig.ReferencePublisherJoinColumnName, previousValue, publisher);
-  }
-
-  public String getPlaceOfPublication() {
-    return placeOfPublication;
-  }
-
-  public void setPlaceOfPublication(String placeOfPublication) {
-    Object previousValue = this.placeOfPublication;
-    this.placeOfPublication = placeOfPublication;
-    callPropertyChangedListeners(TableConfig.ReferencePlaceOfPublicationColumnName, previousValue, placeOfPublication);
-  }
-
-  public String getLength() {
-    return length;
-  }
-
-  public void setLength(String length) {
-    Object previousValue = this.length;
-    this.length = length;
-    callPropertyChangedListeners(TableConfig.ReferenceLengthColumnName, previousValue, length);
-  }
-
-  public ReferenceIndicationUnit getLengthUnit() {
-    return lengthUnit;
-  }
-
-  public void setLengthUnit(ReferenceIndicationUnit lengthUnit) {
-    Object previousValue = this.lengthUnit;
-    this.lengthUnit = lengthUnit;
-    callPropertyChangedListeners(TableConfig.ReferenceLengthUnitJoinColumnName, previousValue, lengthUnit);
-  }
-
-  public String getPrice() {
-    return price;
-  }
-
-  public void setPrice(String price) {
-    Object previousValue = this.price;
-    this.price = price;
-    callPropertyChangedListeners(TableConfig.ReferencePriceColumnName, previousValue, price);
-  }
-
   public Language getLanguage() {
     return language;
   }
@@ -438,25 +287,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Transient
   public String getTextRepresentation() {
     return getPreview();
-  }
-
-  public void addCategorySpecificInfo() {
-    if (category != null) {
-      if (title == null) {
-        // for Newpapers and Magazine, if no Title for this reference is set but Issue and Year, display <Series> <Issus>/<Year> as preview
-        // TODO: for Radio and Television broadcasts as well?
-        if (category == ReferenceCategory.getNewsPaperIssueCategory() || category == ReferenceCategory.getMagazineIssueCategory()) {
-          if (issue != null && year != null) {
-            preview = issue + "/" + year;
-
-            if (series != null)
-              preview = series.getTextRepresentation() + " " + preview;
-          }
-          else if(publishingDate != null && series != null)
-            preview = series.getTitle() + publishingDate;
-        }
-      }
-    }
   }
 
   @Override

@@ -1,11 +1,9 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.SeriesTitleCategory;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -19,8 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * Created by ganymed on 16/12/14.
@@ -32,10 +28,6 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   private static final long serialVersionUID = 876365664840769897L;
 
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.SeriesTitleCategoryJoinColumnName)
-  protected SeriesTitleCategory category;
-
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "series")
   protected Set<Reference> serialParts = new HashSet<>();
 
@@ -44,33 +36,9 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "series")
   protected Set<Entry> entries = new HashSet<>();
 
-  @Column(name = TableConfig.SeriesTitleTitleSupplementColumnName)
-  protected String titleSupplement;
-
   @Column(name = TableConfig.SeriesTitleTableOfContentsColumnName)
   @Lob
   protected String tableOfContents;
-
-  @Column(name = TableConfig.SeriesTitleFirstDayOfPublicationColumnName)
-  @Temporal(TemporalType.TIMESTAMP)
-  protected Date firstDayOfPublication; // SQLite needs this, can't handle null dates
-
-  @Column(name = TableConfig.SeriesTitleLastDayOfPublicationColumnName)
-  @Temporal(TemporalType.TIMESTAMP)
-  protected Date lastDayOfPublication; // SQLite needs this, can't handle null dates
-
-  @Column(name = TableConfig.SeriesTitleStandardAbbreviationColumnName)
-  protected String standardAbbreviation;
-
-  @Column(name = TableConfig.SeriesTitleUserAbbreviation1ColumnName)
-  protected String userAbbreviation1;
-
-  @Column(name = TableConfig.SeriesTitleUserAbbreviation2ColumnName)
-  protected String userAbbreviation2;
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.SeriesTitlePublisherJoinColumnName)
-  protected Publisher publisher;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.PersonDeepThoughtJoinColumnName)
@@ -89,23 +57,6 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     super(title, subTitle);
   }
 
-
-  public SeriesTitleCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(SeriesTitleCategory category) {
-    Object previousValue = this.category;
-    if(this.category != null)
-      this.category.removeSeries(this);
-
-    this.category = category;
-
-    if(this.category != null)
-      this.category.addSeries(this);
-
-    callPropertyChangedListeners(TableConfig.SeriesTitleCategoryJoinColumnName, previousValue, category);
-  }
 
   public Set<Reference> getSerialParts() {
     return serialParts;
@@ -185,16 +136,6 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   }
 
 
-  public String getTitleSupplement() {
-    return titleSupplement;
-  }
-
-  public void setTitleSupplement(String titleSupplement) {
-    Object previousValue = this.titleSupplement;
-    this.titleSupplement = titleSupplement;
-    callPropertyChangedListeners(TableConfig.SeriesTitleTitleSupplementColumnName, previousValue, titleSupplement);
-  }
-
   public String getTableOfContents() {
     return tableOfContents;
   }
@@ -203,73 +144,6 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     Object previousValue = this.tableOfContents;
     this.tableOfContents = tableOfContents;
     callPropertyChangedListeners(TableConfig.SeriesTitleTableOfContentsColumnName, previousValue, tableOfContents);
-  }
-
-  public Date getFirstDayOfPublication() {
-    return firstDayOfPublication;
-  }
-
-  public void setFirstDayOfPublication(Date firstDayOfPublication) {
-    Object previousValue = this.firstDayOfPublication;
-    this.firstDayOfPublication = firstDayOfPublication;
-    callPropertyChangedListeners(TableConfig.SeriesTitleFirstDayOfPublicationColumnName, previousValue, firstDayOfPublication);
-  }
-
-  public Date getLastDayOfPublication() {
-    return lastDayOfPublication;
-  }
-
-  public void setLastDayOfPublication(Date lastDayOfPublication) {
-    Object previousValue = this.lastDayOfPublication;
-    this.lastDayOfPublication = lastDayOfPublication;
-    callPropertyChangedListeners(TableConfig.SeriesTitleLastDayOfPublicationColumnName, previousValue, lastDayOfPublication);
-  }
-
-  public String getStandardAbbreviation() {
-    return standardAbbreviation;
-  }
-
-  public void setStandardAbbreviation(String standardAbbreviation) {
-    Object previousValue = this.standardAbbreviation;
-    this.standardAbbreviation = standardAbbreviation;
-    callPropertyChangedListeners(TableConfig.SeriesTitleStandardAbbreviationColumnName, previousValue, standardAbbreviation);
-  }
-
-  public String getUserAbbreviation1() {
-    return userAbbreviation1;
-  }
-
-  public void setUserAbbreviation1(String userAbbreviation1) {
-    Object previousValue = this.userAbbreviation1;
-    this.userAbbreviation1 = userAbbreviation1;
-    callPropertyChangedListeners(TableConfig.SeriesTitleUserAbbreviation1ColumnName, previousValue, userAbbreviation1);
-  }
-
-  public String getUserAbbreviation2() {
-    return userAbbreviation2;
-  }
-
-  public void setUserAbbreviation2(String userAbbreviation2) {
-    Object previousValue = this.userAbbreviation2;
-    this.userAbbreviation2 = userAbbreviation2;
-    callPropertyChangedListeners(TableConfig.SeriesTitleUserAbbreviation2ColumnName, previousValue, userAbbreviation2);
-  }
-
-  public Publisher getPublisher() {
-    return publisher;
-  }
-
-  public void setPublisher(Publisher publisher) {
-    Object previousValue = this.publisher;
-    if(this.publisher != null)
-      this.publisher.removeSeriesTitle(this);
-
-    this.publisher = publisher;
-
-    if(publisher != null)
-      publisher.addSeriesTitle(this);
-
-    callPropertyChangedListeners(TableConfig.SeriesTitlePublisherJoinColumnName, previousValue, publisher);
   }
 
   public DeepThought getDeepThought() {

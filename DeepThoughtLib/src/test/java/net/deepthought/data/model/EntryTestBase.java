@@ -1,10 +1,8 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.CustomFieldName;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.PersonRole;
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -1182,36 +1180,6 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Assert.assertTrue(doIdsEqual(secondPreviewImage.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryPreviewImageJoinColumnName, entry.getId())));
   }
 
-  @Test
-  public void updateEvaluation_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-    entry.setEvaluation("Not a good Entry");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-
-    String newEvaluation = "Best Entry i ever saw";
-    entry.setEvaluation(newEvaluation);
-
-    // assert preview image really got updated in database
-    Assert.assertEquals(newEvaluation, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryEvaluationColumnName, entry.getId()));
-  }
-
-  @Test
-  public void updateRating_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-    entry.setRating(1);
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-
-    int newRating = 5 + 1;
-    entry.setRating(newRating);
-
-    // assert preview image really got updated in database
-    Assert.assertEquals(newRating, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryRatingColumnName, entry.getId()));
-  }
-
 
   @Test
   public void setSeries_RelationGetsPersisted() throws Exception {
@@ -1586,61 +1554,17 @@ public abstract class EntryTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void updateReferenceStart_UpdatedValueGetsPersistedInDb() throws Exception {
+  public void updateReferenceIndication_UpdatedValueGetsPersistedInDb() throws Exception {
     Entry entry = new Entry("test", "no content");
-    entry.setIndicationStart("41");
+    entry.setIndication("41");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    String newReferenceStart = "42"; // the Application is called after all DeepThought
-    entry.setIndicationStart(newReferenceStart);
+    String newReferenceIndication = "42"; // the Application is called after all DeepThought
+    entry.setIndication(newReferenceIndication);
 
-    Assert.assertEquals(newReferenceStart, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartColumnName, entry.getId()).toString());
-  }
-
-  @Test
-  public void updateReferenceStartUnit_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> referenceIndicationUnits = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    entry.setIndicationStartUnit(referenceIndicationUnits.get(0));
-    deepThought.addEntry(entry);
-
-    ReferenceIndicationUnit newReferenceStartUnit = referenceIndicationUnits.get(1);
-    entry.setIndicationStartUnit(newReferenceStartUnit);
-
-    Assert.assertTrue(doIdsEqual(newReferenceStartUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationStartUnitJoinColumnName, entry.getId())));
-  }
-
-  @Test
-  public void updateReferenceEnd_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-    entry.setIndicationEnd("41");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-
-    String newReferenceEnd = "42"; // the Application is after all called DeepThought
-    entry.setIndicationEnd(newReferenceEnd);
-
-    Assert.assertEquals(newReferenceEnd, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndColumnName, entry.getId()).toString());
-  }
-
-  @Test
-  public void updateReferenceEndUnit_UpdatedValueGetsPersistedInDb() throws Exception {
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<ReferenceIndicationUnit> referenceIndicationUnits = new ArrayList<>(deepThought.getReferenceIndicationUnits());
-    entry.setIndicationEndUnit(referenceIndicationUnits.get(0));
-    deepThought.addEntry(entry);
-
-    ReferenceIndicationUnit newReferenceEndUnit = referenceIndicationUnits.get(1);
-    entry.setIndicationEndUnit(newReferenceEndUnit);
-
-    Assert.assertTrue(doIdsEqual(newReferenceEndUnit.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationEndUnitJoinColumnName, entry.getId())));
+    Assert.assertEquals(newReferenceIndication, getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryIndicationColumnName, entry.getId()).toString());
   }
 
 
@@ -1657,135 +1581,6 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry.setLanguage(newLanguage);
 
     Assert.assertTrue(doIdsEqual(newLanguage.getId(), getValueFromTable(TableConfig.EntryTableName, TableConfig.EntryLanguageJoinColumnName, entry.getId())));
-  }
-
-
-  @Test
-  public void addCustomField_RelationGetsPersisted() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    entry.addCustomField(customField);
-
-    Assert.assertNotNull(customField.getId());
-    Assert.assertTrue(doIdsEqual(entry.getId(), getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldEntryJoinColumnName, customField.getId())));
-  }
-
-  @Test
-  public void addCustomField_EntitiesGetAddedToRelatedCollections() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    entry.addCustomField(customField);
-
-    Assert.assertEquals(entry, customField.getEntry());
-    Assert.assertTrue(entry.getCustomFields().contains(customField));
-    Assert.assertEquals(1, customField.getOrder());
-  }
-
-  @Test
-  public void addMultipleCustomFields() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    CustomField customField1 = new CustomField(customFieldName, "test1");
-    entry.addCustomField(customField1);
-    CustomField customField2 = new CustomField(customFieldName, "test2");
-    entry.addCustomField(customField2);
-    CustomField customField3 = new CustomField(customFieldName, "test3");
-    entry.addCustomField(customField3);
-    CustomField customField4 = new CustomField(customFieldName, "test4");
-    entry.addCustomField(customField4);
-
-    Assert.assertEquals(4, entry.getCustomFields().size());
-
-    int index = 0;
-    for(CustomField customField : entry.getCustomFields()) {
-      Assert.assertEquals(entry, customField.getEntry());
-      Assert.assertEquals(++index, customField.getOrder());
-    }
-  }
-
-  @Test
-  public void removeCustomField_RelationGetsDeleted() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    entry.addCustomField(customField);
-    entry.removeCustomField(customField);
-
-    // assert CustomField really got deleted from database
-    Assert.assertNull(getValueFromTable(TableConfig.CustomFieldTableName, TableConfig.CustomFieldEntryJoinColumnName, customField.getId()));
-
-    Assert.assertFalse(entry.isDeleted());
-    Assert.assertFalse(customFieldName.isDeleted());
-    Assert.assertTrue(customField.isDeleted());
-  }
-
-  @Test
-  public void removeCustomField_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    CustomField customField = new CustomField(customFieldName, "test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    entry.addCustomField(customField);
-    entry.removeCustomField(customField);
-
-    Assert.assertNull(customField.getEntry());
-    Assert.assertFalse(entry.getCustomFields().contains(customField));
-  }
-
-  @Test
-  public void addMultipleCustomFields_ThenRemove2_OrderGetsAdjustedCorrectly() throws Exception {
-    CustomFieldName customFieldName = new CustomFieldName("test");
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addCustomFieldName(customFieldName);
-    deepThought.addEntry(entry);
-
-    CustomField customField1 = new CustomField(customFieldName, "test1");
-    entry.addCustomField(customField1);
-    CustomField customField2 = new CustomField(customFieldName, "test2");
-    entry.addCustomField(customField2);
-    CustomField customField3 = new CustomField(customFieldName, "test3");
-    entry.addCustomField(customField3);
-    CustomField customField4 = new CustomField(customFieldName, "test4");
-    entry.addCustomField(customField4);
-
-    entry.removeCustomField(customField1);
-    entry.removeCustomField(customField3);
-
-    Assert.assertEquals(2, entry.getCustomFields().size());
-
-    Assert.assertEquals(1, customField2.getOrder());
-    Assert.assertEquals(2, customField4.getOrder());
-
-    Assert.assertNull(customField1.getEntry());
-    Assert.assertNull(customField3.getEntry());
   }
 
 }

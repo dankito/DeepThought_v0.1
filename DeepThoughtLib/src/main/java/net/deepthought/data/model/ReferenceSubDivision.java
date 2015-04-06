@@ -1,7 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.ReferenceIndicationUnit;
-import net.deepthought.data.model.enums.ReferenceSubDivisionCategory;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import java.util.ArrayList;
@@ -15,7 +13,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 /**
@@ -27,10 +24,6 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
 
   private static final long serialVersionUID = -967783983570745569L;
 
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferenceSubDivisionCategoryJoinColumnName)
-  protected ReferenceSubDivisionCategory category;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = TableConfig.ReferenceSubDivisionReferenceJoinColumnName)
@@ -51,14 +44,6 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   protected Collection<Entry> entries = new HashSet<>();
 
 
-  @Column(name = TableConfig.ReferenceSubDivisionLengthColumnName)
-  protected String length;
-
-  @OneToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferenceSubDivisionLengthUnitJoinColumnName)
-  protected ReferenceIndicationUnit lengthUnit;
-
-
 
   public ReferenceSubDivision() {
 
@@ -73,22 +58,6 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   }
 
 
-
-  public ReferenceSubDivisionCategory getCategory() {
-    return category;
-  }
-
-  public void setCategory(ReferenceSubDivisionCategory category) {if(this.category != null)
-    this.category.removeReferenceSubDivision(this);
-
-    Object previousValue = this.category;
-    this.category = category;
-
-    if(this.category != null)
-      this.category.addReferenceSubDivision(this);
-
-    callPropertyChangedListeners(TableConfig.ReferenceCategoryJoinColumnName, previousValue, category);
-  }
 
   public Collection<Entry> getEntries() {
     return entries;
@@ -177,26 +146,6 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     Object previousValue = this.subDivisionOrder;
     this.subDivisionOrder = subDivisionOrder;
     callPropertyChangedListeners(TableConfig.ReferenceSubDivisionOrderColumnName, previousValue, subDivisionOrder);
-  }
-
-  public String getLength() {
-    return length;
-  }
-
-  public void setLength(String length) {
-    Object previousValue = this.length;
-    this.length = length;
-    callPropertyChangedListeners(TableConfig.ReferenceSubDivisionLengthColumnName, previousValue, length);
-  }
-
-  public ReferenceIndicationUnit getLengthUnit() {
-    return lengthUnit;
-  }
-
-  public void setLengthUnit(ReferenceIndicationUnit lengthUnit) {
-    Object previousValue = this.lengthUnit;
-    this.lengthUnit = lengthUnit;
-    callPropertyChangedListeners(TableConfig.ReferenceSubDivisionLengthUnitJoinColumnName, previousValue, lengthUnit);
   }
 
 
