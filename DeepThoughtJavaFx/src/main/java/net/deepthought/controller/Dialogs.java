@@ -6,9 +6,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Publisher;
 import net.deepthought.data.model.Reference;
-import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Localization;
 
@@ -215,90 +213,6 @@ public class Dialogs {
       dialogStage.requestFocus();
     } catch(Exception ex) {
       log.error("Could not load / show EditFileDialog", ex);
-    }
-  }
-
-
-  public static void showEditPublisherDialog(Publisher publisher) {
-    showEditPublisherDialog(publisher, null);
-  }
-
-  public static void showEditPublisherDialog(final Publisher publisher, final ChildWindowsControllerListener listener) {
-    try {
-      FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditPublisherDialog.fxml", StageStyle.UTILITY);
-
-      // Set the publisher into the controller.
-      EditPublisherDialogController controller = loader.getController();
-      controller.setWindowStageAndPublisher(dialogStage, publisher);
-
-      controller.setListener(new ChildWindowsControllerListener() {
-        @Override
-        public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(controller.getDialogResult() == DialogResult.Ok) {
-            if(publisher.isPersisted() == false) { // a new Reference
-              Application.getDeepThought().addPublisher(publisher);
-            }
-          }
-
-          if(listener != null)
-            listener.windowClosing(stage, controller);
-        }
-
-        @Override
-        public void windowClosed(Stage stage, ChildWindowsController controller) {
-          removeClosedChildWindow(stage);
-
-          if(listener != null)
-            listener.windowClosed(stage, controller);
-        }
-      });
-
-      addOpenedChildWindow(dialogStage);
-
-      dialogStage.show();
-      dialogStage.requestFocus();
-    } catch(Exception ex) {
-      log.error("Could not load / show EditPublisherDialog", ex);
-    }
-  }
-
-
-  public static void showEditSeriesTitleDialog(SeriesTitle seriesTitle) {
-    showEditSeriesTitleDialog(seriesTitle, null);
-  }
-
-  public static void showEditSeriesTitleDialog(final SeriesTitle seriesTitle, final ChildWindowsControllerListener listener) {
-    try {
-      FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditSeriesTitleDialog.fxml");
-
-      // Set the seriesTitle into the controller.
-      EditSeriesTitleDialogController controller = loader.getController();
-      controller.setWindowStageAndSeriesTitle(dialogStage, seriesTitle);
-
-      controller.setListener(new ChildWindowsControllerListener() {
-        @Override
-        public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(listener != null)
-            listener.windowClosing(stage, controller);
-        }
-
-        @Override
-        public void windowClosed(Stage stage, ChildWindowsController controller) {
-          removeClosedChildWindow(stage);
-
-          if(listener != null)
-            listener.windowClosed(stage, controller);
-        }
-      });
-
-      addOpenedChildWindow(dialogStage);
-
-      dialogStage.show();
-      dialogStage.requestFocus();
-    } catch(Exception ex) {
-      log.error("Could not load / show EditSeriesTitleDialog", ex);
     }
   }
 

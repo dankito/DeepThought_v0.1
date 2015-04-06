@@ -1389,33 +1389,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    });
   }
 
-  protected void createNewSeriesTitlePublisher() {
-    final Publisher newPublisher = new Publisher();
-
-    net.deepthought.controller.Dialogs.showEditPublisherDialog(newPublisher, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok)
-          seriesTitle.setPublisher(newPublisher);
-      }
-    });
-  }
-
   @FXML
   public void handleButtonSeriesTitleNewOrEditPublisherAction(ActionEvent event) {
-    if(btnSeriesTitleNewOrEditPublisher.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-      net.deepthought.controller.Dialogs.showEditPublisherDialog(cmbxSeriesTitlePublisher.getValue());
-    else
-      createNewSeriesTitlePublisher();
+
   }
 
   protected void handleMenuItemSeriesTitleNewPublisherAction(NewOrEditButtonMenuActionEvent event) {
-    createNewSeriesTitlePublisher();
+
   }
 
   @FXML
@@ -1548,10 +1528,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   public void handleButtonNewOrEditSeriesTitleAction(ActionEvent event) {
-    if(btnNewOrEditSeriesTitle.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-      net.deepthought.controller.Dialogs.showEditSeriesTitleDialog(cmbxSeriesTitle.getValue());
-    else
-      createNewSeriesTitle();
+
   }
 
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
@@ -1640,24 +1617,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void handleMenuItemNewSeriesTitleAction(NewOrEditButtonMenuActionEvent event) {
-    createNewSeriesTitle();
-  }
 
-  protected void createNewSeriesTitle() {
-    final SeriesTitle newSeriesTitle = new SeriesTitle();
-
-    net.deepthought.controller.Dialogs.showEditSeriesTitleDialog(newSeriesTitle, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if (controller.getDialogResult() == DialogResult.Ok)
-          reference.setSeries(newSeriesTitle);
-      }
-    });
   }
 
   public void handleButtonNewOrEditReferenceCategoryAction(ActionEvent event) {
@@ -1688,33 +1648,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    });
   }
 
-  protected void createNewPublisher() {
-    final Publisher newPublisher = new Publisher();
-
-    net.deepthought.controller.Dialogs.showEditPublisherDialog(newPublisher, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok)
-          reference.setPublisher(newPublisher);
-      }
-    });
-  }
-
   @FXML
   public void handleButtonNewOrEditPublisherAction(ActionEvent event) {
-    if(btnNewOrEditPublisher.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-      net.deepthought.controller.Dialogs.showEditPublisherDialog(cmbxPublisher.getValue());
-    else
-      createNewPublisher();
+
   }
 
   protected void handleMenuItemNewPublisherAction(NewOrEditButtonMenuActionEvent event) {
-    createNewPublisher();
+
   }
 
   public void handleButtonNewOrEditReferenceIndicationUnitAction(ActionEvent event) {

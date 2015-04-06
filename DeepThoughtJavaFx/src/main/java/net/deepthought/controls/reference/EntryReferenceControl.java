@@ -500,35 +500,11 @@ public class EntryReferenceControl extends VBox {
 
 
   public void handleButtonEditOrNewSeriesTitleAction(ActionEvent event) {
-    if(btnNewOrEditSeriesTitle.getButtonFunction() == NewOrEditButton.ButtonFunction.New)
-      createNewSeriesTitle();
-    else if(cmbxSeriesTitleOrReference.getValue() instanceof SeriesTitle)
-      Dialogs.showEditSeriesTitleDialog((SeriesTitle) cmbxSeriesTitleOrReference.getValue());
-    else
-      Dialogs.showEditSeriesTitleDialog(((Reference)cmbxSeriesTitleOrReference.getValue()).getSeries());
+
   }
 
   public void handleMenuItemNewSeriesTitleAction(NewOrEditButtonMenuActionEvent event) {
-    createNewSeriesTitle();
-  }
 
-  protected void createNewSeriesTitle() {
-    //      SeriesTitle newSeriesTitle = SeriesTitle.createReferenceFromStringRepresentation(cmbxSeriesTitle.getEditor().getText()); // TODO: use as soon as typing directly in  ComboBox is possible again
-    final SeriesTitle newSeriesTitle = new SeriesTitle();
-    Dialogs.showEditSeriesTitleDialog(newSeriesTitle, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-        if (controller.getDialogResult() == DialogResult.Ok) {
-//          entry.setSeries(newSeriesTitle);
-          cmbxSeriesTitleOrReference.setValue(newSeriesTitle);
-        }
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-
-      }
-    });
   }
 
 
