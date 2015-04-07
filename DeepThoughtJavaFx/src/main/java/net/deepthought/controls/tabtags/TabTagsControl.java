@@ -517,8 +517,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
-          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
+//      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
+//          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
+      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && tblvwTags.getSelectionModel().getSelectedItem() != null &&
+          collection == tblvwTags.getSelectionModel().getSelectedItem().getEntries()) {
         if(filteredTags.size() > 0)
           reapplyTagsFilter();
         showEntriesForSelectedTag((Tag)collectionHolder);

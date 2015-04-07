@@ -94,7 +94,8 @@ public class FXUtils {
               mapOriginalEvents.put(button, button.getOnAction());
               button.setOnAction(event -> {
                 textChangedEvent.textChanged(editor);
-                mapOriginalEvents.get(button).handle(event);
+                if(mapOriginalEvents.get(button) != null)
+                  mapOriginalEvents.get(button).handle(event);
               });
               button.setOnMouseClicked(event -> textChangedEvent.textChanged(editor));
             }

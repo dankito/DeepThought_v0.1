@@ -695,7 +695,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     if (preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
       if (preview.length() > 0)
         preview += " - ";
-      preview += content;
+      preview += Application.getHtmlHelper().extractPlainTextFromHtmlBody(content);
     }
 
     if (preview.length() >= PreviewMaxLength)

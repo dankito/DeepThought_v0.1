@@ -185,7 +185,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   public boolean addEntry(Entry entry) {
-    entry.setEntryIndex(nextEntryIndex++);
+    entry.setEntryIndex(increaseNextEntryIndex());
 
     if (entries instanceof List)
       ((List) entries).add(0, entry);
@@ -240,6 +240,14 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   public int getNextEntryIndex() {
+    return nextEntryIndex;
+  }
+
+  protected int increaseNextEntryIndex() {
+    Object previousValue = this.nextEntryIndex;
+    this.nextEntryIndex++;
+    callPropertyChangedListeners(TableConfig.DeepThoughtNextEntryIndexColumnName, previousValue, nextEntryIndex);
+
     return nextEntryIndex;
   }
 

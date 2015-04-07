@@ -4,6 +4,8 @@ import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
+import net.deepthought.data.html.IHtmlHelper;
+import net.deepthought.data.html.JsoupHtmlHelper;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.model.DeepThought;
@@ -44,6 +46,8 @@ public class Application {
 
   protected static IDataComparer dataComparer = null;
   protected static IDataMerger dataMerger = null;
+
+  protected static IHtmlHelper htmlHelper = null;
 
   protected static Set<ApplicationListener> listeners = new HashSet<>();
 
@@ -100,6 +104,9 @@ public class Application {
 //      startTime = new Date();
       Application.dataMerger = dependencyResolver.createDataMerger();
 //      logResolvingDependencyDuration("DataMerger", startTime);
+
+      // TODO: make configurable
+      htmlHelper = new JsoupHtmlHelper();
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
@@ -232,6 +239,10 @@ public class Application {
 
   public static IDataMerger getDataMerger() {
     return dataMerger;
+  }
+
+  public static IHtmlHelper getHtmlHelper() {
+    return htmlHelper;
   }
 
   public static DeepThoughtApplication getApplication() {

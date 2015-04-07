@@ -9,6 +9,8 @@ import com.j256.ormlite.stmt.StatementExecutor;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import net.deepthought.Application;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -313,7 +315,10 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
 
   @Override
   public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
-
+     if(Application.getDeepThought() != null) {
+       for(Person person : Application.getDeepThought().getPersons())
+         person.getTextRepresentation();
+     }
   }
 
   @Override

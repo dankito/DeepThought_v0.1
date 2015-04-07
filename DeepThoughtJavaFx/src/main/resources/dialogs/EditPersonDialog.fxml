@@ -7,9 +7,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="dialogPane" prefHeight="336.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
+<BorderPane fx:id="dialogPane" prefHeight="286.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
    <center>
-      <VBox prefHeight="392.0" prefWidth="734.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="392.0" BorderPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
@@ -41,7 +41,7 @@
                         <Insets bottom="6.0" top="6.0" />
                      </VBox.margin>
                   </Label>
-                  <TextArea fx:id="txtarNotes" prefHeight="125.0" VBox.vgrow="ALWAYS" />
+                  <TextArea fx:id="txtarNotes" prefHeight="95.0" VBox.vgrow="ALWAYS" />
                </children>
             </VBox>
             <HBox alignment="CENTER_RIGHT" prefHeight="40.0">

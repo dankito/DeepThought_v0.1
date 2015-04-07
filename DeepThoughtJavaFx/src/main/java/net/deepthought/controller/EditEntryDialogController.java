@@ -73,6 +73,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -209,6 +210,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
       updateWindowTitle(newValue);
     });
     paneTitle.setVisible(false);
+    ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
@@ -471,8 +473,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
-    if(paneTitle.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
+//    if(paneTitle.isVisible() == false)
+//      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
     if(ttldpnAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "entry.abstract");
     if(ttldpnContent.isVisible() == false)

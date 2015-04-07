@@ -98,7 +98,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
         if(entry.hasTags() == false) {
 //        EntriesWithoutTagsSystemTag.this.addAsAuthorOnEntry(entryFragment);
           filteredEntries.add(entry);
-          callEntityAddedListeners(entries, entry);
+          callEntityAddedListeners(filteredEntries, entry);
         }
       }
     }
@@ -120,7 +120,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 
         if(filteredEntries.contains(entry)) {
           filteredEntries.remove(entry);
-          callEntityRemovedListeners(entries, entry);
+          callEntityRemovedListeners(filteredEntries, entry);
         }
       }
     }

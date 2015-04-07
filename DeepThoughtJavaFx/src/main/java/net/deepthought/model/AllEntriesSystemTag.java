@@ -65,7 +65,7 @@ public class AllEntriesSystemTag extends SystemTag {
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collection == deepThought.getEntries()) {
 //        filteredEntries.add((Entry) addedEntity); // TODO: this is not the correct sort order afterwards as new Entries should be shown first in list, not last
-        callEntityAddedListeners(entries, (Entry) addedEntity);
+        callEntityAddedListeners(filteredEntries, (Entry) addedEntity);
       }
     }
 
@@ -78,7 +78,7 @@ public class AllEntriesSystemTag extends SystemTag {
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(collection == deepThought.getEntries()) {
 //        filteredEntries.remove((Entry) removedEntity);
-        callEntityRemovedListeners(entries, (Entry)removedEntity);
+        callEntityRemovedListeners(filteredEntries, (Entry)removedEntity);
       }
     }
   };
