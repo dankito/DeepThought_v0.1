@@ -3,11 +3,9 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.BaseEntityListCell;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.controls.person.ReferencePersonsControl;
 import net.deepthought.controls.person.ReferenceSubDivisionPersonsControl;
@@ -25,7 +23,6 @@ import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.DateConvertUtils;
-import net.deepthought.util.Empty;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -40,6 +37,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
@@ -51,15 +49,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -71,10 +67,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 /**
@@ -92,6 +88,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected ReferenceSubDivision referenceSubDivision = null;
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
+
+  protected int publishingDateFormat = DateFormat.MEDIUM;
 
 
   @FXML
@@ -187,28 +185,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected ReferencePersonsControl referencePersonsControl;
 
   @FXML
-  protected Pane panePublishingDateAndPlaceOfPublication;
+  protected Pane panePublishingDate;
   @FXML
   protected DatePicker dtpckPublishingDate;
 
   @FXML
   protected TextField txtfldIsbnOrIssn;
   @FXML
-  protected Pane pnReferenceLength;
+  protected Pane paneIsbnOrIssn;
 
-  @FXML
-  protected Pane paneIssue;
-  @FXML
-  protected TextField txtfldIssue;
-  @FXML
-  protected TextField txtfldYear;
-
-  @FXML
-  protected Pane panePriceAndLanguage;
-  @FXML
-  protected ComboBox<Language> cmbxLanguage;
-  @FXML
-  protected NewOrEditButton btnNewOrEditLanguage;
   @FXML
   protected Pane paneOnlineAddress;
   @FXML
@@ -322,6 +307,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     seriesTitlePersonsControl.setExpanded(true);
     seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
+    VBox.setMargin(seriesTitlePersonsControl, new Insets(6, 0, 0, 0));
     paneSeriesTitle.getChildren().add(6, seriesTitlePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
@@ -371,48 +357,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     referencePersonsControl.setExpanded(true);
     referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
-    contentPane.getChildren().add(9, referencePersonsControl);
+    VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
+    contentPane.getChildren().add(6, referencePersonsControl);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublishingDateAndPlaceOfPublication);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublishingDate);
     dtpckPublishingDate.setConverter(localeDateStringConverter);
     dtpckPublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePublishingDate));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceLength);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneIsbnOrIssn);
     txtfldIsbnOrIssn.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIsbnOrIssn));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneIssue);
-    txtfldIssue.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIssue));
-    txtfldYear.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceYear));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePriceAndLanguage);
-    resetComboBoxLanguageItems();
-//    cmbxLanguage.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanged.ReferenceLanguage));
-    cmbxLanguage.valueProperty().addListener(cmbxLanguageValueChangeListener);
-
-    cmbxLanguage.setConverter(new StringConverter<Language>() {
-      @Override
-      public String toString(Language language) {
-        return language.getTextRepresentation();
-      }
-
-      @Override
-      public Language fromString(String string) {
-        return null;
-      }
-    });
-    cmbxLanguage.setCellFactory(new Callback<ListView<Language>, ListCell<Language>>() {
-      @Override
-      public ListCell<Language> call(ListView<Language> param) {
-        return new BaseEntityListCell<Language>();
-      }
-    });
-
-    btnNewOrEditLanguage = new NewOrEditButton();
-    btnNewOrEditLanguage.setOnAction(event -> handleButtonNewOrEditLanguageAction(event));
-    btnNewOrEditLanguage.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewLanguageAction(event));
-    btnNewOrEditLanguage.setDisable(true); // TODO: unset as soon as editing is possible
-    panePriceAndLanguage.getChildren().add(btnNewOrEditLanguage);
-
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
@@ -444,6 +397,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     referenceSubDivisionPersonsControl.setExpanded(true);
     referenceSubDivisionPersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
     referenceSubDivisionPersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
+    VBox.setMargin(referenceSubDivisionPersonsControl, new Insets(6, 0, 0, 0));
     paneReferenceSubDivision.getChildren().add(4, referenceSubDivisionPersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
@@ -488,8 +442,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    pnReferenceLength.setVisible(StringUtils.isNotNullOrEmpty(reference.getIsbnOrIssn()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    panePriceAndLanguage.setVisible(reference.getLanguage() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneIsbnOrIssn.setVisible(StringUtils.isNotNullOrEmpty(reference.getIsbnOrIssn()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -508,29 +461,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     ttldpnReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-  }
-
-
-  protected ChangeListener<Language> cmbxLanguageValueChangeListener = new ChangeListener<Language>() {
-    @Override
-    public void changed(ObservableValue<? extends Language> observable, Language oldValue, Language newValue) {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceLanguage);
-
-      if(newValue == null || Empty.Language.equals(newValue)) {
-        btnNewOrEditLanguage.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditLanguage.setShowNewMenuItem(false);
-      }
-      else {
-        btnNewOrEditLanguage.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-        btnNewOrEditLanguage.setShowNewMenuItem(true);
-      }
-    }
-  };
-
-  protected void resetComboBoxLanguageItems() {
-    cmbxLanguage.getItems().clear();
-    cmbxLanguage.getItems().add(Empty.Language);
-    cmbxLanguage.getItems().addAll(Application.getDeepThought().getLanguages());
   }
 
 
@@ -685,26 +615,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceIsbnOrIssn)) {
       reference.setIsbnOrIssn(txtfldIsbnOrIssn.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIsbnOrIssn);
-    }
-
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceIssue)) {
-      reference.setIssue(txtfldIssue.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIssue);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceYear)) {
-      if(StringUtils.isNullOrEmpty(txtfldYear.getText()))
-        reference.setYear(null);
-      else
-        reference.setYear(Integer.parseInt(txtfldYear.getText()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceYear);
-    }
-
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceLanguage)) {
-      if(Empty.Language.equals(cmbxLanguage.getValue()))
-        reference.setLanguage(null);
-      else
-        reference.setLanguage(cmbxLanguage.getValue());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceLanguage);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
@@ -908,7 +818,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     if(paneSeriesTitleOnlineAddress.isVisible() == false) {
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleOnlineAddress, "online.address");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleOnlineAddress, "last.access");
     }
 
     if(ttldpnSeriesTitleNotes.isVisible() == false)
@@ -929,24 +838,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(paneSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
 
+    if(paneIsbnOrIssn.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIsbnOrIssn, "isbn.or.issn");
+
     if(ttldpnAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
     if(ttldpnTableOfContents.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnTableOfContents, "table.of.contents");
 
-    if(pnReferenceLength.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, pnReferenceLength, "isbn.or.issn");
-    }
-    if(paneIssue.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIssue, "issue");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIssue, "year");
-    }
-    if(panePriceAndLanguage.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, panePriceAndLanguage, "language");
-    }
     if(paneOnlineAddress.isVisible() == false) {
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "online.address");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "last.access");
     }
 
     if(ttldpnNotes.isVisible() == false)
@@ -971,7 +872,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     if(paneReferenceSubDivisionOnlineAddress.isVisible() == false) {
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubDivisionOnlineAddress, "online.address");
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubDivisionOnlineAddress, "last.access");
     }
 
     if(ttldpnReferenceSubDivisionNotes.isVisible() == false)
@@ -1106,15 +1006,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     txtfldIsbnOrIssn.setText(reference.getIsbnOrIssn());
 
-    txtfldIssue.setText(reference.getIssue());
-    if(reference.getYear() != null)
-      txtfldYear.setText(Integer.toString(reference.getYear()));
-
-    if(reference.getLanguage() == null)
-      cmbxLanguage.setValue(Empty.Language);
-    else
-      cmbxLanguage.setValue(reference.getLanguage());
-
     txtfldOnlineAddress.setText(reference.getOnlineAddress());
 
     txtarNotes.setText(reference.getNotes());
@@ -1141,14 +1032,49 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected StringConverter<LocalDate> localeDateStringConverter = new StringConverter<LocalDate>() {
     @Override
-    public String toString(LocalDate object) {
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(object));
+    public String toString(LocalDate date) {
+      log.debug("publishingDateFormat: " + publishingDateFormat);
+      return DateFormat.getDateInstance(DateFormat.YEAR_FIELD, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(date));
     }
 
     @Override
     public LocalDate fromString(String string) {
       try {
-        return DateConvertUtils.asLocalDate(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).parse(string));
+        Date parsedDate = null;
+        try {
+          parsedDate = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).parse(string);
+          publishingDateFormat = DateFormat.MEDIUM;
+        } catch(Exception ex) {
+          if(string.length() == 4) {
+            try {
+              int year = Integer.parseInt(string) - 1900;
+              log.debug("Parsed year: " + year);
+              parsedDate = new Date(year, 0, 1);
+              publishingDateFormat = DateFormat.YEAR_FIELD;
+            } catch(Exception ex2) { }
+          }
+          else if(string.length() == 7) {
+            try {
+              int month = Integer.parseInt(string.substring(0, 2)) - 1;
+              int year = Integer.parseInt(string.substring(3, 7)) - 1900;
+              parsedDate = new Date(year, month, 1);
+              publishingDateFormat = DateFormat.SHORT;
+            } catch(Exception ex2) { }
+          }
+          else {
+            try {
+              parsedDate = DateFormat.getDateInstance(DateFormat.LONG, Localization.getLanguageLocale()).parse(string);
+              publishingDateFormat = DateFormat.LONG;
+            } catch(Exception ex2) { }
+          }
+        }
+
+        if(parsedDate == null)
+          log.warn("Could not parse string {} to java.util.date for Locale {}", string, Localization.getLanguageLocale());
+        else {
+          log.debug("Parsed date: " + parsedDate);
+          return DateConvertUtils.asLocalDate(parsedDate);
+        }
       } catch(Exception ex) { log.warn("Could not parse string {} to java.util.date for Locale {}", string, Localization.getLanguageLocale()); }
 
       return LocalDate.now();
@@ -1240,12 +1166,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         tableOfContentsChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceIsbnOrIssnColumnName))
         isbnOrIssnChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceIssueColumnName))
-        issueChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceYearColumnName))
-        yearChanged(previousValue == null ? "" : previousValue.toString(), newValue.toString());
-      else if(propertyName.equals(TableConfig.ReferenceLanguageJoinColumnName))
-        languageChanged((Language) previousValue, (Language) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
         onlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
@@ -1296,29 +1216,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     // TODO: if current value != previousValue, ask User what to do?
     txtfldIsbnOrIssn.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIsbnOrIssn);
-  }
-
-  protected void issueChanged(String previousValue, String newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    txtfldIssue.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIssue);
-  }
-
-  protected void yearChanged(String previousValue, String newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    txtfldYear.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceYear);
-  }
-
-  protected void languageChanged(Language previousValue, Language newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    cmbxLanguage.valueProperty().removeListener(cmbxLanguageValueChangeListener);
-    if(newValue == null)
-      cmbxLanguage.setValue(Empty.Language);
-    else
-      cmbxLanguage.setValue(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceLanguage);
-    cmbxLanguage.valueProperty().addListener(cmbxLanguageValueChangeListener);
   }
 
   protected void onlineAddressChanged(String previousValue, String newValue) {
@@ -1406,26 +1303,17 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == Application.getDeepThought().getLanguages()) {
-        resetComboBoxLanguageItems();
-      }
+
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(updatedEntity instanceof Language && updatedEntity.equals(cmbxLanguage.getValue())) {
-        cmbxLanguage.valueProperty().removeListener(cmbxLanguageValueChangeListener);
-        cmbxLanguage.setValue(Empty.Language);
-        cmbxLanguage.setValue((Language) updatedEntity);
-        cmbxLanguage.valueProperty().addListener(cmbxLanguageValueChangeListener);
-      }
+
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == Application.getDeepThought().getLanguages()) {
-        resetComboBoxLanguageItems();
-      }
+
     }
   };
 

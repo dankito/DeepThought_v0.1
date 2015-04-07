@@ -62,25 +62,51 @@
                                     </Button>
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets />
                                  </VBox.margin>
                               </AnchorPane>
                               <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%reference.title" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%reference.title" />
                                     <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <HBox fx:id="paneSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
                                     <TextField fx:id="txtfldSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox fx:id="panePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
+                                 <children>
+                                    <Label prefWidth="135.0" text="%publishing.date">
+                                       <HBox.margin>
+                                          <Insets />
+                                       </HBox.margin>
+                                    </Label>
+                                    <DatePicker fx:id="dtpckPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <HBox fx:id="paneIsbnOrIssn" alignment="CENTER_LEFT" prefHeight="40.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label prefWidth="100.0" text="%isbn.or.issn">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <TextField fx:id="txtfldIsbnOrIssn" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                       </children>
+                                       <HBox.margin>
+                                          <Insets left="18.0" />
+                                       </HBox.margin>
+                                    </HBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <TitledPane fx:id="ttldpnAbstract" animated="false" text="%abstract">
@@ -88,7 +114,7 @@
                                     <TextArea fx:id="txtarAbstract" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
                               <TitledPane fx:id="ttldpnTableOfContents" animated="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
@@ -96,82 +122,14 @@
                                     <HTMLEditor fx:id="htmledTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
-                              <HBox fx:id="panePublishingDateAndPlaceOfPublication" alignment="CENTER_LEFT" prefHeight="40.0">
-                                 <children>
-                                    <Label prefWidth="130.0" text="%publishing.date">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <DatePicker fx:id="dtpckPublishingDate" HBox.hgrow="ALWAYS" />
-                                    <Label text="%place.of.publication">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txtfldPlaceOfPublication" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox fx:id="pnReferenceLength" alignment="CENTER_LEFT" prefHeight="40.0">
-                                 <children>
-                                    <Label prefWidth="130.0" text="%isbn.or.issn">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txtfldIsbnOrIssn" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox fx:id="paneIssue" alignment="CENTER_LEFT" prefHeight="40.0">
-                                 <children>
-                                    <Label prefWidth="130.0" text="%issue">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txtfldIssue" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <Label text="%year">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <TextField fx:id="txtfldYear" prefHeight="35.0" prefWidth="100.0" />
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox fx:id="panePriceAndLanguage" alignment="CENTER_LEFT" prefHeight="40.0">
-                                 <children>
-                                    <Label text="%language">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <ComboBox fx:id="cmbxLanguage" prefHeight="35.0" prefWidth="150.0">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ComboBox>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </HBox>
                               <HBox fx:id="paneOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefWidth="130.0" text="%online.address">
+                                    <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
-                                          <Insets right="6.0" />
+                                          <Insets />
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
@@ -251,23 +209,26 @@
                                        </font>
                                     </Button>
                                  </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
                               </AnchorPane>
                               <HBox fx:id="paneReferenceSubDivisionTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%reference.sub.division.title" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%reference.sub.division.title" />
                                     <TextField fx:id="txtfldReferenceSubDivisionTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <HBox fx:id="paneReferenceSubDivisionSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
                                     <TextField fx:id="txtfldReferenceSubDivisionSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <TitledPane fx:id="ttldpnReferenceSubDivisionAbstract" animated="false" text="%abstract">
@@ -275,12 +236,12 @@
                                     <TextArea fx:id="txtarReferenceSubDivisionAbstract" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
                               <HBox fx:id="paneReferenceSubDivisionOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefWidth="130.0" text="%online.address">
+                                    <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>
@@ -288,7 +249,7 @@
                                     <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" top="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <TitledPane fx:id="ttldpnReferenceSubDivisionNotes" animated="false" expanded="false" text="%notes">
@@ -296,7 +257,7 @@
                                     <TextArea fx:id="txtarReferenceSubDivisionNotes" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
                               <TitledPane fx:id="ttldpnReferenceSubDivisionFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
@@ -327,6 +288,9 @@
                                        </children>
                                     </HBox>
                                  </graphic>
+                                 <VBox.margin>
+                                    <Insets top="6.0" />
+                                 </VBox.margin>
                               </TitledPane>
                            </children>
                            <BorderPane.margin>
@@ -367,20 +331,20 @@
                               </AnchorPane>
                               <HBox fx:id="paneSeriesTitleTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%series.title.title" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%series.title.title" />
                                     <TextField fx:id="txtfldSeriesTitleTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <HBox fx:id="paneSeriesTitleSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%subtitle" />
+                                    <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
                                     <TextField fx:id="txtfldSeriesTitleSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
                               <TitledPane fx:id="ttldpnSeriesTitleAbstract" animated="false" expanded="false" text="%abstract">
@@ -388,7 +352,7 @@
                                     <TextArea fx:id="txtarSeriesTitleAbstract" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets bottom="6.0" />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
                               <TitledPane fx:id="ttldpnSeriesTitleTableOfContents" animated="false" expanded="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
@@ -396,12 +360,12 @@
                                     <HTMLEditor fx:id="htmledSeriesTitleTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
                                  </content>
                                  <VBox.margin>
-                                    <Insets />
+                                    <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
                               <HBox fx:id="paneSeriesTitleOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefWidth="130.0" text="%online.address">
+                                    <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>

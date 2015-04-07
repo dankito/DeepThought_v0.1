@@ -1,15 +1,12 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by ganymed on 10/11/14.
@@ -341,61 +338,6 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
     reference.setIsbnOrIssn(newValue);
 
     Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceIsbnOrIssnColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateIssue_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setIssue(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceIssueColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateYear_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    Integer newValue = 2015;
-    reference.setYear(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceYearColumnName, reference.getId()));
-  }
-
-  @Test
-  public void setLanguage_ValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<Language> languages = new ArrayList<>(deepThought.getLanguages());
-    deepThought.addReference(reference);
-
-    Language language = languages.get(0);
-    reference.setLanguage(language);
-
-    Assert.assertTrue(doIdsEqual(language.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceLanguageJoinColumnName, reference.getId())));
-  }
-
-  @Test
-  public void updateLanguage_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    List<Language> languages = new ArrayList<>(deepThought.getLanguages());
-    reference.setLanguage(languages.get(0));
-    deepThought.addReference(reference);
-
-    Language newValue = languages.get(1);
-    reference.setLanguage(newValue);
-
-    Assert.assertTrue(doIdsEqual(newValue.getId(), getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceLanguageJoinColumnName, reference.getId())));
   }
 
 

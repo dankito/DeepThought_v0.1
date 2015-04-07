@@ -312,9 +312,6 @@ public class TableConfig {
   public final static String ReferenceTableOfContentsColumnName = "table_of_contents";
   public final static String ReferencePublishingDateColumnName = "publishing_date";
   public final static String ReferenceIsbnOrIssnColumnName = "isbn_or_issn";
-  public final static String ReferenceIssueColumnName = "issue";
-  public final static String ReferenceYearColumnName = "year_ref"; // Derby doesn't like 'year' as column name
-  public final static String ReferenceLanguageJoinColumnName = "language_id";
 
 
   /*          ReferenceSubDivision Table Config        */

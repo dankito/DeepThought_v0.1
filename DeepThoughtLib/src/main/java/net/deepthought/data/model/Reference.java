@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import java.util.ArrayList;
@@ -61,16 +60,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   @Column(name = TableConfig.ReferenceIsbnOrIssnColumnName)
   protected String isbnOrIssn;
-
-  @Column(name = TableConfig.ReferenceIssueColumnName)
-  protected String issue;
-
-  @Column(name = TableConfig.ReferenceYearColumnName)
-  protected Integer year;
-
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.ReferenceLanguageJoinColumnName)
-  protected Language language;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.PersonDeepThoughtJoinColumnName)
@@ -228,36 +217,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     callPropertyChangedListeners(TableConfig.ReferenceIsbnOrIssnColumnName, previousValue, isbnOrIssn);
   }
 
-  public String getIssue() {
-    return issue;
-  }
-
-  public void setIssue(String issue) {
-    Object previousValue = this.issue;
-    this.issue = issue;
-    callPropertyChangedListeners(TableConfig.ReferenceIssueColumnName, previousValue, issue);
-  }
-
-  public Integer getYear() {
-    return year;
-  }
-
-  public void setYear(Integer year) {
-    Object previousValue = this.year;
-    this.year = year;
-    callPropertyChangedListeners(TableConfig.ReferenceYearColumnName, previousValue, year);
-  }
-
-  public Language getLanguage() {
-    return language;
-  }
-
-  public void setLanguage(Language language) {
-    Object previousValue = this.language;
-    this.language = language;
-    callPropertyChangedListeners(TableConfig.ReferenceLanguageJoinColumnName, previousValue, language);
-  }
-
   public DeepThought getDeepThought() {
     return deepThought;
   }
@@ -271,9 +230,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 //      preview = getTextRepresentation();
 //      addCategorySpecificInfo();
       preview = title;
-      if (issue != null && year != null)
-        preview = issue + "/" + year;
-      else if(title == null && publishingDate != null)
+      if(title == null && publishingDate != null)
         preview = publishingDate.toString();
 
       if (series != null)
