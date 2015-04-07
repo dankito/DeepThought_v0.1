@@ -2,12 +2,9 @@ package net.deepthought.controls.person;
 
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntryPersonListener;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -40,24 +37,14 @@ public class EntryPersonsControl extends PersonsControl {
     setDisable(entry == null);
 
     if(entry != null) {
-      setEntityPersons(extractReferencePersons(entry));
+      setEntityPersons(entry.getPersons());
       entry.addEntryPersonListener(entryPersonListener);
     }
     else
-      setEntityPersons(new HashMap<PersonRole, Set<Person>>()); // TODO: or set to null to tell that editing is not enabled?
+      setEntityPersons(new HashSet<Person>()); // TODO: or set to null to tell that editing is not enabled?
 
     for(PersonListCell cell : personListCells)
       ((EntryPersonListCell)cell).setEntry(entry);
-  }
-
-  protected Map<PersonRole, Set<Person>> extractReferencePersons(Entry entry) {
-    Map<PersonRole, Set<Person>> persons = new HashMap<>();
-
-    for(PersonRole role : entry.getPersonRoles()) {
-      persons.put(role, entry.getPersonsForRole(role));
-    }
-
-    return persons;
   }
 
   @Override
@@ -68,17 +55,17 @@ public class EntryPersonsControl extends PersonsControl {
 
   protected EntryPersonListener entryPersonListener = new EntryPersonListener() {
     @Override
-    public void personAdded(Entry entry, PersonRole role, Person addedPerson) {
+    public void personAdded(Entry entry, Person addedPerson) {
       if(entry.equals(EntryPersonsControl.this.entry) == false)
         log.warn("This should never be the case, EntryPersonListener's entry parameter {} doesn't equal member variable entry {}", entry, EntryPersonsControl.this.entry);
-      setEntityPersons(extractReferencePersons(entry));
+      setEntityPersons(entry.getPersons());
     }
 
     @Override
-    public void personRemoved(Entry entry, PersonRole role, Person removedPerson) {
+    public void personRemoved(Entry entry, Person removedPerson) {
       if(entry.equals(EntryPersonsControl.this.entry) == false)
         log.warn("This should never be the case, EntryPersonListener's entry parameter {} doesn't equal member variable entry {}", entry, EntryPersonsControl.this.entry);
-      setEntityPersons(extractReferencePersons(entry));
+      setEntityPersons(entry.getPersons());
 
     }
   };

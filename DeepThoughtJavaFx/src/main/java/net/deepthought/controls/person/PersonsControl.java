@@ -6,7 +6,6 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
@@ -22,10 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -38,18 +35,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -71,10 +61,10 @@ public abstract class PersonsControl extends TitledPane {
   protected FilteredList<Person> filteredPersons;
   protected SortedList<Person> sortedFilteredPersons;
 
-  protected Map<PersonRole, Set<Person>> currentlySetPersonsOnEntity = new HashMap<>();
-  protected Map<PersonRole, Set<Person>> addedPersons = new HashMap<>();
-  protected Map<PersonRole, Set<Person>> removedPersons = new HashMap<>();
-  protected Map<PersonRole, Set<Person>> editedEntityPersons = new HashMap<>();
+  protected Set<Person> currentlySetPersonsOnEntity = new HashSet<>();
+  protected Set<Person> addedPersons = new HashSet<>();
+  protected Set<Person> removedPersons = new HashSet<>();
+  protected Set<Person> editedEntityPersons = new HashSet<>();
 
   protected List<PersonListCell> personListCells = new ArrayList<>();
 
@@ -180,7 +170,7 @@ public abstract class PersonsControl extends TitledPane {
 //    return new PersonListCell(this);
 //  }
 
-  protected void setEntityPersons(Map<PersonRole, Set<Person>> persons) {
+  protected void setEntityPersons(Set<Person> persons) {
     currentlySetPersonsOnEntity = persons;
     editedEntityPersons = persons;
 
@@ -193,88 +183,45 @@ public abstract class PersonsControl extends TitledPane {
   protected void updatePersonsSetOnEntityPreview() {
     pnSelectedPersonsPreview.getChildren().clear();
 
-    for(PersonRole role : new TreeSet<>(editedEntityPersons.keySet())) {
-      addPersonRolePreviewPane(role);
+
+    for(Person person : new TreeSet<>(editedEntityPersons)) {
+      pnSelectedPersonsPreview.getChildren().add(createPersonPreviewLabel(person));
     }
   }
 
-  protected void addPersonRolePreviewPane(PersonRole role) {
-    HBox rolePreviewPane = new HBox();
-    rolePreviewPane.setAlignment(Pos.CENTER_LEFT);
-    if(role != PersonRole.getWithoutRolePersonRole())
-      pnSelectedPersonsPreview.getChildren().add(rolePreviewPane);
-    else
-      pnSelectedPersonsPreview.getChildren().add(0, rolePreviewPane);
-
-    if(role != PersonRole.getWithoutRolePersonRole()) {
-      Label roleLabel = new Label(role.getName());
-      HBox.setMargin(roleLabel, new Insets(0, 6, 0, 0));
-      rolePreviewPane.getChildren().add(roleLabel);
-    }
-
-    FlowPane roleFlowPane = new FlowPane(Orientation.HORIZONTAL);
-    roleFlowPane.setRowValignment(VPos.CENTER);
-    roleFlowPane.setColumnHalignment(HPos.LEFT);
-    roleFlowPane.setVgap(6);
-    roleFlowPane.setMaxWidth(Double.MAX_VALUE);
-    roleFlowPane.setUserData(role);
-    HBox.setHgrow(roleFlowPane, Priority.ALWAYS);
-    rolePreviewPane.getChildren().add(roleFlowPane);
-
-    for(Person person : new TreeSet<>(editedEntityPersons.get(role))) {
-      roleFlowPane.getChildren().add(createPersonInRolePreviewLabel(role, person));
-    }
-  }
-
-  protected PersonLabel createPersonInRolePreviewLabel(PersonRole role, Person person) {
-    PersonLabel label = new PersonLabel(role, person);
-    label.setOnButtonRemoveItemFromCollectionEventHandler((event) -> removePersonFromEntity(role, person));
+  protected PersonLabel createPersonPreviewLabel(Person person) {
+    PersonLabel label = new PersonLabel(person);
+    label.setOnButtonRemoveItemFromCollectionEventHandler((event) -> removePersonFromEntity(person));
     return label;
   }
 
-  protected void addPersonToEntity(PersonRole role, Person person) {
-    if(removedPersons.containsKey(role) && removedPersons.get(role).contains(person)) {
-      removedPersons.get(role).remove(person);
-      if (removedPersons.get(role).size() == 0)
-        removedPersons.remove(role);
+  protected void addPersonToEntity(Person person) {
+    if(removedPersons.contains(person)) {
+      removedPersons.remove(person);
     }
     else {
-      if (addedPersons.containsKey(role) == false)
-        addedPersons.put(role, new HashSet<Person>());
-      addedPersons.get(role).add(person);
+      addedPersons.add(person);
     }
 
-    if (editedEntityPersons.containsKey(role) == false)
-      editedEntityPersons.put(role, new HashSet<Person>());
-    editedEntityPersons.get(role).add(person);
+    editedEntityPersons.add(person);
 
     updatePersonsSetOnEntityPreview();
-    firePersonAddedEvent(role, person);
+    firePersonAddedEvent(person);
 
   }
 
-  protected void removePersonFromEntity(PersonRole role, Person person) {
-    if(addedPersons.containsKey(role) && addedPersons.get(role).contains(person)) {
-      addedPersons.get(role).remove(person);
-      if (addedPersons.get(role).size() == 0)
-        addedPersons.remove(role);
+  protected void removePersonFromEntity(Person person) {
+    if(addedPersons.contains(person)) {
+      addedPersons.remove(person);
     }
     else {
-
-      if(removedPersons.containsKey(role) == false)
-        removedPersons.put(role, new HashSet<Person>());
-      removedPersons.get(role).add(person);
+      removedPersons.add(person);
     }
 
-    if(editedEntityPersons.containsKey(role)) { // should actually never be false
-      editedEntityPersons.get(role).remove(person);
-
-      if (editedEntityPersons.get(role).size() == 0)
-        editedEntityPersons.remove(role);
-    }
+    editedEntityPersons.remove(person);
 
     updatePersonsSetOnEntityPreview();
-    firePersonRemovedEvent(role, person);
+    firePersonRemovedEvent(person);
   }
 
   protected void filterPersons() {
@@ -327,6 +274,8 @@ public abstract class PersonsControl extends TitledPane {
 
     if(deepThought != null)
       deepThought.addPerson(newPerson);
+
+    addPersonToEntity(newPerson);
   }
 
   @FXML
@@ -381,14 +330,14 @@ public abstract class PersonsControl extends TitledPane {
   }
 
 
-  protected void firePersonAddedEvent(PersonRole role, Person person) {
+  protected void firePersonAddedEvent(Person person) {
     if(personAddedEventHandler != null)
-      personAddedEventHandler.handle(new PersonsControlPersonsEditedEvent(this, role, person));
+      personAddedEventHandler.handle(new PersonsControlPersonsEditedEvent(this, person));
   }
 
-  protected void firePersonRemovedEvent(PersonRole role, Person person) {
+  protected void firePersonRemovedEvent(Person person) {
     if(personRemovedEventHandler != null)
-      personRemovedEventHandler.handle(new PersonsControlPersonsEditedEvent(this, role, person));
+      personRemovedEventHandler.handle(new PersonsControlPersonsEditedEvent(this, person));
   }
 
   public EventHandler<PersonsControlPersonsEditedEvent> getPersonAddedEventHandler() {
@@ -408,15 +357,15 @@ public abstract class PersonsControl extends TitledPane {
   }
 
 
-  public Map<PersonRole, Set<Person>> getEditedEntityPersons() {
+  public Set<Person> getEditedEntityPersons() {
     return editedEntityPersons;
   }
 
-  public Map<PersonRole, Set<Person>> getRemovedPersons() {
+  public Set<Person> getRemovedPersons() {
     return removedPersons;
   }
 
-  public Map<PersonRole, Set<Person>> getAddedPersons() {
+  public Set<Person> getAddedPersons() {
     return addedPersons;
   }
 

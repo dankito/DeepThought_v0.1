@@ -18,7 +18,6 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.enums.Language;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
@@ -41,11 +40,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -148,8 +143,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Pane paneSeriesTitleOnlineAddress;
   @FXML
   protected TextField txtfldSeriesTitleOnlineAddress;
-  @FXML
-  protected DatePicker dtpckSeriesTitleLastAccess;
 
   @FXML
   protected TitledPane ttldpnSeriesTitleNotes;
@@ -220,8 +213,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Pane paneOnlineAddress;
   @FXML
   protected TextField txtfldOnlineAddress;
-  @FXML
-  protected DatePicker dtpckLastAccess;
 
   @FXML
   protected TitledPane ttldpnNotes;
@@ -266,8 +257,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Pane paneReferenceSubDivisionOnlineAddress;
   @FXML
   protected TextField txtfldReferenceSubDivisionOnlineAddress;
-  @FXML
-  protected DatePicker dtpckReferenceSubDivisionLastAccess;
 
   @FXML
   protected TitledPane ttldpnReferenceSubDivisionNotes;
@@ -340,8 +329,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
     txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
-    dtpckSeriesTitleLastAccess.setConverter(localeDateStringConverter);
-    dtpckSeriesTitleLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleLastAccess));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleNotes);
     txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
@@ -428,8 +415,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
-    dtpckLastAccess.setConverter(localeDateStringConverter);
-    dtpckLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceLastAccess));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
@@ -465,8 +450,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
     txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
-    dtpckReferenceSubDivisionLastAccess.setConverter(localeDateStringConverter);
-    dtpckReferenceSubDivisionLastAccess.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionLastAccess));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionNotes);
     txtarReferenceSubDivisionNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes));
@@ -492,7 +475,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     seriesTitlePersonsControl.setVisible(seriesTitle.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || seriesTitle.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -507,7 +490,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     pnReferenceLength.setVisible(StringUtils.isNotNullOrEmpty(reference.getIsbnOrIssn()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     panePriceAndLanguage.setVisible(reference.getLanguage() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || reference.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -521,7 +504,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     referenceSubDivisionPersonsControl.setVisible(referenceSubDivision.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneReferenceSubDivisionOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getOnlineAddress()) || referenceSubDivision.getLastAccessDate() != null || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneReferenceSubDivisionOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -625,17 +608,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitlePersons)) {
-      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(seriesTitlePersonsControl.getRemovedPersons());
-      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
-        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
-          seriesTitle.removePerson(removedPerson, removedPersonsInRole);
-      }
+      for(Person removedPerson : seriesTitlePersonsControl.getRemovedPersons())
+        seriesTitle.removePerson(removedPerson);
 
-      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(seriesTitlePersonsControl.getAddedPersons());
-      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
-        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
-          seriesTitle.addPerson(addedPerson, addedPersonsInRole);
-      }
+      for(Person addedPerson : seriesTitlePersonsControl.getAddedPersons())
+        seriesTitle.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePersons);
     }
@@ -643,10 +620,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleOnlineAddress)) {
       seriesTitle.setOnlineAddress(txtfldSeriesTitleOnlineAddress.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleLastAccess)) {
-      seriesTitle.setLastAccessDate(DateConvertUtils.asUtilDate(dtpckSeriesTitleLastAccess.getValue()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastAccess);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSerialParts)) {
@@ -695,17 +668,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferencePersons)) {
-      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(referencePersonsControl.getRemovedPersons());
-      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
-        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
-          reference.removePerson(removedPerson, removedPersonsInRole);
-      }
+      for(Person removedPerson : referencePersonsControl.getRemovedPersons())
+        reference.removePerson(removedPerson);
 
-      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(referencePersonsControl.getAddedPersons());
-      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
-        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
-          reference.addPerson(addedPerson, addedPersonsInRole);
-      }
+      for(Person addedPerson : referencePersonsControl.getAddedPersons())
+        reference.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
     }
@@ -744,10 +711,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       reference.setOnlineAddress(txtfldOnlineAddress.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceLastAccess)) {
-      reference.setLastAccessDate(DateConvertUtils.asUtilDate(dtpckLastAccess.getValue()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceLastAccess);
-    }
 
 //    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanged.ReferenceSubDivisions)) {
 //
@@ -781,17 +744,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionPersons)) {
-      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(referenceSubDivisionPersonsControl.getRemovedPersons());
-      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
-        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
-          referenceSubDivision.removePerson(removedPerson, removedPersonsInRole);
-      }
+      for(Person removedPerson : referenceSubDivisionPersonsControl.getRemovedPersons())
+        referenceSubDivision.removePerson(removedPerson);
 
-      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(referenceSubDivisionPersonsControl.getAddedPersons());
-      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
-        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
-          referenceSubDivision.addPerson(addedPerson, addedPersonsInRole);
-      }
+      for(Person addedPerson : referenceSubDivisionPersonsControl.getAddedPersons())
+        referenceSubDivision.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionPersons);
     }
@@ -799,10 +756,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress)) {
       referenceSubDivision.setOnlineAddress(txtfldReferenceSubDivisionOnlineAddress.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionLastAccess)) {
-      referenceSubDivision.setLastAccessDate(DateConvertUtils.asUtilDate(dtpckReferenceSubDivisionLastAccess.getValue()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionLastAccess);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionNotes)) {
@@ -899,7 +852,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     seriesTitlePersonsControl.setSeries(seriesTitle);
 
     txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
-    dtpckSeriesTitleLastAccess.setValue(DateConvertUtils.asLocalDate(seriesTitle.getLastAccessDate()));
 
     txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
 
@@ -920,7 +872,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     referenceSubDivisionPersonsControl.setSubDivision(subDivision);
 
     txtfldReferenceSubDivisionOnlineAddress.setText(subDivision.getOnlineAddress());
-    dtpckReferenceSubDivisionLastAccess.setValue(DateConvertUtils.asLocalDate(subDivision.getLastAccessDate()));
 
     txtarReferenceSubDivisionNotes.setText(subDivision.getNotes());
 
@@ -1165,7 +1116,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       cmbxLanguage.setValue(reference.getLanguage());
 
     txtfldOnlineAddress.setText(reference.getOnlineAddress());
-    dtpckLastAccess.setValue(DateConvertUtils.asLocalDate(reference.getLastAccessDate()));
 
     txtarNotes.setText(reference.getNotes());
 
@@ -1219,8 +1169,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         seriesTitleTableOfContentsChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
         seriesTitleOnlineAddressChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceBaseLastAccessDateColumnName))
-        seriesTitleLastAccessChanged((Date) previousValue, (Date) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
         seriesTitleNotesChanged((String) previousValue, (String) newValue);
     }
@@ -1272,12 +1220,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
   }
 
-  protected void seriesTitleLastAccessChanged(Date previousValue, Date newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    dtpckSeriesTitleLastAccess.setValue(DateConvertUtils.asLocalDate(newValue));
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleLastAccess);
-  }
-
   protected void seriesTitleNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarSeriesTitleNotes.setText(newValue);
@@ -1306,8 +1248,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         languageChanged((Language) previousValue, (Language) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
         onlineAddressChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceBaseLastAccessDateColumnName))
-        lastAccessChanged((Date) previousValue, (Date) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
         notesChanged((String) previousValue, (String) newValue);
     }
@@ -1387,12 +1327,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
   }
 
-  protected void lastAccessChanged(Date previousValue, Date newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    dtpckLastAccess.setValue(DateConvertUtils.asLocalDate(newValue));
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceLastAccess);
-  }
-
   protected void notesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarNotes.setText(newValue);
@@ -1406,34 +1340,14 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.ReferenceBaseTitleColumnName))
         referenceSubDivisionTitleChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleCategoryJoinColumnName))
-//        seriesTitleCategoryChanged((SeriesTitleCategory) previousValue, (SeriesTitleCategory) newValue);
-//      else if(propertyName.equals(TableConfig.ReferenceBaseSubTitleColumnName))
-//        seriesTitleSubTitleChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleTitleSupplementColumnName))
-//        seriesTitleTitleSupplementChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.ReferenceBaseAbstractColumnName))
-//        seriesTitleAbstractChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleTableOfContentsColumnName))
-//        seriesTitleTableOfContentsChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleFirstDayOfPublicationColumnName))
-//        seriesTitleFirstDayOfPublicationChanged((Date) previousValue, (Date) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleLastDayOfPublicationColumnName))
-//        seriesTitleLastDayOfPublicationChanged((Date) previousValue, (Date) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitlePublisherJoinColumnName))
-//        seriesTitlePublisherChanged((Publisher) previousValue, (Publisher) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleStandardAbbreviationColumnName))
-//        seriesTitleStandardAbbreviationChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleUserAbbreviation1ColumnName))
-//        seriesTitleUserAbbreviation1Changed((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.SeriesTitleUserAbbreviation2ColumnName))
-//        seriesTitleUserAbbreviation2Changed((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
-//        seriesTitleOnlineAddressChanged((String) previousValue, (String) newValue);
-//      else if(propertyName.equals(TableConfig.ReferenceBaseLastAccessDateColumnName))
-//        seriesTitleLastAccessChanged((Date) previousValue, (Date) newValue);
-//      else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
-//        seriesTitleNotesChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceBaseSubTitleColumnName))
+        referenceSubDivisionSubTitleChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceBaseAbstractColumnName))
+        referenceSubDivisionAbstractChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
+        referenceSubDivisionOnlineAddressChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
+        referenceSubDivisionNotesChanged((String) previousValue, (String) newValue);
     }
 
     @Override
@@ -1475,12 +1389,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     // TODO: if current value != previousValue, ask User what to do?
     txtfldReferenceSubDivisionOnlineAddress.setText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
-  }
-
-  protected void referenceSubDivisionLastAccessChanged(Date previousValue, Date newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    dtpckReferenceSubDivisionLastAccess.setValue(DateConvertUtils.asLocalDate(newValue));
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionLastAccess);
   }
 
   protected void referenceSubDivisionNotesChanged(String previousValue, String newValue) {

@@ -10,7 +10,6 @@ import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
@@ -105,19 +104,16 @@ public class DataHelper {
     deepThought.addPerson(paech);
     deepThought.addPerson(graeber);
 
-    PersonRole author = new PersonRole("Author");
-    PersonRole editor = new PersonRole("Editor");
+    entry1.addPerson(welzer);
+    entry1.addPerson(paech);
+    entry2.addPerson(welzer);
+    entry3.addPerson(welzer);
+    entry3.addPerson(paech);
 
-    entry1.addPerson(welzer, author);
-    entry1.addPerson(paech, author);
-    entry2.addPerson(welzer, author);
-    entry3.addPerson(welzer, author);
-    entry3.addPerson(paech, author);
-
-    entry1.addPerson(graeber, editor);
-    entry2.addPerson(graeber, editor);
-    entry2.addPerson(paech, editor);
-    entry3.addPerson(graeber, editor);
+    entry1.addPerson(graeber);
+    entry2.addPerson(graeber);
+    entry2.addPerson(paech);
+    entry3.addPerson(graeber);
 
     entry1.addFile(new FileLink("dummy"));
     entry2.addFile(new FileLink("dummy"));

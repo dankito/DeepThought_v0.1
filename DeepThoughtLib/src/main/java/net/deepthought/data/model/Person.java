@@ -1,7 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.data.model.enums.Gender;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -10,9 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -76,16 +73,16 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "person")
   protected Set<EntryPersonAssociation> entryPersonAssociations = new HashSet<>();
 
-  protected transient Map<Entry, Set<PersonRole>> entryRoles = null;
+  protected transient Set<Entry> entries = null;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "person")
   protected Set<ReferenceBasePersonAssociation> referenceBasePersonAssociations = new HashSet<>();
 
-  protected transient Map<SeriesTitle, Set<PersonRole>> seriesRoles = null;
+  protected transient Set<SeriesTitle> associatedSeriesTitles = null;
 
-  protected transient Map<Reference, Set<PersonRole>> referenceRoles = null;
+  protected transient Set<Reference> associatedReferences = null;
 
-  protected transient Map<ReferenceSubDivision, Set<PersonRole>> referenceSubDivisionRoles = null;
+  protected transient Set<ReferenceSubDivision> associatedReferenceSubDivisions = null;
 
 //  @JsonIgnore
   @ManyToOne(fetch = FetchType.EAGER)
@@ -219,7 +216,7 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     boolean result = entryPersonAssociations.add(entryPersonAssociation);
 
     if(result) {
-      entryRoles = null;
+      entries = null;
       callEntityAddedListeners(entryPersonAssociations, entryPersonAssociation);
     }
 
@@ -230,7 +227,7 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     boolean result = entryPersonAssociations.remove(entryPersonAssociation);
 
     if(result) {
-      entryRoles = null;
+      entries = null;
       callEntityRemovedListeners(entryPersonAssociations, entryPersonAssociation);
     }
 
@@ -242,25 +239,16 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   }
 
   public Set<Entry> getAssociatedEntries() {
-    if(entryRoles == null)
-      createEntryRoles();
+    if(entries == null)
+      createEntries();
 
-    return entryRoles.keySet();
+    return entries;
   }
 
-  public Set<PersonRole> getRolesForEntry(Entry entry) {
-    if(entryRoles == null)
-      createEntryRoles();
-
-    return entryRoles.get(entry);
-  }
-
-  protected void createEntryRoles() {
-    entryRoles = new HashMap<>();
+  protected void createEntries() {
+    entries = new HashSet<>();
     for(EntryPersonAssociation association : entryPersonAssociations) {
-      if(entryRoles.containsKey(association.getEntry()) == false)
-        entryRoles.put(association.getEntry(), new HashSet<PersonRole>());
-      entryRoles.get(association.getEntry()).add(association.getRole());
+      entries.add(association.getEntry());
     }
   }
 
@@ -269,7 +257,7 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     boolean result = referenceBasePersonAssociations.add(referenceBasePersonAssociation);
 
     if(result) {
-      referenceRoles = null;
+      associatedReferences = null;
       callEntityAddedListeners(referenceBasePersonAssociations, referenceBasePersonAssociation);
     }
 
@@ -280,7 +268,7 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     boolean result = referenceBasePersonAssociations.remove(referenceBasePersonAssociation);
 
     if(result) {
-      referenceRoles = null;
+      associatedReferences = null;
       callEntityRemovedListeners(referenceBasePersonAssociations, referenceBasePersonAssociation);
     }
 
@@ -292,26 +280,17 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   }
 
   public Set<SeriesTitle> getAssociatedSeries() {
-    if(seriesRoles == null)
-      createSeriesRoles();
+    if(associatedSeriesTitles == null)
+      createAssociatedSeries();
 
-    return seriesRoles.keySet();
+    return associatedSeriesTitles;
   }
 
-  public Set<PersonRole> getRolesForSeries(SeriesTitle series) {
-    if(seriesRoles == null)
-      createSeriesRoles();
-
-    return seriesRoles.get(series);
-  }
-
-  protected void createSeriesRoles() {
-    seriesRoles = new HashMap<>();
+  protected void createAssociatedSeries() {
+    associatedSeriesTitles = new HashSet<>();
     for(ReferenceBasePersonAssociation association : referenceBasePersonAssociations) {
       if(association.getReferenceBase() instanceof SeriesTitle) {
-        if(seriesRoles.containsKey(association.getReferenceBase()) == false)
-          seriesRoles.put((SeriesTitle)association.getReferenceBase(), new HashSet<PersonRole>());
-        seriesRoles.get(association.getReferenceBase()).add(association.getRole());
+        associatedSeriesTitles.add((SeriesTitle) association.getReferenceBase());
       }
     }
   }
@@ -321,26 +300,17 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   }
 
   public Set<Reference> getAssociatedReferences() {
-    if(referenceRoles == null)
-      createReferenceRoles();
+    if(associatedReferences == null)
+      createAssociatedReferences();
 
-    return referenceRoles.keySet();
+    return associatedReferences;
   }
 
-  public Set<PersonRole> getRolesForReference(Reference reference) {
-    if(referenceRoles == null)
-      createReferenceRoles();
-
-    return referenceRoles.get(reference);
-  }
-
-  protected void createReferenceRoles() {
-    referenceRoles = new HashMap<>();
+  protected void createAssociatedReferences() {
+    associatedReferences = new HashSet<>();
     for(ReferenceBasePersonAssociation association : referenceBasePersonAssociations) {
       if(association.getReferenceBase() instanceof Reference) {
-        if(referenceRoles.containsKey(association.getReferenceBase()) == false)
-          referenceRoles.put((Reference)association.getReferenceBase(), new HashSet<PersonRole>());
-        referenceRoles.get(association.getReferenceBase()).add(association.getRole());
+        associatedReferences.add((Reference) association.getReferenceBase());
       }
     }
   }
@@ -350,26 +320,17 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   }
 
   public Set<ReferenceSubDivision> getAssociatedReferenceSubDivisions() {
-    if(referenceSubDivisionRoles == null)
-      createReferenceSubDivisionRoles();
+    if(associatedReferenceSubDivisions == null)
+      createAssociatedReferenceSubDivisions();
 
-    return referenceSubDivisionRoles.keySet();
+    return associatedReferenceSubDivisions;
   }
 
-  public Set<PersonRole> getRolesForSubDivision(ReferenceSubDivision subDivision) {
-    if(referenceSubDivisionRoles == null)
-      createReferenceSubDivisionRoles();
-
-    return referenceSubDivisionRoles.get(subDivision);
-  }
-
-  protected void createReferenceSubDivisionRoles() {
-    referenceSubDivisionRoles = new HashMap<>();
+  protected void createAssociatedReferenceSubDivisions() {
+    associatedReferenceSubDivisions = new HashSet<>();
     for(ReferenceBasePersonAssociation association : referenceBasePersonAssociations) {
       if(association.getReferenceBase() instanceof ReferenceSubDivision) {
-        if(referenceSubDivisionRoles.containsKey(association.getReferenceBase()) == false)
-          referenceSubDivisionRoles.put((ReferenceSubDivision)association.getReferenceBase(), new HashSet<PersonRole>());
-        referenceSubDivisionRoles.get(association.getReferenceBase()).add(association.getRole());
+        associatedReferenceSubDivisions.add((ReferenceSubDivision)association.getReferenceBase());
       }
     }
   }

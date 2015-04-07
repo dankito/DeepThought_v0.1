@@ -2,7 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntryPersonListener;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
@@ -13,10 +12,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -90,7 +87,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "entry", cascade = CascadeType.PERSIST)
   protected Set<EntryPersonAssociation> entryPersonAssociations = new HashSet<>();
 
-  protected transient Map<PersonRole, Set<Person>> personRoles = null;
+  protected transient Set<Person> persons = null;
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "entry", cascade = CascadeType.PERSIST)
   protected Set<Note> notes = new HashSet<>();
@@ -482,23 +479,25 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return entryPersonAssociations;
   }
 
-  public boolean addPerson(Person person, PersonRole role) {
-    Set<Person> personsAlreadyInRole = getPersonsForRole(role);
-    EntryPersonAssociation entryPersonAssociation = new EntryPersonAssociation(this, person, role, personsAlreadyInRole == null ? 0 : personsAlreadyInRole.size());
+  public boolean addPerson(Person person) {
+    EntryPersonAssociation existingAssociation = findEntryPersonAssociation(person);
+    if(existingAssociation != null) // Person already added to Entry
+      return false;
+
+    EntryPersonAssociation entryPersonAssociation = new EntryPersonAssociation(this, person, entryPersonAssociations.size());
 
     boolean result = this.entryPersonAssociations.add(entryPersonAssociation);
     result &= person.addEntry(entryPersonAssociation);
-    result &= role.addEntry(entryPersonAssociation);
 
-    personRoles = null;
-    callPersonAddedListeners(role, person);
+    persons = null;
+    callPersonAddedListeners(person);
     callEntityAddedListeners(entryPersonAssociations, entryPersonAssociation);
 
     return result;
   }
 
-  public boolean removePerson(Person person, PersonRole role) {
-    EntryPersonAssociation entryPersonAssociation = findEntryPersonAssociation(person, role);
+  public boolean removePerson(Person person) {
+    EntryPersonAssociation entryPersonAssociation = findEntryPersonAssociation(person);
     if(entryPersonAssociation == null)
       return false;
 
@@ -506,9 +505,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
     boolean result = this.entryPersonAssociations.remove(entryPersonAssociation);
     result &= person.removeEntry(entryPersonAssociation);
-    result &= role.removeEntry(entryPersonAssociation);
 
-    personRoles = null;
+    persons = null;
 
     for(EntryPersonAssociation association : entryPersonAssociations) {
       if(association.getPersonOrder() > removeIndex)
@@ -516,40 +514,31 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     callEntityRemovedListeners(entryPersonAssociations, entryPersonAssociation);
-    callPersonRemovedListeners(role, person);
+    callPersonRemovedListeners(person);
 
     return result;
   }
 
-  protected EntryPersonAssociation findEntryPersonAssociation(Person person, PersonRole role) {
+  protected EntryPersonAssociation findEntryPersonAssociation(Person person) {
     for(EntryPersonAssociation association : this.entryPersonAssociations) {
-      if(association.getPerson().equals(person) && association.getRole().equals(role))
+      if(association.getPerson().equals(person))
         return association;
     }
 
     return null;
   }
 
-  public Set<PersonRole> getPersonRoles() {
-    if(personRoles == null)
-      createPersonRoles();
+  public Set<Person> getPersons() {
+    if(persons == null)
+      createPersons();
 
-    return personRoles.keySet();
+    return persons;
   }
 
-  public Set<Person> getPersonsForRole(PersonRole role) {
-    if(personRoles == null)
-      createPersonRoles();
-
-    return personRoles.get(role);
-  }
-
-  protected void createPersonRoles() {
-    personRoles = new HashMap<>();
+  protected void createPersons() {
+    persons = new HashSet<>();
     for(EntryPersonAssociation association : entryPersonAssociations) {
-      if(personRoles.containsKey(association.getRole()) == false)
-        personRoles.put(association.getRole(), new HashSet<Person>());
-      personRoles.get(association.getRole()).add(association.getPerson());
+      persons.add(association.getPerson());
     }
   }
 
@@ -668,14 +657,14 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return entryPersonListeners.remove(listener);
   }
 
-  protected void callPersonAddedListeners(PersonRole role, Person person) {
+  protected void callPersonAddedListeners(Person person) {
     for(EntryPersonListener listener : entryPersonListeners)
-      listener.personAdded(this, role, person);
+      listener.personAdded(this, person);
   }
 
-  protected void callPersonRemovedListeners(PersonRole role, Person person) {
+  protected void callPersonRemovedListeners(Person person) {
     for(EntryPersonListener listener : entryPersonListeners)
-      listener.personRemoved(this, role, person);
+      listener.personRemoved(this, person);
   }
 
 

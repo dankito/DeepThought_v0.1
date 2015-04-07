@@ -1,20 +1,16 @@
 package net.deepthought.controls.person;
 
-import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
@@ -27,9 +23,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -47,23 +40,17 @@ public class PersonListCell extends ListCell<Person> {
 
   protected PersonsControl personsControl;
 
-  protected PersonRole defaultPersonRole = null;
-
   protected HBox graphicPane = new HBox();
 
   protected Label personDisplayNameLabel = new Label();
 
-  protected Button btnAddPersonWithoutRole = new Button();
-  protected Button btnAddPersonInDefaultRole = new Button();
-  protected MenuButton btnSelectPersonRole = new MenuButton();
+  protected Button btnAddPerson = new Button();
   protected Button btnEditPerson = new Button();
   protected Button btnDeletePerson = new Button();
 
 
   public PersonListCell(PersonsControl personsControl) {
     this.personsControl = personsControl;
-
-    this.defaultPersonRole = PersonRole.getAuthorPersonRole();
 
     setText(null);
     setupGraphic();
@@ -90,45 +77,16 @@ public class PersonListCell extends ListCell<Person> {
     personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(personDisplayNameLabel);
 
-    JavaFxLocalization.bindLabeledText(btnAddPersonWithoutRole, "person.role.without.role");
-    btnAddPersonWithoutRole.setMinWidth(80);
-    HBox.setMargin(btnAddPersonWithoutRole, new Insets(0, 6, 0, 0));
-    graphicPane.getChildren().add(btnAddPersonWithoutRole);
+    JavaFxLocalization.bindLabeledText(btnAddPerson, "add");
+    btnAddPerson.setMinWidth(80);
+    HBox.setMargin(btnAddPerson, new Insets(0, 6, 0, 0));
+    graphicPane.getChildren().add(btnAddPerson);
 
-    btnAddPersonWithoutRole.setOnAction(new EventHandler<ActionEvent>() {
+    btnAddPerson.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         selectCurrentCell();
-        handleButtonAddPersonWithoutRoleAction();
-      }
-    });
-
-    if(defaultPersonRole != null)
-      JavaFxLocalization.bindLabeledText(btnAddPersonInDefaultRole, "add.as.default.role", defaultPersonRole.getName());
-    btnAddPersonInDefaultRole.setVisible(defaultPersonRole != null);
-    btnAddPersonInDefaultRole.setMinWidth(80);
-    HBox.setMargin(btnAddPersonInDefaultRole, new Insets(0, 6, 0, 0));
-    graphicPane.getChildren().add(btnAddPersonInDefaultRole);
-
-    btnAddPersonInDefaultRole.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        selectCurrentCell();
-        handleButtonAddPersonInDefaultRoleAction();
-      }
-    });
-
-    JavaFxLocalization.bindLabeledText(btnSelectPersonRole, "as...");
-    btnSelectPersonRole.setMinWidth(80);
-    HBox.setMargin(btnSelectPersonRole, new Insets(0, 6, 0, 0));
-    graphicPane.getChildren().add(btnSelectPersonRole);
-
-    btnSelectPersonRole.showingProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        createButtonSelectPersonRoleItems();
-
-        selectCurrentCell();
+        handleButtonAddPersonAction();
       }
     });
 
@@ -152,15 +110,6 @@ public class PersonListCell extends ListCell<Person> {
   }
 
 
-  protected void setDefaultPersonRole(PersonRole defaultPersonRole) {
-    this.defaultPersonRole = defaultPersonRole;
-
-    if(defaultPersonRole != null)
-      JavaFxLocalization.bindLabeledText(btnAddPersonInDefaultRole, "add.as.default.role", defaultPersonRole.getName());
-    setDefaultRoleButtonsVisibleState();
-  }
-
-
   @Override
   protected void updateItem(Person item, boolean empty) {
     super.updateItem(item, empty);
@@ -176,12 +125,11 @@ public class PersonListCell extends ListCell<Person> {
   }
 
   protected void setDefaultRoleButtonsVisibleState() {
-    btnAddPersonWithoutRole.setVisible(getItem() != null && isPersonSetInPersonRoleOnEntity(PersonRole.getWithoutRolePersonRole(), getItem()) == false);
-    btnAddPersonInDefaultRole.setVisible(defaultPersonRole != null && getItem() != null && isPersonSetInPersonRoleOnEntity(defaultPersonRole, getItem()) == false);
+    btnAddPerson.setVisible(getItem() != null && isPersonSetOnEntity(getItem()) == false);
   }
 
-  protected boolean isPersonSetInPersonRoleOnEntity(PersonRole role, Person person) {
-    return personsControl.getEditedEntityPersons().containsKey(role) && personsControl.getEditedEntityPersons().get(role).contains(person);
+  protected boolean isPersonSetOnEntity(Person person) {
+    return personsControl.getEditedEntityPersons().contains(person);
   }
 
 
@@ -190,11 +138,11 @@ public class PersonListCell extends ListCell<Person> {
       //Dialogs.showEditPersonDialog(getItem());
 
       if(getItem() != null) {
-        Map<PersonRole, Set<Person>> editedPersons = personsControl.getEditedEntityPersons();
-        if (editedPersons.containsKey(PersonRole.getWithoutRolePersonRole()) == false || editedPersons.get(PersonRole.getWithoutRolePersonRole()).contains(getItem()) == false)
-          addPersonInRoleToEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+        Set<Person> editedPersons = personsControl.getEditedEntityPersons();
+        if (editedPersons.contains(getItem()) == false)
+          addPersonToEntity(getItem());
         else
-          removePersonInRoleFromEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+          removePersonFromEntity(getItem());
       }
     }
   }
@@ -217,47 +165,17 @@ public class PersonListCell extends ListCell<Person> {
   }
 
 
-  protected void handleButtonAddPersonWithoutRoleAction() {
-    addPersonInRoleToEntity(getItem(), PersonRole.getWithoutRolePersonRole());
+  protected void handleButtonAddPersonAction() {
+    addPersonToEntity(getItem());
   }
 
-  protected void handleButtonAddPersonInDefaultRoleAction() {
-    addPersonInRoleToEntity(getItem(), defaultPersonRole);
-  }
-
-
-  protected void createButtonSelectPersonRoleItems() {
-    btnSelectPersonRole.getItems().clear();
-
-    for(final PersonRole role : Application.getDeepThought().getPersonRolesSorted()) {
-      MenuItem roleMenuItem = new MenuItem(role.getName());
-      roleMenuItem.setDisable(isPersonSetInPersonRoleOnEntity(role, getItem()));
-      btnSelectPersonRole.getItems().add(roleMenuItem);
-
-      roleMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-        @Override
-        public void handle(ActionEvent event) {
-          addPersonInRoleToEntity(getItem(), role);
-        }
-      });
-    }
-
-    btnSelectPersonRole.getItems().add(new SeparatorMenuItem());
-
-    MenuItem createNewRoleMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("create.new.role"));
-    createNewRoleMenuItem.setDisable(true);
-    btnSelectPersonRole.getItems().add(createNewRoleMenuItem);
-
-//    createNewRoleMenuItem.setOnAction((event) -> );
-  }
-
-  protected void addPersonInRoleToEntity(Person person, PersonRole role) {
-    personsControl.addPersonToEntity(role, person);
+  protected void addPersonToEntity(Person person) {
+    personsControl.addPersonToEntity(person);
     setDefaultRoleButtonsVisibleState();
   }
 
-  protected void removePersonInRoleFromEntity(Person person, PersonRole role) {
-    personsControl.removePersonFromEntity(role, person);
+  protected void removePersonFromEntity(Person person) {
+    personsControl.removePersonFromEntity(person);
     setDefaultRoleButtonsVisibleState();
   }
 

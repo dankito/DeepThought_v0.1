@@ -175,12 +175,6 @@
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <Label text="%last.access">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <DatePicker fx:id="dtpckLastAccess" prefHeight="35.0" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
@@ -292,12 +286,6 @@
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <Label text="%last.access">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <DatePicker fx:id="dtpckReferenceSubDivisionLastAccess" prefHeight="35.0" />
                                  </children>
                                  <VBox.margin>
                                     <Insets bottom="6.0" top="6.0" />
@@ -419,12 +407,6 @@
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldSeriesTitleOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <Label text="%last.access">
-                                       <HBox.margin>
-                                          <Insets left="18.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                    <DatePicker fx:id="dtpckSeriesTitleLastAccess" prefHeight="35.0" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />

@@ -6,7 +6,6 @@ import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.SettingsBase;
 import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
@@ -644,57 +643,6 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertNull(language.getDeepThought());
     Assert.assertFalse(deepThought.getLanguages().contains(language));
-  }
-
-
-  @Test
-  public void addPersonRole_RelationGetsPersisted() throws Exception {
-    PersonRole personRole = new PersonRole("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPersonRole(personRole);
-
-    Object persistedDeepThoughtId = getValueFromTable(TableConfig.PersonRoleTableName, TableConfig.ExtensibleEnumerationDeepThoughtJoinColumnName, personRole.getId());
-    Assert.assertTrue(doIdsEqual(personRole.getDeepThought().getId(), persistedDeepThoughtId));
-  }
-
-  @Test
-  public void addPersonRole_EntitiesGetAddedToRelatedCollections() throws Exception {
-    PersonRole personRole = new PersonRole("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPersonRole(personRole);
-
-    Assert.assertNotNull(personRole.getDeepThought());
-    Assert.assertTrue(deepThought.getPersonRoles().contains(personRole));
-  }
-
-  @Test
-  public void removePersonRole_RelationGetsDeleted() throws Exception {
-    PersonRole personRole = new PersonRole("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPersonRole(personRole);
-
-    deepThought.removePersonRole(personRole);
-
-    Object persistedDeepThoughtId = getValueFromTable(TableConfig.PersonRoleTableName, TableConfig.ExtensibleEnumerationDeepThoughtJoinColumnName, personRole.getId());
-    Assert.assertNull(persistedDeepThoughtId);
-
-    Assert.assertTrue(personRole.isDeleted());
-  }
-
-  @Test
-  public void removePersonRole_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    PersonRole personRole = new PersonRole("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPersonRole(personRole);
-
-    deepThought.removePersonRole(personRole);
-
-    Assert.assertNull(personRole.getDeepThought());
-    Assert.assertFalse(deepThought.getPersonRoles().contains(personRole));
   }
 
 

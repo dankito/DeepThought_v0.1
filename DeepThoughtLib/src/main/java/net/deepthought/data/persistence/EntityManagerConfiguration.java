@@ -23,7 +23,6 @@ import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
-import net.deepthought.data.model.enums.PersonRole;
 
 import java.io.File;
 import java.util.HashMap;
@@ -343,7 +342,6 @@ public class EntityManagerConfiguration {
         Tag.class,
         IndexTerm.class,
         Person.class,
-        PersonRole.class,
         EntryPersonAssociation.class,
     
         Note.class,

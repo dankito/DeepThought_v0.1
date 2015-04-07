@@ -2,14 +2,11 @@ package net.deepthought.controls.person;
 
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -38,24 +35,14 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
     setDisable(subDivision == null);
 
     if(subDivision != null) {
-      setEntityPersons(extractReferenceSubDivisionPersons(subDivision));
+      setEntityPersons(subDivision.getPersons());
       subDivision.addEntityListener(referenceSubDivisionListener);
     }
     else
-      setEntityPersons(new HashMap<PersonRole, Set<Person>>()); // TODO: or set to null to tell that editing is not enabled?
+      setEntityPersons(new HashSet<Person>()); // TODO: or set to null to tell that editing is not enabled?
 
     for(PersonListCell cell : personListCells)
       ((ReferenceSubDivisionPersonListCell)cell).setSubDivision(subDivision);
-  }
-
-  protected Map<PersonRole, Set<Person>> extractReferenceSubDivisionPersons(ReferenceSubDivision reference) {
-    Map<PersonRole, Set<Person>> persons = new HashMap<>();
-
-    for(PersonRole role : reference.getPersonRoles()) {
-      persons.put(role, reference.getPersonsForRole(role));
-    }
-
-    return persons;
   }
 
   @Override
@@ -79,7 +66,7 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collection == subDivision.getReferenceBasePersonAssociations())
-        setEntityPersons(extractReferenceSubDivisionPersons(subDivision));
+        setEntityPersons(subDivision.getPersons());
     }
 
     @Override
@@ -90,7 +77,7 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(collection == subDivision.getReferenceBasePersonAssociations())
-        setEntityPersons(extractReferenceSubDivisionPersons(subDivision));
+        setEntityPersons(subDivision.getPersons());
     }
   };
 

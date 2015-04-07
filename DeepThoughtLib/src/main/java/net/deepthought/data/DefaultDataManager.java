@@ -17,7 +17,6 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -372,9 +371,7 @@ public class DefaultDataManager implements IDataManager {
         ensureAllLazyLoadingDataIsLoadedRecursive(tag);
       for(IndexTerm indexTerm : entry.getIndexTerms())
         ensureAllLazyLoadingDataIsLoadedRecursive(indexTerm);
-      for(PersonRole role : entry.getPersonRoles()) {
-        ensureAllLazyLoadingDataIsLoadedRecursive(role);
-        for(Person person : ((Entry) entity).getPersonsForRole(role))
+      for(Person person : entry.getPersons()) {
           ensureAllLazyLoadingDataIsLoadedRecursive(person);
       }
       for(FileLink file : entry.getFiles())

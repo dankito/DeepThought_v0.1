@@ -23,7 +23,6 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
@@ -43,10 +42,7 @@ import org.w3c.dom.Document;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -254,6 +250,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setPrefHeight(250);
+    entryPersonsControl.setExpanded(true);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
@@ -413,18 +410,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryPersons)) {
-      Map<PersonRole, Set<Person>> removedPersons = new HashMap<>(entryPersonsControl.getRemovedPersons());
-      for(PersonRole removedPersonsInRole : removedPersons.keySet()) {
-        for(Person removedPerson : removedPersons.get(removedPersonsInRole))
-          entry.removePerson(removedPerson, removedPersonsInRole);
-      }
+      for(Person removedPerson : entryPersonsControl.getRemovedPersons())
+        entry.removePerson(removedPerson);
       entryPersonsControl.getRemovedPersons().clear();
 
-      Map<PersonRole, Set<Person>> addedPersons = new HashMap<>(entryPersonsControl.getAddedPersons());
-      for(PersonRole addedPersonsInRole : addedPersons.keySet()) {
-        for(Person addedPerson : addedPersons.get(addedPersonsInRole))
-          entry.addPerson(addedPerson, addedPersonsInRole);
-      }
+      for(Person addedPerson : entryPersonsControl.getAddedPersons())
+        entry.addPerson(addedPerson);
       entryPersonsControl.getAddedPersons().clear();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryPersons);

@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.AssociationEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -20,20 +19,13 @@ public class ReferenceBasePersonAssociation extends AssociationEntity {
 
   private static final long serialVersionUID = -1098887985449009796L;
 
-  //  @Id
   @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName)
   protected ReferenceBase referenceBase;
 
-//  @Id
   @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName)
   protected Person person;
-
-//  @Id
-  @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = TableConfig.ReferenceBasePersonAssociationPersonRoleJoinColumnName)
-  protected PersonRole role;
 
   @Column(name = TableConfig.ReferenceBasePersonAssociationPersonOrderColumnName)
   protected int personOrder = Integer.MAX_VALUE;
@@ -43,14 +35,13 @@ public class ReferenceBasePersonAssociation extends AssociationEntity {
 
   }
 
-  public ReferenceBasePersonAssociation(ReferenceBase referenceBase, Person person, PersonRole role) {
+  public ReferenceBasePersonAssociation(ReferenceBase referenceBase, Person person) {
     this.referenceBase = referenceBase;
     this.person = person;
-    this.role = role;
   }
 
-  public ReferenceBasePersonAssociation(ReferenceBase referenceBase, Person person, PersonRole role, int personOrder) {
-    this(referenceBase, person, role);
+  public ReferenceBasePersonAssociation(ReferenceBase referenceBase, Person person, int personOrder) {
+    this(referenceBase, person);
     this.personOrder = personOrder;
   }
 
@@ -61,10 +52,6 @@ public class ReferenceBasePersonAssociation extends AssociationEntity {
 
   public Person getPerson() {
     return person;
-  }
-
-  public PersonRole getRole() {
-    return role;
   }
 
   public int getPersonOrder() {

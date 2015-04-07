@@ -2,7 +2,6 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -34,11 +33,10 @@ public abstract class EntryTestBase extends DataModelTestBase {
         TableConfig.EntryIndexTermJoinTableIndexTermIdColumnName, indexTermId);
   }
 
-  protected boolean doesEntryPersonRoleJoinTableEntryExist(Long entryId, Long personRoleId, Long personId) throws SQLException {
+  protected boolean doesEntryPersonRoleJoinTableEntryExist(Long entryId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.EntryPersonAssociationTableName + " WHERE " +
         TableConfig.EntryPersonAssociationEntryJoinColumnName +  "=" + entryId +
-        " AND " + TableConfig.EntryPersonAssociationPersonJoinColumnName + "=" + personId +
-        " AND " + TableConfig.EntryPersonAssociationPersonRoleJoinColumnName + "=" + personRoleId);
+        " AND " + TableConfig.EntryPersonAssociationPersonJoinColumnName + "=" + personId);
     return result.size() == 1;
 //    return doesJoinTableEntryExist(TableConfig.EntryPersonRolesTableName, TableConfig.EntryPersonRolesEntryJoinColumnName, entryId,
 //        TableConfig.EntryPersonRolesPersonRoleJoinColumnName, personId);
@@ -683,39 +681,30 @@ public abstract class EntryTestBase extends DataModelTestBase {
   public void addPerson_RelationGetsPersisted() throws Exception {
     Entry entry = new Entry("test", "no content");
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person, role);
+    entry.addPerson(person);
 
-    Assert.assertTrue(doesEntryPersonRoleJoinTableEntryExist(entry.getId(), role.getId(), person.getId()));
+    Assert.assertTrue(doesEntryPersonRoleJoinTableEntryExist(entry.getId(), person.getId()));
   }
 
   @Test
   public void addPerson_EntitiesGetAddedToRelatedCollections() throws Exception {
     Entry entry = new Entry("test", "no content");
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person, role);
+    entry.addPerson(person);
 
-    Assert.assertTrue(entry.getPersonRoles().contains(role));
-    Assert.assertTrue(entry.getPersonsForRole(role).contains(person));
+    Assert.assertTrue(entry.getPersons().contains(person));
 
     Assert.assertTrue(person.getAssociatedEntries().contains(entry));
-    Assert.assertTrue(person.getRolesForEntry(entry).contains(role));
-
-    Assert.assertTrue(role.getEntries().contains(entry));
-    Assert.assertTrue(role.getEntriesPersons().contains(person));
   }
 
   @Test
@@ -724,18 +713,16 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Person person1 = new Person("Mahatma", "Gandhi");
     Person person2 = new Person("Nelson", "Mandela");
     Person person3 = new Person("Mother Teresa", "");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(person1);
     deepThought.addPerson(person2);
     deepThought.addPerson(person3);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person1, role);
-    entry.addPerson(person2, role);
-    entry.addPerson(person3, role);
+    entry.addPerson(person1);
+    entry.addPerson(person2);
+    entry.addPerson(person3);
 
     for(EntryPersonAssociation association : entry.getEntryPersonAssociations()) {
       if(association.getPerson().equals(person1))
@@ -752,95 +739,56 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Entry entry = new Entry("test", "no content");
     Person firstPerson = new Person("Mahatma", "Gandhi");
     Person secondPerson = new Person("Mandela", "Nelson");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(firstPerson);
     deepThought.addPerson(secondPerson);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(firstPerson, role);
+    entry.addPerson(firstPerson);
 
-    entry.addPerson(secondPerson, role);
+    entry.addPerson(secondPerson);
 
-    Assert.assertTrue(entry.getPersonsForRole(role).contains(secondPerson));
+    Assert.assertTrue(entry.getPersons().contains(secondPerson));
 
     Assert.assertTrue(secondPerson.getAssociatedEntries().contains(entry));
-    Assert.assertTrue(secondPerson.getRolesForEntry(entry).contains(role));
-
-    Assert.assertTrue(role.getEntriesPersons().contains(secondPerson));
-  }
-
-  @Test
-  public void addPersonToSecondPersonRole_EntitiesGetAddedToRelatedCollections() throws Exception {
-    Entry entry = new Entry("test", "no content");
-    Person person = new Person("Mahatma", "Gandhi");
-    PersonRole firstRole = new PersonRole("Hero");
-    PersonRole secondRole = new PersonRole("Model"); // Vorbild
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-    deepThought.addPerson(person);
-    deepThought.addPersonRole(firstRole);
-    deepThought.addPersonRole(secondRole);
-
-    entry.addPerson(person, firstRole);
-
-    entry.addPerson(person, secondRole);
-
-    Assert.assertTrue(entry.getPersonRoles().contains(secondRole));
-    Assert.assertTrue(entry.getPersonsForRole(secondRole).contains(person));
-
-    Assert.assertTrue(person.getRolesForEntry(entry).contains(secondRole));
-
-    Assert.assertTrue(secondRole.getEntries().contains(entry));
-    Assert.assertTrue(secondRole.getEntriesPersons().contains(person));
   }
 
   @Test
   public void removePerson_PersistedRelationGetsDeleted() throws Exception {
     Entry entry = new Entry("test", "no content");
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person, role);
+    entry.addPerson(person);
 
-    entry.removePerson(person, role);
+    entry.removePerson(person);
 
-    Assert.assertFalse(doesEntryPersonRoleJoinTableEntryExist(entry.getId(), role.getId(), person.getId()));
+    Assert.assertFalse(doesEntryPersonRoleJoinTableEntryExist(entry.getId(), person.getId()));
 
     Assert.assertFalse(entry.isDeleted());
     Assert.assertFalse(person.isDeleted());
-    Assert.assertFalse(role.isDeleted());
   }
 
   @Test
   public void removePerson_EntitiesGetRemovedFromRelatedCollections() throws Exception {
     Entry entry = new Entry("test", "no content");
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person, role);
+    entry.addPerson(person);
 
-    entry.removePerson(person, role);
+    entry.removePerson(person);
 
-    Assert.assertFalse(entry.getPersonRoles().contains(role));
+    Assert.assertFalse(entry.getPersons().contains(person));
 
     Assert.assertFalse(person.getAssociatedEntries().contains(entry));
-
-    Assert.assertFalse(role.getEntries().contains(entry));
-    Assert.assertFalse(role.getEntriesPersons().contains(person));
   }
 
   @Test
@@ -848,55 +796,23 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Entry entry = new Entry("test", "no content");
     Person firstPerson = new Person("Mahatma", "Gandhi");
     Person secondPerson = new Person("Mandela", "Nelson");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addPerson(firstPerson);
     deepThought.addPerson(secondPerson);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(firstPerson, role);
+    entry.addPerson(firstPerson);
 
-    entry.addPerson(secondPerson, role);
+    entry.addPerson(secondPerson);
 
-    entry.removePerson(firstPerson, role);
+    entry.removePerson(firstPerson);
 
-    Assert.assertFalse(entry.getPersonsForRole(role).contains(firstPerson));
-    Assert.assertTrue(entry.getPersonsForRole(role).contains(secondPerson));
+    Assert.assertFalse(entry.getPersons().contains(firstPerson));
+    Assert.assertTrue(entry.getPersons().contains(secondPerson));
 
     Assert.assertFalse(firstPerson.getAssociatedEntries().contains(entry));
     Assert.assertTrue(secondPerson.getAssociatedEntries().contains(entry));
-
-    Assert.assertFalse(role.getEntriesPersons().contains(firstPerson));
-    Assert.assertTrue(role.getEntriesPersons().contains(secondPerson));
-  }
-
-  @Test
-  public void removeFirstOfTwoPersonRoles_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    Entry entry = new Entry("test", "no content");
-    Person person = new Person("Mahatma", "Gandhi");
-    PersonRole firstRole = new PersonRole("Hero");
-    PersonRole secondRole = new PersonRole("Model"); // Vorbild
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-    deepThought.addPerson(person);
-    deepThought.addPersonRole(firstRole);
-    deepThought.addPersonRole(secondRole);
-
-    entry.addPerson(person, firstRole);
-
-    entry.addPerson(person, secondRole);
-
-    entry.removePerson(person, firstRole);
-
-    Assert.assertFalse(entry.getPersonRoles().contains(firstRole));
-
-    Assert.assertFalse(person.getRolesForEntry(entry).contains(firstRole));
-
-    Assert.assertFalse(firstRole.getEntries().contains(entry));
-    Assert.assertFalse(firstRole.getEntriesPersons().contains(person));
   }
 
   @Test
@@ -906,7 +822,6 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Person person2 = new Person("Nelson", "Mandela");
     Person person3 = new Person("Mother Teresa", "");
     Person person4 = new Person("Edward", "Snowden");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
@@ -914,14 +829,13 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addPerson(person2);
     deepThought.addPerson(person3);
     deepThought.addPerson(person4);
-    deepThought.addPersonRole(role);
 
-    entry.addPerson(person1, role);
-    entry.addPerson(person2, role);
-    entry.addPerson(person3, role);
-    entry.addPerson(person4, role);
+    entry.addPerson(person1);
+    entry.addPerson(person2);
+    entry.addPerson(person3);
+    entry.addPerson(person4);
 
-    entry.removePerson(person2, role);
+    entry.removePerson(person2);
 
     for(EntryPersonAssociation association : entry.getEntryPersonAssociations()) {
       if(association.getPerson().equals(person1))

@@ -304,7 +304,6 @@ public class TableConfig {
   public final static String ReferenceBaseSubTitleColumnName = "sub_title";
   public final static String ReferenceBaseAbstractColumnName = "abstract";
   public final static String ReferenceBaseOnlineAddressColumnName = "online_address";
-  public final static String ReferenceBaseLastAccessDateColumnName = "last_access_date";
   public final static String ReferenceBaseNotesColumnName = "notes";
 
 
@@ -314,7 +313,6 @@ public class TableConfig {
 
   public final static String ReferenceBasePersonAssociationReferenceBaseJoinColumnName = "reference_base_id";
   public final static String ReferenceBasePersonAssociationPersonJoinColumnName = "person_id";
-  public final static String ReferenceBasePersonAssociationPersonRoleJoinColumnName = "person_role_id";
   public final static String ReferenceBasePersonAssociationPersonOrderColumnName = "person_order";
 
 

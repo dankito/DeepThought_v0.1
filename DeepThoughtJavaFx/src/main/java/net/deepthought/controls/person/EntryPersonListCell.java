@@ -2,7 +2,6 @@ package net.deepthought.controls.person;
 
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.EntryPersonListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -69,13 +68,13 @@ public class EntryPersonListCell extends PersonListCell {
 
   protected EntryPersonListener entryPersonListener = new EntryPersonListener() {
     @Override
-    public void personAdded(Entry entry, PersonRole role, Person addedPerson) {
+    public void personAdded(Entry entry, Person addedPerson) {
       if(addedPerson.equals(getItem()))
         updateItem(addedPerson, addedPerson == null);
     }
 
     @Override
-    public void personRemoved(Entry entry, PersonRole role, Person removedPerson) {
+    public void personRemoved(Entry entry, Person removedPerson) {
       if(removedPerson.equals(getItem()))
         updateItem(removedPerson, removedPerson == null);
     }

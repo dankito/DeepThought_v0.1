@@ -2,7 +2,6 @@ package net.deepthought.controls.person;
 
 import net.deepthought.controls.CollectionItemLabel;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 
@@ -13,13 +12,10 @@ import java.util.Collection;
  */
 public class PersonLabel extends CollectionItemLabel {
 
-  protected PersonRole role;
-
   protected Person person;
 
 
-  public PersonLabel(PersonRole role, Person person) {
-    this.role = role;
+  public PersonLabel(Person person) {
     this.person = person;
 
     person.addEntityListener(personListener);

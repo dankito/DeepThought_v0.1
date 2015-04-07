@@ -3,7 +3,6 @@ package net.deepthought.data.model;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
@@ -82,12 +81,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<Language> languages = new HashSet<>(); // these are Languages User can set to specify Language of their Entries, References, ...
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<PersonRole> personRoles = new HashSet<>();
-
-  protected transient SortedSet<PersonRole> personRolesSorted = null;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
@@ -391,44 +384,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
-  public Collection<PersonRole> getPersonRoles() {
-    return personRoles;
-  }
-
-  public boolean addPersonRole(PersonRole personRole) {
-    personRolesSorted = null;
-    boolean result = personRoles.add(personRole);
-
-    if(result) {
-      personRole.setDeepThought(this);
-      callEntityAddedListeners(personRoles, personRole);
-    }
-
-    return result;
-  }
-
-  public boolean removePersonRole(PersonRole personRole) {
-    personRolesSorted = null;
-    boolean result = personRoles.remove(personRole);
-
-    if(result) {
-      personRole.setDeepThought(null);
-      callEntityRemovedListeners(personRoles, personRole);
-    }
-
-    return result;
-  }
-
-  public Collection<PersonRole> getPersonRolesSorted() {
-    if(personRolesSorted == null)
-      sortPersonRoles();
-    return personRolesSorted;
-  }
-
-  protected void sortPersonRoles() {
-    personRolesSorted = new TreeSet<>(getPersonRoles());
-  }
-
   public Collection<NoteType> getNoteTypes() {
     return noteTypes;
   }
@@ -508,8 +463,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     personsSorted = null;
     if(persons.remove(person)) {
       for(Entry entry : new ArrayList<>(person.getAssociatedEntries())) {
-        for(PersonRole role : person.getRolesForEntry(entry))
-          entry.removePerson(person, role);
+        entry.removePerson(person);
       }
 
       person.deepThought = null;

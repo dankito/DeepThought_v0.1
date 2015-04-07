@@ -1,14 +1,10 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -21,8 +17,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -54,17 +48,13 @@ public abstract class ReferenceBase extends UserDataEntity {
   @Column(name = TableConfig.ReferenceBaseOnlineAddressColumnName)
   protected String onlineAddress;
 
-  @Column(name = TableConfig.ReferenceBaseLastAccessDateColumnName)
-  @Temporal(TemporalType.TIMESTAMP)
-  protected Date lastAccessDate;
-
   @Column(name = TableConfig.ReferenceBaseNotesColumnName)
   protected String notes;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
   protected Set<ReferenceBasePersonAssociation> referenceBasePersonAssociations = new HashSet<>();
 
-  protected transient Map<PersonRole, Set<Person>> personRoles = null;
+  protected transient Set<Person> persons = null;
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
   protected Set<FileLink> files = new HashSet<>();
@@ -124,16 +114,6 @@ public abstract class ReferenceBase extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.ReferenceBaseOnlineAddressColumnName, previousValue, onlineAddress);
   }
 
-  public Date getLastAccessDate() {
-    return lastAccessDate;
-  }
-
-  public void setLastAccessDate(Date lastAccessDate) {
-    Object previousValue = this.lastAccessDate;
-    this.lastAccessDate = lastAccessDate;
-    callPropertyChangedListeners(TableConfig.ReferenceBaseLastAccessDateColumnName, previousValue, lastAccessDate);
-  }
-
   public String getNotes() {
     return notes;
   }
@@ -153,23 +133,24 @@ public abstract class ReferenceBase extends UserDataEntity {
     return referenceBasePersonAssociations;
   }
 
-  public boolean addPerson(Person person, PersonRole role) {
-    Set<Person> personsAlreadyInRole = getPersonsForRole(role);
-    ReferenceBasePersonAssociation association = new ReferenceBasePersonAssociation(this, person, role, personsAlreadyInRole == null ? 0 : personsAlreadyInRole.size());
+  public boolean addPerson(Person person) {
+    ReferenceBasePersonAssociation existingAssociation = findReferenceBasePersonAssociation(person);
+    if(existingAssociation != null) // Person already added to ReferenceBase
+      return false;
+
+    ReferenceBasePersonAssociation association = new ReferenceBasePersonAssociation(this, person, referenceBasePersonAssociations.size());
 
     boolean result = this.referenceBasePersonAssociations.add(association);
     result &= person.addReference(association);
-    result &= role.addReference(association);
 
-    personRoles = null;
 //    callPersonAddedListeners(role, person);
     callEntityAddedListeners(referenceBasePersonAssociations, association);
 
     return result;
   }
 
-  public boolean removePerson(Person person, PersonRole role) {
-    ReferenceBasePersonAssociation association = findReferenceBasePersonAssociation(person, role);
+  public boolean removePerson(Person person) {
+    ReferenceBasePersonAssociation association = findReferenceBasePersonAssociation(person);
     if(association == null)
       return false;
 
@@ -177,9 +158,8 @@ public abstract class ReferenceBase extends UserDataEntity {
 
     boolean result = this.referenceBasePersonAssociations.remove(association);
     result &= person.removeReference(association);
-    result &= role.removeReference(association);
 
-    personRoles = null;
+    persons = null;
 
     for(ReferenceBasePersonAssociation personAssociation : referenceBasePersonAssociations) {
       if(personAssociation.getPersonOrder() > removeIndex)
@@ -192,35 +172,26 @@ public abstract class ReferenceBase extends UserDataEntity {
     return result;
   }
 
-  protected ReferenceBasePersonAssociation findReferenceBasePersonAssociation(Person person, PersonRole role) {
+  protected ReferenceBasePersonAssociation findReferenceBasePersonAssociation(Person person) {
     for(ReferenceBasePersonAssociation association : this.referenceBasePersonAssociations) {
-      if(association.getPerson().equals(person) && association.getRole().equals(role))
+      if(association.getPerson().equals(person))
         return association;
     }
 
     return null;
   }
 
-  public Set<PersonRole> getPersonRoles() {
-    if(personRoles == null)
-      createPersonRoles();
+  public Set<Person> getPersons() {
+    if(persons == null)
+      createPersons();
 
-    return personRoles.keySet();
+    return persons;
   }
 
-  public Set<Person> getPersonsForRole(PersonRole role) {
-    if(personRoles == null)
-      createPersonRoles();
-
-    return personRoles.get(role);
-  }
-
-  protected void createPersonRoles() {
-    personRoles = new HashMap<>();
+  protected void createPersons() {
+    persons = new HashSet<>();
     for(ReferenceBasePersonAssociation association : referenceBasePersonAssociations) {
-      if(personRoles.containsKey(association.getRole()) == false)
-        personRoles.put(association.getRole(), new HashSet<Person>());
-      personRoles.get(association.getRole()).add(association.getPerson());
+      persons.add(association.getPerson());
     }
   }
 

@@ -1,14 +1,12 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,16 +58,6 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void updateLastAccessDate_UpdatedValueGetsPersistedInDb() throws Exception {
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-
-    Date newValue = new Date();
-    referenceBase.setLastAccessDate(newValue);
-
-    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.ReferenceBaseTableName, TableConfig.ReferenceBaseLastAccessDateColumnName, referenceBase.getId()));
-  }
-
-  @Test
   public void updateNotes_UpdatedValueGetsPersistedInDb() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
 
@@ -84,47 +72,36 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   public void addPerson_RelationGetsPersisted() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person, role);
+    referenceBase.addPerson(person);
 
-    Assert.assertTrue(doesReferenceBasePersonRoleJoinTableEntryExist(referenceBase.getId(), role.getId(), person.getId()));
+    Assert.assertTrue(doesReferenceBasePersonRoleJoinTableEntryExist(referenceBase.getId(), person.getId()));
   }
 
   @Test
   public void addPerson_EntitiesGetAddedToRelatedCollections() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person, role);
+    referenceBase.addPerson(person);
 
-    Assert.assertTrue(referenceBase.getPersonRoles().contains(role));
-    Assert.assertTrue(referenceBase.getPersonsForRole(role).contains(person));
+    Assert.assertTrue(referenceBase.getPersons().contains(person));
 
     if(referenceBase instanceof SeriesTitle) {
       Assert.assertTrue(person.getAssociatedSeries().contains(referenceBase));
-      Assert.assertTrue(person.getRolesForSeries((SeriesTitle) referenceBase).contains(role));
     }
     else if(referenceBase instanceof Reference) {
       Assert.assertTrue(person.getAssociatedReferences().contains(referenceBase));
-      Assert.assertTrue(person.getRolesForReference((Reference)referenceBase).contains(role));
     }
     else if(referenceBase instanceof ReferenceSubDivision) {
       Assert.assertTrue(person.getAssociatedReferenceSubDivisions().contains(referenceBase));
-      Assert.assertTrue(person.getRolesForSubDivision((ReferenceSubDivision) referenceBase).contains(role));
     }
-
-    Assert.assertTrue(role.getReferenceBases().contains(referenceBase));
-    Assert.assertTrue(role.getReferenceBasesPersons().contains(person));
   }
 
   @Test
@@ -133,17 +110,15 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     Person person1 = new Person("Mahatma", "Gandhi");
     Person person2 = new Person("Nelson", "Mandela");
     Person person3 = new Person("Mother Teresa", "");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person1);
     deepThought.addPerson(person2);
     deepThought.addPerson(person3);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person1, role);
-    referenceBase.addPerson(person2, role);
-    referenceBase.addPerson(person3, role);
+    referenceBase.addPerson(person1);
+    referenceBase.addPerson(person2);
+    referenceBase.addPerson(person3);
 
     for(ReferenceBasePersonAssociation association : referenceBase.getReferenceBasePersonAssociations()) {
       if(association.getPerson().equals(person1))
@@ -156,105 +131,61 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void addSecondPersonToRole_EntitiesGetAddedToRelatedCollections() throws Exception {
+  public void addSecondPerson_EntitiesGetAddedToRelatedCollections() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person firstPerson = new Person("Mahatma", "Gandhi");
     Person secondPerson = new Person("Mandela", "Nelson");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(firstPerson);
     deepThought.addPerson(secondPerson);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(firstPerson, role);
+    referenceBase.addPerson(firstPerson);
 
-    referenceBase.addPerson(secondPerson, role);
+    referenceBase.addPerson(secondPerson);
 
-    Assert.assertTrue(referenceBase.getPersonsForRole(role).contains(secondPerson));
+    Assert.assertTrue(referenceBase.getPersons().contains(secondPerson));
 
     if(referenceBase instanceof SeriesTitle) {
       Assert.assertTrue(secondPerson.getAssociatedSeries().contains(referenceBase));
-      Assert.assertTrue(secondPerson.getRolesForSeries((SeriesTitle) referenceBase).contains(role));
     }
     else if(referenceBase instanceof Reference) {
       Assert.assertTrue(secondPerson.getAssociatedReferences().contains(referenceBase));
-      Assert.assertTrue(secondPerson.getRolesForReference((Reference)referenceBase).contains(role));
     }
     else if(referenceBase instanceof ReferenceSubDivision) {
       Assert.assertTrue(secondPerson.getAssociatedReferenceSubDivisions().contains(referenceBase));
-      Assert.assertTrue(secondPerson.getRolesForSubDivision((ReferenceSubDivision) referenceBase).contains(role));
     }
-
-    Assert.assertTrue(role.getReferenceBasesPersons().contains(secondPerson));
-  }
-
-  @Test
-  public void addPersonToSecondPersonRole_EntitiesGetAddedToRelatedCollections() throws Exception {
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-    Person person = new Person("Mahatma", "Gandhi");
-    PersonRole firstRole = new PersonRole("Hero");
-    PersonRole secondRole = new PersonRole("Model"); // Vorbild
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPerson(person);
-    deepThought.addPersonRole(firstRole);
-    deepThought.addPersonRole(secondRole);
-
-    referenceBase.addPerson(person, firstRole);
-
-    referenceBase.addPerson(person, secondRole);
-
-    Assert.assertTrue(referenceBase.getPersonRoles().contains(secondRole));
-    Assert.assertTrue(referenceBase.getPersonsForRole(secondRole).contains(person));
-
-    if(referenceBase instanceof SeriesTitle)
-      Assert.assertTrue(person.getRolesForSeries((SeriesTitle) referenceBase).contains(secondRole));
-    else if(referenceBase instanceof Reference)
-      Assert.assertTrue(person.getRolesForReference((Reference) referenceBase).contains(secondRole));
-    else if(referenceBase instanceof ReferenceSubDivision)
-      Assert.assertTrue(person.getRolesForSubDivision((ReferenceSubDivision) referenceBase).contains(secondRole));
-
-    Assert.assertTrue(secondRole.getReferenceBases().contains(referenceBase));
-    Assert.assertTrue(secondRole.getReferenceBasesPersons().contains(person));
   }
 
   @Test
   public void removePerson_PersistedRelationGetsDeleted() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person, role);
+    referenceBase.addPerson(person);
 
-    referenceBase.removePerson(person, role);
+    referenceBase.removePerson(person);
 
-    Assert.assertFalse(doesReferenceBasePersonRoleJoinTableEntryExist(referenceBase.getId(), role.getId(), person.getId()));
+    Assert.assertFalse(doesReferenceBasePersonRoleJoinTableEntryExist(referenceBase.getId(), person.getId()));
 
     Assert.assertFalse(referenceBase.isDeleted());
     Assert.assertFalse(person.isDeleted());
-    Assert.assertFalse(role.isDeleted());
   }
 
   @Test
   public void removePerson_EntitiesGetRemovedFromRelatedCollections() throws Exception {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person person = new Person("Mahatma", "Gandhi");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person, role);
+    referenceBase.addPerson(person);
 
-    referenceBase.removePerson(person, role);
-
-    Assert.assertFalse(referenceBase.getPersonRoles().contains(role));
+    referenceBase.removePerson(person);
 
     if(referenceBase instanceof SeriesTitle)
       Assert.assertFalse(person.getAssociatedSeries().contains(referenceBase));
@@ -262,9 +193,6 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
       Assert.assertFalse(person.getAssociatedReferences().contains(referenceBase));
     else if(referenceBase instanceof ReferenceSubDivision)
       Assert.assertFalse(person.getAssociatedReferenceSubDivisions().contains(referenceBase));
-
-    Assert.assertFalse(role.getReferenceBases().contains(referenceBase));
-    Assert.assertFalse(role.getReferenceBasesPersons().contains(person));
   }
 
   @Test
@@ -272,21 +200,19 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     Person firstPerson = new Person("Mahatma", "Gandhi");
     Person secondPerson = new Person("Mandela", "Nelson");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(firstPerson);
     deepThought.addPerson(secondPerson);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(firstPerson, role);
+    referenceBase.addPerson(firstPerson);
 
-    referenceBase.addPerson(secondPerson, role);
+    referenceBase.addPerson(secondPerson);
 
-    referenceBase.removePerson(firstPerson, role);
+    referenceBase.removePerson(firstPerson);
 
-    Assert.assertFalse(referenceBase.getPersonsForRole(role).contains(firstPerson));
-    Assert.assertTrue(referenceBase.getPersonsForRole(role).contains(secondPerson));
+    Assert.assertFalse(referenceBase.getPersons().contains(firstPerson));
+    Assert.assertTrue(referenceBase.getPersons().contains(secondPerson));
 
     if(referenceBase instanceof SeriesTitle) {
       Assert.assertFalse(firstPerson.getAssociatedSeries().contains(referenceBase));
@@ -300,39 +226,6 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
       Assert.assertFalse(firstPerson.getAssociatedReferenceSubDivisions().contains(referenceBase));
       Assert.assertTrue(secondPerson.getAssociatedReferenceSubDivisions().contains(referenceBase));
     }
-
-    Assert.assertFalse(role.getReferenceBasesPersons().contains(firstPerson));
-    Assert.assertTrue(role.getReferenceBasesPersons().contains(secondPerson));
-  }
-
-  @Test
-  public void removeFirstOfTwoPersonRoles_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
-    Person person = new Person("Mahatma", "Gandhi");
-    PersonRole firstRole = new PersonRole("Hero");
-    PersonRole secondRole = new PersonRole("Model"); // Vorbild
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addPerson(person);
-    deepThought.addPersonRole(firstRole);
-
-    referenceBase.addPerson(person, firstRole);
-
-    referenceBase.addPerson(person, secondRole);
-
-    referenceBase.removePerson(person, firstRole);
-
-    Assert.assertFalse(referenceBase.getPersonRoles().contains(firstRole));
-
-    if(referenceBase instanceof SeriesTitle)
-      Assert.assertFalse(person.getRolesForSeries((SeriesTitle)referenceBase).contains(firstRole));
-    else if(referenceBase instanceof Reference)
-      Assert.assertFalse(person.getRolesForReference((Reference)referenceBase).contains(firstRole));
-    else if(referenceBase instanceof ReferenceSubDivision)
-      Assert.assertFalse(person.getRolesForSubDivision((ReferenceSubDivision)referenceBase).contains(firstRole));
-
-    Assert.assertFalse(firstRole.getReferenceBases().contains(referenceBase));
-    Assert.assertFalse(firstRole.getReferenceBasesPersons().contains(person));
   }
 
   @Test
@@ -342,21 +235,19 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     Person person2 = new Person("Nelson", "Mandela");
     Person person3 = new Person("Mother Teresa", "");
     Person person4 = new Person("Edward", "Snowden");
-    PersonRole role = new PersonRole("Hero");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addPerson(person1);
     deepThought.addPerson(person2);
     deepThought.addPerson(person3);
     deepThought.addPerson(person4);
-    deepThought.addPersonRole(role);
 
-    referenceBase.addPerson(person1, role);
-    referenceBase.addPerson(person2, role);
-    referenceBase.addPerson(person3, role);
-    referenceBase.addPerson(person4, role);
+    referenceBase.addPerson(person1);
+    referenceBase.addPerson(person2);
+    referenceBase.addPerson(person3);
+    referenceBase.addPerson(person4);
 
-    referenceBase.removePerson(person2, role);
+    referenceBase.removePerson(person2);
 
     for(ReferenceBasePersonAssociation association : referenceBase.getReferenceBasePersonAssociations()) {
       if(association.getPerson().equals(person1))
@@ -419,11 +310,10 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personRoleId, Long personId) throws SQLException {
+  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.ReferenceBasePersonAssociationTableName + " WHERE " +
         TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName +  "=" + referenceBaseId +
-        " AND " + TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName + "=" + personId +
-        " AND " + TableConfig.ReferenceBasePersonAssociationPersonRoleJoinColumnName + "=" + personRoleId);
+        " AND " + TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName + "=" + personId);
     return result.size() == 1;
   }
 

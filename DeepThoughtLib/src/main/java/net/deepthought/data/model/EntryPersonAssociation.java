@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.persistence.db.AssociationEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -21,20 +20,13 @@ public class EntryPersonAssociation extends AssociationEntity {
   private static final long serialVersionUID = -5046567432089774614L;
 
 
-//  @Id
   @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.EntryPersonAssociationEntryJoinColumnName)
   protected Entry entry;
 
-//  @Id
   @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.EntryPersonAssociationPersonJoinColumnName)
   protected Person person;
-
-//  @Id
-  @ManyToOne(optional = false, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-  @JoinColumn(name = TableConfig.EntryPersonAssociationPersonRoleJoinColumnName)
-  protected PersonRole role;
 
   @Column(name = TableConfig.EntryPersonAssociationPersonOrderColumnName)
   protected int personOrder = Integer.MAX_VALUE;
@@ -44,14 +36,13 @@ public class EntryPersonAssociation extends AssociationEntity {
 
   }
 
-  public EntryPersonAssociation(Entry entry, Person person, PersonRole role) {
+  public EntryPersonAssociation(Entry entry, Person person) {
     this.entry = entry;
     this.person = person;
-    this.role = role;
   }
 
-  public EntryPersonAssociation(Entry entry, Person person, PersonRole role, int personOrder) {
-    this(entry, person, role);
+  public EntryPersonAssociation(Entry entry, Person person, int personOrder) {
+    this(entry, person);
     this.personOrder = personOrder;
   }
 
@@ -62,10 +53,6 @@ public class EntryPersonAssociation extends AssociationEntity {
 
   public Person getPerson() {
     return person;
-  }
-
-  public PersonRole getRole() {
-    return role;
   }
 
   public int getPersonOrder() {

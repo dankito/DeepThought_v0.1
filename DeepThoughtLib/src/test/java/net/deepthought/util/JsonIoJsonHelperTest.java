@@ -5,7 +5,6 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.User;
-import net.deepthought.data.model.enums.PersonRole;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
@@ -94,9 +93,7 @@ public class JsonIoJsonHelperTest {
       Assert.assertTrue(entry.getCategories().size() > 0);
       Assert.assertTrue(entry.hasTags());
       Assert.assertTrue(entry.hasIndexTerms());
-      Assert.assertTrue(entry.getPersonRoles().size() > 0);
-      for(PersonRole role : entry.getPersonRoles())
-        Assert.assertTrue(entry.getPersonsForRole(role).size() > 0);
+      Assert.assertTrue(entry.getPersons().size() > 0);
       Assert.assertTrue(entry.getFiles().size() > 0);
       Assert.assertTrue(entry.getNotes().size() > 0);
 
