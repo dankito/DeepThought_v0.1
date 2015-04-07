@@ -428,6 +428,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     deepThought.addCategory(newLastViewedCategory);
     deepThought.getSettings().setLastViewedCategory(newLastViewedCategory);
 
+    entityManager.updateEntity(deepThought);
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
 
     Assert.assertNotNull(settings);
@@ -442,6 +443,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     deepThought.addTag(newLastViewedTag);
     deepThought.getSettings().setLastViewedTag(newLastViewedTag);
 
+    entityManager.updateEntity(deepThought);
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
 
     Assert.assertNotNull(settings);
@@ -456,6 +458,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     deepThought.addEntry(newLastViewedEntry);
     deepThought.getSettings().setLastViewedEntry(newLastViewedEntry);
 
+    entityManager.updateEntity(deepThought);
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
 
     Assert.assertNotNull(settings);
@@ -469,6 +472,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     SelectedTab newLastSelectedTab = SelectedTab.Search;
     deepThought.getSettings().setLastSelectedTab(newLastSelectedTab);
 
+    entityManager.updateEntity(deepThought);
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
 
     Assert.assertNotNull(settings);
@@ -482,6 +486,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     SelectedAndroidTab newLastSelectedAndroidTab = SelectedAndroidTab.EntriesOverview;
     deepThought.getSettings().setLastSelectedAndroidTab(newLastSelectedAndroidTab);
 
+    entityManager.updateEntity(deepThought);
     DeepThoughtSettings settings = SettingsBase.createSettingsFromString(deepThought.settingsString, DeepThoughtSettings.class);
 
     Assert.assertNotNull(settings);

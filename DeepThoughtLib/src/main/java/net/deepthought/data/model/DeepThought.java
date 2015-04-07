@@ -86,7 +86,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OrderBy(value = "sortOrder")
   protected Set<NoteType> noteTypes = new HashSet<>();
 
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<BackupFileServiceType> backupFileServiceTypes = new HashSet<>();
 

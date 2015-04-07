@@ -237,25 +237,9 @@ public class TableConfig {
   public final static String PersonTableName = "person";
 
   public final static String PersonFirstNameColumnName = "first_name";
-  public final static String PersonMiddleNamesColumnName = "middle_names";
   public final static String PersonLastNameColumnName = "last_name";
-  public final static String PersonTitleColumnName = "title";
-  public final static String PersonPrefixColumnName = "prefix";
-  public final static String PersonSuffixColumnName = "suffix";
-  public final static String PersonAbbreviationColumnName = "abbreviation";
-  public final static String PersonGenderColumnName = "gender";
-  public final static String PersonBirthDayColumnName = "birth_day";
   public final static String PersonNotesColumnName = "notes";
-  public final static String PersonSortByColumnName = "sort_by";
   public final static String PersonDeepThoughtJoinColumnName = "deep_thought_id";
-
-
-  /*          EntryPersonRoles Table Config        */
-
-  public final static String EntryPersonRolesTableName = "entry_person_roles";
-
-  public final static String EntryPersonRolesPersonRoleJoinColumnName = "person_role_id";
-  public final static String EntryPersonRolesEntryJoinColumnName = "entry_id";
 
 
   /*          EntryPersonJoinTable Table Config        */
@@ -264,13 +248,7 @@ public class TableConfig {
 
   public final static String EntryPersonAssociationEntryJoinColumnName = "entry_id";
   public final static String EntryPersonAssociationPersonJoinColumnName = "person_id";
-  public final static String EntryPersonAssociationPersonRoleJoinColumnName = "person_role_id";
   public final static String EntryPersonAssociationPersonOrderColumnName = "person_order";
-
-
-  /*          PersonRole Table Config        */
-
-  public final static String PersonRoleTableName = "person_role";
 
 
   /*          Note Table Config        */

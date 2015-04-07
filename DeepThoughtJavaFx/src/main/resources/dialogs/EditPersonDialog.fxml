@@ -7,14 +7,14 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="dialogPane" prefHeight="520.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
+<BorderPane fx:id="dialogPane" prefHeight="336.0" prefWidth="734.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditPersonDialogController">
    <center>
-      <VBox BorderPane.alignment="CENTER">
+      <VBox prefHeight="392.0" prefWidth="734.0" BorderPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Title" />
-                  <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                  <Label prefHeight="40.0" prefWidth="120.0" text="%first.name" />
+                  <TextField fx:id="txtfldFirstName" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                   <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
                      <HBox.margin>
                         <Insets left="12.0" />
@@ -27,62 +27,8 @@
             </HBox>
             <HBox prefHeight="40.0">
                <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="First name" />
-                  <TextField fx:id="txtfldFirstName" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Middle name(s)" />
-                  <TextField fx:id="txtfldMiddleNames" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Prefix" />
-                  <TextField fx:id="txtfldPrefix" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Last name" />
+                  <Label prefHeight="40.0" prefWidth="120.0" text="%last.name" />
                   <TextField fx:id="txtfldLastName" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Suffix" />
-                  <TextField fx:id="txtfldSuffix" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Abbreviation" />
-                  <TextField fx:id="txtfldAbbreviation" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-               </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" />
-               </VBox.margin>
-            </HBox>
-            <HBox prefHeight="40.0">
-               <children>
-                  <Label prefHeight="40.0" prefWidth="120.0" text="Gender" />
-                  <ComboBox fx:id="cmbxGender" prefHeight="35.0" prefWidth="250.0" />
                </children>
                <VBox.margin>
                   <Insets bottom="6.0" />
@@ -90,9 +36,9 @@
             </HBox>
             <VBox>
                <children>
-                  <Label prefHeight="40.0" text="Notes">
+                  <Label prefHeight="25.0" text="%notes">
                      <VBox.margin>
-                        <Insets bottom="6.0" top="12.0" />
+                        <Insets bottom="6.0" top="6.0" />
                      </VBox.margin>
                   </Label>
                   <TextArea fx:id="txtarNotes" prefHeight="125.0" VBox.vgrow="ALWAYS" />

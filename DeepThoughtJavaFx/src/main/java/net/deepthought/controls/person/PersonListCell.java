@@ -44,7 +44,7 @@ public class PersonListCell extends ListCell<Person> {
 
   protected Label personDisplayNameLabel = new Label();
 
-  protected Button btnAddPerson = new Button();
+  protected Button btnAddOrRemovePerson = new Button();
   protected Button btnEditPerson = new Button();
   protected Button btnDeletePerson = new Button();
 
@@ -77,21 +77,21 @@ public class PersonListCell extends ListCell<Person> {
     personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(personDisplayNameLabel);
 
-    JavaFxLocalization.bindLabeledText(btnAddPerson, "add");
-    btnAddPerson.setMinWidth(80);
-    HBox.setMargin(btnAddPerson, new Insets(0, 6, 0, 0));
-    graphicPane.getChildren().add(btnAddPerson);
+    JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "add");
+    btnAddOrRemovePerson.setMinWidth(100);
+    HBox.setMargin(btnAddOrRemovePerson, new Insets(0, 6, 0, 0));
+    graphicPane.getChildren().add(btnAddOrRemovePerson);
 
-    btnAddPerson.setOnAction(new EventHandler<ActionEvent>() {
+    btnAddOrRemovePerson.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
         selectCurrentCell();
-        handleButtonAddPersonAction();
+        handleButtonAddOrRemovePersonAction();
       }
     });
 
     JavaFxLocalization.bindLabeledText(btnEditPerson, "edit");
-    btnEditPerson.setMinWidth(80);
+    btnEditPerson.setMinWidth(100);
     graphicPane.getChildren().add(btnEditPerson);
     btnEditPerson.setOnAction(new EventHandler<ActionEvent>() {
       @Override
@@ -120,12 +120,19 @@ public class PersonListCell extends ListCell<Person> {
     else {
       setGraphic(graphicPane);
       personDisplayNameLabel.setText(item.getNameRepresentation());
-      setDefaultRoleButtonsVisibleState();
+      setButtonAddOrRemovePersonState();
     }
   }
 
-  protected void setDefaultRoleButtonsVisibleState() {
-    btnAddPerson.setVisible(getItem() != null && isPersonSetOnEntity(getItem()) == false);
+  protected void setButtonAddOrRemovePersonState() {
+    btnAddOrRemovePerson.setVisible(getItem() != null);
+
+    if(getItem() != null) {
+      if(isPersonSetOnEntity(getItem()) == false)
+        JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "add");
+      else
+        JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "remove");
+    }
   }
 
   protected boolean isPersonSetOnEntity(Person person) {
@@ -165,18 +172,21 @@ public class PersonListCell extends ListCell<Person> {
   }
 
 
-  protected void handleButtonAddPersonAction() {
-    addPersonToEntity(getItem());
+  protected void handleButtonAddOrRemovePersonAction() {
+    if(isPersonSetOnEntity(getItem()) == false)
+      addPersonToEntity(getItem());
+    else
+      removePersonFromEntity(getItem());
   }
 
   protected void addPersonToEntity(Person person) {
     personsControl.addPersonToEntity(person);
-    setDefaultRoleButtonsVisibleState();
+    setButtonAddOrRemovePersonState();
   }
 
   protected void removePersonFromEntity(Person person) {
     personsControl.removePersonFromEntity(person);
-    setDefaultRoleButtonsVisibleState();
+    setButtonAddOrRemovePersonState();
   }
 
   protected void handleButtonEditPersonAction() {

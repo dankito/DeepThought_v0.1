@@ -6,7 +6,6 @@ import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.enums.Gender;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Localization;
@@ -20,7 +19,6 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
@@ -28,7 +26,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -55,9 +52,6 @@ public class EditPersonDialogController extends ChildWindowsController implement
   protected Button btnApply;
 
   @FXML
-  protected TextField txtfldTitle;
-
-  @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
 
   protected ContextHelpControl contextHelpControl;
@@ -65,17 +59,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
   @FXML
   protected TextField txtfldFirstName;
   @FXML
-  protected TextField txtfldMiddleNames;
-  @FXML
   protected TextField txtfldLastName;
-  @FXML
-  protected TextField txtfldPrefix;
-  @FXML
-  protected TextField txtfldSuffix;
-  @FXML
-  protected TextField txtfldAbbreviation;
-  @FXML
-  protected ComboBox<Gender> cmbxGender;
   @FXML
   protected TextArea txtarNotes;
 
@@ -95,31 +79,11 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   protected void setupFields() {
-    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonTitle));
-    txtfldTitle.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("title"));
-
     txtfldFirstName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonFirstName));
     txtfldFirstName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("first.name"));
 
-    txtfldMiddleNames.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonMiddleNames));
-    txtfldMiddleNames.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("middle.names"));
-
     txtfldLastName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonLastName));
     txtfldLastName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("last.name"));
-
-    txtfldPrefix.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonPrefix));
-    txtfldPrefix.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("prefix"));
-
-    txtfldSuffix.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonSuffix));
-    txtfldSuffix.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("suffix"));
-
-    txtfldAbbreviation.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonAbbreviation));
-    txtfldAbbreviation.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("abbreviation"));
-
-    ObservableList<Gender> cmbxGenderItems = FXCollections.observableArrayList(Gender.Unset, Gender.Female, Gender.Male);
-    cmbxGender.setItems(cmbxGenderItems);
-    cmbxGender.getSelectionModel().select(Gender.Unset);
-    cmbxGender.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonGender));
 
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonNotes));
     txtarNotes.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("notes"));
@@ -155,14 +119,8 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   protected void personToEditSet(Person person) {
-    txtfldTitle.setText(person.getTitle());
     txtfldFirstName.setText(person.getFirstName());
-    txtfldMiddleNames.setText(person.getMiddleNames());
     txtfldLastName.setText(person.getLastName());
-    txtfldPrefix.setText(person.getPrefix());
-    txtfldSuffix.setText(person.getSuffix());
-    txtfldAbbreviation.setText(person.getAbbreviation());
-    cmbxGender.getSelectionModel().select(person.getGender());
     txtarNotes.setText(person.getNotes());
   }
 
@@ -209,35 +167,9 @@ public class EditPersonDialogController extends ChildWindowsController implement
       person.setFirstName(txtfldFirstName.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonFirstName);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonMiddleNames)) {
-      person.setMiddleNames(txtfldMiddleNames.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonMiddleNames);
-    }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonLastName)) {
       person.setLastName(txtfldLastName.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonLastName);
-    }
-
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonTitle)) {
-      person.setTitle(txtfldTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonTitle);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonPrefix)) {
-      person.setPrefix(txtfldPrefix.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonPrefix);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonSuffix)) {
-      person.setSuffix(txtfldSuffix.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonSuffix);
-    }
-
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonAbbreviation)) {
-      person.setAbbreviation(txtfldAbbreviation.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonAbbreviation);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonGender)) {
-      person.setGender(cmbxGender.getSelectionModel().getSelectedItem());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonGender);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonNotes)) {

@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.data.model.enums.Gender;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -8,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +16,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -39,36 +35,11 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   @Column(name = TableConfig.PersonFirstNameColumnName)
   protected String firstName = "";
 
-  @Column(name = TableConfig.PersonMiddleNamesColumnName)
-  protected String middleNames;
-
   @Column(name = TableConfig.PersonLastNameColumnName)
   protected String lastName = "";
 
-  @Column(name = TableConfig.PersonTitleColumnName)
-  protected String title;
-
-  @Column(name = TableConfig.PersonPrefixColumnName)
-  protected String prefix;
-
-  @Column(name = TableConfig.PersonSuffixColumnName)
-  protected String suffix;
-
-  @Column(name = TableConfig.PersonAbbreviationColumnName)
-  protected String abbreviation;
-
-  @Column(name = TableConfig.PersonGenderColumnName)
-  protected Gender gender = Gender.Unset;
-
-  @Column(name = TableConfig.PersonBirthDayColumnName)
-  @Temporal(TemporalType.DATE)
-  protected Date birthDate;
-
   @Column(name = TableConfig.PersonNotesColumnName)
   protected String notes;
-
-  @Column(name = TableConfig.PersonSortByColumnName)
-  protected String sortBy;
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "person")
   protected Set<EntryPersonAssociation> entryPersonAssociations = new HashSet<>();
@@ -110,16 +81,6 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     callPropertyChangedListeners(TableConfig.PersonFirstNameColumnName, previousFirstName, firstName);
   }
 
-  public String getMiddleNames() {
-    return middleNames;
-  }
-
-  public void setMiddleNames(String middleNames) {
-    String previousMiddleNames = this.middleNames;
-    this.middleNames = middleNames;
-    callPropertyChangedListeners(TableConfig.PersonMiddleNamesColumnName, previousMiddleNames, middleNames);
-  }
-
   public String getLastName() {
     return lastName;
   }
@@ -130,66 +91,6 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     callPropertyChangedListeners(TableConfig.PersonLastNameColumnName, previousLastName, lastName);
   }
 
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    String previousTitle = this.title;
-    this.title = title;
-    callPropertyChangedListeners(TableConfig.PersonTitleColumnName, previousTitle, title);
-  }
-
-  public String getPrefix() {
-    return prefix;
-  }
-
-  public void setPrefix(String prefix) {
-    String previousPrefix = this.prefix;
-    this.prefix = prefix;
-    callPropertyChangedListeners(TableConfig.PersonPrefixColumnName, previousPrefix, prefix);
-  }
-
-  public String getSuffix() {
-    return suffix;
-  }
-
-  public void setSuffix(String suffix) {
-    String previousSuffix = this.suffix;
-    this.suffix = suffix;
-    callPropertyChangedListeners(TableConfig.PersonSuffixColumnName, previousSuffix, suffix);
-  }
-
-  public String getAbbreviation() {
-    return abbreviation;
-  }
-
-  public void setAbbreviation(String abbreviation) {
-    String previousAbbreviation = this.abbreviation;
-    this.abbreviation = abbreviation;
-    callPropertyChangedListeners(TableConfig.PersonAbbreviationColumnName, previousAbbreviation, abbreviation);
-  }
-
-  public Gender getGender() {
-    return gender;
-  }
-
-  public void setGender(Gender gender) {
-    Gender previousGender = this.gender; // sounds a bit funny, previousGender
-    this.gender = gender;
-    callPropertyChangedListeners(TableConfig.PersonGenderColumnName, previousGender, gender);
-  }
-
-  public Date getBirthDate() {
-    return birthDate;
-  }
-
-  public void setBirthDate(Date birthDate) {
-    Date previousBirthDate = this.birthDate;
-    this.birthDate = birthDate;
-    callPropertyChangedListeners(TableConfig.PersonBirthDayColumnName, previousBirthDate, birthDate);
-  }
-
   public String getNotes() {
     return notes;
   }
@@ -198,16 +99,6 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     String previousNotes = this.notes;
     this.notes = notes;
     callPropertyChangedListeners(TableConfig.PersonNotesColumnName, previousNotes, notes);
-  }
-
-  public String getSortBy() {
-    return sortBy;
-  }
-
-  public void setSortBy(String sortBy) {
-    String previousSortBy = this.sortBy;
-    this.sortBy = sortBy;
-    callPropertyChangedListeners(TableConfig.PersonAbbreviationColumnName, previousSortBy, sortBy);
   }
 
 
@@ -343,27 +234,12 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
 
     representation += getLastName();
 
-    if(suffix != null && representation.length() > 0)
-      representation += " " + suffix;
-
     if(firstName != null && firstName.isEmpty() == false) {
       if(representation.length() > 0)
         representation += ", ";
 
-      if(title != null && representation.length() > 0)
-        representation += title + " ";
-
       representation += firstName;
-
-      if(middleNames != null)
-        representation += " " + middleNames;
     }
-
-    if(abbreviation != null)
-      representation += " " + abbreviation;
-
-    if(prefix != null)
-      representation += " " + prefix;
 
     return representation;
   }
@@ -385,20 +261,11 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     if(other == null)
       return 1;
 
-    String thisFirstCompareLevel = sortBy != null ? sortBy : lastName;
-    String otherFirstCompareLevel = other.getSortBy() != null ? other.getSortBy() : other.getLastName();
-
-    if(thisFirstCompareLevel.equals(otherFirstCompareLevel) == false)
-      return thisFirstCompareLevel.compareTo(otherFirstCompareLevel);
+    if(lastName.equals(other.getLastName()) == false)
+      return lastName.compareTo(other.getLastName());
 
     if(firstName.equals(other.getFirstName()) == false)
       return firstName.compareTo(other.getFirstName());
-
-    if(middleNames != null) {
-      if (other.getMiddleNames() == null)
-        return 1;
-      return middleNames.compareTo(other.getMiddleNames());
-    }
 
     return 0;
   }
