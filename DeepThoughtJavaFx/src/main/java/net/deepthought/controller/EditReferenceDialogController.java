@@ -41,8 +41,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
@@ -88,7 +86,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected ReferenceSubDivision referenceSubDivision = null;
 
-  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
+  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedSeriesTitleChanges = FXCollections.observableSet();
+  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceChanges = FXCollections.observableSet();
+  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceSubDivisionChanges = FXCollections.observableSet();
 
   protected int publishingDateFormat = DateFormat.MEDIUM;
 
@@ -103,7 +103,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Pane paneSeriesTitle;
 
   @FXML
-  protected Pane contentPane;
+  protected Pane paneReference;
 
   @FXML
   protected Pane paneSeriesTitleHeader;
@@ -260,10 +260,22 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void initialize(URL location, ResourceBundle resources) {
     btnApplyChanges.managedProperty().bind(btnApplyChanges.visibleProperty());
 
-    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
+    fieldsWithUnsavedSeriesTitleChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
       @Override
       public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
-        btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
+        btnApplyChanges.setDisable(hasUnsavedChanges() == false);
+      }
+    });
+    fieldsWithUnsavedReferenceChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
+      @Override
+      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
+        btnApplyChanges.setDisable(hasUnsavedChanges() == false);
+      }
+    });
+    fieldsWithUnsavedReferenceSubDivisionChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
+      @Override
+      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
+        btnApplyChanges.setDisable(hasUnsavedChanges() == false);
       }
     });
 
@@ -288,24 +300,24 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void setupSeriesTitleControls() {
     txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
+      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
       if(editedReferenceBase instanceof SeriesTitle)
         updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
-    txtfldSeriesTitleSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleSubTitle));
+    txtfldSeriesTitleSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleSubTitle));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleAbstract);
-    txtarSeriesTitleAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract));
+    txtarSeriesTitleAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleTableOfContents);
-    FXUtils.addHtmlEditorTextChangedListener(htmledSeriesTitleTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents));
+    FXUtils.addHtmlEditorTextChangedListener(htmledSeriesTitleTableOfContents, event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents));
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
     seriesTitlePersonsControl.setExpanded(true);
-    seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
-    seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
+    seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
+    seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     VBox.setMargin(seriesTitlePersonsControl, new Insets(6, 0, 0, 0));
     paneSeriesTitle.getChildren().add(6, seriesTitlePersonsControl);
 
@@ -313,10 +325,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     seriesTitlePersonsControl.setVisible(false);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
-    txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
+    txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleNotes);
-    txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
+    txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleFiles);
 
@@ -338,31 +350,33 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void setupReferenceControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
+
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
       if(editedReferenceBase instanceof Reference)
         updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
-    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
+    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceAbstract));
+    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnTableOfContents);
-    FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents));
+    FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents));
 
     referencePersonsControl = new ReferencePersonsControl();
     referencePersonsControl.setExpanded(true);
-    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
-    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePersons));
+    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
+    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
-    contentPane.getChildren().add(6, referencePersonsControl);
+    paneReference.getChildren().add(6, referencePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublishingDate);
     txtfldIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     });
 
 //    dtpckPublishingDate.setConverter(localeDateStringConverter);
@@ -371,10 +385,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
-    txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
+    txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
-    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
+    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -386,32 +400,34 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void setupReferenceSubDivisionControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
+      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
       if(editedReferenceBase instanceof ReferenceSubDivision)
         updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
-    txtfldReferenceSubDivisionSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle));
+    txtfldReferenceSubDivisionSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionAbstract);
-    txtarReferenceSubDivisionAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract));
+    txtarReferenceSubDivisionAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract));
 
     referenceSubDivisionPersonsControl = new ReferenceSubDivisionPersonsControl();
     referenceSubDivisionPersonsControl.setExpanded(true);
-    referenceSubDivisionPersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
-    referenceSubDivisionPersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
+    referenceSubDivisionPersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
+    referenceSubDivisionPersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
     VBox.setMargin(referenceSubDivisionPersonsControl, new Insets(6, 0, 0, 0));
     paneReferenceSubDivision.getChildren().add(4, referenceSubDivisionPersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
-    txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
+    txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionNotes);
-    txtarReferenceSubDivisionNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes));
+    txtarReferenceSubDivisionNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionFiles);
 
@@ -470,7 +486,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEditedFieldsOnReference();
+    if(seriesTitle.isPersisted() && hasSeriesTitleBeenEdited())
+      saveEditedFieldsOnSeriesTitle();
+    if(reference.isPersisted() && hasReferenceBeenEdited())
+      saveEditedFieldsOnReference();
+    if(referenceSubDivision.isPersisted() && hasReferenceSubDivisionBeenEdited())
+      saveEditedFieldsOnReferenceSubDivision();
   }
 
   @FXML
@@ -492,34 +513,56 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     // TODO: also check if a previously set Entity now has been unset
 
     // TODO: save async while closing the dialog? Would make Dialog closing faster
-    if(StringUtils.isNotNullOrEmpty(txtfldTitle.getText()) || StringUtils.isNotNullOrEmpty(txtfldIssueOrPublishingDate.getText())) {
+    if(hasReferenceBeenEdited()) {
       editedReferenceBase = reference;
-      if (reference.isPersisted() == false) // a new Reference
+      if (reference.isPersisted() == false) { // a new Reference
         Application.getDeepThought().addReference(reference);
+        if (persistedParentReferenceBase instanceof SeriesTitle)
+          ((SeriesTitle) persistedParentReferenceBase).addSerialPart(reference);
+      }
+
+      saveEditedFieldsOnReference();
     }
 
-    if(StringUtils.isNotNullOrEmpty(txtfldSeriesTitleTitle.getText())) {
+    if(hasSeriesTitleBeenEdited()) {
       if (seriesTitle.isPersisted() == false) { // a new SeriesTitle
         Application.getDeepThought().addSeriesTitle(seriesTitle);
-        reference.setSeries(seriesTitle);
+        if(reference.isPersisted())
+          reference.setSeries(seriesTitle);
       }
+
+      saveEditedFieldsOnSeriesTitle();
 
       if(editedReferenceBase == null)
         editedReferenceBase = seriesTitle;
     }
 
-    if(StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivisionTitle.getText())) {
+    if(hasReferenceSubDivisionBeenEdited()) {
       editedReferenceBase = referenceSubDivision;
       if (referenceSubDivision.isPersisted() == false) { // a new ReferenceSubDivision
-        reference.addSubDivision(referenceSubDivision);
+        if(reference.isPersisted())
+          reference.addSubDivision(referenceSubDivision);
       }
+
+      saveEditedFieldsOnReferenceSubDivision();
     }
 
-    saveEditedFieldsOnSeriesTitle();
-    saveEditedFieldsOnReference();
-    saveEditedFieldsOnReferenceSubDivision();
-
     closeDialog();
+  }
+
+  protected boolean hasSeriesTitleBeenEdited() {
+//    return StringUtils.isNotNullOrEmpty(txtfldSeriesTitleTitle.getText());
+    return fieldsWithUnsavedSeriesTitleChanges.size() > 0;
+  }
+
+  protected boolean hasReferenceBeenEdited() {
+//    return StringUtils.isNotNullOrEmpty(txtfldTitle.getText()) || StringUtils.isNotNullOrEmpty(txtfldIssueOrPublishingDate.getText());
+    return fieldsWithUnsavedReferenceChanges.size() > 0;
+  }
+
+  protected boolean hasReferenceSubDivisionBeenEdited() {
+//    return StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivisionTitle.getText());
+    return fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0;
   }
 
   @Override
@@ -533,163 +576,163 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTitle)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleTitle)) {
       seriesTitle.setTitle(txtfldSeriesTitleTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSubTitle)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleSubTitle)) {
       seriesTitle.setSubTitle(txtfldSeriesTitleSubTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleAbstract)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleAbstract)) {
       seriesTitle.setAbstract(txtarSeriesTitleAbstract.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledSeriesTitleTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledSeriesTitleTableOfContents.getHtmlText().equals(seriesTitle.getTableOfContents()) == false) {
       if(FXUtils.HtmlEditorDefaultText.equals(htmledSeriesTitleTableOfContents.getHtmlText())) {
         if(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()))
           seriesTitle.setTableOfContents("");
       }
       else
         seriesTitle.setTableOfContents(htmledSeriesTitleTableOfContents.getHtmlText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitlePersons)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitlePersons)) {
       for(Person removedPerson : seriesTitlePersonsControl.getCopyOfRemovedPersonsAndClear())
         seriesTitle.removePerson(removedPerson);
 
       for(Person addedPerson : seriesTitlePersonsControl.getCopyOfAddedPersonsAndClear())
         seriesTitle.addPerson(addedPerson);
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePersons);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitlePersons);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleOnlineAddress)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleOnlineAddress)) {
       seriesTitle.setOnlineAddress(txtfldSeriesTitleOnlineAddress.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleSerialParts)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleSerialParts)) {
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSerialParts);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleSerialParts);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleNotes)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleNotes)) {
       seriesTitle.setNotes(txtarSeriesTitleNotes.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleFiles)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleFiles)) {
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleFiles);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleFiles);
     }
   }
 
   protected void saveEditedFieldsOnReference() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSeriesTitle)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceSeriesTitle)) {
       //TODO
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSeriesTitle);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSeriesTitle);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTitle)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTitle)) {
       reference.setTitle(txtfldTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubTitle)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceSubTitle)) {
       reference.setSubTitle(txtfldSubTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceAbstract)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceAbstract)) {
       reference.setAbstract(txtarAbstract.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtmlText().equals(reference.getTableOfContents()) == false) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtmlText().equals(reference.getTableOfContents()) == false) {
       if(FXUtils.HtmlEditorDefaultText.equals(htmledTableOfContents.getHtmlText())) {
         if(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()))
           reference.setTableOfContents("");
       }
       else
         reference.setTableOfContents(htmledTableOfContents.getHtmlText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferencePersons)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferencePersons)) {
       for(Person removedPerson : referencePersonsControl.getCopyOfRemovedPersonsAndClear())
         reference.removePerson(removedPerson);
 
       for(Person addedPerson : referencePersonsControl.getCopyOfAddedPersonsAndClear())
         reference.addPerson(addedPerson);
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
       reference.setIssueOrPublishingDate(txtfldIssueOrPublishingDate.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
       reference.setOnlineAddress(txtfldOnlineAddress.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
     }
 
-//    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanged.ReferenceSubDivisions)) {
+//    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanged.ReferenceSubDivisions)) {
 //
-//      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanged.ReferenceSubDivisions);
+//      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanged.ReferenceSubDivisions);
 //    }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceNotes)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceNotes)) {
       reference.setNotes(txtarNotes.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
     }
 
-//    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanged.ReferenceBaseFiles)) {
+//    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanged.ReferenceBaseFiles)) {
 //
-//      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanged.ReferenceBaseFiles);
+//      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanged.ReferenceBaseFiles);
 //    }
   }
 
   protected void saveEditedFieldsOnReferenceSubDivision() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionTitle)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionTitle)) {
       referenceSubDivision.setTitle(txtfldReferenceSubDivisionTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
     }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle)) {
       referenceSubDivision.setSubTitle(txtfldReferenceSubDivisionSubTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract)) {
       referenceSubDivision.setAbstract(txtarReferenceSubDivisionAbstract.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionPersons)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionPersons)) {
       for(Person removedPerson : referenceSubDivisionPersonsControl.getCopyOfRemovedPersonsAndClear())
         referenceSubDivision.removePerson(removedPerson);
 
       for(Person addedPerson : referenceSubDivisionPersonsControl.getCopyOfAddedPersonsAndClear())
         referenceSubDivision.addPerson(addedPerson);
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionPersons);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionPersons);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress)) {
       referenceSubDivision.setOnlineAddress(txtfldReferenceSubDivisionOnlineAddress.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionNotes)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionNotes)) {
       referenceSubDivision.setNotes(txtarReferenceSubDivisionNotes.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionFiles)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionFiles)) {
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionFiles);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionFiles);
     }
   }
 
@@ -704,12 +747,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       }
     });
 
-    windowStage.widthProperty().addListener(new ChangeListener<Number>() {
-      @Override
-      public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-
-      }
-    });
+//    windowStage.widthProperty().addListener(new ChangeListener<Number>() {
+//      @Override
+//      public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//
+//      }
+//    });
   }
 
   protected void askIfStageShouldBeClosed(WindowEvent event) {
@@ -781,7 +824,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 //    trtblvwSeriesTitleFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
-    fieldsWithUnsavedChanges.clear();
+    fieldsWithUnsavedSeriesTitleChanges.clear();
 
     seriesTitle.addEntityListener(seriesTitleListener);
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
@@ -801,7 +844,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 //    trtblvwReferenceSubDivisionFiles.setRoot(new FileRootTreeItem(subDivision));
 
-    fieldsWithUnsavedChanges.clear();
+    fieldsWithUnsavedReferenceSubDivisionChanges.clear();
 
     subDivision.addEntityListener(referenceSubDivisionListener);
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
@@ -972,13 +1015,20 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     return reference;
   }
 
-  public void setWindowStageAndReference(Stage windowStage, ReferenceBase referenceBase) {
+  protected ReferenceBase persistedParentReferenceBase;
+
+
+  public void setWindowStageAndReferenceBase(Stage windowStage, ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase) {
     // TODO: if referenceBase != null disallow editing of Entities below referenceBase's Hierarchy (e.g. referenceBase instanceof Reference -> don't allow ReferenceSubDivision editing
     editedReferenceBase = referenceBase;
+    Node nodeToFocus = txtfldReferenceSubDivisionTitle;
 
     if(referenceBase instanceof ReferenceSubDivision) {
       this.referenceSubDivision = (ReferenceSubDivision)referenceBase;
       this.reference = referenceSubDivision.getReference();
+      if(reference == null && persistedParentReferenceBase instanceof Reference) // it should never be the case that referenceSubDivision.getReference() == null and
+      // persistedParentReferenceBase is not a Reference
+        this.reference = (Reference)persistedParentReferenceBase;
       this.seriesTitle = reference.getSeries();
       if(this.seriesTitle == null)
         this.seriesTitle = new SeriesTitle();
@@ -991,14 +1041,33 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         this.seriesTitle = reference.getSeries();
         if(this.seriesTitle == null)
           this.seriesTitle = new SeriesTitle();
+        nodeToFocus = txtfldTitle;
+        paneReferenceSubDivision.setVisible(false);
       }
       else {
         this.reference = new Reference();
 
-        if(referenceBase instanceof SeriesTitle)
+        if(referenceBase instanceof SeriesTitle) {
           this.seriesTitle = (SeriesTitle) referenceBase;
-        else
+          paneReferenceSubDivision.setVisible(false);
+          paneReference.setVisible(false);
+        }
+        else // a new Reference should be created
           this.seriesTitle = new SeriesTitle();
+        nodeToFocus = txtfldSeriesTitleTitle;
+      }
+    }
+
+    if(persistedParentReferenceBase != null) {
+      this.persistedParentReferenceBase = persistedParentReferenceBase;
+
+      if(persistedParentReferenceBase instanceof SeriesTitle) {
+        this.seriesTitle = (SeriesTitle)persistedParentReferenceBase;
+        nodeToFocus = txtfldTitle;
+      }
+      else if(persistedParentReferenceBase instanceof Reference) {
+        this.reference = (Reference)persistedParentReferenceBase;
+        nodeToFocus = txtfldReferenceSubDivisionTitle;
       }
     }
 
@@ -1013,16 +1082,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     });
 
     setupControls();
-    txtfldTitle.requestFocus();
 
     setSeriesTitleValues(seriesTitle);
     setReferenceValues(reference);
     setReferenceSubDivisionValues(referenceSubDivision);
+
+    btnApplyChanges.setVisible(seriesTitle.isPersisted() || reference.isPersisted() || referenceSubDivision.isPersisted());
+    FXUtils.focusNode(nodeToFocus);
   }
 
   protected void setReferenceValues(final Reference reference) {
-    btnApplyChanges.setVisible(reference.isPersisted());
-
     txtfldTitle.setText(reference.getTitle());
     txtfldSubTitle.setText(reference.getSubTitle());
 
@@ -1040,14 +1109,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 //    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
 
-    fieldsWithUnsavedChanges.clear();
+    fieldsWithUnsavedReferenceChanges.clear();
 
     reference.addEntityListener(referenceListener);
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
   public boolean hasUnsavedChanges() {
-    return fieldsWithUnsavedChanges.size() > 0;
+    return (seriesTitle.isPersisted() && fieldsWithUnsavedSeriesTitleChanges.size() > 0) || (reference.isPersisted() && fieldsWithUnsavedReferenceChanges.size() > 0) ||
+        (referenceSubDivision.isPersisted() && fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0);
   }
 
   protected void updateWindowTitle(ReferenceBase referenceBase) {
@@ -1146,37 +1216,37 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void seriesTitleTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldSeriesTitleTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleTitle);
   }
 
   protected void seriesTitleSubTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldSeriesTitleSubTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleSubTitle);
   }
 
   protected void seriesTitleAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarSeriesTitleAbstract.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
   }
 
   protected void seriesTitleTableOfContentsChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     htmledSeriesTitleTableOfContents.setHtmlText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
   }
 
   protected void seriesTitleOnlineAddressChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldSeriesTitleOnlineAddress.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleOnlineAddress);
   }
 
   protected void seriesTitleNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarSeriesTitleNotes.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
+    fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
   }
 
 
@@ -1216,37 +1286,37 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void titleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
   }
 
   protected void subTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldSubTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
   }
 
   protected void abstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarAbstract.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
   }
 
   protected void tableOfContentsChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     htmledTableOfContents.setHtmlText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
   }
 
   protected void onlineAddressChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldOnlineAddress.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
   }
 
   protected void notesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarNotes.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
   }
 
 
@@ -1286,31 +1356,31 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void referenceSubDivisionTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldReferenceSubDivisionTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
+    fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
   }
 
   protected void referenceSubDivisionSubTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldReferenceSubDivisionSubTitle.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle);
+    fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle);
   }
 
   protected void referenceSubDivisionAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarReferenceSubDivisionAbstract.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
+    fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
   }
 
   protected void referenceSubDivisionOnlineAddressChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtfldReferenceSubDivisionOnlineAddress.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
+    fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress);
   }
 
   protected void referenceSubDivisionNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
     txtarReferenceSubDivisionNotes.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
+    fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
   }
 
 

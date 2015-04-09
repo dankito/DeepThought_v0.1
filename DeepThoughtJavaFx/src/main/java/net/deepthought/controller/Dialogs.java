@@ -222,6 +222,10 @@ public class Dialogs {
   }
 
   public static void showEditReferenceDialog(final ReferenceBase referenceBase, final ChildWindowsControllerListener listener) {
+    showEditReferenceDialog(referenceBase, null, listener);
+  }
+
+  public static void showEditReferenceDialog(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditReferenceDialog.fxml");
@@ -230,7 +234,7 @@ public class Dialogs {
 
       // Set the referenceBase into the controller.
       EditReferenceDialogController controller = loader.getController();
-      controller.setWindowStageAndReference(dialogStage, referenceBase);
+      controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override

@@ -20,7 +20,7 @@
                         <Insets right="12.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="btnApplyChanges" alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
+                  <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
                      <HBox.margin>
                         <Insets right="12.0" />
                      </HBox.margin>
@@ -33,11 +33,11 @@
             </HBox>
          </bottom>
          <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
                <content>
                   <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                      <center>
-                        <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
+                        <VBox fx:id="paneReference" BorderPane.alignment="CENTER">
                            <children>
                               <AnchorPane>
                                  <children>
@@ -55,7 +55,7 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <Button fx:id="btnChooseFieldsToShow" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -191,7 +191,7 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <Button fx:id="btnChooseReferenceSubDivisionFieldsToShow" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <Button fx:id="btnChooseReferenceSubDivisionFieldsToShow" focusTraversable="false" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
@@ -305,12 +305,12 @@
                                           </Label>
                                        </children>
                                     </HBox>
-                                    <Button fx:id="btnChooseSeriesTitleFieldsToShow" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
+                                    <Button fx:id="btnChooseSeriesTitleFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
                                     </Button>
-                                    <ToggleButton fx:id="tglbtnShowHideContextHelp" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>

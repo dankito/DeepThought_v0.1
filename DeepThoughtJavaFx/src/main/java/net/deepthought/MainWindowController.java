@@ -6,6 +6,7 @@
 
 package net.deepthought;
 
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
@@ -119,7 +120,7 @@ public class MainWindowController implements Initializable {
 
 
   @FXML
-  protected HBox hboxCategoriesBar;
+  protected HBox paneCategoriesQuickFilter;
   @FXML
   protected CustomTextField txtfldCategoriesQuickFilter;
   @FXML
@@ -365,10 +366,13 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupCategoriesTab() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneCategoriesQuickFilter);
+    paneCategoriesQuickFilter.setVisible(false); // TODO: display again when you know how to filter Categories
+
     // replace normal TextField txtfldCategoriesQuickFilter with a SearchTextField (with a cross to clear selection)
-    hboxCategoriesBar.getChildren().remove(txtfldCategoriesQuickFilter);
+    paneCategoriesQuickFilter.getChildren().remove(txtfldCategoriesQuickFilter);
     txtfldCategoriesQuickFilter = (CustomTextField) TextFields.createClearableTextField();
-    hboxCategoriesBar.getChildren().add(1, txtfldCategoriesQuickFilter);
+    paneCategoriesQuickFilter.getChildren().add(1, txtfldCategoriesQuickFilter);
     HBox.setHgrow(txtfldCategoriesQuickFilter, Priority.ALWAYS);
     txtfldCategoriesQuickFilter.setPromptText("Quickly filter Categories");
     txtfldCategoriesQuickFilter.setPromptText("(disabled)");

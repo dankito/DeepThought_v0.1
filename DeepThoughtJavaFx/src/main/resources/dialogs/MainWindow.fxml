@@ -32,29 +32,31 @@
                      <content>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <HBox fx:id="hboxCategoriesBar" alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                              <AnchorPane maxHeight="40.0" prefHeight="40.0">
                                  <children>
-                                    <Label text="%quick.filter">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin></Label>
-                                    <CustomTextField fx:id="txtfldCategoriesQuickFilter" disable="true" promptText="Quickly filter Categories" HBox.hgrow="ALWAYS">
+                                    <HBox fx:id="paneCategoriesQuickFilter" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="98.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <Label text="%quick.filter">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                          <CustomTextField fx:id="txtfldCategoriesQuickFilter" disable="true" promptText="Quickly filter Categories" HBox.hgrow="ALWAYS">
                                     </CustomTextField>
-                                    <Button fx:id="btnRemoveSelectedCategories" disable="true" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedCategoryAction" prefWidth="40.0" text="-" textFill="#d01010">
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="btnRemoveSelectedCategories" disable="true" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedCategoryAction" prefWidth="40.0" text="-" textFill="#d01010" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="46.0" AnchorPane.topAnchor="5.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
-                                       <HBox.margin>
-                                          <Insets left="6.0" right="6.0" />
-                                       </HBox.margin>
                                     </Button>
-                                    <Button mnemonicParsing="false" onAction="#handleButtonAddCategoryAction" prefWidth="40.0" text="+" textFill="#047504">
+                                    <Button mnemonicParsing="false" onAction="#handleButtonAddCategoryAction" prefWidth="40.0" text="+" textFill="#047504" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
                                     </Button>
                                  </children>
-                              </HBox>
+                              </AnchorPane>
                               <TreeView fx:id="trvwCategories" editable="true" prefHeight="200.0" prefWidth="200.0" showRoot="false" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>

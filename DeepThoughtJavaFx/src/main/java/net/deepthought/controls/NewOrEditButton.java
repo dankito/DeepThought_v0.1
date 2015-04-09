@@ -29,7 +29,7 @@ public class NewOrEditButton extends SplitMenuButton {
 
   protected String newText = "new...";
 
-  protected String editText = "edit";
+  protected String editText = "edit...";
 
   protected ButtonFunction buttonFunction = ButtonFunction.New;
 

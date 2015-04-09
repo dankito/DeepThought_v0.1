@@ -208,15 +208,15 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
     if(getItem() instanceof SeriesTitle) {
       final SeriesTitle seriesTitle = (SeriesTitle)getItem();
       final Reference newReference = new Reference();
-      seriesTitle.addSerialPart(newReference);
+//      seriesTitle.addSerialPart(newReference);
 
-      Dialogs.showEditReferenceDialog(newReference, new ChildWindowsControllerListener() {
+      Dialogs.showEditReferenceDialog(newReference, seriesTitle, new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
           if(controller.getDialogResult() == DialogResult.Ok)
             addReferenceBaseToEntry(newReference);
-          else
-            seriesTitle.removeSerialPart(newReference);
+//          else
+//            seriesTitle.removeSerialPart(newReference);
         }
 
         @Override
@@ -228,15 +228,15 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
     else if(getItem() instanceof Reference) {
       final Reference reference = (Reference)getItem();
       final ReferenceSubDivision newSubDivision = new ReferenceSubDivision();
-      reference.addSubDivision(newSubDivision);
+//      reference.addSubDivision(newSubDivision);
 
-      Dialogs.showEditReferenceDialog(newSubDivision, new ChildWindowsControllerListener() {
+      Dialogs.showEditReferenceDialog(newSubDivision, reference, new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
           if(controller.getDialogResult() == DialogResult.Ok)
             addReferenceBaseToEntry(newSubDivision);
-          else
-            reference.removeSubDivision(newSubDivision);
+//          else
+//            reference.removeSubDivision(newSubDivision);
         }
 
         @Override

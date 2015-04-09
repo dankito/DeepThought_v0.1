@@ -6,6 +6,7 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -50,6 +51,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -73,6 +75,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -100,13 +103,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
   @FXML
+  protected BorderPane dialogPane;
+
+  @FXML
   protected Button btnApplyChanges;
 
   @FXML
   protected Pane contentPane;
-
-  @FXML
-  protected Pane paneFirstLine;
 
   @FXML
   protected Pane paneTitle;
@@ -114,11 +117,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected TextField txtfldTitle;
 
   @FXML
-  protected Pane paneViewConfig;
-  @FXML
   protected Button btnChooseFieldsToShow;
   @FXML
   protected ToggleButton tglbtnShowHideContextHelp;
+  protected ContextHelpControl contextHelpControl;
 
   @FXML
   protected TitledPane ttldpnAbstract;
@@ -159,11 +161,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected TreeTableView<FileLink> trtblvwFiles;
   @FXML
   protected TreeTableColumn<FileLink, String> clmnFile;
-
-  @FXML
-  protected Control paneContextHelp;
-  @FXML
-  protected WebView wbvwContextHelp;
 
 
   @Override
@@ -246,7 +243,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
-    VBox.setMargin(entryReferenceControl, new Insets(6, 0, 6, 0));
+    VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
     contentPane.getChildren().add(entryReferenceControl);
 
     entryPersonsControl = new EntryPersonsControl(entry);
@@ -254,12 +251,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryPersonsControl.setExpanded(true);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
+    VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
     contentPane.getChildren().add(entryPersonsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
-    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> showContextHelp("default")); // TODO: remove as soon as other context help texts are implemented
+    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> contextHelpControl.showContextHelpForResourceKey("default")); // TODO: remove as soon as other context help texts are
+    // implemented
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -269,25 +268,15 @@ public class EditEntryDialogController extends ChildWindowsController implements
       }
     });
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneContextHelp);
-    paneContextHelp.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+
+    contextHelpControl = new ContextHelpControl("context.help.entry.");
+    dialogPane.setRight(contextHelpControl);
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
+    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(("icons/context_help_28x30.png")));
-
-    try {
-      // Use reflection to retrieve the WebEngine's private 'page' field.
-      Field f = wbvwContextHelp.getEngine().getClass().getDeclaredField("page");
-      f.setAccessible(true);
-      final WebPage page = (WebPage) f.get(wbvwContextHelp.getEngine());
-      wbvwContextHelp.getEngine().documentProperty().addListener(new ChangeListener<Document>() {
-        @Override
-        public void changed(ObservableValue<? extends Document> observable, Document oldValue, Document newValue) {
-          page.setBackgroundColor(Constants.ContextHelpBackgroundColor);
-        }
-      });
-    } catch (Exception e) { }
-
-    showContextHelp("default");
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
@@ -532,23 +521,20 @@ public class EditEntryDialogController extends ChildWindowsController implements
     });
 
     setupControls();
-    htmledContent.requestFocus();
 
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
+
+    FXUtils.focusNode(txtarAbstract);
   }
 
   protected void showContextHelpForTarget(MouseEvent event) {
     EventTarget target = event.getTarget();
     log.debug("Target has been {}, source {}", target, event.getSource());
     if(target instanceof Node && ("txtfldSearchForPerson".equals(((Node)target).getId()) || isNodeChildOf((Node)target, entryPersonsControl)))
-      showContextHelp("search.person");
+      contextHelpControl.showContextHelpForResourceKey("search.person");
     else  // TODO: add Context Help for other fields
-      showContextHelp("default");
-  }
-
-  protected void showContextHelp(String contextHelpResourceKey) {
-    wbvwContextHelp.getEngine().loadContent(Localization.getLocalizedStringForResourceKey("context.help.entry." + contextHelpResourceKey));
+      contextHelpControl.showContextHelpForResourceKey("default");
   }
 
   protected boolean isNodeChildOf(Node node, Node parentToSearchFor) {

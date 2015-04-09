@@ -10,7 +10,7 @@
       <children>
           <HBox fx:id="paneSeriesTitleOrReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
               <children>
-                  <Label prefHeight="40.0" text="%reference">
+                  <Label minWidth="45.0" prefHeight="40.0" text="%reference">
                       <HBox.margin>
                           <Insets right="12.0" />
                       </HBox.margin>
@@ -18,7 +18,7 @@
             <HBox fx:id="paneSelectedReferenceBase" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minWidth="40.0" prefHeight="35.0" HBox.hgrow="ALWAYS" />
             <HBox fx:id="paneReferenceIndicationSettings" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
-                  <Label prefHeight="40.0" text="%indication">
+                  <Label minWidth="45.0" prefHeight="40.0" text="%indication">
                      <HBox.margin>
                         <Insets left="12.0" right="6.0" />
                      </HBox.margin>
@@ -45,7 +45,7 @@
             <Insets top="6.0" />
          </VBox.margin>
       </HBox>
-      <ListView fx:id="lstvwReferences" prefHeight="200.0">
+      <ListView fx:id="lstvwReferences" minHeight="200.0" prefHeight="200.0">
          <VBox.margin>
             <Insets top="6.0" />
          </VBox.margin>

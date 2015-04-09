@@ -7,5 +7,5 @@
 <?import javafx.scene.control.*?>
 
 
-<fx:root prefHeight="35.0" prefWidth="117.0" text="New ..." type="javafx.scene.control.SplitMenuButton" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root minWidth="90.0" prefHeight="35.0" prefWidth="117.0" text="New ..." type="javafx.scene.control.SplitMenuButton" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 </fx:root>

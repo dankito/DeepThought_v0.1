@@ -15,6 +15,7 @@ import java.util.Map;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -60,6 +61,26 @@ public class FXUtils {
     }
 
     return false;
+  }
+
+
+  /**
+   * A bit hackish, but i didn't find another way to focus a node (see http://stackoverflow.com/questions/20594035/how-to-focus-a-specific-node-when-selected-tab-changes-in-javafx)
+   * @param nodeToFocus
+   */
+  public static void focusNode(final Node nodeToFocus) {
+    new Thread(new Task<Void>() {
+      @Override
+      protected Void call() throws Exception {// This is NOT on FX thread
+        Thread.sleep(100);
+        return null;
+      }
+
+      @Override
+      public void succeeded() { // This is called on FX thread.
+        nodeToFocus.requestFocus();
+      }
+    }).start();
   }
 
 

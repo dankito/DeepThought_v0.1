@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.image.ImageView?>
 
-<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" >
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <HBox fx:id="hboxTagsBar" alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
             <children>
@@ -21,7 +21,7 @@
                         <Insets right="6.0" />
                     </HBox.margin></Label>
                 <CustomTextField fx:id="txtfldTagsQuickFilter" minWidth="70.0" promptText="Quickly filter Tags" HBox.hgrow="ALWAYS" />
-                <Button fx:id="btnRemoveTagsFilter" disable="true" maxHeight="29.0" maxWidth="40.0" mnemonicParsing="false" onAction="#handleButtonRemoveTagsFilterAction" prefWidth="40.0" textFill="#b90909">
+                <Button fx:id="btnRemoveTagsFilter" disable="true" maxHeight="30.0" maxWidth="40.0" mnemonicParsing="false" onAction="#handleButtonRemoveTagsFilterAction" prefWidth="40.0" textFill="#b90909">
                     <font>
                         <Font size="15.0" />
                     </font>
@@ -29,7 +29,7 @@
                         <Insets left="6.0" />
                     </HBox.margin>
                 </Button>
-                <Button fx:id="btnRemoveSelectedTag" disable="true" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedTagsAction" prefWidth="40.0" text="-" textFill="#b90909">
+                <Button fx:id="btnRemoveSelectedTag" disable="true" maxHeight="30.0" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedTagsAction" prefWidth="40.0" text="-" textFill="#b90909">
                     <HBox.margin>
                         <Insets left="6.0" />
                     </HBox.margin>
@@ -37,7 +37,7 @@
                         <Font size="15.0" />
                     </font>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="40.0" text="+" textFill="#068606">
+                <Button maxHeight="30.0" mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="40.0" text="+" textFill="#068606">
                     <font>
                         <Font name="System Bold" size="15.0" />
                     </font>
