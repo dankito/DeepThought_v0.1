@@ -5,6 +5,7 @@ import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
     this.textRepresentation = getTextRepresentationForCell(entry);
 
     setItem(textRepresentation);
-    updateItem(textRepresentation, textRepresentation.isEmpty());
+    updateItem(textRepresentation, StringUtils.isNullOrEmpty(textRepresentation));
   }
 
   protected abstract String getTextRepresentationForCell(Entry entry);

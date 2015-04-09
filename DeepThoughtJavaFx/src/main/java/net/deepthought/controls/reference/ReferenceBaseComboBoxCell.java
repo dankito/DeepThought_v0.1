@@ -7,9 +7,9 @@ import net.deepthought.data.model.ReferenceBase;
 /**
  * Created by ganymed on 10/02/15.
  */
-public class ReferenceListCell<T extends ReferenceBase> extends BaseEntityListCell<T> {
+public class ReferenceBaseComboBoxCell<T extends ReferenceBase> extends BaseEntityListCell<T> {
 
-  public ReferenceListCell() {
+  public ReferenceBaseComboBoxCell() {
 
   }
 

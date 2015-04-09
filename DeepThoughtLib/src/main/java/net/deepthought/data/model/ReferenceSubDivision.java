@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.Transient;
 
 /**
  * Created by ganymed on 21/01/15.
@@ -148,6 +149,15 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     callPropertyChangedListeners(TableConfig.ReferenceSubDivisionOrderColumnName, previousValue, subDivisionOrder);
   }
 
+
+  @Override
+  @Transient
+  public String getTextRepresentation() {
+    if(reference != null)
+      return reference.getTextRepresentation() + " - " + super.getTextRepresentation();
+
+    return super.getTextRepresentation();
+  }
 
   @Override
   public String toString() {

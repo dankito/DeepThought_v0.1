@@ -369,4 +369,16 @@ public abstract class PersonsControl extends TitledPane {
     return addedPersons;
   }
 
+  public Set<Person> getCopyOfRemovedPersonsAndClear() {
+    Set<Person> copy = new HashSet<>(removedPersons);
+    removedPersons.clear();
+    return copy;
+  }
+
+  public Set<Person> getCopyOfAddedPersonsAndClear() {
+    Set<Person> copy = new HashSet<>(addedPersons);
+    addedPersons.clear();
+    return copy;
+  }
+
 }

@@ -6,7 +6,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Localization;
 
@@ -217,20 +217,20 @@ public class Dialogs {
   }
 
 
-  public static void showEditReferenceDialog(Reference reference) {
-    showEditReferenceDialog(reference, null);
+  public static void showEditReferenceDialog(ReferenceBase referenceBase) {
+    showEditReferenceDialog(referenceBase, null);
   }
 
-  public static void showEditReferenceDialog(final Reference reference, final ChildWindowsControllerListener listener) {
+  public static void showEditReferenceDialog(final ReferenceBase referenceBase, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditReferenceDialog.fxml");
       dialogStage.setMinHeight(500);
       dialogStage.setMinWidth(500);
 
-      // Set the reference into the controller.
+      // Set the referenceBase into the controller.
       EditReferenceDialogController controller = loader.getController();
-      controller.setWindowStageAndReference(dialogStage, reference);
+      controller.setWindowStageAndReference(dialogStage, referenceBase);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override

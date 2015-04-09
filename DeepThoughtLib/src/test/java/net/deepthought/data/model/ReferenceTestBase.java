@@ -6,8 +6,6 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
-
 /**
  * Created by ganymed on 10/11/14.
  */
@@ -321,23 +319,10 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
 
-    Date newValue = new Date();
-    reference.setPublishingDate(newValue);
+    String newValue = "21.10.1983";
+    reference.setIssueOrPublishingDate(newValue);
 
-    Assert.assertEquals(newValue, getDateValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferencePublishingDateColumnName, reference.getId()));
-  }
-
-  @Test
-  public void updateIsbnOrIssn_UpdatedValueGetsPersistedInDb() throws Exception {
-    Reference reference = new Reference("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addReference(reference);
-
-    String newValue = "New value";
-    reference.setIsbnOrIssn(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceIsbnOrIssnColumnName, reference.getId()));
+    Assert.assertEquals(newValue, getValueFromTable(TableConfig.ReferenceTableName, TableConfig.ReferenceIssueOrPublishingDateColumnName, reference.getId()));
   }
 
 

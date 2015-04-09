@@ -722,7 +722,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
         referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getMagazineArticleCategory() || referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getArticleCategory())*/)
       return referenceSubDivision.getTextRepresentation();
     else if(reference != null)
-      return reference.getPreview();
+      return reference.getTextRepresentation();
     else if(series != null)
       return series.getTextRepresentation();
 

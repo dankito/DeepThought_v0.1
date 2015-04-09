@@ -73,7 +73,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -386,24 +385,19 @@ public class EditEntryDialogController extends ChildWindowsController implements
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySeriesTitle) || fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReference)) {
-      ReferenceBase referenceBase = entryReferenceControl.getReferenceBase();
-      ReferenceSubDivision subDivision = entryReferenceControl.getReferenceSubDivision();
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntrySeriesTitle) || fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReference)
+        || fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceSubDivision)) {
+      ReferenceBase referenceBase = entryReferenceControl.getSelectedReferenceBase();
 
-      if(referenceBase instanceof SeriesTitle)
-        entry.setSeries((SeriesTitle)referenceBase);
-      else {
+      if(referenceBase instanceof ReferenceSubDivision)
+        entry.setReferenceSubDivision((ReferenceSubDivision)referenceBase);
+      else if(referenceBase instanceof Reference)
         entry.setReference((Reference) referenceBase);
-      }
+      else if(referenceBase instanceof SeriesTitle)
+        entry.setSeries((SeriesTitle)referenceBase);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySeriesTitle);
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReference);
-
-      entry.setReferenceSubDivision(subDivision);
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceSubDivision)) {
-      entry.setReferenceSubDivision(entryReferenceControl.getReferenceSubDivision());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceSubDivision);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryReferenceIndication)) {
@@ -412,13 +406,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryPersons)) {
-      for(Person removedPerson : entryPersonsControl.getRemovedPersons())
+      for(Person removedPerson : entryPersonsControl.getCopyOfRemovedPersonsAndClear())
         entry.removePerson(removedPerson);
-      entryPersonsControl.getRemovedPersons().clear();
 
-      for(Person addedPerson : entryPersonsControl.getAddedPersons())
+      for(Person addedPerson : entryPersonsControl.getCopyOfAddedPersonsAndClear())
         entry.addPerson(addedPerson);
-      entryPersonsControl.getAddedPersons().clear();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryPersons);
     }

@@ -85,25 +85,13 @@
                               </HBox>
                               <HBox fx:id="panePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefWidth="135.0" text="%publishing.date">
+                                    <Label prefWidth="175.0" text="%issue.or.publishing.date">
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
                                     </Label>
-                                    <DatePicker fx:id="dtpckPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <HBox fx:id="paneIsbnOrIssn" alignment="CENTER_LEFT" prefHeight="40.0" HBox.hgrow="ALWAYS">
-                                       <children>
-                                          <Label prefWidth="100.0" text="%isbn.or.issn">
-                                             <HBox.margin>
-                                                <Insets right="6.0" />
-                                             </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="txtfldIsbnOrIssn" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <HBox.margin>
-                                          <Insets left="18.0" />
-                                       </HBox.margin>
-                                    </HBox>
+                                    <TextField fx:id="txtfldIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <DatePicker fx:id="dtpckPublishingDate" editable="false" maxWidth="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="0.0" showWeekNumbers="true" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
@@ -367,7 +355,7 @@
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
-                                          <Insets right="6.0" />
+                                          <Insets />
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldSeriesTitleOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />

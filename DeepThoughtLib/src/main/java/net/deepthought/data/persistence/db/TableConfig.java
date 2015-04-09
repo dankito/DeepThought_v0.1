@@ -310,8 +310,8 @@ public class TableConfig {
   public final static String ReferenceSeriesTitleJoinColumnName = "series_title_id";
   public final static String ReferenceSeriesTitleOrderColumnName = "series_order";
   public final static String ReferenceTableOfContentsColumnName = "table_of_contents";
+  public final static String ReferenceIssueOrPublishingDateColumnName = "issue_or_publishing_date";
   public final static String ReferencePublishingDateColumnName = "publishing_date";
-  public final static String ReferenceIsbnOrIssnColumnName = "isbn_or_issn";
 
 
   /*          ReferenceSubDivision Table Config        */

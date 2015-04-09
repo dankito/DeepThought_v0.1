@@ -145,8 +145,7 @@ public class PersonListCell extends ListCell<Person> {
       //Dialogs.showEditPersonDialog(getItem());
 
       if(getItem() != null) {
-        Set<Person> editedPersons = personsControl.getEditedEntityPersons();
-        if (editedPersons.contains(getItem()) == false)
+        if (isPersonSetOnEntity(getItem()) == false)
           addPersonToEntity(getItem());
         else
           removePersonFromEntity(getItem());

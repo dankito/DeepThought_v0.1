@@ -40,13 +40,13 @@
             </HBox>
          </bottom>
          <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="550.0" prefViewportWidth="650.0" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
                <content>
                   <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                      <center>
                         <VBox fx:id="contentPane" BorderPane.alignment="CENTER">
                            <children>
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                              <AnchorPane maxHeight="40.0">
                                  <children>
                                     <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                                        <children>
@@ -85,7 +85,7 @@
                               </HBox>
                               <TitledPane fx:id="ttldpnAbstract" animated="false" text="%entry.abstract">
                                  <content>
-                                    <TextArea fx:id="txtarAbstract" minHeight="120.0" prefHeight="120.0" wrapText="true" />
+                                    <TextArea fx:id="txtarAbstract" minHeight="90.0" prefHeight="90.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
                                     <Insets bottom="6.0" />
@@ -96,7 +96,7 @@
                                     <Insets bottom="6.0" />
                                  </VBox.margin>
                                  <content>
-                                    <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
+                                    <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="200.0" />
                                  </content>
                               </TitledPane>
                               <HBox fx:id="paneTagsAndCategories" />

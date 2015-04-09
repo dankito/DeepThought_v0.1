@@ -79,7 +79,7 @@ public enum FieldWithUnsavedChanges {
   ReferenceTableOfContents,
   ReferenceEdition,
   ReferenceVolume,
-  ReferencePublishingDate,
+  ReferenceIssueOrPublishingDate,
   ReferencePlaceOfPublication,
   ReferencePublisher,
   ReferenceIsbnOrIssn,

@@ -2,7 +2,10 @@ package net.deepthought.data.model;
 
 import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -20,8 +23,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -54,12 +55,12 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Lob
   protected String tableOfContents;
 
-  @Column(name = TableConfig.ReferencePublishingDateColumnName)
-  @Temporal(TemporalType.TIMESTAMP)
-  protected Date publishingDate; // SQLite needs this, can't handle null dates
+  @Column(name = TableConfig.ReferenceIssueOrPublishingDateColumnName)
+  protected String issueOrPublishingDate;
 
-  @Column(name = TableConfig.ReferenceIsbnOrIssnColumnName)
-  protected String isbnOrIssn;
+//  @Column(name = TableConfig.ReferencePublishingDateColumnName)
+//  @Temporal(TemporalType.TIMESTAMP)
+  protected transient Date publishingDate; // SQLite needs this, can't handle null dates
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.PersonDeepThoughtJoinColumnName)
@@ -197,24 +198,22 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     callPropertyChangedListeners(TableConfig.ReferenceTableOfContentsColumnName, previousValue, tableOfContents);
   }
 
+  public String getIssueOrPublishingDate() {
+    return issueOrPublishingDate;
+  }
+
+  public void setIssueOrPublishingDate(String issueOrPublishingDate) {
+    Object previousValue = this.issueOrPublishingDate;
+    this.issueOrPublishingDate = issueOrPublishingDate;
+    preview = null;
+    publishingDate = null;
+    callPropertyChangedListeners(TableConfig.ReferenceIssueOrPublishingDateColumnName, previousValue, issueOrPublishingDate);
+  }
+
   public Date getPublishingDate() {
+    if(publishingDate == null)
+      publishingDate = tryToParseIssueOrPublishingDateToDate();
     return publishingDate;
-  }
-
-  public void setPublishingDate(Date publishingDate) {
-    Object previousValue = this.publishingDate;
-    this.publishingDate = publishingDate;
-    callPropertyChangedListeners(TableConfig.ReferencePublishingDateColumnName, previousValue, publishingDate);
-  }
-
-  public String getIsbnOrIssn() {
-    return isbnOrIssn;
-  }
-
-  public void setIsbnOrIssn(String isbnOrIssn) {
-    Object previousValue = this.isbnOrIssn;
-    this.isbnOrIssn = isbnOrIssn;
-    callPropertyChangedListeners(TableConfig.ReferenceIsbnOrIssnColumnName, previousValue, isbnOrIssn);
   }
 
   public DeepThought getDeepThought() {
@@ -230,14 +229,46 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 //      preview = getTextRepresentation();
 //      addCategorySpecificInfo();
       preview = title;
-      if(title == null && publishingDate != null)
-        preview = publishingDate.toString();
+      if(StringUtils.isNullOrEmpty(title) && issueOrPublishingDate != null)
+        preview = issueOrPublishingDate.toString();
 
       if (series != null)
         preview = series.getTextRepresentation() + " " + preview;
     }
 
     return preview;
+  }
+
+
+
+  protected Date tryToParseIssueOrPublishingDateToDate() {
+    if(StringUtils.isNullOrEmpty(issueOrPublishingDate))
+      return null;
+
+    try {
+      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).parse(issueOrPublishingDate);
+    } catch(Exception ex) {
+      if(issueOrPublishingDate.length() == 4) { // only year is set
+        try {
+          int year = Integer.parseInt(issueOrPublishingDate) - 1900;
+          return new Date(year, 0, 1);
+        } catch(Exception ex2) { }
+      }
+      else if(issueOrPublishingDate.length() == 7) { // month and year - separated by any sign - are set
+        try {
+          int month = Integer.parseInt(issueOrPublishingDate.substring(0, 2)) - 1;
+          int year = Integer.parseInt(issueOrPublishingDate.substring(3, 7)) - 1900;
+          return new Date(year, month, 1);
+        } catch(Exception ex2) { }
+      }
+      else { // if String has been set by DatePicker control
+        try {
+          return DateFormat.getDateInstance(DateFormat.LONG, Localization.getLanguageLocale()).parse(issueOrPublishingDate);
+        } catch(Exception ex2) { }
+      }
+    }
+
+    return null;
   }
 
   @Override

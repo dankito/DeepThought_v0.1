@@ -13,6 +13,7 @@ import net.deepthought.controls.person.SeriesTitlePersonsControl;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.enums.Language;
@@ -187,12 +188,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @FXML
   protected Pane panePublishingDate;
   @FXML
+  protected TextField txtfldIssueOrPublishingDate;
+  @FXML
   protected DatePicker dtpckPublishingDate;
-
-  @FXML
-  protected TextField txtfldIsbnOrIssn;
-  @FXML
-  protected Pane paneIsbnOrIssn;
 
   @FXML
   protected Pane paneOnlineAddress;
@@ -291,7 +289,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void setupSeriesTitleControls() {
     txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
-      updateWindowTitle(newValue);
+      if(editedReferenceBase instanceof SeriesTitle)
+        updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
@@ -341,7 +340,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void setupReferenceControls() {
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
-      updateWindowTitle(newValue);
+      if(editedReferenceBase instanceof Reference)
+        updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
@@ -361,11 +361,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     contentPane.getChildren().add(6, referencePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublishingDate);
-    dtpckPublishingDate.setConverter(localeDateStringConverter);
-    dtpckPublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferencePublishingDate));
+    txtfldIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
+    });
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneIsbnOrIssn);
-    txtfldIsbnOrIssn.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceIsbnOrIssn));
+//    dtpckPublishingDate.setConverter(localeDateStringConverter);
+    dtpckPublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> {
+      txtfldIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(newValue)));
+        });
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
     txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
@@ -384,7 +388,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void setupReferenceSubDivisionControls() {
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
-      updateWindowTitle(newValue);
+      if(editedReferenceBase instanceof ReferenceSubDivision)
+        updateWindowTitle(editedReferenceBase);
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
@@ -442,7 +447,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneIsbnOrIssn.setVisible(StringUtils.isNotNullOrEmpty(reference.getIsbnOrIssn()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -475,23 +479,38 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     closeDialog();
   }
 
+  protected ReferenceBase editedReferenceBase = null;
+
+  public ReferenceBase getEditedReferenceBase() {
+    return editedReferenceBase;
+  }
+
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
-    // TODO: save async while closing the dialog? Would make Dialog closing faster
-    if(reference.isPersisted() == false) // a new Reference
-      Application.getDeepThought().addReference(reference);
+    // TODO: also check if a previously set Entity now has been unset
 
-    if(seriesTitle.isPersisted() == false) { // a new SeriesTitle
-      if(StringUtils.isNotNullOrEmpty(txtfldSeriesTitleTitle.getText())) {
+    // TODO: save async while closing the dialog? Would make Dialog closing faster
+    if(StringUtils.isNotNullOrEmpty(txtfldTitle.getText()) || StringUtils.isNotNullOrEmpty(txtfldIssueOrPublishingDate.getText())) {
+      editedReferenceBase = reference;
+      if (reference.isPersisted() == false) // a new Reference
+        Application.getDeepThought().addReference(reference);
+    }
+
+    if(StringUtils.isNotNullOrEmpty(txtfldSeriesTitleTitle.getText())) {
+      if (seriesTitle.isPersisted() == false) { // a new SeriesTitle
         Application.getDeepThought().addSeriesTitle(seriesTitle);
         reference.setSeries(seriesTitle);
       }
+
+      if(editedReferenceBase == null)
+        editedReferenceBase = seriesTitle;
     }
 
-    if(referenceSubDivision.isPersisted() == false) { // a new ReferenceSubDivision
-      if(StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivisionTitle.getText())) {
+    if(StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivisionTitle.getText())) {
+      editedReferenceBase = referenceSubDivision;
+      if (referenceSubDivision.isPersisted() == false) { // a new ReferenceSubDivision
         reference.addSubDivision(referenceSubDivision);
       }
     }
@@ -538,10 +557,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitlePersons)) {
-      for(Person removedPerson : seriesTitlePersonsControl.getRemovedPersons())
+      for(Person removedPerson : seriesTitlePersonsControl.getCopyOfRemovedPersonsAndClear())
         seriesTitle.removePerson(removedPerson);
 
-      for(Person addedPerson : seriesTitlePersonsControl.getAddedPersons())
+      for(Person addedPerson : seriesTitlePersonsControl.getCopyOfAddedPersonsAndClear())
         seriesTitle.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitlePersons);
@@ -598,23 +617,18 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferencePersons)) {
-      for(Person removedPerson : referencePersonsControl.getRemovedPersons())
+      for(Person removedPerson : referencePersonsControl.getCopyOfRemovedPersonsAndClear())
         reference.removePerson(removedPerson);
 
-      for(Person addedPerson : referencePersonsControl.getAddedPersons())
+      for(Person addedPerson : referencePersonsControl.getCopyOfAddedPersonsAndClear())
         reference.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferencePublishingDate)) {
-      reference.setPublishingDate(DateConvertUtils.asUtilDate(dtpckPublishingDate.getValue()));
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferencePublishingDate);
-    }
-
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceIsbnOrIssn)) {
-      reference.setIsbnOrIssn(txtfldIsbnOrIssn.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIsbnOrIssn);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
+      reference.setIssueOrPublishingDate(txtfldIssueOrPublishingDate.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
@@ -640,7 +654,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void saveEditedFieldsOnReferenceSubDivision() {
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionTitle)) {
-      referenceSubDivision.setTitle(txtfldSubTitle.getText());
+      referenceSubDivision.setTitle(txtfldReferenceSubDivisionTitle.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle)) {
@@ -654,10 +668,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionPersons)) {
-      for(Person removedPerson : referenceSubDivisionPersonsControl.getRemovedPersons())
+      for(Person removedPerson : referenceSubDivisionPersonsControl.getCopyOfRemovedPersonsAndClear())
         referenceSubDivision.removePerson(removedPerson);
 
-      for(Person addedPerson : referenceSubDivisionPersonsControl.getAddedPersons())
+      for(Person addedPerson : referenceSubDivisionPersonsControl.getCopyOfAddedPersonsAndClear())
         referenceSubDivision.addPerson(addedPerson);
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionPersons);
@@ -838,9 +852,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(paneSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
 
-    if(paneIsbnOrIssn.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneIsbnOrIssn, "isbn.or.issn");
-
     if(ttldpnAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
     if(ttldpnTableOfContents.isVisible() == false)
@@ -961,21 +972,39 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     return reference;
   }
 
-  public void setWindowStageAndReference(Stage windowStage, Reference reference) {
-    setWindowStageAndReferenceSubDivision(windowStage, reference, new ReferenceSubDivision());
-  }
+  public void setWindowStageAndReference(Stage windowStage, ReferenceBase referenceBase) {
+    // TODO: if referenceBase != null disallow editing of Entities below referenceBase's Hierarchy (e.g. referenceBase instanceof Reference -> don't allow ReferenceSubDivision editing
+    editedReferenceBase = referenceBase;
 
-  public void setWindowStageAndReferenceSubDivision(Stage windowStage, Reference reference, ReferenceSubDivision subDivision) {
-    this.reference = reference;
-    this.referenceSubDivision = subDivision;
+    if(referenceBase instanceof ReferenceSubDivision) {
+      this.referenceSubDivision = (ReferenceSubDivision)referenceBase;
+      this.reference = referenceSubDivision.getReference();
+      this.seriesTitle = reference.getSeries();
+      if(this.seriesTitle == null)
+        this.seriesTitle = new SeriesTitle();
+    }
+    else {
+      this.referenceSubDivision = new ReferenceSubDivision();
 
-    this.seriesTitle = reference.getSeries();
-    if(seriesTitle == null)
-      seriesTitle = new SeriesTitle();
+      if(referenceBase instanceof Reference) {
+        this.reference = (Reference) referenceBase;
+        this.seriesTitle = reference.getSeries();
+        if(this.seriesTitle == null)
+          this.seriesTitle = new SeriesTitle();
+      }
+      else {
+        this.reference = new Reference();
+
+        if(referenceBase instanceof SeriesTitle)
+          this.seriesTitle = (SeriesTitle) referenceBase;
+        else
+          this.seriesTitle = new SeriesTitle();
+      }
+    }
 
     super.setWindowStage(windowStage);
 
-    updateWindowTitle(reference.getTitle());
+    updateWindowTitle(editedReferenceBase);
     windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
       @Override
       public void handle(WindowEvent event) {
@@ -988,7 +1017,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     setSeriesTitleValues(seriesTitle);
     setReferenceValues(reference);
-    setReferenceSubDivisionValues(subDivision);
+    setReferenceSubDivisionValues(referenceSubDivision);
   }
 
   protected void setReferenceValues(final Reference reference) {
@@ -1003,8 +1032,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     referencePersonsControl.setReference(reference);
 
     dtpckPublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
-
-    txtfldIsbnOrIssn.setText(reference.getIsbnOrIssn());
+    txtfldIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
 
     txtfldOnlineAddress.setText(reference.getOnlineAddress());
 
@@ -1022,19 +1050,19 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     return fieldsWithUnsavedChanges.size() > 0;
   }
 
-  protected void updateWindowTitle(String referenceTitle) {
-    if(this.reference.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.reference", referenceTitle));
+  protected void updateWindowTitle(ReferenceBase referenceBase) {
+    if(editedReferenceBase == null)
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.reference"));
     else
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.reference", referenceTitle));
+      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.reference", referenceBase.getTextRepresentation()));
   }
 
 
   protected StringConverter<LocalDate> localeDateStringConverter = new StringConverter<LocalDate>() {
     @Override
     public String toString(LocalDate date) {
-      log.debug("publishingDateFormat: " + publishingDateFormat);
-      return DateFormat.getDateInstance(DateFormat.YEAR_FIELD, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(date));
+//      log.debug("publishingDateFormat: " + publishingDateFormat);
+      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(date));
     }
 
     @Override
@@ -1048,7 +1076,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
           if(string.length() == 4) {
             try {
               int year = Integer.parseInt(string) - 1900;
-              log.debug("Parsed year: " + year);
               parsedDate = new Date(year, 0, 1);
               publishingDateFormat = DateFormat.YEAR_FIELD;
             } catch(Exception ex2) { }
@@ -1061,7 +1088,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
               publishingDateFormat = DateFormat.SHORT;
             } catch(Exception ex2) { }
           }
-          else {
+          else { // if String has been set by DatePicker control
             try {
               parsedDate = DateFormat.getDateInstance(DateFormat.LONG, Localization.getLanguageLocale()).parse(string);
               publishingDateFormat = DateFormat.LONG;
@@ -1164,8 +1191,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         abstractChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceTableOfContentsColumnName))
         tableOfContentsChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceIsbnOrIssnColumnName))
-        isbnOrIssnChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
         onlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
@@ -1210,12 +1235,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     // TODO: if current value != previousValue, ask User what to do?
     htmledTableOfContents.setHtmlText(newValue);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
-  }
-
-  protected void isbnOrIssnChanged(String previousValue, String newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    txtfldIsbnOrIssn.setText(newValue);
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceIsbnOrIssn);
   }
 
   protected void onlineAddressChanged(String previousValue, String newValue) {

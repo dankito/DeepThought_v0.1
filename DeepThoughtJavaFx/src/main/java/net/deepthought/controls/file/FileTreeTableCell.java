@@ -95,7 +95,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
     entryFileOptionsButtonsPane.managedProperty().bind(entryFileOptionsButtonsPane.visibleProperty());
     graphicPane.getChildren().add(entryFileOptionsButtonsPane);
 
-    JavaFxLocalization.bindLabeledText(removeFileButton, "remove");
+    JavaFxLocalization.bindLabeledText(removeFileButton, "delete");
     JavaFxLocalization.bindControlToolTip(removeFileButton, "remove.file.from.entry.tool.tip");
     removeFileButton.setMinWidth(80);
     entryFileOptionsButtonsPane.getChildren().add(removeFileButton);
