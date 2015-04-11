@@ -1,8 +1,14 @@
 package net.deepthought.data.search;
 
+import com.example.OpenOfficeDocumentsImporterExporter;
+
+import net.deepthought.Application;
+import net.deepthought.data.helper.MockEntityManager;
+import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.helper.IdSettableEntry;
+import net.deepthought.data.search.helper.TestApplicationConfiguration;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Assert;
@@ -22,6 +28,8 @@ public class LuceneSearchEngineTest {
   @Before
   public void setup() {
     searchEngine = new LuceneSearchEngine();
+
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
   }
 
 
@@ -36,9 +44,49 @@ public class LuceneSearchEngineTest {
     searchEngine.index("Voulez vous coucher avec moi? - Va te faire enculer sale fils de pute!");
     searchEngine.index("Preferisco la dolce vita italiana");
 
-    searchEngine.search("lebt");
-    searchEngine.search("leben");
-    searchEngine.search("run");
+    searchEngine.search("lebt", Entry.class);
+    searchEngine.search("leben", Entry.class);
+    searchEngine.search("run", Entry.class);
+
+    List<IndexTerm> terms = searchEngine.getAllTerms();
+  }
+
+  @Test
+  public void testLanguageDetection() throws IOException, ParseException {
+    searchEngine.index("Jetzt aber mal ein ganz ein langer Text, dessen Sprache zu identifizieren dir hoffentlich keine Mühe bereitet, liebes Tika");
+    searchEngine.index("Entweder man lebt, oder man ist konsequent");
+    searchEngine.index("Du hast nichts zu verlieren, aber eine Welt zu gewinnen");
+    searchEngine.index("Die Welt hat genug für jedermanns Bedürfnisse, aber nicht für jedermanns Gier");
+    searchEngine.index("Shit happens");
+    searchEngine.index("In the long run we're all dead");
+    searchEngine.index("Voulez vous coucher avec moi? - Va te faire enculer sale fils de pute!");
+    searchEngine.index("Preferisco la dolce vita italiana");
+  }
+
+  @Test
+  public void testSearchingInLongTexts() throws IOException, ParseException {
+    OpenOfficeDocumentsImporterExporter importer = new OpenOfficeDocumentsImporterExporter();
+    String documentContent = importer.extractPlainTextFromTextDocument
+        ("/run/media/ganymed/fast_data/coding/Android/self/DeepThought/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/src/test/resources/Schneisen im Wald 4.odt");
+    searchEngine.index(documentContent);
+
+    searchEngine.search("Metallbörse", Entry.class);
+    searchEngine.search("leben", Entry.class);
+    searchEngine.search("run", Entry.class);
+
+    List<IndexTerm> terms = searchEngine.getAllTerms();
+  }
+
+  @Test
+  public void testSearchingInIndexWithManyDocuments() throws IOException, ParseException {
+    OpenOfficeDocumentsImporterExporter importer = new OpenOfficeDocumentsImporterExporter();
+    List<Entry> entries = importer.extractEntriesFromDankitosSchneisenImWald("/run/media/ganymed/fast_data/coding/Android/self/DeepThought/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/src/test/resources/Schneisen im Wald 4.odt");
+    for(Entry entry : entries)
+      searchEngine.updateIndex(entry);
+
+    searchEngine.search("Metallbörse", Entry.class);
+    searchEngine.search("Überwachungsstaat", Entry.class);
+    searchEngine.search("Überwachung", Entry.class);
 
     List<IndexTerm> terms = searchEngine.getAllTerms();
   }

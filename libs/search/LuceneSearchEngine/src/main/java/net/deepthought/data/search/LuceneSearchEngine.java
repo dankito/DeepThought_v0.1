@@ -1,7 +1,9 @@
 package net.deepthought.data.search;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.db.BaseEntity;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -90,8 +92,8 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
     IndexWriter iwriter = new IndexWriter(directory, config);
 
     Document doc = new Document();
-    doc.add(new Field("fieldname", text, TextField.TYPE_STORED));
-    doc.add(new IntField("id", idMock++, Field.Store.YES));
+    doc.add(new Field(FieldName.Content.toString(), text, TextField.TYPE_STORED));
+    doc.add(new IntField(FieldName.Id.toString(), idMock++, Field.Store.YES));
     iwriter.addDocument(doc);
     iwriter.close();
 
@@ -116,7 +118,7 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
 //    }
 
 
-//    DocsEnum de = MultiFields.getTermDocsEnum(reader, MultiFields.getLiveDocs(reader), "fieldname", new BytesRef("run"));
+//    DocsEnum de = MultiFields.getTermDocsEnum(reader, MultiFields.getLiveDocs(reader), FieldName.Content.toString(), new BytesRef("run"));
 //    if(de != null) {
 //      int docNum;
 //      while ((docNum = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
@@ -172,22 +174,36 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
     }
   }
 
-  public void search(String term) throws IOException, ParseException {
-    DirectoryReader ireader = DirectoryReader.open(directory);
-    IndexSearcher isearcher = new IndexSearcher(ireader);
+  public List<BaseEntity> search(String term, Class resultEntityType) throws IOException, ParseException {
+    List<Long> searchResultIds = new ArrayList<>();
+
+    DirectoryReader indexReader = DirectoryReader.open(directory);
+    IndexSearcher indexSearcher = new IndexSearcher(indexReader);
     // Parse a simple query that searches for "text":
-    QueryParser parser = new QueryParser("fieldname", analyzer);
+    QueryParser parser = new QueryParser(FieldName.Content.toString(), analyzer);
     Query query = parser.parse(term);
-    ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
+    ScoreDoc[] hits = indexSearcher.search(query, null, 1000).scoreDocs;
 
     // Iterate through the results:
     System.out.println("Searching for term " + term + " resulted " + hits.length + " results:");
     for (int i = 0; i < hits.length; i++) {
-      Document hitDoc = isearcher.doc(hits[i].doc);
-      System.out.println(hitDoc.toString());
+      Document hitDoc = indexSearcher.doc(hits[i].doc);
+      Long entityId = hitDoc.getField(FieldName.Id.toString()).numericValue().longValue();
+      searchResultIds.add(entityId);
     }
 
-    ireader.close();
+    indexReader.close();
+
+    return getBaseEntitiesFromIds(resultEntityType, searchResultIds);
+  }
+
+  protected <T extends BaseEntity> List<T> getBaseEntitiesFromIds(Class<T> type, List<Long> searchResultIds) {
+    List<T> resultEntities = new ArrayList<>();
+
+    for(Long entityId : searchResultIds)
+      resultEntities.add(Application.getEntityManager().getEntityById(type, entityId));
+
+    return resultEntities;
   }
 
   public List<Long> fndEntriesWithTags(String[] tagNames) throws IOException, ParseException {
@@ -250,7 +266,7 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
 //    IndexWriter iwriter = new IndexWriter(directory, config);
 //    Document doc = new Document();
 //    String text = "This is the text to be indexed.";
-//    doc.add(new Field("fieldname", text, TextField.TYPE_STORED));
+//    doc.add(new Field(FieldName.Content.toString(), text, TextField.TYPE_STORED));
 //    iwriter.addDocument(doc);
 //    iwriter.close();
 //
@@ -258,14 +274,14 @@ public class LuceneSearchEngine implements IDeepThoughtSearchEngine {
 //    DirectoryReader ireader = DirectoryReader.open(directory);
 //    IndexSearcher isearcher = new IndexSearcher(ireader);
 //    // Parse a simple query that searches for "text":
-//    QueryParser parser = new QueryParser("fieldname", analyzer);
+//    QueryParser parser = new QueryParser(FieldName.Content.toString(), analyzer);
 //    Query query = parser.parse("text");
 //    ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
 //    assertEquals(1, hits.length);
 //    // Iterate through the results:
 //    for (int i = 0; i < hits.length; i++) {
 //      Document hitDoc = isearcher.doc(hits[i].doc);
-//      assertEquals("This is the text to be indexed.", hitDoc.get("fieldname"));
+//      assertEquals("This is the text to be indexed.", hitDoc.get(FieldName.Content.toString()));
 //    }
 //    ireader.close();
 //    directory.close();

@@ -9,5 +9,9 @@ dependencies {
     compile 'org.apache.lucene:lucene-suggest:5.0.0'
 
     testCompile 'junit:junit:4.8.1'
+
+    // to include test helper classes from DeepThoughtLib
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
     testCompile project(':JavaSeOrmLiteEntityManager')
+    testCompile project(':OpenOfficeDocumentsImporterExporter')
 }

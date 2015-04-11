@@ -1,0 +1,25 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://repository.apache.org/service/local/staging/deploy/maven2"
+        }
+    }
+}
+
+apply plugin: 'java'
+
+dependencies {
+    compile project(':DeepThoughtLib')
+
+    // newest version, which eliminates bugs important to me, is not available on maven, so i had to get .jar and resolve its dependencies by myself
+    //        compile 'org.apache.odftoolkit:simple-odf:0.7-incubating'
+    compile files('libs/odftoolkit-0.6.1/simple-odf-0.8.1-incubating.jar')
+    // dependencies for above lib, can be removed as soon as newest version is available on maven
+    compile 'org.apache.odftoolkit:odfdom-java:0.8.8-incubating'
+    compile 'org.apache.odftoolkit:taglets:0.8.8-incubating'
+    compile 'xerces:xercesImpl:2.11.0'
+    compile 'org.apache.clerezza:rdf.rdfa:0.2'
+    compile 'org.apache.jena:jena-arq:2.13.0'
+    compile 'commons-validator:commons-validator:1.4.1'
+}

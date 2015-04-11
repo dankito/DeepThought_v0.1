@@ -6,6 +6,7 @@ include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
 include ':json-io'
 include ':LuceneSearchEngine'
+include ':OpenOfficeDocumentsImporterExporter'
 //include ':VideoDownloader'
 //include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
@@ -21,6 +22,8 @@ project(':JavaSeOrmLiteEntityManager').projectDir = new File('libs/persistence/d
 project(':json-io').projectDir = new File('libs/persistence/json/json-io')
 
 project(':LuceneSearchEngine').projectDir = new File('libs/search/LuceneSearchEngine')
+
+project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
 
 //project(':SymmetricDS-Core').projectDir = new File('libs/sync/SymmetricDS-Core')
 //project(':SymmetricDS-CSV').projectDir = new File('libs/sync/SymmetricDS-CSV')
