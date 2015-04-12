@@ -79,6 +79,8 @@ dependencies {
     // only needed if the newest version of Hibernate is used (as this requires the lastest JPA 2.1 annotations (which are Drafts!)
     //    compile 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Draft-16'
     compile 'org.eclipse.persistence:javax.persistence:2.1.0'
+
+    compile 'com.norconex.language:langdetect:1.3.0'
     compile 'org.apache.tika:tika-core:1.6'
     compile 'org.jsoup:jsoup:1.8.1'
 

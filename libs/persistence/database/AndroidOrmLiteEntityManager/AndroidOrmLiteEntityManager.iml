@@ -86,12 +86,14 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="jsonic-1.3.5" level="project" />
     <orderEntry type="library" exported="" name="jsoup-1.8.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="robotium-solo-4.3.1" level="project" />
     <orderEntry type="library" exported="" name="javax.persistence-2.1.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.11" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
+    <orderEntry type="library" exported="" name="langdetect-1.3.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="tika-core-1.6" level="project" />
     <orderEntry type="module" module-name="ormlite-android" exported="" />

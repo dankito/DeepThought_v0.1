@@ -14,6 +14,7 @@ defaultTasks 'run'
 dependencies {
     compile project(':DeepThoughtLib')
     compile project(':JavaSeOrmLiteEntityManager')
+//    compile project(':OpenOfficeDocumentsImporterExporter')
 
     compile 'org.controlsfx:controlsfx:8.20.8'
 

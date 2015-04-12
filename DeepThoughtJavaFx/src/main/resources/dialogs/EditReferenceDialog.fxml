@@ -85,7 +85,7 @@
                               </HBox>
                               <HBox fx:id="panePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
-                                    <Label prefWidth="175.0" text="%issue.or.publishing.date">
+                                    <Label prefWidth="200.0" text="%issue.or.publishing.date">
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
@@ -231,7 +231,7 @@
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
-                                          <Insets right="6.0" />
+                                          <Insets />
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />

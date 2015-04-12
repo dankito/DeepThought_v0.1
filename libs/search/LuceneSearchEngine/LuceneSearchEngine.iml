@@ -28,10 +28,10 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="library" exported="" name="lucene-core-5.0.0" level="project" />
-    <orderEntry type="library" exported="" name="tika-core-1.7" level="project" />
     <orderEntry type="library" exported="" name="lucene-analyzers-common-5.0.0" level="project" />
     <orderEntry type="library" exported="" name="lucene-queryparser-5.0.0" level="project" />
     <orderEntry type="library" exported="" name="lucene-suggest-5.0.0" level="project" />
+    <orderEntry type="library" exported="" name="tika-core-1.7" level="project" />
     <orderEntry type="library" exported="" name="lucene-queries-5.0.0" level="project" />
     <orderEntry type="library" exported="" name="lucene-sandbox-5.0.0" level="project" />
     <orderEntry type="library" exported="" name="lucene-misc-5.0.0" level="project" />

@@ -6,6 +6,8 @@
 
 package net.deepthought;
 
+import com.example.OpenOfficeDocumentsImporterExporter;
+
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -248,6 +251,10 @@ public class MainWindowController implements Initializable {
 
 //    if(deepThought.getLastViewedCategory() != null)
 //      trvwCategories.getSelectionModel().(deepThought.getLastViewedCategory());
+
+//      OpenOfficeDocumentsImporterExporter importer = new OpenOfficeDocumentsImporterExporter();
+//      List<Entry> extractedEntries = importer.extractEntriesFromDankitosSchneisenImWald
+//          ("/run/media/ganymed/fast_data/coding/Android/self/DeepThought/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/src/test/resources/Schneisen im Wald 4.odt");
     }
   }
 
