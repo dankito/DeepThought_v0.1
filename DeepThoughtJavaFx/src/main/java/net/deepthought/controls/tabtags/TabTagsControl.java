@@ -10,6 +10,8 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.Search;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.model.AllEntriesSystemTag;
 import net.deepthought.model.EntriesWithoutTagsSystemTag;
 import net.deepthought.model.SystemTag;
@@ -230,10 +232,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       log.debug("Determining Entries in entriesHavingFilteredTags with Tag " + tag + " ...");
 //      tagsToFilterForSize = tagsToFilterFor.size();
       Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
-      for(Entry filteredEntry : entriesHavingFilteredTags) {
-        if(filteredEntry.hasTag(tag))
-          filteredEntriesWithThisTag.add(filteredEntry);
+      for(Entry tagEntry : tag.getEntries()) {
+        if(tagEntry.hasTags(tagsToFilterFor))
+          filteredEntriesWithThisTag.add(tagEntry);
       }
+//      for(Entry filteredEntry : entriesHavingFilteredTags) {
+//        if(filteredEntry.hasTag(tag))
+//          filteredEntriesWithThisTag.add(filteredEntry);
+//      }
 
       log.debug("done");
       mainWindowController.showEntries(filteredEntriesWithThisTag);
@@ -262,8 +268,31 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected void quickFilterTags() {
     log.debug("Starting to quick filter Tags ... ");
-    Tag selectedTag = deepThought.getSettings().getLastViewedTag();
+    final Tag selectedTag = deepThought.getSettings().getLastViewedTag();
 
+//    Application.getSearchEngine().filterTags(new Search<Tag>(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<Tag>() {
+//      @Override
+//      public void completed(final Collection<Tag> results) {
+//        filteredTags.setPredicate((tag) -> {
+//          return results.contains(tag);
+//        });
+//
+//        if(results.contains(selectedTag))
+//          tblvwTags.getSelectionModel().select(selectedTag);
+//
+//        log.debug("Done quick filtering Tags");
+//      }
+//    }));
+
+    quickFilterTagsManually();
+
+    if(filteredTags.contains(selectedTag))
+      tblvwTags.getSelectionModel().select(selectedTag);
+
+    log.debug("Done quick filtering Tags");
+  }
+
+  protected void quickFilterTagsManually() {
     String filter = txtfldTagsQuickFilter.getText();
     String lowerCaseFilter = filter.toLowerCase(); // TODO: can filter ever be null?
     String[] parts = lowerCaseFilter.split(",");
@@ -274,7 +303,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
         return true;
       }
 
-      if(tag instanceof SystemTag)
+      if (tag instanceof SystemTag)
         return false;
 
       String lowerCaseTagName = tag.getName().toLowerCase();
@@ -287,11 +316,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
       return false; // Does not match.
     });
-
-    if(filteredTags.contains(selectedTag))
-      tblvwTags.getSelectionModel().select(selectedTag);
-
-    log.debug("Done quick filtering Tags");
   }
 
   protected void addTagToTagFilter(Tag tag) {
@@ -334,21 +358,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       showAllTagsInListViewTags(deepThought);
     }
     else {
-      final Set<Tag> tagsWithEntriesContainingFilteredTags = new HashSet<>();
-      tagsWithEntriesContainingFilteredTags.addAll(tagsToFilterFor);
+      final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
+      tagsOnEntriesContainingFilteredTags.addAll(tagsToFilterFor);
 
-      for (Tag filteredTag : tagsToFilterFor) {
-        for (Entry entry : filteredTag.getEntries()) {
-          if (entry.hasTags(tagsToFilterFor)) {
-            entriesHavingFilteredTags.add(entry);
-            tagsWithEntriesContainingFilteredTags.addAll(entry.getTags());
-          }
-        }
-      }
+      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
 
       clearTableViewTagsItemsWithoutInvokingTableViewTagsSelectedItemChangedEvent();
-      log.debug("Adding all tagsWithEntriesContainingFilteredTags");
-      tableViewTagsItems.addAll(tagsWithEntriesContainingFilteredTags);
+      log.debug("Adding all tagsOnEntriesContainingFilteredTags");
+      tableViewTagsItems.addAll(tagsOnEntriesContainingFilteredTags);
     }
 
     quickFilterTags();

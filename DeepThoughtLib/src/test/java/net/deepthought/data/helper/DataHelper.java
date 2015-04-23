@@ -8,7 +8,6 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
@@ -90,17 +89,6 @@ public class DataHelper {
 //    entry1.addTag(new Tag("Entry 1 Tag"));
 //    entry2.addTag(new Tag("Entry 2 Tag"));
 //    entry3.addTag(new Tag("Entry 3 Tag"));
-
-    IndexTerm indexTerm1 = new IndexTerm("Weltfrieden");
-    IndexTerm indexTerm2 = new IndexTerm("Amalgan");
-    deepThought.addIndexTerm(indexTerm1);
-    deepThought.addIndexTerm(indexTerm2);
-
-    entry1.addIndexTerm(indexTerm1);
-    entry1.addIndexTerm(indexTerm2);
-    entry2.addIndexTerm(indexTerm1);
-    entry2.addIndexTerm(indexTerm2);
-    entry3.addIndexTerm(indexTerm1);
 
     Person welzer = new Person("Harald", "Welzer");
     Person paech = new Person("Niko", "Paech");

@@ -10,6 +10,8 @@
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" filepath="$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/OpenOfficeDocumentsImporterExporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/OpenOfficeDocumentsImporterExporter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/SueddeutscheImporter/SueddeutscheImporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/SueddeutscheImporter/SueddeutscheImporter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" />

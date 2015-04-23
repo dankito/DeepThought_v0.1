@@ -66,11 +66,9 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
 
   protected List<Tag> tagsToSearchFor = new ArrayList<>();
 
-  protected RelativeLayout rlytSearchTitle = null;
-  protected Spinner spnSearchTitleSearchOption = null;
-  protected EditText edtxtSearchTitle = null;
-
   protected RelativeLayout rlytSearchContent = null;
+  protected Spinner spnSearchContentSearchOption = null;
+  protected EditText edtxtSearchContent = null;
 
   protected SearchResultsAdapter searchResultsAdapter = null;
 
@@ -85,8 +83,6 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     View rootView = inflater.inflate(R.layout.fragment_search, container, false);
 
     setupSearchTagSection(rootView);
-
-    setupSearchTitleSection(rootView);
 
     setupSearchContentSection(rootView);
 
@@ -116,33 +112,26 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     lstvwSearchTags.setAdapter(new SearchForTagsAdapter(this.getActivity(), tagsToSearchFor, this));
   }
 
-  protected void setupSearchTitleSection(View rootView) {
-    TextView txtvwSearchSectionTitleTitle = (TextView)rootView.findViewById(R.id.txtvwSearchSectionTitleTitle);
-    txtvwSearchSectionTitleTitle.setOnClickListener(txtvwSearchSectionTitleTitleOnClickListener);
-    rlytSearchTitle = (RelativeLayout)rootView.findViewById(R.id.rlytSearchTitle);
-    rlytSearchTitle.setOnClickListener(txtvwSearchSectionTitleTitleOnClickListener);
-
-    spnSearchTitleSearchOption = (Spinner)rootView.findViewById(R.id.spnSearchTitleSearchOption);
-    spnSearchTitleSearchOption.setOnItemSelectedListener(spnSearchTitleSearchOptionOnItemSelectedListener);
-
-    List<String> titleSearchOptions = new ArrayList<>();
-    titleSearchOptions.add(getString(R.string.search_contains_text));
-    titleSearchOptions.add(getString(R.string.search_starts_with_text));
-    titleSearchOptions.add(getString(R.string.search_ends_with_text));
-    titleSearchOptions.add(getString(R.string.search_equals_text));
-    ArrayAdapter<String> spnSearchTitleSearchOptionAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, titleSearchOptions);
-    spnSearchTitleSearchOptionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spnSearchTitleSearchOption.setAdapter(spnSearchTitleSearchOptionAdapter);
-
-    edtxtSearchTitle = (EditText)rootView.findViewById(R.id.edtxtSearchTitle);
-    edtxtSearchTitle.addTextChangedListener(edtxtSearchTitleOnTextChangedListener);
-  }
-
   protected void setupSearchContentSection(View rootView) {
     TextView txtvwSearchSectionContentTitle = (TextView)rootView.findViewById(R.id.txtvwSearchSectionContentTitle);
     txtvwSearchSectionContentTitle.setOnClickListener(txtvwSearchSectionContentTitleOnClickListener);
     rlytSearchContent = (RelativeLayout)rootView.findViewById(R.id.rlytSearchContent);
     rlytSearchContent.setOnClickListener(txtvwSearchSectionContentTitleOnClickListener);
+
+    spnSearchContentSearchOption = (Spinner)rootView.findViewById(R.id.spnSearchContentSearchOption);
+    spnSearchContentSearchOption.setOnItemSelectedListener(spnSearchContentSearchOptionOnItemSelectedListener);
+
+    List<String> contentSearchOptions = new ArrayList<>();
+    contentSearchOptions.add(getString(R.string.search_contains_text));
+    contentSearchOptions.add(getString(R.string.search_starts_with_text));
+    contentSearchOptions.add(getString(R.string.search_ends_with_text));
+    contentSearchOptions.add(getString(R.string.search_equals_text));
+    ArrayAdapter<String> spnSearchContentSearchOptionAdapter = new ArrayAdapter<String>(this.getActivity(), android.R.layout.simple_spinner_item, contentSearchOptions);
+    spnSearchContentSearchOptionAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spnSearchContentSearchOption.setAdapter(spnSearchContentSearchOptionAdapter);
+
+    edtxtSearchContent = (EditText)rootView.findViewById(R.id.edtxtSearchContent);
+    edtxtSearchContent.addTextChangedListener(edtxtSearchContentOnTextChangedListener);
   }
 
 
@@ -222,20 +211,10 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
   }
 
 
-  protected View.OnClickListener txtvwSearchSectionTitleTitleOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      if(rlytSearchTitle.getVisibility() == View.GONE)
-        rlytSearchTitle.setVisibility(View.VISIBLE);
-      else
-        rlytSearchTitle.setVisibility(View.GONE);
-    }
-  };
-
-  protected AdapterView.OnItemSelectedListener spnSearchTitleSearchOptionOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+  protected AdapterView.OnItemSelectedListener spnSearchContentSearchOptionOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-      searchForTitleAsync();
+      searchForContentAsync();
     }
 
     @Override
@@ -244,7 +223,7 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     }
   };
 
-  protected TextWatcher edtxtSearchTitleOnTextChangedListener = new TextWatcher() {
+  protected TextWatcher edtxtSearchContentOnTextChangedListener = new TextWatcher() {
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -257,19 +236,19 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
 
     @Override
     public void afterTextChanged(Editable s) {
-      searchForTitleAsync();
+      searchForContentAsync();
     }
   };
 
-  protected void searchForTitleAsync() {
-    final String titleToSearchFor = edtxtSearchTitle.getText().toString().toLowerCase();
-    final TextCompareOption textCompareOption = TextCompareOption.fromIndex(spnSearchTitleSearchOption.getSelectedItemPosition());
+  protected void searchForContentAsync() {
+    final String contentToSearchFor = edtxtSearchContent.getText().toString().toLowerCase();
+    final TextCompareOption textCompareOption = TextCompareOption.fromIndex(spnSearchContentSearchOption.getSelectedItemPosition());
 
     new AsyncTask<Void, Void, List<Entry>>() {
 
       @Override
       protected List<Entry> doInBackground(Void... params) {
-        return filterEntriesForTitle(titleToSearchFor, textCompareOption);
+        return filterEntriesForContent(contentToSearchFor, textCompareOption);
       }
 
       @Override
@@ -280,15 +259,15 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     }.execute();
   }
 
-  protected void searchForTitle() {
-    String titleToSearchFor = edtxtSearchTitle.getText().toString().toLowerCase();
-    TextCompareOption textCompareOption = TextCompareOption.fromIndex(spnSearchTitleSearchOption.getSelectedItemPosition());
-    List<Entry> searchResults = filterEntriesForTitle(titleToSearchFor, textCompareOption);
+  protected void searchForContent() {
+    String contentToSearchFor = edtxtSearchContent.getText().toString().toLowerCase();
+    TextCompareOption textCompareOption = TextCompareOption.fromIndex(spnSearchContentSearchOption.getSelectedItemPosition());
+    List<Entry> searchResults = filterEntriesForContent(contentToSearchFor, textCompareOption);
 
     searchResultsAdapter.setSearchResults(searchResults);
   }
 
-  protected List<Entry> filterEntriesForTitle(String titleToSearchFor, TextCompareOption textCompareOption) {
+  protected List<Entry> filterEntriesForContent(String contentToSearchFor, TextCompareOption textCompareOption) {
     List<Entry> searchResults = new ArrayList<>();
 
     if(Application.getDeepThought() == null)
@@ -297,25 +276,25 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     switch(textCompareOption) {
       case Contains:
         for(Entry entry : Application.getDeepThought().getEntries()) {
-          if(entry.getTitle().toLowerCase().contains(titleToSearchFor))
+          if(entry.getContentAsPlainText().toLowerCase().contains(contentToSearchFor))
             searchResults.add(entry);
         }
         break;
       case StartsWith:
         for(Entry entry : Application.getDeepThought().getEntries()) {
-          if(entry.getTitle().toLowerCase().startsWith(titleToSearchFor))
+          if(entry.getContentAsPlainText().toLowerCase().startsWith(contentToSearchFor))
             searchResults.add(entry);
         }
         break;
       case EndsWith:
         for(Entry entry : Application.getDeepThought().getEntries()) {
-          if(entry.getTitle().toLowerCase().endsWith(titleToSearchFor))
+          if(entry.getContentAsPlainText().toLowerCase().endsWith(contentToSearchFor))
             searchResults.add(entry);
         }
         break;
       case Equals:
         for(Entry entry : Application.getDeepThought().getEntries()) {
-          if(entry.getTitle().toLowerCase().equals(titleToSearchFor))
+          if(entry.getContentAsPlainText().toLowerCase().equals(contentToSearchFor))
             searchResults.add(entry);
         }
         break;

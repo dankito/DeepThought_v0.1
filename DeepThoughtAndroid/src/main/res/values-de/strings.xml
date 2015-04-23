@@ -31,12 +31,11 @@
     <string name="search_section_tag_title">Schlagwortsuche</string>
     <string name="search_section_tag_label">Schlagwörter:</string>
     <string name="search_select_tags"><![CDATA[<Schlagwörter auswählen>]]></string>
-    <string name="search_section_title_title">Titelsuche</string>
+    <string name="search_section_content_title">Inhaltssuche</string>
+    <string name="search_section_results_title">Ergebnisse:</string>
     <string name="search_contains_text">Enthält</string>
     <string name="search_starts_with_text">Beginnt mit</string>
     <string name="search_ends_with_text">Ended mit</string>
     <string name="search_equals_text">Exakt</string>
-    <string name="search_section_content_title">Inhaltssuche</string>
-    <string name="search_section_results_title">Ergebnisse:</string>
 
 </resources>

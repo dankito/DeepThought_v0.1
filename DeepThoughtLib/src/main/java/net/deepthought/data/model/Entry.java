@@ -3,6 +3,7 @@ package net.deepthought.data.model;
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.listener.EntryPersonListener;
+import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
@@ -27,6 +28,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
 import javax.persistence.Transient;
 
 /**
@@ -59,6 +61,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Lob
   protected String content = "";
 
+  protected transient String plainTextContent = null;
+
   @Column(name = TableConfig.EntryEntryIndexColumnName)
   protected int entryIndex;
 
@@ -76,14 +80,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   protected transient Collection<Tag> sortedTags = null;
 
-  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
-  @JoinTable(
-      name = TableConfig.EntryIndexTermJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryIndexTermJoinTableIndexTermIdColumnName/*, referencedColumnName = "id"*/) }
-  )
-  protected Set<IndexTerm> indexTerms = new HashSet<>();
-
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "entry", cascade = CascadeType.PERSIST)
   protected Set<EntryPersonAssociation> entryPersonAssociations = new HashSet<>();
 
@@ -100,7 +96,13 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   )
   protected Set<EntriesLinkGroup> linkGroups = new HashSet<>();
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "entry", cascade = CascadeType.PERSIST)
+//  @OneToMany(fetch = FetchType.EAGER, mappedBy = "entry", cascade = CascadeType.PERSIST)
+  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @JoinTable(
+      name = TableConfig.EntryFileLinkJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.EntryFileLinkJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryFileLinkJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
+  )
   protected Set<FileLink> files = new HashSet<>();
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
@@ -141,13 +143,13 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   }
 
-  public Entry(String title) {
-    this.title = title;
+  public Entry(String content) {
+    this.content = content;
   }
 
-  public Entry(String title, String content) {
-    this(title);
-    this.content = content;
+  public Entry(String content, String abstractString) {
+    this(content);
+    this.abstractString = abstractString;
   }
 
 
@@ -177,9 +179,21 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return content;
   }
 
+  public String getContentAsPlainText() {
+    if(plainTextContent == null) {
+      if (Application.getHtmlHelper() != null)
+        plainTextContent = Application.getHtmlHelper().extractPlainTextFromHtmlBody(content);
+      else
+//        return content;
+        return "";
+    }
+    return plainTextContent;
+  }
+
   public void setContent(String content) {
     String previousContent = this.content;
     this.content = content;
+    plainTextContent = null;
     preview = null;
     callPropertyChangedListeners(TableConfig.EntryContentColumnName, previousContent, content);
   }
@@ -191,6 +205,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setPreviewImage(FileLink previewImage) {
     FileLink previousPreviewImage = this.previewImage;
     this.previewImage = previewImage;
+
+    if(previewImage.getDeepThought() == null && this.deepThought != null)
+      deepThought.addFile(previewImage);
+
     callPropertyChangedListeners(TableConfig.EntryPreviewImageJoinColumnName, previousPreviewImage, previewImage);
   }
 
@@ -357,7 +375,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public Collection<Tag> getTagsSorted() {
     if(sortedTags == null) {
       sortedTags = new ArrayList<>(getTags());
-      Collections.sort((List)sortedTags);
+      Collections.sort((List) sortedTags);
     }
 
     return sortedTags;
@@ -415,59 +433,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       result &= hasTag(tag);
 
     return result;
-  }
-
-  public boolean hasIndexTerms() {
-    return getIndexTerms().size() > 0;
-  }
-
-  public Collection<IndexTerm> getIndexTerms() {
-    return indexTerms;
-  }
-
-  public boolean addIndexTerm(IndexTerm indexTerm) {
-    boolean result = indexTerms.add(indexTerm);
-    if(result) {
-      indexTerm.addEntry(this);
-      callEntityAddedListeners(indexTerms, indexTerm);
-    }
-
-    return result;
-  }
-
-  public boolean removeIndexTerm(IndexTerm indexTerm) {
-    boolean result = indexTerms.remove(indexTerm);
-    if(result) {
-      indexTerm.removeEntry(this);
-      callEntityRemovedListeners(indexTerms, indexTerm);
-    }
-
-    return result;
-  }
-
-  public boolean hasIndexTerm(IndexTerm indexTerm) {
-    return indexTerms.contains(indexTerm);
-  }
-
-  public boolean hasIndexTerms(Collection<IndexTerm> indexTerms) {
-    boolean result = true;
-
-    for(IndexTerm indexTerm : indexTerms)
-      result &= hasIndexTerm(indexTerm);
-
-    return result;
-  }
-
-  @Transient
-  public String getIndexTermsStringRepresentation() {
-    String indexTermsString = "";
-    for(IndexTerm indexTerm : getIndexTerms())
-      indexTermsString += indexTerm.getName() + ", ";
-
-    if(indexTermsString.length() > 2)
-      indexTermsString = indexTermsString.substring(0, indexTermsString.length() - 2);
-
-    return indexTermsString;
   }
 
 
@@ -551,6 +516,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     boolean result = notes.add(note);
     if(result) {
       note.setEntry(this);
+
+      if(note.getDeepThought() == null && this.deepThought != null)
+        deepThought.addNote(note);
+
       callEntityAddedListeners(notes, note);
     }
 
@@ -561,6 +530,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     boolean result = notes.remove(note);
     if(result) {
       note.setEntry(null);
+      if(deepThought != null)
+        deepThought.removeNote(note);
+
       callEntityRemovedListeners(notes, note);
     }
 
@@ -604,7 +576,11 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public boolean addFile(FileLink file) {
     boolean result = files.add(file);
     if(result) {
-      file.setEntry(this);
+      file.addEntry(this);
+
+      if(file.getDeepThought() == null && this.deepThought != null)
+        deepThought.addFile(file);
+
       callEntityAddedListeners(files, file);
     }
 
@@ -614,7 +590,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public boolean removeFile(FileLink file) {
     boolean result = files.remove(file);
     if(result) {
-      file.setEntry(null);
+      file.removeEntry(this);
+//      if(deepThought != null)
+//        deepThought.removeFile(file);
+
       callEntityRemovedListeners(files, file);
     }
 
@@ -674,8 +653,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   @Transient
   public String getPreview() {
-    if(preview == null)
-      preview = determinePreview();
+    if(preview == null) {
+      String temp = determinePreview();
+      if(Application.getHtmlHelper() == null)
+        return temp;
+      preview = temp;
+    }
 
     return preview;
   }
@@ -695,8 +678,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     if (preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
       if (preview.length() > 0)
         preview += " - ";
-      if(Application.getHtmlHelper() != null)
-        preview += Application.getHtmlHelper().extractPlainTextFromHtmlBody(content);
+      preview += getContentAsPlainText();
     }
 
     if (preview.length() >= PreviewMaxLength)
@@ -766,6 +748,45 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return "Entry " + getTextRepresentation();
   }
 
+
+  @PostPersist
+  protected void postPersist() {
+    if(Application.getSearchEngine() != null)
+      Application.getSearchEngine().indexEntity(this);
+  }
+
+  @Override
+  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
+    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
+
+    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
+  }
+
+  @Override
+  protected void callEntityAddedListeners(Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+    super.callEntityAddedListeners(collection, addedEntity);
+
+    if(collection == tags)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryTagsPseudoColumnName);
+    else if(collection == categories)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryCategoriesPseudoColumnName);
+    else if(collection == entryPersonAssociations)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryPersonsPseudoColumnName);
+  }
+
+  @Override
+  protected void callEntityRemovedListeners(Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+    super.callEntityRemovedListeners(collection, removedEntity);
+
+    if(collection == tags)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryTagsPseudoColumnName);
+    else if(collection == categories)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryCategoriesPseudoColumnName);
+    else if(collection == entryPersonAssociations)
+      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryPersonsPseudoColumnName);
+  }
+
+
   @Override
   public int compareTo(Entry other) {
     if(other == null)
@@ -779,5 +800,4 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
     return topLevelEntry;
   }
-
 }

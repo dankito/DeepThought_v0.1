@@ -67,28 +67,12 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected List<Entry> entries = new ArrayList<>();
 
   @Column(name = TableConfig.DeepThoughtNextEntryIndexColumnName)
-  protected int nextEntryIndex = 1;
+  protected int nextEntryIndex = 0;
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   protected Set<Tag> tags = new HashSet<>();
 
-  protected transient List<Tag> sortedTags = new ArrayList<>();
-
-  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-  protected Set<IndexTerm> indexTerms = new HashSet<>();
-
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<Language> languages = new HashSet<>(); // these are Languages User can set to specify Language of their Entries, References, ...
-
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<NoteType> noteTypes = new HashSet<>();
-
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
-  @OrderBy(value = "sortOrder")
-  protected Set<BackupFileServiceType> backupFileServiceTypes = new HashSet<>();
+  protected transient List<Tag> sortedTags = null;
 
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -105,6 +89,29 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected Set<Reference> references = new HashSet<>();
 
   protected transient SortedSet<Reference> referencesSorted = null;
+
+  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  protected Set<ReferenceSubDivision> referenceSubDivisions = new HashSet<>();
+
+  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  protected Set<Note> notes = new HashSet<>();
+
+  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  protected Set<FileLink> files = new HashSet<>();
+
+
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OrderBy(value = "sortOrder")
+  protected Set<Language> languages = new TreeSet<>(); // these are Languages User can set to specify Language of their Entries, References, ...
+
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OrderBy(value = "sortOrder")
+  protected Set<NoteType> noteTypes = new TreeSet<>();
+
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OrderBy(value = "sortOrder")
+  protected Set<BackupFileServiceType> backupFileServiceTypes = new TreeSet<>();
+
 
 //  @JsonIgnore
   @ManyToOne(fetch = FetchType.EAGER)
@@ -216,9 +223,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
       for(Tag tag : new ArrayList<>(entry.getTags()))
         entry.removeTag(tag);
 
-      for(IndexTerm indexTerm : new ArrayList<>(entry.getIndexTerms()))
-        entry.removeIndexTerm(indexTerm);
-
       callEntityRemovedListeners(entries, entry);
       return true;
     }
@@ -314,53 +318,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
 //    return tags.get(index);
 //  }
 
-
-  public Collection<IndexTerm> getIndexTerms() {
-    return indexTerms;
-  }
-
-  public boolean addIndexTerm(IndexTerm indexTerm) {
-    if(indexTerms.add(indexTerm)) {
-      indexTerm.deepThought = this;
-
-      callEntityAddedListeners(indexTerms, indexTerm);
-      return true;
-    }
-
-    return false;
-  }
-
-  public boolean removeIndexTerm(IndexTerm indexTerm) {
-    if(indexTerms.remove(indexTerm)) {
-      indexTerm.deepThought = null;
-
-      for(Entry entry : new ArrayList<>(indexTerm.getEntries()))
-        entry.removeIndexTerm(indexTerm);
-      indexTerm.entries.clear();
-
-      callEntityRemovedListeners(indexTerms, indexTerm);
-      return true;
-    }
-
-    return false;
-  }
-
-  public boolean containsIndexTerm(IndexTerm indexTerm) {
-    return indexTerms.contains(indexTerm);
-  }
-
-  public boolean containsIndexTermOfName(String keywordName) {
-    for(Tag tag : tags) {
-      if(tag.getName().equals(keywordName))
-        return true;
-    }
-
-    return false;
-  }
-
-  public int countIndexTerms() {
-    return indexTerms.size();
-  }
 
   public Collection<Language> getLanguages() {
     return languages;
@@ -575,6 +532,89 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return referencesSorted;
   }
 
+  public Set<ReferenceSubDivision> getReferenceSubDivisions() {
+    return referenceSubDivisions;
+  }
+
+  public boolean addReferenceSubDivision(ReferenceSubDivision subDivision) {
+    if(referenceSubDivisions.add(subDivision)) {
+      subDivision.deepThought = this;
+
+      callEntityAddedListeners(referenceSubDivisions, subDivision);
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean removeReferenceSubDivision(ReferenceSubDivision subDivision) {
+    if(referenceSubDivisions.remove(subDivision)) {
+      subDivision.deepThought = null;
+
+      callEntityRemovedListeners(referenceSubDivisions, subDivision);
+      return true;
+    }
+
+    return false;
+  }
+
+
+  public Set<Note> getNotes() {
+    return notes;
+  }
+
+  public boolean addNote(Note note) {
+    if(notes.add(note)) {
+      note.deepThought = this;
+
+      callEntityAddedListeners(notes, note);
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean removeNote(Note note) {
+    if(notes.remove(note)) {
+      note.deepThought = null;
+
+      callEntityRemovedListeners(notes, note);
+      return true;
+    }
+
+    return false;
+  }
+
+  public Set<FileLink> getFiles() {
+    return files;
+  }
+
+  public boolean addFile(FileLink file) {
+    if(files.add(file)) {
+      file.deepThought = this;
+
+      callEntityAddedListeners(files, file);
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean removeFile(FileLink file) {
+    if(files.remove(file)) {
+      file.deepThought = null;
+      for(Entry entry : new ArrayList<>(file.getEntries()))
+        file.removeEntry(entry);
+      for(ReferenceBase referenceBase : new ArrayList<>(file.getReferenceBases()))
+        file.removeReferenceBase(referenceBase);
+
+      callEntityRemovedListeners(files, file);
+      return true;
+    }
+
+    return false;
+  }
+
 
   public DeepThoughtSettings getSettings() {
     if(settings == null) {
@@ -641,7 +681,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
    * @param entity The just mapped Entity
    */
   public void lazyLoadedEntityMapped(BaseEntity entity) {
-    log.debug("Lazy loaded Entity mapped: {}", entity);
+    log.info("Lazy loaded Entity mapped: {}", entity);
     entity.addEntityListener(subEntitiesListener);
   }
 
@@ -652,10 +692,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
       if(entity instanceof Tag) {// a Tag has been updated -> reapply Tag sorting
         sortedTags = null;
       }
-
-      // TODO: bad solution
-      if(isEntityNotOwnedByDeepThought(newValue) && ((BaseEntity)newValue).isPersisted() == false)
-        callEntityAddedListeners(entity, new ArrayList<BaseEntity>() {{ add((BaseEntity)newValue); }}, (BaseEntity)newValue);
 
       entityUpdated(entity);
     }
@@ -679,15 +715,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
   };
 
-  protected boolean isEntityNotOwnedByDeepThought(Object entity) {
-    return entity instanceof FileLink || entity instanceof Note || entity instanceof ReferenceSubDivision;
-  }
-
-  protected boolean isCollectionOnDeepThought(BaseEntity collectionEntity) {
-    return collectionEntity instanceof Category || collectionEntity instanceof Entry || collectionEntity instanceof Tag || collectionEntity instanceof IndexTerm ||
-           collectionEntity instanceof Person || collectionEntity instanceof SeriesTitle || collectionEntity instanceof Reference;
-  }
-
   protected void entityUpdated(final BaseEntity entity) {
     if(entity instanceof Category)
       callEntityOfCollectionUpdatedListeners(getCategories(), entity);
@@ -695,22 +722,24 @@ public class DeepThought extends UserDataEntity implements Serializable {
       callEntityOfCollectionUpdatedListeners(getEntries(), entity);
     else if(entity instanceof Tag)
       callEntityOfCollectionUpdatedListeners(getTags(), entity);
-    else if(entity instanceof IndexTerm)
-      callEntityOfCollectionUpdatedListeners(getIndexTerms(), entity);
     else if(entity instanceof Person)
       callEntityOfCollectionUpdatedListeners(getPersons(), entity);
     else if(entity instanceof SeriesTitle)
       callEntityOfCollectionUpdatedListeners(getSeriesTitles(), entity);
     else if(entity instanceof Reference)
       callEntityOfCollectionUpdatedListeners(getReferences(), entity);
+    else if(entity instanceof ReferenceSubDivision)
+      callEntityOfCollectionUpdatedListeners(getReferenceSubDivisions(), entity);
+    else if(entity instanceof FileLink)
+      callEntityOfCollectionUpdatedListeners(getFiles(), entity);
+    else if(entity instanceof Note)
+      callEntityOfCollectionUpdatedListeners(getNotes(), entity);
     else if(entity instanceof NoteType)
       callEntityOfCollectionUpdatedListeners(getNoteTypes(), entity);
     else if(entity instanceof Language)
       callEntityOfCollectionUpdatedListeners(getLanguages(), entity);
     else if(entity instanceof BackupFileServiceType)
       callEntityOfCollectionUpdatedListeners(getBackupFileServiceTypes(), entity);
-    else if(isEntityNotOwnedByDeepThought(entity))
-      callEntityOfCollectionUpdatedListeners(new ArrayList<BaseEntity>() {{ add(entity); }}, entity);
     else
       log.warn("Updated entity of type " + entity.getClass() + " retrieved, but don't know what to do with this type");
   }
@@ -746,32 +775,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @Override
   protected void callEntityRemovedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
     // don't remove listener if removedEntity is still on a DeepThought collection
-    if(collectionHolder == this || isComposition(collectionHolder, removedEntity) == true)
+    if(collectionHolder == this)
       removedEntity.removeEntityListener(subEntitiesListener);
 
     super.callEntityRemovedListeners(collectionHolder, collection, removedEntity);
-  }
-
-  public boolean isComposition(BaseEntity collectionHolder, BaseEntity entity) {
-    if(collectionHolder instanceof Entry) {
-      if(entity instanceof FileLink || entity instanceof Note)
-        return true;
-    }
-    else if(collectionHolder instanceof Reference) {
-      if(entity instanceof ReferenceSubDivision)
-        return true;
-    }
-    else if(collectionHolder instanceof ReferenceSubDivision) {
-      if(entity instanceof ReferenceSubDivision)
-        return true;
-    }
-
-    if(collectionHolder instanceof ReferenceBase) {
-      if(entity instanceof FileLink)
-        return true;
-    }
-
-    return false;
   }
 
 
@@ -809,16 +816,64 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   protected static void createLanguageDefaultValues(DeepThought deepThought) {
-    deepThought.addLanguage(new Language("language.english", true, true, 1));
-    deepThought.addLanguage(new Language("language.german", true, true, 2));
+    deepThought.addLanguage(new Language("en", "English", "language.english", true, true, 1));
+    deepThought.addLanguage(new Language("de", "Deutsch", "language.german", true, true, 2));
+    deepThought.addLanguage(new Language("es", "Español", "language.spanish", true, true, 3));
+    deepThought.addLanguage(new Language("fr", "Français", "language.french", true, true, 4));
+    deepThought.addLanguage(new Language("it", "Italiano", "language.italian", true, true, 5));
+    deepThought.addLanguage(new Language("ar", "العربية", "language.arabic", true, true, 6));
+    deepThought.addLanguage(new Language("bg", "Български", "language.bulgarian", true, true, 7));
+    deepThought.addLanguage(new Language("cs", "Čeština", "language.czech", true, true, 8));
+    deepThought.addLanguage(new Language("da", "Dansk", "language.danish", true, true, 9));
+    deepThought.addLanguage(new Language("el", "Ελληνικά", "language.greek", true, true, 10));
+    deepThought.addLanguage(new Language("fa", "فارسی", "language.persian", true, true, 11));
+    deepThought.addLanguage(new Language("fi", "Suomi", "language.finnish", true, true, 12));
+    deepThought.addLanguage(new Language("hi", "हिन्दी", "language.hindi", true, true, 13));
+    deepThought.addLanguage(new Language("hu", "Magyar", "language.hungarian", true, true, 14));
+    deepThought.addLanguage(new Language("id", "Bahasa Indonesia", "language.indonesian", true, true, 15));
+    deepThought.addLanguage(new Language("ja", "日本語", "language.japanese", true, true, 16));
+    deepThought.addLanguage(new Language("ko", "한국어", "language.korean", true, true, 17));
+    deepThought.addLanguage(new Language("nl", "Nederlands", "language.dutch", true, true, 18));
+    deepThought.addLanguage(new Language("no", "Norsk bokmål", "language.norwegian", true, true, 19));
+    deepThought.addLanguage(new Language("pt", "Português", "language.portuguese", true, true, 20));
+    deepThought.addLanguage(new Language("ro", "Română", "language.romanian", true, true, 21));
+    deepThought.addLanguage(new Language("ru", "Русский", "language.russian", true, true, 22));
+    deepThought.addLanguage(new Language("sv", "Svenska", "language.swedish", true, true, 23));
+    deepThought.addLanguage(new Language("th", "ไทย", "language.thai", true, true, 24));
+    deepThought.addLanguage(new Language("tr", "Türkçe", "language.turkish", true, true, 25));
+    deepThought.addLanguage(new Language("zh-cn", "中文", "language.chinese.simplified", true, true, 26));
+    deepThought.addLanguage(new Language("zh-tw", "文言", "language.chinese.traditional", true, true, 27));
+
+    deepThought.addLanguage(new Language("ar", "Afrikaans", "language.afrikaans", true, true, 28));
+    deepThought.addLanguage(new Language("bn", "বাংলা", "language.bengali", true, true, 29));
+    deepThought.addLanguage(new Language("gu", "ગુજરાતી", "language.gujarati", true, true, 30));
+    deepThought.addLanguage(new Language("he", "עברית", "language.hebrew", true, true, 31));
+    deepThought.addLanguage(new Language("hr", "Hrvatski", "language.croatian", true, true, 32));
+    deepThought.addLanguage(new Language("kn", "ಕನ್ನಡ", "language.kannada", true, true, 33));
+    deepThought.addLanguage(new Language("mk", "Македонски", "language.macedonian", true, true, 34));
+    deepThought.addLanguage(new Language("ml", "മലയാളം", "language.malayalam", true, true, 35));
+    deepThought.addLanguage(new Language("mr", "मराठी", "language.marathi", true, true, 36));
+    deepThought.addLanguage(new Language("ne", "नेपाली", "language.nepali", true, true, 37));
+    deepThought.addLanguage(new Language("pa", "ਪੰਜਾਬੀ", "language.punjabi", true, true, 38));
+    deepThought.addLanguage(new Language("pl", "Polski", "language.polish", true, true, 39));
+    deepThought.addLanguage(new Language("sk", "Slovenčina", "language.slovak", true, true, 40));
+    deepThought.addLanguage(new Language("so", "Soomaaliga", "language.somali", true, true, 41));
+    deepThought.addLanguage(new Language("sq", "Shqip", "language.albanian", true, true, 42));
+    deepThought.addLanguage(new Language("sw", "Kiswahili", "language.swahili", true, true, 43));
+    deepThought.addLanguage(new Language("ta", "தமிழ்", "language.tamil", true, true, 44));
+    deepThought.addLanguage(new Language("te", "తెలుగు", "language.telugu", true, true, 45));
+    deepThought.addLanguage(new Language("tl", "Tagalog", "language.tagalog", true, true, 46));
+    deepThought.addLanguage(new Language("uk", "Українська", "language.ukrainian", true, true, 47));
+    deepThought.addLanguage(new Language("ur", "اردو", "language.urdu", true, true, 48));
+    deepThought.addLanguage(new Language("vi", "Tiếng Việt", "language.vietnamese", true, true, 49));
   }
 
   protected static void createNoteTypeDefaultValues(DeepThought deepThought) {
-    deepThought.addNoteType(new NoteType("note.type.comment", true, false, 1));
-    deepThought.addNoteType(new NoteType("note.type.info", true, false, 2));
-    deepThought.addNoteType(new NoteType("note.type.to.do", true, false, 3));
-    deepThought.addNoteType(new NoteType("note.type.thought", true, false, 4));
-//    deepThought.addNoteType(new NoteType("note.type.unset", true, false, 5));
+    deepThought.addNoteType(new NoteType("note.type.unset", true, false, 1));
+    deepThought.addNoteType(new NoteType("note.type.comment", true, false, 2));
+    deepThought.addNoteType(new NoteType("note.type.info", true, false, 3));
+    deepThought.addNoteType(new NoteType("note.type.to.do", true, false, 4));
+    deepThought.addNoteType(new NoteType("note.type.thought", true, false, 5));
   }
 
   protected static void createBackupFileServiceTypeDefaultValues(DeepThought deepThought) {

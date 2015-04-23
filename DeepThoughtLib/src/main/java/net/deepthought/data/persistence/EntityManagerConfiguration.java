@@ -1,5 +1,6 @@
 package net.deepthought.data.persistence;
 
+import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
@@ -9,7 +10,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.EntryPersonAssociation;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Group;
-import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Created by ganymed on 03/01/15.
  */
-public class EntityManagerConfiguration {
+public class EntityManagerConfiguration extends ApplicationConfiguration {
   
   public enum DatabaseType { SQLite, H2Embedded, H2Mem, Derby, HSQLDB }
   
@@ -43,6 +43,8 @@ public class EntityManagerConfiguration {
   protected String dataFolder = null;
   protected String dataCollectionFileName = null;
   protected String dataCollectionPersistencePath = null;
+
+  protected int currentDataModelVersion;
   protected boolean createDatabase = false;
 
   protected DatabaseType databaseType;
@@ -173,6 +175,16 @@ public class EntityManagerConfiguration {
     this.dataCollectionPersistencePath = dataCollectionPersistencePath;
   }
 
+  @Override
+  public int getCurrentDataModelVersion() {
+    return currentDataModelVersion;
+  }
+
+  @Override
+  public void setCurrentDataModelVersion(int currentDataModelVersion) {
+    this.currentDataModelVersion = currentDataModelVersion;
+  }
+
   public boolean createDatabase() {
     return createDatabase;
   }
@@ -230,6 +242,12 @@ public class EntityManagerConfiguration {
     this.dropTables = dropTables;
   }
 
+
+  public static EntityManagerConfiguration createDefaultConfiguration(ApplicationConfiguration applicationConfiguration) {
+    EntityManagerConfiguration configuration = createDefaultConfiguration(applicationConfiguration.getDataFolder(), false);
+    configuration.setCurrentDataModelVersion(applicationConfiguration.getCurrentDataModelVersion());
+    return configuration;
+  }
 
   public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder) {
     return createDefaultConfiguration(dataFolder, false);
@@ -291,6 +309,12 @@ public class EntityManagerConfiguration {
     return createTestConfiguration("data/tests/");
   }
 
+  public static EntityManagerConfiguration createTestConfiguration(ApplicationConfiguration applicationConfiguration) {
+    EntityManagerConfiguration configuration = createTestConfiguration(applicationConfiguration.getDataFolder(), false);
+    configuration.setCurrentDataModelVersion(applicationConfiguration.getCurrentDataModelVersion());
+    return configuration;
+  }
+
   public static EntityManagerConfiguration createTestConfiguration(String dataFolder) {
     return createTestConfiguration(dataFolder, false);
   }
@@ -300,7 +324,11 @@ public class EntityManagerConfiguration {
   }
 
   public static EntityManagerConfiguration createTestConfiguration(String dataFolder, boolean createTables) {
-    EntityManagerConfiguration configuration = createDefaultConfiguration(dataFolder, createTables, DatabaseType.H2Mem);
+    return createTestConfiguration(dataFolder, createTables, DatabaseType.H2Mem);
+  }
+
+  public static EntityManagerConfiguration createTestConfiguration(String dataFolder, boolean createTables, DatabaseType databaseType) {
+    EntityManagerConfiguration configuration = createDefaultConfiguration(dataFolder, createTables, databaseType);
 
     switch(configuration.getDatabaseType()) {
       case SQLite:
@@ -340,7 +368,6 @@ public class EntityManagerConfiguration {
         Entry.class,
         EntriesLinkGroup.class,
         Tag.class,
-        IndexTerm.class,
         Person.class,
         EntryPersonAssociation.class,
     

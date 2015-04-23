@@ -19,7 +19,7 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
   public void testDefaultLanguagesGetCreatedCorrectly() throws Exception {
     DeepThought deepThought = Application.getDeepThought();
 
-    Assert.assertEquals(2, deepThought.getLanguages().size());
+    Assert.assertEquals(27, deepThought.getLanguages().size());
 
     int index = 1;
     for(Language language : deepThought.getLanguages()) {
@@ -33,7 +33,7 @@ public abstract class CreateDeepThoughtTestBase extends DataModelTestBase {
   public void testDefaultNoteTypesGetCreatedCorrectly() throws Exception {
     DeepThought deepThought = Application.getDeepThought();
 
-    Assert.assertEquals(4, deepThought.getNoteTypes().size());
+    Assert.assertEquals(5, deepThought.getNoteTypes().size());
 
     int index = 1;
     for(NoteType noteType : deepThought.getNoteTypes()) {

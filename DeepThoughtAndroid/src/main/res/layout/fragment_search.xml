@@ -75,55 +75,11 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/txtvwSearchSectionTitleTitle"
-        android:text="@string/search_section_title_title"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/search_section_title_height"
-        android:layout_below="@+id/rlytSearchTag"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical"
-        android:layout_marginTop="6dp"
-        android:textSize="@dimen/search_section_title_text_size"
-        />
-
-    <RelativeLayout
-        android:id="@+id/rlytSearchTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtvwSearchSectionTitleTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:visibility="gone"
-        >
-
-        <Spinner
-            android:id="@+id/spnSearchTitleSearchOption"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/search_section_title_search_options_height"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:gravity="center_vertical"
-            />
-
-        <EditText
-            android:id="@+id/edtxtSearchTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/search_section_title_search_options_height"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/spnSearchTitleSearchOption"
-            android:layout_toRightOf="@+id/spnSearchTitleSearchOption"
-            android:singleLine="true"
-            />
-
-    </RelativeLayout>
-
-    <TextView
         android:id="@+id/txtvwSearchSectionContentTitle"
         android:text="@string/search_section_content_title"
         android:layout_width="match_parent"
         android:layout_height="@dimen/search_section_title_height"
-        android:layout_below="@+id/rlytSearchTitle"
+        android:layout_below="@+id/rlytSearchTag"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
@@ -140,6 +96,25 @@
         android:layout_alignParentRight="true"
         android:visibility="gone"
         >
+
+        <Spinner
+            android:id="@+id/spnSearchContentSearchOption"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/search_section_content_search_options_height"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:id="@+id/edtxtSearchContent"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/search_section_content_search_options_height"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/spnSearchContentSearchOption"
+            android:layout_toRightOf="@+id/spnSearchContentSearchOption"
+            android:singleLine="true"
+            />
 
     </RelativeLayout>
 

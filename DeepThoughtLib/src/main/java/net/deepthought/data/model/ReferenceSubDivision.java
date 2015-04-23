@@ -44,6 +44,10 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "referenceSubDivision")
   protected Collection<Entry> entries = new HashSet<>();
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = TableConfig.ReferenceSubDivisionDeepThoughtJoinColumnName)
+  protected DeepThought deepThought;
+
 
 
   public ReferenceSubDivision() {
@@ -110,6 +114,9 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     if(subDivision.reference == null && this.reference != null)
       subDivision.reference = this.reference;
 
+    if(subDivision.getDeepThought() == null && this.deepThought != null)
+      deepThought.addReferenceSubDivision(subDivision);
+
     boolean result = subDivisions.add(subDivision);
     if(result) {
       callEntityAddedListeners(subDivisions, subDivision);
@@ -147,6 +154,28 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     Object previousValue = this.subDivisionOrder;
     this.subDivisionOrder = subDivisionOrder;
     callPropertyChangedListeners(TableConfig.ReferenceSubDivisionOrderColumnName, previousValue, subDivisionOrder);
+  }
+
+  @Override
+  public boolean addFile(FileLink file) {
+    if(super.addFile(file)) {
+      if(file.getDeepThought() == null && this.deepThought != null)
+        deepThought.addFile(file);
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public void setPreviewImage(FileLink previewImage) {
+    if(previewImage.getDeepThought() == null && this.deepThought != null)
+      deepThought.addFile(previewImage);
+
+    super.setPreviewImage(previewImage);
+  }
+
+  public DeepThought getDeepThought() {
+    return deepThought;
   }
 
 

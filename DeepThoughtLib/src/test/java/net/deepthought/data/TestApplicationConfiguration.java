@@ -5,14 +5,33 @@ package net.deepthought.data;
  */
 public class TestApplicationConfiguration extends ApplicationConfiguration {
 
+  protected String dataFolder = "data/tests/";
+
+  protected int dataModelVersion = 0;
+
+
+  public TestApplicationConfiguration() {
+    this("data/tests/");
+  }
+
+  public TestApplicationConfiguration(String dataFolder) {
+    this(dataFolder, 0);
+  }
+
+  public TestApplicationConfiguration(String dataFolder, int dataModelVersion) {
+    this.dataFolder = dataFolder;
+    this.dataModelVersion = dataModelVersion;
+  }
+
+
   @Override
   public String getDataFolder() {
-    return "data/tests/";
+    return dataFolder;
   }
 
   @Override
   public void setDataFolder(String dataFolder) {
-
+    this.dataFolder = dataFolder;
   }
 
   @Override

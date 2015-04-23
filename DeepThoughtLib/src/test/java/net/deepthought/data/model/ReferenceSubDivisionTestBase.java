@@ -13,6 +13,8 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
   @Override
   protected ReferenceBase createReferenceBaseInstanceAndAddToDeepThought() {
+    ReferenceBaseSubClassClass = ReferenceSubDivision.class;
+
     Reference reference = new Reference("War on People");
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1");
 
@@ -81,6 +83,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     Assert.assertTrue(reference.getSubDivisions().contains(subDivision));
     Assert.assertEquals(reference, subDivision.getReference());
+    Assert.assertEquals(deepThought, subDivision.getDeepThought());
 
     Assert.assertEquals(0, subDivision.getSubDivisionOrder());
   }
@@ -113,6 +116,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
     reference.removeSubDivision(subDivision);
 
     Assert.assertFalse(reference.getSubDivisions().contains(subDivision));
+    Assert.assertNull(subDivision.getDeepThought());
     Assert.assertNull(subDivision.getReference());
   }
 

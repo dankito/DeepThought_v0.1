@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+dependencies {
+    compile project(':DeepThoughtLib')
+
+    testCompile 'junit:junit:4.8.1'
+    // to include test helper classes from DeepThoughtLib
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
+    testCompile project(':JavaSeOrmLiteEntityManager')
+}

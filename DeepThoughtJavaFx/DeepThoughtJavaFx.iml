@@ -29,6 +29,7 @@
     <orderEntry type="library" exported="" scope="PROVIDED" name="_usr_lib_jvm_java_8_jdk_jre_lib_jfxrt_jar" level="project" />
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
+    <orderEntry type="module" module-name="LuceneSearchEngine" exported="" />
     <orderEntry type="library" exported="" name="controlsfx-8.20.8" level="project" />
     <orderEntry type="library" exported="" name="logback-classic-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="logback-core-1.1.1" level="project" />

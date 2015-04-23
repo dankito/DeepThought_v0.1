@@ -1,7 +1,6 @@
 package net.deepthought.controls.entries;
 
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -104,8 +103,6 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
       Entry entry = (Entry)collectionHolder;
       if(collection == entry.getTags())
         tagHasBeenAdded(entry, (Tag)addedEntity);
-      if(collection == entry.getIndexTerms())
-        indexTermHasBeenAdded(entry, (IndexTerm) addedEntity);
     }
 
     @Override
@@ -118,8 +115,6 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
       Entry entry = (Entry)collectionHolder;
       if(collection == entry.getTags())
         tagHasBeenRemoved(entry, (Tag) removedEntity);
-      if(collection == entry.getIndexTerms())
-        indexTermHasBeenRemoved(entry, (IndexTerm) removedEntity);
     }
   };
 
@@ -130,14 +125,6 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
   }
 
   protected void tagHasBeenRemoved(Entry entry, Tag tag) {
-    // nothing to do here but may in subclasses
-  }
-
-  protected void indexTermHasBeenAdded(Entry entry, IndexTerm indexTerm) {
-    // nothing to do here but may in subclasses
-  }
-
-  protected void indexTermHasBeenRemoved(Entry entry, IndexTerm indexTerm) {
     // nothing to do here but may in subclasses
   }
 }

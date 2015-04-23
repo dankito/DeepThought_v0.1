@@ -7,6 +7,7 @@ import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.FileUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -36,21 +37,31 @@ public abstract class DataModelTestBase {
 
   @Before
   public void setup() throws Exception {
-    configuration = EntityManagerConfiguration.createTestConfiguration(true);
+//    configuration = EntityManagerConfiguration.createTestConfiguration(true);
 //    FileUtils.deleteFile(configuration.getDataCollectionPersistencePath());
 //    configuration.setCreateDatabase(true);
 
-    entityManager = getEntityManager(configuration);
+//    FileUtils.deleteFile(EntityManagerConfiguration.createDefaultConfiguration(new TestApplicationConfiguration()).getDataCollectionPersistencePath());
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager));
+//    entityManager = getEntityManager(configuration);
+
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver() {
+      @Override
+      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
+        DataModelTestBase.this.configuration = configuration;
+        return getEntityManager(configuration);
+      }
+    });
+
+    entityManager = Application.getEntityManager();
   }
 
   @After
   public void tearDown() {
     entityManager.deleteEntity(Application.getApplication()); // damn, why doesn't it close the db properly? So next try: delete DeepThoughtApplication object
 //    String databasePath = Application.getDataManager().getDataCollectionSavePath();
+    FileUtils.deleteFile(entityManager.getDatabasePath());
     Application.shutdown();
-//    FileUtils.deleteFile(entityManager.getDatabasePath());
   }
 
 

@@ -9,6 +9,8 @@ buildscript {
 
 apply plugin: 'java'
 
+sourceCompatibility = JavaVersion.VERSION_1_7
+
 dependencies {
     compile project(':DeepThoughtLib')
 
@@ -22,4 +24,9 @@ dependencies {
     compile 'org.apache.clerezza:rdf.rdfa:0.2'
     compile 'org.apache.jena:jena-arq:2.13.0'
     compile 'commons-validator:commons-validator:1.4.1'
+
+    testCompile 'junit:junit:4.8.1'
+    // to include test helper classes from DeepThoughtLib
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
+    testCompile project(':JavaSeOrmLiteEntityManager')
 }

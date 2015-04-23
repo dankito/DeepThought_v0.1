@@ -23,6 +23,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 //    deepThought.addEntriesChangedListener(entriesChangedListener);
     deepThought.addEntityListener(entityListener);
     this.filteredEntries = filterDeepThoughtEntries();
+//    this.filteredEntries = new HashSet<>();
   }
 
   @Override

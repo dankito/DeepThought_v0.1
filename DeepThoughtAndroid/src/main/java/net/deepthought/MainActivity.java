@@ -98,6 +98,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public IDataManager createDataManager(IEntityManager entityManager) {
           return new AndroidDataManager(entityManager);
         }
+
+//        @Override
+//        public ISearchEngine createSearchEngine() {
+//          try {
+//            return new LuceneSearchEngine();
+//          } catch(Exception ex) {
+//            log.error("Could not initialize LuceneSearchEngine", ex);
+//          }
+//          return null; // TODO: abort application?
+//        }
       });
 
       loadingDataProgressDialog = new ProgressDialog(this);

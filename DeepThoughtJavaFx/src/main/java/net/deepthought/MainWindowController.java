@@ -6,8 +6,6 @@
 
 package net.deepthought;
 
-import com.example.OpenOfficeDocumentsImporterExporter;
-
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
@@ -27,7 +25,11 @@ import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
+import net.deepthought.language.ILanguageDetector;
+import net.deepthought.language.LanguageDetector;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -42,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collection;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -155,8 +156,23 @@ public class MainWindowController implements Initializable {
     Application.instantiateAsync(new DeepThoughtFxApplicationConfiguration(), new DefaultDependencyResolver() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-//        return new JpaEntityManager(configuration);
         return new OrmLiteJavaSeEntityManager(configuration);
+      }
+
+      @Override
+      public ISearchEngine createSearchEngine() {
+        try {
+          return new LuceneSearchEngine();
+        } catch(Exception ex) {
+          log.error("Could not initialize LuceneSearchEngine", ex);
+        }
+        return null; // TODO: abort application?
+      }
+
+
+      @Override
+      public ILanguageDetector createLanguageDetector() {
+        return new LanguageDetector();
       }
     });
 

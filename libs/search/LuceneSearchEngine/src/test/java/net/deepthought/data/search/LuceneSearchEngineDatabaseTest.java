@@ -2,22 +2,23 @@ package net.deepthought.data.search;
 
 import net.deepthought.Application;
 import net.deepthought.DefaultDependencyResolver;
+import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.helper.TestApplicationConfiguration;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.store.RAMDirectory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Created by ganymed on 17/03/15.
@@ -34,7 +35,7 @@ public class LuceneSearchEngineDatabaseTest {
 
   @Before
   public void setup() throws Exception {
-    searchEngine = new LuceneSearchEngine();
+    searchEngine = new LuceneSearchEngine(new RAMDirectory());
 
     configuration = EntityManagerConfiguration.createTestConfiguration(true);
 //    FileUtils.deleteFile(configuration.getDataCollectionPersistencePath());
@@ -77,21 +78,21 @@ public class LuceneSearchEngineDatabaseTest {
     entryWithTags2.addTag(tag2);
     entryWithTags2.addTag(tag3);
 
-    searchEngine.updateIndex(entryWithoutTags1);
-    searchEngine.updateIndex(entryWithTags1);
-    searchEngine.updateIndex(entryWithoutTags2);
-    searchEngine.updateIndex(entryWithTags2);
-    searchEngine.updateIndex(entryWithoutTags3);
+    searchEngine.indexEntity(entryWithoutTags1);
+    searchEngine.indexEntity(entryWithTags1);
+    searchEngine.indexEntity(entryWithoutTags2);
+    searchEngine.indexEntity(entryWithTags2);
+    searchEngine.indexEntity(entryWithoutTags3);
 
-    List<Long> entriesWithoutTags = searchEngine.getEntriesWithoutTags();
+    Collection<Entry> entriesWithoutTags = searchEngine.getEntriesWithoutTags();
     Assert.assertEquals(3, entriesWithoutTags.size());
 
-    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1.getId()));
-    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags2.getId()));
-    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags3.getId()));
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1));
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags2));
+    Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags3));
 
-    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags1.getId()));
-    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags2.getId()));
+    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags1));
+    Assert.assertFalse(entriesWithoutTags.contains(entryWithTags2));
   }
 
 }

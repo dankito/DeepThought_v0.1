@@ -13,6 +13,8 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
 
   @Override
   protected ReferenceBase createReferenceBaseInstanceAndAddToDeepThought() {
+    ReferenceBaseSubClassClass = Reference.class;
+
     Reference reference = new Reference("test");
 
     DeepThought deepThought = Application.getDeepThought();

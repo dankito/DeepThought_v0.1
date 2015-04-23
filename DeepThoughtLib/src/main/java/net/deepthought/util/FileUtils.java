@@ -517,4 +517,10 @@ public class FileUtils {
       return result;
     }
   }
+
+  public static void ensureFolderExists(String folderPath) {
+    File folder = new File(folderPath);
+    if(folder.exists() == false)
+      folder.mkdirs();
+  }
 }

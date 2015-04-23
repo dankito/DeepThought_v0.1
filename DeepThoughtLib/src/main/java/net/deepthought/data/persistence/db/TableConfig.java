@@ -181,6 +181,10 @@ public class TableConfig {
 
   public final static String EntryDeepThoughtJoinColumnName = "deep_thought_id";
 
+  public final static String EntryTagsPseudoColumnName = "tags";
+  public final static String EntryCategoriesPseudoColumnName = "categories";
+  public final static String EntryPersonsPseudoColumnName = "persons";
+
 
   /*          Entry Tag Join Table Config        */
 
@@ -190,12 +194,12 @@ public class TableConfig {
   public final static String EntryTagJoinTableTagIdColumnName = "tag_id";
 
 
-  /*          Entry IndexTerm Join Table Config        */
+  /*          Entry FileLink Join Table Config        */
 
-  public final static String EntryIndexTermJoinTableName = "entry_index_term_join_table";
+  public final static String EntryFileLinkJoinTableName = "entry_file_link_join_table";
 
-  public final static String EntryIndexTermJoinTableEntryIdColumnName = "entry_id";
-  public final static String EntryIndexTermJoinTableIndexTermIdColumnName = "index_term_id";
+  public final static String EntryFileLinkJoinTableEntryIdColumnName = "entry_id";
+  public final static String EntryFileLinkJoinTableFileLinkIdColumnName = "file_link_id";
 
 
   /*          Entry EntriesLinkGroup Join Table Config        */
@@ -258,6 +262,7 @@ public class TableConfig {
   public final static String NoteNoteColumnName = "notes";
   public final static String NoteNoteTypeJoinColumnName = "note_type_id";
   public final static String NoteEntryJoinColumnName = "entry_id";
+  public final static String NoteDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          FileLink Table Config        */
@@ -268,9 +273,9 @@ public class TableConfig {
   public final static String FileLinkNameColumnName = "name";
   public final static String FileLinkIsFolderColumnName = "folder";
   public final static String FileLinkNotesColumnName = "notes";
-  public final static String FileLinkPreviewImageJoinColumnName = "preview_image_file_id";
   public final static String FileLinkEntryJoinColumnName = "entry_id";
   public final static String FileLinkReferenceBaseJoinColumnName = "reference_base_id";
+  public final static String FileLinkDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          ReferenceBase Table Config        */
@@ -283,6 +288,7 @@ public class TableConfig {
   public final static String ReferenceBaseAbstractColumnName = "abstract";
   public final static String ReferenceBaseOnlineAddressColumnName = "online_address";
   public final static String ReferenceBaseNotesColumnName = "notes";
+  public final static String ReferenceBasePreviewImageJoinColumnName = "preview_image_id";
 
 
   /*          ReferenceBasePersonJoinTable Table Config        */
@@ -294,12 +300,21 @@ public class TableConfig {
   public final static String ReferenceBasePersonAssociationPersonOrderColumnName = "person_order";
 
 
+  /*          ReferenceBase FileLink Join Table Config        */
+
+  public final static String ReferenceBaseFileLinkJoinTableName = "reference_base_file_link_join_table";
+
+  public final static String ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName = "reference_base_id";
+  public final static String ReferenceBaseFileLinkJoinTableFileLinkIdColumnName = "file_link_id";
+
+
   /*          SeriesTitle Table Config        */
 
   public final static String SeriesTitleTableName = "series_title";
   public final static String SeriesTitleDiscriminatorValue = "SERIES_TITLE";
 
   public final static String SeriesTitleTableOfContentsColumnName = "table_of_contents";
+  public final static String SeriesTitleDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          Reference Table Config        */
@@ -311,7 +326,7 @@ public class TableConfig {
   public final static String ReferenceSeriesTitleOrderColumnName = "series_order";
   public final static String ReferenceTableOfContentsColumnName = "table_of_contents";
   public final static String ReferenceIssueOrPublishingDateColumnName = "issue_or_publishing_date";
-  public final static String ReferencePublishingDateColumnName = "publishing_date";
+  public final static String ReferenceDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          ReferenceSubDivision Table Config        */
@@ -322,6 +337,7 @@ public class TableConfig {
   public final static String ReferenceSubDivisionReferenceJoinColumnName = "reference_id";
   public final static String ReferenceSubDivisionParentSubDivisionJoinColumnName = "parent_sub_division_id";
   public final static String ReferenceSubDivisionOrderColumnName = "sub_division_order"; // Derby also doesn't like 'order' as column name
+  public final static String ReferenceSubDivisionDeepThoughtJoinColumnName = "deep_thought_id";
 
 
 
@@ -348,7 +364,8 @@ public class TableConfig {
 
   public final static String LanguageTableName = "language";
 
-  public final static String LanguageSortOrderColumnName = "sort_order";
+  public final static String LanguageLanguageKeyColumnName = "language_key";
+  public final static String LanguageNameInLanguageColumnName = "name_in_language";
 
 
   /*          NoteType Table Config        */

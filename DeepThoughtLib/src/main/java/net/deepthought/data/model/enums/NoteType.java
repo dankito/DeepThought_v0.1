@@ -1,5 +1,6 @@
 package net.deepthought.data.model.enums;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.persistence.db.TableConfig;
 
@@ -62,6 +63,22 @@ public class NoteType extends ExtensibleEnumeration {
   @Override
   public String toString() {
     return "NoteType " + getTextRepresentation();
+  }
+
+
+  protected static NoteType defaultNoteType = null;
+
+  public static NoteType getDefaultNoteType() {
+    if(defaultNoteType == null) {
+      for(NoteType noteType : Application.getDeepThought().getNoteTypes()) {
+        if("note.type.unset".equals(noteType.nameResourceKey)) {
+          defaultNoteType = noteType;
+          break;
+        }
+      }
+    }
+
+    return defaultNoteType;
   }
 
 }

@@ -14,8 +14,19 @@ import java.util.List;
  */
 public abstract class ReferenceBaseTestBase extends DataModelTestBase {
 
+  protected Class ReferenceBaseSubClassClass;
+
   protected abstract ReferenceBase createReferenceBaseInstanceAndAddToDeepThought();
 
+
+  @Test
+  public void addReferenceBaseSubClass_QueryForReferenceBase_SubClassGetsReturned() throws Exception {
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+
+    ReferenceBase returnedReferenceBase = entityManager.getEntityById(ReferenceBase.class, referenceBase.getId());
+
+    Assert.assertEquals(ReferenceBaseSubClassClass, returnedReferenceBase.getClass());
+  }
 
   @Test
   public void updateTitle_UpdatedValueGetsPersistedInDb() throws Exception {
@@ -268,7 +279,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     referenceBase.addFile(internetFileAttachment);
 
     // assert FileLink really got written to database
-    Assert.assertTrue(isFileReferenceJoinTableValueSet(internetFileAttachment.getId(), referenceBase.getId()));
+    Assert.assertTrue(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
   }
 
   @Test
@@ -279,6 +290,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     referenceBase.addFile(internetFileAttachment);
 
     Assert.assertEquals(1, referenceBase.getFiles().size());
+    Assert.assertEquals(Application.getDeepThought(), internetFileAttachment.getDeepThought());
   }
 
   @Test
@@ -291,9 +303,14 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     referenceBase.removeFile(internetFileAttachment);
 
     // assert file really got deleted from database
-    Assert.assertFalse(isFileReferenceJoinTableValueSet(internetFileAttachment.getId(), referenceBase.getId()));
+    Assert.assertFalse(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
 
     Assert.assertFalse(referenceBase.isDeleted());
+    Assert.assertFalse(internetFileAttachment.isDeleted());
+
+    Application.getDeepThought().removeFile(internetFileAttachment);
+
+    Assert.assertNull(internetFileAttachment.getDeepThought());
     Assert.assertTrue(internetFileAttachment.isDeleted());
   }
 
@@ -310,6 +327,37 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
 
+  @Test
+  public void setPreviewImage_RelationGetsPersistedInDb() throws Exception {
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    FileLink previewImage = new FileLink("/tmp/dummy.png");
+
+    DeepThought deepThought = Application.getDeepThought();
+
+    referenceBase.setPreviewImage(previewImage);
+
+    // assert preview image really got written to database
+    Assert.assertNotNull(previewImage.getId());
+    Assert.assertTrue(doIdsEqual(previewImage.getId(), getValueFromTable(TableConfig.ReferenceBaseTableName, TableConfig.ReferenceBasePreviewImageJoinColumnName, referenceBase.getId())));
+  }
+
+  @Test
+  public void updatePreviewImage_UpdatedValueGetsPersistedInDb() throws Exception {
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    FileLink firstPreviewImage = new FileLink("/tmp/dummy.png");
+
+    DeepThought deepThought = Application.getDeepThought();
+
+    referenceBase.setPreviewImage(firstPreviewImage);
+
+    FileLink secondPreviewImage = new FileLink("/tmp/PhotoOfTheYear.png");
+    referenceBase.setPreviewImage(secondPreviewImage);
+
+    // assert preview image really got updated in database
+    Assert.assertTrue(doIdsEqual(secondPreviewImage.getId(), getValueFromTable(TableConfig.ReferenceBaseTableName, TableConfig.ReferenceBasePreviewImageJoinColumnName, referenceBase.getId())));
+  }
+
+
   protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.ReferenceBasePersonAssociationTableName + " WHERE " +
         TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName +  "=" + referenceBaseId +
@@ -317,9 +365,9 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     return result.size() == 1;
   }
 
-  protected boolean isFileReferenceJoinTableValueSet(Long fileId, Long referenceBaseId) throws SQLException {
-    Object persistedgetReferenceBaseId = getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkReferenceBaseJoinColumnName, fileId);
-    return doIdsEqual(referenceBaseId, persistedgetReferenceBaseId);
+  protected boolean doesReferenceBaseFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
+    return doesJoinTableEntryExist(TableConfig.ReferenceBaseFileLinkJoinTableName, TableConfig.ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName, referenceBaseId,
+        TableConfig.ReferenceBaseFileLinkJoinTableFileLinkIdColumnName, fileId);
   }
 
 }

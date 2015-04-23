@@ -73,7 +73,7 @@ public class OpenOfficeDocumentsImporterExporter {
         return extractedEntries;
 
       Iterator<Paragraph> paragraphs = textDocument.getParagraphIterator();
-      extractedEntries = extractEntriesFromParagraphs(paragraphs, extractedEntries);
+      extractEntriesFromParagraphs(paragraphs, extractedEntries);
     } catch (Exception ex) {
       log.error("Could not load text document " + documentPath, ex);
     }
@@ -83,27 +83,35 @@ public class OpenOfficeDocumentsImporterExporter {
     return extractedEntries;
   }
 
-  protected List<Entry> extractEntriesFromParagraphs(Iterator<Paragraph> paragraphs, List<Entry> extractedEntries) throws URISyntaxException {
+  protected void extractEntriesFromParagraphs(Iterator<Paragraph> paragraphs, List<Entry> extractedEntries) throws URISyntaxException {
     List<Paragraph> entryParagraphs = null;
     for(entryParagraphs = getEntryParagraphs(paragraphs); entryParagraphs.size() > 0; entryParagraphs = getEntryParagraphs(paragraphs)) {
-      try {
-        Entry currentEntry = new Entry();
-        ReferenceBase currentReference = tryToExtractReference(entryParagraphs);
-        if(currentReference instanceof ReferenceSubDivision)
-          currentEntry.setReferenceSubDivision((ReferenceSubDivision)currentReference);
-        else if(currentReference instanceof Reference)
-          currentEntry.setReference((Reference)currentReference);
-
-        currentEntry.setContent(extractEntryContent(entryParagraphs));
-        Application.getDeepThought().addEntry(currentEntry);
-        addEntryToCategory(currentEntry);
-        extractedEntries.add(currentEntry);
-      } catch(Exception ex) {
-        log.error("Could not extract Entry from entryParagraphs", ex);
-      }
+      Entry extractedEntry = extractEntryFromEntryParagraphs(entryParagraphs);
+      if(extractedEntry != null)
+        extractedEntries.add(extractedEntry);
     }
 
-    return extractedEntries;
+//    return extractedEntries;
+  }
+
+  protected Entry extractEntryFromEntryParagraphs(List<Paragraph> entryParagraphs) {
+    try {
+      Entry currentEntry = new Entry();
+      ReferenceBase currentReference = tryToExtractReference(entryParagraphs);
+      if(currentReference instanceof ReferenceSubDivision)
+        currentEntry.setReferenceSubDivision((ReferenceSubDivision)currentReference);
+      else if(currentReference instanceof Reference)
+        currentEntry.setReference((Reference)currentReference);
+
+      currentEntry.setContent(extractEntryContent(entryParagraphs));
+      Application.getDeepThought().addEntry(currentEntry);
+      addEntryToCategory(currentEntry);
+      return currentEntry;
+    } catch(Exception ex) {
+      log.error("Could not extract Entry from entryParagraphs", ex);
+    }
+
+    return null;
   }
 
   protected String extractEntryContent(List<Paragraph> entryParagraphs) {

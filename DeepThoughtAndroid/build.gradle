@@ -12,8 +12,8 @@ println "DeepThoughtAndroid: isAndroid = " + project.isAndroid
 System.properties.put("isAndroid", true)
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.1'
 
     defaultConfig {
         applicationId "net.deepthought"
@@ -72,10 +72,8 @@ android {
 
 dependencies {
     compile 'com.android.support:appcompat-v7:19.1.0'
-
-//    compile project(':DeepThoughtLib')
+    //    compile project(':DeepThoughtLib')
     compile project(':AndroidOrmLiteEntityManager')
-//    compile project(':KeywordExtractor')
-
+//    compile project(':LuceneSearchEngine')
     compile 'org.slf4j:slf4j-android:1.7.10'
 }

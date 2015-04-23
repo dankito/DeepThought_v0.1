@@ -79,7 +79,6 @@ public class JsonIoJsonHelperTest {
     Assert.assertTrue(deepThought.getCategories().size() > 0);
     Assert.assertTrue(deepThought.countEntries() > 0);
     Assert.assertTrue(deepThought.countTags() > 0);
-    Assert.assertTrue(deepThought.countIndexTerms() > 0);
     Assert.assertTrue(deepThought.countPersons() > 0);
     Assert.assertTrue(deepThought.getNextEntryIndex() > 1);
 
@@ -92,7 +91,6 @@ public class JsonIoJsonHelperTest {
     for(Entry entry : deepThought.getEntries()) {
       Assert.assertTrue(entry.getCategories().size() > 0);
       Assert.assertTrue(entry.hasTags());
-      Assert.assertTrue(entry.hasIndexTerms());
       Assert.assertTrue(entry.getPersons().size() > 0);
       Assert.assertTrue(entry.getFiles().size() > 0);
       Assert.assertTrue(entry.getNotes().size() > 0);

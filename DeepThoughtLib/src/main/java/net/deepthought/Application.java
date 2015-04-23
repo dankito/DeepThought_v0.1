@@ -5,7 +5,6 @@ import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
 import net.deepthought.data.html.IHtmlHelper;
-import net.deepthought.data.html.JsoupHtmlHelper;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.model.DeepThought;
@@ -14,7 +13,10 @@ import net.deepthought.data.model.User;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.language.ILanguageDetector;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.FileUtils;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -47,6 +49,9 @@ public class Application {
   protected static IDataComparer dataComparer = null;
   protected static IDataMerger dataMerger = null;
 
+  protected static ILanguageDetector languageDetector = null;
+  protected static ISearchEngine searchEngine = null;
+
   protected static IHtmlHelper htmlHelper = null;
 
   protected static Set<ApplicationListener> listeners = new HashSet<>();
@@ -71,8 +76,7 @@ public class Application {
   }
 
   public static void instantiate(ApplicationConfiguration applicationConfiguration, IDependencyResolver dependencyResolver) {
-//    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(DeepThoughtFxProperties.getDataFolderOrCreateDefaultValuesOnNull());
-    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration.getDataFolder());
+    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration);
 
     instantiate(entityManagerConfiguration, dependencyResolver);
   }
@@ -83,6 +87,8 @@ public class Application {
 
     Application.dependencyResolver = dependencyResolver;
     Application.entityManagerConfiguration = configuration;
+
+    Application.htmlHelper = dependencyResolver.createHtmlHelper();
 
     if(openDatabase(dependencyResolver) == false)
       return;
@@ -105,8 +111,9 @@ public class Application {
       Application.dataMerger = dependencyResolver.createDataMerger();
 //      logResolvingDependencyDuration("DataMerger", startTime);
 
-      // TODO: make configurable
-      htmlHelper = new JsoupHtmlHelper();
+      Application.languageDetector = dependencyResolver.createLanguageDetector();
+
+      Application.searchEngine = dependencyResolver.createSearchEngine();
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
@@ -116,6 +123,7 @@ public class Application {
 
   protected static boolean openDatabase(IDependencyResolver dependencyResolver) {
     try {
+      FileUtils.ensureFolderExists(entityManagerConfiguration.getDataFolder());
       Application.entityManager = dependencyResolver.createEntityManager(entityManagerConfiguration);
     } catch(Exception ex) {
       log.error("Could not resolve EntityManager dependency", ex);
@@ -177,6 +185,12 @@ public class Application {
     dataManager = null;
 
     entityManager = null;
+    entityManagerConfiguration = null;
+
+    searchEngine.close();
+    searchEngine = null;
+
+    dependencyResolver = null;
   }
 
 
@@ -239,6 +253,14 @@ public class Application {
 
   public static IDataMerger getDataMerger() {
     return dataMerger;
+  }
+
+  public static ILanguageDetector getLanguageDetector() {
+    return languageDetector;
+  }
+
+  public static ISearchEngine getSearchEngine() {
+    return searchEngine;
   }
 
   public static IHtmlHelper getHtmlHelper() {

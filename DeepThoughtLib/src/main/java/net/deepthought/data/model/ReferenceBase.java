@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -15,7 +16,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -56,8 +62,19 @@ public abstract class ReferenceBase extends UserDataEntity {
 
   protected transient Set<Person> persons = null;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
+//  @OneToMany(fetch = FetchType.EAGER, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
+  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @JoinTable(
+      name = TableConfig.ReferenceBaseFileLinkJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseFileLinkJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
+  )
   protected Set<FileLink> files = new HashSet<>();
+
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = TableConfig.ReferenceBasePreviewImageJoinColumnName)
+  protected FileLink previewImage;
+
 
 
   public ReferenceBase() {
@@ -207,7 +224,8 @@ public abstract class ReferenceBase extends UserDataEntity {
   public boolean addFile(FileLink file) {
     boolean result = files.add(file);
     if(result) {
-      file.setReferenceBase(this);
+      file.addReferenceBase(this);
+
       callEntityAddedListeners(files, file);
     }
 
@@ -217,11 +235,22 @@ public abstract class ReferenceBase extends UserDataEntity {
   public boolean removeFile(FileLink file) {
     boolean result = files.remove(file);
     if(result) {
-      file.setReferenceBase(null);
+      file.removeReferenceBase(this);
+
       callEntityRemovedListeners(files, file);
     }
 
     return result;
+  }
+
+  public FileLink getPreviewImage() {
+    return previewImage;
+  }
+
+  public void setPreviewImage(FileLink previewImage) {
+    FileLink previousPreviewImage = this.previewImage;
+    this.previewImage = previewImage;
+    callPropertyChangedListeners(TableConfig.ReferenceBasePreviewImageJoinColumnName, previousPreviewImage, previewImage);
   }
 
 
@@ -229,6 +258,22 @@ public abstract class ReferenceBase extends UserDataEntity {
   @Transient
   public String getTextRepresentation() {
     return title;
+  }
+
+
+
+
+  @PostPersist
+  protected void postPersist() {
+    if(Application.getSearchEngine() != null)
+      Application.getSearchEngine().indexEntity(this);
+  }
+
+  @Override
+  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
+    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
+
+    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
   }
 
 

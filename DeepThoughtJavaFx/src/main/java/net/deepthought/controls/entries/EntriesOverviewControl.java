@@ -8,27 +8,27 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.tag.EntryTagsControl;
-import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.util.DeepThoughtError;
+import net.deepthought.data.search.FilterEntriesSearch;
+import net.deepthought.data.search.Search;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -39,14 +39,12 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -75,6 +73,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   protected FilteredList<Entry> filteredEntries = null;
   protected SortedList<Entry> sortedFilteredEntries = null;
 //  protected Entry selectedEntryInTableViewEntries = null;
+
+  protected FilterEntriesSearch filterEntriesSearch = null;
 
 
   protected MainWindowController mainWindowController;
@@ -529,6 +529,18 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void filterEntries() {
+    if(filterEntriesSearch != null)
+      filterEntriesSearch.interrupt();
+
+    filterEntriesSearch = new FilterEntriesSearch(txtfldEntriesQuickFilter.getText(), tglbtnEntriesQuickFilterContent.isSelected(), tglbtnEntriesQuickFilterAbstract.isSelected(), (results) -> {
+      filteredEntries.setPredicate((entry) -> results.contains(entry));
+    });
+    Application.getSearchEngine().filterEntries(filterEntriesSearch);
+
+//    filterEntriesManually();
+  }
+
+  protected void filterEntriesManually() {
     log.debug("Going to filter Entries ...");
     String filter = txtfldEntriesQuickFilter.getText();
     String lowerCaseFilter = filter.toLowerCase(); // TODO: can txtfldEntriesQuickFilter.getText() ever be null?
@@ -550,7 +562,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     log.debug("Filtering Entries done");
   }
-
 
 
   protected EntityListener entryListener = new EntityListener() {

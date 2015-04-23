@@ -95,7 +95,7 @@ public class EditEntryActivity extends Activity {
       }));
 
       if(entry.isPersisted()) // not a new entry, entry is already persisted in db
-        getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_entry_format, entry.getTitle()));
+        getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_entry_format, entry.getPreview()));
     }
   }
 

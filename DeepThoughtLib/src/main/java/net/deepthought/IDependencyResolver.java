@@ -3,9 +3,12 @@ package net.deepthought;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
+import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.language.ILanguageDetector;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -21,5 +24,11 @@ public interface IDependencyResolver {
   public IDataComparer createDataComparer();
 
   public IDataMerger createDataMerger();
+
+  public ILanguageDetector createLanguageDetector();
+
+  public ISearchEngine createSearchEngine();
+
+  public IHtmlHelper createHtmlHelper();
 
 }

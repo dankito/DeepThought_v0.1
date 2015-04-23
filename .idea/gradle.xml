@@ -12,6 +12,8 @@
             <option value="$PROJECT_DIR$/DeepThoughtJavaFx" />
             <option value="$PROJECT_DIR$/DeepThoughtLib" />
             <option value="$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter" />
+            <option value="$PROJECT_DIR$/libs/importer_exporter/SueddeutscheImporter" />
+            <option value="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter" />
             <option value="$PROJECT_DIR$/libs/persistence/database/AndroidOrmLiteEntityManager" />
             <option value="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-android" />

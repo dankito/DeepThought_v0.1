@@ -11,7 +11,6 @@ import net.deepthought.data.model.EntriesLinkGroup;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Group;
-import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
@@ -249,13 +248,15 @@ public class DefaultDataManager implements IDataManager {
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       DefaultDataManager.this.entityUpdated(updatedEntity);
+
+      if(updatedEntity instanceof Entry)
+        Application.getSearchEngine().updateIndexForEntity((Entry) updatedEntity, "");
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
 //      removedEntity.removeEntityListener(baseEntityListener);
-      if(collectionHolder instanceof DeepThought || collectionHolder instanceof DeepThoughtApplication || removedEntity instanceof AssociationEntity ||
-          (currentDeepThought != null && currentDeepThought.isComposition(collectionHolder, removedEntity)))
+      if(collectionHolder instanceof DeepThought || collectionHolder instanceof DeepThoughtApplication || removedEntity instanceof AssociationEntity)
         DefaultDataManager.this.entityDeleted(removedEntity);
     }
   };
@@ -340,8 +341,6 @@ public class DefaultDataManager implements IDataManager {
         ensureAllLazyLoadingDataIsLoadedRecursive(entry);
       for(Tag tag : deepThought.getTags())
         ensureAllLazyLoadingDataIsLoadedRecursive(tag);
-      for(IndexTerm indexTerm : deepThought.getIndexTerms())
-        ensureAllLazyLoadingDataIsLoadedRecursive(indexTerm);
       for(Person person : deepThought.getPersons())
         ensureAllLazyLoadingDataIsLoadedRecursive(person);
 
@@ -369,8 +368,6 @@ public class DefaultDataManager implements IDataManager {
         ensureAllLazyLoadingDataIsLoadedRecursive(category);
       for(Tag tag : entry.getTags())
         ensureAllLazyLoadingDataIsLoadedRecursive(tag);
-      for(IndexTerm indexTerm : entry.getIndexTerms())
-        ensureAllLazyLoadingDataIsLoadedRecursive(indexTerm);
       for(Person person : entry.getPersons()) {
           ensureAllLazyLoadingDataIsLoadedRecursive(person);
       }
@@ -396,15 +393,6 @@ public class DefaultDataManager implements IDataManager {
       tag.getDeepThought();
     }
 
-    if(entity instanceof IndexTerm) {
-      IndexTerm indexTerm = (IndexTerm) entity;
-      indexTerm.getName();
-      for(Entry entry : indexTerm.getEntries()) {}
-//        ensureAllLazyLoadingDataIsLoadedRecursive(entry);
-//      ensureAllLazyLoadingDataIsLoadedRecursive(keyword.getDeepThought());
-      indexTerm.getDeepThought();
-    }
-
     if(entity instanceof Person) {
       Person person = (Person) entity;
       person.getLastName();
@@ -422,7 +410,7 @@ public class DefaultDataManager implements IDataManager {
       file.getName();
 //      ensureAllLazyLoadingDataIsLoadedRecursive(file.getEntryFragment());
 //      ensureAllLazyLoadingDataIsLoadedRecursive(file.getPreviewImage());
-      file.getEntry();
+      file.getEntries();
     }
 
     if(entity instanceof EntriesLinkGroup) {

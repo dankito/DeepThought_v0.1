@@ -75,11 +75,13 @@ public abstract class CreateDeepThoughtApplicationTestBase extends DataModelTest
 
   @Test
   public void testDefaultApplicationLanguagesGetCreatedCorrectly() throws Exception {
-    DeepThoughtApplication deepThought = Application.getApplication();
+    DeepThoughtApplication deepThoughtApplication = Application.getApplication();
 
-    Assert.assertEquals(2, deepThought.getApplicationLanguages().size());
+    Assert.assertEquals(2, deepThoughtApplication.getApplicationLanguages().size());
 
-    for(ApplicationLanguage language : deepThought.getApplicationLanguages()) {
+
+    int index = 1;
+    for(ApplicationLanguage language : deepThoughtApplication.getApplicationLanguages()) {
       testUserDataEntityFields(language);
 
       Assert.assertNotNull(language.getName());
@@ -87,6 +89,9 @@ public abstract class CreateDeepThoughtApplicationTestBase extends DataModelTest
       Assert.assertNull(language.getDeepThought());
       Assert.assertTrue(language.isSystemValue());
       Assert.assertFalse(language.isDeletable());
+
+      Assert.assertEquals(index, language.getSortOrder());
+      index++;
     }
   }
 

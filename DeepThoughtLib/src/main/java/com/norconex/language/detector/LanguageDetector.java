@@ -1,17 +1,17 @@
 /* Copyright 2014 Norconex Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package com.norconex.language.detector;
 
 import com.cybozu.labs.langdetect.Detector;
@@ -33,20 +33,20 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Should be cached if reused for optimal performance.
- * @author Pascal Essiembre
- *
- */
-// using well-formed IETF BCP 47 language tag representing this locale. 
+* Should be cached if reused for optimal performance.
+* @author Pascal Essiembre
+*
+*/
+// using well-formed IETF BCP 47 language tag representing this locale.
 public class LanguageDetector {
 
     private static final Logger LOG = LoggerFactory.getLogger(LanguageDetector.class);
-    
+
     private static final String[] DEFAULT_SHORTTEXT_LANGUAGES = new String[] {
         "ar", "bg", "bn", "ca", "cs", "da", "de", "el", "en", "es", "et", "fa",
         "fi", "fr", "gu", "he", "hi", "hr", "hu", "id", "it", "ja", "ko", "lt",
         "lv", "mk", "ml", "nl", "no", "pa", "pl", "pt", "ro", "ru", "si", "sq",
-        "sv", "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh-cn", "zh-tw" 
+        "sv", "ta", "te", "th", "tl", "tr", "uk", "ur", "vi", "zh-cn", "zh-tw"
     };
     private static final String[] DEFAULT_LONGTEXT_LANGUAGES = new String[] {
         "af", "ar", "bg", "bn", "cs", "da", "de", "el", "en", "es", "et", "fa",
@@ -59,14 +59,14 @@ public class LanguageDetector {
         Arrays.sort(DEFAULT_LONGTEXT_LANGUAGES);
         Arrays.sort(DEFAULT_SHORTTEXT_LANGUAGES);
     }
-    
+
     private static final int MIN_LANGUAGES = 2;
     private static final int MAX_WORD_LENGTH = 3;
     private static final String LONG_TEXT_PATH = "/profiles/longtext/";
     private static final String SHORT_TEXT_PATH = "/profiles/shorttext/";
-    private static final LanguageProfile[] EMPTY_PROFILES = 
+    private static final LanguageProfile[] EMPTY_PROFILES =
             new LanguageProfile[]{};
-    
+
     //TODO use concurent hashmap?
     private final HashMap<String, double[]> wordLangProbMap = new HashMap<>();
     private final ArrayList<String> detectableLanguages = new ArrayList<>();
@@ -89,28 +89,28 @@ public class LanguageDetector {
     public LanguageDetector(LanguageProfile... languageProfiles)
             throws LanguageDetectorException {
         super();
-        if (languageProfiles == null 
+        if (languageProfiles == null
                 || languageProfiles.length < MIN_LANGUAGES) {
-            throw new LanguageDetectorException("Must supply at least " 
+            throw new LanguageDetectorException("Must supply at least "
                     + MIN_LANGUAGES + " language profiles.");
         }
         initProfiles(languageProfiles);
     }
-    public LanguageDetector(String... languageTags) 
+    public LanguageDetector(String... languageTags)
             throws LanguageDetectorException {
         this(false, languageTags);
     }
-    public LanguageDetector(boolean shortText, String... detectableLanguages) 
+    public LanguageDetector(boolean shortText, String... detectableLanguages)
             throws LanguageDetectorException {
         super();
-        if (detectableLanguages == null 
+        if (detectableLanguages == null
                 || detectableLanguages.length < MIN_LANGUAGES) {
             throw new LanguageDetectorException(
                     "Must supply at least " + MIN_LANGUAGES + " languages.");
         }
         initProfilesFromTags(shortText, detectableLanguages);
     }
-    public LanguageDetector(Locale... locales) 
+    public LanguageDetector(Locale... locales)
             throws LanguageDetectorException {
         this(false, locales);
     }
@@ -135,10 +135,10 @@ public class LanguageDetector {
         return Arrays.copyOf(DEFAULT_LONGTEXT_LANGUAGES,
                 DEFAULT_LONGTEXT_LANGUAGES.length);
     }
-    
-    public DetectedLanguages detect(Reader reader) 
+
+    public DetectedLanguages detect(Reader reader)
             throws LanguageDetectorException {
-        
+
         //TODO wrap Reader in BufferedReader?
         Detector shuyoDetector = new Detector(
                 wordLangProbMap, detectableLanguages, 0L);
@@ -155,15 +155,15 @@ public class LanguageDetector {
         }
         return doDetect(shuyoDetector);
     }
-    
-    public DetectedLanguages detect(String text) 
+
+    public DetectedLanguages detect(String text)
             throws LanguageDetectorException {
         Detector shuyoDetector = new Detector(
                 wordLangProbMap, detectableLanguages, 0L);
         shuyoDetector.append(text);
         return doDetect(shuyoDetector);
     }
-    public DetectedLanguages doDetect(Detector shuyoDetector) 
+    public DetectedLanguages doDetect(Detector shuyoDetector)
             throws LanguageDetectorException {
         try {
             return new DetectedLanguages(shuyoDetector.getProbabilities());
@@ -172,33 +172,33 @@ public class LanguageDetector {
                     "Cannot detect language(s).", e);
         }
     }
-    
+
     //TODO JVM-cache profiles loaded from classpath
     private void initProfilesFromTags(
-            boolean shortText, String[] languageTags) 
+            boolean shortText, String[] languageTags)
                     throws LanguageDetectorException {
         List<LanguageProfile> profiles = new ArrayList<>();
         for (String languageTag : languageTags) {
-            LanguageProfile profile = 
+            LanguageProfile profile =
                     getClassPathProfile(shortText, languageTag);
             if (profile != null) {
                 profiles.add(profile);
             }
         }
         initProfiles(profiles.toArray(EMPTY_PROFILES));
-    }    
-    
+    }
+
     private LanguageProfile getClassPathProfile(
             boolean shortText, String langTag) {
-        String path = LONG_TEXT_PATH; 
+        String path = LONG_TEXT_PATH;
         if (shortText) {
             path = SHORT_TEXT_PATH;
         }
         return LanguageProfileLoader.loadFromClasspath(
                 getClass(), path + langTag);
     }
-    
-    private void initProfiles(LanguageProfile[] languageProfiles) 
+
+    private void initProfiles(LanguageProfile[] languageProfiles)
             throws LanguageDetectorException {
         int langsize = languageProfiles.length;
         for (int i = 0; i < languageProfiles.length; i++) {
@@ -206,28 +206,28 @@ public class LanguageDetector {
             initProfile(languageProfile, i, langsize);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Initialized " + languageProfiles.length 
+            LOG.debug("Initialized " + languageProfiles.length
                     + " language profiles for language detection.");
         }
     }
 
     /**
      * @param profile
-     * @param langsize 
-     * @param index 
+     * @param langsize
+     * @param index
      * @throws com.cybozu.labs.langdetect.LangDetectException
      */
     private void initProfile(
-            LanguageProfile languageProfile, int index, int langsize) 
+            LanguageProfile languageProfile, int index, int langsize)
                     throws LanguageDetectorException {
-        
+
         LangProfile shuyoProfile = languageProfile.getShuyoLangProfile();
         String language = shuyoProfile.name;
         if (detectableLanguages.contains(language)) {
             throw new LanguageDetectorException(
-                    "Cannot initialize profile for language tag: " + language, 
+                    "Cannot initialize profile for language tag: " + language,
                     new LangDetectException(
-                            ErrorCode.DuplicateLangError, 
+                            ErrorCode.DuplicateLangError,
                             "duplicate the same language profile"));
         }
         detectableLanguages.add(language);
@@ -247,9 +247,9 @@ public class LanguageDetector {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((detectableLanguages == null) 
+        result = prime * result + ((detectableLanguages == null)
                 ? 0 : detectableLanguages.hashCode());
-        result = prime * result + ((wordLangProbMap == null) 
+        result = prime * result + ((wordLangProbMap == null)
                 ? 0 : wordLangProbMap.hashCode());
         return result;
     }
@@ -285,10 +285,10 @@ public class LanguageDetector {
     public String toString() {
         final int maxLen = 10;
         return "LanguageDetector [wordLangProbMap="
-                + (wordLangProbMap != null 
+                + (wordLangProbMap != null
                         ? toString(wordLangProbMap.entrySet(), maxLen) : null)
                 + ", detectableLanguages="
-                + (detectableLanguages != null 
+                + (detectableLanguages != null
                         ? toString(detectableLanguages, maxLen) : null) + "]";
     }
     private String toString(Collection<?> collection, int maxLen) {

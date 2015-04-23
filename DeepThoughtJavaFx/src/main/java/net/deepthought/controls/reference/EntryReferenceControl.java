@@ -19,15 +19,14 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.data.search.Search;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Empty;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
-import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -39,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -53,8 +53,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -62,8 +60,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -84,6 +80,8 @@ public class EntryReferenceControl extends VBox {
   protected ObservableList<ReferenceBase> listViewReferenceBasesItems = null;
   protected FilteredList<ReferenceBase> filteredReferenceBases = null;
   protected SortedList<ReferenceBase> sortedFilteredReferenceBases = null;
+
+  protected Search<ReferenceBase> filterReferenceBasesSearch = null;
 
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
 
@@ -216,94 +214,19 @@ public class EntryReferenceControl extends VBox {
       resetListViewReferenceBasesItems(Application.getDeepThought());
   }
 
-
   protected void filterReferenceBases() {
-    final String filter = txtfldSearchForReference.getText();
-    String lowerCaseFilter = filter == null ? "" : filter.toLowerCase();
-    final boolean filterForReferenceHierarchy = lowerCaseFilter.contains(",");
-    String seriesTitleFilterTemp = null, referenceFilterTemp = null, referenceSubDivisionFilterTemp = null;
+    if(filterReferenceBasesSearch != null)
+      filterReferenceBasesSearch.interrupt();
 
-    if(filterForReferenceHierarchy == false)
-      seriesTitleFilterTemp = referenceFilterTemp = referenceSubDivisionFilterTemp = lowerCaseFilter;
-    else {
-      String[] parts = lowerCaseFilter.split(",");
-      seriesTitleFilterTemp = parts[0].trim();
-      if(seriesTitleFilterTemp.length() == 0) seriesTitleFilterTemp = null;
-
-      if(parts.length > 1) {
-        referenceFilterTemp = parts[1].trim();
-        if(referenceFilterTemp.length() == 0) referenceFilterTemp = null;
-      }
-      if(parts.length > 2) {
-        referenceSubDivisionFilterTemp = parts[2].trim();
-        if(referenceSubDivisionFilterTemp.length() == 0) referenceSubDivisionFilterTemp = null;
-      }
-    }
-
-    final String seriesTitleFilter = seriesTitleFilterTemp;
-    final String referenceFilter = referenceFilterTemp;
-    final String referenceSubDivisionFilter = referenceSubDivisionFilterTemp;
-
-    filteredReferenceBases.setPredicate((referenceBase) -> {
-      // If filter text is empty, display all ReferenceBases.
-      if (StringUtils.isNullOrEmpty(filter)) {
-        return true;
-      }
-
-
-      if(filterForReferenceHierarchy == false) {
-        if (referenceBase.getTextRepresentation().toLowerCase().contains(lowerCaseFilter))
-          return true;
-      }
-      else {
-        if(referenceBase instanceof SeriesTitle) {
-          if(referenceFilter != null || referenceSubDivisionFilter != null) // cannot fullfil all filters
-            return false;
-          return seriesTitleFilter != null && referenceBase.getTextRepresentation().toLowerCase().contains(seriesTitleFilter);
-        }
-        else if(referenceBase instanceof Reference) {
-          if(referenceSubDivisionFilter != null) // cannot fullfil all filters as ReferenceSubDivisionFilter is set an it isn't a ReferenceSubDivision
-            return false;
-          Reference reference = (Reference)referenceBase;
-          return referenceFilter != null && referenceBase.getTextRepresentation().toLowerCase().contains(referenceFilter) &&
-              ((seriesTitleFilter == null && reference.getSeries() == null) ||
-                seriesTitleFilter != null && reference.getSeries() != null && reference.getSeries().getTextRepresentation().toLowerCase().contains(seriesTitleFilter));
-        }
-        else if(referenceBase instanceof ReferenceSubDivision) {
-          ReferenceSubDivision subDivision = (ReferenceSubDivision)referenceBase;
-          return referenceSubDivisionFilter != null && referenceBase.getTextRepresentation().toLowerCase().contains(referenceSubDivisionFilter) &&
-              ((referenceFilter == null && subDivision.getReference() == null) ||
-              (referenceFilter != null && subDivision.getReference() != null && subDivision.getReference().getTextRepresentation().toLowerCase().contains(referenceFilter))) &&
-              ((seriesTitleFilter == null && (subDivision.getReference() == null || subDivision.getReference().getSeries() == null)) ||
-                  (seriesTitleFilter != null && subDivision.getReference() != null && subDivision.getReference().getSeries() != null &&
-                  subDivision.getReference().getSeries().getTextRepresentation().toLowerCase().contains(seriesTitleFilter)));
-        }
-      }
-
-      return false; // Does not match.
+    Date startTime = new Date();
+    filterReferenceBasesSearch = new Search<>(txtfldSearchForReference.getText(), (results) -> {
+      filteredReferenceBases.setPredicate((referenceBase) -> results.contains(referenceBase));
     });
+    Application.getSearchEngine().filterReferenceBases(filterReferenceBasesSearch);
   }
 
   protected void handleTextFieldSearchForReferenceAction() {
 
-  }
-
-  protected Collection<Reference> findReferencesToSuggestion(AutoCompletionBinding.ISuggestionRequest suggestionProvider) {
-    List<Reference> suggestions = new ArrayList<>();
-
-    for(Reference reference : Application.getDeepThought().getReferencesSorted()) {
-      if(suggestionProvider.isCancelled())
-        break;
-
-      if(reference.getTitle().toLowerCase().contains(suggestionProvider.getUserText().toLowerCase()))
-        suggestions.add(reference);
-    }
-
-    return suggestions;
-  }
-
-  protected Boolean doesSearchTermMatchReference(FXUtils.DoesItemMatchSearchTermParam<Reference> param) {
-    return param.getItem().getTitle().toLowerCase().contains(param.getSearchTerm().toLowerCase());
   }
 
 

@@ -31,13 +31,12 @@
     <string name="search_section_tag_title">Tag Search</string>
     <string name="search_section_tag_label">Tag:</string>
     <string name="search_select_tags"><![CDATA[<Select Tags>]]></string>
-    <string name="search_section_title_title">Title Search</string>
+    <string name="search_section_content_title">Content Search</string>
+    <string name="search_section_results_title">Results:</string>
     <string name="search_contains_text">Contains</string>
     <string name="search_starts_with_text">Starts with</string>
     <string name="search_ends_with_text">Ends with</string>
     <string name="search_equals_text">Equals</string>
-    <string name="search_section_content_title">Content Search</string>
-    <string name="search_section_results_title">Results:</string>
 
 
 </resources>

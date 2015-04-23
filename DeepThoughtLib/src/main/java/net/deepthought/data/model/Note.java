@@ -31,12 +31,17 @@ public class Note extends UserDataEntity {
   @JoinColumn(name = TableConfig.NoteEntryJoinColumnName)
   protected Entry entry;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = TableConfig.NoteDeepThoughtJoinColumnName)
+  protected DeepThought deepThought;
+
 
   public Note() {
-
+    this.type = NoteType.getDefaultNoteType();
   }
 
   public Note(String note) {
+    this();
     this.note = note;
   }
 
@@ -79,6 +84,10 @@ public class Note extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.NoteEntryJoinColumnName, previousValue, entry);
   }
 
+  public DeepThought getDeepThought() {
+    return deepThought;
+  }
+
 
   @Override
   @Transient
@@ -93,7 +102,7 @@ public class Note extends UserDataEntity {
     if(entry == null)
       description += " Entry == null, is Note deleted? " + isDeleted();
     else
-      description += " (on Entry " + entry.getTitle() + ")";
+      description += " (on " + entry + ")";
 
     return description;
   }

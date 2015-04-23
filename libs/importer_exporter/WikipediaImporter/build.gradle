@@ -1,0 +1,17 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+dependencies {
+    compile project(':DeepThoughtLib')
+//    compile 'info.bliki.wiki:bliki:3.0.19'
+    compile 'info.bliki.wiki:bliki-core:3.0.19'
+
+    testCompile 'junit:junit:4.8.1'
+
+    // to include test helper classes from DeepThoughtLib
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
+    testCompile project(':JavaSeOrmLiteEntityManager')
+    testCompile project(':LuceneSearchEngine')
+//    testCompile project(':OpenOfficeDocumentsImporterExporter')
+}

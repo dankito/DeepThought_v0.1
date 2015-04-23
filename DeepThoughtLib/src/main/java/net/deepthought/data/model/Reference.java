@@ -63,7 +63,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   protected transient Date publishingDate; // SQLite needs this, can't handle null dates
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.PersonDeepThoughtJoinColumnName)
+  @JoinColumn(name = TableConfig.ReferenceDeepThoughtJoinColumnName)
   protected DeepThought deepThought;
 
 
@@ -123,6 +123,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
       subDivision.setReference(this);
       subDivisionsSorted = null;
 
+      if(subDivision.getDeepThought() == null && this.deepThought != null)
+        deepThought.addReferenceSubDivision(subDivision);
+
       callEntityAddedListeners(subDivisions, subDivision);
       return true;
     }
@@ -144,6 +147,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
         if(subDivisionEnum.getSubDivisionOrder() > removeSubDivisionOrder)
           subDivisionEnum.setSubDivisionOrder(subDivisionEnum.getSubDivisionOrder() - 1);
       }
+
+      if(deepThought != null)
+        deepThought.removeReferenceSubDivision(subDivision);
 
       callEntityRemovedListeners(subDivisions, subDivision);
       return true;
@@ -214,6 +220,24 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     if(publishingDate == null)
       publishingDate = tryToParseIssueOrPublishingDateToDate();
     return publishingDate;
+  }
+
+  @Override
+  public boolean addFile(FileLink file) {
+    if(super.addFile(file)) {
+      if(file.getDeepThought() == null && this.deepThought != null)
+        deepThought.addFile(file);
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public void setPreviewImage(FileLink previewImage) {
+    if(previewImage.getDeepThought() == null && this.deepThought != null)
+      deepThought.addFile(previewImage);
+
+    super.setPreviewImage(previewImage);
   }
 
   public DeepThought getDeepThought() {

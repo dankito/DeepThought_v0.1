@@ -13,6 +13,8 @@ public abstract class SeriesTitleTestBase extends ReferenceBaseTestBase {
 
   @Override
   protected ReferenceBase createReferenceBaseInstanceAndAddToDeepThought() {
+    ReferenceBaseSubClassClass = SeriesTitle.class;
+
     SeriesTitle series = new SeriesTitle("test");
 
     DeepThought deepThought = Application.getDeepThought();

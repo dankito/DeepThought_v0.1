@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 public class LanguageDetector implements ILanguageDetector {
 
-  public final static String CouldNotDetectLanguage = "CouldNotDetectLanguage";
-
   private final static Logger log = LoggerFactory.getLogger(LanguageDetector.class);
 
 
@@ -42,7 +40,7 @@ public class LanguageDetector implements ILanguageDetector {
         }
       }
     } catch(Exception ex) {
-      log.error("Could not detect language for text " + text, ex);
+//      log.error("Could not detect language for text " + text, ex);
     }
 
     return CouldNotDetectLanguage;

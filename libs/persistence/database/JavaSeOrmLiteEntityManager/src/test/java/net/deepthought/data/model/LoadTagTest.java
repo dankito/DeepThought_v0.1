@@ -5,9 +5,9 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 /**
- * Created by ganymed on 10/11/14.
+ * Created by ganymed on 19/04/15.
  */
-public class IndexTermTest extends IndexTermTestBase {
+public class LoadTagTest extends LoadTagTestBase {
 
   @Override
   protected IEntityManager getEntityManager(EntityManagerConfiguration configuration) throws Exception {

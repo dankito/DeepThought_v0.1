@@ -6,8 +6,10 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.Search;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +63,8 @@ public abstract class PersonsControl extends TitledPane {
   protected ObservableList<Person> listViewAllPersonsItems;
   protected FilteredList<Person> filteredPersons;
   protected SortedList<Person> sortedFilteredPersons;
+
+  protected Search<Person> filterPersonsSearch = null;
 
   protected Set<Person> currentlySetPersonsOnEntity = new HashSet<>();
   protected Set<Person> addedPersons = new HashSet<>();
@@ -225,6 +230,18 @@ public abstract class PersonsControl extends TitledPane {
   }
 
   protected void filterPersons() {
+    if(filterPersonsSearch != null)
+      filterPersonsSearch.interrupt();
+
+    filterPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
+      filteredPersons.setPredicate((person) -> results.contains(person));
+    });
+    Application.getSearchEngine().filterPersons(filterPersonsSearch);
+
+//    filterPersonsManually();
+  }
+
+  protected void filterPersonsManually() {
     String filter = txtfldSearchForPerson.getText();
     String lowerCaseFilter = filter == null ? "" : filter.toLowerCase();
     final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");

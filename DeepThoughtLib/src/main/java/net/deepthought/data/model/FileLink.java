@@ -5,11 +5,15 @@ import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
@@ -34,13 +38,19 @@ public class FileLink extends UserDataEntity implements Serializable {
   @Column(name = TableConfig.FileLinkNotesColumnName)
   protected String notes;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = TableConfig.FileLinkEntryJoinColumnName)
-  protected Entry entry;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = TableConfig.FileLinkEntryJoinColumnName)
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "files")
+  protected Set<Entry> entries = new HashSet<>();
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = TableConfig.FileLinkReferenceBaseJoinColumnName)
-  protected ReferenceBase referenceBase;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = TableConfig.FileLinkReferenceBaseJoinColumnName)
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "files")
+  protected Set<ReferenceBase> referenceBases = new HashSet<>();
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = TableConfig.FileLinkDeepThoughtJoinColumnName)
+  protected DeepThought deepThought;
 
 
   public FileLink() {
@@ -102,21 +112,54 @@ public class FileLink extends UserDataEntity implements Serializable {
     callPropertyChangedListeners(TableConfig.FileLinkNotesColumnName, previousValue, notes);
   }
 
-  public Entry getEntry() {
-    return entry;
+  public Collection<Entry> getEntries() {
+    return entries;
   }
 
-  protected void setEntry(Entry entry) {
-    Object previousValue = this.entry;
-    this.entry = entry;
-    callPropertyChangedListeners(TableConfig.FileLinkEntryJoinColumnName, previousValue, entry);
+  protected boolean addEntry(Entry entry) {
+    boolean result = entries.add(entry);
+    if(result) {
+      callEntityAddedListeners(entries, entry);
+    }
+
+    return result;
   }
 
-  protected void setReferenceBase(ReferenceBase referenceBase) {
-    Object previousValue = this.referenceBase;
-    this.referenceBase = referenceBase;
-    callPropertyChangedListeners(TableConfig.FileLinkReferenceBaseJoinColumnName, previousValue, referenceBase);
+  protected boolean removeEntry(Entry entry) {
+    boolean result = entries.remove(entry);
+    if(result) {
+      callEntityRemovedListeners(entries, entry);
+    }
+
+    return result;
   }
+
+  public Set<ReferenceBase> getReferenceBases() {
+    return referenceBases;
+  }
+
+  protected boolean addReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBases.add(referenceBase);
+    if(result) {
+      callEntityAddedListeners(referenceBases, referenceBase);
+    }
+
+    return result;
+  }
+
+  protected boolean removeReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBases.remove(referenceBase);
+    if(result) {
+      callEntityRemovedListeners(referenceBases, referenceBase);
+    }
+
+    return result;
+  }
+
+  public DeepThought getDeepThought() {
+    return deepThought;
+  }
+
 
   @Transient
   public String getTextRepresentation() {

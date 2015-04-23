@@ -7,7 +7,6 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.IndexTerm;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -86,7 +85,6 @@ public class JsonIoJsonHelper {
     fieldsIgnoreMap.put(Category.class, getCategoryIncludeFields());
     fieldsIgnoreMap.put(Entry.class, getEntryIncludeFields());
     fieldsIgnoreMap.put(Tag.class, getTagIncludeFields());
-    fieldsIgnoreMap.put(IndexTerm.class, getKeywordIncludeFields());
     fieldsIgnoreMap.put(Person.class, getPersonIncludeFields());
     fieldsIgnoreMap.put(Device.class, getDeviceIncludeFields());
 

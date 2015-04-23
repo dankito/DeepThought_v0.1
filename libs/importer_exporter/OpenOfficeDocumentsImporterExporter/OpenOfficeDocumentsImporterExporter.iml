@@ -69,6 +69,8 @@
     <orderEntry type="library" exported="" name="jcl-over-slf4j-1.7.7" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.7" level="project" />
     <orderEntry type="library" exported="" name="simple-odf-0.8.1-incubating" level="project" />
+    <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
+    <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
   </component>
 </module>
 

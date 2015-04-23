@@ -28,7 +28,7 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   private static final long serialVersionUID = 876365664840769897L;
 
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "series")
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "series")
   protected Set<Reference> serialParts = new HashSet<>();
 
   protected transient SortedSet<Reference> serialPartsSorted = null;
@@ -41,7 +41,7 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   protected String tableOfContents;
 
   @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = TableConfig.PersonDeepThoughtJoinColumnName)
+  @JoinColumn(name = TableConfig.SeriesTitleDeepThoughtJoinColumnName)
   protected DeepThought deepThought;
 
 
@@ -144,6 +144,24 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     Object previousValue = this.tableOfContents;
     this.tableOfContents = tableOfContents;
     callPropertyChangedListeners(TableConfig.SeriesTitleTableOfContentsColumnName, previousValue, tableOfContents);
+  }
+
+  @Override
+  public boolean addFile(FileLink file) {
+    if(super.addFile(file)) {
+      if(file.getDeepThought() == null && this.deepThought != null)
+        deepThought.addFile(file);
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public void setPreviewImage(FileLink previewImage) {
+    if(previewImage.getDeepThought() == null && this.deepThought != null)
+      deepThought.addFile(previewImage);
+
+    super.setPreviewImage(previewImage);
   }
 
   public DeepThought getDeepThought() {

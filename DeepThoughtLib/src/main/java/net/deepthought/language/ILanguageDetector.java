@@ -5,6 +5,8 @@ package net.deepthought.language;
  */
 public interface ILanguageDetector {
 
+  public final static String CouldNotDetectLanguage = "CouldNotDetectLanguage";
+
   public String detectLanguageOfText(String text);
 
 }

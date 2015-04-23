@@ -21,6 +21,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+import javax.persistence.PostPersist;
 
 /**
  * Created by ganymed on 10/11/14.
@@ -49,7 +50,7 @@ public class Category extends UserDataEntity {
   @JoinColumn(name = TableConfig.CategoryParentCategoryJoinColumnName)
   protected Category parentCategory;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "parentCategory"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentCategory"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)
   @OrderBy("categoryOrder ASC") // TODO: EclipseLink Error: The order by value [category_index], specified on the element [subCategories] from entity [class Category], is invalid. No property or field with that name exists on the target entity [class Category].
   protected Collection<Category> subCategories = new ArrayList<>();
 
@@ -237,6 +238,21 @@ public class Category extends UserDataEntity {
       description += ", " + getSubCategories().size() + " subcategories";
 
     return description;
+  }
+
+
+  @PostPersist
+  protected void postPersist() {
+    if(Application.getSearchEngine() != null)
+      Application.getSearchEngine().indexEntity(this);
+  }
+
+  @Override
+  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
+    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
+
+    if(Application.getSearchEngine() != null)
+      Application.getSearchEngine().updateIndexForEntity(this, propertyName);
   }
 
 

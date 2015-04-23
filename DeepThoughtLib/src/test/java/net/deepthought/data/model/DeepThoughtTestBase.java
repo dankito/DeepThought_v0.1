@@ -1,8 +1,6 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
@@ -10,7 +8,6 @@ import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.SettingsBase;
 import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.deepthought.data.model.settings.enums.SelectedTab;
-import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
 
 import org.junit.Assert;
@@ -291,25 +288,26 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     Assert.assertEquals(0, tag.getEntries().size());
   }
 
-  @Test
-  // this cannot work with a in memory database
-  public void addEntry_ClosePersistenceManager_NextEntryIndexHasBeenIncremented() throws Exception {
-    Entry entry = new Entry("test", "no content");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(entry);
-
-    Assert.assertEquals(2, deepThought.getNextEntryIndex());
-
-    entityManager.close();
-
-    IEntityManager entityManager2 = getEntityManager(configuration);
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager2));
-
-    DeepThought deepThought2 = Application.getDeepThought();
-
-    Assert.assertEquals(2, deepThought2.getNextEntryIndex());
-  }
+//  @Test
+//  // this cannot work with a in memory database
+//  public void addEntry_ClosePersistenceManager_NextEntryIndexHasBeenIncremented() throws Exception {
+//    Entry entry = new Entry("test", "no content");
+//
+//    DeepThought deepThought = Application.getDeepThought();
+//    deepThought.addEntry(entry);
+//
+//    Assert.assertEquals(2, deepThought.getNextEntryIndex());
+//
+//    entityManager.close();
+//
+//    IEntityManager entityManager2 = getEntityManager(configuration);
+//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager2));
+//
+//    DeepThought deepThought2 = Application.getDeepThought();
+//    entityManager2.close();
+//
+//    Assert.assertEquals(2, deepThought2.getNextEntryIndex());
+//  }
   
 
   @Test
@@ -363,60 +361,6 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
 
     Assert.assertNull(tag.getDeepThought());
     Assert.assertFalse(deepThought.getTags().contains(tag));
-  }
-
-
-  @Test
-  public void addIndexTerm_IndexTermGetsPersisted() throws Exception {
-    IndexTerm indexTerm = new IndexTerm("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addIndexTerm(indexTerm);
-
-    // assert IndexTerm really got written to database
-    Assert.assertNotEquals(0, getRowFromTable(TableConfig.IndexTermTableName, indexTerm.getId()));
-  }
-
-  @Test
-  public void addIndexTerm_RelationsGetSet() throws Exception {
-    IndexTerm indexTerm = new IndexTerm("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addIndexTerm(indexTerm);
-
-    Assert.assertNotNull(indexTerm.getId());
-    Assert.assertEquals(deepThought, indexTerm.getDeepThought());
-    Assert.assertTrue(deepThought.getIndexTerms().contains(indexTerm));
-  }
-
-  @Test
-  public void removeIndexTerm_IndexTermGetsNotDeletedFromDB() throws Exception {
-    IndexTerm indexTerm = new IndexTerm("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addIndexTerm(indexTerm);
-
-    Long indexTermId = indexTerm.getId();
-    deepThought.removeIndexTerm(indexTerm);
-
-    // assert IndexTerm still exists in database (no data ever gets deleted from db, only its 'Deleted' flag gets set to true)
-    Assert.assertTrue(indexTerm.isDeleted());
-    Assert.assertNotEquals(0, getRowFromTable(TableConfig.IndexTermTableName, indexTermId));
-  }
-
-  @Test
-  public void removeIndexTerm_RelationsGetRemoved() throws Exception {
-    IndexTerm indexTerm = new IndexTerm("test");
-
-    DeepThought deepThought = Application.getDeepThought();
-    deepThought.addIndexTerm(indexTerm);
-
-    deepThought.removeIndexTerm(indexTerm);
-
-    Assert.assertNull(indexTerm.getDeepThought());
-    Assert.assertFalse(deepThought.getIndexTerms().contains(indexTerm));
-
-    Assert.assertTrue(indexTerm.isDeleted());
   }
   
 
