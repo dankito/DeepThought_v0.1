@@ -1,0 +1,35 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.1"
+
+    defaultConfig {
+//        applicationId "com.j256.ormlite"
+        minSdkVersion 8
+        targetSdkVersion 19
+        versionCode 1
+        versionName "1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    buildTypes {
+        release {
+//            runProguard false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+//junitVersion = '4.8.1'
+
+dependencies {
+    compile project(':ormlite-core')
+
+    androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
+    //androidTestCompile 'junit:junit:' + junitVersion
+}
