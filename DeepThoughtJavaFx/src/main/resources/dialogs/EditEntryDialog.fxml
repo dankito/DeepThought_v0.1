@@ -9,28 +9,49 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" prefHeight="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" prefHeight="700.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
    <center>
       <BorderPane BorderPane.alignment="CENTER">
          <bottom>
-            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
+            <AnchorPane prefHeight="42.0">
                <children>
-                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="120.0" text="%cancel">
-                     <HBox.margin>
-                        <Insets right="12.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
-                     <HBox.margin>
-                        <Insets right="12.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
+                  <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets right="6.0" />
+                           </HBox.margin>
+                        </Button>
+                        <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </ToggleButton>
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="40.0" prefWidth="120.0" text="%cancel">
+                           <HBox.margin>
+                              <Insets right="12.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="40.0" prefWidth="120.0" text="%apply">
+                           <HBox.margin>
+                              <Insets right="12.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="40.0" prefWidth="120.0" text="%ok" />
+                     </children>
+                     <BorderPane.margin>
+                        <Insets bottom="6.0" top="6.0" />
+                     </BorderPane.margin>
+                  </HBox>
                </children>
-               <BorderPane.margin>
-                  <Insets bottom="6.0" top="6.0" />
-               </BorderPane.margin>
-            </HBox>
+            </AnchorPane>
          </bottom>
          <center>
             <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
@@ -54,32 +75,22 @@
                                     </Rectangle>
                                  </children>
                               </HBox>
-                              <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="66.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Button>
-                              <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" maxHeight="40.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </ToggleButton>
                            </children>
                         </AnchorPane>
-                        <TitledPane fx:id="ttldpnAbstract" animated="false" text="%entry.abstract">
+                        <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets top="6.0" />
+                           </VBox.margin>
                            <content>
-                              <TextArea fx:id="txtarAbstract" minHeight="90.0" prefHeight="90.0" wrapText="true" />
+                              <HTMLEditor fx:id="htmledAbstract" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="120.0" prefHeight="150.0" />
                            </content>
-                           <VBox.margin>
-                              <Insets top="6.0" />
-                           </VBox.margin>
                         </TitledPane>
-                        <TitledPane fx:id="ttldpnContent" animated="false" text="%content" VBox.vgrow="ALWAYS">
+                        <TitledPane fx:id="ttldpnContent" animated="false" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
                            <VBox.margin>
                               <Insets top="6.0" />
                            </VBox.margin>
                            <content>
-                              <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="200.0" />
+                              <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />
                            </content>
                         </TitledPane>
                         <HBox fx:id="paneTagsAndCategories">

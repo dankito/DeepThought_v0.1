@@ -21,7 +21,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
-import javax.persistence.PostPersist;
 
 /**
  * Created by ganymed on 10/11/14.
@@ -238,21 +237,6 @@ public class Category extends UserDataEntity {
       description += ", " + getSubCategories().size() + " subcategories";
 
     return description;
-  }
-
-
-  @PostPersist
-  protected void postPersist() {
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().indexEntity(this);
-  }
-
-  @Override
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
-    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
-
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().updateIndexForEntity(this, propertyName);
   }
 
 

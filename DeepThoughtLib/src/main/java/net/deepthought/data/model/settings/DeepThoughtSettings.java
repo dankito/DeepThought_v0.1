@@ -8,6 +8,8 @@ import net.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.deepthought.data.model.settings.enums.SelectedList;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.settings.enums.Setting;
+import net.deepthought.data.model.ui.AllEntriesSystemTag;
+import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 
 import java.io.Serializable;
 
@@ -97,8 +99,15 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
   }
 
   public Tag getLastViewedTag() {
-    if(lastViewedTag == null && lastViewedTagId != null)
-      lastViewedTag = Application.getEntityManager().getEntityById(Tag.class, lastViewedTagId);
+    if(lastViewedTag == null && lastViewedTagId != null) {
+      if(lastViewedTagId == AllEntriesSystemTag.ID)
+        lastViewedTag = Application.getDeepThought().AllEntriesSystemTag();
+      else if(lastViewedTagId == EntriesWithoutTagsSystemTag.ID)
+        lastViewedTag = Application.getDeepThought().EntriesWithoutTagsSystemTag();
+      else
+        lastViewedTag = Application.getEntityManager().getEntityById(Tag.class, lastViewedTagId);
+    }
+
     return lastViewedTag;
   }
 

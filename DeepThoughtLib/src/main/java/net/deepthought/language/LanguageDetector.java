@@ -3,6 +3,8 @@ package net.deepthought.language;
 import com.norconex.language.detector.DetectedLanguage;
 import com.norconex.language.detector.DetectedLanguages;
 
+import net.deepthought.data.model.enums.Language;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +33,15 @@ public class LanguageDetector implements ILanguageDetector {
     }
   }
 
-  public String detectLanguageOfText(String text) {
+  public Language detectLanguageOfText(String text) {
+    String languageTag = getLanguageTagOfText(text);
+
+    if(languageTag != null)
+      return getLanguageFromLanguageTag(languageTag);
+    return CouldNotDetectLanguage;
+  }
+
+  public String getLanguageTagOfText(String text) {
     try {
       DetectedLanguages detectedLanguages = detector.detect(text);
       for(DetectedLanguage probableLanguage : detectedLanguages) {
@@ -43,7 +53,11 @@ public class LanguageDetector implements ILanguageDetector {
 //      log.error("Could not detect language for text " + text, ex);
     }
 
-    return CouldNotDetectLanguage;
+    return null;
+  }
+
+  protected Language getLanguageFromLanguageTag(String languageTag) {
+    return Language.findByLanguageKey(languageTag);
   }
 
 }

@@ -10,15 +10,15 @@ dependencies {
     compile project(':DeepThoughtLib')
 
 //    compile 'org.apache.lucene:lucene-core:5.1.0'
-    compile 'org.apache.lucene:lucene-analyzers-common:5.1.0'
-    compile 'org.apache.lucene:lucene-queryparser:5.1.0'
+//    compile 'org.apache.lucene:lucene-analyzers-common:5.1.0'
+//    compile 'org.apache.lucene:lucene-queryparser:5.1.0'
 //    compile 'org.apache.lucene:lucene-suggest:5.1.0'
 
-    // Lucene 5.x needs java.nio.file.Path to create an index Directory which is not supported by Android (yet) -> use an older Version to be compatible with Android
-////    compile 'org.apache.lucene:lucene-core:5.0.0'
-//    compile 'org.apache.lucene:lucene-analyzers-common:4.10.4'
-//    compile 'org.apache.lucene:lucene-queryparser:4.10.4'
-////    compile 'org.apache.lucene:lucene-suggest:5.0.0'
+    // Lucene 5.x and 4.8 and above need java.nio.file.Path to create an index Directory which is not supported by Android (yet) -> use an older Version to be compatible with Android
+    compile 'org.apache.lucene:lucene-core:4.7.2'
+    compile 'org.apache.lucene:lucene-analyzers-common:4.7.2'
+    compile 'org.apache.lucene:lucene-queryparser:4.7.2'
+//    compile 'org.apache.lucene:lucene-codecs:4.7.2'
 
     testCompile 'junit:junit:4.8.1'
 

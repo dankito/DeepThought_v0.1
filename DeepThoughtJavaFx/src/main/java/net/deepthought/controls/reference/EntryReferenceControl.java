@@ -7,7 +7,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -20,6 +20,7 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
@@ -28,43 +29,37 @@ import net.deepthought.util.Empty;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends VBox {
+public class EntryReferenceControl extends TitledPane {
 
   private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
 
@@ -77,9 +72,11 @@ public class EntryReferenceControl extends VBox {
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
 
-  protected ObservableList<ReferenceBase> listViewReferenceBasesItems = null;
-  protected FilteredList<ReferenceBase> filteredReferenceBases = null;
-  protected SortedList<ReferenceBase> sortedFilteredReferenceBases = null;
+  protected LazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
+//  protected CombinedLazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
+//  protected ObservableList<ReferenceBase> listViewReferenceBasesItems = null;
+//  protected FilteredList<ReferenceBase> filteredReferenceBases = null;
+//  protected SortedList<ReferenceBase> sortedFilteredReferenceBases = null;
 
   protected Search<ReferenceBase> filterReferenceBasesSearch = null;
 
@@ -153,11 +150,14 @@ public class EntryReferenceControl extends VBox {
 
       if(deepThought != null)
         deepThought.addEntityListener(deepThoughtListener);
+
+      if(entry != null) // TODO: was fuer ein Quatsch dies an dieser Stelle zu machen, entbehrt jeder Logik
+        txtfldReferenceIndication.setText(entry.getIndication());
+
+      selectedReferenceBaseChanged(selectedReferenceBase);
     } catch (IOException ex) {
       log.error("Could not load EntryReferenceControl", ex);
     }
-
-    selectedReferenceBaseChanged(selectedReferenceBase);
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -203,11 +203,14 @@ public class EntryReferenceControl extends VBox {
 
     lstvwReferences.setCellFactory((listView) -> new ReferenceBaseListCell(this));
 
-    listViewReferenceBasesItems = FXCollections.observableList(lstvwReferences.getItems());
-    filteredReferenceBases = new FilteredList<>(listViewReferenceBasesItems, referenceBase -> true);
-    sortedFilteredReferenceBases = new SortedList<>(filteredReferenceBases, referenceBaseComparator);
+//    listViewReferenceBasesItems = FXCollections.observableList(lstvwReferences.getItems());
+    listViewReferenceBasesItems = new LazyLoadingObservableList<>();
+//    listViewReferenceBasesItems = new CombinedLazyLoadingObservableList<>();
+    lstvwReferences.setItems(listViewReferenceBasesItems);
 
-    lstvwReferences.setItems(sortedFilteredReferenceBases);
+//    filteredReferenceBases = new FilteredList<>(listViewReferenceBasesItems, referenceBase -> true);
+//    sortedFilteredReferenceBases = new SortedList<>(filteredReferenceBases, referenceBaseComparator);
+//    lstvwReferences.setItems(sortedFilteredReferenceBases);
 
     // TODO: - check if DeepThough != null  - react on changes to SeriesTitles etc. - Make ListView items searchable
     if(Application.getDeepThought() != null)
@@ -215,12 +218,13 @@ public class EntryReferenceControl extends VBox {
   }
 
   protected void filterReferenceBases() {
-    if(filterReferenceBasesSearch != null)
+    if(filterReferenceBasesSearch != null && filterReferenceBasesSearch.isCompleted() == false)
       filterReferenceBasesSearch.interrupt();
 
     Date startTime = new Date();
     filterReferenceBasesSearch = new Search<>(txtfldSearchForReference.getText(), (results) -> {
-      filteredReferenceBases.setPredicate((referenceBase) -> results.contains(referenceBase));
+//      filteredReferenceBases.setPredicate((referenceBase) -> results.contains(referenceBase));
+      listViewReferenceBasesItems.setUnderlyingCollection(results);
     });
     Application.getSearchEngine().filterReferenceBases(filterReferenceBasesSearch);
   }
@@ -431,14 +435,18 @@ public class EntryReferenceControl extends VBox {
   }
 
   protected void resetListViewReferenceBasesItems(DeepThought deepThought) {
-    listViewReferenceBasesItems.clear();
-
-    listViewReferenceBasesItems.addAll(deepThought.getSeriesTitles());
+//    listViewReferenceBasesItems.clear();
+//
+//    listViewReferenceBasesItems.addAll(deepThought.getSeriesTitles());
 //    listViewReferenceBasesItems.addAll(deepThought.getReferences());
-    for(Reference reference : deepThought.getReferences()) {
-      listViewReferenceBasesItems.add(reference);
-      listViewReferenceBasesItems.addAll(reference.getSubDivisions());
-    }
+////    for(Reference reference : deepThought.getReferences()) {
+////      listViewReferenceBasesItems.add(reference);
+////      listViewReferenceBasesItems.addAll(reference.getSubDivisions());
+////    }
+//    listViewReferenceBasesItems.addAll(deepThought.getReferenceSubDivisions());
+
+    listViewReferenceBasesItems.setUnderlyingCollection(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles(), Application.getDeepThought().getReferences(),
+        Application.getDeepThought().getReferenceSubDivisions()));
 
     filterReferenceBases();
   }

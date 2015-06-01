@@ -1,15 +1,16 @@
 package net.deepthought.controller;
 
+import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileNameSuggestion;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileNameSuggestion;
+import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
-import net.deepthought.util.enums.ExistingFileHandling;
-import net.deepthought.util.listener.FileOperationListener;
+import net.deepthought.util.file.enums.ExistingFileHandling;
+import net.deepthought.util.file.listener.FileOperationListener;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
@@ -259,6 +260,10 @@ public class EditFileDialogController extends ChildWindowsController implements 
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
     saveEditedFields();
+
+    if(file.isPersisted() == false)
+      Application.getDeepThought().addFile(file);
+
     closeDialog();
   }
 
@@ -280,14 +285,6 @@ public class EditFileDialogController extends ChildWindowsController implements 
       if(rdbtnFileOrUrl.isSelected())
         file.setUriString(txtfldFileLocation.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileFileLocation);
-
-      if(cmbxLocalFileLinkOptions.isDisabled() == false) {
-        FileLinkOptions fileLinkOption = cmbxLocalFileLinkOptions.getSelectionModel().getSelectedItem();
-        if(fileLinkOption == FileLinkOptions.CopyToDataFolder)
-          copyFileToDataFolder();
-        else if(fileLinkOption == FileLinkOptions.MoveToDataFolder)
-          moveFileToDataFolder();
-      }
     }
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileFolderLocation)) {
       if(rdbtnFolder.isSelected())
@@ -295,9 +292,18 @@ public class EditFileDialogController extends ChildWindowsController implements 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileFolderLocation);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileName)) {
+//    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileName)) {
+    if(txtfldFileName.getText().equals(file.getName()) == false) {
       file.setName(txtfldFileName.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileName);
+    }
+
+    if(cmbxLocalFileLinkOptions.isDisabled() == false) {
+      FileLinkOptions fileLinkOption = cmbxLocalFileLinkOptions.getSelectionModel().getSelectedItem();
+      if(fileLinkOption == FileLinkOptions.CopyToDataFolder)
+        copyFileToDataFolder();
+      else if(fileLinkOption == FileLinkOptions.MoveToDataFolder)
+        moveFileToDataFolder();
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileNotes)) {
@@ -329,7 +335,8 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
       @Override
       public void fileOperationDone(boolean successful, File destinationFile) {
-
+        if(successful)
+          file = new FileLink(destinationFile.getPath());
       }
     });
   }
@@ -357,7 +364,8 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
       @Override
       public void fileOperationDone(boolean successful, File destinationFile) {
-
+        if(successful)
+          file = new FileLink(destinationFile.getPath());
       }
     });
   }

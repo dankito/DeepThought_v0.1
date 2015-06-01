@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+dependencies {
+    compile project(':DeepThoughtLib')
+    compile 'com.github.axet:wget:1.2.12'
+
+    testCompile 'junit:junit:4.8.1'
+    // to include test helper classes from DeepThoughtLib
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
+    testCompile project(':JavaSeOrmLiteEntityManager')
+}

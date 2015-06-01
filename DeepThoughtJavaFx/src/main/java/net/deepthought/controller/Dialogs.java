@@ -13,6 +13,7 @@ import net.deepthought.util.Localization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
@@ -87,6 +88,13 @@ public class Dialogs {
   }
 
   public static void showEditEntryDialog(final Entry entry, final ChildWindowsControllerListener listener) {
+    if(Platform.isFxApplicationThread())
+      showEditEntryDialogOnUiThread(entry, listener);
+    else
+      Platform.runLater(() -> showEditEntryDialogOnUiThread(entry, listener));
+  }
+
+  protected static void showEditEntryDialogOnUiThread(final Entry entry, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditEntryDialog.fxml");

@@ -20,7 +20,7 @@ public class NoteType extends ExtensibleEnumeration {
   private static final long serialVersionUID = 9127576069157935076L;
 
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "type"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "type"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)
   protected Set<Note> notes = new HashSet<>();
 
 
@@ -69,7 +69,7 @@ public class NoteType extends ExtensibleEnumeration {
   protected static NoteType defaultNoteType = null;
 
   public static NoteType getDefaultNoteType() {
-    if(defaultNoteType == null) {
+    if(defaultNoteType == null && Application.getDeepThought() != null) { // TODO: bad solution as then Note's NoteType stays null
       for(NoteType noteType : Application.getDeepThought().getNoteTypes()) {
         if("note.type.unset".equals(noteType.nameResourceKey)) {
           defaultNoteType = noteType;

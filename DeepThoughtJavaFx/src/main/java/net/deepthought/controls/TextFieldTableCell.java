@@ -21,6 +21,8 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
 
   protected TextField textField;
 
+  protected boolean editingStarted = false;
+
 
   public TextFieldTableCell() {
     tableRowProperty().addListener((observable, oldValue, newValue) -> {
@@ -50,10 +52,16 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
   public void startEdit() {
     super.startEdit();
 
+    if(editingStarted == true) // there must be a Bug in JavaFX: startEdit() is called twice, on real start and on committing -> filter out second call
+      return;
+
+    editingStarted = true;
     if (textField == null) {
       createTextField();
     }
-    textField.setText(getItemEditingTextFieldText());
+    if(isEmpty() == false)
+      textField.setText(getItemEditingTextFieldText());
+    log.debug("startEdit() has been called, textField's text has been set to {}; isEmpty = {}", textField.getText(), isEmpty());
 
     showCellInEditingState();
 
@@ -65,12 +73,14 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
   public void cancelEdit() {
     super.cancelEdit();
 
+    editingStarted = false;
     showCellInNotEditingState();
   }
 
   @Override
   public void commitEdit(String newValue) {
     super.commitEdit(newValue);
+    editingStarted = false;
   }
 
   @Override
@@ -108,7 +118,6 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
   protected void createTextField() {
     textField = new TextField(getItemEditingTextFieldText());
     textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-
       @Override
       public void handle(KeyEvent t) {
         if (t.getCode() == KeyCode.ENTER) {

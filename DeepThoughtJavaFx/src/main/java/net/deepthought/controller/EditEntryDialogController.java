@@ -12,6 +12,7 @@ import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.file.FileRootTreeItem;
 import net.deepthought.controls.file.FileTreeTableCell;
+import net.deepthought.controls.html.DeepThoughtHTMLEditor;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
@@ -126,11 +127,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected TitledPane ttldpnAbstract;
   @FXML
   protected TextArea txtarAbstract;
+  @FXML
+  protected HTMLEditor htmledAbstract;
 
   @FXML
   protected TitledPane ttldpnContent;
-  @FXML
-  protected TextArea txtarContent;
   @FXML
   protected HTMLEditor htmledContent;
 
@@ -209,9 +210,15 @@ public class EditEntryDialogController extends ChildWindowsController implements
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract));
+    htmledAbstract = new DeepThoughtHTMLEditor();
+    ttldpnAbstract.setContent(htmledAbstract);
+    FXUtils.addHtmlEditorTextChangedListener(htmledAbstract, editor -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract);
+    });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
+    htmledContent = new DeepThoughtHTMLEditor();
+    ttldpnContent.setContent(htmledContent);
 //    txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
     FXUtils.addHtmlEditorTextChangedListener(htmledContent, editor -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
@@ -301,7 +308,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //    txtfldTitle.setText(entry.getTitle());
 
 
-    txtarAbstract.setText(entry.getAbstract());
+    htmledAbstract.setHtmlText(entry.getAbstract());
 
     htmledContent.setHtmlText(entry.getContent());
     // TODO: check which Content format Content has
@@ -338,6 +345,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
+    if(entry.getReference() != null && entry.getReference().isPersisted() == false)
+      Application.getDeepThought().addReference(entry.getReference());
+
+    if(entry.getReferenceSubDivision() != null && entry.getReferenceSubDivision().isPersisted() == false)
+      Application.getDeepThought().addReferenceSubDivision(entry.getReferenceSubDivision());
+
     if(entry.isPersisted() == false) // a new entry
       Application.getDeepThought().addEntry(entry);
 
@@ -360,12 +373,17 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
-      entry.setAbstract(txtarAbstract.getText());
+      if(FXUtils.hasHtmlEditorDefaultText(htmledAbstract)) {
+        if(StringUtils.isNotNullOrEmpty(entry.getAbstract()))
+          entry.setAbstract("");
+      }
+      else
+        entry.setAbstract(htmledAbstract.getHtmlText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
-      if(FXUtils.HtmlEditorDefaultText.equals(htmledContent.getHtmlText())) {
+      if(FXUtils.hasHtmlEditorDefaultText(htmledContent)) {
         if(StringUtils.isNotNullOrEmpty(entry.getContent()))
           entry.setContent("");
       }
@@ -473,7 +491,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     if(ttldpnFiles.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
 
-    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
   }
 
   protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
@@ -508,7 +526,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     return entry;
   }
 
-  public void setWindowStageAndEntry(Stage windowStage, Entry entry) {
+  public void setWindowStageAndEntry(final Stage windowStage, Entry entry) {
     super.setWindowStage(windowStage);
     this.entry = entry;
 
@@ -525,7 +543,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
 
-    FXUtils.focusNode(txtarAbstract);
+    // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
+//    FXUtils.focusNode(htmledContent);
   }
 
   protected void showContextHelpForTarget(MouseEvent event) {

@@ -4,7 +4,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.db.UserDataEntity;
 
 import java.util.Collection;
 import java.util.Set;
@@ -14,12 +13,7 @@ import java.util.Set;
  */
 public interface ISearchEngine {
 
-  public void indexEntity(UserDataEntity entity);
-//
-//  public void entryUpdated(Entry entry);
-
-  public void updateIndexForEntity(UserDataEntity entity, String propertyName);
-
+  public void getEntriesWithoutTags(SearchCompletedListener<Entry> listener);
 
   public void filterTags(Search<Tag> search);
 

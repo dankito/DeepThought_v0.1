@@ -3,6 +3,7 @@ package net.deepthought.data.persistence;
 import net.deepthought.data.persistence.db.BaseEntity;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ public interface IEntityManager {
   public boolean deleteEntity(BaseEntity entity);
 
   public <T extends BaseEntity> T getEntityById(Class<T> type, Long id);
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids);
   public <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type);
 
   /**
@@ -32,6 +34,8 @@ public interface IEntityManager {
    * @throws Exception
    */
   public void resolveAllLazyRelations(BaseEntity entity) throws Exception;
+
+  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException;
 
   public List doNativeQuery(String query) throws SQLException;
 

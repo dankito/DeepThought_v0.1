@@ -69,6 +69,15 @@ public class Language extends ExtensibleEnumeration {
     return defaultLanguage;
   }
 
+  public static Language findByLanguageKey(String languageKey) {
+    for(Language language : Application.getDeepThought().getLanguages()) {
+      if(languageKey.equals(language.getLanguageKey()))
+        return language;
+    }
+
+    return LanguageWithThatNameNotFound;
+  }
+
   public static Language findByNameResourceKey(String nameResourceKey) {
     for(Language language : Application.getDeepThought().getLanguages()) {
       if(nameResourceKey.equals(language.nameResourceKey))

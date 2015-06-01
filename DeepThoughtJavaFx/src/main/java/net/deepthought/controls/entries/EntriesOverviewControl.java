@@ -7,29 +7,34 @@ import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
+import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
+import net.deepthought.data.model.ui.AllEntriesSystemTag;
+import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
+import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.FilterEntriesSearch;
-import net.deepthought.data.search.Search;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -69,7 +74,10 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
   protected DeepThought deepThought = null;
 
-  protected ObservableList<Entry> tableViewEntriesItems = null;
+  protected Collection<Entry> unfilteredCurrentEntriesToShow = new ArrayList<>();
+
+//  protected ObservableList<Entry> tableViewEntriesItems = null;
+  protected LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
   protected FilteredList<Entry> filteredEntries = null;
   protected SortedList<Entry> sortedFilteredEntries = null;
 //  protected Entry selectedEntryInTableViewEntries = null;
@@ -156,8 +164,11 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
 
-      if (deepThought.getSettings().getLastViewedEntry() != null)
-        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
+      if (deepThought.getSettings().getLastViewedEntry() != null) {
+        // no, don't set Entry, as TableView then iterates through all Entries in Table to find selected Entry -> would eventually load a lot of Entries from Database
+//        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
+        selectedEntryChanged(deepThought.getSettings().getLastViewedEntry());
+      }
     }
   }
 
@@ -185,12 +196,17 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
 
-    tableViewEntriesItems = tblvwEntries.getItems();
-    filteredEntries = new FilteredList<>(tableViewEntriesItems, entry -> true);
-    sortedFilteredEntries = new SortedList<Entry>(filteredEntries, entriesComparator);
-    tblvwEntries.setItems(sortedFilteredEntries);
+    tableViewEntriesItems = new LazyLoadingObservableList<>();
+//    filteredEntries = new FilteredList<>(tblvwEntries.getItems(), entry -> true);
+//    sortedFilteredEntries = new SortedList<Entry>(tblvwEntries.getItems(), entriesComparator);
+    tblvwEntries.setItems(tableViewEntriesItems);
 
-    sortedFilteredEntries.comparatorProperty().bind(tblvwEntries.comparatorProperty());
+//    tableViewEntriesItems = tblvwEntries.getItems();
+//    filteredEntries = new FilteredList<>(tableViewEntriesItems, entry -> true);
+//    sortedFilteredEntries = new SortedList<Entry>(filteredEntries, entriesComparator);
+//    tblvwEntries.setItems(sortedFilteredEntries);
+
+//    sortedFilteredEntries.comparatorProperty().bind(tblvwEntries.comparatorProperty());
 
     tblvwEntries.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tblvwEntries.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Entry>() {
@@ -275,11 +291,24 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
 
   public void showEntries(Collection<Entry> entries) {
-    tableViewEntriesItems.clear();
-    tableViewEntriesItems.addAll(entries);
+    this.unfilteredCurrentEntriesToShow = entries;
+
+//    selectedEntryChanged(null);
+    tblvwEntries.getSelectionModel().clearSelection();
+
+//    tableViewEntriesItems.clear();
+//    tableViewEntriesItems.addAll(entries);
+    tableViewEntriesItems.setUnderlyingCollection(entries);
   }
 
-  protected void selectedEntryChanged(Entry selectedEntry) {
+  protected void selectedEntryChanged(final Entry selectedEntry) {
+    if(Platform.isFxApplicationThread())
+      selectedEntryChangedOnUiThread(selectedEntry);
+    else
+      Platform.runLater(() -> selectedEntryChangedOnUiThread(selectedEntry));
+  }
+
+  protected void selectedEntryChangedOnUiThread(Entry selectedEntry) {
     log.debug("Selected Entry changed to {}", selectedEntry);
 
     if(deepThought.getSettings().getLastViewedEntry() != null)
@@ -319,17 +348,17 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     }
   }
 
-  protected void addAndSelectEntry(Entry newEntry) {
-    tableViewEntriesItems.add(0, newEntry);
-    selectEntry(newEntry);
-  }
-
-  private void selectEntry(Entry entry) {
-    tblvwEntries.getSelectionModel().select(entry);
-    deepThought.getSettings().setLastViewedEntry(entry); // TODO: can this ever be not already set to this Entry?
-
-    txtfldEntryAbstract.requestFocus();
-  }
+//  protected void addAndSelectEntry(Entry newEntry) {
+//    tableViewEntriesItems.add(0, newEntry);
+//    selectEntry(newEntry);
+//  }
+//
+//  private void selectEntry(Entry entry) {
+//    tblvwEntries.getSelectionModel().select(entry);
+//    deepThought.getSettings().setLastViewedEntry(entry); // TODO: can this ever be not already set to this Entry?
+//
+//    txtfldEntryAbstract.requestFocus();
+//  }
 
   @FXML
   public void handleButtonAddEntryAction(ActionEvent actionEvent) {
@@ -529,39 +558,57 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void filterEntries() {
-    if(filterEntriesSearch != null)
+    if(filterEntriesSearch != null && filterEntriesSearch.isCompleted() == false)
       filterEntriesSearch.interrupt();
 
-    filterEntriesSearch = new FilterEntriesSearch(txtfldEntriesQuickFilter.getText(), tglbtnEntriesQuickFilterContent.isSelected(), tglbtnEntriesQuickFilterAbstract.isSelected(), (results) -> {
-      filteredEntries.setPredicate((entry) -> results.contains(entry));
-    });
-    Application.getSearchEngine().filterEntries(filterEntriesSearch);
+    String filterTerm = txtfldEntriesQuickFilter.getText();
+    Tag selectedTag = deepThought.getSettings().getLastViewedTag();
+
+    if(StringUtils.isNullOrEmpty(filterTerm)) // no filter applied -> show all entries
+      tableViewEntriesItems.setUnderlyingCollection(unfilteredCurrentEntriesToShow);
+    else {
+      filterEntriesSearch = new FilterEntriesSearch(txtfldEntriesQuickFilter.getText(), tglbtnEntriesQuickFilterContent.isSelected(), tglbtnEntriesQuickFilterAbstract.isSelected(),
+          /*unfilteredCurrentEntriesToShow,*/ (results) -> {
+        Platform.runLater(() -> {
+          tblvwEntries.getSelectionModel().clearSelection();
+          tableViewEntriesItems.setUnderlyingCollection(results);
+        });
+      });
+
+      if(selectedTag instanceof EntriesWithoutTagsSystemTag)
+        filterEntriesSearch.setFilterOnlyEntriesWithoutTags(true);
+      else if(selectedTag instanceof SystemTag == false) {
+        filterEntriesSearch.setEntriesToFilter(unfilteredCurrentEntriesToShow);
+      }
+
+      Application.getSearchEngine().filterEntries(filterEntriesSearch);
+    }
 
 //    filterEntriesManually();
   }
 
-  protected void filterEntriesManually() {
-    log.debug("Going to filter Entries ...");
-    String filter = txtfldEntriesQuickFilter.getText();
-    String lowerCaseFilter = filter.toLowerCase(); // TODO: can txtfldEntriesQuickFilter.getText() ever be null?
-
-    filteredEntries.setPredicate((entry) -> {
-      // If filter text is empty, display all Entries.
-      if (filter == null || filter.isEmpty()) {
-        return true;
-      }
-
-      if(tglbtnEntriesQuickFilterAbstract.isSelected() && entry.getAbstract().toLowerCase().contains(lowerCaseFilter)) {
-        return true; // Filter matches Abstract
-      }
-      else if (tglbtnEntriesQuickFilterContent.isSelected() && entry.getContent().toLowerCase().contains(lowerCaseFilter)) {
-        return true; // Filter matches Content
-      }
-      return false; // Does not match.
-    });
-
-    log.debug("Filtering Entries done");
-  }
+//  protected void filterEntriesManually() {
+//    log.debug("Going to filter Entries ...");
+//    String filter = txtfldEntriesQuickFilter.getText();
+//    String lowerCaseFilter = filter.toLowerCase(); // TODO: can txtfldEntriesQuickFilter.getText() ever be null?
+//
+//    filteredEntries.setPredicate((entry) -> {
+//      // If filter text is empty, display all Entries.
+//      if (filter == null || filter.isEmpty()) {
+//        return true;
+//      }
+//
+//      if(tglbtnEntriesQuickFilterAbstract.isSelected() && entry.getAbstract().toLowerCase().contains(lowerCaseFilter)) {
+//        return true; // Filter matches Abstract
+//      }
+//      else if (tglbtnEntriesQuickFilterContent.isSelected() && entry.getContent().toLowerCase().contains(lowerCaseFilter)) {
+//        return true; // Filter matches Content
+//      }
+//      return false; // Does not match.
+//    });
+//
+//    log.debug("Filtering Entries done");
+//  }
 
 
   protected EntityListener entryListener = new EntityListener() {

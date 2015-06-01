@@ -1,10 +1,12 @@
 package net.deepthought.data.search;
 
 import net.deepthought.Application;
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.enums.Language;
 import net.deepthought.language.ILanguageDetector;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.ar.ArabicAnalyzer;
 import org.apache.lucene.analysis.bg.BulgarianAnalyzer;
 import org.apache.lucene.analysis.cjk.CJKAnalyzer;
@@ -30,14 +32,15 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.sv.SwedishAnalyzer;
 import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
+import org.apache.lucene.util.Version;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by ganymed on 16/04/15.
- */
-public class DeepThoughtAnalyzer extends DelegatingAnalyzerWrapper {
+* Created by ganymed on 16/04/15.
+*/
+public class DeepThoughtAnalyzer extends AnalyzerWrapper {
 
   protected final Analyzer defaultAnalyzer;
 
@@ -46,99 +49,103 @@ public class DeepThoughtAnalyzer extends DelegatingAnalyzerWrapper {
   protected final Analyzer defaultLanguageDependentFieldAnalyzer;
   protected Analyzer currentLanguageAnalyzer = null;
 
-  protected Map<String, Analyzer> cachedLanguageAnalyzers = new HashMap<>();
+  protected Map<Language, Analyzer> cachedLanguageAnalyzers = new HashMap<>();
 
 
   public DeepThoughtAnalyzer() {
     super(PER_FIELD_REUSE_STRATEGY);
-    defaultAnalyzer = new StandardAnalyzer();
-    longFieldAnalyzer = new StandardAnalyzer();
-    defaultLanguageDependentFieldAnalyzer = new StandardAnalyzer();
+    defaultAnalyzer = new StandardAnalyzer(Version.LUCENE_47);
+    longFieldAnalyzer = new StandardAnalyzer(Version.LUCENE_47);
+    defaultLanguageDependentFieldAnalyzer = new StandardAnalyzer(Version.LUCENE_47);
     currentLanguageAnalyzer = defaultLanguageDependentFieldAnalyzer;
   }
 
   @Override
   protected Analyzer getWrappedAnalyzer(String fieldName) {
-    // only Entry's Content and Abstract are analyzed based on current language (so that stop words get removed and words are being stemmed)
-    if(FieldName.Content.equals(fieldName) || FieldName.Abstract.equals(fieldName))
+    // only Entry's EntryContent and EntryAbstract are analyzed based on current language (so that stop words get removed and words are being stemmed)
+    // this is a bit problematic: as we only be the field name, but not the field value, we cannot determine the language of Abstract and Content directly
+    if(FieldName.EntryContent.equals(fieldName) || FieldName.EntryAbstract.equals(fieldName))
       return currentLanguageAnalyzer;
-    else if(FieldName.TagsIds.equals(fieldName))
+    else if(FieldName.EntryTagsIds.equals(fieldName))
       return longFieldAnalyzer;
     return defaultAnalyzer;
   }
 
   protected Analyzer getAnalyzerForTextLanguage(String text) {
-    String language = Application.getLanguageDetector().detectLanguageOfText(text);
+    Language language = Application.getLanguageDetector().detectLanguageOfText(text);
     if(language == ILanguageDetector.CouldNotDetectLanguage)
       return defaultAnalyzer;
     return getAnalyzerForLanguage(language);
   }
 
-  protected Analyzer getAnalyzerForLanguage(String language) {
+  protected Analyzer getAnalyzerForLanguage(Language language) {
     if(cachedLanguageAnalyzers.containsKey(language) == false)
       cachedLanguageAnalyzers.put(language, createAnalyzerForLanguage(language));
 
     return cachedLanguageAnalyzers.get(language);
   }
 
-  protected Analyzer createAnalyzerForLanguage(String language) {
-    switch(language) {
+  protected Analyzer createAnalyzerForLanguage(Language language) {
+    if(language == null || language == ILanguageDetector.CouldNotDetectLanguage)
+      return defaultAnalyzer;
+
+    switch(language.getLanguageKey()) {
       case "en":
-        return new EnglishAnalyzer();
+        return new EnglishAnalyzer(Version.LUCENE_47);
       case "es":
-        return new SpanishAnalyzer();
+        return new SpanishAnalyzer(Version.LUCENE_47);
       case "fr":
-        return new FrenchAnalyzer();
+        return new FrenchAnalyzer(Version.LUCENE_47);
       case "it":
-        return new ItalianAnalyzer();
+        return new ItalianAnalyzer(Version.LUCENE_47);
       case "de":
-        return new GermanAnalyzer();
+        return new GermanAnalyzer(Version.LUCENE_47);
       case "ar":
-        return new ArabicAnalyzer();
+        return new ArabicAnalyzer(Version.LUCENE_47);
       case "bg":
-        return new BulgarianAnalyzer();
+        return new BulgarianAnalyzer(Version.LUCENE_47);
       case "br": // Brazil
-        return new PortugueseAnalyzer();
+        return new PortugueseAnalyzer(Version.LUCENE_47);
       case "cs":
-        return new CzechAnalyzer();
+        return new CzechAnalyzer(Version.LUCENE_47);
       case "da":
-        return new DanishAnalyzer();
+        return new DanishAnalyzer(Version.LUCENE_47);
       case "el":
-        return new GreekAnalyzer();
+        return new GreekAnalyzer(Version.LUCENE_47);
       case "fa":
-        return new PersianAnalyzer();
+        return new PersianAnalyzer(Version.LUCENE_47);
       case "fi":
-        return new FinnishAnalyzer();
+        return new FinnishAnalyzer(Version.LUCENE_47);
       case "hi":
-        return new HindiAnalyzer();
+        return new HindiAnalyzer(Version.LUCENE_47);
       case "hu":
-        return new HungarianAnalyzer();
+        return new HungarianAnalyzer(Version.LUCENE_47);
       case "id":
-        return new IndonesianAnalyzer();
+        return new IndonesianAnalyzer(Version.LUCENE_47);
       case "ja": // Japanese
-        return new CJKAnalyzer();
+        return new CJKAnalyzer(Version.LUCENE_47);
       case "ko": // Korean
-        return new CJKAnalyzer();
+        return new CJKAnalyzer(Version.LUCENE_47);
       case "nl":
-        return new DutchAnalyzer();
+        return new DutchAnalyzer(Version.LUCENE_47);
       case "no":
-        return new NorwegianAnalyzer();
+        return new NorwegianAnalyzer(Version.LUCENE_47);
       case "pt":
-        return new PortugueseAnalyzer();
+        return new PortugueseAnalyzer(Version.LUCENE_47);
       case "ro":
-        return new RomanianAnalyzer();
+        return new RomanianAnalyzer(Version.LUCENE_47);
       case "ru":
-        return new RussianAnalyzer();
+        return new RussianAnalyzer(Version.LUCENE_47);
       case "sv":
-        return new SwedishAnalyzer();
+        return new SwedishAnalyzer(Version.LUCENE_47);
       case "th":
-        return new ThaiAnalyzer();
+        return new ThaiAnalyzer(Version.LUCENE_47);
       case "tr":
-        return new TurkishAnalyzer();
+        return new TurkishAnalyzer(Version.LUCENE_47);
       case "zh-cn": // Simplified Chinese
-        return new CJKAnalyzer();
+        return new CJKAnalyzer(Version.LUCENE_47);
       case "zh-tw": // Traditional Chinese
-        return new CJKAnalyzer();
+        return new CJKAnalyzer(Version.LUCENE_47);
     }
 
     return defaultAnalyzer;
@@ -161,8 +168,15 @@ public class DeepThoughtAnalyzer extends DelegatingAnalyzerWrapper {
     this.currentLanguageAnalyzer = currentLanguageAnalyzer;
   }
 
-  public void setNextLanguageDependentFieldValueToBeAnalyzed(String languageDependentFieldValue) {
-    setCurrentLanguageAnalyzer(getAnalyzerForTextLanguage(languageDependentFieldValue));
+  /**
+   * <p>
+   *   This is a bit problematic: as we only be the field name, but not the field value, we cannot determine the language of Abstract and Content directly
+   *   So before an Entry's Abstract and Content can be analyzed, you have to tell DeepThoughtAnalyzer explicitly which Entry is going to be indexed next.
+   * </p>
+   * @param nextEntryToBeAnalyzed
+   */
+  public void setNextEntryToBeAnalyzed(Entry nextEntryToBeAnalyzed) {
+    setCurrentLanguageAnalyzer(getAnalyzerForTextLanguage(nextEntryToBeAnalyzed.getAbstractAsPlainText() + " " + nextEntryToBeAnalyzed.getContentAsPlainText()));
   }
 
 }

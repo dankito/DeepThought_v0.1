@@ -23,6 +23,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -58,9 +60,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Column(name = TableConfig.ReferenceIssueOrPublishingDateColumnName)
   protected String issueOrPublishingDate;
 
-//  @Column(name = TableConfig.ReferencePublishingDateColumnName)
-//  @Temporal(TemporalType.TIMESTAMP)
-  protected transient Date publishingDate; // SQLite needs this, can't handle null dates
+  @Column(name = TableConfig.ReferencePublishingDateColumnName)
+  @Temporal(TemporalType.TIMESTAMP)
+  protected Date publishingDate; // SQLite needs this, can't handle null dates
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceDeepThoughtJoinColumnName)
@@ -212,7 +214,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     Object previousValue = this.issueOrPublishingDate;
     this.issueOrPublishingDate = issueOrPublishingDate;
     preview = null;
-    publishingDate = null;
+    setPublishingDate(tryToParseIssueOrPublishingDateToDate());
     callPropertyChangedListeners(TableConfig.ReferenceIssueOrPublishingDateColumnName, previousValue, issueOrPublishingDate);
   }
 
@@ -220,6 +222,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     if(publishingDate == null)
       publishingDate = tryToParseIssueOrPublishingDateToDate();
     return publishingDate;
+  }
+
+  protected void setPublishingDate(Date publishingDate) {
+    this.publishingDate = publishingDate;
   }
 
   @Override

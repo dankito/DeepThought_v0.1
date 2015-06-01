@@ -2,6 +2,7 @@ package net.deepthought.controls;
 
 import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,18 @@ public class FXUtils {
         .forEach(div ->  div.setMouseTransparent(!show) );
   }
 
+
+  public static boolean hasHtmlEditorDefaultText(HTMLEditor htmlEditor) {
+    return FXUtils.HtmlEditorDefaultText.equals(htmlEditor.getHtmlText());
+  }
+
+  public static boolean htmlTextIsNullOrEmptyOrHasHtmlEditorDefaultText(HTMLEditor htmlEditor) {
+    return htmlTextIsNullOrEmptyOrHasHtmlEditorDefaultText(htmlEditor.getHtmlText());
+  }
+
+  public static boolean htmlTextIsNullOrEmptyOrHasHtmlEditorDefaultText(String htmlText) {
+    return StringUtils.isNullOrEmpty(htmlText) || FXUtils.HtmlEditorDefaultText.equals(htmlText);
+  }
 
   public static void addHtmlEditorTextChangedListener(final HTMLEditor editor, final HtmlEditorTextChangedEvent textChangedEvent) {
     editor.setOnKeyReleased(new EventHandler<KeyEvent>() {

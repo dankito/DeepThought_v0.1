@@ -9,6 +9,7 @@ gradle
 
 /docs
 /data
+/plugins
 /res
 **/DeepThoughtFx.properties
 

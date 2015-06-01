@@ -47,7 +47,7 @@ public class CreateBigIndex {
 
   @Before
   public void setup() throws SQLException {
-    ApplicationConfiguration applicationConfiguration = new TestApplicationConfiguration("data/tests/big_data/");
+    ApplicationConfiguration applicationConfiguration = new TestApplicationConfiguration("data/tests/big_data_new/");
 
     Application.instantiate(applicationConfiguration, new DefaultDependencyResolver() {
       @Override
@@ -69,7 +69,7 @@ public class CreateBigIndex {
     entityManager = Application.getEntityManager();
 
     searchEngine = (LuceneSearchEngine)Application.getSearchEngine();
-    searchEngine.deleteIndex();
+//    searchEngine.deleteIndex();
   }
 
   @After
@@ -82,9 +82,9 @@ public class CreateBigIndex {
 
   @Test
   public void createBigIndex() {
-    createRandomTagsCategoriesPersonsAndReferences();
+//    importEntriesFromDankitoSchneisenImWald();
     indexWikipediaArticles();
-    importEntriesFromDankitoSchneisenImWald();
+//    createRandomTagsCategoriesPersonsAndReferences();
   }
 
   protected void createRandomTagsCategoriesPersonsAndReferences() {

@@ -18,7 +18,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by ganymed on 17/03/15.
@@ -84,7 +87,18 @@ public class LuceneSearchEngineDatabaseTest {
     searchEngine.indexEntity(entryWithTags2);
     searchEngine.indexEntity(entryWithoutTags3);
 
-    Collection<Entry> entriesWithoutTags = searchEngine.getEntriesWithoutTags();
+    final List<Entry> entriesWithoutTags = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        entriesWithoutTags.addAll(results);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
     Assert.assertEquals(3, entriesWithoutTags.size());
 
     Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1));

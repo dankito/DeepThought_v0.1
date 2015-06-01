@@ -8,6 +8,8 @@ import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.SettingsBase;
 import net.deepthought.data.model.settings.enums.Setting;
+import net.deepthought.data.model.ui.AllEntriesSystemTag;
+import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
@@ -18,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +45,24 @@ import javax.persistence.Transient;
 public class DeepThought extends UserDataEntity implements Serializable {
 
   private static final long serialVersionUID = 441616313532856392L;
+
+
+  protected transient AllEntriesSystemTag allEntriesSystemTag = null;
+
+  protected transient EntriesWithoutTagsSystemTag entriesWithoutTagsSystemTag = null;
+
+  public AllEntriesSystemTag AllEntriesSystemTag() {
+    if(allEntriesSystemTag == null)
+      allEntriesSystemTag = new AllEntriesSystemTag(this);
+    return allEntriesSystemTag;
+  }
+
+  public final EntriesWithoutTagsSystemTag EntriesWithoutTagsSystemTag() {
+    if(entriesWithoutTagsSystemTag == null)
+      entriesWithoutTagsSystemTag = new EntriesWithoutTagsSystemTag(this);
+    return entriesWithoutTagsSystemTag;
+  }
+
 
   private final static Logger log = LoggerFactory.getLogger(DeepThought.class);
 
@@ -72,10 +91,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   protected Set<Tag> tags = new HashSet<>();
 
-  protected transient List<Tag> sortedTags = null;
+  protected transient Collection<Tag> sortedTags = null;
 
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @OrderBy("lastName, firstName")
   protected Set<Person> persons = new HashSet<>();
 
   protected transient SortedSet<Person> personsSorted = null;
@@ -261,8 +281,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   public Collection<Tag> getSortedTags() {
-    if(sortedTags == null)
-      sortedTags = new ArrayList<>(tags);
+    if(sortedTags == null) {
+      sortedTags = new TreeSet<>(tags);
+    }
+
     return sortedTags;
   }
 
@@ -270,8 +292,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(tags.add(tag)) {
       tag.deepThought = this;
 
-      getSortedTags().add(tag);
-      Collections.sort(sortedTags);
+      if(sortedTags != null)
+        sortedTags.add(tag);
 
       callEntityAddedListeners(tags, tag);
       return true;
@@ -287,8 +309,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       for(Entry entry : new ArrayList<>(tag.getEntries()))
         entry.removeTag(tag);
 
-      getSortedTags().remove(tag);
-//      Collections.sort(sortedTags); // why sorting, they should already be in correct order
+      if(sortedTags != null)
+        sortedTags.remove(tag);
 
       callEntityRemovedListeners(tags, tag);
       return true;
@@ -469,6 +491,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeSeriesTitle(SeriesTitle seriesTitle) {
     if(seriesTitles.remove(seriesTitle)) {
+      for(Entry entry : new ArrayList<>(seriesTitle.getEntries()))
+        entry.setSeries(null);
       for(Reference reference : new ArrayList<>(seriesTitle.getSerialParts()))
         reference.setSeries(null);
 
@@ -511,6 +535,14 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeReference(Reference reference) {
     if(references.remove(reference)) {
+      for(Entry entry : new ArrayList<>(reference.getEntries()))
+        entry.setSeries(null);
+
+      if(reference.getSeries() != null)
+        reference.setSeries(null);
+      for(ReferenceSubDivision subDivision : new ArrayList<>(reference.getSubDivisions()))
+        reference.removeSubDivision(subDivision);
+
       referencesSorted = null;
       reference.setSeries(null);
       reference.deepThought = null;
@@ -549,6 +581,16 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeReferenceSubDivision(ReferenceSubDivision subDivision) {
     if(referenceSubDivisions.remove(subDivision)) {
+      for(Entry entry : new ArrayList<>(subDivision.getEntries()))
+        entry.setSeries(null);
+
+      if(subDivision.getReference() != null)
+        subDivision.getReference().removeSubDivision(subDivision);
+      if(subDivision.getParentSubDivision() != null)
+        subDivision.getParentSubDivision().removeSubDivision(subDivision);
+      for(ReferenceSubDivision subSubDivision : new ArrayList<>(subDivision.getSubDivisions()))
+        removeReferenceSubDivision(subSubDivision);
+
       subDivision.deepThought = null;
 
       callEntityRemovedListeners(referenceSubDivisions, subDivision);
@@ -683,6 +725,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public void lazyLoadedEntityMapped(BaseEntity entity) {
     log.info("Lazy loaded Entity mapped: {}", entity);
     entity.addEntityListener(subEntitiesListener);
+//    try { throw new Exception("Show me the Call Stack"); } catch (Exception ex) { log.error("", ex); }
   }
 
   protected transient EntityListener subEntitiesListener = new EntityListener() {

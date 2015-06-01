@@ -14,9 +14,15 @@ import java.util.List;
  */
 public interface IBackupManager {
 
-  public void createBackupsForAllRegisteredBackupFileServices();
 
-  public Collection<IBackupFileService> getAvailableBackupFileServices();
+  public Collection<IBackupFileService> getRegisteredBackupFileServices();
+
+  public boolean registerBackupFileService(IBackupFileService backupFileService);
+
+  public boolean unregisterBackupFileService(IBackupFileService backupFileService);
+
+
+  public void createBackupsForAllRegisteredBackupFileServices();
 
   public List<BackupFile> getAllAvailableBackups();
 

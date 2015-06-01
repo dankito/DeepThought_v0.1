@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -17,7 +16,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PostPersist;
 import javax.persistence.Transient;
 
 /**
@@ -256,21 +254,6 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
   @Override
   public String toString() {
     return getTextRepresentation();
-  }
-
-
-
-  @PostPersist
-  protected void postPersist() {
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().indexEntity(this);
-  }
-
-  @Override
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
-    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
-
-    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
   }
 
 

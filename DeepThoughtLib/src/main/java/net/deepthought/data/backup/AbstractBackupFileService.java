@@ -11,9 +11,9 @@ import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
-import net.deepthought.util.enums.ExistingFileHandling;
+import net.deepthought.util.file.enums.ExistingFileHandling;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

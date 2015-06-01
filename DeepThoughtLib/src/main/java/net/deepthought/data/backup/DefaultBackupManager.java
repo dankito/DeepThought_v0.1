@@ -3,7 +3,7 @@ package net.deepthought.data.backup;
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,13 +28,26 @@ public class DefaultBackupManager implements IBackupManager {
 
 
   public DefaultBackupManager() {
-    mapBackupFileServices.put(AllBackupsFileService.getFileServiceType(), AllBackupsFileService);
+    registerBackupFileService(AllBackupsFileService);
 
     IBackupFileService copyDatabaseBackupFileService = new DatabaseBackupFileService();
-    mapBackupFileServices.put(copyDatabaseBackupFileService.getFileServiceType(), copyDatabaseBackupFileService);
+    registerBackupFileService(copyDatabaseBackupFileService);
 
-    IBackupFileService jsonBackupFileService = new JsonIoBackupFileService();
-    mapBackupFileServices.put(jsonBackupFileService.getFileServiceType(), jsonBackupFileService);
+//    IBackupFileService jsonBackupFileService = new JsonIoBackupFileService();
+//    registerBackupFileService(jsonBackupFileService);
+  }
+
+
+  public Collection<IBackupFileService> getRegisteredBackupFileServices() {
+    return mapBackupFileServices.values();
+  }
+
+  public boolean registerBackupFileService(IBackupFileService backupFileService) {
+    return mapBackupFileServices.put(backupFileService.getFileServiceType(), backupFileService) != null;
+  }
+
+  public boolean unregisterBackupFileService(IBackupFileService backupFileService) {
+    return mapBackupFileServices.remove(backupFileService.getFileServiceType(), backupFileService);
   }
 
 
@@ -46,10 +59,6 @@ public class DefaultBackupManager implements IBackupManager {
           backupFileService.createBackup(new CreateBackupParams(Application.getApplication(), getBackupsFolderPath(), null));
       } catch(Exception ex) { log.error("Could not create Database Backup for BackupFileService " + backupFileService.getFileServiceType(), ex); }
     }
-  }
-
-  public Collection<IBackupFileService> getAvailableBackupFileServices() {
-    return mapBackupFileServices.values();
   }
 
 

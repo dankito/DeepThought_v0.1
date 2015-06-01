@@ -273,6 +273,7 @@ public class TableConfig {
   public final static String FileLinkNameColumnName = "name";
   public final static String FileLinkIsFolderColumnName = "folder";
   public final static String FileLinkNotesColumnName = "notes";
+  public final static String FileLinkSourceUriColumnName = "source_uri";
   public final static String FileLinkEntryJoinColumnName = "entry_id";
   public final static String FileLinkReferenceBaseJoinColumnName = "reference_base_id";
   public final static String FileLinkDeepThoughtJoinColumnName = "deep_thought_id";
@@ -326,6 +327,7 @@ public class TableConfig {
   public final static String ReferenceSeriesTitleOrderColumnName = "series_order";
   public final static String ReferenceTableOfContentsColumnName = "table_of_contents";
   public final static String ReferenceIssueOrPublishingDateColumnName = "issue_or_publishing_date";
+  public final static String ReferencePublishingDateColumnName = "publishing_date";
   public final static String ReferenceDeepThoughtJoinColumnName = "deep_thought_id";
 
 

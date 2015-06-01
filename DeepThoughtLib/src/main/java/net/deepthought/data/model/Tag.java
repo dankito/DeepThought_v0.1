@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -16,7 +15,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.PostPersist;
 import javax.persistence.Transient;
 
 /**
@@ -93,8 +91,8 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
 //    callEntryAddedListeners(entry);
 //    return result;
 
-    if(entries instanceof List)
-      ((List)entries).add(0, entry);
+    if(entries instanceof List) // i know this is not perfect as added Entry could have a smaller EntryIndex than already added ones
+      ((List)entries).add(0, entry); // but sorting is not an option as with sorting all Entries would have to be loaded with is bad on Tags with a lot of Entries
     else
       entries.add(entry);
 
@@ -124,26 +122,12 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
   @Override
   @Transient
   public String getTextRepresentation() {
-    return "Tag " + name + " (" + entries.size() + ")";
+    return name + " (" + entries.size() + ")";
   }
 
   @Override
   public String toString() {
-    return getTextRepresentation();
-  }
-
-
-  @PostPersist
-  protected void postPersist() {
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().indexEntity(this);
-  }
-
-  @Override
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
-    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
-
-    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
+    return "Tag " + getTextRepresentation();
   }
 
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.input.*?>
 <?import org.controlsfx.control.*?>
 <?import org.controlsfx.control.textfield.*?>
 <?import javafx.scene.web.*?>
@@ -16,7 +17,7 @@
    <center>
    </center>
    <bottom>
-      <HBox alignment="CENTER_LEFT" prefHeight="24.0" prefWidth="433.0" BorderPane.alignment="CENTER_LEFT">
+      <HBox fx:id="statusLabelPane" alignment="CENTER_LEFT" prefHeight="24.0" prefWidth="433.0" BorderPane.alignment="CENTER_LEFT">
          <children>
             <Label fx:id="statusLabel" text="Ready" HBox.hgrow="ALWAYS" />
             <Label fx:id="statusLabelCountEntries" prefWidth="100.0" textAlignment="RIGHT" />
@@ -73,16 +74,17 @@
          <children>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="%file">
+                <Menu fx:id="mnitmFile" mnemonicParsing="false" onShowing="#handleMainMenuFileShowing" text="%file">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="Close" />
+                        <Menu fx:id="mnitmFileClipboard" mnemonicParsing="false" text="%clipboard" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator></MenuItem>
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="%edit">
-                  <items>
-                    <MenuItem disable="true" mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
+                <Menu mnemonicParsing="false" text="%edit" />
                   <Menu mnemonicParsing="false" text="%view">
                     <items>
                         <Menu mnemonicParsing="false" text="%dialogs.fields.display">
@@ -98,7 +100,10 @@
                   </Menu>
                   <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
                      <items>
-                      <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups..." />
+                      <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
+                           <accelerator>
+                              <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                           </accelerator></MenuItem>
                      </items>
                   </Menu>
                   <Menu fx:id="mnitmMainMenuWindow" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />

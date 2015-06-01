@@ -10,11 +10,11 @@ import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileNameSuggestion;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileNameSuggestion;
+import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
-import net.deepthought.util.enums.ExistingFileHandling;
-import net.deepthought.util.listener.FileOperationListener;
+import net.deepthought.util.file.enums.ExistingFileHandling;
+import net.deepthought.util.file.listener.FileOperationListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

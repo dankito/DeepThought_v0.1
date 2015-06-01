@@ -4,19 +4,34 @@ import net.deepthought.Application;
 import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
+import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.Group;
+import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.User;
+import net.deepthought.data.model.enums.ApplicationLanguage;
+import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.Language;
+import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +57,7 @@ public class MockEntityManager implements IEntityManager {
 
   @Override
   public String getDatabasePath() {
-    return configuration.getDataFolder();
+    return new File(configuration.getDataFolder(), "Mock.db").getAbsolutePath();
   }
 
   @Override
@@ -67,13 +82,14 @@ public class MockEntityManager implements IEntityManager {
 
       mapPersistedEntities.get(entityClass).put(id, entity);
 
+      if(entity instanceof DeepThoughtApplication)
+        persistDeepThoughtApplication((DeepThoughtApplication) entity);
+      else if(entity instanceof DeepThought)
+        persistDeepThought((DeepThought)entity);
       if(entity instanceof UserDataEntity) {
         createdByField.set(entity, Application.getLoggedOnUser());
         modifiedByField.set(entity, Application.getLoggedOnUser());
         ownerField.set(entity, Application.getLoggedOnUser());
-      }
-      else if(entity instanceof DeepThoughtApplication) {
-        persistEntity(((DeepThoughtApplication)entity).getLastLoggedOnUser());
       }
 
       callPostPersistLifeCycleMethod(entity);
@@ -81,6 +97,51 @@ public class MockEntityManager implements IEntityManager {
       return false;
     }
     return true;
+  }
+
+  private void persistDeepThoughtApplication(DeepThoughtApplication application) {
+    for(User entity : application.getUsers())
+      persistEntity(entity);
+    for(Group entity : application.getGroups())
+      persistEntity(entity);
+    for(Device entity : application.getDevices())
+      persistEntity(entity);
+    for(ApplicationLanguage entity : application.getApplicationLanguages())
+      persistEntity(entity);
+  }
+
+  protected void persistDeepThought(DeepThought deepThought) {
+    persistEntity(deepThought.getTopLevelCategory());
+    for(Category category : deepThought.getCategories())
+      persistEntity(category);
+
+    persistEntity(deepThought.getTopLevelEntry());
+    for(Entry entry : deepThought.getEntries())
+      persistEntity(entry);
+
+    for(Tag tag : deepThought.getTags())
+      persistEntity(tag);
+    for(Person person : deepThought.getPersons())
+      persistEntity(person);
+
+    for(SeriesTitle entity : deepThought.getSeriesTitles())
+      persistEntity(entity);
+    for(Reference entity : deepThought.getReferences())
+      persistEntity(entity);
+    for(ReferenceSubDivision entity : deepThought.getReferenceSubDivisions())
+      persistEntity(entity);
+
+    for(NoteType entity : deepThought.getNoteTypes())
+      persistEntity(entity);
+    for(Note entity : deepThought.getNotes())
+      persistEntity(entity);
+
+    for(FileLink entity : deepThought.getFiles())
+      persistEntity(entity);
+    for(BackupFileServiceType entity : deepThought.getBackupFileServiceTypes())
+      persistEntity(entity);
+    for(Language entity : deepThought.getLanguages())
+      persistEntity(entity);
   }
 
   @Override
@@ -120,6 +181,16 @@ public class MockEntityManager implements IEntityManager {
   }
 
   @Override
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids) {
+    List<T> result = new ArrayList<>();
+
+    for(Long id : ids)
+      result.add(getEntityById(type, id));
+
+    return result;
+  }
+
+  @Override
   public <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type) {
 //    if(type == DeepThoughtApplication.class)
 //      return new ArrayList<T>() {{ add((T)DataHelper.createTestApplication()); }} ;
@@ -129,6 +200,11 @@ public class MockEntityManager implements IEntityManager {
   @Override
   public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
 
+  }
+
+  @Override
+  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
+    return new ArrayList<>();
   }
 
   @Override

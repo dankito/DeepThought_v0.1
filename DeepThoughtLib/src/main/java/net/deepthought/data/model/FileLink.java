@@ -3,6 +3,8 @@ package net.deepthought.data.model;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
+import net.deepthought.util.file.FileUtils;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -30,13 +32,16 @@ public class FileLink extends UserDataEntity implements Serializable {
   protected String uriString;
 
   @Column(name = TableConfig.FileLinkNameColumnName)
-  protected String name;
+  protected String name = "";
 
   @Column(name = TableConfig.FileLinkIsFolderColumnName)
   protected boolean isFolder;
 
   @Column(name = TableConfig.FileLinkNotesColumnName)
   protected String notes;
+
+  @Column(name = TableConfig.FileLinkSourceUriColumnName)
+  protected String sourceUriString;
 
 //  @ManyToOne(fetch = FetchType.LAZY)
 //  @JoinColumn(name = TableConfig.FileLinkEntryJoinColumnName)
@@ -80,6 +85,9 @@ public class FileLink extends UserDataEntity implements Serializable {
     Object previousValue = this.uriString;
     this.uriString = uriString;
     callPropertyChangedListeners(TableConfig.FileLinkUriColumnName, previousValue, uriString);
+
+    if(StringUtils.isNullOrEmpty(name))
+      setName(FileUtils.getFileNameIncludingExtension(uriString));
   }
 
   public String getName() {
@@ -112,6 +120,16 @@ public class FileLink extends UserDataEntity implements Serializable {
     callPropertyChangedListeners(TableConfig.FileLinkNotesColumnName, previousValue, notes);
   }
 
+  public String getSourceUriString() {
+    return sourceUriString;
+  }
+
+  public void setSourceUriString(String sourceUriString) {
+    Object previousValue = this.sourceUriString;
+    this.sourceUriString = sourceUriString;
+    callPropertyChangedListeners(TableConfig.FileLinkSourceUriColumnName, previousValue, sourceUriString);
+  }
+
   public Collection<Entry> getEntries() {
     return entries;
   }
@@ -119,7 +137,8 @@ public class FileLink extends UserDataEntity implements Serializable {
   protected boolean addEntry(Entry entry) {
     boolean result = entries.add(entry);
     if(result) {
-      callEntityAddedListeners(entries, entry);
+      if(entry.isPersisted())
+        callEntityAddedListeners(entries, entry);
     }
 
     return result;
@@ -141,7 +160,8 @@ public class FileLink extends UserDataEntity implements Serializable {
   protected boolean addReferenceBase(ReferenceBase referenceBase) {
     boolean result = referenceBases.add(referenceBase);
     if(result) {
-      callEntityAddedListeners(referenceBases, referenceBase);
+      if(referenceBase.isPersisted())
+        callEntityAddedListeners(referenceBases, referenceBase);
     }
 
     return result;

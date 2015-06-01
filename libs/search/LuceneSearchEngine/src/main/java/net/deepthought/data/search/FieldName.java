@@ -9,24 +9,34 @@ public class FieldName {
 
   public final static String EntryId = "entry_id";
 
-  public final static String Abstract = "abstract";
+  public final static String EntryAbstract = "abstract";
 
-  public final static String Content = "content";
+  public final static String EntryContent = "content";
 
-  public final static String Tags = "tags";
-  public final static String TagsIds = "tags_ids";
-  public final static String NoTags = "no_tags";
+  public final static String EntryTags = "tags";
+  public final static String EntryTagsIds = "tags_ids";
+  public final static String EntryNoTags = "no_tags";
 
-  public final static String Categories = "categories";
-  public final static String NoCategories = "no_categories";
+  public final static String EntryCategories = "categories";
+  public final static String EntryNoCategories = "no_categories";
 
-//  public final static String SeriesTitle = "series_title";
-  public final static String Reference = "reference";
-//  public final static String ReferenceSubDivision = "reference_sub_division";
-  public final static String NoReference = "no_reference";
+  public final static String EntryPersons = "persons";
+  public final static String EntryNoPersons = "no_persons";
+
+  public final static String EntrySeries = "series";
+  public final static String EntryNoSeries = "no_series";
+
+  public final static String EntryReference = "reference";
+  public final static String EntryNoReference = "no_reference";
+
+  public final static String EntryReferenceSubDivision = "reference_sub_division";
+  public final static String EntryNoReferenceSubDivision = "no_reference_sub_division";
+
+  public final static String EntryNotes = "notes";
+  public final static String EntryNoNotes = "no_notes";
 
 
-  /*      Tags      */
+  /*      EntryTags      */
 
   public final static String TagId = "tag_id";
 
@@ -55,17 +65,22 @@ public class FieldName {
   public final static String SeriesTitleTitle = "series_title_title";
 
   public final static String ReferenceTitle = "reference_title";
-  public final static String ReferenceSeriesTitle = "reference_series_title";
+  public final static String ReferencePublishingDate = "reference_publishing_date";
 
   public final static String ReferenceSubDivisionTitle = "reference_sub_division_title";
-  public final static String ReferenceSubDivisionReference = "reference_sub_division_reference";
-  public final static String ReferenceSubDivisionSeriesTitle = "reference_sub_division_series_title";
+
+
+  /*      Notes      */
+
+  public final static String NoteId = "note_id";
+
+  public final static String NoteNote = "note_note";
 
 //  Id("id"),
-//  Abstract("abstract"),
-//  Content("content"),
-//  Tags("tags"),
-//  NoTags("no_tags"),
+//  EntryAbstract("abstract"),
+//  EntryContent("content"),
+//  EntryTags("tags"),
+//  EntryNoTags("no_tags"),
 //  ;
 //
 //  protected String name;

@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
@@ -21,7 +20,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -258,22 +256,6 @@ public abstract class ReferenceBase extends UserDataEntity {
   @Transient
   public String getTextRepresentation() {
     return title;
-  }
-
-
-
-
-  @PostPersist
-  protected void postPersist() {
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().indexEntity(this);
-  }
-
-  @Override
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
-    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
-
-    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
   }
 
 

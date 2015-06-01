@@ -39,7 +39,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="lstvwAllTags" minHeight="150.0" prefHeight="230.0" />
+            <ListView fx:id="lstvwAllTags" editable="true" minHeight="150.0" prefHeight="230.0" />
          </children>
       </VBox>
    </content>

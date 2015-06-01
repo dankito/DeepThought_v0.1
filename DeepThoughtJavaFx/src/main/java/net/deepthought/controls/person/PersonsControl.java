@@ -1,6 +1,7 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.Application;
+import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -60,9 +61,10 @@ public abstract class PersonsControl extends TitledPane {
 
   protected DeepThought deepThought = null;
 
-  protected ObservableList<Person> listViewAllPersonsItems;
-  protected FilteredList<Person> filteredPersons;
-  protected SortedList<Person> sortedFilteredPersons;
+  protected LazyLoadingObservableList<Person> listViewAllPersonsItems;
+//  protected ObservableList<Person> listViewAllPersonsItems;
+//  protected FilteredList<Person> filteredPersons;
+//  protected SortedList<Person> sortedFilteredPersons;
 
   protected Search<Person> filterPersonsSearch = null;
 
@@ -132,7 +134,7 @@ public abstract class PersonsControl extends TitledPane {
 
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      listViewAllPersonsItems.addAll(deepThought.getPersons());
+      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
       filterPersons();
     }
   }
@@ -156,12 +158,17 @@ public abstract class PersonsControl extends TitledPane {
     });
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchAuthorsAction());
 
-    listViewAllPersonsItems = lstvwAllPersons.getItems();
-    filteredPersons = new FilteredList<>(listViewAllPersonsItems, tag -> true);
-    sortedFilteredPersons = new SortedList<>(filteredPersons, personComparator);
-    lstvwAllPersons.setItems(sortedFilteredPersons);
+//    listViewAllPersonsItems = lstvwAllPersons.getItems();
+//    filteredPersons = new FilteredList<>(listViewAllPersonsItems, tag -> true);
+//    sortedFilteredPersons = new SortedList<>(filteredPersons, personComparator);
+//    lstvwAllPersons.setItems(sortedFilteredPersons);
+//    if(deepThought != null)
+//      listViewAllPersonsItems.addAll(deepThought.getPersonsSorted());
+
+    listViewAllPersonsItems = new LazyLoadingObservableList<>();
     if(deepThought != null)
-      listViewAllPersonsItems.addAll(deepThought.getPersonsSorted());
+      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
+    lstvwAllPersons.setItems(listViewAllPersonsItems);
 
     lstvwAllPersons.setCellFactory((listView) -> {
       final PersonListCell cell = createPersonListCell();
@@ -230,55 +237,56 @@ public abstract class PersonsControl extends TitledPane {
   }
 
   protected void filterPersons() {
-    if(filterPersonsSearch != null)
+    if(filterPersonsSearch != null && filterPersonsSearch.isCompleted() == false)
       filterPersonsSearch.interrupt();
 
     filterPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
-      filteredPersons.setPredicate((person) -> results.contains(person));
+//      filteredPersons.setPredicate((person) -> results.contains(person));
+        listViewAllPersonsItems.setUnderlyingCollection(results);
     });
     Application.getSearchEngine().filterPersons(filterPersonsSearch);
 
 //    filterPersonsManually();
   }
 
-  protected void filterPersonsManually() {
-    String filter = txtfldSearchForPerson.getText();
-    String lowerCaseFilter = filter == null ? "" : filter.toLowerCase();
-    final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");
-    String lastNameFilterTemp, firstNameFilterTemp = null;
-
-    if(filterForFirstAndLastName == false)
-      lastNameFilterTemp = firstNameFilterTemp = lowerCaseFilter;
-    else {
-      lastNameFilterTemp = lowerCaseFilter.substring(0, lowerCaseFilter.indexOf(",")).trim();
-      firstNameFilterTemp = lowerCaseFilter.substring(lowerCaseFilter.indexOf(","));
-      firstNameFilterTemp = firstNameFilterTemp.substring(1).trim();
-    }
-
-    final String lastNameFilter = lastNameFilterTemp;
-    final String firstNameFilter = firstNameFilterTemp;
-
-    filteredPersons.setPredicate((person) -> {
-      // If filter text is empty, display all Persons.
-      if (filter == null || filter.isEmpty()) {
-        return true;
-      }
-
-
-      if(filterForFirstAndLastName == false) {
-        if (person.getLastName().toLowerCase().contains(lowerCaseFilter)) {
-          return true; // Filter matches last name
-        } else if (person.getFirstName().toLowerCase().contains(lowerCaseFilter)) {
-          return true; // Filter matches first name
-        }
-      }
-      else {
-        return person.getLastName().toLowerCase().contains(lastNameFilter) && person.getFirstName().toLowerCase().contains(firstNameFilter);
-      }
-
-      return false; // Does not match.
-    });
-  }
+//  protected void filterPersonsManually() {
+//    String filter = txtfldSearchForPerson.getText();
+//    String lowerCaseFilter = filter == null ? "" : filter.toLowerCase();
+//    final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");
+//    String lastNameFilterTemp, firstNameFilterTemp = null;
+//
+//    if(filterForFirstAndLastName == false)
+//      lastNameFilterTemp = firstNameFilterTemp = lowerCaseFilter;
+//    else {
+//      lastNameFilterTemp = lowerCaseFilter.substring(0, lowerCaseFilter.indexOf(",")).trim();
+//      firstNameFilterTemp = lowerCaseFilter.substring(lowerCaseFilter.indexOf(","));
+//      firstNameFilterTemp = firstNameFilterTemp.substring(1).trim();
+//    }
+//
+//    final String lastNameFilter = lastNameFilterTemp;
+//    final String firstNameFilter = firstNameFilterTemp;
+//
+//    filteredPersons.setPredicate((person) -> {
+//      // If filter text is empty, display all Persons.
+//      if (filter == null || filter.isEmpty()) {
+//        return true;
+//      }
+//
+//
+//      if(filterForFirstAndLastName == false) {
+//        if (person.getLastName().toLowerCase().contains(lowerCaseFilter)) {
+//          return true; // Filter matches last name
+//        } else if (person.getFirstName().toLowerCase().contains(lowerCaseFilter)) {
+//          return true; // Filter matches first name
+//        }
+//      }
+//      else {
+//        return person.getLastName().toLowerCase().contains(lastNameFilter) && person.getFirstName().toLowerCase().contains(firstNameFilter);
+//      }
+//
+//      return false; // Does not match.
+//    });
+//  }
 
   public void close() {
     if(deepThought != null)
@@ -341,8 +349,7 @@ public abstract class PersonsControl extends TitledPane {
   };
 
   protected void resetListViewAllPersonsItems() {
-    listViewAllPersonsItems.clear();
-    listViewAllPersonsItems.addAll(deepThought.getPersonsSorted());
+    listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
     filterPersons();
   }
 

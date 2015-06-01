@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableRow;
 
@@ -27,7 +29,18 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
 
 
   public EntryTableCell() {
-
+    tableRowProperty().addListener(new ChangeListener<TableRow>() {
+      @Override
+      public void changed(ObservableValue<? extends TableRow> observable, TableRow oldValue, TableRow newValue) {
+        if(newValue != null)
+          newValue.itemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+              entryChanged((Entry)newValue);
+            }
+          });
+      }
+    });
   }
 
   protected void entryChanged(Entry entry) {

@@ -19,53 +19,53 @@ public class LanguageDetectorTest {
 
   @Test
   public void detectLanguageOfGermanTexts() throws Exception {
-    String language1 = detector.detectLanguageOfText("Jetzt aber mal ein ganz ein langer Text, dessen Sprache zu identifizieren dir hoffentlich keine Mühe bereitet, liebes Tika");
+    String language1 = detector.getLanguageTagOfText("Jetzt aber mal ein ganz ein langer Text, dessen Sprache zu identifizieren dir hoffentlich keine Mühe bereitet, liebes Tika");
     Assert.assertEquals("de", language1);
 
-    String language2 = detector.detectLanguageOfText("Entweder man lebt, oder man ist konsequent");
+    String language2 = detector.getLanguageTagOfText("Entweder man lebt, oder man ist konsequent");
     Assert.assertEquals("de", language2);
 
-    String language3 = detector.detectLanguageOfText("Du hast nichts zu verlieren, aber eine Welt zu gewinnen");
+    String language3 = detector.getLanguageTagOfText("Du hast nichts zu verlieren, aber eine Welt zu gewinnen");
     Assert.assertEquals("de", language3);
 
-    String language4 = detector.detectLanguageOfText("Die Welt hat genug für jedermanns Bedürfnisse, aber nicht für jedermanns Gier");
+    String language4 = detector.getLanguageTagOfText("Die Welt hat genug für jedermanns Bedürfnisse, aber nicht für jedermanns Gier");
     Assert.assertEquals("de", language4);
   }
 
   @Test
   public void detectLanguageOfEnglishTexts() throws Exception {
-    String language1 = detector.detectLanguageOfText("Shit happens");
+    String language1 = detector.getLanguageTagOfText("Shit happens");
     Assert.assertEquals("en", language1);
 
-    String language2 = detector.detectLanguageOfText("In the long run we're all dead");
+    String language2 = detector.getLanguageTagOfText("In the long run we're all dead");
     Assert.assertEquals("en", language2);
   }
 
   @Test
   public void detectLanguageOfFrenchTexts() throws Exception {
-    String language1 = detector.detectLanguageOfText("Voulez vous coucher avec moi? - Va te faire enculer sale fils de pute!");
+    String language1 = detector.getLanguageTagOfText("Voulez vous coucher avec moi? - Va te faire enculer sale fils de pute!");
     Assert.assertEquals("fr", language1);
   }
 
   @Test
   public void detectLanguageOfItalianTexts() throws Exception {
-    String language1 = detector.detectLanguageOfText("Preferisco la dolce vita italiana");
+    String language1 = detector.getLanguageTagOfText("Preferisco la dolce vita italiana");
     Assert.assertEquals("it", language1);
 
-    String language2 = detector.detectLanguageOfText("Prima si vota, poi si beve");
+    String language2 = detector.getLanguageTagOfText("Prima si vota, poi si beve");
     Assert.assertEquals("it", language2);
   }
 
   @Test
   public void detectLanguageOfMixedGermanAndEnglishText() throws Exception {
-    String germanWithEnglishWords = detector.detectLanguageOfText("Mixed one: Deutsch mit Business English einstreusel, immer gut fuer Bullshit Bingo");
+    String germanWithEnglishWords = detector.getLanguageTagOfText("Mixed one: Deutsch mit Business English einstreusel, immer gut fuer Bullshit Bingo");
 
     Assert.assertEquals("de", germanWithEnglishWords); // nice one!
   }
 
   @Test
   public void detectLanguageOfVeryLongGermanText() {
-    String longGermanTextLanguage = detector.detectLanguageOfText("Jetzt mal was langes, fuer dich, mein Schatz: Wer wünscht sich nicht ein langes, " +
+    String longGermanTextLanguage = detector.getLanguageTagOfText("Jetzt mal was langes, fuer dich, mein Schatz: Wer wünscht sich nicht ein langes, " +
         "gesundes Leben? Die Pharmaindustrie entwickelt, testet und vertreibt die Mittel, die das gewährleisten sollen. Doch der Mediziner Peter C. Gøtzsche hält das gegenwärtige System für gescheitert. Der Däne hat selbst für Arzneimittelhersteller gearbeitet, dann die Seiten gewechselt und leitet heute das Nordic Cochrane Center in Kopenhagen. In seinem Buch \"Tödliche Medizin und organisierte Kriminalität\" übt er heftige Kritik an der Branche.\n" +
         "\n" +
         "SZ.de: Kürzlich ist aufgeflogen, dass eine Firma in Indien Daten gefälscht hat, um Studien für internationale Pharmakonzerne besser aussehen zu lassen. Sie behaupten, dass auch die Pharmaindustrie selbst Studien manipuliert. Aber Sie machen der Branche weitere schwere Vorwürfe. Sie sprechen sogar von organisierter Kriminalität und Mafia.\n" +

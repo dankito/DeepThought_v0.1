@@ -72,6 +72,7 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
       }
 
 
+//      if(serialPart.isPersisted())
       callEntityAddedListeners(serialParts, serialPart);
       return true;
     }

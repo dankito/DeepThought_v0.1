@@ -4,6 +4,8 @@ import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
+import net.deepthought.data.contentextractor.IContentExtractorManager;
+import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.merger.IDataMerger;
@@ -15,8 +17,9 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
+import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -39,6 +42,8 @@ public class Application {
   private final static Logger log = LoggerFactory.getLogger(Application.class);
 
 
+  protected static String dataFolderPath = CouldNotGetDataFolderPath;
+
   protected static IDependencyResolver dependencyResolver = null;
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
   protected static IEntityManager entityManager = null;
@@ -53,6 +58,12 @@ public class Application {
   protected static ISearchEngine searchEngine = null;
 
   protected static IHtmlHelper htmlHelper = null;
+
+  protected static IFileDownloader downloader = null;
+
+  protected static IPluginManager pluginManager = null;
+
+  protected static IContentExtractorManager contentExtractorManager = null;
 
   protected static Set<ApplicationListener> listeners = new HashSet<>();
 
@@ -82,13 +93,24 @@ public class Application {
   }
 
   public static void instantiate(EntityManagerConfiguration configuration, IDependencyResolver dependencyResolver) {
+    dataFolderPath = configuration.getDataFolder();
+
     Date startTime = new Date();
     log.info("Starting to resolve dependencies ...");
 
     Application.dependencyResolver = dependencyResolver;
     Application.entityManagerConfiguration = configuration;
 
+    Application.contentExtractorManager = dependencyResolver.createContentExtractorManager();
+
     Application.htmlHelper = dependencyResolver.createHtmlHelper();
+    Application.downloader = dependencyResolver.createDownloader();
+
+    Application.languageDetector = dependencyResolver.createLanguageDetector();
+
+    try {
+      Application.searchEngine = dependencyResolver.createSearchEngine();
+    } catch(Exception ex) { log.error("Could not create SearchEngine", ex); }
 
     if(openDatabase(dependencyResolver) == false)
       return;
@@ -111,9 +133,8 @@ public class Application {
       Application.dataMerger = dependencyResolver.createDataMerger();
 //      logResolvingDependencyDuration("DataMerger", startTime);
 
-      Application.languageDetector = dependencyResolver.createLanguageDetector();
-
-      Application.searchEngine = dependencyResolver.createSearchEngine();
+      Application.pluginManager = dependencyResolver.createPluginManager();
+      pluginManager.loadPluginsAsync();
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
@@ -181,13 +202,15 @@ public class Application {
     if(dataManager != null) {
       dataManager.close();
     }
-
     dataManager = null;
 
+    if(entityManager != null)
+      entityManager.close();
     entityManager = null;
     entityManagerConfiguration = null;
 
-    searchEngine.close();
+    if(searchEngine != null)
+      searchEngine.close();
     searchEngine = null;
 
     dependencyResolver = null;
@@ -267,6 +290,18 @@ public class Application {
     return htmlHelper;
   }
 
+  public static IFileDownloader getDownloader() {
+    return downloader;
+  }
+
+  public static IPluginManager getPluginManager() {
+    return pluginManager;
+  }
+
+  public static IContentExtractorManager getContentExtractorManager() {
+    return contentExtractorManager;
+  }
+
   public static DeepThoughtApplication getApplication() {
     if(dataManager != null)
       return dataManager.getApplication();
@@ -304,9 +339,7 @@ public class Application {
   }
 
   public static String getDataFolderPath() {
-    if(dataManager != null)
-      return dataManager.getDataFolderPath();
-    return CouldNotGetDataFolderPath;
+    return dataFolderPath;
   }
 
 }

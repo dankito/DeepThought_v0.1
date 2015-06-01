@@ -28,6 +28,8 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
 import net.deepthought.util.DeepThoughtError;
@@ -99,15 +101,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
           return new AndroidDataManager(entityManager);
         }
 
-//        @Override
-//        public ISearchEngine createSearchEngine() {
-//          try {
-//            return new LuceneSearchEngine();
-//          } catch(Exception ex) {
-//            log.error("Could not initialize LuceneSearchEngine", ex);
-//          }
-//          return null; // TODO: abort application?
-//        }
+        @Override
+        public ISearchEngine createSearchEngine() {
+          try {
+            return new LuceneSearchEngine();
+          } catch(Exception ex) {
+            log.error("Could not initialize LuceneSearchEngine", ex);
+          }
+          return null; // TODO: abort application?
+        }
       });
 
       loadingDataProgressDialog = new ProgressDialog(this);

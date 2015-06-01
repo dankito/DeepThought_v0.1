@@ -40,15 +40,18 @@ android {
 
     // to solve packaging errors
     packagingOptions {
-        pickFirst 'org/apache/lucene/util/SPIClassIterator.class'
+//        pickFirst 'org/apache/lucene/util/SPIClassIterator.class'
+//        pickFirst 'META-INF/services/org.apache.lucene.codecs.Codec'
+//        pickFirst 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
+//        pickFirst 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
 
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/services/org.apache.lucene.codecs.Codec'
-        exclude 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
-        exclude 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
+//        exclude 'META-INF/services/org.apache.lucene.codecs.Codec'
+//        exclude 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
+//        exclude 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
 
         exclude 'Strings.properties'
         exclude 'Strings_de.properties'
@@ -74,6 +77,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:19.1.0'
     //    compile project(':DeepThoughtLib')
     compile project(':AndroidOrmLiteEntityManager')
-    //    compile project(':LuceneSearchEngine')
+        compile project(':LuceneSearchEngine')
     compile 'org.slf4j:slf4j-android:1.7.10'
 }

@@ -9,6 +9,9 @@ import net.deepthought.data.model.Tag;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
+import javafx.application.Platform;
+import javafx.stage.Stage;
+
 /**
  * Created by ganymed on 01/02/15.
  */
@@ -80,5 +83,21 @@ public class Alerts {
         .showConfirm();
 
     return Dialog.ACTION_YES.equals(response);
+  }
+
+  public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle) {
+    if(Platform.isFxApplicationThread())
+      showErrorMessageOnUiThread(owner, errorMessage, alertTitle);
+    else
+      Platform.runLater(() -> showErrorMessageOnUiThread(owner, errorMessage, alertTitle));
+  }
+
+  protected static void showErrorMessageOnUiThread(Stage owner, String errorMessage, String alertTitle) {
+    org.controlsfx.dialog.Dialogs.create()
+        .title(alertTitle)
+        .message(errorMessage)
+        .actions(Dialog.ACTION_OK)
+        .owner(owner)
+        .showError();
   }
 }

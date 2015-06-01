@@ -4,11 +4,14 @@ include ':DeepThoughtAndroid'
 include ':ormlite-core',':ormlite-android',':ormlite-jdbc'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
-include ':json-io'
+include ':json-io', ':DeepThoughtJson-io'
 include ':LuceneSearchEngine'
+include ':WGetFileDownloader'
+include ':RemoteFileContentExtractor'
+include ':OcrTextContentExtractor'
+include ':SueddeutscheContentExtractor'
 include ':WikipediaImporter'
 include ':OpenOfficeDocumentsImporterExporter'
-include ':SueddeutscheImporter'
 //include ':VideoDownloader'
 //include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
@@ -22,12 +25,17 @@ project(':AndroidOrmLiteEntityManager').projectDir = new File('libs/persistence/
 project(':JavaSeOrmLiteEntityManager').projectDir = new File('libs/persistence/database/JavaSeOrmLiteEntityManager')
 
 project(':json-io').projectDir = new File('libs/persistence/json/json-io')
+project(':DeepThoughtJson-io').projectDir = new File('libs/persistence/json/DeepThoughtJson-io')
 
 project(':LuceneSearchEngine').projectDir = new File('libs/search/LuceneSearchEngine')
 
-project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
+project(':WGetFileDownloader').projectDir = new File('libs/downloader/WGetFileDownloader')
+
+project(':RemoteFileContentExtractor').projectDir = new File('libs/content_extractor/RemoteFileContentExtractor')
+project(':OcrTextContentExtractor').projectDir = new File('libs/content_extractor/OcrTextContentExtractor')
+project(':SueddeutscheContentExtractor').projectDir = new File('libs/content_extractor/SueddeutscheContentExtractor')
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
-project(':SueddeutscheImporter').projectDir = new File('libs/importer_exporter/SueddeutscheImporter')
+project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
 
 //project(':SymmetricDS-Core').projectDir = new File('libs/sync/SymmetricDS-Core')
 //project(':SymmetricDS-CSV').projectDir = new File('libs/sync/SymmetricDS-CSV')

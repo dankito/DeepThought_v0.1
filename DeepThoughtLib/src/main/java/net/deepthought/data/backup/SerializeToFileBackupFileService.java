@@ -10,7 +10,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.serializer.SerializationResult;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +101,7 @@ public abstract class SerializeToFileBackupFileService extends AbstractBackupFil
     }
 
     if(listener != null)
-      listener.stepDone(new RestoreBackupStepResult(backup, BackupStep.DeserializeBackedUpDeepThought, true, BackupStep.InsertEntitiesIntoDatabase));
+      listener.stepDone(new RestoreBackupStepResult(backup, BackupStep.DeserializeBackedUpDeepThought, true, BackupStep.InsertEntitiesIntoDatabase, result.getResult()));
 
     restoreDeepThought(result.getResult(), params);
   }

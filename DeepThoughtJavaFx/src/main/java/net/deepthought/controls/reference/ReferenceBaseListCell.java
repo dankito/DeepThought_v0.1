@@ -138,7 +138,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   protected void updateItem(ReferenceBase item, boolean empty) {
     super.updateItem(item, empty);
 
-    if(empty) {
+    if(empty || item == null) {
       setGraphic(null);
     }
     else {

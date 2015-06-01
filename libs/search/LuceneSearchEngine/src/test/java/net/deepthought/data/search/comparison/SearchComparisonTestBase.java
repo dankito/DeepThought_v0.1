@@ -4,14 +4,15 @@ import net.deepthought.Application;
 import net.deepthought.DefaultDependencyResolver;
 import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.TestApplicationConfiguration;
+import net.deepthought.data.backup.IBackupManager;
+import net.deepthought.data.helper.NoOperationBackupManager;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
-import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
@@ -60,7 +61,11 @@ public abstract class SearchComparisonTestBase {
 
   @BeforeClass
   public static void suiteSetup() throws Exception {
-    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_tests/bin/data/");
+    long startTime = new Date().getTime();
+
+    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
+//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_3000_Entries/");
+//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_tests/data/");
 
     Application.instantiate(configuration, new DefaultDependencyResolver() {
       @Override
@@ -70,7 +75,12 @@ public abstract class SearchComparisonTestBase {
         return entityManager;
       }
 
-//      @Override
+      @Override
+      public IBackupManager createBackupManager() {
+        return new NoOperationBackupManager();
+      }
+
+      //      @Override
 //      public ISearchEngine createSearchEngine() {
 //        SearchComparisonTestBase.this.searchEngine = SearchComparisonTestBase.this.createSearchEngine();
 //        searchEngine = SearchComparisonTestBase.this.searchEngine;
@@ -79,16 +89,7 @@ public abstract class SearchComparisonTestBase {
     });
 
     deepThought = Application.getDeepThought();
-
-    LuceneSearchEngine rebuildIndexSearchEngine = new LuceneSearchEngine();
-//    rebuildIndexSearchEngine.rebuildIndex();
-    int i = 0;
-    for(Entry entry : deepThought.getEntries()) {
-      rebuildIndexSearchEngine.indexEntity(entry);
-      i++;
-      if(i > 10)
-        break;
-    }
+    logOperationProcessTime("Start DeepThought", startTime);
   }
 
 
@@ -101,12 +102,18 @@ public abstract class SearchComparisonTestBase {
 
   @After
   public void tearDown() {
-//    Application.shutdown();
+    searchEngine.close();
   }
 
   @AfterClass
   public static void tearDownSuite() {
+    Application.shutdown();
 
+    log.info(operationProcessTimeMarker, "Operation times have been:");
+    for(String operationName : operationsProcessTime.keySet()) {
+      long millisecondsElapsed = operationsProcessTime.get(operationName);
+      log.info(operationProcessTimeMarker, operationName + " took " + (millisecondsElapsed / 1000) + "." + String.format("%03d", millisecondsElapsed).substring(0, 3) + " seconds");
+    }
   }
 
 
@@ -114,73 +121,244 @@ public abstract class SearchComparisonTestBase {
 
 
   @Test
+  public void getEntriesWithoutTags() {
+    final List<Entry> searchResults = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        logOperationProcessTime("getEntriesWithoutTags");
+        searchResults.addAll(results);
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    for(Entry entryWithoutTag : searchResults)
+      Assert.assertFalse(entryWithoutTag.hasTags());
+    Assert.assertEquals(844, searchResults.size());
+  }
+
+  @Test
   public void filterTags() {
-    searchEngine.filterTags(new Search<Tag>("Dürer", new SearchCompletedListener<Tag>() {
+    final List<Tag> searchResults = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterTags(new Search<Tag>("Zeit", new SearchCompletedListener<Tag>() {
       @Override
       public void completed(Collection<Tag> results) {
+        searchResults.addAll(results);
         logOperationProcessTime("filterTags");
-        Assert.assertEquals(2, results.size());
+        countDownLatch.countDown();
       }
     }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+    Assert.assertEquals(857, searchResults.size());
   }
 
 
   @Test
-  public void findAllEntriesHavingTheseTags() {
-    List<Tag> allTags = new ArrayList<>(deepThought.getTags());
+  public void findAllEntriesHavingTheseTags_ArchäologieOnly() {
     List<Tag> tagsToFilterFor = new ArrayList<>();
-    tagsToFilterFor.add(allTags.get(0));
-    tagsToFilterFor.add(allTags.get(33));
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 1L));
 
     Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
     searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
 
-    logOperationProcessTime("findAllEntriesHavingTheseTags");
-    Assert.assertEquals(2, entriesHavingFilteredTags.size());
-    Assert.assertEquals(2, tagsOnEntriesContainingFilteredTags.size());
+    logOperationProcessTime("findAllEntriesHavingTheseTags_ArchäologieOnly");
+    Assert.assertEquals(20, entriesHavingFilteredTags.size());
+    Assert.assertEquals(43, tagsOnEntriesContainingFilteredTags.size());
   }
-
-
-//  @Test
-//  public void filterPersons() {
-//    searchEngine.filterPersons(new Search<Person>("Dürer", new SearchCompletedListener<Person>() {
-//      @Override
-//      public void completed(Collection<Person> results) {
-//        logOperationProcessTime("filterPersons");
-//        Assert.assertEquals(1, results.size());
-//      }
-//    }));
-//  }
 
   @Test
-  public void filterReferenceBases() {
-    final CountDownLatch filterReferenceBasesForWorldLatch = new CountDownLatch(1);
+  public void findAllEntriesHavingTheseTags_AustralopithecusAfricanusAndLatènezeit() {
+    List<Tag> tagsToFilterFor = new ArrayList<>();
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 41L));
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 10L));
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("World", new SearchCompletedListener<ReferenceBase>() {
-      @Override
-      public void completed(Collection<ReferenceBase> results) {
-        logOperationProcessTime("filterReferenceBases for World");
-//        Assert.assertEquals(1, results.size());
-        filterReferenceBasesForWorldLatch.countDown();
-      }
-    }));
+    Set<Entry> entriesHavingFilteredTags = new HashSet<>();
+    final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
-    try { filterReferenceBasesForWorldLatch.await(); } catch(Exception ex) { }
-    startTime = new Date();
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
 
-    searchEngine.filterReferenceBases(new Search<>("Ardents", new SearchCompletedListener<ReferenceBase>() {
-      @Override
-      public void completed(Collection<ReferenceBase> results) {
-        logOperationProcessTime("filterReferenceBases for Angkor");
-        Assert.assertEquals(1, results.size());
-      }
-    }));
+    logOperationProcessTime("findAllEntriesHavingTheseTags_AustralopithecusAfricanusAndLatènezeit");
+    Assert.assertEquals(2, entriesHavingFilteredTags.size());
+    Assert.assertEquals(7, tagsOnEntriesContainingFilteredTags.size());
   }
 
-  private void logOperationProcessTime(String operationName) {
-    long millisecondsElapsed = (new Date().getTime() - startTime.getTime());
+
+  @Test
+  public void filterPersons() {
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+    final List<Person> searchResults = new ArrayList<>();
+
+    searchEngine.filterPersons(new Search<Person>("Dürer", new SearchCompletedListener<Person>() {
+      @Override
+      public void completed(Collection<Person> results) {
+        logOperationProcessTime("filterPersons");
+        searchResults.addAll(results);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, searchResults.size());
+  }
+
+//  @Test
+//  public void filterAllReferenceBases() {
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("sz", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterEachReferenceBaseWithSeparateFilter for sz");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//    startTime = new Date();
+//
+//    Assert.assertEquals(316, searchResults.size());
+//
+////    searchEngine.filterEachReferenceBaseWithSeparateFilter(new Search<>("Angkor", new SearchCompletedListener<ReferenceBase>() {
+////      @Override
+////      public void completed(Collection<ReferenceBase> results) {
+////        logOperationProcessTime("filterEachReferenceBaseWithSeparateFilter for Angkor");
+////        Assert.assertEquals(1, results.size());
+////      }
+////    }));
+//  }
+//
+//  @Test
+//  public void filterSeriesTitlesOnly_StartsWithTerm() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("wiki,", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterSeriesTitlesOnly_StartsWithTerm for wiki");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(1, searchResults.size());
+//  }
+//
+//  @Test
+//  public void filterSeriesTitlesOnly_ContainsTerm() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("iki,", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterSeriesTitlesOnly_ContainsTerm for iki");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(1, searchResults.size()); // must return the same amount of results as filterSeriesTitlesOnly_StartsWithTerm
+//  }
+//
+//  @Test
+//  public void filterReferencesOnly() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>(",zeit,", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterReferencesOnly for zeit");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(94, searchResults.size());
+//  }
+//
+//  @Test
+//  public void filterReferenceSubDivisionsOnly() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>(",,nsa", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterReferenceSubDivisionsOnly for nsa");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(14, searchResults.size());
+//  }
+//
+//  @Test
+//  public void filterReferenceBasesForSeriesTitleAndReference() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("wiki,stein,", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterReferenceBasesForSeriesTitleAndReference for wiki,zeit,");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(101, searchResults.size());
+//  }
+//
+//  @Test
+//  public void filterReferenceBasesForSeriesTitleReferenceAndReferenceSubDivision() {
+//    final List<ReferenceBase> searchResults = new ArrayList<>();
+//    final CountDownLatch countDownLatch = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("sz,06,pharma", new SearchCompletedListener<ReferenceBase>() {
+//      @Override
+//      public void completed(Collection<ReferenceBase> results) {
+//        logOperationProcessTime("filterReferenceBasesForSeriesTitleReferenceAndReferenceSubDivision for wiki,zeit,sz,06,pharma");
+//        searchResults.addAll(results);
+//        countDownLatch.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(1, searchResults.size());
+//  }
+
+  protected void logOperationProcessTime(String operationName) {
+    logOperationProcessTime(operationName, startTime.getTime());
+  }
+
+  protected static void logOperationProcessTime(String operationName, long startTime) {
+    long millisecondsElapsed = (new Date().getTime() - startTime);
     operationsProcessTime.put(operationName, millisecondsElapsed);
     log.info(operationProcessTimeMarker, operationName + " took " + (millisecondsElapsed / 1000) + "." + String.format("%03d", millisecondsElapsed).substring(0, 3) + " seconds");
   }

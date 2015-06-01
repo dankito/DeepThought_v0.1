@@ -15,7 +15,7 @@ import net.deepthought.data.backup.listener.RestoreBackupListener;
 import net.deepthought.data.merger.enums.MergeEntities;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -132,7 +132,7 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
       }
     });
 
-    for(IBackupFileService backupFileService : Application.getBackupManager().getAvailableBackupFileServices())
+    for(IBackupFileService backupFileService : Application.getBackupManager().getRegisteredBackupFileServices())
       cmbxShowAutomaticallyCreatedBackupsOfType.getItems().add(backupFileService.getFileServiceType());
     FXCollections.sort(cmbxShowAutomaticallyCreatedBackupsOfType.getItems());
 
@@ -279,7 +279,7 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
   protected BackupFileServiceType getFileServiceTypeForBackupFile(String backupFilePath) {
     String backupFileExtension = FileUtils.getFileExtension(backupFilePath);
 
-    for(IBackupFileService backupFileService : Application.getBackupManager().getAvailableBackupFileServices()) {
+    for(IBackupFileService backupFileService : Application.getBackupManager().getRegisteredBackupFileServices()) {
       if(backupFileService.getFileTypeFileExtension().equals(backupFileExtension))
         return backupFileService.getFileServiceType();
     }

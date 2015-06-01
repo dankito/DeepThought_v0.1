@@ -44,7 +44,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <TreeView fx:id="trvwCategories" minHeight="150.0" showRoot="false" />
+            <TreeView fx:id="trvwCategories" editable="true" minHeight="150.0" showRoot="false" />
          </children>
       </VBox>
    </content>

@@ -23,8 +23,18 @@ public class NoOperationBackupManager implements IBackupManager {
   }
 
   @Override
-  public Collection<IBackupFileService> getAvailableBackupFileServices() {
+  public Collection<IBackupFileService> getRegisteredBackupFileServices() {
     return new ArrayList<>();
+  }
+
+  @Override
+  public boolean registerBackupFileService(IBackupFileService backupFileService) {
+    return false;
+  }
+
+  @Override
+  public boolean unregisterBackupFileService(IBackupFileService backupFileService) {
+    return false;
   }
 
   @Override

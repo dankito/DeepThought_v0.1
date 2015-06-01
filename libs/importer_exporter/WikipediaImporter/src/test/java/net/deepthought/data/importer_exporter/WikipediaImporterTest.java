@@ -23,17 +23,17 @@ public class WikipediaImporterTest {
 
   @Before
   public void setup() throws SQLException {
-    importer = new WikipediaImporter();
-
     Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
 
     deepThought = Application.getDeepThought();
+
+    importer = new WikipediaImporter();
   }
 
 
   @Test
   public void test() {
-    importer.importWikipediaArticles();
+    importer.testImportWikipediaArticles();
   }
 
   @Test

@@ -19,7 +19,7 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.junit.After;
 import org.junit.Assert;

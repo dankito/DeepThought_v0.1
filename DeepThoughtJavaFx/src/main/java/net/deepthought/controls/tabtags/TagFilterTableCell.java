@@ -1,7 +1,7 @@
 package net.deepthought.controls.tabtags;
 
 import net.deepthought.data.model.Tag;
-import net.deepthought.model.SystemTag;
+import net.deepthought.data.model.ui.SystemTag;
 
 import java.util.Collection;
 

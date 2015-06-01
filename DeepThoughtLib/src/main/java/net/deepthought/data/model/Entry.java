@@ -3,7 +3,6 @@ package net.deepthought.data.model;
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.listener.EntryPersonListener;
-import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
@@ -28,7 +27,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PostPersist;
 import javax.persistence.Transient;
 
 /**
@@ -55,6 +53,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Column(name = TableConfig.EntryAbstractColumnName)
   @Lob
   protected String abstractString = ""; // field cannot be named 'abstract' as this is a Java Keyword. So i named field abstractString but getter is called getAbstract()
+
+  protected transient String plainTextAbstract = null;
 
   @Column(name = TableConfig.EntryContentColumnName)
 //  @Column(name = TableConfig.EntryContentColumnName, columnDefinition = "clob") // Derby needs explicitly clob column definition
@@ -168,9 +168,21 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return abstractString;
   }
 
+  public String getAbstractAsPlainText() {
+    if(plainTextAbstract == null) {
+      if (Application.getHtmlHelper() != null)
+        plainTextAbstract = Application.getHtmlHelper().extractPlainTextFromHtmlBody(abstractString);
+      else
+//        return content;
+        return "";
+    }
+    return plainTextAbstract;
+  }
+
   public void setAbstract(String abstractString) {
     String previousAbstract = this.abstractString;
     this.abstractString = abstractString;
+    plainTextAbstract = null;
     preview = null;
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
   }
@@ -179,6 +191,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return content;
   }
 
+  @Transient
   public String getContentAsPlainText() {
     if(plainTextContent == null) {
       if (Application.getHtmlHelper() != null)
@@ -449,12 +462,13 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     if(existingAssociation != null) // Person already added to Entry
       return false;
 
+    persons = null;
+
     EntryPersonAssociation entryPersonAssociation = new EntryPersonAssociation(this, person, entryPersonAssociations.size());
 
     boolean result = this.entryPersonAssociations.add(entryPersonAssociation);
     result &= person.addEntry(entryPersonAssociation);
 
-    persons = null;
     callPersonAddedListeners(person);
     callEntityAddedListeners(entryPersonAssociations, entryPersonAssociation);
 
@@ -507,6 +521,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
   }
 
+
+  public boolean hasNotes() {
+    return notes.size() > 0;
+  }
 
   public Collection<Note> getNotes() {
     return notes;
@@ -669,10 +687,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     if (StringUtils.isNotNullOrEmpty(title))
       preview += title;
 
-    if (StringUtils.isNotNullOrEmpty(abstractString)) {
+    if (StringUtils.isNotNullOrEmpty(getAbstractAsPlainText())) {
       if (preview.length() > 0)
         preview += ": ";
-      preview += abstractString;
+      preview += getAbstractAsPlainText();
     }
 
     if (preview.length() <= PreviewMaxLength && StringUtils.isNotNullOrEmpty(content)) {
@@ -746,44 +764,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Override
   public String toString() {
     return "Entry " + getTextRepresentation();
-  }
-
-
-  @PostPersist
-  protected void postPersist() {
-    if(Application.getSearchEngine() != null)
-      Application.getSearchEngine().indexEntity(this);
-  }
-
-  @Override
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
-    super.callPropertyChangedListeners(propertyName, previousValue, newValue);
-
-    Application.getSearchEngine().updateIndexForEntity(this, propertyName);
-  }
-
-  @Override
-  protected void callEntityAddedListeners(Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-    super.callEntityAddedListeners(collection, addedEntity);
-
-    if(collection == tags)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryTagsPseudoColumnName);
-    else if(collection == categories)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryCategoriesPseudoColumnName);
-    else if(collection == entryPersonAssociations)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryPersonsPseudoColumnName);
-  }
-
-  @Override
-  protected void callEntityRemovedListeners(Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-    super.callEntityRemovedListeners(collection, removedEntity);
-
-    if(collection == tags)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryTagsPseudoColumnName);
-    else if(collection == categories)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryCategoriesPseudoColumnName);
-    else if(collection == entryPersonAssociations)
-      Application.getSearchEngine().updateIndexForEntity(this, TableConfig.EntryPersonsPseudoColumnName);
   }
 
 

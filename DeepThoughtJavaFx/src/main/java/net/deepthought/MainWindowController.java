@@ -6,12 +6,21 @@
 
 package net.deepthought;
 
+import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
 import net.deepthought.data.DeepThoughtFxApplicationConfiguration;
+import net.deepthought.data.contentextractor.ClipboardContent;
+import net.deepthought.data.contentextractor.ContentExtractOption;
+import net.deepthought.data.contentextractor.ContentExtractOptions;
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+import net.deepthought.data.contentextractor.JavaFxClipboardContent;
+import net.deepthought.data.contentextractor.OptionInvokedListener;
+import net.deepthought.data.download.IFileDownloader;
+import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -25,13 +34,16 @@ import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.InputManager;
 import net.deepthought.util.Localization;
 
 import org.controlsfx.control.action.Action;
@@ -69,7 +81,10 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -88,14 +103,22 @@ public class MainWindowController implements Initializable {
 
   protected DeepThought deepThought = null;
 
+  protected CreateEntryFromClipboardContentPopup createEntryFromClipboardContentPopup;
+
   protected CategoryTreeItem selectedCategoryTreeItem = null;
 
 
+  @FXML
+  protected Menu mnitmFile;
+  @FXML
+  protected Menu mnitmFileClipboard;
   @FXML
   protected MenuItem mnitmToolsBackups;
   @FXML
   protected Menu mnitmMainMenuWindow;
 
+  @FXML
+  protected Pane statusLabelPane;
   @FXML
   protected Label statusLabel;
   @FXML
@@ -144,6 +167,7 @@ public class MainWindowController implements Initializable {
     Application.addApplicationListener(new ApplicationListener() {
       @Override
       public void deepThoughtChanged(DeepThought deepThought) {
+//        ((LuceneSearchEngine)Application.getSearchEngine()).rebuildIndex();
         deepThoughtChangedThreadSafe(deepThought);
       }
 
@@ -162,13 +186,18 @@ public class MainWindowController implements Initializable {
       @Override
       public ISearchEngine createSearchEngine() {
         try {
-          return new LuceneSearchEngine();
+//          return new LuceneSearchEngine();
+          return new LuceneAndDatabaseSearchEngine();
         } catch(Exception ex) {
           log.error("Could not initialize LuceneSearchEngine", ex);
         }
-        return null; // TODO: abort application?
+        return new InMemorySearchEngine(); // TODO: abort application?
       }
 
+      @Override
+      public IFileDownloader createDownloader() {
+        return new WGetFileDownloader();
+      }
 
       @Override
       public ILanguageDetector createLanguageDetector() {
@@ -567,6 +596,75 @@ public class MainWindowController implements Initializable {
 
 
   @FXML
+  public void handleMainMenuFileShowing(Event event) {
+    ClipboardContent clipboardContent = new JavaFxClipboardContent(Clipboard.getSystemClipboard());
+    ContentExtractOptions contentExtractOptions = Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContent(clipboardContent);
+
+    mnitmFileClipboard.getItems().clear();
+    mnitmFileClipboard.setDisable(contentExtractOptions.hasContentExtractOptions() == false);
+
+    if(contentExtractOptions.hasContentExtractOptions()) {
+      setMenuFileClipboard(contentExtractOptions);
+    }
+  }
+
+  protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
+    if(contentExtractOptions.isOnlineArticleContentExtractor())
+      createOnlineArticleClipboardMenuItems(contentExtractOptions);
+//    else if(contentExtractOptions.isRemoteFileContentExtractor())
+//      createRemoteFileClipboardMenuItems(contentExtractOptions);
+//    else if(contentExtractOptions.isLocalFileContentExtractor())
+//      createLocalFileClipboardMenuItems(contentExtractOptions);
+    else if(contentExtractOptions.isUrl())
+      createLocalFileClipboardMenuItems(contentExtractOptions);
+  }
+
+  protected void createOnlineArticleClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
+    final ContentExtractOption contentExtractOption = contentExtractOptions.getContentExtractOptions().get(0);
+    final IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)contentExtractOption.getContentExtractor();
+
+    addClipboardMenuItem(contentExtractOptions, "create.entry.from.online.article.option.directly.add.entry", InputManager.getInstance().getCreateEntryFromClipboardDirectlyAddEntryKeyCombination(),
+        options -> createEntryFromClipboardContentPopup.directlyAddEntryFromOnlineArticle(contentExtractOption, contentExtractor));
+    addClipboardMenuItem(contentExtractOptions, "create.entry.from.online.article.option.view.new.entry.first", InputManager.getInstance().getCreateEntryFromClipboardViewNewEntryFirstKeyCombination(),
+        options -> createEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst(contentExtractOption, contentExtractor));
+  }
+
+  protected void createRemoteFileClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
+
+  }
+
+  protected void createLocalFileClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
+    if(contentExtractOptions.canSetFileAsEntryContent())
+      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.set.as.entry.content",
+        InputManager.getInstance().getCreateEntryFromClipboardSetAsEntryContentKeyCombination(), options -> createEntryFromClipboardContentPopup.copyFileToDataFolderAndSetAsEntryContent(options));
+
+    if(contentExtractOptions.canAttachFileToEntry())
+      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.add.as.file.attachment",
+        InputManager.getInstance().getCreateEntryFromClipboardAddAsFileAttachmentKeyCombination(), options -> createEntryFromClipboardContentPopup.attachFileToEntry(options));
+
+    if(contentExtractOptions.canExtractText())
+      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.try.to.extract.text.from.it",
+        InputManager.getInstance().getCreateEntryFromClipboardTryToExtractTextKeyCombination(), options -> createEntryFromClipboardContentPopup.tryToExtractText(options));
+
+    if(contentExtractOptions.canAttachFileToEntry() && contentExtractOptions.canExtractText())
+      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.add.as.file.attachment.and.try.to.extract.text.from.it",
+        InputManager.getInstance().getCreateEntryFromClipboardAddAsFileAttachmentAndTryToExtractTextKeyCombination(), options -> createEntryFromClipboardContentPopup.attachFileToEntryAndTryToExtractText(options));
+  }
+
+  protected void addClipboardMenuItem(final ContentExtractOptions contentExtractOptions, String optionNameResourceKey, KeyCombination optionKeyCombination,
+                                      final OptionInvokedListener listener) {
+    final MenuItem optionMenu = new MenuItem(Localization.getLocalizedStringForResourceKey(optionNameResourceKey));
+//    if(optionKeyCombination != null)
+    optionMenu.setAccelerator(optionKeyCombination);
+    mnitmFileClipboard.getItems().add(optionMenu);
+
+    optionMenu.setOnAction(action -> {
+      if (listener != null)
+        listener.optionInvoked(contentExtractOptions);
+    });
+  }
+
+  @FXML
   public void handleMenuItemToolsBackupsAction(Event event) {
     net.deepthought.controller.Dialogs.showRestoreBackupDialog(stage);
   }
@@ -625,6 +723,8 @@ public class MainWindowController implements Initializable {
   public void setStage(Stage stage) {
     this.stage = stage;
 
+    this.createEntryFromClipboardContentPopup = new CreateEntryFromClipboardContentPopup(stage);
+
     stage.setOnHiding(new EventHandler<WindowEvent>() {
       @Override
       public void handle(WindowEvent event) {
@@ -639,6 +739,13 @@ public class MainWindowController implements Initializable {
 //        if(newValue.doubleValue() < oldValue.doubleValue())
 //          padding += (oldValue.doubleValue() - newValue.doubleValue());
 //        pnTitledPaneEditEntryTagsGraphic.setPrefWidth(pnQuickEditEntry.getWidth() - padding);
+      }
+    });
+
+    stage.focusedProperty().addListener(new ChangeListener<Boolean>() {
+      @Override
+      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+        mnitmFileClipboard.getItems().clear();
       }
     });
   }

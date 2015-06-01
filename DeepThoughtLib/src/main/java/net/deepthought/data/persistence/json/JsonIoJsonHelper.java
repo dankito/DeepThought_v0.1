@@ -1,6 +1,5 @@
 package net.deepthought.data.persistence.json;
 
-import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
 
 import net.deepthought.data.model.Category;
@@ -37,7 +36,7 @@ public class JsonIoJsonHelper {
     }
 
     try {
-      T result = (T)JsonReader.jsonToJava(json);
+      T result = (T)DeepThoughtJsonReader.jsonToJava(json);
       return new DeserializationResult<T>(result);
     } catch (IOException e) {
       log.error("Error io json ", e);
@@ -59,7 +58,7 @@ public class JsonIoJsonHelper {
       if(formatOutput)
         arguments.put(JsonWriter.PRETTY_PRINT, true);
 
-      String json = JsonWriter.objectToJson(object, arguments);
+      String json = DeepThoughtJsonWriter.objectToJson(object, arguments);
       return new SerializationResult(json);
     } catch (Exception e) {
       log.error("Error generate json", e);

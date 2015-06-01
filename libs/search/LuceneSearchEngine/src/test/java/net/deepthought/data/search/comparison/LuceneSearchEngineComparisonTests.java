@@ -4,11 +4,21 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.LuceneSearchEngine;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 
 /**
  * Created by ganymed on 16/04/15.
  */
 public class LuceneSearchEngineComparisonTests extends SearchComparisonTestBase {
+
+  @BeforeClass
+  public static void suiteSetup() throws Exception {
+    SearchComparisonTestBase.suiteSetup();
+
+//    LuceneSearchEngine rebuildIndexSearchEngine = new LuceneSearchEngine();
+//    rebuildIndexSearchEngine.rebuildIndex();
+//    rebuildIndexSearchEngine.close();
+  }
 
   @Override
   protected ISearchEngine createSearchEngine() {

@@ -114,7 +114,7 @@ public class PersonListCell extends ListCell<Person> {
   protected void updateItem(Person item, boolean empty) {
     super.updateItem(item, empty);
 
-    if(empty) {
+    if(empty || item == null) {
       setGraphic(null);
     }
     else {

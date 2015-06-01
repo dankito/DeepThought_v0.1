@@ -11,6 +11,7 @@ import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jpa.EntityConfig;
 import com.j256.ormlite.jpa.JpaEntityConfigurationReader;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
@@ -31,6 +32,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -377,6 +379,25 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   }
 
   @Override
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids) {
+    List<T> result = new ArrayList<>();
+
+    try {
+      Dao dao = getDaoForClass(entityClass);
+
+      if(dao != null) {
+        QueryBuilder queryBuilder = dao.queryBuilder();
+        queryBuilder.where().in(dao.getEntityConfig().getIdProperty().getColumnName(), ids);
+        List result2 = queryBuilder.query();
+        return (List<T>)result2;
+      }
+    } catch(Exception ex) {
+      log.error("Could not get Entities for Type " + entityClass, ex); }
+
+    return result;
+  }
+
+  @Override
   public boolean updateEntity(BaseEntity entity) {
     log.debug("Going to update Entity " + entity);
     return createOrUpdateEntity(entity);
@@ -453,6 +474,22 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   @Override
   public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
 
+  }
+
+  @Override
+  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
+    try {
+      Dao dao = getDaoForClass(entityClass);
+
+      if(dao != null) {
+        QueryBuilder queryBuilder = dao.queryBuilder();
+        queryBuilder.where().raw(whereStatement);
+        return (List<T>) queryBuilder.query();
+      }
+    } catch(Exception ex) {
+      log.error("Could not query for Entities for Type " + entityClass + " with where statement " + whereStatement, ex); }
+
+    return new ArrayList<>();
   }
 
   @Override

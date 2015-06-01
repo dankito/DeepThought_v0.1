@@ -5,6 +5,7 @@ import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jpa.EntityConfig;
 import com.j256.ormlite.jpa.JpaEntityConfigurationReader;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.StatementExecutor;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -250,6 +252,22 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
   }
 
   @Override
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids) {
+    try {
+      Dao dao = getDaoForClass(entityClass);
+
+      if(dao != null) {
+        QueryBuilder queryBuilder = dao.queryBuilder();
+        queryBuilder.where().in(dao.getEntityConfig().getIdProperty().getColumnName(), ids);
+        return (List<T>) queryBuilder.query();
+      }
+    } catch(Exception ex) {
+      log.error("Could not get Entities for Type " + entityClass, ex); }
+
+    return new ArrayList<>();
+  }
+
+  @Override
   public boolean updateEntity(BaseEntity entity) {
     log.debug("Going to update Entity " + entity);
     return createOrUpdateEntity(entity);
@@ -344,6 +362,22 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
     }
 
     return results;
+  }
+
+  @Override
+  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
+    try {
+      Dao dao = getDaoForClass(entityClass);
+
+      if(dao != null) {
+        QueryBuilder queryBuilder = dao.queryBuilder();
+        queryBuilder.where().raw(whereStatement);
+        return (List<T>) queryBuilder.query();
+      }
+    } catch(Exception ex) {
+      log.error("Could not query for Entities for Type " + entityClass + " with where statement " + whereStatement, ex); }
+
+    return new ArrayList<>();
   }
 
 

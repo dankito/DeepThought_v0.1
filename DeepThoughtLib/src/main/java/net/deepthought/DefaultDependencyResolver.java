@@ -6,16 +6,22 @@ import net.deepthought.data.backup.DefaultBackupManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.DefaultDataComparer;
 import net.deepthought.data.compare.IDataComparer;
+import net.deepthought.data.contentextractor.DefaultContentExtractorManager;
+import net.deepthought.data.contentextractor.IContentExtractorManager;
+import net.deepthought.data.download.IFileDownloader;
+import net.deepthought.data.download.NoOpFileDownloader;
 import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.html.JsoupHtmlHelper;
 import net.deepthought.data.merger.DefaultDataMerger;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.DefaultSearchEngine;
+import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.NoOpLanguageDetector;
+import net.deepthought.plugin.DefaultPluginManager;
+import net.deepthought.plugin.IPluginManager;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -93,7 +99,7 @@ public class DefaultDependencyResolver implements IDependencyResolver {
   @Override
   public ISearchEngine createSearchEngine() {
     if(searchEngine == null)
-      searchEngine = new DefaultSearchEngine();
+      searchEngine = new InMemorySearchEngine();
     return searchEngine;
   }
 
@@ -102,6 +108,20 @@ public class DefaultDependencyResolver implements IDependencyResolver {
     if(htmlHelper == null)
       htmlHelper = new JsoupHtmlHelper();
     return htmlHelper;
+  }
+
+  public IFileDownloader createDownloader() {
+    return new NoOpFileDownloader();
+  }
+
+  @Override
+  public IPluginManager createPluginManager() {
+    return new DefaultPluginManager();
+  }
+
+  @Override
+  public IContentExtractorManager createContentExtractorManager() {
+    return new DefaultContentExtractorManager();
   }
 
 }

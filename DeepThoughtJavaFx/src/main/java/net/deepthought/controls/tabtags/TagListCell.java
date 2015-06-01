@@ -5,7 +5,7 @@ import net.deepthought.controls.TextFieldListCell;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.model.SystemTag;
+import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.util.Alerts;
 
 import java.util.Collection;

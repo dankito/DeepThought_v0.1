@@ -3,17 +3,10 @@ package net.deepthought.data;
 import net.deepthought.Application;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.listener.ApplicationListener;
-import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.Device;
-import net.deepthought.data.model.EntriesLinkGroup;
-import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Group;
-import net.deepthought.data.model.Note;
-import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.EntityListener;
@@ -23,8 +16,8 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.AssociationEntity;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.FileUtils;
 import net.deepthought.util.Localization;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
@@ -121,6 +113,7 @@ public class DefaultDataManager implements IDataManager {
 
   protected DeepThought createAndPersistDefaultDeepThought() {
     application = DeepThoughtApplication.createApplication();
+    setCurrentDeepThoughtApplication(application);
     loggedOnUser = application.getLastLoggedOnUser();
 
     DeepThought newDeepThought = loggedOnUser.getLastViewedDeepThought();
@@ -153,15 +146,23 @@ public class DefaultDataManager implements IDataManager {
       language.addEntityListener(entityListener);
   }
 
+  protected void setCurrentDeepThoughtApplication(DeepThoughtApplication application) {
+    if(this.application != null)
+      this.application.removeEntityListener(entityListener);
+
+    this.application = application;
+
+    if(application != null)
+      application.addEntityListener(entityListener);
+  }
+
   protected void setCurrentDeepThought(DeepThought deepThought) {
     if(currentDeepThought != null)
-//      deepThought.removeEntityListener(entityListener);
       deepThought.removeEntityListener(entityListener);
 
     currentDeepThought = deepThought;
 
     if(currentDeepThought != null)
-//      deepThought.addEntityListener(entityListener);
       deepThought.addEntityListener(entityListener);
 
     callDeepThoughtChangedListeners(currentDeepThought);
@@ -248,9 +249,6 @@ public class DefaultDataManager implements IDataManager {
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       DefaultDataManager.this.entityUpdated(updatedEntity);
-
-      if(updatedEntity instanceof Entry)
-        Application.getSearchEngine().updateIndexForEntity((Entry) updatedEntity, "");
     }
 
     @Override
@@ -291,134 +289,6 @@ public class DefaultDataManager implements IDataManager {
     }
 
 //    ensureAllLazyLoadingDataIsLoadedRecursive(entity);
-  }
-
-  protected void ensureAllLazyLoadingDataIsLoadedRecursive(BaseEntity entity) {
-    if(entity instanceof DeepThoughtApplication) {
-      DeepThoughtApplication application = (DeepThoughtApplication)entity;
-      for(User user : application.getUsers())
-        ensureAllLazyLoadingDataIsLoadedRecursive(user);
-      for(Group group : application.getGroups())
-        ensureAllLazyLoadingDataIsLoadedRecursive(group);
-    }
-
-    if(entity instanceof Group) {
-      Group group = (Group)entity;
-      group.getName();
-      for(User user : group.getUsers()){}
-//        ensureAllLazyLoadingDataIsLoadedRecursive(user);
-    }
-
-    if(entity instanceof Device) {
-      Device device = (Device)entity;
-      device.getName();
-//      for(User user : device.getUsers())
-//        ensureAllLazyLoadingDataIsLoadedRecursive(user);
-    }
-
-    if(entity instanceof User) {
-      User user = (User)entity;
-      user.getUserName();
-      for(DeepThought deepThought : user.getDeepThoughts())
-        ensureAllLazyLoadingDataIsLoadedRecursive(deepThought);
-      for(Device device : user.getDevices())
-        ensureAllLazyLoadingDataIsLoadedRecursive(device);
-      for(Group group : user.getGroups())
-        ensureAllLazyLoadingDataIsLoadedRecursive(group);
-    }
-
-    if(entity instanceof DeepThought) {
-      DeepThought deepThought = (DeepThought)entity;
-
-      Set<Entry> entries = new HashSet<>(deepThought.getEntries());
-      deepThought.getSettings().setLastViewedEntry(deepThought.getSettings().getLastViewedEntry());
-
-      deepThought.getSettings().getLastSelectedTab();
-      ensureAllLazyLoadingDataIsLoadedRecursive(deepThought.getTopLevelCategory());
-      for(Category category : deepThought.getCategories())
-        ensureAllLazyLoadingDataIsLoadedRecursive(category);
-      for(Entry entry : deepThought.getEntries())
-        ensureAllLazyLoadingDataIsLoadedRecursive(entry);
-      for(Tag tag : deepThought.getTags())
-        ensureAllLazyLoadingDataIsLoadedRecursive(tag);
-      for(Person person : deepThought.getPersons())
-        ensureAllLazyLoadingDataIsLoadedRecursive(person);
-
-      ensureAllLazyLoadingDataIsLoadedRecursive(deepThought.getSettings().getLastViewedCategory());
-      ensureAllLazyLoadingDataIsLoadedRecursive(deepThought.getSettings().getLastViewedEntry());
-      ensureAllLazyLoadingDataIsLoadedRecursive(deepThought.getSettings().getLastViewedTag());
-    }
-
-    if(entity instanceof Category) {
-      Category category = (Category) entity;
-      category.getName();
-//      ensureAllLazyLoadingDataIsLoadedRecursive(category.getParentCategory());
-      category.getParentCategory();
-      for(Category subCategory : category.getSubCategories())
-        ensureAllLazyLoadingDataIsLoadedRecursive(subCategory);
-      for(Entry entry : category.getEntries()){}
-//        ensureAllLazyLoadingDataIsLoadedRecursive(entry);
-//      ensureAllLazyLoadingDataIsLoadedRecursive(category.getDeepThought());
-      category.getDeepThought();
-    }
-
-    if(entity instanceof Entry) {
-      Entry entry = (Entry)entity;
-      for(Category category : entry.getCategories())
-        ensureAllLazyLoadingDataIsLoadedRecursive(category);
-      for(Tag tag : entry.getTags())
-        ensureAllLazyLoadingDataIsLoadedRecursive(tag);
-      for(Person person : entry.getPersons()) {
-          ensureAllLazyLoadingDataIsLoadedRecursive(person);
-      }
-      for(FileLink file : entry.getFiles())
-        ensureAllLazyLoadingDataIsLoadedRecursive(file);
-      for(Note note : entry.getNotes())
-        ensureAllLazyLoadingDataIsLoadedRecursive(note);
-      for(EntriesLinkGroup link : entry.getLinkGroups())
-        ensureAllLazyLoadingDataIsLoadedRecursive(link);
-      // TODO: has this to be done are is this already covered by deepThought.getEntries() ?
-      for(Entry subEntry : entry.getSubEntries())
-        ensureAllLazyLoadingDataIsLoadedRecursive(subEntry);
-//      ensureAllLazyLoadingDataIsLoadedRecursive(entry.getDeepThought());
-      entry.getDeepThought();
-    }
-
-    if(entity instanceof Tag) {
-      Tag tag = (Tag) entity;
-      tag.getName();
-      for(Entry entry : tag.getEntries()) {}
-//        ensureAllLazyLoadingDataIsLoadedRecursive(entry);
-//      ensureAllLazyLoadingDataIsLoadedRecursive(tag.getDeepThought());
-      tag.getDeepThought();
-    }
-
-    if(entity instanceof Person) {
-      Person person = (Person) entity;
-      person.getLastName();
-    }
-
-    if(entity instanceof Note) {
-      Note note = (Note) entity;
-      note.getNote();
-//      ensureAllLazyLoadingDataIsLoadedRecursive(note.getEntryFragment());
-      note.getEntry();
-    }
-
-    if(entity instanceof FileLink) {
-      FileLink file = (FileLink) entity;
-      file.getName();
-//      ensureAllLazyLoadingDataIsLoadedRecursive(file.getEntryFragment());
-//      ensureAllLazyLoadingDataIsLoadedRecursive(file.getPreviewImage());
-      file.getEntries();
-    }
-
-    if(entity instanceof EntriesLinkGroup) {
-      EntriesLinkGroup link = (EntriesLinkGroup) entity;
-      link.getGroupName();
-      for(Entry entry : link.getEntries()){}
-//        ensureAllLazyLoadingDataIsLoadedRecursive(entry);
-    }
   }
 
   @Override

@@ -184,8 +184,7 @@ public class EntryTagsControl extends TitledPane {
     txtfldFilterTags.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-        if (checkIfTagOfThatNameExists(txtfldFilterTags.getText()) == false)
-          addNewTagToEntry();
+        enterHasBeenPressedInTextFieldFilterTags();
       }
     });
     txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -234,6 +233,28 @@ public class EntryTagsControl extends TitledPane {
   }
 
 
+  protected void enterHasBeenPressedInTextFieldFilterTags() {
+    //        if (checkIfTagOfThatNameExists(txtfldFilterTags.getText()) == false)
+//          addNewTagToEntry();
+
+    String tagsFilter = txtfldFilterTags.getText();
+    if(tagsFilter.contains(",") == false) {
+      Tag tagOfThatName = findTagOfThatName(tagsFilter);
+      if (tagOfThatName != null) {
+        if(editedTags.contains(tagOfThatName) == false)
+          addTagToEntry(tagOfThatName);
+        else
+          removeTagFromEntry(tagOfThatName);
+      }
+      else
+        addNewTagToEntry();
+    }
+    else {
+      for(Tag filteredTag : filteredTags)
+        addTagToEntry(filteredTag);
+    }
+  }
+
   protected void setControlsForEnteredTagsFilter(String newValue) {
     filterTags(newValue);
     btnCreateTag.setDisable(checkIfTagOfThatNameExists(newValue));
@@ -246,12 +267,18 @@ public class EntryTagsControl extends TitledPane {
     if(checkIfSystemTagOfThatNameExists(tagName))
       return true;
 
-    for(Tag tag : Application.getDeepThought().getTags()) {
-      if(tagName.equals(tag.getName()))
-        return true;
-    }
+    if(findTagOfThatName(tagName) != null) return true;
 
     return false;
+  }
+
+  protected Tag findTagOfThatName(String tagName) {
+    for(Tag tag : Application.getDeepThought().getTags()) {
+      if(tagName.equals(tag.getName()))
+        return tag;
+    }
+
+    return null;
   }
 
   protected boolean checkIfSystemTagOfThatNameExists(String tagName) {

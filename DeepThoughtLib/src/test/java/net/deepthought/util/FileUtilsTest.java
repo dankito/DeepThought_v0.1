@@ -3,8 +3,10 @@ package net.deepthought.util;
 import net.deepthought.data.helper.AssertSetToFalse;
 import net.deepthought.data.helper.AssertSetToTrue;
 import net.deepthought.data.helper.ErrorOccurred;
-import net.deepthought.util.enums.ExistingFileHandling;
-import net.deepthought.util.listener.FileOperationListener;
+import net.deepthought.util.file.FileNameSuggestion;
+import net.deepthought.util.file.FileUtils;
+import net.deepthought.util.file.enums.ExistingFileHandling;
+import net.deepthought.util.file.listener.FileOperationListener;
 
 import org.junit.After;
 import org.junit.Assert;
