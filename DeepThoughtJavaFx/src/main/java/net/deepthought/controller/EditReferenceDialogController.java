@@ -287,7 +287,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       }
     });
 
-    Application.getDeepThought().addEntityListener(deepThoughtListener);
     // TODO: what to do when DeepThought changes -> close dialog
   }
 
@@ -570,7 +569,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     seriesTitle.removeEntityListener(seriesTitleListener);
     reference.removeEntityListener(referenceListener);
     referenceSubDivision.removeEntityListener(referenceSubDivisionListener);
-    Application.getDeepThought().removeEntityListener(deepThoughtListener);
 
     super.closeDialog();
   }
@@ -1382,28 +1380,5 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtarReferenceSubDivisionNotes.setText(newValue);
     fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
   }
-
-
-  protected EntityListener deepThoughtListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
 
 }

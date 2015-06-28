@@ -9,6 +9,7 @@ import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Group;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -49,6 +50,7 @@ public class DefaultDataManager implements IDataManager {
   protected String dataFolder;
 
   protected Set<ApplicationListener> applicationListeners = new CopyOnWriteArraySet<>();
+  protected Set<AllEntitiesListener> allEntitiesListeners = new CopyOnWriteArraySet<>();
 
   protected Set<BaseEntity> unpersistedUpdatedEntities = new CopyOnWriteArraySet<>();
   protected Timer persistUpdatedEntitiesTimer = null;
@@ -92,9 +94,8 @@ public class DefaultDataManager implements IDataManager {
 
       if (applicationsQueryResult.size() > 0) { // TODO: what to do if there's more than one DeepThoughtApplication instance persisted?
         application = applicationsQueryResult.get(0);
+//        setCurrentDeepThoughtApplication(application);
         loggedOnUser = application.getLastLoggedOnUser();
-
-        application.addEntityListener(entityListener);
 
         // TODO: what to return if user was already logged on but autoLogOn is set to false?
         if (application.autoLogOnLastLoggedOnUser()) {
@@ -113,7 +114,7 @@ public class DefaultDataManager implements IDataManager {
 
   protected DeepThought createAndPersistDefaultDeepThought() {
     application = DeepThoughtApplication.createApplication();
-    setCurrentDeepThoughtApplication(application);
+//    setCurrentDeepThoughtApplication(application);
     loggedOnUser = application.getLastLoggedOnUser();
 
     DeepThought newDeepThought = loggedOnUser.getLastViewedDeepThought();
@@ -122,17 +123,15 @@ public class DefaultDataManager implements IDataManager {
     entityManager.persistEntity(application);
     entityManager.persistEntity(newDeepThought);
     Application.getSettings().setLanguage(Application.getSettings().getLanguage());
-    newDeepThought.getSettings().setLastViewedCategory(newDeepThought.getSettings().getLastViewedCategory());
+    newDeepThought.getSettings().setLastViewedCategory(newDeepThought.getSettings().getLastViewedCategory()); // TODO: what kind of code is this?
 
-    addNewlyCreatedApplicationEntityListeners();
+//    addNewlyCreatedApplicationEntityListeners();
     setCurrentDeepThought(newDeepThought);
 
     return newDeepThought;
   }
 
   protected void addNewlyCreatedApplicationEntityListeners() {
-    application.addEntityListener(entityListener);
-
     for(User user : application.getUsers())
       user.addEntityListener(entityListener);
 
@@ -152,8 +151,8 @@ public class DefaultDataManager implements IDataManager {
 
     this.application = application;
 
-    if(application != null)
-      application.addEntityListener(entityListener);
+    if(this.application != null)
+      this.application.addEntityListener(entityListener);
   }
 
   protected void setCurrentDeepThought(DeepThought deepThought) {
@@ -162,8 +161,8 @@ public class DefaultDataManager implements IDataManager {
 
     currentDeepThought = deepThought;
 
-    if(currentDeepThought != null)
-      deepThought.addEntityListener(entityListener);
+//    if(currentDeepThought != null)
+//      deepThought.addEntityListener(entityListener);
 
     callDeepThoughtChangedListeners(currentDeepThought);
   }
@@ -233,31 +232,66 @@ public class DefaultDataManager implements IDataManager {
   }
 
 
+  /**
+   * <p>
+   * (Not such a good solution)
+   * This method such be called by Database persisted whenever a lazy loading Entity got loaded / mapped
+   * so that Entity Listeners can be added to this Entity in order to keep its state modifiedOn in UI.
+   * </p>
+   * @param entity The just mapped Entity
+   */
+  public void lazyLoadedEntityMapped(BaseEntity entity) {
+    log.info("Lazy loaded Entity mapped: {}", entity);
+    entity.addEntityListener(entityListener);
+//    try { throw new Exception("Show me the Call Stack"); } catch (Exception ex) { log.error("", ex); }
+  }
+
   protected EntityListener entityListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       DefaultDataManager.this.entityUpdated(entity);
+      callEntityUpdatedListeners(entity, propertyName, previousValue, newValue);
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-//      addedEntity.addEntityListener(baseEntityListener);
-      if(addedEntity.isPersisted() == false)
-        DefaultDataManager.this.entityCreated(addedEntity);
+      if(collectionHolder == currentDeepThought || collectionHolder == application ||
+          (collectionHolder instanceof User && addedEntity instanceof DeepThought) || addedEntity instanceof AssociationEntity) {
+        entityHasBeenCreated(addedEntity);
+      }
+      DefaultDataManager.this.entityUpdated(collectionHolder);
+      callEntityAddedToCollectionListeners(collectionHolder, collection, addedEntity);
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      DefaultDataManager.this.entityUpdated(updatedEntity);
+//      DefaultDataManager.this.entityUpdated(updatedEntity); // TODO: still needed?
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-//      removedEntity.removeEntityListener(baseEntityListener);
-      if(collectionHolder instanceof DeepThought || collectionHolder instanceof DeepThoughtApplication || removedEntity instanceof AssociationEntity)
-        DefaultDataManager.this.entityDeleted(removedEntity);
+      if(collectionHolder == currentDeepThought || collectionHolder == application ||
+          (collectionHolder instanceof User && removedEntity instanceof DeepThought)|| removedEntity instanceof AssociationEntity) {
+        entityHasBeenRemoved(removedEntity);
+      }
+      DefaultDataManager.this.entityUpdated(collectionHolder);
+      callEntityRemovedFromCollectionListeners(collectionHolder, collection, removedEntity);
     }
   };
+
+  protected void entityHasBeenCreated(BaseEntity entity) {
+    entity.addEntityListener(entityListener); // add a listener to every Entity so that it's changes can be tracked
+    if (entity.isPersisted() == false)
+      entityCreated(entity);
+    callEntityCreatedListeners(entity);
+  }
+
+  protected void entityHasBeenRemoved(BaseEntity entity) {
+    entity.removeEntityListener(entityListener);
+    if(entity.isDeleted() == false)
+      entityDeleted(entity);
+    callEntityDeletedListeners(entity);
+  }
 
 
   public boolean addApplicationListener(ApplicationListener listener) {
@@ -278,6 +312,42 @@ public class DefaultDataManager implements IDataManager {
   protected void callErrorOccurredListeners(DeepThoughtError error) {
     for(ApplicationListener listener : applicationListeners)
       listener.errorOccurred(error);
+  }
+
+
+  public boolean addAllEntitiesListener(AllEntitiesListener listener) {
+    if(listener == null)
+      return false;
+    return allEntitiesListeners.add(listener);
+  }
+
+  public boolean removeAllEntitiesListener(AllEntitiesListener listener) {
+    return allEntitiesListeners.remove(listener);
+  }
+
+  protected void callEntityCreatedListeners(BaseEntity entity) {
+    for(AllEntitiesListener listener : allEntitiesListeners)
+      listener.entityCreated(entity);
+  }
+
+  protected void callEntityUpdatedListeners(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    for(AllEntitiesListener listener : allEntitiesListeners)
+      listener.entityUpdated(entity, propertyName, previousValue, newValue);
+  }
+
+  protected void callEntityDeletedListeners(BaseEntity entity) {
+    for(AllEntitiesListener listener : allEntitiesListeners)
+      listener.entityDeleted(entity);
+  }
+
+  protected void callEntityAddedToCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+    for(AllEntitiesListener listener : allEntitiesListeners)
+      listener.entityAddedToCollection(collectionHolder, collection, addedEntity);
+  }
+
+  protected void callEntityRemovedFromCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+    for(AllEntitiesListener listener : allEntitiesListeners)
+      listener.entityRemovedFromCollection(collectionHolder, collection, addedEntity);
   }
 
 

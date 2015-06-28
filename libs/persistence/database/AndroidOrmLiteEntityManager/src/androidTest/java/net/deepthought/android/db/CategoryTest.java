@@ -66,7 +66,8 @@ public class CategoryTest extends EntitiesTestBase {
     category.addSubCategory(subCategory);
 
     Long subCategoryId = subCategory.getId();
-    category.removeSubCategory(subCategory);
+//    category.removeSubCategory(subCategory);
+    deepThought.removeCategory(subCategory);
 
     // assert categories really didn't get deleted from database
     List queryResult = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.CategoryTableName + " WHERE id=" + subCategoryId);
@@ -81,7 +82,8 @@ public class CategoryTest extends EntitiesTestBase {
     Category subCategory = new Category("sub");
     category.addSubCategory(subCategory);
 
-    category.removeSubCategory(subCategory);
+//    category.removeSubCategory(subCategory);
+    deepThought.removeCategory(subCategory);
 
     assertNotNull(subCategory.getId()); // subCategories is not a Composition -> subCategory stays in DB till it gets removed from DeepThought
     assertNull(subCategory.getParentCategory());

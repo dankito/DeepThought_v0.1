@@ -156,8 +156,8 @@ public class Category extends UserDataEntity {
           subCategoryEnum.setCategoryOrder(subCategoryEnum.getCategoryOrder() - 1);
       }
 
-      if(deepThought != null /*&& this.equals(subCategory.getParentCategory())*/) // TODO: what is this.equals(subCategory.getParentCategory()) good for?
-        deepThought.removeCategory(subCategory);
+//      if(deepThought != null /*&& this.equals(subCategory.getParentCategory())*/) // TODO: what is this.equals(subCategory.getParentCategory()) good for?
+//        deepThought.removeCategory(subCategory);
 
       callEntityRemovedListeners(subCategories, subCategory);
     }
@@ -183,8 +183,8 @@ public class Category extends UserDataEntity {
         entry.addCategory(this);
 //        Collections.sort((List) entries, entriesByIndexComparator); // throws an UnsupportedException // TODO: sort Category's Entries
 
-        if (entry.deepThought == null)
-          deepThought.addEntry(entry);
+//        if (entry.deepThought == null)
+//          deepThought.addEntry(entry);
 
         callEntityAddedListeners(entries, entry);
         return true;

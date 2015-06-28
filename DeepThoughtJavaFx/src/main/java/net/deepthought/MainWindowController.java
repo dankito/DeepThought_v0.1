@@ -269,7 +269,6 @@ public class MainWindowController implements Initializable {
     log.debug("DeepThought changed from {} to {}", this.deepThought, deepThought);
 
     if(this.deepThought != null) {
-      this.deepThought.removeEntityListener(deepThoughtListener);
       Application.getSettings().removeSettingsChangedListener(userDeviceSettingsChangedListener);
     }
 
@@ -280,8 +279,6 @@ public class MainWindowController implements Initializable {
     clearAllData();
 
     if(deepThought != null) {
-      deepThought.addEntityListener(deepThoughtListener);
-
       trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
       selectedCategoryChanged(deepThought.getTopLevelCategory());
 
@@ -515,7 +512,8 @@ public class MainWindowController implements Initializable {
         trvwCategories.getSelectionModel().select(parentTreeItem);
     }
 
-    parent.removeSubCategory(category);
+//    parent.removeSubCategory(category);
+    deepThought.removeCategory(category);
   }
 
   @FXML
@@ -749,28 +747,6 @@ public class MainWindowController implements Initializable {
       }
     });
   }
-
-  protected EntityListener deepThoughtListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
 
   protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {
     @Override

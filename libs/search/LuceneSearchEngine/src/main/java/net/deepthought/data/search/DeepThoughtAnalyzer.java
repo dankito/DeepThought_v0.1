@@ -32,6 +32,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.sv.SwedishAnalyzer;
 import org.apache.lucene.analysis.th.ThaiAnalyzer;
 import org.apache.lucene.analysis.tr.TurkishAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 import org.apache.lucene.util.Version;
 
 import java.util.HashMap;
@@ -177,6 +178,78 @@ public class DeepThoughtAnalyzer extends AnalyzerWrapper {
    */
   public void setNextEntryToBeAnalyzed(Entry nextEntryToBeAnalyzed) {
     setCurrentLanguageAnalyzer(getAnalyzerForTextLanguage(nextEntryToBeAnalyzed.getAbstractAsPlainText() + " " + nextEntryToBeAnalyzed.getContentAsPlainText()));
+  }
+
+
+
+  protected final static CharArraySet DefaultStopWords = new CharArraySet(Version.LUCENE_47, 0, true);
+
+  public static CharArraySet getLanguageStopWords(Language language) {
+    if(language == null || language == ILanguageDetector.CouldNotDetectLanguage)
+      return DefaultStopWords;
+
+    switch(language.getLanguageKey()) {
+      case "en":
+        return EnglishAnalyzer.getDefaultStopSet();
+      case "es":
+        return SpanishAnalyzer.getDefaultStopSet();
+      case "fr":
+        return FrenchAnalyzer.getDefaultStopSet();
+      case "it":
+        return ItalianAnalyzer.getDefaultStopSet();
+      case "de":
+        CharArraySet stopWords = GermanAnalyzer.getDefaultStopSet();
+        stopWords.add("dass"); // can't believe it, dass is missing in Lucene's German Stop Wort List
+        return stopWords;
+      case "ar":
+        return ArabicAnalyzer.getDefaultStopSet();
+      case "bg":
+        return BulgarianAnalyzer.getDefaultStopSet();
+      case "br": // Brazil
+        return PortugueseAnalyzer.getDefaultStopSet();
+      case "cs":
+        return CzechAnalyzer.getDefaultStopSet();
+      case "da":
+        return DanishAnalyzer.getDefaultStopSet();
+      case "el":
+        return GreekAnalyzer.getDefaultStopSet();
+      case "fa":
+        return PersianAnalyzer.getDefaultStopSet();
+      case "fi":
+        return FinnishAnalyzer.getDefaultStopSet();
+      case "hi":
+        return HindiAnalyzer.getDefaultStopSet();
+      case "hu":
+        return HungarianAnalyzer.getDefaultStopSet();
+      case "id":
+        return IndonesianAnalyzer.getDefaultStopSet();
+      case "ja": // Japanese
+        return CJKAnalyzer.getDefaultStopSet();
+      case "ko": // Korean
+        return CJKAnalyzer.getDefaultStopSet();
+      case "nl":
+        return DutchAnalyzer.getDefaultStopSet();
+      case "no":
+        return NorwegianAnalyzer.getDefaultStopSet();
+      case "pt":
+        return PortugueseAnalyzer.getDefaultStopSet();
+      case "ro":
+        return RomanianAnalyzer.getDefaultStopSet();
+      case "ru":
+        return RussianAnalyzer.getDefaultStopSet();
+      case "sv":
+        return SwedishAnalyzer.getDefaultStopSet();
+      case "th":
+        return ThaiAnalyzer.getDefaultStopSet();
+      case "tr":
+        return TurkishAnalyzer.getDefaultStopSet();
+      case "zh-cn": // Simplified Chinese
+        return CJKAnalyzer.getDefaultStopSet();
+      case "zh-tw": // Traditional Chinese
+        return CJKAnalyzer.getDefaultStopSet();
+    }
+
+    return DefaultStopWords;
   }
 
 }

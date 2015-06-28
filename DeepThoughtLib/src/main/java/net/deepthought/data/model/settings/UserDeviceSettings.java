@@ -21,7 +21,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
   protected boolean autoSaveChanges = true;
 
-  protected int autoSaveChangesAfterMilliseconds = 10 * 1000;
+  protected int autoSaveChangesAfterMilliseconds = 2 * 1000;
 
   protected int maxBackupsToKeep = 7;
 

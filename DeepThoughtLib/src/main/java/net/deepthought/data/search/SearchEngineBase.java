@@ -24,6 +24,8 @@ public abstract class SearchEngineBase implements ISearchEngine {
   public SearchEngineBase() {
     Application.addApplicationListener(applicationListener);
     this.deepThought = Application.getDeepThought();
+    if(deepThought != null)
+      deepThoughtChanged(null, deepThought);
   }
 
 

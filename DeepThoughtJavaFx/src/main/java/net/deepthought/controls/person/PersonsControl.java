@@ -327,14 +327,14 @@ public abstract class PersonsControl extends TitledPane {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == Application.getDeepThought().getPersons()) {
+      if(collection == deepThought.getPersons()) {
         resetListViewAllPersonsItems();
       }
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == Application.getDeepThought().getPersons()) {
+      if(collection == deepThought.getPersons()) {
         resetListViewAllPersonsItems();
         updatePersonsSetOnEntityPreview();
       }
@@ -342,7 +342,7 @@ public abstract class PersonsControl extends TitledPane {
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == Application.getDeepThought().getPersons()) {
+      if(collection == deepThought.getPersons()) {
         resetListViewAllPersonsItems();
       }
     }

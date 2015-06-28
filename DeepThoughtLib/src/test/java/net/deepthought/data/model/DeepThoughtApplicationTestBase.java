@@ -37,16 +37,6 @@ public abstract class DeepThoughtApplicationTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void updateDataModelVersion_UpdatedValueGetsPersistedInDb() throws Exception {
-    DeepThoughtApplication application = Application.getApplication();
-
-    int newValue = application.getDataModelVersion() + 1;
-    application.setDataModelVersion(newValue);
-
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.DeepThoughtApplicationTableName, TableConfig.DeepThoughtApplicationDataModelVersionColumnName, application.getId()));
-  }
-
-  @Test
   public void addUser_RelationGetsPersisted() throws Exception {
     User user = new User("test");
 

@@ -13,8 +13,9 @@
             <option value="$PROJECT_DIR$/DeepThoughtJavaFx" />
             <option value="$PROJECT_DIR$/DeepThoughtLib" />
             <option value="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractor" />
+            <option value="$PROJECT_DIR$/libs/content_extractor/OnlineNewspaperContentExtractor" />
             <option value="$PROJECT_DIR$/libs/content_extractor/RemoteFileContentExtractor" />
-            <option value="$PROJECT_DIR$/libs/content_extractor/SueddeutscheContentExtractor" />
+            <option value="$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor" />
             <option value="$PROJECT_DIR$/libs/downloader/WGetFileDownloader" />
             <option value="$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter" />
             <option value="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter" />
@@ -26,6 +27,7 @@
             <option value="$PROJECT_DIR$/libs/persistence/json/DeepThoughtJson-io" />
             <option value="$PROJECT_DIR$/libs/persistence/json/json-io" />
             <option value="$PROJECT_DIR$/libs/search/LuceneSearchEngine" />
+            <option value="$PROJECT_DIR$/libs/utils/commons-lang" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -181,7 +181,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   public void setAbstract(String abstractString) {
     String previousAbstract = this.abstractString;
-    this.abstractString = abstractString;
+    this.abstractString = abstractString == null ? "" : abstractString;
     plainTextAbstract = null;
     preview = null;
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
@@ -301,6 +301,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryReferenceSubDivisionJoinColumnName, previousValue, referenceSubDivision);
   }
 
+  public boolean isAReferenceSet() {
+    return series != null || reference != null || referenceSubDivision != null;
+  }
+
   public String getIndication() {
     return indication;
   }
@@ -410,11 +414,14 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean addTag(Tag tag) {
+    if (tags.contains(tag))
+      return false;
+
     sortedTags = null;
     tagsPreview = null;
 
     boolean result = tags.add(tag);
-    if(result) {
+    if (result) {
       tag.addEntry(this);
       callEntityAddedListeners(tags, tag);
     }
@@ -531,6 +538,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean addNote(Note note) {
+    if(notes.contains(note))
+      return false;
     boolean result = notes.add(note);
     if(result) {
       note.setEntry(this);
@@ -563,6 +572,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean addLinkGroup(EntriesLinkGroup link) {
+    if(linkGroups.contains(link))
+      return false;
+
     boolean result = linkGroups.add(link);
     if(result) {
       link.addEntryToGroup(this);
@@ -592,6 +604,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public boolean addFile(FileLink file) {
+    if(files.contains(file))
+      return false;
+
     boolean result = files.add(file);
     if(result) {
       file.addEntry(this);
@@ -753,6 +768,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     tagsPreview = tagsPreview.replace("\r", "").replace("\n", "");
 
     return tagsPreview;
+  }
+
+
+  @Override
+  public boolean isPersisted() {
+    return super.isPersisted() && deepThought != null;
   }
 
   @Override

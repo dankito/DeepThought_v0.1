@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.EntryPersonAssociation;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -11,14 +12,21 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.enums.Language;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
 import net.deepthought.data.search.results.LazyLoadingReferenceBasesSearchResultsList;
+import net.deepthought.language.LanguageDetector;
 import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LetterTokenizer;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.util.FilteringTokenFilter;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -27,6 +35,7 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.DocsEnum;
 import org.apache.lucene.index.Fields;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexableField;
@@ -34,6 +43,8 @@ import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.misc.HighFreqTerms;
+import org.apache.lucene.misc.TermStats;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -47,6 +58,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.NumericUtils;
@@ -56,17 +68,22 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public class LuceneSearchEngine extends InMemorySearchEngine {
+public class LuceneSearchEngine extends SearchEngineBase {
 
   public static final String NoTagsFieldValue = "notags";
   public static final String NoCategoriesFieldValue = "nocategories";
@@ -92,7 +109,7 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
   protected boolean isIndexReady = false;
 
   protected int indexUpdatedEntitiesAfterMilliseconds = 1000;
-  protected Set<UserDataEntity> updatedEntitiesToIndex = new CopyOnWriteArraySet<>();
+  protected Queue<UserDataEntity> updatedEntitiesToIndex = new ConcurrentLinkedQueue<>();
   protected Timer indexUpdatedEntitiesTimer = null;
 
 
@@ -101,23 +118,21 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
   }
 
   public LuceneSearchEngine(Directory directory) {
-    this.directory = directory;
-    isIndexReady = directory != null;
-
-    createIndexSearcherAndWriter(directory);
+    this();
+    setDirectory(directory);
   }
 
   @Override
   protected void deepThoughtChanged(DeepThought previousDeepThought, DeepThought newDeepThought) {
     super.deepThoughtChanged(previousDeepThought, newDeepThought);
 
+    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+
     if(previousDeepThought != null) {
-      previousDeepThought.removeEntityListener(deepThoughtListener);
       closeIndexSearcherAndWriter();
     }
 
     createDirectoryAndIndexSearcherAndWriterForDeepThought(newDeepThought);
-    newDeepThought.addEntityListener(deepThoughtListener);
   }
 
 
@@ -161,16 +176,20 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
     }
   }
 
+  protected void setDirectory(Directory directory) {
+    this.directory = directory;
+    isIndexReady = directory != null;
+
+    createIndexSearcherAndWriter(directory);
+  }
+
   protected void createDirectoryAndIndexSearcherAndWriterForDeepThought(DeepThought deepThought) {
     try {
 //   directory = FSDirectory.open(Paths.get(Application.getDataFolderPath(), "index")); // Android doesn't support java.nio package (like therefor also not class Paths)
-      File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), "" + deepThought.getId());
+      File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), String.format("%02d", deepThought.getId()));
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
-      directory = FSDirectory.open(deepThoughtIndexDirectory);
 
-      isIndexReady = true;
-
-      createIndexSearcherAndWriter(directory);
+      setDirectory(FSDirectory.open(deepThoughtIndexDirectory));
 
       if(indexDirExists == false)
         rebuildIndex();
@@ -552,11 +571,11 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
       log.debug("Indexing document {}", doc);
       indexWriter.addDocument(doc);
       indexWriter.commit();
-
-      indexSearcher = null; // so that on next search updates are reflected
     } catch(Exception ex) {
       log.error("Could not index Document " + doc, ex);
     }
+
+    indexSearcher = null; // so that on next search updates are reflected
   }
 
 
@@ -891,14 +910,16 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
     }
   }
 
-  @Override
+//  @Override
   protected void filterReferences(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-    super.filterReferences(search, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
+    // TODO:
+//    super.filterReferences(search, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
   }
 
-  @Override
+//  @Override
   protected void filterReferenceSubDivisions(Search search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-    super.filterReferenceSubDivisions(search, reference, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
+    // TODO:
+//    super.filterReferenceSubDivisions(search, reference, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
   }
 
 //  protected void filterReferences(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
@@ -1169,6 +1190,87 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
     return allTerms;
   }
 
+  protected LanguageDetector languageDetector = new LanguageDetector();
+  protected IndexReader extractTermsFromEntryIndexReader = null;
+
+  public List<String> extractTermsFromEntry(Entry entry) {
+    Set<Term> extractedTerms = new HashSet<>();
+
+    extractedTerms.addAll(extractTermsFromText(entry.getAbstractAsPlainText()));
+    extractedTerms.addAll(extractTermsFromText(entry.getContentAsPlainText()));
+
+    TreeSet<Term> sortedTerms = new TreeSet<>(new Comparator<Term>() {
+      @Override
+      public int compare(Term term1, Term term2) {
+        Long term1Frequency = 0L, term2Frequency = 0L;
+        try {
+          term1Frequency = extractTermsFromEntryIndexReader.totalTermFreq(term1);
+          term2Frequency = extractTermsFromEntryIndexReader.totalTermFreq(term2);
+        } catch(Exception ex) { }
+
+        return term1Frequency.compareTo(term2Frequency);
+      }
+    });
+    sortedTerms.addAll(extractedTerms);
+
+    List<String> terms = new ArrayList<>();
+    for(Term term : sortedTerms)
+      terms.add(term.text());
+    return terms;
+  }
+
+    public Set<Term> extractTermsFromText(String text) {
+      text = QueryParser.escape(text);
+      Set<Term> extractedTerms = new HashSet<>();
+
+      if (extractTermsFromEntryIndexReader == null) {
+        try {
+          Language textLanguage = languageDetector.detectLanguageOfText(text);
+//          IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopAnalyzer(Version.LUCENE_47,
+//              DeepThoughtAnalyzer.getLanguageStopWords(textLanguage))));
+          IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopwordAnalyzerBase(Version.LUCENE_47,
+              DeepThoughtAnalyzer.getLanguageStopWords(textLanguage)) {
+
+            @Override
+            protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+              final Tokenizer source = new LetterTokenizer(matchVersion, reader); // don't lowercase as original StopAnalyzer does
+              return new TokenStreamComponents(source, new FilteringTokenFilter(matchVersion,
+                  source) {
+                private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
+                @Override
+                protected boolean accept() throws IOException {
+                  return !stopwords.contains(termAtt.buffer(), 0, termAtt.length());
+                }
+              });
+            }
+          }));
+//          extractTermsFromEntryIndexReader = DirectoryReader.open(extractTermsFromEntryIndexWriter, false);
+
+          Document doc = new Document();
+          doc.add(new Field("ExtractTermsFromText", text, TextField.TYPE_NOT_STORED));
+
+          extractTermsFromEntryIndexWriter.addDocument(doc);
+          extractTermsFromEntryIndexWriter.commit();
+
+          extractTermsFromEntryIndexReader = DirectoryReader.open(extractTermsFromEntryIndexWriter, true);
+          IndexSearcher searcher = new IndexSearcher(extractTermsFromEntryIndexReader);
+
+          TermStats[] termStatses = HighFreqTerms.getHighFreqTerms(extractTermsFromEntryIndexReader, 1000, "ExtractTermsFromText", new HighFreqTerms.TotalTermFreqComparator());
+          if(termStatses != null) {
+            for (TermStats stats : termStatses) {
+              if (stats.totalTermFreq > 0) {
+              }
+            }
+          }
+        } catch (Exception ex) { log.warn("Could not open IndexReader for extracting Entry's Terms", ex); }
+      }
+
+      extractTermsFromEntryIndexReader = null;
+      return extractedTerms;
+    }
+
+
+
 
   protected BytesRef getByteRefFromLong(Long longValue) {
 //    BytesRefBuilder byteRefBuilder = new BytesRefBuilder();
@@ -1182,38 +1284,83 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
   }
 
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    public void entityCreated(BaseEntity entity) {
+      if(entity instanceof UserDataEntity)
+        indexEntity((UserDataEntity)entity);
+    }
 
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(entity instanceof UserDataEntity) {
+        updateIndexForEntity((UserDataEntity) entity);
+        checkIfEntityIsOnEntry((UserDataEntity)entity);
+      }
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+      if(entity instanceof UserDataEntity)
+        removeEntityFromIndex((UserDataEntity) entity);
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collectionHolder instanceof DeepThought && addedEntity instanceof UserDataEntity)
-        indexEntity((UserDataEntity)addedEntity);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(updatedEntity instanceof UserDataEntity) {
-        updateIndexForEntity((UserDataEntity) updatedEntity);
-        checkIfEntityIsOnEntry((UserDataEntity)updatedEntity);
+      if(collectionHolder instanceof Entry) {
+        if (isIndexedEntityOnEntry(addedEntity))
+          updateIndexForEntity((UserDataEntity)collectionHolder);
       }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collectionHolder instanceof DeepThought && removedEntity instanceof UserDataEntity)
-        removeEntityFromIndex((UserDataEntity) removedEntity);
+      if(collectionHolder instanceof Entry) {
+        if(isIndexedEntityOnEntry(removedEntity))
+          updateIndexForEntity((UserDataEntity) collectionHolder);
+      }
     }
   };
+
+  protected boolean isIndexedEntityOnEntry(BaseEntity entity) {
+    return entity instanceof Tag || entity instanceof Category || entity instanceof Person || entity instanceof EntryPersonAssociation || entity instanceof Note ||
+        entity instanceof SeriesTitle || entity instanceof Reference || entity instanceof ReferenceSubDivision;
+  }
+
+
+//  protected EntityListener deepThoughtListener = new EntityListener() {
+//    @Override
+//    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+//
+//    }
+//
+//    @Override
+//    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+//      if(collectionHolder instanceof DeepThought && addedEntity instanceof UserDataEntity)
+//        indexEntity((UserDataEntity)addedEntity);
+//    }
+//
+//    @Override
+//    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+//      if(updatedEntity instanceof UserDataEntity) {
+//        updateIndexForEntity((UserDataEntity) updatedEntity);
+//        checkIfEntityIsOnEntry((UserDataEntity)updatedEntity);
+//      }
+//    }
+//
+//    @Override
+//    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+//      if(collectionHolder instanceof DeepThought && removedEntity instanceof UserDataEntity)
+//        removeEntityFromIndex((UserDataEntity) removedEntity);
+//    }
+//  };
 
   protected void updateIndexForEntity(UserDataEntity updatedEntity) {
     if(indexUpdatedEntitiesAfterMilliseconds == 0)
       doUpdateIndexForEntity(updatedEntity);
     else {
-      updatedEntitiesToIndex.add(updatedEntity);
+      if(updatedEntitiesToIndex.contains(updatedEntity) == false)
+        updatedEntitiesToIndex.add(updatedEntity);
       activateIndexUpdatedEntitiesTimer();
     }
   }
@@ -1239,7 +1386,7 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
   }
 
   protected void indexUpdatedEntities() {
-    for(UserDataEntity updatedEntity : updatedEntitiesToIndex)
+    for(UserDataEntity updatedEntity : new ArrayList<>(updatedEntitiesToIndex)) // make a copy of updatedEntitiesToIndex as updatedEntitiesToIndex gets changed during iteration
       doUpdateIndexForEntity(updatedEntity);
 
     updatedEntitiesToIndex.clear();
@@ -1256,6 +1403,8 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
     } catch(Exception ex) {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
     }
+
+    indexSearcher = null; // so that on next search updates are reflected
   }
 
   private String getIdFieldNameForEntity(UserDataEntity entity) {
@@ -1287,6 +1436,9 @@ public class LuceneSearchEngine extends InMemorySearchEngine {
     else if(updatedEntity instanceof Person) {
       for(Entry entry : ((Person)updatedEntity).getAssociatedEntries())
         updateIndexForEntity(entry);
+    }
+    else if(updatedEntity instanceof Note) {
+      updateIndexForEntity(((Note)updatedEntity).getEntry());
     }
     else if(updatedEntity instanceof SeriesTitle) {
       for(Entry entry : ((SeriesTitle)updatedEntity).getEntries())

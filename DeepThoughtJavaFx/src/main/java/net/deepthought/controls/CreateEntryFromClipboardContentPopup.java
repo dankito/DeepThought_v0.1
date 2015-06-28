@@ -9,7 +9,6 @@ import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.EntryCreationResult;
-import net.deepthought.data.contentextractor.ILocalFileContentExtractor;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.ITextContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
@@ -35,7 +34,9 @@ import java.io.File;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
@@ -44,14 +45,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 /**
@@ -60,6 +67,8 @@ import javafx.stage.Stage;
 public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   private final static Logger log = LoggerFactory.getLogger(CreateEntryFromClipboardContentPopup.class);
+
+  protected final static Background OptionMouseOverBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(0)));
 
 
   protected Stage stageToShowIn = null;
@@ -99,9 +108,11 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     setMaxWidth(stageToShowIn.getWidth() - 12);
 
     contentPane = new VBox(0);
-//    Color backgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.3);
+    Color backgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
 //    Color backgroundColor = Color.GOLDENROD.deriveColor(0, 1.0, 1.0, 0.3);
-    Color backgroundColor = Color.LAWNGREEN.deriveColor(0, 1.0, 1.0, 0.15);
+//    Color backgroundColor = Color.LAWNGREEN.deriveColor(0, 1.0, 1.0, 0.15);
+//    Color backgroundColor = Color.DARKGREEN.deriveColor(0, 1.0, 1.0, 0.95);
+//    Color backgroundColor = Color.LIMEGREEN.deriveColor(0, 1.0, 1.0, 0.95);
     contentPane.setBackground(new Background(new BackgroundFill(backgroundColor, new CornerRadii(8), new Insets(4))));
     getScene().setRoot(contentPane);
 
@@ -166,6 +177,9 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   }
 
   protected void showInStage() {
+    contentPane.setDisable(false); // TODO: this is not fully correctly implemented: if an option button is pressed and the process is still working, while the window gets
+    // moved, than all options get enabled again
+
     show(stageToShowIn.getScene().getRoot(), 0, 0);
     // ok, PopupWindow is too stupid to set its position to right bottom window corner by itself, so i have to do it on my own
     setX(stageToShowIn.getX() + stageToShowIn.getWidth() - getWidth() - 6);
@@ -396,18 +410,28 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     if(optionKeyCombination != null)
       optionText += " (" + optionKeyCombination.getDisplayText() + ")";
 
-    final Hyperlink optionLink = new Hyperlink(optionText);
+//    final Hyperlink optionLink = new Hyperlink(optionText);
+    final Button optionLink = new Button(optionText);
+    optionLink.setUnderline(true);
+    optionLink.setTextFill(Color.BLACK);
+    optionLink.setBackground(Background.EMPTY);
+    optionLink.setCursor(Cursor.HAND);
+//    optionLink.setBorder(new Border(new BorderStroke(Color.DARKSLATEGRAY, BorderStrokeStyle.SOLID, new CornerRadii(4), new BorderWidths(2))));
     optionLink.setPrefHeight(24);
     optionsPane.getChildren().add(optionLink);
-    VBox.setMargin(optionLink, new Insets(0, 10, 0, 18));
+    VBox.setMargin(optionLink, new Insets(0, 10, 6, 18));
 
     if(optionKeyCombination != null)
       optionLink.getScene().getAccelerators().put(optionKeyCombination, () -> optionLink.fire());
 
     optionLink.setOnAction(action -> {
+      CreateEntryFromClipboardContentPopup.this.contentPane.setDisable(true);
       if(listener != null)
         listener.optionInvoked(contentExtractOptions);
     });
+
+    optionLink.setOnMouseEntered(event -> optionLink.setBackground(OptionMouseOverBackground));
+    optionLink.setOnMouseExited(event -> optionLink.setBackground(Background.EMPTY));
 
     return optionLink;
   }
@@ -451,6 +475,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   }
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
+    log.error("Could not create Entry from Source " + source, error.getException());
     Alerts.showErrorMessage(stageToShowIn, error.getErrorMessage(), Localization.getLocalizedStringForResourceKey("can.not.create.entry.from", source));
   }
 }

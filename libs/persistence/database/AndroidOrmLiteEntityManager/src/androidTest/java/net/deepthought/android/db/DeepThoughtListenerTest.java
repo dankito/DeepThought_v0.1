@@ -128,7 +128,7 @@ public class DeepThoughtListenerTest extends EntitiesTestBase {
     assertTrue(listenerCalled.hasListenerBeenCalled());
   }
 
-  public void testRemoveSubCategoryToCategory_CategoryUpdatedListenerGetsCalled() throws Exception {
+  public void testRemoveSubCategoryFromCategory_CategoryUpdatedListenerGetsCalled() throws Exception {
     Category category = new Category("test");
 
     DeepThought deepThought = Application.getDeepThought();

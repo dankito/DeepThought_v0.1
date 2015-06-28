@@ -32,13 +32,6 @@ public abstract class CreateDeepThoughtApplicationTestBase extends DataModelTest
   }
 
   @Test
-  public void testDataModelVersionGetsCreatedCorrectly() throws Exception {
-    DeepThoughtApplication application = Application.getApplication();
-
-    Assert.assertTrue(application.getDataModelVersion() > 0);
-  }
-
-  @Test
   public void testDefaultUsersGetCreatedCorrectly() throws Exception {
     DeepThoughtApplication application = Application.getApplication();
 

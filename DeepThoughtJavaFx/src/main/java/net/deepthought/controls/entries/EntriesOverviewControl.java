@@ -8,10 +8,14 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
+import net.deepthought.controls.event.CollectionItemLabelEvent;
+import net.deepthought.controls.reference.EntryReferenceBaseLabel;
+import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
@@ -43,6 +47,7 @@ import javafx.collections.SetChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -124,6 +129,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   protected TextField txtfldEntryAbstract;
 
   protected EntryTagsControl currentEditedEntryTagsControl = null;
+
+  protected EntryReferenceControl currentEditedEntryReferenceControl = null;
+
   @FXML
   protected HTMLEditor htmledEntryContent;
 
@@ -135,9 +143,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     if(FXUtils.loadControl(this, "EntriesOverviewControl"))
       setupControl();
-
-    if(deepThought != null)
-      deepThought.addEntityListener(deepThoughtListener);
 
 //    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntriesOverviewControl.fxml"));
 //    fxmlLoader.setRoot(this);
@@ -156,14 +161,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   public void deepThoughtChanged(DeepThought newDeepThought) {
-    if(this.deepThought != null)
-      this.deepThought.removeEntityListener(deepThoughtListener);
-
     this.deepThought = newDeepThought;
 
     if(newDeepThought != null) {
-      newDeepThought.addEntityListener(deepThoughtListener);
-
       if (deepThought.getSettings().getLastViewedEntry() != null) {
         // no, don't set Entry, as TableView then iterates through all Entries in Table to find selected Entry -> would eventually load a lot of Entries from Database
 //        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
@@ -246,7 +246,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
       Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
-      if(selectedEntry != null)
+      if (selectedEntry != null)
         selectedEntry.setAbstract(txtfldEntryAbstract.getText());
     });
 
@@ -261,6 +261,13 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
     VBox.setMargin(currentEditedEntryTagsControl, new Insets(6, 0, 6, 0));
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
+
+    currentEditedEntryReferenceControl = new EntryReferenceControl();
+    currentEditedEntryReferenceControl.setExpanded(false);
+//    currentEditedEntryReferenceControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
+//    currentEditedEntryReferenceControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
+    VBox.setMargin(currentEditedEntryReferenceControl, new Insets(6, 0, 6, 0));
+    pnQuickEditEntry.getChildren().add(2, currentEditedEntryReferenceControl);
   }
 
   public void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {
@@ -319,13 +326,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     btnRemoveSelectedEntries.setDisable(selectedEntry == null);
     pnQuickEditEntry.setDisable(selectedEntry == null);
     currentEditedEntryTagsControl.setEntry(selectedEntry);
+    currentEditedEntryReferenceControl.setEntry(selectedEntry);
 
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
       txtfldEntryAbstract.setText(selectedEntry.getAbstract());
       htmledEntryContent.setHtmlText(selectedEntry.getContent());
-
-      txtfldEntryAbstract.requestFocus();
       txtfldEntryAbstract.selectAll();
     }
     else {
@@ -493,70 +499,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   };
 
 
-  protected ListChangeListener<Tag> entryTagSuggestionListChangeListener = new ListChangeListener<Tag>() {
-    @Override
-    public void onChanged(Change<? extends Tag> c) {
-      Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
-      if(currentlyEditedEntry == null || c.next() == false)
-        return;
-
-      for(Tag addedTag : c.getAddedSubList()) {
-        addTagToEntry(currentlyEditedEntry, addedTag);
-        if(c.next() == false)
-          return;
-      }
-
-      for(Tag removedTag : c.getRemoved()) {
-        removeTagFromEntry(currentlyEditedEntry, removedTag);
-        if(c.next() == false)
-          return;
-      }
-    }
-  };
-
-  protected SetChangeListener<Tag> entryTagSuggestionSetChangeListener = new SetChangeListener<Tag>() {
-    @Override
-    public void onChanged(Change<? extends Tag> c) {
-      Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
-
-      if(c.wasAdded()) {
-        addTagToEntry(currentlyEditedEntry, c.getElementAdded());
-      }
-      else if(c.wasRemoved()) {
-        removeTagFromEntry(currentlyEditedEntry, c.getElementRemoved());
-      }
-
-//      if(currentlyEditedEntry == null || c.next() == false)
-//        return;
-//
-//      for(Tag addedTag : c.getElementAdded()) {
-//        addTagToEntry(currentlyEditedEntry, addedTag);
-//        if(c.next() == false)
-//          return;
-//      }
-//
-//      for(Tag removedTag : c.getRemoved()) {
-//        removeTagFromEntry(currentlyEditedEntry, removedTag);
-//        if(c.next() == false)
-//          return;
-//      }
-    }
-  };
-
-  protected void addTagToEntry(Entry entry, Tag addedTag) {
-    entry.addTag(addedTag);
-  }
-
-  protected void removeTagFromCurrentlyEditedEntry(Tag removedTag) {
-    Entry currentlyEditedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
-    if(currentlyEditedEntry != null)
-      removeTagFromEntry(currentlyEditedEntry, removedTag);
-  }
-
-  protected void removeTagFromEntry(Entry entry, Tag removedTag) {
-    entry.removeTag(removedTag);
-  }
-
   protected void filterEntries() {
     if(filterEntriesSearch != null && filterEntriesSearch.isCompleted() == false)
       filterEntriesSearch.interrupt();
@@ -583,92 +525,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
       Application.getSearchEngine().filterEntries(filterEntriesSearch);
     }
-
-//    filterEntriesManually();
   }
-
-//  protected void filterEntriesManually() {
-//    log.debug("Going to filter Entries ...");
-//    String filter = txtfldEntriesQuickFilter.getText();
-//    String lowerCaseFilter = filter.toLowerCase(); // TODO: can txtfldEntriesQuickFilter.getText() ever be null?
-//
-//    filteredEntries.setPredicate((entry) -> {
-//      // If filter text is empty, display all Entries.
-//      if (filter == null || filter.isEmpty()) {
-//        return true;
-//      }
-//
-//      if(tglbtnEntriesQuickFilterAbstract.isSelected() && entry.getAbstract().toLowerCase().contains(lowerCaseFilter)) {
-//        return true; // Filter matches Abstract
-//      }
-//      else if (tglbtnEntriesQuickFilterContent.isSelected() && entry.getContent().toLowerCase().contains(lowerCaseFilter)) {
-//        return true; // Filter matches Content
-//      }
-//      return false; // Does not match.
-//    });
-//
-//    log.debug("Filtering Entries done");
-//  }
-
-
-  protected EntityListener entryListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
-
-  protected EntityListener deepThoughtListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
-
-
-  protected Comparator<Entry> entriesComparator = new Comparator<Entry>() {
-    @Override
-    public int compare(Entry entry1, Entry entry2) {
-      if(entry1 == null && entry2 == null)
-        return 0;
-      else if(entry1 == null && entry2 != null)
-        return -1;
-      else if(entry1 != null && entry2 == null)
-        return 1;
-
-      return ((Integer)entry2.getEntryIndex()).compareTo(entry1.getEntryIndex());
-    }
-  };
 
 
 }

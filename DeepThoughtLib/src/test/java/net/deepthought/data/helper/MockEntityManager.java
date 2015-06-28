@@ -242,6 +242,7 @@ public class MockEntityManager implements IEntityManager {
 
 
   protected Method userDataEntityPrePersistLifeCycleMethod = null;
+  protected Method baseEntityPostPersistLifeCycleMethod = null;
   protected Method userDataEntityPreUpdateLifeCycleMethod = null;
 
   protected Method baseEntityPostLoadLifeCycleMethod = null;
@@ -257,6 +258,9 @@ public class MockEntityManager implements IEntityManager {
     try {
       userDataEntityPrePersistLifeCycleMethod = UserDataEntity.class.getDeclaredMethod("prePersist");
       userDataEntityPrePersistLifeCycleMethod.setAccessible(true);
+
+      baseEntityPostPersistLifeCycleMethod = BaseEntity.class.getDeclaredMethod("postPersist");
+      baseEntityPostPersistLifeCycleMethod.setAccessible(true);
 
       userDataEntityPreUpdateLifeCycleMethod = UserDataEntity.class.getDeclaredMethod("preUpdate");
       userDataEntityPreUpdateLifeCycleMethod.setAccessible(true);
@@ -302,6 +306,8 @@ public class MockEntityManager implements IEntityManager {
         personPostPersistLifeCycleMethod.invoke(entity);
       else if(entity instanceof ReferenceBase)
         referenceBasePostPersistLifeCycleMethod.invoke(entity);
+      else
+        baseEntityPostPersistLifeCycleMethod.invoke(entity);
     } catch(Exception ex) { }
   }
 

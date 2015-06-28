@@ -126,7 +126,8 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     category.addSubCategory(subCategory);
 
     Long subCategoryId = subCategory.getId();
-    category.removeSubCategory(subCategory);
+//    category.removeSubCategory(subCategory);
+    deepThought.removeCategory(subCategory);
 
     // assert categories really didn't get deleted from database
     Object[] queryResult = getRowFromTable(TableConfig.CategoryTableName, subCategoryId);
@@ -145,7 +146,8 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
 
-    category.removeSubCategory(subCategory);
+//    category.removeSubCategory(subCategory);
+    deepThought.removeCategory(subCategory);
 
     Assert.assertNotNull(subCategory.getId()); // subCategories is not a Composition -> subCategory stays in DB till it gets removed from DeepThought
     Assert.assertNull(subCategory.getParentCategory());
@@ -170,8 +172,10 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     Category subCategory5 = new Category("sub 5");
     category.addSubCategory(subCategory5);
 
-    category.removeSubCategory(subCategory2);
-    category.removeSubCategory(subCategory4);
+//    category.removeSubCategory(subCategory2);
+    deepThought.removeCategory(subCategory2);
+//    category.removeSubCategory(subCategory4);
+    deepThought.removeCategory(subCategory4);
 
     Assert.assertEquals(0, subCategory1.getCategoryOrder());
     Assert.assertEquals(1, subCategory3.getCategoryOrder());

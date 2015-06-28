@@ -8,6 +8,9 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
@@ -37,6 +40,9 @@ import javafx.util.StringConverter;
  * Created by ganymed on 30/11/14.
  */
 public class TagListCell extends ListCell<Tag> {
+
+  private final static Logger log = LoggerFactory.getLogger(TagListCell.class);
+
 
   protected Entry entry = null;
   protected Tag tag = null;
@@ -252,7 +258,11 @@ public class TagListCell extends ListCell<Tag> {
         if (t.getCode() == KeyCode.ENTER) {
           if (txtfldEditTagName.getText().equals(getTagStringRepresentation(tag)) == false)
             tag.setName(txtfldEditTagName.getText());
-          commitEdit(getItem());
+          try {
+            commitEdit(getItem());
+          } catch (Exception ex) {
+            log.error("Could not commit changes to tag " + tag, ex);
+          }
         } else if (t.getCode() == KeyCode.ESCAPE) {
           cancelEdit();
         }
@@ -262,7 +272,7 @@ public class TagListCell extends ListCell<Tag> {
     txtfldEditTagName.focusedProperty().addListener(new ChangeListener<Boolean>() {
       @Override
       public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        if(newValue == false)
+        if (newValue == false)
           cancelEdit();
       }
     });

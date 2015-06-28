@@ -63,15 +63,17 @@ public class Note extends UserDataEntity {
   public void setType(NoteType type) {
     Object previousValue = this.type;
 
-    if(this.type != null)
-      this.type.removeNote(this);
+    if(this.type != type) {
+      if (this.type != null)
+        this.type.removeNote(this);
 
-    this.type = type;
+      this.type = type;
 
-    if(type != null)
-      type.addNote(this);
+      if (type != null)
+        type.addNote(this);
 
-    callPropertyChangedListeners(TableConfig.NoteNoteTypeJoinColumnName, previousValue, note);
+      callPropertyChangedListeners(TableConfig.NoteNoteTypeJoinColumnName, previousValue, note);
+    }
   }
 
   public Entry getEntry() {

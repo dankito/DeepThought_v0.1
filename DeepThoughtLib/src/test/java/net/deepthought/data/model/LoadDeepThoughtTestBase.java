@@ -10,6 +10,7 @@ import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.file.FileUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -60,12 +61,13 @@ public abstract class LoadDeepThoughtTestBase extends DataModelTestBase {
   public void tearDown() {
     loadSavedDataEntityManager.deleteEntity(Application.getApplication()); // damn, why doesn't it close the db properly? So next try: delete DeepThoughtApplication object
     Application.shutdown();
+    FileUtils.deleteFile(loadSavedDataEntityManager.getDatabasePath());
   }
 
 
   @Test
   public void testDefaultLanguagesGetLoadedCorrectly() throws Exception {
-    Assert.assertEquals(27, loadedDeepThought.getLanguages().size());
+    Assert.assertEquals(49, loadedDeepThought.getLanguages().size());
 
     int index = 1;
     for(Language language : loadedDeepThought.getLanguages()) {

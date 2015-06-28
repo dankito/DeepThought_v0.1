@@ -19,7 +19,7 @@ public class AllEntriesSystemTag extends SystemTag {
   public AllEntriesSystemTag(DeepThought deepThought) {
     super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.all.entries")); // TODO: this will not react on Language change
 
-    deepThought.addEntityListener(entityListener);
+    deepThought.addEntityListener(deepThoughtListener);
     this.filteredEntries = deepThought.getEntries();
   }
 
@@ -29,7 +29,7 @@ public class AllEntriesSystemTag extends SystemTag {
     return ID;
   }
 
-  protected EntityListener entityListener = new EntityListener() {
+  protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
 

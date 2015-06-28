@@ -33,6 +33,7 @@
     <orderEntry type="library" exported="" name="lucene-core-4.7.2" level="project" />
     <orderEntry type="library" exported="" name="lucene-analyzers-common-4.7.2" level="project" />
     <orderEntry type="library" exported="" name="lucene-queryparser-4.7.2" level="project" />
+    <orderEntry type="library" exported="" name="lucene-misc-4.7.2" level="project" />
     <orderEntry type="library" exported="" name="lucene-queries-4.7.2" level="project" />
     <orderEntry type="library" exported="" name="lucene-sandbox-4.7.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />

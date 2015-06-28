@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -510,6 +512,35 @@ public class FileUtils {
     BufferedWriter writer = new BufferedWriter(new FileWriter(destinationFile));
     writer.write(fileContent);
     writer.close();
+  }
+
+  public static void writeToFile(InputStream inputStream, File destinationFile) throws Exception {
+    // TODO: what to do if file already exists?
+    ensureFileExists(destinationFile);
+
+    OutputStream outputStream = null;
+
+    try {
+      outputStream = new FileOutputStream(destinationFile);
+
+      int read = 0;
+      byte[] bytes = new byte[1024];
+
+      while ((read = inputStream.read(bytes)) != -1) {
+        outputStream.write(bytes, 0, read);
+      }
+
+    } catch (IOException ex) {
+      log.error("Could not write InputStream to file " + destinationFile.getAbsolutePath(), ex);
+      throw ex;
+    } finally {
+      if (outputStream != null) {
+        try {
+          // outputStream.flush();
+          outputStream.close();
+        } catch (IOException e) { }
+      }
+    }
   }
 
   public static boolean isLocalFile(String url) {

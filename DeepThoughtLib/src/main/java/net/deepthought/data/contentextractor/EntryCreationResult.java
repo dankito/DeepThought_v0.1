@@ -25,7 +25,7 @@ public class EntryCreationResult {
 
   public EntryCreationResult(Object source, Entry createdEntry) {
     this.source = source;
-    this.successful = true;
+    this.successful = createdEntry != null;
     this.createdEntry = createdEntry;
   }
 

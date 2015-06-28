@@ -13,6 +13,8 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
     compile project(':DeepThoughtLib')
+    compile project(':LuceneSearchEngine')
+    compile project(':OnlineNewspaperContentExtractor')
 
     // newest version, which eliminates bugs important to me, is not available on maven, so i had to get .jar and resolve its dependencies by myself
     //        compile 'org.apache.odftoolkit:simple-odf:0.7-incubating'

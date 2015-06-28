@@ -1266,6 +1266,7 @@ public class LuceneSearchEngineTest {
     deepThought.addReference(newReference);
 
     ReferenceSubDivision newSubDivision = new ReferenceSubDivision("subDivision", "don't find me");
+    deepThought.addReferenceSubDivision(newSubDivision);
     newReference.addSubDivision(newSubDivision);
     newSubDivision.setSubTitle("Hephaistos");
 

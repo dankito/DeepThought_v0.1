@@ -18,6 +18,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PostLoad;
+import javax.persistence.PostPersist;
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
@@ -120,8 +121,14 @@ public class BaseEntity implements Serializable {
 
   @PostLoad
   protected void postLoad() {
-    if(Application.getDeepThought() != null)
-      Application.getDeepThought().lazyLoadedEntityMapped(this);
+    if(Application.getDataManager() != null)
+      Application.getDataManager().lazyLoadedEntityMapped(this);
+  }
+
+  @PostPersist
+  protected void postPersist() {
+    if(Application.getDataManager() != null)
+      Application.getDataManager().lazyLoadedEntityMapped(this);
   }
 
 

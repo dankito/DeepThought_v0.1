@@ -1,7 +1,5 @@
 package net.deepthought.controller;
 
-import com.sun.webkit.WebPage;
-
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
@@ -39,20 +37,15 @@ import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
@@ -65,7 +58,6 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -83,7 +75,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -176,23 +167,19 @@ public class EditEntryDialogController extends ChildWindowsController implements
     Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
       @Override
       public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-        if(setting == Setting.UserDeviceShowCategories) {
+        if (setting == Setting.UserDeviceShowCategories) {
           entryCategoriesControl.setVisible((boolean) newValue);
-          if((boolean)newValue) {
+          if ((boolean) newValue) {
             paneTagsAndCategories.getChildren().add(entryCategoriesControl);
 //            contentPane.getChildren().add(entryCategoriesControl);
-          }
-          else
+          } else
             paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
 //            contentPane.getChildren().remove(entryCategoriesControl);
-        }
-        else if(setting == Setting.UserDeviceDialogFieldsDisplay)
-          dialogFieldsDisplayChanged((DialogsFieldsDisplay)newValue);
+        } else if (setting == Setting.UserDeviceDialogFieldsDisplay)
+          dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
       }
     });
 
-//    Application.getDeepThought().addPersonsChangedListener(personsChangedListener);
-    Application.getDeepThought().addEntityListener(deepThoughtListener);
     // TODO: what to do when DeepThought changes -> close dialog
   }
 
@@ -320,6 +307,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     trtblvwFiles.setRoot(new FileRootTreeItem(entry));
 
     entryReferenceControl.setVisible(true);
+    entryReferenceControl.setExpanded(entry.isAReferenceSet() == false);
 
     fieldsWithUnsavedChanges.clear();
 
@@ -329,10 +317,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEditedFieldsOnEntry();
-
-    if(entry.isPersisted() == false) // a new Entry
-      Application.getDeepThought().addEntry(entry);
+    saveEntry();
   }
 
   @FXML
@@ -345,6 +330,23 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
+    saveEntry();
+    closeDialog();
+  }
+
+  @Override
+  protected void closeDialog() {
+    entry.removeEntityListener(entryListener);
+
+    entryCategoriesControl.cleanUpControl();
+
+    super.closeDialog();
+  }
+
+  protected void saveEntry() {
+    if(entry.getSeries() != null && entry.getSeries().isPersisted() == false)
+      Application.getDeepThought().addSeriesTitle(entry.getSeries());
+
     if(entry.getReference() != null && entry.getReference().isPersisted() == false)
       Application.getDeepThought().addReference(entry.getReference());
 
@@ -355,15 +357,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
       Application.getDeepThought().addEntry(entry);
 
     saveEditedFieldsOnEntry();
-    closeDialog();
-  }
-
-  @Override
-  protected void closeDialog() {
-    entry.removeEntityListener(entryListener);
-    Application.getDeepThought().removeEntityListener(deepThoughtListener);
-
-    super.closeDialog();
   }
 
   protected void saveEditedFieldsOnEntry() {
@@ -459,7 +452,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
       if(response.equals(Dialog.ACTION_CANCEL))
         event.consume(); // consume event so that stage doesn't get closed
       else if(response.equals(Dialog.ACTION_YES)) {
-        saveEditedFieldsOnEntry();
+        saveEntry();
         closeDialog();
       }
       else
@@ -582,29 +575,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
   protected EntityListener entryListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
-
-
-  protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
 

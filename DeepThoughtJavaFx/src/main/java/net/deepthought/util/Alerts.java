@@ -21,10 +21,12 @@ public class Alerts {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
       if(deleteCategory)
-        category.getParentCategory().removeSubCategory(category);
+//        category.getParentCategory().removeSubCategory(category);
+      Application.getDeepThought().removeCategory(category);
     }
     else
-      category.getParentCategory().removeSubCategory(category);
+//      category.getParentCategory().removeSubCategory(category);
+      Application.getDeepThought().removeCategory(category);
   }
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {

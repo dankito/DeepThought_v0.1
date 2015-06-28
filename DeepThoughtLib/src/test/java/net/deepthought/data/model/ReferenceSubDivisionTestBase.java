@@ -189,6 +189,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
     parent.addSubDivision(subDivision);
 
     parent.removeSubDivision(subDivision);
+    deepThought.removeReferenceSubDivision(subDivision);
 
     Assert.assertFalse(parent.isDeleted());
     Assert.assertTrue(subDivision.isDeleted());

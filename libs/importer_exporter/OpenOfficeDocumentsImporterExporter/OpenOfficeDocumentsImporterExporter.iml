@@ -28,6 +28,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
+    <orderEntry type="module" module-name="LuceneSearchEngine" exported="" />
+    <orderEntry type="module" module-name="OnlineNewspaperContentExtractor" exported="" />
     <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
     <orderEntry type="library" exported="" name="odfdom-java-0.8.8-incubating" level="project" />
     <orderEntry type="library" exported="" name="taglets-0.8.8-incubating" level="project" />
@@ -72,5 +74,6 @@
     <orderEntry type="library" exported="" name="commons-codec-1.7" level="project" />
     <orderEntry type="library" exported="" name="simple-odf-0.8.1-incubating" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
+    <orderEntry type="library" exported="" name="OpenOfficeDocumentsImporterExporter.OpenOfficeDocumentsImporterExporter" level="project" />
   </component>
 </module>

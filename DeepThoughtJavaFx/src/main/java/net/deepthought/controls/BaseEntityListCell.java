@@ -58,7 +58,7 @@ public class BaseEntityListCell<T extends BaseEntity> extends ListCell<T> {
   protected EntityListener baseEntityListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(entity == getItem())
+//      if(entity == getItem())
         itemChanged((T)entity);
     }
 

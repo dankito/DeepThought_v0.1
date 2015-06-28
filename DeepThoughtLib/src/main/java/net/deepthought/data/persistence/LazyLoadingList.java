@@ -133,7 +133,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
   }
 
   protected void loadAllResults() {
-    log.debug("An iterator has been called on LazyLoadingList with " + entityIds.size() + " Entity IDs, therefor all Entities will now be loaded");
+//    log.debug("An iterator has been called on LazyLoadingList with " + entityIds.size() + " Entity IDs, therefor all Entities will now be loaded");
 //    try { throw new Exception(); } catch(Exception ex) { log.debug("Stacktrace is:", ex); }
 
     if (cachedResults.size() < size()) {

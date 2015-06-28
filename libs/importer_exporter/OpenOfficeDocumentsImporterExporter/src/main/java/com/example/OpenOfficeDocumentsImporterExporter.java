@@ -1,32 +1,54 @@
 package com.example;
 
 import net.deepthought.Application;
+import net.deepthought.data.contentextractor.EntryCreationResult;
+import net.deepthought.data.contentextractor.SpiegelContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.apache.xerces.dom.TextImpl;
+import org.odftoolkit.odfdom.dom.element.draw.DrawFrameElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableCellElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableRowElement;
 import org.odftoolkit.odfdom.dom.element.text.TextAElement;
 import org.odftoolkit.odfdom.dom.element.text.TextLineBreakElement;
+import org.odftoolkit.odfdom.dom.element.text.TextListElement;
+import org.odftoolkit.odfdom.dom.element.text.TextListItemElement;
 import org.odftoolkit.odfdom.dom.element.text.TextParagraphElementBase;
 import org.odftoolkit.odfdom.dom.element.text.TextSoftPageBreakElement;
 import org.odftoolkit.odfdom.dom.element.text.TextSpanElement;
+import org.odftoolkit.odfdom.dom.element.text.TextTabElement;
+import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawFrame;
+import org.odftoolkit.odfdom.incubator.doc.draw.OdfDrawImage;
 import org.odftoolkit.odfdom.incubator.doc.style.OdfStyle;
+import org.odftoolkit.odfdom.incubator.doc.text.OdfTextList;
 import org.odftoolkit.odfdom.incubator.doc.text.OdfTextSpan;
 import org.odftoolkit.simple.TextDocument;
+import org.odftoolkit.simple.draw.Image;
 import org.odftoolkit.simple.text.Paragraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +57,10 @@ import java.util.Map;
 public class OpenOfficeDocumentsImporterExporter {
 
   private final static Logger log = LoggerFactory.getLogger(OpenOfficeDocumentsImporterExporter.class);
+
+
+  protected SpiegelContentExtractor spiegelContentExtractor = new SpiegelContentExtractor();
+  protected SueddeutscheContentExtractor sueddeutscheContentExtractor = new SueddeutscheContentExtractor();
 
 
   public String extractPlainTextFromTextDocument(String documentPath) {
@@ -61,6 +87,236 @@ public class OpenOfficeDocumentsImporterExporter {
     if(textDocument != null)
       textDocument.close();
     return extractedText;
+  }
+
+
+  public List<Entry> importDankitosZitate(String documentPath) {
+    List<Entry> extractedEntries = new ArrayList<>();
+    TextDocument textDocument = null;
+    try {
+      textDocument = TextDocument.loadDocument(documentPath);
+      if(textDocument == null) // Media Type not supported by Simple Odf
+        return extractedEntries;
+
+      Iterator<Paragraph> paragraphs = textDocument.getParagraphIterator();
+      extractQuotationsFromParagraphs(paragraphs, extractedEntries);
+    } catch (Exception ex) {
+      log.error("Could not load text document " + documentPath, ex);
+    }
+
+    if(textDocument != null)
+      textDocument.close();
+    return extractedEntries;
+  }
+
+  protected UserDataEntity lastPersonOrReference = null;
+
+  protected void extractQuotationsFromParagraphs(Iterator<Paragraph> paragraphs, List<Entry> extractedEntries) {
+    List<Paragraph> entryParagraphs = null;
+    for(entryParagraphs = getEntryParagraphs(paragraphs); entryParagraphs.size() > 0; entryParagraphs = getEntryParagraphs(paragraphs)) {
+      UserDataEntity entryPersonOrReference = extractPersonOrReferenceFromIntroducingParagraph(entryParagraphs);
+      if(entryParagraphs.size() == 0) // entryParagraphs contained only the reference for the next Quotations
+        continue;
+
+      Entry extractedEntry = extractQuotationEntryFromEntryParagraphs(entryParagraphs);
+
+      if(extractedEntry != null) {
+        Application.getDeepThought().addEntry(extractedEntry);
+        extractedEntries.add(extractedEntry);
+        addCategoryAndTagsToQuotationEntry(extractedEntry);
+
+        if(entryPersonOrReference != null)
+          setEntryPersonOrReference(extractedEntry, entryPersonOrReference);
+        else if(extractedEntry.getReference() == null && lastPersonOrReference != null)
+          setEntryPersonOrReference(extractedEntry, lastPersonOrReference);
+      }
+    }
+  }
+
+  protected void addCategoryAndTagsToQuotationEntry(Entry extractedEntry) {
+    Application.getDeepThought().findOrCreateTopLevelCategoryForName("Zitate").addEntry(extractedEntry);
+
+    Tag quotationTag = Application.getDeepThought().findOrCreateTagForName("Zitat");
+    extractedEntry.addTag(quotationTag);
+  }
+
+  protected void setEntryPersonOrReference(Entry entry, UserDataEntity entryPersonOrReference) {
+    if(entryPersonOrReference instanceof Person) {
+      Person person = (Person)entryPersonOrReference;
+      entry.addPerson(person);
+      addTagToEntryFromPerson(entry, person);
+    }
+    else if(entryPersonOrReference instanceof Reference) {
+      entry.setReference((Reference) entryPersonOrReference);
+      addTagsToEntryFromReference(entry);
+    }
+  }
+
+  protected void addTagsToEntryFromReference(Entry entry) {
+    if(entry.getReference() != null) {
+      entry.addTag(Application.getDeepThought().findOrCreateTagForName(entry.getReference().getTitle()));
+      for (Person person : entry.getReference().getPersons())
+        addTagToEntryFromPerson(entry, person);
+    }
+  }
+
+  protected void addTagToEntryFromPerson(Entry entry, Person person) {
+    if(StringUtils.isNotNullOrEmpty(person.getFirstName()))
+      entry.addTag(Application.getDeepThought().findOrCreateTagForName(person.getFirstName() + " " + person.getLastName()));
+    else
+      entry.addTag(Application.getDeepThought().findOrCreateTagForName(person.getLastName()));
+  }
+
+  protected Entry extractQuotationEntryFromEntryParagraphs(List<Paragraph> entryParagraphs) {
+    Entry entry = new Entry();
+    tryToFindQuotationPersonOrReferenceFromLastParagraph(entry, entryParagraphs);
+
+    String content = "";
+    for(Paragraph paragraph : entryParagraphs) {
+      content += "<p>" + extractHtmlFormattedContentFromParagraph(paragraph) + "</p>";
+    }
+    entry.setContent(content);
+
+    return entry;
+  }
+
+  protected class QuotationReference {
+    protected Person author = null;
+    protected Reference reference = null;
+    protected String indication = null;
+
+    public Person getAuthor() {
+      return author;
+    }
+
+    public Reference getReference() {
+      return reference;
+    }
+
+    public String getIndication() {
+      return indication;
+    }
+  }
+
+  protected UserDataEntity extractPersonOrReferenceFromIntroducingParagraph(List<Paragraph> entryParagraphs) {
+    Paragraph firstParagraph = entryParagraphs.get(0);
+    String firstParagraphText = firstParagraph.getTextContent().trim();
+    if(firstParagraphText.endsWith(":") && firstParagraphText.length() < 128) {
+      entryParagraphs.remove(0);
+      return extractPersonOrReferenceFromIntroducingParagraph(firstParagraph);
+    }
+
+    return null;
+  }
+
+  protected UserDataEntity extractPersonOrReferenceFromIntroducingParagraph(Paragraph firstParagraph) {
+    String firstParagraphText = firstParagraph.getTextContent();
+    if(firstParagraphText.endsWith(":"))
+      firstParagraphText = firstParagraphText.substring(0, firstParagraphText.length() - 1);
+
+    if(firstParagraphText.contains(" - ") || firstParagraphText.contains(" – ")) { // Author and Book title
+      lastPersonOrReference = getReference(firstParagraphText);
+    }
+    else {
+      lastPersonOrReference = findOrCreatePersonForFullName(firstParagraphText);
+    }
+
+    return lastPersonOrReference;
+  }
+
+  protected Reference getReference(String firstParagraphText) {
+    firstParagraphText = firstParagraphText.replace(" – ", " - ");
+    String[] parts = firstParagraphText.split(" - ");
+    List<Person> authors = findOrCreatePersonsFromAuthorString(parts[0]);
+    Reference book = findOrCreateReferenceForTitle(parts[1]);
+    for(Person author : authors)
+      book.addPerson(author);
+
+    return book;
+  }
+
+  protected List<Person> findOrCreatePersonsFromAuthorString(String authorString) {
+    List<Person> persons = new ArrayList<>();
+
+    if(authorString.contains(", ")) { // multiple persons are separated by comma
+      for(String singlePersonFullName : authorString.split(", "))
+        persons.add(findOrCreatePersonForFullName(singlePersonFullName));
+    }
+    else
+      persons.add(findOrCreatePersonForFullName(authorString));
+
+    return persons;
+  }
+
+  protected Person findOrCreatePersonForFullName(String personFullName) {
+    if(personFullName.contains(" ")) {
+      String[] parts = personFullName.split(" ");
+      String lastName = parts[parts.length - 1].trim();
+      String firstName = "";
+      for(int i = 0; i < parts.length - 1; i++)
+        firstName += parts[i].trim() + " ";
+      firstName = firstName.substring(0, firstName.length() - 1);
+      return Application.getDeepThought().findOrCreatePerson(lastName, firstName);
+    }
+    else {
+      return Application.getDeepThought().findOrCreatePerson(personFullName.trim(), "");
+    }
+  }
+
+  protected Reference findOrCreateReferenceForTitle(String title) {
+    return Application.getDeepThought().findOrCreateReferenceForTitle(title);
+  }
+
+  protected void tryToFindQuotationPersonOrReferenceFromLastParagraph(Entry entry, List<Paragraph> entryParagraphs) {
+    Paragraph lastParagraph = entryParagraphs.get(entryParagraphs.size() - 1);
+    TextParagraphElementBase paragraphElement = lastParagraph.getOdfElement();
+    NodeList children = paragraphElement.getChildNodes();
+    int length = children.getLength();
+    if(paragraphElement.getTextContent().startsWith("(S. ") && paragraphElement.getTextContent().endsWith(")")) {
+      setEntryIndication(entry, paragraphElement.getTextContent().substring(1, paragraphElement.getTextContent().length() - 1));
+      entryParagraphs.remove(lastParagraph);
+    }
+    else if(length == 1 || (length == 2 && paragraphElement.getFirstChild() instanceof TextSoftPageBreakElement)) {
+      NodeList subChildren = children.item(length - 1).getChildNodes();
+      if(subChildren instanceof OdfTextSpan && subChildren.getLength() > 2 && subChildren instanceof OdfTextSpan) {
+        if(subChildren.item(0) instanceof TextTabElement && subChildren.item(1) instanceof TextTabElement) {
+          String referenceText = subChildren.item(2).getTextContent();
+          entryParagraphs.remove(lastParagraph);
+          if(referenceText.contains(" - ") || referenceText.contains(" – ")) { // Author and Book title
+            entry.setReference(getReference(referenceText));
+            addTagsToEntryFromReference(entry);
+            lastPersonOrReference = null;
+          }
+          else if(referenceText.contains("S. ")) {
+            setEntryIndication(entry, referenceText);
+          }
+          else {
+            Person person = findOrCreatePersonForFullName(referenceText);
+            entry.addPerson(person);
+            addTagToEntryFromPerson(entry, person);
+            lastPersonOrReference = null;
+          }
+        }
+      }
+    }
+    else {
+      Node lastChild = children.item(children.getLength() - 1);
+      String lastChildText = lastChild.getTextContent();
+      if(lastChildText.startsWith("(S. ") && lastChildText.endsWith(")")) {
+        setEntryIndication(entry, lastChildText.substring(1, lastChildText.length() - 1));
+        paragraphElement.removeChild(lastChild);
+        if(children.item(children.getLength() - 1) instanceof TextLineBreakElement)
+          paragraphElement.removeChild(children.item(children.getLength() - 1));
+      }
+      else if(lastChildText.equals("ebd.")) {
+
+      }
+    }
+  }
+
+  protected void setEntryIndication(Entry entry, String indicationText) {
+    entry.setIndication(indicationText);
+    setEntryPersonOrReference(entry, lastPersonOrReference);
   }
 
 
@@ -96,16 +352,36 @@ public class OpenOfficeDocumentsImporterExporter {
 
   protected Entry extractEntryFromEntryParagraphs(List<Paragraph> entryParagraphs) {
     try {
-      Entry currentEntry = new Entry();
-      ReferenceBase currentReference = tryToExtractReference(entryParagraphs);
-      if(currentReference instanceof ReferenceSubDivision)
-        currentEntry.setReferenceSubDivision((ReferenceSubDivision)currentReference);
-      else if(currentReference instanceof Reference)
-        currentEntry.setReference((Reference)currentReference);
+      Entry currentEntry = null;
 
-      currentEntry.setContent(extractEntryContent(entryParagraphs));
+      if(entryParagraphs.size() == 1) {
+        if(sueddeutscheContentExtractor.canCreateEntryFromUrl(entryParagraphs.get(0).getOdfElement().getTextContent())) {
+          EntryCreationResult result = sueddeutscheContentExtractor.createEntryFromArticle(entryParagraphs.get(0).getOdfElement().getTextContent());
+          if (result.successful())
+            currentEntry = result.getCreatedEntry();
+        }
+        else if(spiegelContentExtractor.canCreateEntryFromUrl(entryParagraphs.get(0).getOdfElement().getTextContent())) {
+          EntryCreationResult result = spiegelContentExtractor.createEntryFromArticle(entryParagraphs.get(0).getOdfElement().getTextContent());
+          if (result.successful())
+            currentEntry = result.getCreatedEntry();
+        }
+      }
+
+      if(currentEntry == null) {
+        currentEntry = new Entry();
+        ReferenceBase currentReference = tryToExtractReference(entryParagraphs);
+        if (currentReference instanceof ReferenceSubDivision)
+          currentEntry.setReferenceSubDivision((ReferenceSubDivision) currentReference);
+        else if (currentReference instanceof Reference)
+          currentEntry.setReference((Reference) currentReference);
+
+        checkIfFirstParagraphContainsAbstract(currentEntry, entryParagraphs);
+        currentEntry.setContent(extractEntryContent(entryParagraphs));
+      }
+
       Application.getDeepThought().addEntry(currentEntry);
       addEntryToCategory(currentEntry);
+      addTagsToEntry(currentEntry);
       return currentEntry;
     } catch(Exception ex) {
       log.error("Could not extract Entry from entryParagraphs", ex);
@@ -114,12 +390,27 @@ public class OpenOfficeDocumentsImporterExporter {
     return null;
   }
 
+  protected void checkIfFirstParagraphContainsAbstract(Entry entry, List<Paragraph> entryParagraphs) {
+    if(entryParagraphs.size() == 0)
+      return;
+
+    Paragraph firstParagraph = entryParagraphs.get(0);
+    if(firstParagraph.getTextContent().length() < HeadingMaxLength && firstParagraph.getOdfElement().getNextSibling() instanceof TextListElement) {
+      entry.setAbstract(extractHtmlTextFromList((OdfTextList)firstParagraph.getOdfElement().getNextSibling(), firstParagraph));
+      entryParagraphs.remove(0);
+    }
+  }
+
   protected String extractEntryContent(List<Paragraph> entryParagraphs) {
     String entryContent = "";
     
     for(Paragraph paragraph : entryParagraphs) {
       String paragraphHtml = extractHtmlFormattedContentFromParagraph(paragraph);
-      entryContent += "<p>" + paragraphHtml + "</p>";
+
+      if(paragraph.isHeading())
+        entryContent += "<h" + paragraph.getHeadingLevel() + ">" + paragraphHtml + "</h" + paragraph.getHeadingLevel() + ">";
+      else
+        entryContent += "<p>" + paragraphHtml + "</p>";
     }
 
     return entryContent;
@@ -131,32 +422,60 @@ public class OpenOfficeDocumentsImporterExporter {
     NodeList paragraphChildren = paragraph.getOdfElement().getChildNodes();
     for(int i = 0; i < paragraphChildren.getLength(); i++) {
       Node block = paragraphChildren.item(i);
-
-      if(block instanceof TextSoftPageBreakElement) // a manual page break on text overflow, not needed in HTML
-        continue;
-      else if(block instanceof TextLineBreakElement)
-        paragraphHtml += "<br />";
-      else if(block instanceof TextSpanElement) {
-        TextSpanElement element = (TextSpanElement)block;
-        if(element.hasAutomaticStyle() || element.hasDocumentStyle()) {
-          paragraphHtml = extractStyledBlockContent(element);
-        }
-        else
-          paragraphHtml += block.getTextContent();
-      }
-      else if(block instanceof TextAElement) {
-        TextAElement textHyperlink = (TextAElement)block;
-        paragraphHtml += "<a href=\"" + textHyperlink.getXlinkHrefAttribute() + "\">" + textHyperlink.getTextContent() + "</a>";
-      }
-      else
-        paragraphHtml += block.getTextContent();
+      paragraphHtml += extractHtmlTextFromNode(block, paragraph.getOdfElement().getAutomaticStyle());
     }
+
+    if(paragraph.getOdfElement().getNextSibling() instanceof OdfTextList)
+      paragraphHtml += extractHtmlTextFromList((OdfTextList)paragraph.getOdfElement().getNextSibling(), paragraph);
+
+    if(paragraph.getOdfElement().getNextSibling() instanceof TableTableElement)
+      paragraphHtml += extractHtmlTextFromTableElement((TableTableElement)paragraph.getOdfElement().getNextElementSibling(), paragraph);
 
     return paragraphHtml;
   }
 
+  protected String extractHtmlTextFromNode(Node node, OdfStyle parentStyle) {
+    if(node instanceof TextSoftPageBreakElement) // a manual page break on text overflow, not needed in HTML
+      return "";
+    else if(node instanceof TextLineBreakElement)
+      return  "<br />";
+    else if(node instanceof TextSpanElement) {
+      TextSpanElement element = (TextSpanElement)node;
+      if(element.hasAutomaticStyle() || element.hasDocumentStyle()) {
+        return extractStyledBlockContent(element);
+      }
+      else
+        return node.getTextContent();
+    }
+    else if(node instanceof TextAElement) {
+      TextAElement textHyperlink = (TextAElement)node;
+      return  "<a href=\"" + textHyperlink.getXlinkHrefAttribute() + "\">" + textHyperlink.getTextContent() + "</a>";
+    }
+    else if(node instanceof DrawFrameElement)
+      return extractDrawFrameElementContent((DrawFrameElement)node);
+    else if(node instanceof TextListItemElement) {
+      TextListItemElement listItemElement = (TextListItemElement)node;
+      String itemText = "<li>";
+      for(int i = 0; i < listItemElement.getLength(); i++) {
+        Node listItemChild = listItemElement.item(i);
+        itemText += extractHtmlTextFromNode(listItemChild, null);
+      }
+
+      return itemText + "</li>";
+    }
+    else if(parentStyle != null) {
+      return extractStyledBlockContent(node, parentStyle);
+    }
+    else
+      return node.getTextContent();
+  }
+
   protected String extractStyledBlockContent(TextSpanElement element) {
     OdfStyle style = element.hasAutomaticStyle() ? element.getAutomaticStyle() : element.getDocumentStyle();
+    return extractStyledBlockContent(element, style);
+  }
+
+  protected String extractStyledBlockContent(Node node, OdfStyle style) {
     if(style.getFirstChild() instanceof StyleTextPropertiesElement) { // TODO: also check other children for StyleTextPropertiesElement
       StyleTextPropertiesElement textPropertiesElement = (StyleTextPropertiesElement)style.getFirstChild();
       // TODO: also check for: underline, strike through, text fore- and background color, ...
@@ -167,7 +486,7 @@ public class OpenOfficeDocumentsImporterExporter {
       if(isBold) blockHtml += "<b>";
       if(isItalic) blockHtml += "<i>";
 
-      blockHtml += element.getTextContent();
+      blockHtml += node.getTextContent();
 
       if(isItalic) blockHtml += "</i>";
       if(isBold) blockHtml += "</b>";
@@ -175,12 +494,90 @@ public class OpenOfficeDocumentsImporterExporter {
       return blockHtml;
     }
     else
-      return element.getTextContent();
+      return node.getTextContent();
+  }
+
+  protected String extractDrawFrameElementContent(DrawFrameElement drawFrameElement) {
+    for(int i = 0; i < drawFrameElement.getLength(); i++) {
+      Node drawChild = drawFrameElement.item(i);
+      if(drawChild instanceof OdfDrawImage) {
+        OdfDrawImage imageElement = (OdfDrawImage)drawChild;
+        String href = imageElement.getXlinkHrefAttribute();
+        Image extractedImage = Image.getInstanceof(imageElement);
+
+        InputStream imageInputStream = extractedImage.getImageInputStream();
+        if(imageInputStream != null) { // a local image
+          FileLink imageFile = new FileLink(href);
+          String folderPath = FileUtils.getUserDataFolderForFile(imageFile);
+          File destinationFile = new File(folderPath, imageFile.getName());
+          try {
+            FileUtils.writeToFile(imageInputStream, destinationFile);
+          } catch (Exception ex) {
+            return "";
+          }
+          try { imageInputStream.close(); } catch (Exception ex) { }
+
+          return "<p><img src=\"file://" + destinationFile.getAbsolutePath() + "\" /></p>";
+        }
+        else if(StringUtils.isNotNullOrEmpty(href)) // an image referenced from internet
+          return "<p><img src=\"" + href + "\" /></p>"; // TODO: download image
+      }
+    }
+
+    return "";
+  }
+
+  protected String extractHtmlTextFromList(OdfTextList textList, Paragraph paragraph) {
+    String listHtml = "";
+    if(textList.hasChildNodes()) {
+      listHtml += "<ul>";
+      NodeList listChildren = textList.getChildNodes();
+
+      for (int i = 0; i < listChildren.getLength(); i++) {
+        Node listElement = listChildren.item(i);
+        listHtml += extractHtmlTextFromNode(listElement, paragraph.getOdfElement().getAutomaticStyle());
+      }
+
+      listHtml += "</ul>";
+    }
+    return listHtml;
+  }
+
+  protected String extractHtmlTextFromTableElement(TableTableElement tableElement, Paragraph paragraph) {
+    String tableHtml = "";
+    if(tableElement.hasChildNodes()) {
+      tableHtml += "<table>";
+
+      for (int i = 0; i < tableElement.getLength(); i++) {
+        Node tableChildElement = tableElement.item(i);
+        // TODO: extract table header
+        if(tableChildElement instanceof TableTableRowElement) {
+          TableTableRowElement rowElement = (TableTableRowElement) tableChildElement;
+          tableHtml += "<tr>";
+
+          for(int j = 0; j < rowElement.getLength(); j++) {
+            Node rowChild = rowElement.item(j);
+            if(rowChild instanceof TableTableCellElement) {
+              TableTableCellElement cellElement = (TableTableCellElement) rowChild;
+              tableHtml += "<td>";
+              for(int k = 0; k < cellElement.getLength(); k++)
+                tableHtml += extractHtmlTextFromNode(cellElement.item(k), cellElement.getAutomaticStyle());
+              tableHtml += "</td>";
+            }
+          }
+
+          tableHtml += "</tr>";
+        }
+      }
+
+      tableHtml += "</table>";
+    }
+    return tableHtml;
   }
 
   protected ReferenceBase tryToExtractReference(List<Paragraph> entryParagraphs) {
     String referenceText = tryToFindReferenceText(entryParagraphs);
-    if(referenceText == null) // no reference specified in this case
+    if(referenceText == null || referenceText.length() > 255) // no reference specified in this case
       return null;
 
     return tryToFindReferenceTitleSubtitleAndPublishingDate(entryParagraphs, referenceText);
@@ -197,7 +594,7 @@ public class OpenOfficeDocumentsImporterExporter {
       if(/*lastChild instanceof TextImpl &&*/ /*"]".equals(lastChild.getTextContent())*/ lastChild.getTextContent().endsWith("]")) { // paragraph end with a closing square bracket
         Integer lineBreakElementIndex = findLineBreakElement(children, length - 2);
         if(lineBreakElementIndex == null)
-          return null;
+          lineBreakElementIndex = -1;
 
         Integer openingSquareBracketIndex = findOpeningSquareBracketIndex(children, lineBreakElementIndex + 1, length /*- 1*/);
         if(openingSquareBracketIndex == null)
@@ -224,7 +621,7 @@ public class OpenOfficeDocumentsImporterExporter {
     if(referenceText.startsWith("[")) referenceText = referenceText.substring(1);
     if(referenceText.endsWith("]")) referenceText = referenceText.substring(0, referenceText.length() - 1);
 
-    for(int i = length - 1; i >= lineBreakElementIndex; i--)
+    for(int i = length - 1; i >= (lineBreakElementIndex >= 0 ? lineBreakElementIndex : 0); i--)
       paragraphElement.removeChild(children.item(i));
 
     return referenceText;
@@ -250,6 +647,8 @@ public class OpenOfficeDocumentsImporterExporter {
     return null;
   }
 
+  protected final static int HeadingMaxLength = 128;
+
   protected ReferenceBase tryToFindReferenceTitleSubtitleAndPublishingDate(List<Paragraph> entryParagraphs, String referenceText) {
     String title = null;
     String publishingDate = null;
@@ -261,24 +660,49 @@ public class OpenOfficeDocumentsImporterExporter {
       int indexOpeningSquareBracket = firstParagraphText.lastIndexOf('[');
       if(indexOpeningSquareBracket > 0) {
         publishingDate = firstParagraphText.substring(indexOpeningSquareBracket + 1, firstParagraphText.length() - 1);
-        subTitle = firstParagraphText.substring(0, indexOpeningSquareBracket - 1).trim();
-        entryParagraphs.remove(firstParagraph); // first paragraph is now handled, avoid that text extraction re-handles it
+        if(Reference.tryToParseIssueOrPublishingDateToDate(publishingDate) == null)
+          publishingDate = null;
+        else {
+          subTitle = firstParagraphText.substring(0, indexOpeningSquareBracket - 1).trim();
+          if (referenceText.contains("//www.der-postillon.com/") == false)
+            entryParagraphs.remove(firstParagraph); // first paragraph is now handled, avoid that text extraction re-handles it
+          else {
+            firstParagraph.getOdfElement().setTextContent(subTitle);
+            title = subTitle;
+            subTitle = null;
+          }
+        }
       }
     }
     else if(firstParagraph.isHeading()) {
       title = firstParagraphText;
       entryParagraphs.remove(firstParagraph); // first paragraph is now handled, avoid that text extraction re-handles it
     }
+    else if(firstParagraphText.length() < HeadingMaxLength && StringUtils.isNotNullOrEmpty(referenceText) && entryParagraphs.size() > 2) {
+      subTitle = firstParagraphText;
+      entryParagraphs.remove(firstParagraph);
+    }
 
     if(subTitle != null && entryParagraphs.size() > 0) { // first paragraph contained SubTitle and PublishingDate, the second paragraph then contains the Title
       Paragraph secondParagraph = entryParagraphs.get(0);
       title = secondParagraph.getTextContent();
-      if(title.length() > 255) { // not a title but already the content, Entry has only a Title but no SubTitle
+      if(title.length() > HeadingMaxLength || title.startsWith("• ")) { // not a title but already the content, Entry has only a Title but no SubTitle
         title = subTitle;
         subTitle = "";
       }
-      else
+      else if(secondParagraph.getOdfElement().getNextSibling() instanceof OdfTextList == false) // Sueddeutsche articles sometimes have lists as Abstract on second paragraph
         entryParagraphs.remove(secondParagraph); // second paragraph is now handled, avoid that text extraction re-handles it
+    }
+
+    // sometimes i indicate reference date and publishing date together on last paragraph like 'Titanic Online, 09.12.2014'
+    if(publishingDate == null && referenceText.contains(", ")) {
+      publishingDate = referenceText.substring(referenceText.lastIndexOf(", ") + 1).trim();
+      Date parsedDate = Reference.tryToParseIssueOrPublishingDateToDate(publishingDate);
+
+      if(parsedDate != null)
+        referenceText = referenceText.substring(0, referenceText.lastIndexOf(','));
+      else
+        publishingDate = null;
     }
 
     return createReference(referenceText, title, subTitle, publishingDate);
@@ -297,10 +721,20 @@ public class OpenOfficeDocumentsImporterExporter {
       return extractAgora42Reference(referenceText);
     }
     else
-      return createReferenceFromReferenceText(referenceText);
+      return createReferenceFromReferenceText(referenceText, title, subTitle, publishingDate);
   }
 
   protected ReferenceBase createReferenceFromUrl(String url, String title, String subTitle, String publishingDate) {
+    // a Spiegel article which meta data hasn't specified currectly by me
+    if(spiegelContentExtractor.canCreateEntryFromUrl(url) &&
+        (StringUtils.isNullOrEmpty(title) || StringUtils.isNullOrEmpty(subTitle) || StringUtils.isNullOrEmpty(publishingDate))) {
+      EntryCreationResult creationResult = spiegelContentExtractor.createEntryFromArticle(url);
+      if(creationResult.successful())
+        return creationResult.getCreatedEntry().getReferenceSubDivision();
+      else
+        log.error("Could not read Spiegel Online article from Url " + url, creationResult.getError());
+    }
+
     SeriesTitle seriesForUrl = findSeriesForUrl(url);
     if(seriesForUrl != null) {
       if(url.contains("www.youtube.com") == false) {
@@ -309,14 +743,15 @@ public class OpenOfficeDocumentsImporterExporter {
         ReferenceSubDivision article = new ReferenceSubDivision(title, subTitle);
         article.setOnlineAddress(url);
         reference.addSubDivision(article);
+        Application.getDeepThought().addReferenceSubDivision(article);
 
         return article;
       }
       else {
         Reference newYouTubeLink = new Reference(title, subTitle);
         newYouTubeLink.setOnlineAddress(url);
-        Application.getDeepThought().addReference(newYouTubeLink);
         seriesForUrl.addSerialPart(newYouTubeLink);
+        Application.getDeepThought().addReference(newYouTubeLink);
         return newYouTubeLink;
       }
     }
@@ -324,8 +759,9 @@ public class OpenOfficeDocumentsImporterExporter {
     Reference newReference = new Reference(title, subTitle);
     newReference.setIssueOrPublishingDate(publishingDate);
     newReference.setOnlineAddress(url);
-    if(StringUtils.isNullOrEmpty(title) && StringUtils.isNotNullOrEmpty(subTitle))
+    if(StringUtils.isNullOrEmpty(title) && StringUtils.isNullOrEmpty(subTitle))
       newReference.setTitle(url);
+    Application.getDeepThought().addReference(newReference);
     return newReference;
   }
 
@@ -349,20 +785,45 @@ public class OpenOfficeDocumentsImporterExporter {
     }
     else {
       Reference newReference = new Reference(referenceText.substring(8));
-      Application.getDeepThought().addReference(newReference);
       seriesTitle.addSerialPart(newReference);
+      Application.getDeepThought().addReference(newReference);
       return newReference;
     }
   }
 
-  protected ReferenceBase createReferenceFromReferenceText(String referenceText) {
-    return new Reference(referenceText);
+  protected ReferenceBase createReferenceFromReferenceText(String referenceText, String title, String subTitle, String publishingDate) {
+    if(referenceText.toLowerCase().contains("titanic")) {
+      SeriesTitle series = findOrCreateSeriesTitleFor("Titanic");
+      if(publishingDate == null)
+        return series;
+      else {
+        Reference reference = findOrCreateReferenceForSeriesTitleToPublishingDate(series, publishingDate);
+        return reference;
+      }
+    }
+    else if(StringUtils.isNullOrEmpty(title)) {
+      Reference reference = new Reference(referenceText);
+      Application.getDeepThought().addReference(reference);
+      return reference;
+    }
+    else {
+      Reference reference = new Reference(referenceText);
+      if(StringUtils.isNotNullOrEmpty(publishingDate))
+        reference.setIssueOrPublishingDate(publishingDate);
+      Application.getDeepThought().addReference(reference);
+
+      ReferenceSubDivision subDivision = new ReferenceSubDivision(title, subTitle);
+      reference.addSubDivision(subDivision);
+      Application.getDeepThought().addReferenceSubDivision(subDivision);
+
+      return subDivision;
+    }
   }
 
   protected SeriesTitle findSeriesForUrl(String url) {
     if(url.contains("//www.sueddeutsche.de/"))
       return findOrCreateSeriesTitleFor("SZ");
-    else if(url.contains("//www.spiegel.de/"))
+    else if(url.contains(".spiegel.de/"))
       return findOrCreateSeriesTitleFor("Spiegel");
     else if(url.contains("//www.handelsblatt.com/"))
       return findOrCreateSeriesTitleFor("Handelsblatt");
@@ -376,12 +837,14 @@ public class OpenOfficeDocumentsImporterExporter {
       return findOrCreateSeriesTitleFor("Der Freitag");
     else if(url.contains("//www.nzz.ch/"))
       return findOrCreateSeriesTitleFor("NZZ");
-    else if(url.contains("//www.theguardian.com/"))
+    else if(url.contains("//www.theguardian.com/") || url.contains("//www.guardian.co.uk/"))
       return findOrCreateSeriesTitleFor("The Guardian");
     else if(url.contains("//www.youtube.com/"))
       return findOrCreateSeriesTitleFor("YouTube");
     else if(url.contains(".tagesschau.de/"))
       return findOrCreateSeriesTitleFor("Tagesschau");
+    else if(url.contains("//www.der-postillon.com/"))
+      return findOrCreateSeriesTitleFor("Postillon");
 
     return null;
   }
@@ -415,8 +878,8 @@ public class OpenOfficeDocumentsImporterExporter {
 
     Reference newReference = new Reference();
     newReference.setIssueOrPublishingDate(publishingDate);
+    newReference.setSeries(series);
     Application.getDeepThought().addReference(newReference);
-    series.addSerialPart(newReference);
 
     return newReference;
   }
@@ -431,6 +894,7 @@ public class OpenOfficeDocumentsImporterExporter {
 
     ReferenceSubDivision newSubDivision = new ReferenceSubDivision(subDivisionTitle);
     reference.addSubDivision(newSubDivision);
+    Application.getDeepThought().addReferenceSubDivision(newSubDivision);
     return newSubDivision;
   }
 
@@ -439,7 +903,8 @@ public class OpenOfficeDocumentsImporterExporter {
 
     while(paragraphs.hasNext()) {
       Paragraph paragraph = paragraphs.next();
-      if(StringUtils.isNullOrEmpty(paragraph.getTextContent())) { // usually an empty line means end of Entry
+      if(StringUtils.isNullOrEmpty(paragraph.getTextContent()) && paragraph.getOdfElement().getFirstChild() instanceof OdfDrawFrame == false) { // usually an empty line means
+      // end of Entry
         if (entryParagraphs.size() == 0 && paragraphs.hasNext()) // but sometimes there are two empty lines between two Entries, so ignore these
           continue;
 
@@ -466,7 +931,8 @@ public class OpenOfficeDocumentsImporterExporter {
       return seriesTitleCategories.get(seriesTitleTitle);
 
     if("SZ".equals(seriesTitleTitle) || "The Guardian".equals(seriesTitleTitle) || "TAZ".equals(seriesTitleTitle) || "NZZ".equals(seriesTitleTitle) ||
-        "Der Freitag".equals(seriesTitleTitle) || "Spiegel".equals(seriesTitleTitle) || "Zeit".equals(seriesTitleTitle) || "FAZ".equals(seriesTitleTitle) || "Handelsblatt".equals(seriesTitleTitle)) {
+        "Der Freitag".equals(seriesTitleTitle) || "Spiegel".equals(seriesTitleTitle) || "Zeit".equals(seriesTitleTitle) || "FAZ".equals(seriesTitleTitle) ||
+        "Titanic".equals(seriesTitleTitle) || "Postillion".equals(seriesTitleTitle) || "Handelsblatt".equals(seriesTitleTitle)) {
       Category periodicalOnlineCategory = findOrCreateCategoryForOnlinePeriodical(seriesTitleTitle);
       seriesTitleCategories.put(seriesTitleTitle, periodicalOnlineCategory);
       return periodicalOnlineCategory;
@@ -505,11 +971,11 @@ public class OpenOfficeDocumentsImporterExporter {
     Category periodicalCategory = findOrCreateCategoryForPeriodical(categoryTitle);
 
     for(Category periodicalSubCategory : periodicalCategory.getSubCategories()) {
-      if("Online".equals(periodicalSubCategory.getName()))
+      if(periodicalSubCategory.getName().contains("Online"))
         return periodicalSubCategory;
     }
 
-    Category periodicalSubCategory = new Category("Online");
+    Category periodicalSubCategory = new Category(categoryTitle + " Online");
     periodicalCategory.addSubCategory(periodicalSubCategory);
     return periodicalSubCategory;
   }
@@ -562,6 +1028,28 @@ public class OpenOfficeDocumentsImporterExporter {
     videosTopLevelCategory = new Category("Videos");
     Application.getDeepThought().addCategory(videosTopLevelCategory);
     return videosTopLevelCategory;
+  }
+
+
+//  protected LuceneSearchEngine luceneSearchEngine = new LuceneSearchEngine();
+
+  protected void addTagsToEntry(Entry entry) {
+    if(entry.getSeries() != null) {
+      String seriesTitleTitle = entry.getSeries().getTitle();
+      Tag tag = Application.getDeepThought().findOrCreateTagForName(seriesTitleTitle);
+      if(tag != null)
+        entry.addTag(tag);
+    }
+
+//    if(entry.getReference() != null && StringUtils.isNotNullOrEmpty(entry.getReference().getIssueOrPublishingDate()))
+//      entry.addTag(Application.getDeepThought().findOrCreateTagForName(entry.getReference().getIssueOrPublishingDate()));
+
+//    List<String> entryTerms = luceneSearchEngine.extractTermsFromEntry(entry);
+//
+//    for(int i = 0; i < (entryTerms.size() < 5 ? entryTerms.size() : 5); i++) { // add at maximum the five most relevant terms as tags
+//      Tag tag = findOrCreateTagForTagName(entryTerms.get(i));
+//      entry.addTag(tag);
+//    }
   }
 
 }

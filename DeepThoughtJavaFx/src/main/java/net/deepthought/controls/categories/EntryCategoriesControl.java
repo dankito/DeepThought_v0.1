@@ -116,6 +116,11 @@ public class EntryCategoriesControl extends TitledPane {
     }
   }
 
+  public void cleanUpControl() {
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+  }
+
   protected void deepThoughtChanged(DeepThought newDeepThought) {
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);

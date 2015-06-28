@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -30,9 +29,6 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
 
   private static final long serialVersionUID = -3232937271770851228L;
 
-
-  @Column(name = TableConfig.DeepThoughtApplicationDataModelVersionColumnName)
-  protected int dataModelVersion = 0; // TODO: raus damit, ab in die Registry
 
   @OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST } )
   @JoinColumn(name = TableConfig.DeepThoughtApplicationLastLoggedOnUserJoinColumnName)
@@ -66,22 +62,11 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
 
   }
 
-  public DeepThoughtApplication(int dataModelVersion, User lastLoggedOnUser, boolean autoLogOnLastLoggedOnUser) {
-    this.dataModelVersion = dataModelVersion;
+  public DeepThoughtApplication(User lastLoggedOnUser, boolean autoLogOnLastLoggedOnUser) {
     this.lastLoggedOnUser = lastLoggedOnUser;
     this.autoLogOnLastLoggedOnUser = autoLogOnLastLoggedOnUser;
   }
 
-
-  public int getDataModelVersion() {
-    return dataModelVersion;
-  }
-
-  public void setDataModelVersion(int dataModelVersion) {
-    Object previousValue = this.dataModelVersion;
-    this.dataModelVersion = dataModelVersion;
-    callPropertyChangedListeners(TableConfig.DeepThoughtApplicationDataModelVersionColumnName, previousValue, dataModelVersion);
-  }
 
   public User getLastLoggedOnUser() {
     return lastLoggedOnUser;
@@ -224,67 +209,72 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
 
   /*        Listeners handling        */
 
+//  @Override
+//  protected void callEntityAddedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+//    addedEntity.addEntityListener(subEntitiesListener); // add a listener to every Entity so that it's changes can be tracked
+//
+//    super.callEntityAddedListeners(collectionHolder, collection, addedEntity);
+//  }
+//
+//  @Override
+//  protected void callEntityRemovedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+//    // don't remove listener if removedEntity is still on a DeepThought collection
+//    if(collectionHolder == this || isComposition(collectionHolder, removedEntity) == true)
+//      removedEntity.removeEntityListener(subEntitiesListener);
+//
+//    super.callEntityRemovedListeners(collectionHolder, collection, removedEntity);
+//  }
+//
+//  public boolean isComposition(BaseEntity collectionHolder, BaseEntity entity) {
+//    // currently no Composition in DeepThoughtApplication sub Entities
+//
+//    return false;
+//  }
+//
+//  protected transient EntityListener subEntitiesListener = new EntityListener() {
+//    @Override
+//    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+//      log.debug("SubEntity's property {} changed to {}; {}", propertyName, newValue, entity);
+//
+//      entityUpdated(entity);
+//    }
+//
+//    @Override
+//    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+//      callEntityAddedListeners(collectionHolder, collection, addedEntity);
+//      entityUpdated(collectionHolder);
+//    }
+//
+//    @Override
+//    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+//      callEntityOfCollectionUpdatedListeners(collectionHolder, collection, updatedEntity);
+//    }
+//
+//    @Override
+//    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+//      callEntityRemovedListeners(collectionHolder, collection, removedEntity);
+//      entityUpdated(collectionHolder);
+//    }
+//  };
+//
+//  protected void entityUpdated(final BaseEntity entity) {
+//    if(entity instanceof User)
+//      callEntityOfCollectionUpdatedListeners(getUsers(), entity);
+//    else if(entity instanceof Group)
+//      callEntityOfCollectionUpdatedListeners(getGroups(), entity);
+//    else if(entity instanceof Device)
+//      callEntityOfCollectionUpdatedListeners(getDevices(), entity);
+//    else if(entity instanceof ApplicationLanguage)
+//      callEntityOfCollectionUpdatedListeners(getApplicationLanguages(), entity);
+//    else
+//      log.warn("Updated entity of type " + entity.getClass() + " retrieved, but don't know what to do with this type");
+//  }
+
+
   @Override
-  protected void callEntityAddedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-    addedEntity.addEntityListener(subEntitiesListener); // add a listener to every Entity so that it's changes can be tracked
-
-    super.callEntityAddedListeners(collectionHolder, collection, addedEntity);
+  public boolean addEntityListener(EntityListener listener) {
+    return super.addEntityListener(listener);
   }
-
-  @Override
-  protected void callEntityRemovedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-    // don't remove listener if removedEntity is still on a DeepThought collection
-    if(collectionHolder == this || isComposition(collectionHolder, removedEntity) == true)
-      removedEntity.removeEntityListener(subEntitiesListener);
-
-    super.callEntityRemovedListeners(collectionHolder, collection, removedEntity);
-  }
-
-  public boolean isComposition(BaseEntity collectionHolder, BaseEntity entity) {
-    // currently no Composition in DeepThoughtApplication sub Entities
-
-    return false;
-  }
-
-  protected transient EntityListener subEntitiesListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      log.debug("SubEntity's property {} changed to {}; {}", propertyName, newValue, entity);
-
-      entityUpdated(entity);
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      callEntityAddedListeners(collectionHolder, collection, addedEntity);
-      entityUpdated(collectionHolder);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      callEntityOfCollectionUpdatedListeners(collectionHolder, collection, updatedEntity);
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      callEntityRemovedListeners(collectionHolder, collection, removedEntity);
-      entityUpdated(collectionHolder);
-    }
-  };
-
-  protected void entityUpdated(final BaseEntity entity) {
-    if(entity instanceof User)
-      callEntityOfCollectionUpdatedListeners(getUsers(), entity);
-    else if(entity instanceof Group)
-      callEntityOfCollectionUpdatedListeners(getGroups(), entity);
-    else if(entity instanceof Device)
-      callEntityOfCollectionUpdatedListeners(getDevices(), entity);
-    else if(entity instanceof ApplicationLanguage)
-      callEntityOfCollectionUpdatedListeners(getApplicationLanguages(), entity);
-    else
-      log.warn("Updated entity of type " + entity.getClass() + " retrieved, but don't know what to do with this type");
-  }
-
 
   @Override
   public String toString() {
@@ -302,7 +292,7 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
     defaultLocalUser.addDeepThought(defaultDeepThought);
     defaultLocalUser.setLastViewedDeepThought(defaultDeepThought);
 
-    DeepThoughtApplication application = new DeepThoughtApplication(Application.CurrentDataModelVersion, defaultLocalUser, true);
+    DeepThoughtApplication application = new DeepThoughtApplication(defaultLocalUser, true);
     application.setLocalDevice(localDevice);
 
     application.addUser(defaultLocalUser);

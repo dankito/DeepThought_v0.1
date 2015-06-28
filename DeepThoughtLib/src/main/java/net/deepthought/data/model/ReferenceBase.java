@@ -80,7 +80,7 @@ public abstract class ReferenceBase extends UserDataEntity {
   }
 
   public ReferenceBase(String title) {
-    this.title = title;
+    setTitle(title);
   }
 
   public ReferenceBase(String title, String subTitle) {
@@ -95,7 +95,7 @@ public abstract class ReferenceBase extends UserDataEntity {
 
   public void setTitle(String title) {
     Object previousValue = this.title;
-    this.title = title;
+    this.title = title == null ? "" : title;
     callPropertyChangedListeners(TableConfig.ReferenceBaseTitleColumnName, previousValue, title);
   }
 

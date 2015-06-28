@@ -1,0 +1,3 @@
+net.deepthought.data.contentextractor.SueddeutscheContentExtractor
+net.deepthought.data.contentextractor.SpiegelContentExtractor
+net.deepthought.data.contentextractor.ZeitContentExtractor

@@ -284,13 +284,13 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
   protected EntityListener categoryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(entity.equals(category))
+//      if(entity.equals(category))
         categoryPropertiesHaveBeenUpdated(category);
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collectionHolder.equals(category) && collection == category.getEntries()) {
+      if(/*collectionHolder.equals(category) &&*/ collection == category.getEntries()) {
         if(addedEntity.equals(entry))
           setComboBoxToSelected();
       }
@@ -303,7 +303,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collectionHolder.equals(category) && collection == category.getEntries()) {
+      if(/*collectionHolder.equals(category) &&*/ collection == category.getEntries()) {
         if(removedEntity.equals(entry))
           setComboBoxToUnselected();
       }

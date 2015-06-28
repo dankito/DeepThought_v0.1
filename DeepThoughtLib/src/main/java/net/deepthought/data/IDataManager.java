@@ -4,6 +4,7 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.User;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -25,6 +26,9 @@ public interface IDataManager {
   public boolean addApplicationListener(ApplicationListener listener);
   public boolean removeApplicationListener(ApplicationListener listener);
 
+  public boolean addAllEntitiesListener(AllEntitiesListener listener);
+  public boolean removeAllEntitiesListener(AllEntitiesListener listener);
+
   public void deleteExistingDataCollection();
   public void replaceExistingDataCollectionWithData(DeepThoughtApplication data);
 
@@ -32,6 +36,8 @@ public interface IDataManager {
   public void recreateEntityManagerAndRetrieveDeepThoughtApplication();
 
   public void ensureAllLazyLoadingDataIsLoaded(BaseEntity entity);
+
+  public void lazyLoadedEntityMapped(BaseEntity entity);
 
   public void close();
 

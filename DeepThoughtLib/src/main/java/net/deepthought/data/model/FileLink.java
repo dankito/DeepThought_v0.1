@@ -63,7 +63,7 @@ public class FileLink extends UserDataEntity implements Serializable {
   }
 
   public FileLink(String uri) {
-    this.uriString = uri;
+    setUriString(uri);
   }
 
   public FileLink(String uri, String name) {

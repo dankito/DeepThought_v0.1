@@ -98,5 +98,6 @@
     <orderEntry type="library" exported="" name="guava-17.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="sqlite-jdbc-3.8.7" level="project" />
+    <orderEntry type="library" exported="" name="OcrTextContentExtractor.OcrTextContentExtractor" level="project" />
   </component>
 </module>

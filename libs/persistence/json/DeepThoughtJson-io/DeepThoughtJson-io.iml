@@ -29,5 +29,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="module" module-name="json-io" exported="" />
+    <orderEntry type="library" exported="" name="DeepThoughtJson-io.DeepThoughtJson-io" level="project" />
   </component>
 </module>

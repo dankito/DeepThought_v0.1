@@ -13,4 +13,14 @@ public class StringUtils {
     return isNullOrEmpty(string) == false;
   }
 
+  public static int getNumberOfOccurrences(String textToSearchFor, String textToSearchIn) {
+    int numberOfOccurrences = 0;
+    int indexOfOccurrence = -2;
+
+    while((indexOfOccurrence = textToSearchIn.indexOf(textToSearchFor, indexOfOccurrence + 1)) >= 0) {
+      numberOfOccurrences++;
+    }
+
+    return numberOfOccurrences;
+  }
 }

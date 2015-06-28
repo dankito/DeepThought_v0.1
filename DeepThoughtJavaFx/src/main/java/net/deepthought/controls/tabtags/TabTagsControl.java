@@ -509,14 +509,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collection == deepThought.getTags()){
-        if(Platform.isFxApplicationThread()) {
+        if(Platform.isFxApplicationThread())
           tagHasBeenAdded((Tag)addedEntity);
-        }
-        else {
-          Platform.runLater(() -> {
-            tagHasBeenAdded((Tag)addedEntity);
-          });
-        }
+        else
+          Platform.runLater(() -> tagHasBeenAdded((Tag)addedEntity));
       }
     }
 

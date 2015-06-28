@@ -20,8 +20,10 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -714,20 +716,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
   }
 
-  /**
-   * <p>
-   * (Not such a good solution)
-   * This method such be called by Database persisted whenever a lazy loading Entity got loaded / mapped
-   * so that Entity Listeners can be added to this Entity in order to keep its state modifiedOn in UI.
-   * </p>
-   * @param entity The just mapped Entity
-   */
-  public void lazyLoadedEntityMapped(BaseEntity entity) {
-    log.info("Lazy loaded Entity mapped: {}", entity);
-    entity.addEntityListener(subEntitiesListener);
-//    try { throw new Exception("Show me the Call Stack"); } catch (Exception ex) { log.error("", ex); }
-  }
-
   protected transient EntityListener subEntitiesListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, final Object newValue) {
@@ -808,21 +796,21 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   /*        Listeners handling        */
 
-  @Override
-  protected void callEntityAddedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-    addedEntity.addEntityListener(subEntitiesListener); // add a listener to every Entity so that it's changes can be tracked
-
-    super.callEntityAddedListeners(collectionHolder, collection, addedEntity);
-  }
-
-  @Override
-  protected void callEntityRemovedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-    // don't remove listener if removedEntity is still on a DeepThought collection
-    if(collectionHolder == this)
-      removedEntity.removeEntityListener(subEntitiesListener);
-
-    super.callEntityRemovedListeners(collectionHolder, collection, removedEntity);
-  }
+//  @Override
+//  protected void callEntityAddedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+//    addedEntity.addEntityListener(subEntitiesListener); // add a listener to every Entity so that it's changes can be tracked
+//
+//    super.callEntityAddedListeners(collectionHolder, collection, addedEntity);
+//  }
+//
+//  @Override
+//  protected void callEntityRemovedListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+//    // don't remove listener if removedEntity is still on a DeepThought collection
+//    if(collectionHolder == this)
+//      removedEntity.removeEntityListener(subEntitiesListener);
+//
+//    super.callEntityRemovedListeners(collectionHolder, collection, removedEntity);
+//  }
 
 
   @Override
@@ -923,6 +911,166 @@ public class DeepThought extends UserDataEntity implements Serializable {
     deepThought.addBackupFileServiceType(new BackupFileServiceType("backup.file.service.type.all", true, false, 1));
     deepThought.addBackupFileServiceType(new BackupFileServiceType("backup.file.service.type.database", true, false, 2));
     deepThought.addBackupFileServiceType(new BackupFileServiceType("backup.file.service.type.json", true, false, 3));
+  }
+
+
+  protected transient Map<String, SeriesTitle> cachedSeriesTitles = new HashMap<>();
+
+  public SeriesTitle findSeriesTitleForTitle(String title) {
+    if (cachedSeriesTitles.containsKey(title))
+      return cachedSeriesTitles.get(title);
+
+    for (SeriesTitle seriesTitle : getSeriesTitles()) {
+      if (title.equals(seriesTitle.getTitle())) {
+        cachedSeriesTitles.put(title, seriesTitle);
+        return seriesTitle;
+      }
+    }
+
+    return null;
+  }
+
+  public SeriesTitle findOrCreateSeriesTitleForTitle(String title) {
+    SeriesTitle existingSeriesTitle = findSeriesTitleForTitle(title);
+    if(existingSeriesTitle != null)
+      return existingSeriesTitle;
+
+    SeriesTitle newSeriesTitle = new SeriesTitle(title);
+    cachedSeriesTitles.put(title, newSeriesTitle);
+    addSeriesTitle(newSeriesTitle);
+
+    return newSeriesTitle;
+  }
+
+
+  protected transient Map<String, Reference> cachedReferences = new HashMap<>();
+
+  public Reference findReferenceForTitle(String title) {
+    if (cachedReferences.containsKey(title))
+      return cachedReferences.get(title);
+
+    for (Reference reference : getReferences()) {
+      if (title.equals(reference.getTitle())) {
+        cachedReferences.put(title, reference);
+        return reference;
+      }
+    }
+
+    return null;
+  }
+
+  public Reference findOrCreateReferenceForTitle(String title) {
+    Reference existingReference = findReferenceForTitle(title);
+    if(existingReference != null)
+      return existingReference;
+
+    Reference newReference = new Reference(title);
+    cachedReferences.put(title, newReference);
+    addReference(newReference);
+
+    return newReference;
+  }
+
+
+  protected transient Map<String, Tag> cachedTags = new HashMap<>();
+
+  public Tag findTagForName(String name) {
+    if (cachedTags.containsKey(name))
+      return cachedTags.get(name);
+
+    for (Tag tag : getTags()) {
+      if (name.equals(tag.getName())) {
+        cachedTags.put(name, tag);
+        return tag;
+      }
+    }
+
+    return null;
+  }
+
+  public Tag findOrCreateTagForName(String name) {
+    Tag existingTag = findTagForName(name);
+    if(existingTag != null)
+      return existingTag;
+
+    Tag newTag = new Tag(name);
+    cachedTags.put(name, newTag);
+    addTag(newTag);
+
+    return newTag;
+  }
+
+
+  public Category findTopLevelCategoryForName(String name) {
+    for (Category category : topLevelCategory.getSubCategories()) {
+      if (name.equals(category.getName())) {
+        return category;
+      }
+    }
+
+    return null;
+  }
+
+  public Category findOrCreateTopLevelCategoryForName(String name) {
+    Category existingCategory = findTopLevelCategoryForName(name);
+    if(existingCategory != null)
+      return existingCategory;
+
+    Category newCategory = new Category(name);
+    addCategory(newCategory);
+
+    return newCategory;
+  }
+
+  public Category findSubCategoryForName(Category parentCategory, String subCategoryName) {
+    for (Category subCategory : parentCategory.getSubCategories()) {
+      if (subCategoryName.equals(subCategory.getName())) {
+        return subCategory;
+      }
+    }
+
+    return null;
+  }
+
+  public Category findOrCreateSubCategoryForName(Category parentCategory, String subCategoryName) {
+    Category existingCategory = findSubCategoryForName(parentCategory, subCategoryName);
+    if(existingCategory != null)
+      return existingCategory;
+
+    Category newCategory = new Category(subCategoryName);
+    addCategory(newCategory);
+    parentCategory.addSubCategory(newCategory);
+
+    return newCategory;
+  }
+
+
+  protected transient Map<String, Person> cachedPersons = new HashMap<>();
+
+  public Person findPerson(String lastName, String firstName) {
+//    if (cachedPersons.containsKey(lastName))
+//      return cachedPersons.get(lastName);
+
+    for (Person person : getPersons()) {
+      if (lastName.equals(person.getLastName()) && firstName.equals(person.getFirstName())) {
+//        cachedPersons.put(lastName, person);
+        return person;
+      }
+    }
+
+    return null;
+  }
+
+  public Person findOrCreatePerson(String lastName, String firstName) {
+    Person existingPerson = findPerson(lastName, firstName);
+    if(existingPerson != null)
+      return existingPerson;
+
+    Person newPerson = new Person(firstName, lastName);
+//    cachedPersons.put(name, newPerson);
+    addPerson(newPerson);
+
+    return newPerson;
   }
 
 }

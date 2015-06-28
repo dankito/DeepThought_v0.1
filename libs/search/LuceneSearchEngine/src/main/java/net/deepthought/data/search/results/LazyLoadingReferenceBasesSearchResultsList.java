@@ -29,6 +29,9 @@ public class LazyLoadingReferenceBasesSearchResultsList extends LazyLoadingLucen
 
   @Override
   protected Collection<Long> applySorting(SortOrder sortOrder, Collection<Long> resultIds) {
+    if(resultIds.size() == 0)
+      return resultIds;
+
     String query = "SELECT b." + TableConfig.BaseEntityIdColumnName + " FROM " +
         TableConfig.ReferenceBaseTableName + " b " +
         ", " + TableConfig.ReferenceTableName + " r " +

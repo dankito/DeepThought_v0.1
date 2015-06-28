@@ -83,8 +83,8 @@ public class CreateBigIndex {
   @Test
   public void createBigIndex() {
 //    importEntriesFromDankitoSchneisenImWald();
-    indexWikipediaArticles();
-//    createRandomTagsCategoriesPersonsAndReferences();
+//    indexWikipediaArticles();
+    createRandomTagsCategoriesPersonsAndReferences();
   }
 
   protected void createRandomTagsCategoriesPersonsAndReferences() {
@@ -129,7 +129,7 @@ public class CreateBigIndex {
   protected void indexWikipediaArticles() {
     WikipediaImporter importer = new WikipediaImporter();
 
-    importer.getEnglishFeaturedArticles();
+//    importer.getEnglishFeaturedArticles();
 
     importer.getGermanGeschichtsPortalArticles();
   }

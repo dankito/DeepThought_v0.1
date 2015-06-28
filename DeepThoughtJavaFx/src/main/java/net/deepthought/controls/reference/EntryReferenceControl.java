@@ -40,6 +40,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -48,6 +49,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -112,19 +114,6 @@ public class EntryReferenceControl extends TitledPane {
   }
 
   public EntryReferenceControl(Entry entry) {
-    this.entry = entry;
-    if(entry != null) {
-      entry.addEntityListener(entryListener);
-
-      if(entry.getReferenceSubDivision() != null)
-        selectedReferenceBase = entry.getReferenceSubDivision();
-      else if(entry.getReference() != null)
-        selectedReferenceBase = entry.getReference();
-      else if(entry.getSeries() != null)
-        selectedReferenceBase = entry.getSeries();
-    }
-
-    setDisable(entry == null);
     deepThought = Application.getDeepThought();
 
     Application.addApplicationListener(new ApplicationListener() {
@@ -151,13 +140,38 @@ public class EntryReferenceControl extends TitledPane {
       if(deepThought != null)
         deepThought.addEntityListener(deepThoughtListener);
 
-      if(entry != null) // TODO: was fuer ein Quatsch dies an dieser Stelle zu machen, entbehrt jeder Logik
-        txtfldReferenceIndication.setText(entry.getIndication());
-
-      selectedReferenceBaseChanged(selectedReferenceBase);
+      setEntry(entry);
     } catch (IOException ex) {
       log.error("Could not load EntryReferenceControl", ex);
     }
+  }
+
+  public void setEntry(Entry entry) {
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    this.entry = entry;
+
+    if(entry != null) {
+      entry.addEntityListener(entryListener);
+
+      txtfldReferenceIndication.setText(entry.getIndication());
+
+      selectedReferenceBase = null;
+      if(entry.getReferenceSubDivision() != null)
+        selectedReferenceBase = entry.getReferenceSubDivision();
+      else if(entry.getReference() != null)
+        selectedReferenceBase = entry.getReference();
+      else if(entry.getSeries() != null)
+        selectedReferenceBase = entry.getSeries();
+
+      selectedReferenceBaseChanged(selectedReferenceBase);
+    }
+    else {
+      selectedReferenceBaseChanged(null);
+    }
+
+    setDisable(entry == null);
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -182,6 +196,7 @@ public class EntryReferenceControl extends TitledPane {
 
     btnNewOrEditReference.setMinWidth(100);
     btnNewOrEditReference.setPrefWidth(162);
+    HBox.setMargin(btnNewOrEditReference, new Insets(0, 0, 0, 6));
 
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->
         fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndication, txtfldReferenceIndication.getText()));
@@ -264,7 +279,14 @@ public class EntryReferenceControl extends TitledPane {
     });
   }
 
-  protected void selectedReferenceBaseChanged(ReferenceBase newReferenceBase) {
+  protected void selectedReferenceBaseChanged(final ReferenceBase newReferenceBase) {
+    if(Platform.isFxApplicationThread())
+      selectedReferenceBaseChangedOnUiThread(newReferenceBase);
+    else
+      Platform.runLater(() -> selectedReferenceBaseChangedOnUiThread(newReferenceBase));
+  }
+
+  protected void selectedReferenceBaseChangedOnUiThread(ReferenceBase newReferenceBase) {
 //    if(newReferenceBase == null)
 //      cmbxSeriesTitleOrReference.setValue(Empty.Reference);
 //    else
@@ -398,7 +420,7 @@ public class EntryReferenceControl extends TitledPane {
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       // TODO: this is not working this way
-      if(updatedEntity.equals(entry.getSeries()) || updatedEntity.equals(entry.getReference())) {
+      if(updatedEntity.equals(entry.getSeries()) || updatedEntity.equals(entry.getReference()) || updatedEntity.equals(entry.getReferenceSubDivision())) {
 //        cmbxSeriesTitleOrReference.valueProperty().removeListener(cmbxSeriesTitleOrReferenceValueChangedListener);
 
         if(entry.getReferenceSubDivision() != null)
@@ -423,14 +445,9 @@ public class EntryReferenceControl extends TitledPane {
   protected void checkIfReferencesHaveBeenUpdated(BaseEntity collectionHolder, BaseEntity entity) {
     if(collectionHolder instanceof DeepThought) {
       DeepThought deepThought = (DeepThought)collectionHolder;
-      if(entity instanceof SeriesTitle || entity instanceof Reference) {
-//        resetComboBoxSeriesTitleOrReferencesItems(deepThought);
+      if(entity instanceof SeriesTitle || entity instanceof Reference || entity instanceof ReferenceSubDivision) {
         resetListViewReferenceBasesItems(deepThought); // TODO: actually only SeriesTitles or References have to be updated
       }
-    }
-    else if(collectionHolder instanceof Reference && entity instanceof ReferenceSubDivision) {
-      if(deepThought != null)
-        resetListViewReferenceBasesItems(deepThought); // TODO: actually only ReferenceSubDivisions have to be updated
     }
   }
 

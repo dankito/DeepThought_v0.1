@@ -22,7 +22,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
   public EntriesWithoutTagsSystemTag(DeepThought deepThought) {
     super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags"));
 
-    deepThought.addEntityListener(entityListener);
+    deepThought.addEntityListener(deepThoughtListener);
 
     Application.getSearchEngine().getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
       @Override
@@ -39,7 +39,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
     return ID;
   }
 
-  protected EntityListener entityListener = new EntityListener() {
+  protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
 

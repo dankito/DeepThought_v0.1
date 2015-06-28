@@ -125,8 +125,8 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
       subDivision.setReference(this);
       subDivisionsSorted = null;
 
-      if(subDivision.getDeepThought() == null && this.deepThought != null)
-        deepThought.addReferenceSubDivision(subDivision);
+//      if(subDivision.getDeepThought() == null && this.deepThought != null)
+//        deepThought.addReferenceSubDivision(subDivision);
 
       callEntityAddedListeners(subDivisions, subDivision);
       return true;
@@ -207,6 +207,8 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
   public String getIssueOrPublishingDate() {
+    if(StringUtils.isNullOrEmpty(issueOrPublishingDate) && publishingDate != null)
+      DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
     return issueOrPublishingDate;
   }
 
@@ -214,17 +216,17 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     Object previousValue = this.issueOrPublishingDate;
     this.issueOrPublishingDate = issueOrPublishingDate;
     preview = null;
-    setPublishingDate(tryToParseIssueOrPublishingDateToDate());
+    setPublishingDate(tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate));
     callPropertyChangedListeners(TableConfig.ReferenceIssueOrPublishingDateColumnName, previousValue, issueOrPublishingDate);
   }
 
   public Date getPublishingDate() {
     if(publishingDate == null)
-      publishingDate = tryToParseIssueOrPublishingDateToDate();
+      publishingDate = tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate);
     return publishingDate;
   }
 
-  protected void setPublishingDate(Date publishingDate) {
+  public void setPublishingDate(Date publishingDate) {
     this.publishingDate = publishingDate;
   }
 
@@ -263,7 +265,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
         preview = issueOrPublishingDate.toString();
 
       if (series != null)
-        preview = series.getTextRepresentation() + " " + preview;
+        preview = series.getTextRepresentation() + (StringUtils.isNullOrEmpty(preview) ? "" : " " + preview);
     }
 
     return preview;
@@ -271,7 +273,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
 
 
-  protected Date tryToParseIssueOrPublishingDateToDate() {
+  public static Date tryToParseIssueOrPublishingDateToDate(String issueOrPublishingDate) {
     if(StringUtils.isNullOrEmpty(issueOrPublishingDate))
       return null;
 

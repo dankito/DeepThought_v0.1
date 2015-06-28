@@ -7,9 +7,11 @@ include ':JavaSeOrmLiteEntityManager'
 include ':json-io', ':DeepThoughtJson-io'
 include ':LuceneSearchEngine'
 include ':WGetFileDownloader'
+include ':commons-lang'
 include ':RemoteFileContentExtractor'
 include ':OcrTextContentExtractor'
-include ':SueddeutscheContentExtractor'
+include ':OnlineNewspaperContentExtractor'
+include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
 include ':OpenOfficeDocumentsImporterExporter'
 //include ':VideoDownloader'
@@ -31,9 +33,12 @@ project(':LuceneSearchEngine').projectDir = new File('libs/search/LuceneSearchEn
 
 project(':WGetFileDownloader').projectDir = new File('libs/downloader/WGetFileDownloader')
 
+project(':commons-lang').projectDir = new File('libs/utils/commons-lang')
+
 project(':RemoteFileContentExtractor').projectDir = new File('libs/content_extractor/RemoteFileContentExtractor')
 project(':OcrTextContentExtractor').projectDir = new File('libs/content_extractor/OcrTextContentExtractor')
-project(':SueddeutscheContentExtractor').projectDir = new File('libs/content_extractor/SueddeutscheContentExtractor')
+project(':OnlineNewspaperContentExtractor').projectDir = new File('libs/content_extractor/OnlineNewspaperContentExtractor')
+project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_extractor/WikipediaOnlineContentExtractor')
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
 project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
 

@@ -92,6 +92,14 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
     }
 
     for(String url : urls) {
+      for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
+        if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
+          ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, false);
+          contentExtractOptions.addContentExtractOption(new ContentExtractOption(onlineArticleContentExtractor, url, true));
+          return contentExtractOptions;
+        }
+      }
+
       if(isAttachableFile(url)) {
         ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, canSetFileAsEntryContent(url));
         for(ITextContentExtractor textContentExtractor : textContentExtractors) {
@@ -100,15 +108,6 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
         }
 
         return contentExtractOptions; // TODO: what about other files if one of the first files already succeed?
-      }
-      else {
-        for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
-          if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-            ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, false);
-            contentExtractOptions.addContentExtractOption(new ContentExtractOption(onlineArticleContentExtractor, url, true));
-            return contentExtractOptions;
-          }
-        }
       }
     }
 
