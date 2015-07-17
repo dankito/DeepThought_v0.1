@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.preview.ArticlesOverview;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -20,8 +21,11 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtractorBase {
@@ -391,7 +395,173 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
 
   protected ArticlesOverview extractArticlesOverviewFromFrontPage() {
+    try {
+      Document frontPage = retrieveOnlineDocument("http://www.sueddeutsche.de");
+      List<ArticlesOverviewItem> items = extractArticlesOverviewItemsFromFrontPage(frontPage);
+      return new ArticlesOverview(items);
+    } catch(Exception ex) {
+      log.error("Could not retrieve HTML code of Sueddeutsche front page", ex);
+    }
     return null;
+  }
+
+  protected List<ArticlesOverviewItem> extractArticlesOverviewItemsFromFrontPage(Document frontPage) {
+    List<ArticlesOverviewItem> items = new ArrayList<>();
+
+    items.addAll(extractSocialModuleItems(frontPage));
+    items.addAll(extractTileItems(frontPage));
+    items.addAll(extractTeaserItems(frontPage));
+
+    return items;
+  }
+
+  protected Collection<? extends ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
+    List<ArticlesOverviewItem> items = new ArrayList<>();
+
+    Elements teaserElements = frontPage.body().getElementsByClass("teaser");
+    for(Element teaser : teaserElements) {
+      ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
+      if(teaserItem != null)
+        items.add(teaserItem);
+
+      items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
+    }
+
+    return items;
+  }
+
+  protected ArticlesOverviewItem extractItemFromTeaserElement(Element teaser) {
+    ArticlesOverviewItem item = null;
+
+    for(Element child : teaser.children()) {
+      if("a".equals(child.nodeName()) && child.hasClass("entry-title")) {
+        item = new ArticlesOverviewItem(child.attr("href"));
+        for(Element anchorChild : child.children()) {
+          if("img".equals(anchorChild.nodeName()))
+            item.setPreviewImageUrl(anchorChild.attr("src"));
+          else if("strong".equals(anchorChild.nodeName()))
+            item.setSubTitle(anchorChild.text());
+          else if("em".equals(anchorChild.nodeName()))
+            item.setTitle(anchorChild.text());
+        }
+
+        tryToExtractLabel(item, child);
+      }
+      else if("p".equals(child.nodeName()) && child.hasClass("entry-summary")) {
+        if(item != null)
+          item.setSummary(child.ownText());
+      }
+    }
+
+    return item;
+  }
+
+  protected List<ArticlesOverviewItem> extractOneLinerTeaserItemsFromTeaserElement(Element teaser) {
+    List<ArticlesOverviewItem> allExtractedItems = new ArrayList<>();
+
+    for(Element oneLiner : teaser.getElementsByClass("oneliner")) {
+      if("ul".equals(oneLiner.nodeName())) {
+        for(Element listItem : oneLiner.children()) {
+          ArticlesOverviewItem oneLinerItem = null;
+
+          for (Element child : listItem.children()) {
+            if ("a".equals(child.nodeName())) {
+              oneLinerItem = new ArticlesOverviewItem(child.attr("href"));
+              for (Element anchorChild : child.children()) {
+                if ("div".equals(anchorChild.nodeName())) {
+//                  if ("strong".equals(anchorChild.nodeName())) // actually div as a span child and that again has a strong child
+                    oneLinerItem.setSubTitle(anchorChild.text());
+                }
+                else if ("em".equals(anchorChild.nodeName()))
+                  oneLinerItem.setTitle(anchorChild.text());
+              }
+
+              tryToExtractLabel(oneLinerItem, child);
+            }
+          }
+
+          if (oneLinerItem != null)
+            allExtractedItems.add(oneLinerItem);
+        }
+      }
+    }
+
+    return allExtractedItems;
+  }
+
+  protected void tryToExtractLabel(ArticlesOverviewItem item, Element itemElement) {
+    Elements labelElements = itemElement.getElementsByClass("teaserlabel");
+    if(labelElements.size() > 0) {
+      item.setLabel(labelElements.get(0).text());
+    }
+    else {
+      labelElements = itemElement.getElementsByClass("flyout-teaser-label");
+      if(labelElements.size() > 0)
+        item.setLabel(labelElements.get(0).text());
+    }
+  }
+
+  protected Collection<? extends ArticlesOverviewItem> extractTileItems(Document frontPage) {
+    List<ArticlesOverviewItem> extractedItems = new ArrayList<>();
+
+    Elements tileElements = frontPage.body().getElementsByClass("tile-teaser-content");
+    for(Element tileElement : tileElements) {
+      if("div".equals(tileElement.nodeName()) && (tileElement.parent().hasAttr("data-status") == false || "hidden".equals(tileElement.parent().attr("data-status")) == false)) { // don't parse hidden Tiles
+        ArticlesOverviewItem item = null;
+
+        for(Element tileChild : tileElement.children()) {
+          if("a".equals(tileChild.nodeName())) {
+            item = new ArticlesOverviewItem(tileChild.attr("href"));
+            for(Element anchorChild : tileChild.children()) {
+              if("img".equals(anchorChild.nodeName()))
+                item.setPreviewImageUrl(anchorChild.attr("src"));
+              else if("strong".equals(anchorChild.nodeName()))
+                item.setSubTitle(anchorChild.text());
+              else if("em".equals(anchorChild.nodeName()))
+                item.setTitle(anchorChild.text());
+            }
+          }
+          else if(tileChild.hasClass("tile-teaser-text")) {
+            if(item != null)
+              item.setSummary(tileChild.text());
+          }
+        }
+
+        if(item != null)
+          extractedItems.add(item);
+      }
+    }
+
+    return extractedItems;
+  }
+
+  protected Collection<? extends ArticlesOverviewItem> extractSocialModuleItems(Document frontPage) {
+    List<ArticlesOverviewItem> extractedItems = new ArrayList<>();
+
+    Elements socialModuleElements = frontPage.body().getElementsByClass("socialmodule-mainslot");
+    for(Element socialModuleElement : socialModuleElements) {
+      if(socialModuleElement.hasClass("visits") || socialModuleElement.hasClass("social")) {
+        for(Element orderedListElement : socialModuleElement.getElementsByTag("ol")) {
+          for(Element listItem : orderedListElement.children()) {
+            for(Element listItemChild : listItem.children()) {
+              if("a".equals(listItemChild.nodeName())) {
+                ArticlesOverviewItem item = new ArticlesOverviewItem(listItemChild.attr("href"));
+                item.setSubTitle(listItemChild.ownText());
+
+                for(Element anchorChild : listItemChild.children()) {
+                  if("strong".equals(anchorChild.nodeName()))
+                    item.setTitle(anchorChild.text());
+                }
+
+                extractedItems.add(item);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return extractedItems;
   }
 
 }

@@ -11,32 +11,34 @@ public class ArticlesOverviewItem {
 
   protected String subTitle = null;
 
-  protected String abstractString = null;
+  protected String summary = null;
 
   protected String previewImageUrl = null;
+
+  protected String label = null;
 
 
   public ArticlesOverviewItem(String url) {
     this.url = url;
   }
 
-  public ArticlesOverviewItem(String url, String abstractString) {
+  public ArticlesOverviewItem(String url, String summary) {
     this(url);
-    this.abstractString = abstractString;
+    this.summary = summary;
   }
 
-  public ArticlesOverviewItem(String url, String abstractString, String title) {
-    this(url, abstractString);
+  public ArticlesOverviewItem(String url, String summary, String title) {
+    this(url, summary);
     this.title = title;
   }
 
-  public ArticlesOverviewItem(String url, String abstractString, String title, String subTitle) {
-    this(url, abstractString, title);
+  public ArticlesOverviewItem(String url, String summary, String title, String subTitle) {
+    this(url, summary, title);
     this.subTitle = subTitle;
   }
 
-  public ArticlesOverviewItem(String url, String abstractString, String title, String subTitle, String previewImageUrl) {
-    this(url, abstractString, title, subTitle);
+  public ArticlesOverviewItem(String url, String summary, String title, String subTitle, String previewImageUrl) {
+    this(url, summary, title, subTitle);
     this.previewImageUrl = previewImageUrl;
   }
 
@@ -53,6 +55,10 @@ public class ArticlesOverviewItem {
     return title;
   }
 
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   public boolean hasSubTitle() {
     return subTitle != null;
   }
@@ -61,12 +67,20 @@ public class ArticlesOverviewItem {
     return subTitle;
   }
 
-  public boolean hasAbstract() {
-    return abstractString != null;
+  public void setSubTitle(String subTitle) {
+    this.subTitle = subTitle;
   }
 
-  public String getAbstract() {
-    return abstractString;
+  public boolean hasSummary() {
+    return summary != null;
+  }
+
+  public String getSummary() {
+    return summary;
+  }
+
+  public void setSummary(String summary) {
+    this.summary = summary;
   }
 
   public boolean hasPreviewImageUrl() {
@@ -77,16 +91,35 @@ public class ArticlesOverviewItem {
     return previewImageUrl;
   }
 
+  public void setPreviewImageUrl(String previewImageUrl) {
+    this.previewImageUrl = previewImageUrl;
+  }
+
+  public boolean hasLabel() {
+    return label != null;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
 
   @Override
   public String toString() {
     String description = url;
 
-    if(hasAbstract())
-      description = abstractString + " (" + description + ")";
+    if(hasSummary())
+      description = summary + " (" + description + ")";
 
     if(hasTitle())
       description = title + ": " + description;
+
+    if(hasSubTitle())
+      description = subTitle + " - " + description;
 
     return description;
   }

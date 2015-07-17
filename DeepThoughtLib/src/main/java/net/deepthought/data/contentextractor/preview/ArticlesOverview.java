@@ -11,6 +11,15 @@ public class ArticlesOverview {
   protected List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
 
 
+  public ArticlesOverview() {
+
+  }
+
+  public ArticlesOverview(List<ArticlesOverviewItem> overviewItems) {
+    this.overviewItems = overviewItems;
+  }
+
+
   public List<ArticlesOverviewItem> getOverviewItems() {
     return overviewItems;
   }

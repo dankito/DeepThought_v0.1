@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.model.Entry;
 import net.deepthought.util.StringUtils;
 
@@ -166,5 +167,14 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
     Assert.assertFalse(eleven.getContentAsPlainText().endsWith(" ..."));
     testImportedArticleValues(eleven, 8888, "19.06.2015", "Wenn eine Frau so viel kostet wie eine Flasche Wasser", "Ausbeutung durch UN-Blauhelme",
         "Ein UN-Bericht zeigt, dass die Praxis, dass Blauhelmsoldaten Frauen und Kinder im Tausch gegen Waren zum Sex nötigen, weiter verbreitet ist, als bisher angenommen wurde. Viele Experten sind sich einig, dass es sich dabei auch um ein strukturelles Problem der UN-Friedensmissionen handelt. Bislang bleiben viele Vergehen folgenlos für die Täter. Aktivisten und Frauenrechtlerinnen fordern eine konsequentere Strafverfolgung der Blauhelmsoldaten.");
+  }
+
+  @Test
+  public void testGetArticlesOverview() {
+    ArticlesOverview articlesOverview = contentExtractor.getArticlesOverview();
+
+    Assert.assertNotNull(articlesOverview);
+    Assert.assertFalse(articlesOverview.getOverviewItems().size() == 0);
+    Assert.assertTrue(articlesOverview.getOverviewItems().size() > 100);
   }
 }
