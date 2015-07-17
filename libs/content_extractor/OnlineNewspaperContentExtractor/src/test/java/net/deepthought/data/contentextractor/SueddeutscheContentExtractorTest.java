@@ -176,5 +176,9 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
     Assert.assertNotNull(articlesOverview);
     Assert.assertFalse(articlesOverview.getOverviewItems().size() == 0);
     Assert.assertTrue(articlesOverview.getOverviewItems().size() > 100);
+
+    // TODO: check if panorama teaser has been parsed correctly, all social module list items have been found and only visible Tile are parse
+    // in order to do so: save HTML code of Sueddeutsche front page and parse that site
+    // for checking if parsing is still appropriate for current Sueddeutsche web page of course also add online parsing with checks like these ones
   }
 }

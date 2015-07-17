@@ -411,6 +411,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     items.addAll(extractSocialModuleItems(frontPage));
     items.addAll(extractTileItems(frontPage));
     items.addAll(extractTeaserItems(frontPage));
+    // TODO: also parse flyout teasers (<ul class="flyout-teasers">) ?
 
     return items;
   }
@@ -418,16 +419,55 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   protected Collection<? extends ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
+//    ArticlesOverviewItem panoramaItem = extractPanoramaTeaserItem(frontPage);
+//    if(panoramaItem != null)
+//      items.add(panoramaItem);
+
     Elements teaserElements = frontPage.body().getElementsByClass("teaser");
     for(Element teaser : teaserElements) {
-      ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
-      if(teaserItem != null)
-        items.add(teaserItem);
+//      if(teaser.hasClass("panorama") == false && teaser.hasClass("subpanorama") == false) { // panorama teaser is handled separately
+        ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
+        if (teaserItem != null)
+          items.add(teaserItem);
 
-      items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
+        items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
+//      }
     }
 
     return items;
+  }
+
+  // Panorama teaser item is split over to div elements
+  // TODO: this only seems to be the case in browser, here the item is not split
+  protected ArticlesOverviewItem extractPanoramaTeaserItem(Document frontPage) {
+    ArticlesOverviewItem panoramaTeaserItem = null;
+
+    Elements panoramaElements = frontPage.body().getElementsByClass("panorama");
+    for(Element panoramaElement : panoramaElements) {
+      if("div".equals(panoramaElement.nodeName()) && panoramaElement.hasClass("teaser")) {
+        for(Element panoramaChild : panoramaElement.children()) {
+          if("a".equals(panoramaChild.nodeName()))
+            panoramaTeaserItem = createOverviewItemFromAnchorElement(panoramaChild);
+        }
+      }
+    }
+
+    Elements subPanoramaElements = frontPage.body().getElementsByClass("subpanorama");
+    for(Element subPanoramaElement : subPanoramaElements) {
+      if("div".equals(subPanoramaElement.nodeName()) && subPanoramaElement.hasClass("teaser")) {
+        if(panoramaTeaserItem != null) {
+          for(Element subPanoramaChild : subPanoramaElement.children()) {
+            if("p".equals(subPanoramaChild.nodeName()) && subPanoramaChild.hasClass("entry-summary")) {
+              panoramaTeaserItem.setSummary(subPanoramaChild.ownText());
+              tryToExtractLabel(panoramaTeaserItem, subPanoramaChild);
+              // TODO: also extract one liner
+            }
+          }
+        }
+      }
+    }
+
+    return panoramaTeaserItem;
   }
 
   protected ArticlesOverviewItem extractItemFromTeaserElement(Element teaser) {
@@ -435,23 +475,32 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
     for(Element child : teaser.children()) {
       if("a".equals(child.nodeName()) && child.hasClass("entry-title")) {
-        item = new ArticlesOverviewItem(child.attr("href"));
-        for(Element anchorChild : child.children()) {
-          if("img".equals(anchorChild.nodeName()))
-            item.setPreviewImageUrl(anchorChild.attr("src"));
-          else if("strong".equals(anchorChild.nodeName()))
-            item.setSubTitle(anchorChild.text());
-          else if("em".equals(anchorChild.nodeName()))
-            item.setTitle(anchorChild.text());
-        }
-
-        tryToExtractLabel(item, child);
+        item = createOverviewItemFromAnchorElement(child);
       }
       else if("p".equals(child.nodeName()) && child.hasClass("entry-summary")) {
-        if(item != null)
+        if(item != null) {
           item.setSummary(child.ownText());
+          tryToExtractLabel(item, child);
+        }
       }
     }
+
+    return item;
+  }
+
+  protected ArticlesOverviewItem createOverviewItemFromAnchorElement(Element anchorElement) {
+    ArticlesOverviewItem item = new ArticlesOverviewItem(anchorElement.attr("href"));
+
+    for(Element anchorChild : anchorElement.children()) {
+      if("img".equals(anchorChild.nodeName()))
+        item.setPreviewImageUrl(anchorChild.attr("src"));
+      else if("strong".equals(anchorChild.nodeName()))
+        item.setSubTitle(anchorChild.text().trim());
+      else if("em".equals(anchorChild.nodeName()))
+        item.setTitle(anchorChild.text().trim());
+    }
+
+    tryToExtractLabel(item, anchorElement);
 
     return item;
   }
@@ -511,15 +560,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
         for(Element tileChild : tileElement.children()) {
           if("a".equals(tileChild.nodeName())) {
-            item = new ArticlesOverviewItem(tileChild.attr("href"));
-            for(Element anchorChild : tileChild.children()) {
-              if("img".equals(anchorChild.nodeName()))
-                item.setPreviewImageUrl(anchorChild.attr("src"));
-              else if("strong".equals(anchorChild.nodeName()))
-                item.setSubTitle(anchorChild.text());
-              else if("em".equals(anchorChild.nodeName()))
-                item.setTitle(anchorChild.text());
-            }
+            item = createOverviewItemFromAnchorElement(tileChild);
           }
           else if(tileChild.hasClass("tile-teaser-text")) {
             if(item != null)
