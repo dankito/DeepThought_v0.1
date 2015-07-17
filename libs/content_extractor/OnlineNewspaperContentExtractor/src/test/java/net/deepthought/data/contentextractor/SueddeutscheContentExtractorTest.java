@@ -20,11 +20,6 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
     return importer;
   }
 
-  @Override
-  protected String getSeriesTitleTitle() {
-    return "SZ";
-  }
-
 
 //  @Test
 //  public void importArticleToAvoidOnlyTenArticlesAWeekLimit() {
@@ -50,7 +45,7 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
 
   @Test
   public void importDiePharmaindustrieIstSchlimmerAlsDieMafiaArticle() {
-    Entry importedEntry = testImportArticle("http://www.sueddeutsche.de/gesundheit/kritik-an-arzneimittelherstellern-die-pharmaindustrie-ist-schlimmer-als-die-mafia-1.2267631#");
+    Entry importedEntry = testImportArticle("http://www.sueddeutsche.de/gesundheit/kritik-an-arzneimittelherstellern-die-pharmaindustrie-ist-schlimmer-als-die-mafia-1.2267631");
     testImportedArticleValues(importedEntry, 19219, "06.02.2015", "\"Die Pharmaindustrie ist schlimmer als die Mafia\"", "Kritik an Arzneimittelherstellern",
         "Medikamente sollen uns ein langes, gesundes Leben bescheren. Doch die Pharmaindustrie bringt mehr Menschen um als die Mafia, sagt der dänische Mediziner Peter C. Gøtzsche - und fordert für die Branche eine Revolution.");
   }
@@ -72,7 +67,7 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
   @Test
   public void importArticleWithGraphics() {
     Entry importedEntry = testImportArticle("http://www.sueddeutsche.de/politik/fluechtlingspolitik-so-viel-kostet-die-festung-europa-1.2516084");
-    testImportedArticleValues(importedEntry, 7243, "18.06.2015", "So viel kostet die Festung Europa", "Flüchtlingspolitik",
+    testImportedArticleValues(importedEntry, 7223, "18.06.2015", "So viel kostet die Festung Europa", "Flüchtlingspolitik",
         "Das Datenprojekt Migrants Files hat einen Teil der Kosten für die Abschottungspolitik der EU zusammengetragen. Die meisten Kosten entstehen bei der Abschiebung von Flüchtlingen. Zwischen 2000 und 2014 haben die Mitgliedsstaaten sowie Norwegen und die Schweiz dafür 11,3 Milliarden Euro ausgegeben. 1,6 Milliarden Euro entfallen auf Grenzschutzmaßnahmen.");
 
     Assert.assertEquals(4, StringUtils.getNumberOfOccurrences("<div class=\"basebox ", importedEntry.getContent()));
@@ -135,7 +130,26 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
   }
 
   @Test
+  public void summeryIsNotMarkedWithClassArticleEntrySummary() {
+    Entry importedEntry = testImportArticle("http://www.sueddeutsche.de/politik/selektorenliste-der-nsa-was-die-wikileaks-dokumente-zeigen-1.2547250");
+    testImportedArticleValues(importedEntry, 3572, "02.07.2015", "Was die Wikileaks-Dokumente zeigen", "Selektorenliste der NSA",
+        "Anhand der Telefonnummern in dieser Selektorenliste wird deutlich, dass die Ausspähung durch die NSA Bundesminister, Referenten und sogar Faxgeräte von Ministerien umfasste.");
+
+    Assert.assertFalse(importedEntry.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
+  }
+
+  @Test
+  public void questionsAreMissing() {
+    Entry importedEntry = testImportArticle("http://www.sueddeutsche.de/wirtschaft/abschiebung-psychisch-kranker-es-ist-immer-noch-ueblich-patienten-sozial-zu-isolieren-1.2542962?reduced=true");
+    testImportedArticleValues(importedEntry, 8158, "02.07.2015", "\"Es ist immer noch üblich, Patienten sozial zu isolieren\"", "Abschiebung psychisch Kranker",
+        "Kaum etwas fürchten Menschen so sehr, wie nicht mehr gebraucht zu werden. Macht der Kapitalismus uns zum Wegwerfartikel? Ein Gespräch mit Klaus Dörner, einem großen Reformer der Psychiatrie.");
+
+    Assert.assertFalse(importedEntry.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
+    Entry zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     Entry one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");
     Entry two = testImportArticle("http://www.sueddeutsche.de/panorama/kinder-verbot-in-duesseldorfer-biergarten-zehn-bis-prozent-der-heutigen-eltern-kotzen-mich-extremst-an-1.2529278");
     Entry three = testImportArticle("http://www.sueddeutsche.de/digital/mobilfunk-ueberwachung-was-sie-ueber-den-sim-karten-hack-wissen-muessen-1.2361115");
@@ -145,12 +159,12 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
     Entry seven = testImportArticle("http://www.sueddeutsche.de/politik/islamischer-staat-die-wichtigsten-fakten-zum-is-1.2540726");
     Entry eight = testImportArticle("http://www.sueddeutsche.de/muenchen/bauarbeiter-in-muenchen-schuften-zum-hungerlohn-1.2535853");
     Entry nine = testImportArticle("http://www.sueddeutsche.de/wirtschaft/diskussion-um-schuldenschnitt-varoufakis-hat-recht-1.2521596");
-    Entry ten = testImportArticle("http://www.sueddeutsche.de/muenchen/videoueberwachung-in-muenchen-stadt-der-augen-1.2316618#");
+    Entry ten = testImportArticle("http://www.sueddeutsche.de/muenchen/videoueberwachung-in-muenchen-stadt-der-augen-1.2316618");
     Entry eleven = testImportArticle("http://www.sueddeutsche.de/politik/ausbeutung-durch-un-blauhelme-wenn-eine-frau-so-viel-kostet-wie-eine-flasche-wasser-1.2524555");
 
     // now check if the 10 + 1th article has been imported correctly
     Assert.assertFalse(eleven.getContentAsPlainText().endsWith(" ..."));
-    testImportedArticleValues(eleven, 8888, "19.05.2015", "Wenn eine Frau so viel kostet wie eine Flasche Wasser", "Ausbeutung durch UN-Blauhelme",
+    testImportedArticleValues(eleven, 8888, "19.06.2015", "Wenn eine Frau so viel kostet wie eine Flasche Wasser", "Ausbeutung durch UN-Blauhelme",
         "Ein UN-Bericht zeigt, dass die Praxis, dass Blauhelmsoldaten Frauen und Kinder im Tausch gegen Waren zum Sex nötigen, weiter verbreitet ist, als bisher angenommen wurde. Viele Experten sind sich einig, dass es sich dabei auch um ein strukturelles Problem der UN-Friedensmissionen handelt. Bislang bleiben viele Vergehen folgenlos für die Täter. Aktivisten und Frauenrechtlerinnen fordern eine konsequentere Strafverfolgung der Blauhelmsoldaten.");
   }
 }

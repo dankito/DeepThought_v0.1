@@ -27,6 +27,11 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
 
 
   @Override
+  public String getNewspaperName() {
+    return "Zeit";
+  }
+
+  @Override
   public String getSiteBaseUrl() {
     return "Zeit.de";
   }
@@ -51,8 +56,8 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
       Entry articleEntry = createEntry(articleBodyElement);
       articleEntry.setReferenceSubDivision(reference);
 
-      addTags(document.body(), articleEntry, "Zeit");
-      addCategory(articleEntry, "Zeit", true);
+      addTags(document.body(), articleEntry);
+      addNewspaperCategory(articleEntry, true);
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
@@ -114,7 +119,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
         publishingDateString = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
     }
 
-    Reference spiegelDateReference = findOrCreateReferenceForThatDate("Zeit", publishingDateString);
+    Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);
 
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
     articleReference.setOnlineAddress(articleUrl);
@@ -137,8 +142,8 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     return null;
   }
 
-  protected void addTags(Element bodyElement, Entry articleEntry, String newspaperName) {
-    addTags(articleEntry, newspaperName);
+  protected void addTags(Element bodyElement, Entry articleEntry) {
+    addNewspaperTag(articleEntry);
 
     Elements tagsElements = bodyElement.getElementsByClass("tags");
     for(Element tagsElement : tagsElements) {

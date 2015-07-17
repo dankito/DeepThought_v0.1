@@ -18,11 +18,6 @@ public class SpiegelContentExtractorTest extends OnlineNewspaperContentExtractor
     return spiegelContentExtractor;
   }
 
-  @Override
-  protected String getSeriesTitleTitle() {
-    return "Spiegel";
-  }
-
   @Test
   public void importWallStreetMogulSteveCohenArmerReicherHedgefondsKönigArticle() {
     Entry importedEntry = testImportArticle("http://www.spiegel.de/wirtschaft/unternehmen/wall-street-mogul-steve-cohen-armer-reicher-hedgefonds-koenig-a-700480.html");

@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 
 import javafx.application.Platform;
@@ -61,9 +60,9 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends TitledPane {
+public class SearchReferencesControl extends TitledPane {
 
-  private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
+  private final static Logger log = LoggerFactory.getLogger(SearchReferencesControl.class);
 
 
   protected Entry entry = null;
@@ -86,16 +85,6 @@ public class EntryReferenceControl extends TitledPane {
 
 
   @FXML
-  protected Pane paneSeriesTitleOrReference;
-  @FXML
-  protected Pane paneSelectedReferenceBase;
-  @FXML
-  protected NewOrEditButton btnNewOrEditReference;
-
-  @FXML
-  protected TextField txtfldReferenceIndication;
-
-  @FXML
   protected Pane paneSearchForReference;
   @FXML
   protected CustomTextField txtfldSearchForReference;
@@ -104,22 +93,22 @@ public class EntryReferenceControl extends TitledPane {
   protected ListView<ReferenceBase> lstvwReferences;
 
 
-  public EntryReferenceControl() {
+  public SearchReferencesControl() {
     this(null);
   }
 
-  public EntryReferenceControl(Entry entry, EventHandler<FieldChangedEvent> fieldChangedEvent) {
+  public SearchReferencesControl(Entry entry, EventHandler<FieldChangedEvent> fieldChangedEvent) {
     this(entry);
     addFieldChangedEvent(fieldChangedEvent);
   }
 
-  public EntryReferenceControl(Entry entry) {
+  public SearchReferencesControl(Entry entry) {
     deepThought = Application.getDeepThought();
 
     Application.addApplicationListener(new ApplicationListener() {
       @Override
       public void deepThoughtChanged(DeepThought deepThought) {
-        EntryReferenceControl.this.deepThoughtChanged(deepThought);
+        SearchReferencesControl.this.deepThoughtChanged(deepThought);
       }
 
       @Override
@@ -128,7 +117,7 @@ public class EntryReferenceControl extends TitledPane {
       }
     });
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryReferenceControl.fxml"));
+    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchReferencesControl.fxml"));
     fxmlLoader.setRoot(this);
     fxmlLoader.setController(this);
     fxmlLoader.setResources(Localization.getStringsResourceBundle());
@@ -142,7 +131,7 @@ public class EntryReferenceControl extends TitledPane {
 
       setEntry(entry);
     } catch (IOException ex) {
-      log.error("Could not load EntryReferenceControl", ex);
+      log.error("Could not load SearchReferencesControl", ex);
     }
   }
 
@@ -154,8 +143,6 @@ public class EntryReferenceControl extends TitledPane {
 
     if(entry != null) {
       entry.addEntityListener(entryListener);
-
-      txtfldReferenceIndication.setText(entry.getIndication());
 
       selectedReferenceBase = null;
       if(entry.getReferenceSubDivision() != null)
@@ -189,18 +176,6 @@ public class EntryReferenceControl extends TitledPane {
   }
 
   protected void setupControl() {
-    btnNewOrEditReference = new NewOrEditButton();// create btnNewOrEditReference before cmbxSeriesTitleOrReference's value gets set (otherwise cmbxSeriesTitleOrReferenceValueChangedListener causes a NullPointerException)
-    btnNewOrEditReference.setOnAction(event -> handleButtonEditOrNewReferenceAction(event));
-    btnNewOrEditReference.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceAction(event));
-    paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditReference);
-
-    btnNewOrEditReference.setMinWidth(100);
-    btnNewOrEditReference.setPrefWidth(162);
-    HBox.setMargin(btnNewOrEditReference, new Insets(0, 0, 0, 6));
-
-    txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndication, txtfldReferenceIndication.getText()));
-
     // replace normal TextField txtfldSearchForPerson with a SearchTextField (with a cross to clear selection)
     paneSearchForReference.getChildren().remove(txtfldSearchForReference);
     txtfldSearchForReference = (CustomTextField) TextFields.createClearableTextField();
@@ -216,7 +191,8 @@ public class EntryReferenceControl extends TitledPane {
     });
     txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
 
-    lstvwReferences.setCellFactory((listView) -> new ReferenceBaseListCell(this));
+    // TODO: set cell
+//    lstvwReferences.setCellFactory((listView) -> new ReferenceBaseListCell(this));
 
     listViewReferenceBasesItems = new LazyLoadingObservableList<>();
 //    listViewReferenceBasesItems = new CombinedLazyLoadingObservableList<>();
@@ -242,36 +218,6 @@ public class EntryReferenceControl extends TitledPane {
   }
 
 
-  public void handleButtonEditOrNewReferenceAction(ActionEvent event) {
-    if(btnNewOrEditReference.getButtonFunction() == NewOrEditButton.ButtonFunction.New)
-      createNewReferenceBase();
-    else {
-      Dialogs.showEditReferenceDialog(selectedReferenceBase);
-    }
-  }
-
-  public void handleMenuItemNewReferenceAction(NewOrEditButtonMenuActionEvent event) {
-    createNewReferenceBase();
-  }
-
-  protected void createNewReferenceBase() {
-    //      Reference newReference = Reference.createReferenceFromStringRepresentation(cmbxSeriesTitleOrReference.getEditor().getText()); // TODO: use as soon as typing directly in ComboBox is
-    // possible again
-    Dialogs.showEditReferenceDialog(null, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-        if (controller.getDialogResult() == DialogResult.Ok)
-//          entry.setReference(newReference);
-          selectedReferenceBaseChanged(((EditReferenceDialogController)controller).getEditedReferenceBase());
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-
-      }
-    });
-  }
-
   protected void selectedReferenceBaseChanged(final ReferenceBase newReferenceBase) {
     if(Platform.isFxApplicationThread())
       selectedReferenceBaseChangedOnUiThread(newReferenceBase);
@@ -287,19 +233,6 @@ public class EntryReferenceControl extends TitledPane {
 
     ReferenceBase previousReferenceBase = this.selectedReferenceBase;
     this.selectedReferenceBase = newReferenceBase;
-
-    paneSelectedReferenceBase.getChildren().clear();
-
-    if (selectedReferenceBase != null)
-      paneSelectedReferenceBase.getChildren().add(new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler));
-
-    if (selectedReferenceBase == null) {
-      btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-      btnNewOrEditReference.setShowNewMenuItem(false);
-    } else {
-      btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-      btnNewOrEditReference.setShowNewMenuItem(true);
-    }
 
     fireFieldChangedEvent(newReferenceBase, previousReferenceBase);
   }
@@ -329,21 +262,6 @@ public class EntryReferenceControl extends TitledPane {
         if(entry.getReference() != null)
           fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newValue);
       }
-
-      if(newValue == null || Empty.Reference.equals(newValue)) {
-        btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditReference.setShowNewMenuItem(false);
-      }
-      else {
-        if(newValue instanceof SeriesTitle) {
-          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-          btnNewOrEditReference.setShowNewMenuItem(true);
-        }
-        else {
-          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-          btnNewOrEditReference.setShowNewMenuItem(true);
-        }
-      }
     }
   };
 
@@ -359,9 +277,6 @@ public class EntryReferenceControl extends TitledPane {
       }
       else if(propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {
         updateComboBoxSeriesTitleOrReferenceSelectedItem();
-      }
-      else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
-        referenceIndicationUpdated();
       }
     }
 
@@ -392,11 +307,6 @@ public class EntryReferenceControl extends TitledPane {
       selectedReferenceBaseChanged(null);
 
 //    cmbxSeriesTitleOrReference.valueProperty().addListener(cmbxSeriesTitleOrReferenceValueChangedListener);
-  }
-
-  protected void referenceIndicationUpdated() {
-    txtfldReferenceIndication.setText(entry.getIndication());
-    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReferenceIndication);
   }
 
   protected EntityListener deepThoughtListener = new EntityListener() {
@@ -497,10 +407,6 @@ public class EntryReferenceControl extends TitledPane {
 
   public ReferenceBase getSelectedReferenceBase() {
     return selectedReferenceBase;
-  }
-
-  public String getReferenceIndication() {
-    return txtfldReferenceIndication.getText();
   }
 
 

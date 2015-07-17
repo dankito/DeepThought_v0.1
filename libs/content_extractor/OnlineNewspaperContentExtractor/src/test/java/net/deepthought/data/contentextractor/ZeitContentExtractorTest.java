@@ -19,11 +19,6 @@ public class ZeitContentExtractorTest extends OnlineNewspaperContentExtractorTes
     return zeitContentExtractor;
   }
 
-  @Override
-  protected String getSeriesTitleTitle() {
-    return "Zeit";
-  }
-
 
   @Test
   public void importSinglePageArticle() {

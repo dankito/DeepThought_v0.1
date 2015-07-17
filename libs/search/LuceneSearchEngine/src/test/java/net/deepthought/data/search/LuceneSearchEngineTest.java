@@ -2,7 +2,6 @@ package net.deepthought.data.search;
 
 import net.deepthought.Application;
 import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.MockEntityManager;
 import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -13,13 +12,16 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.CombinedLazyLoadingList;
+import net.deepthought.data.persistence.EntityManagerConfiguration;
+import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.RAMDirectory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,11 +52,18 @@ public class LuceneSearchEngineTest {
 
   @Before
   public void setup() throws IOException {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
+//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver() {
+      @Override
+      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
+        return new OrmLiteJavaSeEntityManager(configuration);
+      }
+
       @Override
       public ISearchEngine createSearchEngine() {
         try {
-          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine(new RAMDirectory());
+//          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine(new RAMDirectory());
+          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine();
         } catch(Exception ex) {
           log.error("Could not create LuceneSearchEngine", ex);
         }
@@ -64,7 +73,7 @@ public class LuceneSearchEngineTest {
 
     deepThought = Application.getDeepThought();
 
-    searchEngine.deleteIndex();
+//    searchEngine.deleteIndex();
     searchEngine.setIndexUpdatedEntitiesAfterMilliseconds(0);
   }
 
@@ -1572,6 +1581,73 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags3));
 
+  }
+
+  @Test
+  public void filterTestReferences() {
+    final CombinedLazyLoadingList<ReferenceBase> results = new CombinedLazyLoadingList<ReferenceBase>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterAllReferenceBaseTypesForSameFilterTest(new Search<ReferenceBase>("wikip", new SearchCompletedListener<ReferenceBase>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.setUnderlyingCollection(result);
+        countDownLatch.countDown();
+      }
+    }), "wikip");
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(5, results.size());
+
+
+    results.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.filterAllReferenceBaseTypesForSameFilterTest(new Search<ReferenceBase>("sz", new SearchCompletedListener<ReferenceBase>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.setUnderlyingCollection(result);
+        countDownLatch.countDown();
+      }
+    }), "sz");
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(468, results.size());
+
+
+//    results.clear();
+//    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<Reference>("2012", new SearchCompletedListener<Reference>() {
+//      @Override
+//      public void completed(Collection<Reference> result) {
+//        results.addAll(result);
+//        countDownLatch3.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch3.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(1, results.size());
+//    Assert.assertEquals(newReference, results.get(0));
+//
+//
+//    results.clear();
+//    final CountDownLatch countDownLatch4 = new CountDownLatch(1);
+//
+//    searchEngine.filterReferenceBases(new Search<Reference>("Liebe", new SearchCompletedListener<Reference>() {
+//      @Override
+//      public void completed(Collection<Reference> result) {
+//        results.addAll(result);
+//        countDownLatch4.countDown();
+//      }
+//    }));
+//
+//    try { countDownLatch4.await(); } catch(Exception ex) { }
+//
+//    Assert.assertEquals(0, results.size());
   }
 
 }

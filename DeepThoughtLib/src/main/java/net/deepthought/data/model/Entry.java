@@ -528,6 +528,30 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
   }
 
+  protected transient String personsPreview = null;
+
+  @Transient
+  public String getPersonsPreview() {
+    if(personsPreview == null)
+      personsPreview = determinePersonsPreview();
+
+    return personsPreview;
+  }
+
+  @Transient
+  protected String determinePersonsPreview() {
+    if(hasPersons() == false)
+      return null;
+
+    String personsPreview = "";
+
+    for(Person person : getPersons())
+      personsPreview += person.getNameRepresentation() + "; ";
+    personsPreview = personsPreview.substring(0, personsPreview.length() - "; ".length());
+
+    return "";
+  }
+
 
   public boolean hasNotes() {
     return notes.size() > 0;
@@ -743,6 +767,14 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       return series.getTextRepresentation();
 
     return "";
+  }
+
+  @Transient
+  public String getReferenceOrPersonsPreview() {
+    if(getReferencePreview() != null)
+      return getReferencePreview();
+
+    return getPersonsPreview();
   }
 
 

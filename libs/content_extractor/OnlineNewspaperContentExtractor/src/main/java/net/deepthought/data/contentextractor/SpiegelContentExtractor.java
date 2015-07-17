@@ -25,6 +25,11 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
 
 
   @Override
+  public String getNewspaperName() {
+    return "Spiegel";
+  }
+
+  @Override
   public String getSiteBaseUrl() {
     return "Spiegel.de";
   }
@@ -46,8 +51,8 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
       Entry articleEntry = createEntry(articleSectionElements, articleIntroElements);
       articleEntry.setReferenceSubDivision(reference);
 
-      addTags(articleEntry, "Spiegel");
-      addCategory(articleEntry, "Spiegel", true);
+      addNewspaperTag(articleEntry);
+      addNewspaperCategory(articleEntry, true);
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
@@ -179,7 +184,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
     if(publishingDate != null)
       publishingDateString = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
 
-    Reference spiegelDateReference = findOrCreateReferenceForThatDate("Spiegel", publishingDateString);
+    Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);
 
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
     articleReference.setOnlineAddress(articleUrl);

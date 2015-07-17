@@ -6,6 +6,7 @@ import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
 import net.deepthought.data.contentextractor.IContentExtractorManager;
 import net.deepthought.data.download.IFileDownloader;
+import net.deepthought.data.exchange.FirefoxPluginCommunicator;
 import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.merger.IDataMerger;
@@ -19,8 +20,8 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,8 @@ public class Application {
   protected static IPluginManager pluginManager = null;
 
   protected static IContentExtractorManager contentExtractorManager = null;
+
+  protected static FirefoxPluginCommunicator firefoxPluginCommunicator = null;
 
   protected static Set<ApplicationListener> listeners = new HashSet<>();
 
@@ -135,6 +138,8 @@ public class Application {
 
       Application.pluginManager = dependencyResolver.createPluginManager();
       pluginManager.loadPluginsAsync();
+
+//      firefoxPluginCommunicator = new FirefoxPluginCommunicator();
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,

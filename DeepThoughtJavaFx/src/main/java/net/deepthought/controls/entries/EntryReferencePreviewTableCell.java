@@ -10,7 +10,7 @@ public class EntryReferencePreviewTableCell extends EntryTableCell {
   @Override
   protected String getTextRepresentationForCell(Entry entry) {
     if(entry != null)
-      return entry.getReferencePreview();
+      return entry.getReferenceOrPersonsPreview();
     else
       return "";
   }

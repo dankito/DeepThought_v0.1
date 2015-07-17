@@ -266,6 +266,8 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
       if (series != null)
         preview = series.getTextRepresentation() + (StringUtils.isNullOrEmpty(preview) ? "" : " " + preview);
+
+      // TODO: what about Persons?
     }
 
     return preview;

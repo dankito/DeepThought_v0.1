@@ -6,6 +6,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.util.Localization;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -18,6 +19,13 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
 
   private final static Logger log = LoggerFactory.getLogger(OnlineNewspaperContentExtractorBase.class);
+
+
+  public abstract String getNewspaperName();
+
+  protected Reference findOrCreateReferenceForThatDate(String articleDate) {
+    return findOrCreateReferenceForThatDate(getNewspaperName(), articleDate);
+  }
 
   protected Reference findOrCreateReferenceForThatDate(String newspaperTitle, String articleDate) {
     SeriesTitle newspaperSeries = null;
@@ -40,19 +48,27 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return newspaperDateReference;
   }
 
-  protected void addTags(Entry articleEntry, String newspaperName) {
+  protected void addNewspaperTag(Entry articleEntry) {
+    addNewspaperTag(articleEntry, getNewspaperName());
+  }
+
+  protected void addNewspaperTag(Entry articleEntry, String newspaperName) {
     Tag newspaperTag = Application.getDeepThought().findOrCreateTagForName(newspaperName);
     articleEntry.addTag(newspaperTag);
   }
 
-  protected void addCategory(Entry articleEntry, String newspaperName, boolean isOnlineArticle) {
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName("Periodika");
+  protected void addNewspaperCategory(Entry articleEntry, boolean isOnlineArticle) {
+    addNewspaperCategory(articleEntry, getNewspaperName(), isOnlineArticle);
+  }
+
+  protected void addNewspaperCategory(Entry articleEntry, String newspaperName, boolean isOnlineArticle) {
+    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedStringForResourceKey("periodicals"));
     Category newspaperCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
 
     if(isOnlineArticle == false)
       newspaperCategory.addEntry(articleEntry);
     else {
-      Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " Online");
+      Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedStringForResourceKey("online"));
       newspaperOnlineCategory.addEntry(articleEntry);
     }
   }

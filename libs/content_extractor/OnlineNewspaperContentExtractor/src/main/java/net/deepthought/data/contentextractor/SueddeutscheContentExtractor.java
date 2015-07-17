@@ -26,6 +26,10 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheContentExtractor.class);
 
+  @Override
+  public String getNewspaperName() {
+    return "SZ";
+  }
 
   @Override
   public String getSiteBaseUrl() {
@@ -48,14 +52,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     try {
       // TODO: implement Sueddeutsche Magazin articles like http://sz-magazin.sueddeutsche.de/texte/anzeigen/42288/Das-Zerquetschen-von-Eiern
-      Element articleElement = null;
-      Elements articleElements = document.body().getElementsByTag("article");
-      if (articleElements.size() == 1)
-        articleElement = articleElements.get(0);
-      else
-        articleElement = document.body().getElementById("sitecontent");
-
-      if(articleElement.getElementsByClass("article-paging").size() > 0) { // an article with multiple pages
+      if(document.body().getElementById("singlePageForm") != null) { // an article with multiple pages
         try {
           Map<String, String> data = new HashMap<>();
           data.put("article.singlePage", "true");
@@ -63,14 +60,21 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
         } catch(Exception ex) { log.error("Could not get Html Document for Sueddeutsche Article with multiple pages of Url " + articleUrl, ex); }
       }
 
+      Element articleElement = null;
+      Elements articleElements = document.body().getElementsByTag("article");
+      if (articleElements.size() == 1)
+        articleElement = articleElements.get(0);
+      else
+        articleElement = document.body().getElementById("sitecontent");
+
       ReferenceSubDivision reference = createReference(articleUrl, articleElement);
 
       Entry articleEntry = createEntry(articleElement);
       if(reference != null)
         articleEntry.setReferenceSubDivision(reference);
 
-      addTags(articleEntry, "SZ");
-      addCategory(articleEntry, "SZ", true);
+      addNewspaperTag(articleEntry);
+      addNewspaperCategory(articleEntry, true);
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
@@ -102,7 +106,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     Entry entry = new Entry();
     String content = "";
 
-    content += extractInlineGalleryHtmlIfAny(bodySection);
+    content += extractUsefulTopEnrichmentElements(bodySection);
 
     content += extractTextFromElementChildren(bodySection, entry);
 
@@ -119,11 +123,14 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
   protected String extractTextFromElementChildren(Element parentElement, Entry entry) {
     String content = "";
+    boolean isInterviewArticle = false;
 
     // body section contains a lot of stuff we don't need but luckily all article (text) data is given in Paragraph elements
     for(Element bodyChild : parentElement.children()) {
       if("p".equals(bodyChild.tagName())) { // so check if child element is a Paragraph element or a (for us useless) other element
-        if("article entry-summary".equals(bodyChild.className())) // there's only one special Paragraph element, the first one, with the article summary
+        Element nextElementSibling = bodyChild.nextElementSibling();
+        if(bodyChild.hasClass("entry-summary") || // there's only one special Paragraph element, the first one, with the article summary
+            (nextElementSibling != null && "section".equals(nextElementSibling.tagName()) && nextElementSibling.hasClass("authors")))
           entry.setAbstract(bodyChild.text().trim());
         else
           content += "<p>" + bodyChild.html().trim() + "</p>";
@@ -134,7 +141,12 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
         else  // else wise the unordered list belongs to the article content
           content += bodyChild.outerHtml().replaceAll("\u00A0", " ");
       }
-      // TODO: what about Headers?
+      else if("h3".equals(bodyChild.tagName())) {
+        if(bodyChild.text().startsWith("SZ: "))
+          isInterviewArticle = true;
+        if(isInterviewArticle)
+          content += bodyChild.outerHtml();
+      }
       else if("figure".equals(bodyChild.tagName())) {
         if(bodyChild.hasClass("gallery") /*&& bodyChild.hasClass("inline")*/)
           content += parseInlineImageGallery(bodyChild);
@@ -152,12 +164,16 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     return content;
   }
 
-  protected String extractInlineGalleryHtmlIfAny(Element bodySection) {
+  protected String extractUsefulTopEnrichmentElements(Element bodySection) {
     Elements topEnrichmentElements = bodySection.parent().getElementsByClass("topenrichment");
     if(topEnrichmentElements.size() > 0) {
       Element imageGalleryElement = getElementByClassAndNodeName(topEnrichmentElements.get(0), "figure", "gallery");
       if(imageGalleryElement != null)
         return parseInlineImageGallery(topEnrichmentElements.get(0));
+
+      Element panoramaElement = getElementByClassAndNodeName(topEnrichmentElements.get(0), "div", "panorama");
+      if(panoramaElement != null && panoramaElement.hasClass("basebox") && panoramaElement.hasClass("include"))
+        return panoramaElement.outerHtml();
     }
 
     return "";
@@ -274,7 +290,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
       if(headerElement != null) {
         ReferenceSubDivision articleReference = extractReferenceSubDivisionFromHeaderSection(articleElement.baseUri(), headerElement);
 
-        Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate("SZ", publishingDate);
+        Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate(publishingDate);
         sueddeutscheDateReference.addSubDivision(articleReference);
         return articleReference;
       }
@@ -314,7 +330,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     if(timeElements.size() > 0)
       articleDate = parseSueddeutscheHeaderDate(timeElements.get(0).attributes().get("datetime"));
 
-    Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate("SZ", articleDate);
+    Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate(articleDate);
     sueddeutscheDateReference.addSubDivision(articleReference);
 
     return articleReference;

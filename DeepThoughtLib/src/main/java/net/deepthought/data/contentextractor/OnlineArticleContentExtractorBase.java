@@ -3,6 +3,20 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,9 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +41,10 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
 
   private final static Logger log = LoggerFactory.getLogger(OnlineArticleContentExtractorBase.class);
 
+
+  static {
+    CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE)); // maybe it helps so that Sueddeutsche cookies don't get set
+  }
 
 
   @Override
@@ -87,23 +107,73 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   }
 
   protected Document retrieveOnlineDocument(String articleUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException {
-    Connection connection = Jsoup.connect(articleUrl);
-    connection.header("user-agent", userAgent);
-    connection.data(data);
-    connection.method(method);
-    Connection.Response response = connection.execute();
+    CookieStore cookieStore = new BasicCookieStore();
+    HttpClient httpclient = createHttpClient(userAgent, cookieStore);
 
-    removeAllCookies(response);
+    HttpRequestBase request = createHttpRequest(articleUrl, data, method);
 
-    if(articleUrl.equals(response.url().toString()) == false)
-      return retrieveOnlineDocument(response.url().toString(), userAgent, data, method);
-    return response.parse();
+    HttpResponse response = httpclient.execute(request);
+    HttpEntity entity = response.getEntity();
+    log.debug("Request Handled for url " + articleUrl + " ?: " + response.getStatusLine());
+    //InputStream in = entity.getContent();
+    String html = EntityUtils.toString(entity);
+    httpclient.getConnectionManager().shutdown();
+    cookieStore.clear();
+
+    return Jsoup.parse(html, articleUrl);
+
+//    String originalProxyHost = System.getProperty("http.proxyHost");
+//    String originalProxyPort = System.getProperty("http.proxyPort");
+//    System.setProperty("http.proxyHost", "127.0.0.1");  //set proxy host
+//    System.setProperty("http.proxyPort", "8889");  //set proxy port
+//
+//    Connection connection = Jsoup.connect(articleUrl);
+//    connection.header("user-agent", userAgent);
+//    connection.data(data);
+//    connection.method(method);
+//    connection.cookies(new HashMap<String, String>()); // maybe that helps to avoid that Jsoup sends cookies along
+////    CookieHandler cookieHandler = java.net.CookieManager.getDefault();
+////    cookieHandler.get()
+//
+//    Connection.Response response = connection.execute();
+//    System.setProperty("http.proxyHost", originalProxyHost == null ? "" : originalProxyHost);  // unset proxy host
+//    System.setProperty("http.proxyPort", originalProxyPort == null ? "" : originalProxyPort);  // unset proxy port
+//
+//    if(articleUrl.equals(response.url().toString()) == false)
+//      return retrieveOnlineDocument(response.url().toString(), userAgent, data, method);
+//    return response.parse();
   }
 
-  protected void removeAllCookies(Connection.Response response) {
-    List<String> cookieNames = new ArrayList<>(response.cookies().keySet()); // make a copy of, otherwise a ConcurrentModificationException will be thrown
-    for(String name : cookieNames)
-      response.removeCookie(name);
+  protected HttpClient createHttpClient(String userAgent, CookieStore cookieStore) {
+    DefaultHttpClient httpclient = new DefaultHttpClient();
+    httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
+    httpclient.setCookieStore(cookieStore);
+
+//    HttpHost proxy = new HttpHost("127.0.0.1", 8889);
+//    httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+
+    return httpclient;
+  }
+
+  protected HttpRequestBase createHttpRequest(String articleUrl, Map<String, String> data, Connection.Method method) {
+    HttpRequestBase request = null;
+
+    if(method == Connection.Method.GET)
+      request = new HttpGet(articleUrl);
+    else if(method == Connection.Method.POST) {
+      request = new HttpPost(articleUrl);
+      ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+      for(String key : data.keySet())
+        nameValuePairs.add(new BasicNameValuePair(key, data.get(key)));
+
+      try {
+        ((HttpPost) request).setEntity(new UrlEncodedFormEntity(nameValuePairs));
+      } catch(Exception ex) {
+        log.error("Could not set HttpPost's Post Body", ex);
+      }
+    }
+
+    return request;
   }
 
   protected abstract EntryCreationResult parseHtmlToEntry(String articleUrl, Document document);
