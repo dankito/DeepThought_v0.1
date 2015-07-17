@@ -1,17 +1,10 @@
 package net.deepthought.controls.reference;
 
 import net.deepthought.Application;
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
-import net.deepthought.controller.Dialogs;
-import net.deepthought.controller.EditReferenceDialogController;
-import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
-import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -24,10 +17,9 @@ import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
-import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Empty;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -44,18 +36,14 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -112,7 +100,7 @@ public class SearchReferencesControl extends TitledPane {
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

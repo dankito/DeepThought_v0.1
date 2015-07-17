@@ -7,7 +7,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
-import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
@@ -206,7 +206,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
     }
 
     @Override
-    public void errorOccurred(DeepThoughtError error) {
+    public void notification(Notification notification) {
 
     }
   };

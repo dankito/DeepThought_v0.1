@@ -327,7 +327,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
           public void run() {
             org.controlsfx.dialog.Dialogs.create()
                                          .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
-                                         .message(error.getErrorMessage())
+                                         .message(error.getNotificationMessage())
                                          .showError();
           }
         });
@@ -356,7 +356,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
           public void run() {
             org.controlsfx.dialog.Dialogs.create()
                 .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
-                .message(error.getErrorMessage())
+                .message(error.getNotificationMessage())
                 .showError();
           }
         });

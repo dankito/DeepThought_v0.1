@@ -6,6 +6,7 @@
 
 package net.deepthought;
 
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
@@ -22,10 +23,10 @@ import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.util.NotificationType;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
@@ -33,11 +34,9 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
-import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
@@ -45,6 +44,7 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.InputManager;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -74,6 +74,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
@@ -81,6 +82,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
@@ -116,6 +118,9 @@ public class MainWindowController implements Initializable {
   protected MenuItem mnitmToolsBackups;
   @FXML
   protected Menu mnitmMainMenuWindow;
+
+  @FXML
+  protected MenuButton btnOnlineArticleExtractors;
 
   @FXML
   protected Pane statusLabelPane;
@@ -172,8 +177,8 @@ public class MainWindowController implements Initializable {
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
-        showErrorOccurredMessageThreadSafe(error);
+      public void notification(Notification notification) {
+        notifyUserThreadSafe(notification);
       }
     });
 
@@ -218,19 +223,37 @@ public class MainWindowController implements Initializable {
     });
   }
 
-  protected void showErrorOccurredMessageThreadSafe(DeepThoughtError error) {
+  protected void notifyUserThreadSafe(Notification notification) {
     if(Platform.isFxApplicationThread())
-      showErrorOccurredMessage(error);
+      notifyUser(notification);
     else
-      Platform.runLater(() -> showErrorOccurredMessage(error));
+      Platform.runLater(() -> notifyUser(notification));
+  }
+
+  protected void notifyUser(Notification notification) {
+    if(notification instanceof DeepThoughtError)
+      showErrorOccurredMessage((DeepThoughtError) notification);
+    else if(notification.getType() == NotificationType.Info)
+      showInfoMessage(notification);
+    else if(notification.getType() == NotificationType.PluginLoaded) {
+
+      setStatusLabelText(Localization.getLocalizedStringForResourceKey("plugin.loaded"));
+    }
+  }
+
+  protected void showInfoMessage(Notification notification) {
+    if(notification.hasNotificationMessageTitle())
+      setStatusLabelText(notification.getNotificationMessageTitle() + ": " + notification.getNotificationMessage());
+    else
+      setStatusLabelText(notification.getNotificationMessage());
   }
 
   protected void showErrorOccurredMessage(DeepThoughtError error) {
-    if(error.getErrorMessageTitle() != null) {
+    if(error.getNotificationMessageTitle() != null) {
       Action response = Dialogs.create()
           .owner(stage)
-          .title(error.getErrorMessageTitle())
-          .message(error.getErrorMessage())
+          .title(error.getNotificationMessageTitle())
+          .message(error.getNotificationMessage())
           .actions(Dialog.ACTION_OK)
           .showException(error.getException());
     }
@@ -238,7 +261,7 @@ public class MainWindowController implements Initializable {
       Action response = Dialogs.create()
           .owner(stage)
           .title(Localization.getLocalizedStringForResourceKey("alert.message.title.severe.error.occurred"))
-          .message(Localization.getLocalizedStringForResourceKey("alert.message.message.severe.error.occurred", error.getErrorMessage()))
+          .message(Localization.getLocalizedStringForResourceKey("alert.message.message.severe.error.occurred", error.getNotificationMessage()))
           .actions(Dialog.ACTION_OK)
           .showException(error.getException());
     }
@@ -246,7 +269,7 @@ public class MainWindowController implements Initializable {
       Dialogs dialog = Dialogs.create()
           .owner(stage)
           .title(Localization.getLocalizedStringForResourceKey("alert.message.title.error.occurred"))
-          .message(error.getErrorMessage())
+          .message(error.getNotificationMessage())
           .actions(Dialog.ACTION_OK);
 
       Action response = null;
@@ -369,7 +392,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupMainMenu() {
-
+    btnOnlineArticleExtractors.setGraphic(new ImageView(Constants.NewspaperIconPath));
   }
 
   private void setupTabPaneOverview() {

@@ -24,10 +24,10 @@ import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
-import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Empty;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 
 import javafx.application.Platform;
@@ -123,7 +122,7 @@ public class EntryReferenceControl extends TitledPane {
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

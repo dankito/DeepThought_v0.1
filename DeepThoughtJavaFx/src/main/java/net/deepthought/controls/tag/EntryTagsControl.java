@@ -8,8 +8,8 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class EntryTagsControl extends TitledPane {
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

@@ -72,48 +72,60 @@
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <MenuBar>
-              <menus>
-                <Menu fx:id="mnitmFile" mnemonicParsing="false" onShowing="#handleMainMenuFileShowing" text="%file">
-                  <items>
-                        <Menu fx:id="mnitmFileClipboard" mnemonicParsing="false" text="%clipboard" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="%edit" />
-                  <Menu mnemonicParsing="false" text="%view">
-                    <items>
-                        <Menu mnemonicParsing="false" text="%dialogs.fields.display">
+            <AnchorPane maxHeight="29.0">
+               <children>
+                  <MenuBar AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0">
+                    <menus>
+                      <Menu fx:id="mnitmFile" mnemonicParsing="false" onShowing="#handleMainMenuFileShowing" text="%file">
+                        <items>
+                              <Menu fx:id="mnitmFileClipboard" mnemonicParsing="false" text="%clipboard" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                          <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                        </items>
+                      </Menu>
+                      <Menu mnemonicParsing="false" text="%edit" />
+                        <Menu mnemonicParsing="false" text="%view">
                           <items>
-                              <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowImportantOnes" mnemonicParsing="false" text="%dialogs.fields.display.show.important.ones" />
-                              <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowAll" mnemonicParsing="false" text="%dialogs.fields.display.show.all" />
+                              <Menu mnemonicParsing="false" text="%dialogs.fields.display">
+                                <items>
+                                    <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowImportantOnes" mnemonicParsing="false" text="%dialogs.fields.display.show.important.ones" />
+                                    <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowAll" mnemonicParsing="false" text="%dialogs.fields.display.show.all" />
+                                </items>
+                              </Menu>
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" />
+                              <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />
                           </items>
                         </Menu>
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" />
-                        <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />
+                        <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
+                           <items>
+                            <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                           </items>
+                        </Menu>
+                        <Menu fx:id="mnitmMainMenuWindow" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />
+                      <Menu mnemonicParsing="false" text="%help">
+                        <items>
+                          <MenuItem disable="true" mnemonicParsing="false" text="About" />
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+                  <MenuButton fx:id="btnOnlineArticleExtractors" contentDisplay="GRAPHIC_ONLY" disable="true" maxHeight="29.0" mnemonicParsing="false" prefWidth="60.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
                     </items>
-                  </Menu>
-                  <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
-                     <items>
-                      <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
-                           <accelerator>
-                              <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
-                           </accelerator></MenuItem>
-                     </items>
-                  </Menu>
-                  <Menu fx:id="mnitmMainMenuWindow" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />
-                <Menu mnemonicParsing="false" text="%help">
-                  <items>
-                    <MenuItem disable="true" mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
+                  </MenuButton>
+               </children>
+            </AnchorPane>
          </children>
       </VBox>
    </top>

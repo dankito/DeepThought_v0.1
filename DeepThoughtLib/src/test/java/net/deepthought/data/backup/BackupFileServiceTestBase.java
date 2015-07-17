@@ -19,6 +19,7 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Notification;
 import net.deepthought.util.file.FileUtils;
 
 import org.junit.After;
@@ -225,7 +226,7 @@ public abstract class BackupFileServiceTestBase extends TestsRequiringFileSystem
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

@@ -59,7 +59,7 @@ public class BackupRestoreProgressMessageTableCell extends BackupRestoreProgress
       if(progressItem.getResult().successful())
         message = progressItem.getStep().toString() + System.lineSeparator() + Localization.getLocalizedStringForResourceKey("successful");
       else
-        message = progressItem.getStep().toString() + System.lineSeparator() + progressItem.getResult().getError().getErrorMessage();
+        message = progressItem.getStep().toString() + System.lineSeparator() + progressItem.getResult().getError().getNotificationMessage();
     }
 
     setItem(message);

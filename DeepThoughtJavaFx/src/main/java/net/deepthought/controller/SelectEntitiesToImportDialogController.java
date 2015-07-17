@@ -9,8 +9,8 @@ import net.deepthought.data.compare.DataCompareResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 import net.deepthought.util.ReflectionHelper;
 
 import org.controlsfx.control.PropertySheet;
@@ -108,7 +108,7 @@ public class SelectEntitiesToImportDialogController extends ChildWindowsControll
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

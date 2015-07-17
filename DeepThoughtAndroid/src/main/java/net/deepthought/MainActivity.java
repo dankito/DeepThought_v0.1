@@ -32,7 +32,7 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
-import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +78,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         @Override
-        public void errorOccurred(DeepThoughtError error) {
+        public void notification(Notification notification) {
           // TODO: show error message
         }
       });

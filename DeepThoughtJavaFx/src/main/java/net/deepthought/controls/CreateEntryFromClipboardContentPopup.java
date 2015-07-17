@@ -34,31 +34,23 @@ import java.io.File;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
 /**
@@ -476,6 +468,6 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
     log.error("Could not create Entry from Source " + source, error.getException());
-    Alerts.showErrorMessage(stageToShowIn, error.getErrorMessage(), Localization.getLocalizedStringForResourceKey("can.not.create.entry.from", source));
+    Alerts.showErrorMessage(stageToShowIn, error.getNotificationMessage(), Localization.getLocalizedStringForResourceKey("can.not.create.entry.from", source));
   }
 }

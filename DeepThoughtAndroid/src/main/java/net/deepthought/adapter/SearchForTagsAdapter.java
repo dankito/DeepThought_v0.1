@@ -16,7 +16,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.filter.TagsFilter;
-import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Notification;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +72,7 @@ public class SearchForTagsAdapter extends BaseAdapter implements Filterable, Tag
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

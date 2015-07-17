@@ -21,6 +21,7 @@ import net.deepthought.language.ILanguageDetector;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -142,7 +143,7 @@ public class Application {
 //      firefoxPluginCommunicator = new FirefoxPluginCommunicator();
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
-      callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
+      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
           Localization.getLocalizedStringForResourceKey("alert.message.title.a.severe.error.occurred.resolving.a.manager.instance")));
     }
   }
@@ -154,10 +155,10 @@ public class Application {
     } catch(Exception ex) {
       log.error("Could not resolve EntityManager dependency", ex);
       if(isDatabaseAlreadyInUseException(ex))
-        callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.database.already.in.use"), ex, true,
+        callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.database.already.in.use"), ex, true,
             Localization.getLocalizedStringForResourceKey("alert.message.title.database.already.in.use")));
       else
-        callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.opening.database"), ex, true,
+        callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.opening.database"), ex, true,
             Localization.getLocalizedStringForResourceKey("alert.message.title.a.severe.error.occurred.opening.database")));
 
       return false;
@@ -186,7 +187,7 @@ public class Application {
       Application.dataManager.retrieveDeepThoughtApplication();
     } catch(Exception ex) {
       log.error("Could not retrieve data", ex);
-      callErrorOccurredListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.retrieving.data"), ex, true,
+      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.a.severe.error.occurred.retrieving.data"), ex, true,
           Localization.getLocalizedStringForResourceKey("alert.message.title.a.severe.error.occurred.retrieving.data")));
 
       return false;
@@ -235,9 +236,13 @@ public class Application {
       listener.deepThoughtChanged(deepThought);
   }
 
-  protected static void callErrorOccurredListeners(DeepThoughtError error) {
+  protected static void callNotificationListeners(Notification notification) {
     for(ApplicationListener listener : listeners)
-      listener.errorOccurred(error);
+      listener.notification(notification);
+  }
+
+  public static void notifyUser(Notification notification) {
+    callNotificationListeners(notification);
   }
 
   protected static ApplicationListener dataManagerListener = new ApplicationListener() {
@@ -247,8 +252,8 @@ public class Application {
     }
 
     @Override
-    public void errorOccurred(DeepThoughtError error) {
-      callErrorOccurredListeners(error);
+    public void notification(Notification notification) {
+      callNotificationListeners(notification);
     }
   };
 

@@ -13,7 +13,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Notification;
 
 import java.util.Collection;
 
@@ -45,7 +45,7 @@ public class EntriesOverviewAdapter extends BaseAdapter {
       }
 
       @Override
-      public void errorOccurred(DeepThoughtError error) {
+      public void notification(Notification notification) {
 
       }
     });

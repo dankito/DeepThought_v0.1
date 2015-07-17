@@ -85,7 +85,7 @@ public class DatabaseBackupFileService extends AbstractBackupFileService {
         public void fileOperationDone(boolean successful, File destinationFile) {
           log.debug("Was copying database file successful? {}", successful);
           logElapsedTime(startTime);
-          if (successful && listener != null) // in error case listener has already been notified in errorOccurred() FileOperationListener method
+          if (successful && listener != null) // in error case listener has already been notified in notification() FileOperationListener method
             listener.createBackupDone(CreateBackupResult.Successful, null, backupFile);
         }
       });
