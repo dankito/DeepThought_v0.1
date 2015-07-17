@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
+import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
@@ -22,6 +23,18 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
 
   public abstract String getNewspaperName();
+
+  public String getIconUrl() {
+    return IOnlineArticleContentExtractor.NoIcon;
+  }
+
+  public boolean hasArticlesOverview() {
+    return false;
+  }
+
+  public ArticlesOverview getArticlesOverview() {
+    return null;
+  }
 
   @Override
   public String getName() {

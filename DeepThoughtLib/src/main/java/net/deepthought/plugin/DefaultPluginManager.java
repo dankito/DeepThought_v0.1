@@ -2,6 +2,9 @@ package net.deepthought.plugin;
 
 import net.deepthought.Application;
 import net.deepthought.data.contentextractor.IContentExtractor;
+import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -65,7 +68,9 @@ public class DefaultPluginManager implements IPluginManager {
       for(IPlugin plugin : pluginLoader) {
         try {
           if(plugin instanceof IContentExtractor)
-          Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
+            Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
+
+          Application.notifyUser(new Notification(NotificationType.PluginLoaded, Localization.getLocalizedStringForResourceKey("plugin.loaded", plugin.getName()), plugin));
         } catch(Exception ex) {
           log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
         }

@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -16,6 +17,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,6 +31,29 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   @Override
   public String getNewspaperName() {
     return "SZ";
+  }
+
+  @Override
+  public String getIconUrl() {
+    try {
+      URL url = SueddeutscheContentExtractor.class.getClassLoader().getResource("sz_icon.png");
+      return url.toExternalForm();
+      //return url.toString();
+    } catch(Exception ex) {
+      log.error("Could not load sz_icon.png from Resources", ex);
+    }
+
+    return super.getIconUrl();
+  }
+
+  @Override
+  public boolean hasArticlesOverview() {
+    return true;
+  }
+
+  @Override
+  public ArticlesOverview getArticlesOverview() {
+    return extractArticlesOverviewFromFrontPage();
   }
 
   @Override
@@ -362,6 +387,11 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
       return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
     } catch(Exception ex) { log.error("Could not parse Sueddeutsche Header Date " + datetime, ex); }
     return "";
+  }
+
+
+  protected ArticlesOverview extractArticlesOverviewFromFrontPage() {
+    return null;
   }
 
 }

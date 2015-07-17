@@ -118,7 +118,7 @@
                       </Menu>
                     </menus>
                   </MenuBar>
-                  <MenuButton fx:id="btnOnlineArticleExtractors" contentDisplay="GRAPHIC_ONLY" disable="true" maxHeight="29.0" mnemonicParsing="false" prefWidth="60.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <MenuButton fx:id="btnOnlineArticleExtractors" contentDisplay="GRAPHIC_ONLY" disable="true" graphicTextGap="0.0" maxHeight="29.0" mnemonicParsing="false" prefWidth="60.0" style="-fx-border-image-insets: 0; -fx-border-insets: 0; -fx-padding: 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
                       <MenuItem mnemonicParsing="false" text="Action 1" />
                       <MenuItem mnemonicParsing="false" text="Action 2" />

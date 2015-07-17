@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
+import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
@@ -28,6 +29,21 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
   public String getSiteBaseUrl() {
     //return "Wikipedia.org";
     return "Wikipedia";
+  }
+
+  @Override
+  public String getIconUrl() {
+    return null; // TODO
+  }
+
+  @Override
+  public boolean hasArticlesOverview() {
+    return false;
+  }
+
+  @Override
+  public ArticlesOverview getArticlesOverview() {
+    return null;
   }
 
   @Override

@@ -23,8 +23,6 @@ import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.listener.ApplicationListener;
-import net.deepthought.plugin.IPlugin;
-import net.deepthought.util.NotificationType;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -35,17 +33,19 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
+import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.InputManager;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 
 import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -69,6 +69,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -83,6 +84,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
@@ -237,8 +239,8 @@ public class MainWindowController implements Initializable {
     else if(notification.getType() == NotificationType.Info)
       showInfoMessage(notification);
     else if(notification.getType() == NotificationType.PluginLoaded) {
+      showInfoMessage(notification);
       if(notification.getParameter() instanceof IPlugin) {
-        setStatusLabelText(Localization.getLocalizedStringForResourceKey("plugin.loaded", ((IPlugin)notification.getParameter()).getName()));
         pluginLoaded((IPlugin)notification.getParameter());
       }
     }
@@ -286,7 +288,14 @@ public class MainWindowController implements Initializable {
   protected void pluginLoaded(IPlugin plugin) {
     if(plugin instanceof IOnlineArticleContentExtractor) {
       IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
+      if(onlineArticleContentExtractor.hasArticlesOverview()) {
+        MenuItem articleContentExtractorMenuItem = new MenuItem(plugin.getName());
+        if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon)
+          articleContentExtractorMenuItem.setGraphic(new ImageView(onlineArticleContentExtractor.getIconUrl()));
 
+        btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
+        btnOnlineArticleExtractors.setDisable(false);
+      }
     }
   }
 
@@ -402,7 +411,11 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupMainMenu() {
-    btnOnlineArticleExtractors.setGraphic(new ImageView(Constants.NewspaperIconPath));
+    ImageView newspaperIcon = new ImageView(Constants.NewspaperIconPath);
+    newspaperIcon.setPreserveRatio(true);
+    newspaperIcon.setFitHeight(20); // TODO: make icon fill button
+    btnOnlineArticleExtractors.setGraphic(newspaperIcon);
+    btnOnlineArticleExtractors.getItems().clear(); // remove automatically added 'Article 1' and 'Article 2'
   }
 
   private void setupTabPaneOverview() {
