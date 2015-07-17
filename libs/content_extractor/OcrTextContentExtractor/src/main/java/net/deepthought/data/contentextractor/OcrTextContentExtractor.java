@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.model.Entry;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
 import org.apache.tika.metadata.Metadata;
@@ -19,6 +20,11 @@ import javafx.scene.image.Image;
  * Created by ganymed on 25/04/15.
  */
 public class OcrTextContentExtractor implements ITextContentExtractor {
+
+  @Override
+  public String getName() {
+    return Localization.getLocalizedStringForResourceKey("ocr.text.content.extractor");
+  }
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {

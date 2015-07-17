@@ -61,12 +61,13 @@ public class DefaultPluginManager implements IPluginManager {
     try {
       ClassLoader classLoader = new URLClassLoader(new URL[] { jar.toURI().toURL() });
 
-      ServiceLoader<IContentExtractor> contentExtractorLoader = ServiceLoader.load(IContentExtractor.class, classLoader);
-      for(IContentExtractor contentExtractor : contentExtractorLoader) {
+      ServiceLoader<IPlugin> pluginLoader = ServiceLoader.load(IPlugin.class, classLoader);
+      for(IPlugin plugin : pluginLoader) {
         try {
-          Application.getContentExtractorManager().addContentExtractor(contentExtractor);
+          if(plugin instanceof IContentExtractor)
+          Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
         } catch(Exception ex) {
-          log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + contentExtractor, ex);
+          log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
         }
       }
 

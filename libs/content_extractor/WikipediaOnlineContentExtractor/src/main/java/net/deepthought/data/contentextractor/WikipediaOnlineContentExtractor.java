@@ -20,6 +20,11 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
 
   @Override
+  public String getName() {
+    return Localization.getLocalizedStringForResourceKey("named.content.extractor", "Wikipedia");
+  }
+
+  @Override
   public String getSiteBaseUrl() {
     //return "Wikipedia.org";
     return "Wikipedia";

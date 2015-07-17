@@ -1,9 +1,11 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.plugin.IPlugin;
+
 /**
  * Created by ganymed on 15/01/15.
  */
-public interface IContentExtractor {
+public interface IContentExtractor extends IPlugin {
 
 //  boolean canExtractContentFromUrl(URL url);
 //

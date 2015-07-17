@@ -23,6 +23,11 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
   public abstract String getNewspaperName();
 
+  @Override
+  public String getName() {
+    return Localization.getLocalizedStringForResourceKey("named.content.extractor", getNewspaperName());
+  }
+
   protected Reference findOrCreateReferenceForThatDate(String articleDate) {
     return findOrCreateReferenceForThatDate(getNewspaperName(), articleDate);
   }

@@ -2,6 +2,7 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
 import java.io.File;
@@ -12,6 +13,11 @@ import javafx.scene.image.Image;
  * Created by ganymed on 25/04/15.
  */
 public class DefaultLocalFileContentExtractor implements ILocalFileContentExtractor {
+
+  @Override
+  public String getName() {
+    return Localization.getLocalizedStringForResourceKey("local.file.content.extractor");
+  }
 
   @Override
   public boolean canAttachFileToEntry(String url) {

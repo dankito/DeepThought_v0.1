@@ -23,6 +23,7 @@ import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.NotificationType;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -236,8 +237,10 @@ public class MainWindowController implements Initializable {
     else if(notification.getType() == NotificationType.Info)
       showInfoMessage(notification);
     else if(notification.getType() == NotificationType.PluginLoaded) {
-
-      setStatusLabelText(Localization.getLocalizedStringForResourceKey("plugin.loaded"));
+      if(notification.getParameter() instanceof IPlugin) {
+        setStatusLabelText(Localization.getLocalizedStringForResourceKey("plugin.loaded", ((IPlugin)notification.getParameter()).getName()));
+        pluginLoaded((IPlugin)notification.getParameter());
+      }
     }
   }
 
@@ -277,6 +280,13 @@ public class MainWindowController implements Initializable {
         response = dialog.showException(error.getException());
       else
         response = dialog.showError();
+    }
+  }
+
+  protected void pluginLoaded(IPlugin plugin) {
+    if(plugin instanceof IOnlineArticleContentExtractor) {
+      IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
+
     }
   }
 

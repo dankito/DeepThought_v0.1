@@ -2,9 +2,15 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
 public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
+
+  @Override
+  public String getName() {
+    return Localization.getLocalizedStringForResourceKey("remote.file.content.extractor");
+  }
 
   @Override
   public boolean canDownloadFile(String url) {
