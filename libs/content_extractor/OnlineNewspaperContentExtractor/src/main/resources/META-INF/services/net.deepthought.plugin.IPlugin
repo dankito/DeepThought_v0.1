@@ -1,4 +1,4 @@
 net.deepthought.data.contentextractor.SueddeutscheContentExtractor
 net.deepthought.data.contentextractor.SpiegelContentExtractor
 net.deepthought.data.contentextractor.ZeitContentExtractor
-net.deepthought.data.contentextractor.PostillionContentExtractor
+net.deepthought.data.contentextractor.PostillonContentExtractor

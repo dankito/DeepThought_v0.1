@@ -125,7 +125,8 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
   @FXML
   public void handleButtonAddSelectedAction(ActionEvent actionEvent) {
     for(ArticlesOverviewItem item : selectedItems)
-      extractEntryAndShowInEditEntryDialog(item);
+      extractAndAddEntryToDeepThought(item);
+    selectedItems.clear();
 
 //    setDialogResult(DialogResult.Ok);
 //    closeDialog();
@@ -135,6 +136,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
   public void handleButtonViewSelectedAction(ActionEvent actionEvent) {
     for(ArticlesOverviewItem item : selectedItems)
       extractEntryAndShowInEditEntryDialog(item);
+    selectedItems.clear();
 
 //    setDialogResult(DialogResult.Ok);
 //    closeDialog();

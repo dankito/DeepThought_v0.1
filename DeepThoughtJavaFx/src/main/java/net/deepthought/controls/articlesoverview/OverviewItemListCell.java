@@ -24,6 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
@@ -95,15 +96,15 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
     setAlignment(Pos.CENTER_LEFT);
 
     graphicPane.setPrefHeight(100);
-    graphicPane.setMaxHeight(130);
+//    graphicPane.setMaxHeight(Region.USE_PREF_SIZE);
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
     graphicPane.getColumnConstraints().clear();
     graphicPane.getColumnConstraints().add(new ColumnConstraints(30, 30, 30, Priority.NEVER, HPos.CENTER, false));
     graphicPane.getColumnConstraints().add(new ColumnConstraints(120, 120, 120, Priority.NEVER, HPos.CENTER, false));
     graphicPane.getColumnConstraints().add(new ColumnConstraints(-1, -1, -1, Priority.ALWAYS, HPos.LEFT, true));
-    graphicPane.getRowConstraints().add(new RowConstraints(-1, -1, -1, Priority.ALWAYS, VPos.CENTER, true));
-    graphicPane.getRowConstraints().add(new RowConstraints(24, 24, 24, Priority.NEVER, VPos.CENTER, false));
+    graphicPane.getRowConstraints().add(new RowConstraints(-1, -1, -1, Priority.ALWAYS, VPos.CENTER, false));
+    graphicPane.getRowConstraints().add(new RowConstraints(30, 30, 30, Priority.NEVER, VPos.CENTER, false));
 
     graphicPane.add(chkbxSelectItem, 0, 0);
     chkbxSelectItem.setText(null);
@@ -128,11 +129,13 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
 
     itemTextLinesPane.getChildren().add(lblItemSubTitle);
     lblItemSubTitle.setMaxHeight(20);
-//    VBox.setMargin(lblItemSubTitle, new Insets(0, 0, 6, 0));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSubTitle);
+    VBox.setMargin(lblItemSubTitle, new Insets(0, 0, 6, 0));
 
     itemTextLinesPane.getChildren().add(lblItemTitle);
     lblItemTitle.setMaxHeight(20);
-//    VBox.setMargin(lblItemTitle, new Insets(0, 0, 6, 0));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemTitle);
+    VBox.setMargin(lblItemTitle, new Insets(0, 0, 6, 0));
 
     itemTextLinesPane.getChildren().add(lblItemSummary);
     VBox.setVgrow(lblItemSummary, Priority.ALWAYS);
@@ -181,8 +184,13 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
         lblItemTitle.setText(item.getTitle());
 
       lblItemSummary.setVisible(item.hasSummary());
-      if(item.hasSummary())
+      if(item.hasSummary()) {
         lblItemSummary.setText(item.getSummary());
+//        if(item.getSummary().length() > 400)
+//          graphicPane.setMaxHeight(170);
+//        else
+//          graphicPane.setMaxHeight(100);
+      }
 
       lblItemCategoryOrLabel.setVisible(item.hasLabel() || item.hasCategories());
       if(item.hasLabel() || item.hasCategories()) {
