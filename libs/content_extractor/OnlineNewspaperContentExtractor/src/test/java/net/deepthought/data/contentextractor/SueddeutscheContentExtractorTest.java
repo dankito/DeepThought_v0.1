@@ -1,11 +1,19 @@
 package net.deepthought.data.contentextractor;
 
-import net.deepthought.data.contentextractor.preview.ArticlesOverview;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.util.StringUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by ganymed on 14/04/15.
@@ -171,11 +179,28 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
 
   @Test
   public void testGetArticlesOverview() {
-    ArticlesOverview articlesOverview = contentExtractor.getArticlesOverview();
+    final List<ArticlesOverviewItem> allItems = new ArrayList<>();
+    final AtomicInteger partialItemsExtractionCall = new AtomicInteger();
+    final CountDownLatch getArticlesOverviewLatch = new CountDownLatch(1);
 
-    Assert.assertNotNull(articlesOverview);
-    Assert.assertFalse(articlesOverview.getOverviewItems().size() == 0);
-    Assert.assertTrue(articlesOverview.getOverviewItems().size() > 100);
+    contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
+      @Override
+      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {
+        partialItemsExtractionCall.incrementAndGet();
+        allItems.addAll(items);
+
+        Assert.assertNotNull(contentExtractor);
+        Assert.assertFalse(items.size() == 0);
+
+        if (isDone)
+          getArticlesOverviewLatch.countDown();
+      }
+    });
+
+    try { getArticlesOverviewLatch.await(10, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(partialItemsExtractionCall.get() == 3);
+    Assert.assertTrue(allItems.size() > 100);
 
     // TODO: check if panorama teaser has been parsed correctly, all social module list items have been found and only visible Tile are parse
     // in order to do so: save HTML code of Sueddeutsche front page and parse that site

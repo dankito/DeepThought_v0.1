@@ -1,7 +1,8 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
-import net.deepthought.data.contentextractor.preview.ArticlesOverview;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
@@ -13,6 +14,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleContentExtractorBase {
 
@@ -32,8 +35,22 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return false;
   }
 
-  public ArticlesOverview getArticlesOverview() {
-    return null;
+  @Override
+  public void getArticlesOverviewAsync(final ArticlesOverviewListener listener) {
+    if(hasArticlesOverview()) {
+      new Thread(new Runnable() {
+        @Override
+        public void run() {
+          getArticlesOverview(listener);
+        }
+      }).start();
+    }
+    else
+      listener.overviewItemsRetrieved(this, new ArrayList<ArticlesOverviewItem>(), true);
+  }
+
+  protected void getArticlesOverview(ArticlesOverviewListener listener) {
+    // may be overwritten in subclass (if hasArticlesOverview() is set to true)
   }
 
   @Override

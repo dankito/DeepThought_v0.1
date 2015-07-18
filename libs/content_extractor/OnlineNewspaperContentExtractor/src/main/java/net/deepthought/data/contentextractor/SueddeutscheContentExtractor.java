@@ -2,6 +2,7 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -56,8 +57,8 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   }
 
   @Override
-  public ArticlesOverview getArticlesOverview() {
-    return extractArticlesOverviewFromFrontPage();
+  protected void getArticlesOverview(ArticlesOverviewListener listener) {
+    extractArticlesOverviewFromFrontPage(listener);
   }
 
   @Override
@@ -394,10 +395,10 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   }
 
 
-  protected ArticlesOverview extractArticlesOverviewFromFrontPage() {
+  protected ArticlesOverview extractArticlesOverviewFromFrontPage(ArticlesOverviewListener listener) {
     try {
       Document frontPage = retrieveOnlineDocument("http://www.sueddeutsche.de");
-      List<ArticlesOverviewItem> items = extractArticlesOverviewItemsFromFrontPage(frontPage);
+      List<ArticlesOverviewItem> items = extractArticlesOverviewItemsFromFrontPage(frontPage, listener);
       return new ArticlesOverview(items);
     } catch(Exception ex) {
       log.error("Could not retrieve HTML code of Sueddeutsche front page", ex);
@@ -405,69 +406,30 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     return null;
   }
 
-  protected List<ArticlesOverviewItem> extractArticlesOverviewItemsFromFrontPage(Document frontPage) {
+  protected List<ArticlesOverviewItem> extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
-    items.addAll(extractSocialModuleItems(frontPage));
-    items.addAll(extractTileItems(frontPage));
-    items.addAll(extractTeaserItems(frontPage));
+    listener.overviewItemsRetrieved(this, extractSocialModuleItems(frontPage), false);
+    listener.overviewItemsRetrieved(this, extractTileItems(frontPage), false);
+    listener.overviewItemsRetrieved(this, extractTeaserItems(frontPage), true);
     // TODO: also parse flyout teasers (<ul class="flyout-teasers">) ?
 
     return items;
   }
 
-  protected Collection<? extends ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
+  protected Collection<ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
-//    ArticlesOverviewItem panoramaItem = extractPanoramaTeaserItem(frontPage);
-//    if(panoramaItem != null)
-//      items.add(panoramaItem);
-
     Elements teaserElements = frontPage.body().getElementsByClass("teaser");
-    for(Element teaser : teaserElements) {
-//      if(teaser.hasClass("panorama") == false && teaser.hasClass("subpanorama") == false) { // panorama teaser is handled separately
-        ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
-        if (teaserItem != null)
-          items.add(teaserItem);
+    for (Element teaser : teaserElements) {
+      ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
+      if (teaserItem != null)
+        items.add(teaserItem);
 
-        items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
-//      }
+      items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
     }
 
     return items;
-  }
-
-  // Panorama teaser item is split over to div elements
-  // TODO: this only seems to be the case in browser, here the item is not split
-  protected ArticlesOverviewItem extractPanoramaTeaserItem(Document frontPage) {
-    ArticlesOverviewItem panoramaTeaserItem = null;
-
-    Elements panoramaElements = frontPage.body().getElementsByClass("panorama");
-    for(Element panoramaElement : panoramaElements) {
-      if("div".equals(panoramaElement.nodeName()) && panoramaElement.hasClass("teaser")) {
-        for(Element panoramaChild : panoramaElement.children()) {
-          if("a".equals(panoramaChild.nodeName()))
-            panoramaTeaserItem = createOverviewItemFromAnchorElement(panoramaChild);
-        }
-      }
-    }
-
-    Elements subPanoramaElements = frontPage.body().getElementsByClass("subpanorama");
-    for(Element subPanoramaElement : subPanoramaElements) {
-      if("div".equals(subPanoramaElement.nodeName()) && subPanoramaElement.hasClass("teaser")) {
-        if(panoramaTeaserItem != null) {
-          for(Element subPanoramaChild : subPanoramaElement.children()) {
-            if("p".equals(subPanoramaChild.nodeName()) && subPanoramaChild.hasClass("entry-summary")) {
-              panoramaTeaserItem.setSummary(subPanoramaChild.ownText());
-              tryToExtractLabel(panoramaTeaserItem, subPanoramaChild);
-              // TODO: also extract one liner
-            }
-          }
-        }
-      }
-    }
-
-    return panoramaTeaserItem;
   }
 
   protected ArticlesOverviewItem extractItemFromTeaserElement(Element teaser) {
@@ -489,7 +451,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   }
 
   protected ArticlesOverviewItem createOverviewItemFromAnchorElement(Element anchorElement) {
-    ArticlesOverviewItem item = new ArticlesOverviewItem(anchorElement.attr("href"));
+    ArticlesOverviewItem item = new ArticlesOverviewItem(this, anchorElement.attr("href"));
 
     for(Element anchorChild : anchorElement.children()) {
       if("img".equals(anchorChild.nodeName()))
@@ -515,7 +477,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
           for (Element child : listItem.children()) {
             if ("a".equals(child.nodeName())) {
-              oneLinerItem = new ArticlesOverviewItem(child.attr("href"));
+              oneLinerItem = new ArticlesOverviewItem(this, child.attr("href"));
               for (Element anchorChild : child.children()) {
                 if ("div".equals(anchorChild.nodeName())) {
 //                  if ("strong".equals(anchorChild.nodeName())) // actually div as a span child and that again has a strong child
@@ -550,7 +512,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     }
   }
 
-  protected Collection<? extends ArticlesOverviewItem> extractTileItems(Document frontPage) {
+  protected Collection<ArticlesOverviewItem> extractTileItems(Document frontPage) {
     List<ArticlesOverviewItem> extractedItems = new ArrayList<>();
 
     Elements tileElements = frontPage.body().getElementsByClass("tile-teaser-content");
@@ -576,7 +538,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
     return extractedItems;
   }
 
-  protected Collection<? extends ArticlesOverviewItem> extractSocialModuleItems(Document frontPage) {
+  protected Collection<ArticlesOverviewItem> extractSocialModuleItems(Document frontPage) {
     List<ArticlesOverviewItem> extractedItems = new ArrayList<>();
 
     Elements socialModuleElements = frontPage.body().getElementsByClass("socialmodule-mainslot");
@@ -586,7 +548,7 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
           for(Element listItem : orderedListElement.children()) {
             for(Element listItemChild : listItem.children()) {
               if("a".equals(listItemChild.nodeName())) {
-                ArticlesOverviewItem item = new ArticlesOverviewItem(listItemChild.attr("href"));
+                ArticlesOverviewItem item = new ArticlesOverviewItem(this, listItemChild.attr("href"));
                 item.setSubTitle(listItemChild.ownText());
 
                 for(Element anchorChild : listItemChild.children()) {

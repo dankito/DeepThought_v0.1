@@ -287,9 +287,10 @@ public class MainWindowController implements Initializable {
 
   protected void pluginLoaded(IPlugin plugin) {
     if(plugin instanceof IOnlineArticleContentExtractor) {
-      IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
+      final IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
       if(onlineArticleContentExtractor.hasArticlesOverview()) {
         MenuItem articleContentExtractorMenuItem = new MenuItem(plugin.getName());
+        articleContentExtractorMenuItem.setOnAction(event -> net.deepthought.controller.Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
         if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon)
           articleContentExtractorMenuItem.setGraphic(new ImageView(onlineArticleContentExtractor.getIconUrl()));
 

@@ -1,9 +1,13 @@
 package net.deepthought.data.contentextractor.preview;
 
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+
 /**
  * Created by ganymed on 17/07/15.
  */
 public class ArticlesOverviewItem {
+
+  protected IOnlineArticleContentExtractor articleContentExtractor = null;
 
   protected String url;
 
@@ -15,33 +19,40 @@ public class ArticlesOverviewItem {
 
   protected String previewImageUrl = null;
 
+  protected String categories = null;
+
   protected String label = null;
 
 
-  public ArticlesOverviewItem(String url) {
+  public ArticlesOverviewItem(IOnlineArticleContentExtractor articleContentExtractor, String url) {
+    this.articleContentExtractor = articleContentExtractor;
     this.url = url;
   }
 
-  public ArticlesOverviewItem(String url, String summary) {
-    this(url);
+  public ArticlesOverviewItem(IOnlineArticleContentExtractor articleContentExtractor, String url, String summary) {
+    this(articleContentExtractor, url);
     this.summary = summary;
   }
 
-  public ArticlesOverviewItem(String url, String summary, String title) {
-    this(url, summary);
+  public ArticlesOverviewItem(IOnlineArticleContentExtractor articleContentExtractor, String url, String summary, String title) {
+    this(articleContentExtractor, url, summary);
     this.title = title;
   }
 
-  public ArticlesOverviewItem(String url, String summary, String title, String subTitle) {
-    this(url, summary, title);
+  public ArticlesOverviewItem(IOnlineArticleContentExtractor articleContentExtractor, String url, String summary, String title, String subTitle) {
+    this(articleContentExtractor, url, summary, title);
     this.subTitle = subTitle;
   }
 
-  public ArticlesOverviewItem(String url, String summary, String title, String subTitle, String previewImageUrl) {
-    this(url, summary, title, subTitle);
+  public ArticlesOverviewItem(IOnlineArticleContentExtractor articleContentExtractor, String url, String summary, String title, String subTitle, String previewImageUrl) {
+    this(articleContentExtractor, url, summary, title, subTitle);
     this.previewImageUrl = previewImageUrl;
   }
 
+
+  public IOnlineArticleContentExtractor getArticleContentExtractor() {
+    return articleContentExtractor;
+  }
 
   public String getUrl() {
     return url;
@@ -95,6 +106,18 @@ public class ArticlesOverviewItem {
     this.previewImageUrl = previewImageUrl;
   }
 
+  public boolean hasCategories() {
+    return categories != null;
+  }
+
+  public String getCategories() {
+    return categories;
+  }
+
+  public void setCategories(String categories) {
+    this.categories = categories;
+  }
+
   public boolean hasLabel() {
     return label != null;
   }
@@ -105,6 +128,15 @@ public class ArticlesOverviewItem {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public String getCategoriesAndLabel() {
+    if(hasCategories() == true && hasLabel() == false)
+      return getCategories();
+    else if(hasCategories() == false && hasLabel() == true)
+      return getLabel();
+
+    return categories + ", " + label;
   }
 
 

@@ -2,6 +2,7 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
@@ -243,6 +244,45 @@ public class Dialogs {
       // Set the referenceBase into the controller.
       EditReferenceDialogController controller = loader.getController();
       controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
+
+      controller.setListener(new ChildWindowsControllerListener() {
+        @Override
+        public void windowClosing(Stage stage, ChildWindowsController controller) {
+          if(listener != null)
+            listener.windowClosing(stage, controller);
+        }
+
+        @Override
+        public void windowClosed(Stage stage, ChildWindowsController controller) {
+          removeClosedChildWindow(stage);
+
+          if(listener != null)
+            listener.windowClosed(stage, controller);
+        }
+      });
+
+      addOpenedChildWindow(dialogStage);
+
+      dialogStage.show();
+      dialogStage.requestFocus();
+    } catch(Exception ex) {
+      log.error("Could not load / show EditReferenceDialog", ex);
+    }
+  }
+
+
+  public static void showArticlesOverviewDialog(final IOnlineArticleContentExtractor articleContentExtractor) {
+    showArticlesOverviewDialog(articleContentExtractor, null);
+  }
+
+  public static void showArticlesOverviewDialog(final IOnlineArticleContentExtractor articleContentExtractor, final ChildWindowsControllerListener listener) {
+    try {
+      FXMLLoader loader = new FXMLLoader();
+      Stage dialogStage = createStage(loader, "ArticlesOverviewDialog.fxml");
+
+      // Set the referenceBase into the controller.
+      ArticlesOverviewDialogController controller = loader.getController();
+      controller.setWindowStageAndArticleContentExtractor(dialogStage, articleContentExtractor);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
