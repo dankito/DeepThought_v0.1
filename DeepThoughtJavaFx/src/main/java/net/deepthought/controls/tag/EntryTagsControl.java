@@ -1,6 +1,7 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.event.EntryTagsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -35,6 +36,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -42,10 +44,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -151,7 +157,9 @@ public class EntryTagsControl extends TitledPane {
   protected void setupControl() {
     this.setExpanded(false);
 
-//    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
+    // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
+    this.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
+    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
 
     pnContent.setPrefHeight(175);
 

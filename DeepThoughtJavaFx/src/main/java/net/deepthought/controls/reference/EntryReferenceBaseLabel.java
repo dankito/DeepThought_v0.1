@@ -32,6 +32,10 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
     return "";
   }
 
+  @Override
+  protected String getToolTipText() {
+    return getItemDisplayName();
+  }
 
   protected EntityListener referenceBaseListener = new EntityListener() {
     @Override

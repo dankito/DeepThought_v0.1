@@ -7,6 +7,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
@@ -49,12 +50,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -87,10 +90,14 @@ public class EntryReferenceControl extends TitledPane {
   @FXML
   protected Pane paneSeriesTitleOrReference;
   @FXML
+  protected Label lblReference;
+  @FXML
   protected Pane paneSelectedReferenceBase;
   @FXML
   protected NewOrEditButton btnNewOrEditReference;
 
+  @FXML
+  protected Pane paneReferenceIndicationSettings;
   @FXML
   protected TextField txtfldReferenceIndication;
 
@@ -261,7 +268,7 @@ public class EntryReferenceControl extends TitledPane {
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok)
 //          entry.setReference(newReference);
-          selectedReferenceBaseChanged(((EditReferenceDialogController)controller).getEditedReferenceBase());
+          selectedReferenceBaseChanged(((EditReferenceDialogController) controller).getEditedReferenceBase());
       }
 
       @Override
@@ -279,18 +286,15 @@ public class EntryReferenceControl extends TitledPane {
   }
 
   protected void selectedReferenceBaseChangedOnUiThread(ReferenceBase newReferenceBase) {
-//    if(newReferenceBase == null)
-//      cmbxSeriesTitleOrReference.setValue(Empty.Reference);
-//    else
-//      cmbxSeriesTitleOrReference.setValue(newReferenceBase);
-
+    if(currentWidthListener != null)
+      this.widthProperty().removeListener(currentWidthListener);
     ReferenceBase previousReferenceBase = this.selectedReferenceBase;
     this.selectedReferenceBase = newReferenceBase;
 
     paneSelectedReferenceBase.getChildren().clear();
 
     if (selectedReferenceBase != null)
-      paneSelectedReferenceBase.getChildren().add(new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler));
+      createEntryReferenceBaseLabel(newReferenceBase);
 
     if (selectedReferenceBase == null) {
       btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
@@ -301,6 +305,23 @@ public class EntryReferenceControl extends TitledPane {
     }
 
     fireFieldChangedEvent(newReferenceBase, previousReferenceBase);
+  }
+
+  protected ChangeListener<? super Number> currentWidthListener = null;
+
+  protected void createEntryReferenceBaseLabel(ReferenceBase newReferenceBase) {
+    final EntryReferenceBaseLabel label = new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler);
+
+    // laborious but works: Before if EntryReferenceBaseLabel was to broad to be fully displayed it broadened the whole EntryReferenceControl and there moved the Splitter of SplitPane
+    currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(label);
+    this.widthProperty().addListener(currentWidthListener);
+    setEntryReferenceBaseLabelMaxWidth(label);
+
+    paneSelectedReferenceBase.getChildren().add(label);
+  }
+
+  protected void setEntryReferenceBaseLabelMaxWidth(EntryReferenceBaseLabel label) {
+    label.setMaxWidth(this.getWidth() - lblReference.getWidth() - btnNewOrEditReference.getWidth() - paneReferenceIndicationSettings.getWidth() - 60);
   }
 
   protected EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler = new EventHandler<CollectionItemLabelEvent>() {

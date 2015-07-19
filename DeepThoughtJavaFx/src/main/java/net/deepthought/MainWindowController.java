@@ -69,6 +69,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -91,6 +92,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -289,10 +291,16 @@ public class MainWindowController implements Initializable {
     if(plugin instanceof IOnlineArticleContentExtractor) {
       final IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
       if(onlineArticleContentExtractor.hasArticlesOverview()) {
-        MenuItem articleContentExtractorMenuItem = new MenuItem(plugin.getName());
+        MenuItem articleContentExtractorMenuItem = new MenuItem(onlineArticleContentExtractor.getSiteBaseUrl());
         articleContentExtractorMenuItem.setOnAction(event -> net.deepthought.controller.Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
-        if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon)
-          articleContentExtractorMenuItem.setGraphic(new ImageView(onlineArticleContentExtractor.getIconUrl()));
+
+        if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
+          HBox graphicsPane = new HBox(new ImageView(onlineArticleContentExtractor.getIconUrl()));
+          graphicsPane.setPrefWidth(38);
+          graphicsPane.setMaxWidth(38);
+          graphicsPane.setAlignment(Pos.CENTER);
+          articleContentExtractorMenuItem.setGraphic(graphicsPane);
+        }
 
         btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
         btnOnlineArticleExtractors.setDisable(false);

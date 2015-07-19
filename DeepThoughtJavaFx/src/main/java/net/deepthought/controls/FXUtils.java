@@ -19,6 +19,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
@@ -29,6 +30,11 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.util.Callback;
 
@@ -45,6 +51,10 @@ public class FXUtils {
 
   public static void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
     node.managedProperty().bind(node.visibleProperty());
+  }
+
+  public static void setBackgroundToColor(Region region, Color color) {
+    region.setBackground(new Background(new BackgroundFill(color, new CornerRadii(0), new Insets(0))));
   }
 
 

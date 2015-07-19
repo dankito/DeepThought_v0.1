@@ -79,7 +79,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     super.setWindowStage(dialogStage);
 
     this.articleContentExtractor = articleContentExtractor;
-    dialogStage.setTitle(articleContentExtractor.getName());
+    dialogStage.setTitle(articleContentExtractor.getSiteBaseUrl());
 
     articleContentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
