@@ -164,6 +164,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter, boolean mustFitBothFilters) {
+    // TODO: escape lastNameFilter and firstNameFilter (e.g. if they contain: ' )
     IEntityManager entityManager = Application.getEntityManager();
 
     String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.PersonTableName + " WHERE " +

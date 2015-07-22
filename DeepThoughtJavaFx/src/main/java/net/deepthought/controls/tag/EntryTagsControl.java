@@ -36,21 +36,21 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 /**
@@ -62,6 +62,7 @@ public class EntryTagsControl extends TitledPane {
 
 
   protected Entry entry = null;
+  protected boolean hasEntryBeenSetBefore = false;
 
   protected DeepThought deepThought = null;
 
@@ -157,10 +158,6 @@ public class EntryTagsControl extends TitledPane {
   protected void setupControl() {
     this.setExpanded(false);
 
-    // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
-    this.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
-    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
-
     pnContent.setPrefHeight(175);
 
     // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)
@@ -219,9 +216,27 @@ public class EntryTagsControl extends TitledPane {
 //    widthProperty().addListener((observable, oldValue, newValue) -> {
 //      pnSelectedTagsPreview.setPrefWrapLength(newValue.doubleValue() - lblTags.getWidth() - 50);
 //    });
+
+    // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
+    this.widthProperty().addListener((observable, oldValue, newValue) -> {
+      if(lblTags.getWidth() > 0)
+        pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60);
+    });
+    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
+
+    FXUtils.setBackgroundToColor(pnSelectedTagsPreview, Color.ORANGE);
   }
 
   protected void showEntryTags(Entry entry) {
+//    if(hasEntryBeenSetBefore == false) { // doing this in setupControls() is too early as Dialog hasn't been fully layouted yet, so do it here
+//      hasEntryBeenSetBefore = true;
+//
+//      // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
+//      ChangeListener<? super Number> setWrapLengthListener = (observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength();
+//      this.widthProperty().addListener(setWrapLengthListener);
+//      lblTags.widthProperty().addListener(setWrapLengthListener);
+//    }
+
     pnSelectedTagsPreview.getChildren().clear();
 
     if(entry != null) {
@@ -229,8 +244,8 @@ public class EntryTagsControl extends TitledPane {
       for(final Tag tag : new TreeSet<>(editedTags)) {
         pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> {
           removeTagFromEntry(tag);
-          for(TagListCell cell : tagListCells) {
-            if(tag.equals(cell.tag)) {
+          for (TagListCell cell : tagListCells) {
+            if (tag.equals(cell.tag)) {
               cell.setComboBoxToUnselected();
               break;
             }
@@ -238,6 +253,35 @@ public class EntryTagsControl extends TitledPane {
         }));
       }
     }
+  }
+
+  protected void setPaneSelectedTagsPreviewWrapLength() {
+    if(lblTags.getWidth() > 0) { // on the first call this.getWidth() == 0 -> maxWidth would be less than zero -> less than zero this means 'MAX_VALUE'
+      double adjustment = /*isInScrollPane() ? 90 :*/ 70;
+      double debug1 = this.getWidth();
+      double debug2 = lblTags.getWidth();
+      double debug3 = getScene().getWidth();
+      double debug = this.getWidth() - lblTags.getWidth() - adjustment;
+//      pnSelectedTagsPreview.setPrefWidth(this.getWidth() - lblTags.getWidth() - adjustment);
+      pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - adjustment);
+//      pnSelectedTagsPreview.setMaxWidth(this.getWidth() - lblTags.getWidth() - adjustment);
+//      pnSelectedTagsPreview.setPrefWrapLength(pnSelectedTagsPreview.getMaxWidth());
+//      pnSelectedTagsPreview.setPrefWidth(pnSelectedTagsPreview.getPrefWrapLength());
+//      pnSelectedTagsPreview.setPrefWidth(Region.USE_COMPUTED_SIZE);
+//      pnSelectedTagsPreview.getChildren().add(dummy);
+//      pnSelectedTagsPreview.getChildren().remove(dummy);
+    }
+//    else
+//      pnSelectedTagsPreview.setPrefWrapLength(this.getMinWidth() / 2);
+  }
+
+  protected boolean isInScrollPane() {
+    if(this.getParent().getClass().getName().contains("ScrollPane"))
+      return true;
+    else if(this.getParent().getParent().getClass().getName().contains("ScrollPane"))
+      return true;
+
+    return false;
   }
 
 

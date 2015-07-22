@@ -286,8 +286,10 @@ public class EntryReferenceControl extends TitledPane {
   }
 
   protected void selectedReferenceBaseChangedOnUiThread(ReferenceBase newReferenceBase) {
-    if(currentWidthListener != null)
+    if(currentWidthListener != null) {
       this.widthProperty().removeListener(currentWidthListener);
+      paneReferenceIndicationSettings.widthProperty().removeListener(currentWidthListener);
+    }
     ReferenceBase previousReferenceBase = this.selectedReferenceBase;
     this.selectedReferenceBase = newReferenceBase;
 
@@ -315,13 +317,17 @@ public class EntryReferenceControl extends TitledPane {
     // laborious but works: Before if EntryReferenceBaseLabel was to broad to be fully displayed it broadened the whole EntryReferenceControl and there moved the Splitter of SplitPane
     currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(label);
     this.widthProperty().addListener(currentWidthListener);
+    paneReferenceIndicationSettings.widthProperty().addListener(currentWidthListener);
     setEntryReferenceBaseLabelMaxWidth(label);
 
     paneSelectedReferenceBase.getChildren().add(label);
   }
 
   protected void setEntryReferenceBaseLabelMaxWidth(EntryReferenceBaseLabel label) {
-    label.setMaxWidth(this.getWidth() - lblReference.getWidth() - btnNewOrEditReference.getWidth() - paneReferenceIndicationSettings.getWidth() - 60);
+    if(paneReferenceIndicationSettings.getWidth() > 0) // on the first call this.getWidth() == 0 -> maxWidth would be less than zero -> less than zero this means 'MAX_VALUE'
+      label.setMaxWidth(this.getWidth() - lblReference.getWidth() - btnNewOrEditReference.getWidth() - paneReferenceIndicationSettings.getWidth() - 60);
+    else
+      label.setMaxWidth(this.getMinWidth() - 60);
   }
 
   protected EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler = new EventHandler<CollectionItemLabelEvent>() {

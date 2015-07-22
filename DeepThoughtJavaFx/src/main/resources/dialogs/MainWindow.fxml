@@ -72,9 +72,22 @@
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <AnchorPane maxHeight="29.0">
+            <GridPane fx:id="grdpnMainMenu">
+              <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="60.0" minWidth="0.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
                <children>
-                  <MenuBar AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="0.0">
+                  <MenuButton fx:id="btnOnlineArticleExtractors" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" maxHeight="29.0" mnemonicParsing="false" prefWidth="60.0" style="-fx-border-image-insets: 0; -fx-border-insets: 0; -fx-padding: 0;" visible="false" GridPane.columnIndex="1">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                  </MenuButton>
+                  <MenuBar GridPane.hgrow="ALWAYS">
                     <menus>
                       <Menu fx:id="mnitmFile" mnemonicParsing="false" onShowing="#handleMainMenuFileShowing" text="%file">
                         <items>
@@ -118,14 +131,8 @@
                       </Menu>
                     </menus>
                   </MenuBar>
-                  <MenuButton fx:id="btnOnlineArticleExtractors" contentDisplay="GRAPHIC_ONLY" disable="true" graphicTextGap="0.0" maxHeight="29.0" mnemonicParsing="false" prefWidth="60.0" style="-fx-border-image-insets: 0; -fx-border-insets: 0; -fx-padding: 0;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <items>
-                      <MenuItem mnemonicParsing="false" text="Action 1" />
-                      <MenuItem mnemonicParsing="false" text="Action 2" />
-                    </items>
-                  </MenuButton>
                </children>
-            </AnchorPane>
+            </GridPane>
          </children>
       </VBox>
    </top>

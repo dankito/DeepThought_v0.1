@@ -305,6 +305,18 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return series != null || reference != null || referenceSubDivision != null;
   }
 
+  @Transient
+  public ReferenceBase getLowestReferenceBase() {
+    if(referenceSubDivision != null)
+      return referenceSubDivision;
+    else if(reference != null)
+      return reference;
+    else if(series != null)
+      return series;
+
+    return null;
+  }
+
   public String getIndication() {
     return indication;
   }
@@ -550,6 +562,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     personsPreview = personsPreview.substring(0, personsPreview.length() - "; ".length());
 
     return "";
+  }
+
+  public boolean hasPersonsOrIsAReferenceSet() {
+    return hasPersons() || isAReferenceSet();
   }
 
 

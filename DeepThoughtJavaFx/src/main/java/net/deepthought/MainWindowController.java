@@ -89,6 +89,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -114,6 +115,9 @@ public class MainWindowController implements Initializable {
 
   protected CategoryTreeItem selectedCategoryTreeItem = null;
 
+
+  @FXML
+  GridPane grdpnMainMenu;
 
   @FXML
   protected Menu mnitmFile;
@@ -303,7 +307,9 @@ public class MainWindowController implements Initializable {
         }
 
         btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
-        btnOnlineArticleExtractors.setDisable(false);
+//        btnOnlineArticleExtractors.setDisable(false);
+        btnOnlineArticleExtractors.setVisible(true);
+//        grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(btnOnlineArticleExtractors.getPrefWidth());
       }
     }
   }
@@ -425,6 +431,9 @@ public class MainWindowController implements Initializable {
     newspaperIcon.setFitHeight(20); // TODO: make icon fill button
     btnOnlineArticleExtractors.setGraphic(newspaperIcon);
     btnOnlineArticleExtractors.getItems().clear(); // remove automatically added 'Article 1' and 'Article 2'
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnOnlineArticleExtractors);
+//    grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(0);
   }
 
   private void setupTabPaneOverview() {

@@ -8,24 +8,22 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.event.CollectionItemLabelEvent;
+import net.deepthought.controls.person.PersonLabel;
 import net.deepthought.controls.reference.EntryReferenceBaseLabel;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
-import net.deepthought.data.model.ui.AllEntriesSystemTag;
 import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.FilterEntriesSearch;
-import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
 
@@ -36,21 +34,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.SetChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
@@ -60,10 +58,13 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
@@ -124,13 +125,34 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
 
   @FXML
+  protected ScrollPane pnQuickEditEntryScrollPane;
+  @FXML
   protected Pane pnQuickEditEntry;
   @FXML
   protected TextField txtfldEntryAbstract;
 
   protected EntryTagsControl currentEditedEntryTagsControl = null;
 
-  protected EntryReferenceControl currentEditedEntryReferenceControl = null;
+  @FXML
+  ScrollPane pnReferenceAndPersonsScrollPane;
+  @FXML
+  Pane pnReferenceAndPersons;
+  @FXML
+  Pane pnReference;
+  @FXML
+  Label lblReference;
+  @FXML
+  Pane pnSelectedReference;
+  @FXML
+  TextField txtfldReferenceIndication;
+//  @FXML
+//  ScrollPane pnPersonsScrollPane;
+  @FXML
+  Pane pnPersons;
+  @FXML
+  Label lblPersons;
+  @FXML
+  Pane pnSelectedPersons;
 
   @FXML
   protected HTMLEditor htmledEntryContent;
@@ -212,7 +234,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     tblvwEntries.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Entry>() {
       @Override
       public void changed(ObservableValue<? extends Entry> observable, Entry oldValue, Entry newValue) {
-        if(oldValue != null)
+        if (oldValue != null)
           oldValue.removeEntityListener(currentlyEditedEntryListener);
 
         selectedEntryChanged(newValue);
@@ -242,7 +264,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void setupQuickEditEntrySection() {
-    pnQuickEditEntry.managedProperty().bind(pnQuickEditEntry.visibleProperty());
+//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntry);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntryScrollPane);
 
     txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
       Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
@@ -262,27 +285,41 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     VBox.setMargin(currentEditedEntryTagsControl, new Insets(6, 0, 6, 0));
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
 
-    currentEditedEntryReferenceControl = new EntryReferenceControl();
-    currentEditedEntryReferenceControl.setExpanded(false);
-//    currentEditedEntryReferenceControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
-//    currentEditedEntryReferenceControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
-    VBox.setMargin(currentEditedEntryReferenceControl, new Insets(6, 0, 6, 0));
-    pnQuickEditEntry.getChildren().add(2, currentEditedEntryReferenceControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReference);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnPersons);
+
+    this.widthProperty().addListener((observable, oldValue, newValue) -> pnReferenceAndPersonsScrollPane.setPrefWidth(this.getWidth()));
+
+    final ChangeListener<? super Number> fixControlsWidthListener = (observable, oldValue, newValue) -> {
+      if(observable instanceof ReadOnlyProperty) { // set control's width to a fixed value. Otherwise dynamic layout would shrink them
+        Object bean = ((ReadOnlyProperty)observable).getBean();
+        if(bean instanceof Region) {
+          ((Region)bean).setMinWidth(newValue.doubleValue());
+          ((Region)bean).setMaxWidth(newValue.doubleValue());
+        }
+      }
+    };
+    lblReference.widthProperty().addListener(fixControlsWidthListener);
+    txtfldReferenceIndication.widthProperty().addListener(fixControlsWidthListener);
+    lblPersons.widthProperty().addListener(fixControlsWidthListener);
   }
 
   public void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {
-    pnQuickEditEntry.setVisible(showPaneQuickEditEntry);
+//    pnQuickEditEntry.setVisible(showPaneQuickEditEntry);
+    pnQuickEditEntryScrollPane.setVisible(showPaneQuickEditEntry);
 
     if(showPaneQuickEditEntry) {
-      if(splpnEntries.getItems().contains(pnQuickEditEntry) == false) {
-//      pnQuickEditEntry.setVisible(true);
-        splpnEntries.getItems().add(pnQuickEditEntry);
+//      if(splpnEntries.getItems().contains(pnQuickEditEntry) == false) {
+      if(splpnEntries.getItems().contains(pnQuickEditEntryScrollPane) == false) {
+//        splpnEntries.getItems().add(pnQuickEditEntry);
+        splpnEntries.getItems().add(pnQuickEditEntryScrollPane);
         splpnEntries.setDividerPositions(0.5);
       }
     }
     else {
-//      pnQuickEditEntry.setVisible(false);
-      splpnEntries.getItems().remove(pnQuickEditEntry);
+//      splpnEntries.getItems().remove(pnQuickEditEntry);
+      splpnEntries.getItems().remove(pnQuickEditEntryScrollPane);
       splpnEntries.setDividerPosition(0, 1);
       try {
         FXUtils.showSplitPaneDividers(splpnEntries, false);
@@ -326,17 +363,50 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     btnRemoveSelectedEntries.setDisable(selectedEntry == null);
     pnQuickEditEntry.setDisable(selectedEntry == null);
     currentEditedEntryTagsControl.setEntry(selectedEntry);
-    currentEditedEntryReferenceControl.setEntry(selectedEntry);
 
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
-      txtfldEntryAbstract.setText(selectedEntry.getAbstract());
+      txtfldEntryAbstract.setText(selectedEntry.getAbstractAsPlainText());
       htmledEntryContent.setHtmlText(selectedEntry.getContent());
       txtfldEntryAbstract.selectAll();
+
+      setPaneReferenceAndPersons(selectedEntry);
     }
     else {
       txtfldEntryAbstract.setText("");
       htmledEntryContent.setHtmlText("");
+      pnReferenceAndPersonsScrollPane.setVisible(false);
+    }
+  }
+
+  protected void setPaneReferenceAndPersons(Entry selectedEntry) {
+    pnReferenceAndPersonsScrollPane.setVisible(selectedEntry.hasPersonsOrIsAReferenceSet());
+    pnReference.setVisible(selectedEntry.isAReferenceSet());
+    pnPersons.setVisible(selectedEntry.hasPersons());
+
+    pnSelectedReference.getChildren().clear();
+    txtfldReferenceIndication.setText("");
+    pnSelectedPersons.getChildren().clear();
+
+    if(selectedEntry.isAReferenceSet()) {
+      if(selectedEntry.hasPersons())
+        pnReference.setMaxWidth(this.getWidth() * 2 / 3);
+      else
+        pnReference.setMaxWidth(this.getWidth() - 30);
+      pnSelectedReference.getChildren().add(new EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), null));
+    }
+    txtfldReferenceIndication.setText(selectedEntry.getIndication());
+
+    if(selectedEntry.hasPersons()) {
+      pnReferenceAndPersonsScrollPane.setMinHeight(55);
+      for(Person person : selectedEntry.getPersons()) {
+        final PersonLabel label = new PersonLabel(person);
+        pnSelectedPersons.getChildren().add(label);
+        HBox.setMargin(label, new Insets(0, 6, 0, 0));
+      }
+    }
+    else {
+      pnReferenceAndPersonsScrollPane.setMinHeight(40);
     }
   }
 
