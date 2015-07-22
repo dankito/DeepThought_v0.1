@@ -4,12 +4,8 @@ import com.sun.javafx.scene.web.skin.HTMLEditorSkin;
 import com.sun.javafx.webkit.Accessor;
 import com.sun.webkit.WebPage;
 
-import net.deepthought.controls.FXUtils;
-import net.deepthought.util.StringUtils;
-
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -122,7 +118,7 @@ public class DeepThoughtHTMLEditor extends HTMLEditor {
   protected void setWebView(WebView webView) {
     this.webView = webView;
     this.webPage = Accessor.getPageFor(webView.getEngine());
-    executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
+//    executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
   }
 
   protected void setFormatComboBox(ComboBox comboBox) {
@@ -135,13 +131,13 @@ public class DeepThoughtHTMLEditor extends HTMLEditor {
 
   protected void setFontSizeComboBox(ComboBox comboBox) {
     fontSizeComboBox = comboBox;
-    fontSizeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-      if (resources.getString("small").equals(newValue) && FXUtils.htmlTextIsNullOrEmptyOrHasHtmlEditorDefaultText(this)) {
-        executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
-        fontSizeComboBox.setValue(resources.getString("extraSmall"));
-        executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
-      }
-    });
+//    fontSizeComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//      if (resources.getString("small").equals(newValue) && FXUtils.htmlTextIsNullOrEmptyOrHasHtmlEditorDefaultText(this)) {
+//        executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
+//        fontSizeComboBox.setValue(resources.getString("extraSmall"));
+//        executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
+//      }
+//    });
 
 //    Platform.runLater(() -> {
 //      executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
@@ -155,7 +151,7 @@ public class DeepThoughtHTMLEditor extends HTMLEditor {
 //    setPrefHeight(150);
     setMaxHeight(Double.MAX_VALUE);
 
-    executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
+//    executeCommand(FONT_SIZE_COMMAND, resources.getString("extraSmall"));
     setStyle(getStyle() + " -fx-font: 11 arial;");
   }
 

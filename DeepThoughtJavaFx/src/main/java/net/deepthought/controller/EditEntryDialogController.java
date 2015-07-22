@@ -184,8 +184,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void setupControls() {
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnApplyChanges);
-
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
@@ -294,8 +292,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void setEntryValues(final Entry entry) {
-    btnApplyChanges.setVisible(entry.isPersisted());
-
 //    txtfldTitle.setText(entry.getTitle());
 
 
@@ -315,6 +311,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryReferenceControl.setExpanded(entry.isAReferenceSet() == false);
 
     fieldsWithUnsavedChanges.clear();
+
+    btnApplyChanges.setDisable(entry.isPersisted() == true || entry.hasContent() == false); // e.g. for new Entries created by a ContentExtractor: User should be able to save them immediately by clicking on 'Apply'
 
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
@@ -443,6 +441,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryCategories);
     }
+
+    if(fieldsWithUnsavedChanges.size() > 0) {
+      log.warn("We're at end of () method an  still contains unsaved fields:");
+      for(FieldWithUnsavedChanges field : fieldsWithUnsavedChanges)
+        log.warn("" + field);
+    }
+    // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
+    btnApplyChanges.setDisable(true);
   }
 
   protected void askIfStageShouldBeClosed(WindowEvent event) {

@@ -164,6 +164,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryTitleColumnName, previousTitle, title);
   }
 
+  public boolean hasAbstract() {
+    return StringUtils.isNotNullOrEmpty(getAbstractAsPlainText());
+  }
+
   public String getAbstract() {
     return abstractString;
   }
@@ -187,8 +191,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
   }
 
-  public boolean hasAbstract() {
-    return StringUtils.isNotNullOrEmpty(getAbstractAsPlainText());
+  public boolean hasContent() {
+    return StringUtils.isNotNullOrEmpty(getContentAsPlainText());
   }
 
   public String getContent() {

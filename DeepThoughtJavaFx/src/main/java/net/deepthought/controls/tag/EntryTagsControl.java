@@ -223,8 +223,6 @@ public class EntryTagsControl extends TitledPane {
         pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60);
     });
     lblTags.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
-
-    FXUtils.setBackgroundToColor(pnSelectedTagsPreview, Color.ORANGE);
   }
 
   protected void showEntryTags(Entry entry) {
