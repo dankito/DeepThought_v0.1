@@ -197,6 +197,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
+    ttldpnAbstract.setExpanded(false);
+
     htmledAbstract = new DeepThoughtHTMLEditor();
     ttldpnAbstract.setContent(htmledAbstract);
     FXUtils.addHtmlEditorTextChangedListener(htmledAbstract, editor -> {
@@ -236,13 +238,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
     paneTagsAndCategories.getChildren().add(entryCategoriesControl);
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
+    entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
     contentPane.getChildren().add(entryReferenceControl);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setPrefHeight(250);
-    entryPersonsControl.setExpanded(true);
+    entryPersonsControl.setExpanded(false);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
@@ -277,6 +280,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
 //    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    entryReferenceControl.setVisible(entry.isAReferenceSet() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryPersonsControl.setVisible(entry.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
@@ -296,6 +300,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
     htmledAbstract.setHtmlText(entry.getAbstract());
+    ttldpnAbstract.setExpanded(entry.hasAbstract());
 
     htmledContent.setHtmlText(entry.getContent());
     // TODO: check which Content format Content has
@@ -487,11 +492,16 @@ public class EditEntryDialogController extends ChildWindowsController implements
     hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
   }
 
-  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
+  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, final Node nodeToShowOnClick, String menuItemText) {
     MenuItem titleMenuItem = new MenuItem();
     JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
     hiddenFieldsMenu.getItems().add(titleMenuItem);
-    titleMenuItem.setOnAction(event -> nodeToShowOnClick.setVisible(true));
+    titleMenuItem.setOnAction(event -> {
+      nodeToShowOnClick.setVisible(true);
+
+      if(nodeToShowOnClick instanceof TitledPane)
+        ((TitledPane)nodeToShowOnClick).setExpanded(true);
+    });
   }
 
 

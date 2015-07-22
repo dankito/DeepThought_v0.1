@@ -27,7 +27,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
   protected DialogsFieldsDisplay dialogsFieldsDisplay = DialogsFieldsDisplay.ShowImportantOnes;
 
-  protected boolean showCategories = true;
+  protected boolean showCategories = false;
 
   protected boolean showQuickEditEntryPane = false;
 

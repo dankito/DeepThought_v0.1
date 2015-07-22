@@ -187,6 +187,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
   }
 
+  public boolean hasAbstract() {
+    return StringUtils.isNotNullOrEmpty(getAbstractAsPlainText());
+  }
+
   public String getContent() {
     return content;
   }
