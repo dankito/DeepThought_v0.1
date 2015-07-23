@@ -19,7 +19,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,27 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtractorBase {
+public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBase {
 
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheContentExtractor.class);
 
-  @Override
-  public String getNewspaperName() {
-    return "SZ";
-  }
+  // TODO: Improve architecture so that calls for Article extraction of SZ Magazin articles land here
+  protected SueddeutscheMagazinContentExtractor sueddeutscheMagazinContentExtractor = new SueddeutscheMagazinContentExtractor();
 
-  @Override
-  public String getIconUrl() {
-    try {
-      URL url = SueddeutscheContentExtractor.class.getClassLoader().getResource("sz_icon.png");
-      return url.toExternalForm();
-      //return url.toString();
-    } catch(Exception ex) {
-      log.error("Could not load sz_icon.png from Resources", ex);
-    }
-
-    return super.getIconUrl();
-  }
 
   @Override
   public boolean hasArticlesOverview() {
@@ -62,11 +47,6 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
   }
 
   @Override
-  public String getSiteBaseUrl() {
-    return "Sueddeutsche.de";
-  }
-
-  @Override
   public boolean canCreateEntryFromUrl(String url) {
     return url.startsWith("http://www.sueddeutsche.de/") || url.startsWith("https://www.sueddeutsche.de/") /*|| url.startsWith("http://sz-magazin.sueddeutsche.de/")*/;
   }
@@ -74,6 +54,9 @@ public class SueddeutscheContentExtractor extends OnlineNewspaperContentExtracto
 
   @Override
   public EntryCreationResult createEntryFromArticle(String articleUrl) {
+    if(sueddeutscheMagazinContentExtractor.canCreateEntryFromUrl(articleUrl))
+      return sueddeutscheMagazinContentExtractor.createEntryFromArticle(articleUrl);
+
     if(articleUrl.contains("?reduced=true"))
       articleUrl = articleUrl.replace("?reduced=true", "");
     return super.createEntryFromArticle(articleUrl);

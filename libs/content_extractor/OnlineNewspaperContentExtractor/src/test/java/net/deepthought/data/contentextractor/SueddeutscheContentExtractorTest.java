@@ -206,4 +206,15 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
     // in order to do so: save HTML code of Sueddeutsche front page and parse that site
     // for checking if parsing is still appropriate for current Sueddeutsche web page of course also add online parsing with checks like these ones
   }
+
+  @Test
+  public void testIfSzMagazinArticleUrlGetsRedirectedCorrectly() {
+    EntryCreationResult result = contentExtractor.createEntryFromArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43365");
+
+    Assert.assertTrue(result.successful());
+    Assert.assertNotNull(result.getCreatedEntry());
+    testImportedArticleValues(result.getCreatedEntry(), 3200, "22.07.2015", "Druckluft", "Nummer Eins der Woche",
+        "Der Laden, in dem sich die Leute am liebsten aufhalten, ist laut einer aktuellen Umfrage: die Buchhandlung. Und die Gelegenheit, bei der die Leute am liebsten lügen, ist erfahrungsgemäß: die Umfrage.");
+  }
+
 }
