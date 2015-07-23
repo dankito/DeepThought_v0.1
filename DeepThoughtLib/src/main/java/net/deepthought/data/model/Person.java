@@ -2,6 +2,7 @@ package net.deepthought.data.model;
 
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,11 +235,26 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
 
     representation += getLastName();
 
-    if(firstName != null && firstName.isEmpty() == false) {
+    if(StringUtils.isNotNullOrEmpty(firstName)) {
       if(representation.length() > 0)
         representation += ", ";
 
       representation += firstName;
+    }
+
+    return representation;
+  }
+
+  public String getNameRepresentationStartingWithFirstName() {
+    String representation = "";
+
+    representation += getFirstName();
+
+    if(StringUtils.isNotNullOrEmpty(lastName)) {
+      if(representation.length() > 0)
+        representation += " ";
+
+      representation += lastName;
     }
 
     return representation;

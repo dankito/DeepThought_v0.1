@@ -17,6 +17,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
+import javafx.css.Styleable;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -25,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -384,6 +386,22 @@ public class FXUtils {
     } else {
       return comboBox.getItems().get(comboBox.getSelectionModel().getSelectedIndex());
     }
+  }
+
+  public static void addStyleToCurrentStyle(Node node, String styleToAdd) {
+    String style = addStyleToCurrentStyleString(node, styleToAdd);
+    node.setStyle(style);
+  }
+
+  public static void addStyleToCurrentStyle(MenuItem item, String styleToAdd) {
+    String style = addStyleToCurrentStyleString(item, styleToAdd);
+    item.setStyle(style);
+  }
+
+  protected static String addStyleToCurrentStyleString(Styleable styleable, String styleToAdd) {
+    String style = styleable.getStyle();
+    style = style == null ? styleToAdd : style + " " + styleToAdd;
+    return style;
   }
 
   public static class DoesItemMatchSearchTermParam<T> {

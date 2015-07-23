@@ -6,19 +6,33 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 /**
  * Created by ganymed on 30/11/14.
  */
 public abstract class CollectionItemLabel extends HBox {
+
+  protected final static Background DefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
+
+  protected final static Background MouseOverBackground = new Background(new BackgroundFill(CreateEntryFromClipboardContentPopup.BackgroundColor, new CornerRadii(4), new Insets(0)));
+
 
   protected Button btnRemoveItemFromCollection;
   protected Label lblItemName;
@@ -40,6 +54,16 @@ public abstract class CollectionItemLabel extends HBox {
 
   protected void setupItemLabel() {
     setAlignment(Pos.CENTER_LEFT);
+    this.setPrefHeight(36);
+    this.setMaxHeight(36);
+    this.setBackground(DefaultBackground);
+    this.hoverProperty().addListener((observable, oldValue, newValue) -> { // set a hover effect
+      if(newValue == true)
+        setBackground(MouseOverBackground);
+      else
+        setBackground(DefaultBackground);
+    });
+    this.setCursor(Cursor.HAND);
     FlowPane.setMargin(this, new Insets(0, 6, 0, 0));
 
     btnRemoveItemFromCollection = new Button("x");

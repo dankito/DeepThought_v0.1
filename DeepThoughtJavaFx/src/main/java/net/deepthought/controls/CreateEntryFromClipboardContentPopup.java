@@ -60,6 +60,8 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   private final static Logger log = LoggerFactory.getLogger(CreateEntryFromClipboardContentPopup.class);
 
+  public final static Color BackgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
+
   protected final static Background OptionMouseOverBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(0)));
 
 
@@ -100,12 +102,12 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     setMaxWidth(stageToShowIn.getWidth() - 12);
 
     contentPane = new VBox(0);
-    Color backgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
+//    Color backgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
 //    Color backgroundColor = Color.GOLDENROD.deriveColor(0, 1.0, 1.0, 0.3);
 //    Color backgroundColor = Color.LAWNGREEN.deriveColor(0, 1.0, 1.0, 0.15);
 //    Color backgroundColor = Color.DARKGREEN.deriveColor(0, 1.0, 1.0, 0.95);
 //    Color backgroundColor = Color.LIMEGREEN.deriveColor(0, 1.0, 1.0, 0.95);
-    contentPane.setBackground(new Background(new BackgroundFill(backgroundColor, new CornerRadii(8), new Insets(4))));
+    contentPane.setBackground(new Background(new BackgroundFill(BackgroundColor, new CornerRadii(8), new Insets(4))));
     getScene().setRoot(contentPane);
 
     hidePopupButton = new Button("x");

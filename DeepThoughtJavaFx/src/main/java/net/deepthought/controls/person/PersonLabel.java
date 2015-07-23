@@ -1,11 +1,22 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.CollectionItemLabel;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.ClipboardHelper;
+import net.deepthought.util.Localization;
 
 import java.util.Collection;
+
+import javafx.geometry.Side;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -14,11 +25,16 @@ public class PersonLabel extends CollectionItemLabel {
 
   protected Person person;
 
+  protected ContextMenu contextMenu = null;
+
 
   public PersonLabel(Person person) {
     this.person = person;
 
     person.addEntityListener(personListener);
+
+    this.setOnMousePressed(event -> onMousePressedOrReleased(event));
+    this.setOnMouseReleased(event -> onMousePressedOrReleased(event));
 
     setUserData(person);
     itemDisplayNameUpdated();
@@ -29,6 +45,56 @@ public class PersonLabel extends CollectionItemLabel {
     if(person != null)
       return person.getNameRepresentation();
     return "";
+  }
+
+  @Override
+  protected String getToolTipText() {
+    if(person != null)
+      return person.getNameRepresentationStartingWithFirstName();
+    return "";
+  }
+
+  protected void onMousePressedOrReleased(MouseEvent event) {
+    if(event.isPopupTrigger())
+      showContextMenu();
+  }
+
+  @Override
+  protected void onLabelClickedAction(MouseEvent event) {
+    super.onLabelClickedAction(event);
+
+    if(onLabelClickedEventHandler == null) {
+      if(event.getButton() == MouseButton.PRIMARY) {
+        if(event.getClickCount() == 1)
+          Dialogs.showEditPersonDialog(this.person);
+      }
+      else if(event.isPopupTrigger())
+        showContextMenu();
+    }
+  }
+
+  protected void showContextMenu() {
+    if(contextMenu == null)
+      contextMenu = createContextMenu();
+
+    contextMenu.show(this, Side.BOTTOM, 0, 0);
+  }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    MenuItem editMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("edit"));
+    FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
+    editMenuItem.setOnAction(event -> Dialogs.showEditPersonDialog(this.person));
+    contextMenu.getItems().add(editMenuItem);
+
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("copy.person.text.to.clipboard"));
+    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getToolTipText()));
+    contextMenu.getItems().add(copyReferenceTextMenuItem);
+
+    return contextMenu;
   }
 
 

@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeSet;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyProperty;
@@ -399,7 +400,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     if(selectedEntry.hasPersons()) {
       pnReferenceAndPersonsScrollPane.setMinHeight(55);
-      for(Person person : selectedEntry.getPersons()) {
+      for(Person person : new TreeSet<>(selectedEntry.getPersons())) {
         final PersonLabel label = new PersonLabel(person);
         pnSelectedPersons.getChildren().add(label);
         HBox.setMargin(label, new Insets(0, 6, 0, 0));
