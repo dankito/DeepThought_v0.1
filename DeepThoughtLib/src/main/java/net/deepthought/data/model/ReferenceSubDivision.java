@@ -178,6 +178,11 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.ReferenceSubDivisionDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
 
   @Override
   @Transient

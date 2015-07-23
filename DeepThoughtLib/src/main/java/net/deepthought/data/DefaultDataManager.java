@@ -284,6 +284,9 @@ public class DefaultDataManager implements IDataManager {
     entity.addEntityListener(entityListener); // add a listener to every Entity so that it's changes can be tracked
     if (entity.isPersisted() == false)
       entityCreated(entity);
+    else // TODO: bad solution but needed if e.g. a new Reference and ReferenceSubDivision have been created. On Reference persist also its ReferenceSubDivision gets persisted,
+    // but SubDivision's deepThought is still null. After adding SubDivision to DeepThought isPersisted() is true so just set DeepThought on SubDivision won't be saved. Therefore call update() on Entity
+      entityUpdated(entity);
     callEntityCreatedListeners(entity);
   }
 

@@ -90,6 +90,12 @@ public class Note extends UserDataEntity {
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.NoteDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   @Override
   @Transient

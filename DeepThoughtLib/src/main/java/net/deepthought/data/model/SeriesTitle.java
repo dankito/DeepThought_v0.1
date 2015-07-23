@@ -169,6 +169,12 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.SeriesTitleDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   @Override
   public String toString() {

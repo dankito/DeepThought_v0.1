@@ -252,6 +252,12 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.ReferenceDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   protected transient String preview = null;
 

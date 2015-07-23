@@ -112,6 +112,12 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.TagDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
   @Override
   public int compareTo(Tag other) {
     return name.toLowerCase().compareTo(other.getName().toLowerCase());

@@ -180,6 +180,12 @@ public class FileLink extends UserDataEntity implements Serializable {
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.FileLinkDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   @Transient
   public String getTextRepresentation() {

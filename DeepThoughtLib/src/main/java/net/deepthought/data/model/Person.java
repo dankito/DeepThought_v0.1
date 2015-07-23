@@ -227,6 +227,16 @@ public class Person extends UserDataEntity implements Serializable, Comparable<P
     }
   }
 
+  public DeepThought getDeepThought() {
+    return deepThought;
+  }
+
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.PersonDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
 
   @Transient

@@ -212,6 +212,12 @@ public class Category extends UserDataEntity {
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.CategoryDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   protected transient Comparator<Entry> entriesByIndexComparator = new Comparator<Entry>() {
     @Override

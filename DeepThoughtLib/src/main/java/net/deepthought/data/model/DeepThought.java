@@ -163,7 +163,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   
   public boolean addCategory(Category category) {
     if(categories.add(category)) {
-      category.deepThought = this;
+      category.setDeepThought(this);
       if(category.getParentCategory() == null && category.equals(topLevelCategory) == false)
         topLevelCategory.addSubCategory(category);
 
@@ -191,7 +191,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       }
       category.subCategories.clear();
 
-      category.deepThought = null;
+      category.setDeepThought(null);
 
       callEntityRemovedListeners(categories, category);
       return true;
@@ -220,7 +220,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       ((List) entries).add(0, entry);
     else
       entries.add(entry);
-    entry.deepThought = this;
+    entry.setDeepThought(this);
 
     // TODO: why not adding entry to TopLevelCategory? -> because then it's displayed everywhere that Entry belongs to Category 'Ich weiss dass ich nichts weiss'
 //      if(entry.getCategories() == null)
@@ -235,7 +235,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeEntry(Entry entry) {
     if(entries.remove(entry)) {
-      entry.deepThought = null;
+      entry.setDeepThought(null);
       if(entry.getParentEntry() != null)
         entry.getParentEntry().removeSubEntry(entry);
 
@@ -292,7 +292,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addTag(Tag tag) {
     if(tags.add(tag)) {
-      tag.deepThought = this;
+      tag.setDeepThought(this);
 
       if(sortedTags != null)
         sortedTags.add(tag);
@@ -306,7 +306,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeTag(Tag tag) {
     if(tags.remove(tag)) {
-      tag.deepThought = null;
+      tag.setDeepThought(null);
 
       for(Entry entry : new ArrayList<>(tag.getEntries()))
         entry.removeTag(tag);
@@ -439,7 +439,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public boolean addPerson(Person person) {
     personsSorted = null;
     if(persons.add(person)) {
-      person.deepThought = this;
+      person.setDeepThought(this);
 
       callEntityAddedListeners(persons, person);
       return true;
@@ -455,7 +455,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
         entry.removePerson(person);
       }
 
-      person.deepThought = null;
+      person.setDeepThought(null);
 
       callEntityRemovedListeners(persons, person);
       return true;
@@ -481,7 +481,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addSeriesTitle(SeriesTitle seriesTitle) {
     if(seriesTitles.add(seriesTitle)) {
-      seriesTitle.deepThought = this;
+      seriesTitle.setDeepThought(this);
       seriesTitlesSorted = null;
 
       callEntityAddedListeners(seriesTitles, seriesTitle);
@@ -498,7 +498,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       for(Reference reference : new ArrayList<>(seriesTitle.getSerialParts()))
         reference.setSeries(null);
 
-      seriesTitle.deepThought = null;
+      seriesTitle.setDeepThought(null);
       seriesTitlesSorted = null;
 
       callEntityRemovedListeners(seriesTitles, seriesTitle);
@@ -525,7 +525,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addReference(Reference reference) {
     if(references.add(reference)) {
-      reference.deepThought = this;
+      reference.setDeepThought(this);
       referencesSorted = null;
 
       callEntityAddedListeners(references, reference);
@@ -547,7 +547,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
       referencesSorted = null;
       reference.setSeries(null);
-      reference.deepThought = null;
+      reference.setDeepThought(null);
 
       callEntityRemovedListeners(references, reference);
       return true;
@@ -572,7 +572,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addReferenceSubDivision(ReferenceSubDivision subDivision) {
     if(referenceSubDivisions.add(subDivision)) {
-      subDivision.deepThought = this;
+      subDivision.setDeepThought(this);
 
       callEntityAddedListeners(referenceSubDivisions, subDivision);
       return true;
@@ -593,7 +593,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       for(ReferenceSubDivision subSubDivision : new ArrayList<>(subDivision.getSubDivisions()))
         removeReferenceSubDivision(subSubDivision);
 
-      subDivision.deepThought = null;
+      subDivision.setDeepThought(null);
 
       callEntityRemovedListeners(referenceSubDivisions, subDivision);
       return true;
@@ -609,7 +609,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addNote(Note note) {
     if(notes.add(note)) {
-      note.deepThought = this;
+      note.setDeepThought(this);
 
       callEntityAddedListeners(notes, note);
       return true;
@@ -620,7 +620,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeNote(Note note) {
     if(notes.remove(note)) {
-      note.deepThought = null;
+      note.setDeepThought(null);
 
       callEntityRemovedListeners(notes, note);
       return true;
@@ -635,7 +635,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean addFile(FileLink file) {
     if(files.add(file)) {
-      file.deepThought = this;
+      file.setDeepThought(this);
 
       callEntityAddedListeners(files, file);
       return true;
@@ -646,7 +646,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeFile(FileLink file) {
     if(files.remove(file)) {
-      file.deepThought = null;
+      file.setDeepThought(null);
       for(Entry entry : new ArrayList<>(file.getEntries()))
         file.removeEntry(entry);
       for(ReferenceBase referenceBase : new ArrayList<>(file.getReferenceBases()))

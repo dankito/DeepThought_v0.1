@@ -687,6 +687,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return deepThought;
   }
 
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.ReferenceSubDivisionDeepThoughtJoinColumnName, previousValue, deepThought);
+  }
+
 
   public int getEntryIndex() {
     return entryIndex;
