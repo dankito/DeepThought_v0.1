@@ -512,22 +512,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     // TODO: also check if a previously set Entity now has been unset
 
     // TODO: save async while closing the dialog? Would make Dialog closing faster
-    if(hasReferenceBeenEdited()) {
-      editedReferenceBase = reference;
-      if (reference.isPersisted() == false) { // a new Reference
-        Application.getDeepThought().addReference(reference);
-        if (persistedParentReferenceBase instanceof SeriesTitle)
-          ((SeriesTitle) persistedParentReferenceBase).addSerialPart(reference);
-      }
-
-      saveEditedFieldsOnReference();
-    }
-
     if(hasSeriesTitleBeenEdited()) {
       if (seriesTitle.isPersisted() == false) { // a new SeriesTitle
         Application.getDeepThought().addSeriesTitle(seriesTitle);
-        if(reference.isPersisted())
-          reference.setSeries(seriesTitle);
       }
 
       saveEditedFieldsOnSeriesTitle();
@@ -536,14 +523,32 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         editedReferenceBase = seriesTitle;
     }
 
+    if(hasReferenceBeenEdited()) {
+      if (reference.isPersisted() == false) { // a new Reference
+        Application.getDeepThought().addReference(reference);
+//        if (persistedParentReferenceBase instanceof SeriesTitle) // is this really needed or are the two lines below sufficient
+//          ((SeriesTitle) persistedParentReferenceBase).addSerialPart(reference);
+        if(seriesTitle.isPersisted())
+          reference.setSeries(seriesTitle);
+      }
+
+      saveEditedFieldsOnReference();
+
+      if(editedReferenceBase == null)
+        editedReferenceBase = reference;
+    }
+
     if(hasReferenceSubDivisionBeenEdited()) {
-      editedReferenceBase = referenceSubDivision;
       if (referenceSubDivision.isPersisted() == false) { // a new ReferenceSubDivision
+        Application.getDeepThought().addReferenceSubDivision(referenceSubDivision);
         if(reference.isPersisted())
           reference.addSubDivision(referenceSubDivision);
       }
 
       saveEditedFieldsOnReferenceSubDivision();
+
+      if(editedReferenceBase == null)
+        editedReferenceBase = referenceSubDivision;
     }
 
     closeDialog();
@@ -1065,6 +1070,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       }
       else if(persistedParentReferenceBase instanceof Reference) {
         this.reference = (Reference)persistedParentReferenceBase;
+        this.seriesTitle = reference.getSeries();
         nodeToFocus = txtfldReferenceSubDivisionTitle;
       }
     }

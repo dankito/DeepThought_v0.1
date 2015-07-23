@@ -347,19 +347,28 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void saveEntry() {
-    if(entry.getSeries() != null && entry.getSeries().isPersisted() == false)
-      Application.getDeepThought().addSeriesTitle(entry.getSeries());
-
-    if(entry.getReference() != null && entry.getReference().isPersisted() == false)
-      Application.getDeepThought().addReference(entry.getReference());
-
-    if(entry.getReferenceSubDivision() != null && entry.getReferenceSubDivision().isPersisted() == false)
-      Application.getDeepThought().addReferenceSubDivision(entry.getReferenceSubDivision());
-
-    if(entry.isPersisted() == false) // a new entry
-      Application.getDeepThought().addEntry(entry);
+    persistEntitiesIfNecessary();
 
     saveEditedFieldsOnEntry();
+  }
+
+  protected void persistEntitiesIfNecessary() {
+    boolean isSeriesUnPersisted = entry.getSeries() != null && entry.getSeries().isPersisted() == false;
+    boolean isReferenceUnPersisted = entry.getReference() != null && entry.getReference().isPersisted() == false;
+    boolean isReferenceSubDivisionUnPersisted = entry.getReferenceSubDivision() != null && entry.getReferenceSubDivision().isPersisted() == false;
+    boolean isEntryUnPersisted = entry.isPersisted() == false;
+
+    if(isSeriesUnPersisted)
+      Application.getDeepThought().addSeriesTitle(entry.getSeries());
+
+    if(isReferenceUnPersisted)
+      Application.getDeepThought().addReference(entry.getReference());
+
+    if(isReferenceSubDivisionUnPersisted)
+      Application.getDeepThought().addReferenceSubDivision(entry.getReferenceSubDivision());
+
+    if(isEntryUnPersisted) // a new entry
+      Application.getDeepThought().addEntry(entry);
   }
 
   protected void saveEditedFieldsOnEntry() {
