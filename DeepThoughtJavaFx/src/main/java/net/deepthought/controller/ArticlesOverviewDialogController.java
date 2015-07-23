@@ -2,8 +2,8 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.articlesoverview.OverviewItemListCell;
-import net.deepthought.controls.person.PersonListCell;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
@@ -18,22 +18,22 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 /**
  * Created by ganymed on 17/07/15.
@@ -47,6 +47,11 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   protected ObservableSet<ArticlesOverviewItem> selectedItems = FXCollections.observableSet();
 
+
+  @FXML
+  protected Pane pnTopBar;
+  @FXML
+  protected Button btnUpdateArticlesOverview;
 
   @FXML
   protected ListView<ArticlesOverviewItem> lstvwArticleOverviewItems;
@@ -67,6 +72,8 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
   }
 
   protected void setupControls() {
+    btnUpdateArticlesOverview.setGraphic(new ImageView(Constants.UpdateIconPath));
+
     lstvwArticleOverviewItems.setCellFactory((listView) -> {
       final OverviewItemListCell cell = new OverviewItemListCell(selectedItems);
       cell.setItemSelectionChangedEventHandler((item, isSelected) -> itemSelectionChanged(item, isSelected));
@@ -81,10 +88,21 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     this.articleContentExtractor = articleContentExtractor;
     dialogStage.setTitle(articleContentExtractor.getSiteBaseUrl());
 
-    articleContentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
+    getArticlesOverview();
+  }
+
+  protected void getArticlesOverview() {
+    final AtomicBoolean articlesOverviewUpdateStarted = new AtomicBoolean(true);
+
+    this.articleContentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
       public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final Collection<ArticlesOverviewItem> items, boolean isDone) {
         Platform.runLater(() -> {
+          if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
+            articlesOverviewUpdateStarted.set(false);
+            lstvwArticleOverviewItems.getItems().clear();
+          }
+
           addOverviewItemsToListView(items);
         });
       }
@@ -114,6 +132,11 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
         extractEntryAndShowInEditEntryDialog(item);
       }
     }
+  }
+
+  @FXML
+  public void handleButtonUpdateArticlesOverviewAction(ActionEvent actionEvent) {
+    getArticlesOverview();
   }
 
   @FXML
