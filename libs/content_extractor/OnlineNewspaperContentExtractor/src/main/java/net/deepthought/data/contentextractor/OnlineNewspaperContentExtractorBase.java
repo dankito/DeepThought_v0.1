@@ -15,7 +15,9 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleContentExtractorBase {
 
@@ -134,6 +136,10 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
       return element.ownText();
 
     return "";
+  }
+
+  protected String formatDateToDeepThoughtDateString(Date parsedDate) {
+    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
   }
 
 }

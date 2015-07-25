@@ -213,8 +213,18 @@ public class SueddeutscheContentExtractorTest extends OnlineNewspaperContentExtr
 
     Assert.assertTrue(result.successful());
     Assert.assertNotNull(result.getCreatedEntry());
-    testImportedArticleValues(result.getCreatedEntry(), 3200, "22.07.2015", "Druckluft", "Nummer Eins der Woche",
+    testImportedArticleValues(result.getCreatedEntry(), 3179, "22.07.2015", "Der Laden, in dem sich die Leute am liebsten aufhalten, ist laut einer aktuellen Umfrage: die Buchhandlung.", "Druckluft",
         "Der Laden, in dem sich die Leute am liebsten aufhalten, ist laut einer aktuellen Umfrage: die Buchhandlung. Und die Gelegenheit, bei der die Leute am liebsten lügen, ist erfahrungsgemäß: die Umfrage.");
+  }
+
+  @Test
+  public void testIfJetztArticleUrlGetsRedirectedCorrectly() {
+    EntryCreationResult result = contentExtractor.createEntryFromArticle("http://jetzt.sueddeutsche.de/texte/anzeigen/593621/Arbeit-schlaegt-Studium");
+
+    Assert.assertTrue(result.successful());
+    Assert.assertNotNull(result.getCreatedEntry());
+    testImportedArticleValues(result.getCreatedEntry(), 4934, "09.07.2015", "Arbeit schlägt Studium!", "",
+        "Das Studium ist die beste Zeit des Lebens - diesen Satz hört man ziemlich oft. Dabei ist das totaler Quatsch. Richtig gut wird es erst, wenn man arbeitet.");
   }
 
 }

@@ -116,7 +116,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     if(articleDateTimeElement != null) {
       Date publishingDate = parseZeitDateTimeFormat(articleDateTimeElement.html());
       if(publishingDate != null)
-        publishingDateString = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
+        publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
     }
 
     Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);

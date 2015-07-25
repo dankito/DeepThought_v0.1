@@ -203,7 +203,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
   protected String tryToParseSueddeutscheMagazinPublishingDate(String publishingDate) {
     try {
       Date parsedDate = sueddeutscheMagazinDateFormat.parse(publishingDate);
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+      return formatDateToDeepThoughtDateString(parsedDate);
     } catch(Exception ex) { log.error("Could not parse Sueddeutsche Magazin Date " + publishingDate, ex); }
     return "";
   }

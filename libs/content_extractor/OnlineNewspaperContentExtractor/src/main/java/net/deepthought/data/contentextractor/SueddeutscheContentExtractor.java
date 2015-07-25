@@ -33,7 +33,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheContentExtractor.class);
 
   // TODO: Improve architecture so that calls for Article extraction of SZ Magazin articles land here
-  protected SueddeutscheMagazinContentExtractor sueddeutscheMagazinContentExtractor = new SueddeutscheMagazinContentExtractor();
+  protected SueddeutscheMagazinContentExtractor szMagazinContentExtractor = new SueddeutscheMagazinContentExtractor();
+
+  protected SueddeutscheJetztContentExtractor jetztContentExtractor = new SueddeutscheJetztContentExtractor();
 
 
   @Override
@@ -54,8 +56,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   @Override
   public EntryCreationResult createEntryFromArticle(String articleUrl) {
-    if(sueddeutscheMagazinContentExtractor.canCreateEntryFromUrl(articleUrl))
-      return sueddeutscheMagazinContentExtractor.createEntryFromArticle(articleUrl);
+    if(szMagazinContentExtractor.canCreateEntryFromUrl(articleUrl))
+      return szMagazinContentExtractor.createEntryFromArticle(articleUrl);
+    else if(jetztContentExtractor.canCreateEntryFromUrl(articleUrl))
+      return jetztContentExtractor.createEntryFromArticle(articleUrl);
 
     if(articleUrl.contains("?reduced=true"))
       articleUrl = articleUrl.replace("?reduced=true", "");
@@ -372,7 +376,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   protected String parseSueddeutscheHeaderDate(String datetime) {
     try {
       Date parsedDate = sueddeutscheHeaderDateFormat.parse(datetime);
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+      return formatDateToDeepThoughtDateString(parsedDate);
     } catch(Exception ex) { log.error("Could not parse Sueddeutsche Header Date " + datetime, ex); }
     return "";
   }

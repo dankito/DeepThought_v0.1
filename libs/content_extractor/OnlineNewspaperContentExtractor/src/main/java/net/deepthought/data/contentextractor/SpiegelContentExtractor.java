@@ -182,7 +182,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
 
     String publishingDateString = "";
     if(publishingDate != null)
-      publishingDateString = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
+      publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
 
     Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);
 

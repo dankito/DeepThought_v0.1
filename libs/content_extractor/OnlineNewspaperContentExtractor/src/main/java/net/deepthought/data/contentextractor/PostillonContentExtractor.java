@@ -6,7 +6,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -141,7 +140,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
   protected String parsePostillionDateFormat(String articleDate) {
     try {
       Date parsedDate = debugpostillionDateFormat.parse(articleDate);
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+      return formatDateToDeepThoughtDateString(parsedDate);
     } catch(Exception ex) { log.error("Could not parse Postillion DateTime Format " + articleDate, ex); }
 
     int indexOfComma = articleDate.indexOf(',') + 1;
@@ -150,7 +149,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
     try {
       Date parsedDate = postillionDateFormat.parse(articleDate);
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+      return formatDateToDeepThoughtDateString(parsedDate);
     } catch(Exception ex) { log.error("Could not parse Postillion DateTime Format " + articleDate, ex); }
 
     return null;
