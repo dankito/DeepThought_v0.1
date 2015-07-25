@@ -54,8 +54,8 @@ public abstract class CollectionItemLabel extends HBox {
 
   protected void setupItemLabel() {
     setAlignment(Pos.CENTER_LEFT);
-    this.setPrefHeight(36);
-    this.setMaxHeight(36);
+    this.setMinHeight(22);
+    this.setMaxHeight(22);
     this.setBackground(DefaultBackground);
     this.hoverProperty().addListener((observable, oldValue, newValue) -> { // set a hover effect
       if(newValue == true)

@@ -8,14 +8,14 @@
 
 <fx:root animated="false" maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <HBox fx:id="pnPersonsGraphic" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="25.0">
+      <HBox fx:id="pnPersonsGraphic" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="22.0">
          <children>
-            <Label minHeight="25.0" text="%persons">
+            <Label text="%persons">
                <HBox.margin>
                   <Insets right="6.0" />
                </HBox.margin>
             </Label>
-            <VBox fx:id="pnSelectedPersonsPreview" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
+            <FlowPane fx:id="pnSelectedPersonsPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" vgap="2.0" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </graphic>

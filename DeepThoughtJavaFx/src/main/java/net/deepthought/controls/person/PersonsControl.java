@@ -77,7 +77,7 @@ public abstract class PersonsControl extends TitledPane {
   @FXML
   protected Pane pnPersonsGraphic;
   @FXML
-  protected VBox pnSelectedPersonsPreview;
+  protected Pane pnSelectedPersonsPreview;
   @FXML
   protected HBox hboxSearchForPerson;
   @FXML

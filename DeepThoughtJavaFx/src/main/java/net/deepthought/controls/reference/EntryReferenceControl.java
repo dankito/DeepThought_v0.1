@@ -202,6 +202,7 @@ public class EntryReferenceControl extends TitledPane {
 
     btnNewOrEditReference.setMinWidth(100);
     btnNewOrEditReference.setPrefWidth(162);
+    btnNewOrEditReference.setMaxHeight(28);
     HBox.setMargin(btnNewOrEditReference, new Insets(0, 0, 0, 6));
 
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->

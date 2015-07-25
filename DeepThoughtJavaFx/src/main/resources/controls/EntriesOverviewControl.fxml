@@ -73,27 +73,30 @@
          <content>
               <VBox fx:id="pnQuickEditEntry" disable="true" prefHeight="200.0" prefWidth="100.0">
                   <children>
-                      <HBox alignment="CENTER_LEFT" prefHeight="40.0">
+                      <HBox alignment="CENTER_LEFT" minHeight="30.0" prefHeight="32.0">
                           <children>
-                              <Label text="%entry.abstract" />
+                              <Label text="%entry.abstract">
+                           <HBox.margin>
+                              <Insets left="4.0" right="4.0" />
+                           </HBox.margin></Label>
                               <TextField fx:id="txtfldEntryAbstract" editable="false" HBox.hgrow="ALWAYS">
                                   <HBox.margin>
-                                      <Insets left="12.0" />
+                                      <Insets />
                                   </HBox.margin>
                               </TextField>
-                              <Button minWidth="80.0" mnemonicParsing="false" onAction="#handleEditCurrentSelectedEntryAction" text="%edit">
+                              <Button minHeight="30.0" minWidth="100.0" mnemonicParsing="false" onAction="#handleEditCurrentSelectedEntryAction" text="%edit">
                                   <HBox.margin>
                                       <Insets left="12.0" />
                                   </HBox.margin>
                               </Button>
                           </children>
                           <VBox.margin>
-                              <Insets bottom="6.0" />
+                              <Insets bottom="2.0" top="2.0" />
                           </VBox.margin>
                       </HBox>
-                  <ScrollPane fx:id="pnReferenceAndPersonsScrollPane" maxHeight="55.0" maxWidth="1.7976931348623157E308" minHeight="40.0" prefViewportHeight="40.0" prefViewportWidth="776.0" vbarPolicy="NEVER">
+                  <ScrollPane fx:id="pnReferenceAndPersonsScrollPane" maxHeight="46.0" maxWidth="1.7976931348623157E308" minHeight="30.0" prefViewportHeight="30.0" prefViewportWidth="776.0" vbarPolicy="NEVER">
                      <content>
-                        <HBox fx:id="pnReferenceAndPersons" alignment="CENTER_LEFT" maxHeight="40.0" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
+                        <HBox fx:id="pnReferenceAndPersons" alignment="CENTER_LEFT" maxHeight="28.0" maxWidth="1.7976931348623157E308" minHeight="28.0" prefHeight="28.0">
                            <children>
                               <HBox fx:id="pnReference" alignment="CENTER_LEFT">
                                  <children>
@@ -102,7 +105,7 @@
                                           <Insets left="6.0" right="6.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <HBox fx:id="pnSelectedReference" />
+                                    <HBox fx:id="pnSelectedReference" alignment="CENTER_LEFT" />
                                     <TextField fx:id="txtfldReferenceIndication" editable="false" maxWidth="50.0">
                                        <HBox.margin>
                                           <Insets left="6.0" right="12.0" />
@@ -120,15 +123,21 @@
                                           <Insets left="6.0" right="6.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <HBox fx:id="pnSelectedPersons" maxWidth="1.7976931348623157E308" />
+                                    <HBox fx:id="pnSelectedPersons" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" />
                                  </children>
                                  <HBox.margin>
                                     <Insets />
                                  </HBox.margin>
                               </HBox>
                            </children>
+                           <padding>
+                              <Insets bottom="4.0" top="4.0" />
+                           </padding>
                         </HBox>
                      </content>
+                     <VBox.margin>
+                        <Insets top="2.0" />
+                     </VBox.margin>
                   </ScrollPane>
                   <HTMLEditor fx:id="htmledEntryContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="250.0" VBox.vgrow="ALWAYS">
                      <VBox.margin>

@@ -265,7 +265,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void setupQuickEditEntrySection() {
-//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntry);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntryScrollPane);
 
     txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -283,7 +282,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     currentEditedEntryTagsControl = new EntryTagsControl();
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
     currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
-    VBox.setMargin(currentEditedEntryTagsControl, new Insets(6, 0, 6, 0));
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
@@ -307,19 +305,15 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   public void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {
-//    pnQuickEditEntry.setVisible(showPaneQuickEditEntry);
     pnQuickEditEntryScrollPane.setVisible(showPaneQuickEditEntry);
 
     if(showPaneQuickEditEntry) {
-//      if(splpnEntries.getItems().contains(pnQuickEditEntry) == false) {
       if(splpnEntries.getItems().contains(pnQuickEditEntryScrollPane) == false) {
-//        splpnEntries.getItems().add(pnQuickEditEntry);
         splpnEntries.getItems().add(pnQuickEditEntryScrollPane);
         splpnEntries.setDividerPositions(0.5);
       }
     }
     else {
-//      splpnEntries.getItems().remove(pnQuickEditEntry);
       splpnEntries.getItems().remove(pnQuickEditEntryScrollPane);
       splpnEntries.setDividerPosition(0, 1);
       try {
@@ -399,7 +393,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     txtfldReferenceIndication.setText(selectedEntry.getIndication());
 
     if(selectedEntry.hasPersons()) {
-      pnReferenceAndPersonsScrollPane.setMinHeight(55);
+      pnReferenceAndPersonsScrollPane.setMinHeight(46);
       for(Person person : new TreeSet<>(selectedEntry.getPersons())) {
         final PersonLabel label = new PersonLabel(person);
         pnSelectedPersons.getChildren().add(label);
@@ -407,7 +401,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       }
     }
     else {
-      pnReferenceAndPersonsScrollPane.setMinHeight(40);
+      pnReferenceAndPersonsScrollPane.setMinHeight(30);
     }
   }
 

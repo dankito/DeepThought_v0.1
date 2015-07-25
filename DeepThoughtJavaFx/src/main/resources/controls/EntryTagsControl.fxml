@@ -8,19 +8,19 @@
 
 <fx:root animated="false" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="36.0">
+      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="22.0">
          <children>
-            <Label fx:id="lblTags" minHeight="25.0" text="%tags">
+            <Label fx:id="lblTags" minHeight="22.0" text="%tags">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Label>
-            <FlowPane fx:id="pnSelectedTagsPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefWrapLength="200.0" vgap="6.0" HBox.hgrow="ALWAYS" />
+            <FlowPane fx:id="pnSelectedTagsPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="22.0" prefWrapLength="200.0" vgap="2.0" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" prefHeight="230.0">
+      <VBox fx:id="pnContent" maxHeight="230.0" minHeight="230.0">
          <children>
             <HBox fx:id="pnFilterTags" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
@@ -35,7 +35,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="lstvwAllTags" editable="true" minHeight="150.0" prefHeight="230.0" />
+            <ListView fx:id="lstvwAllTags" editable="true" minHeight="150.0" />
          </children>
       </VBox>
    </content>

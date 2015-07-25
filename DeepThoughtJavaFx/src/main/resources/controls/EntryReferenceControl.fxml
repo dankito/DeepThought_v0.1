@@ -32,22 +32,22 @@
         </VBox>
    </content>
    <graphic>
-          <HBox fx:id="paneSeriesTitleOrReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0">
+          <HBox fx:id="paneSeriesTitleOrReference" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="32.0" prefHeight="32.0">
               <children>
-                  <Label fx:id="lblReference" minWidth="45.0" prefHeight="40.0" text="%reference">
+                  <Label fx:id="lblReference" minWidth="45.0" text="%reference">
                       <HBox.margin>
                           <Insets right="12.0" />
                       </HBox.margin>
                   </Label>
-            <HBox fx:id="paneSelectedReferenceBase" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minWidth="40.0" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-            <HBox fx:id="paneReferenceIndicationSettings" alignment="CENTER_LEFT" prefHeight="40.0">
+            <HBox fx:id="paneSelectedReferenceBase" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minWidth="40.0" HBox.hgrow="ALWAYS" />
+            <HBox fx:id="paneReferenceIndicationSettings" alignment="CENTER_LEFT">
                <children>
-                  <Label minWidth="45.0" prefHeight="40.0" text="%indication">
+                  <Label minWidth="45.0" text="%indication">
                      <HBox.margin>
                         <Insets left="12.0" right="6.0" />
                      </HBox.margin>
                   </Label>
-                  <TextField fx:id="txtfldReferenceIndication" minWidth="60.0" prefHeight="34.0" prefWidth="90.0">
+                  <TextField fx:id="txtfldReferenceIndication" minHeight="28.0" minWidth="60.0" prefWidth="90.0">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>

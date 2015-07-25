@@ -138,10 +138,6 @@ public class EntryCategoriesControl extends TitledPane {
   protected void setupControl() {
     this.setExpanded(false);
 
-//    pnSelectedCategoriesPreview.setMaxWidth(Double.MAX_VALUE);
-
-    pnContent.setPrefHeight(175);
-
     pnFilterCategories.setVisible(false);
     pnFilterCategories.setManaged(false);
 //    // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)

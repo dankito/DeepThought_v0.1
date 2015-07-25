@@ -9,17 +9,17 @@
 
 <fx:root animated="false" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
-      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="28.0">
+      <HBox fx:id="pnGraphicsPane" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="22.0">
          <children>
-            <Label minHeight="25.0" text="%categories">
+            <Label text="%categories">
                <HBox.margin>
                   <Insets right="12.0" />
                </HBox.margin>
             </Label>
             <FlowPane fx:id="pnSelectedCategoriesPreview" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" prefWrapLength="159.0" vgap="6.0" HBox.hgrow="ALWAYS" />
-            <Button minHeight="25.0" mnemonicParsing="false" onAction="#handleButtonAddCategoryAction" prefWidth="35.0" text="+" textFill="#117219">
+            <Button alignment="CENTER" contentDisplay="CENTER" graphicTextGap="0.0" minHeight="22.0" mnemonicParsing="false" onAction="#handleButtonAddCategoryAction" prefHeight="22.0" prefWidth="35.0" text="+" textFill="#117219">
                <font>
-                  <Font name="System Bold" size="13.0" />
+                  <Font name="System Bold" size="11.0" />
                </font>
                <HBox.margin>
                   <Insets left="6.0" />
@@ -29,7 +29,7 @@
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" maxWidth="1.7976931348623157E308" prefHeight="270.0">
+      <VBox fx:id="pnContent" maxHeight="230.0" maxWidth="1.7976931348623157E308" minHeight="230.0">
          <children>
             <HBox fx:id="pnFilterCategories" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
