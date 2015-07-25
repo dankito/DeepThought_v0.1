@@ -15,6 +15,7 @@ import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.EntryPersonAssociation;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
@@ -274,7 +275,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
     FXUtils.addHtmlEditorTextChangedListener(htmledEntryContent, event -> {
-      Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
+      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
       if (selectedEntry != null)
         selectedEntry.setContent(htmledEntryContent.getHtmlText());
     });
@@ -283,6 +284,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
     currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
+
+    txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) -> {
+      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
+      if (selectedEntry != null)
+        selectedEntry.setIndication(txtfldReferenceIndication.getText());
+    });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReference);
@@ -374,13 +381,13 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     }
   }
 
-  protected void setPaneReferenceAndPersons(Entry selectedEntry) {
+  protected void setPaneReferenceAndPersons(final Entry selectedEntry) {
     pnReferenceAndPersonsScrollPane.setVisible(selectedEntry.hasPersonsOrIsAReferenceSet());
     pnReference.setVisible(selectedEntry.isAReferenceSet());
     pnPersons.setVisible(selectedEntry.hasPersons());
 
     pnSelectedReference.getChildren().clear();
-    txtfldReferenceIndication.setText("");
+    //txtfldReferenceIndication.setText("");
     pnSelectedPersons.getChildren().clear();
 
     if(selectedEntry.isAReferenceSet()) {
@@ -388,16 +395,21 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         pnReference.setMaxWidth(this.getWidth() * 2 / 3);
       else
         pnReference.setMaxWidth(this.getWidth() - 30);
-      pnSelectedReference.getChildren().add(new EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), null));
+      pnSelectedReference.getChildren().add(new EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), event -> selectedEntry.clearReferenceBases()));
     }
     txtfldReferenceIndication.setText(selectedEntry.getIndication());
 
     if(selectedEntry.hasPersons()) {
       pnReferenceAndPersonsScrollPane.setMinHeight(46);
-      for(Person person : new TreeSet<>(selectedEntry.getPersons())) {
+      for(final Person person : new TreeSet<>(selectedEntry.getPersons())) {
         final PersonLabel label = new PersonLabel(person);
         pnSelectedPersons.getChildren().add(label);
         HBox.setMargin(label, new Insets(0, 6, 0, 0));
+
+        label.setOnButtonRemoveItemFromCollectionEventHandler(event -> {
+//          pnSelectedPersons.getChildren().remove(label);
+          selectedEntry.removePerson(person);
+        });
       }
     }
     else {
@@ -539,17 +551,28 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   protected EntityListener currentlyEditedEntryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(propertyName.equals(TableConfig.EntryTitleColumnName)) {
-        txtfldEntryAbstract.setText(((Entry) entity).getAbstract());
+      if(propertyName.equals(TableConfig.EntryAbstractColumnName)) {
+        txtfldEntryAbstract.setText(((Entry) entity).getAbstractAsPlainText());
+      }
+      else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
+        if(txtfldReferenceIndication.getText().equals(((Entry) entity).getContent()) == false) // don't update txtfldReferenceIndication if change has been commited by it
+          txtfldReferenceIndication.setText(((Entry) entity).getIndication());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
-        htmledEntryContent.setHtmlText(((Entry) entity).getContent());
+        if(htmledEntryContent.getHtmlText().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been commited by it
+          htmledEntryContent.setHtmlText(((Entry) entity).getContent());
+      }
+      else if(propertyName.equals(TableConfig.EntrySeriesTitleJoinColumnName) || propertyName.equals(TableConfig.EntryReferenceJoinColumnName) ||
+          propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {
+        setPaneReferenceAndPersons((Entry)entity);
       }
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
+      if(addedEntity instanceof EntryPersonAssociation) {
+        setPaneReferenceAndPersons((Entry)collectionHolder);
+      }
     }
 
     @Override
@@ -559,7 +582,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
+      if(removedEntity instanceof EntryPersonAssociation) {
+        setPaneReferenceAndPersons((Entry)collectionHolder);
+      }
     }
   };
 

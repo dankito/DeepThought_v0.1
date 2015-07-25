@@ -28,6 +28,7 @@ import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -407,6 +408,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
         entry.setReference((Reference) referenceBase);
       else if(referenceBase instanceof SeriesTitle)
         entry.setSeries((SeriesTitle)referenceBase);
+      else // Reference has been unset
+        entry.clearReferenceBases();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntrySeriesTitle);
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryReference);
@@ -602,7 +605,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected EntityListener entryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
+      if(propertyName.equals(TableConfig.EntryAbstractColumnName)) {
+        if(htmledAbstract.getHtmlText().equals(((Entry) entity).getAbstract()) == false) // don't update Html Control if change has been committed by it
+          htmledAbstract.setHtmlText(((Entry) entity).getAbstract());
+      }
+      else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
+        if(htmledContent.getHtmlText().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
+          htmledContent.setHtmlText(((Entry) entity).getContent());
+      }
     }
 
     @Override

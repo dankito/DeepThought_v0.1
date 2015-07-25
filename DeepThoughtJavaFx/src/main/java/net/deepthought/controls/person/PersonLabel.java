@@ -55,8 +55,10 @@ public class PersonLabel extends CollectionItemLabel {
   }
 
   protected void onMousePressedOrReleased(MouseEvent event) {
-    if(event.isPopupTrigger())
+    if(event.isPopupTrigger()) {
+      event.consume();
       showContextMenu();
+    }
   }
 
   @Override
@@ -65,11 +67,15 @@ public class PersonLabel extends CollectionItemLabel {
 
     if(onLabelClickedEventHandler == null) {
       if(event.getButton() == MouseButton.PRIMARY) {
-        if(event.getClickCount() == 1)
+        if(event.getClickCount() == 1) {
+          event.consume();
           Dialogs.showEditPersonDialog(this.person);
+        }
       }
-      else if(event.isPopupTrigger())
+      else if(event.isPopupTrigger()) {
+        event.consume();
         showContextMenu();
+      }
     }
   }
 

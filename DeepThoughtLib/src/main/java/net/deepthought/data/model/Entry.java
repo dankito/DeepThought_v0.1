@@ -240,8 +240,11 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setSeries(SeriesTitle series) {
     Object previousValue = this.series;
 
-    if(this.series != null)
+    if(this.series != null) {
       this.series.removeEntry(this);
+      if(this.series.getSerialParts().contains(this.getReference()))
+        setReference(null);
+    }
 
     this.series = series;
     referencePreview = null;
@@ -265,8 +268,11 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   public void setReference(Reference reference) {
     Object previousValue = this.reference;
 
-    if(this.reference != null)
+    if(this.reference != null) {
       this.reference.removeEntry(this);
+      if(this.reference.getSubDivisions().contains(this.getReferenceSubDivision()))
+        setReferenceSubDivision(null);
+    }
 
     this.reference = reference;
     referencePreview = null;
@@ -307,6 +313,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     callPropertyChangedListeners(TableConfig.EntryReferenceSubDivisionJoinColumnName, previousValue, referenceSubDivision);
+  }
+
+  public void clearReferenceBases() {
+    setSeries(null);
   }
 
   public boolean isAReferenceSet() {

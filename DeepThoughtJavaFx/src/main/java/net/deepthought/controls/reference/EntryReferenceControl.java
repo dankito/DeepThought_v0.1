@@ -7,7 +7,6 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
@@ -57,7 +56,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -294,6 +292,8 @@ public class EntryReferenceControl extends TitledPane {
     ReferenceBase previousReferenceBase = this.selectedReferenceBase;
     this.selectedReferenceBase = newReferenceBase;
 
+    if(paneSelectedReferenceBase.getChildren().size() > 0)
+      ((EntryReferenceBaseLabel)paneSelectedReferenceBase.getChildren().get(0)).setOnButtonRemoveItemFromCollectionEventHandler(null);
     paneSelectedReferenceBase.getChildren().clear();
 
     if (selectedReferenceBase != null)
@@ -379,13 +379,13 @@ public class EntryReferenceControl extends TitledPane {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.EntrySeriesTitleJoinColumnName)) {
-        updateComboBoxSeriesTitleOrReferenceSelectedItem();
+        selectedReferenceBaseChanged();
       }
       else if(propertyName.equals(TableConfig.EntryReferenceJoinColumnName)) {
-        updateComboBoxSeriesTitleOrReferenceSelectedItem();
+        selectedReferenceBaseChanged();
       }
       else if(propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {
-        updateComboBoxSeriesTitleOrReferenceSelectedItem();
+        selectedReferenceBaseChanged();
       }
       else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
         referenceIndicationUpdated();
@@ -408,17 +408,15 @@ public class EntryReferenceControl extends TitledPane {
     }
   };
 
-  protected void updateComboBoxSeriesTitleOrReferenceSelectedItem() {
-//    cmbxSeriesTitleOrReference.valueProperty().removeListener(cmbxSeriesTitleOrReferenceValueChangedListener);
-
-    if(entry.getReference() != null)
+  protected void selectedReferenceBaseChanged() {
+    if(entry.getReferenceSubDivision() != null)
+      selectedReferenceBaseChanged(entry.getReferenceSubDivision());
+    else if(entry.getReference() != null)
       selectedReferenceBaseChanged(entry.getReference());
     else if(entry.getSeries() != null)
       selectedReferenceBaseChanged(entry.getSeries());
     else
       selectedReferenceBaseChanged(null);
-
-//    cmbxSeriesTitleOrReference.valueProperty().addListener(cmbxSeriesTitleOrReferenceValueChangedListener);
   }
 
   protected void referenceIndicationUpdated() {
@@ -494,22 +492,18 @@ public class EntryReferenceControl extends TitledPane {
     if(fieldChangedEvents == null)
       return;
 
-    if(fieldChangedEvents != null) {
-      if(newReferenceBase instanceof SeriesTitle)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newReferenceBase);
-      else if(newReferenceBase instanceof Reference)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newReferenceBase);
-      else if(newReferenceBase instanceof ReferenceSubDivision)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, newReferenceBase);
-    }
-    else {
-      if(previousReferenceBase instanceof SeriesTitle)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, previousReferenceBase);
-      else if(previousReferenceBase instanceof Reference)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, previousReferenceBase);
-      else if(previousReferenceBase instanceof ReferenceSubDivision)
-        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, previousReferenceBase);
-    }
+    if(newReferenceBase instanceof SeriesTitle)
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newReferenceBase);
+    else if(newReferenceBase instanceof Reference)
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newReferenceBase);
+    else if(newReferenceBase instanceof ReferenceSubDivision)
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, newReferenceBase);
+    else if(previousReferenceBase instanceof SeriesTitle) // if newReferenceBase == null then get changed field by previousReferenceBase
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newReferenceBase);
+    else if(previousReferenceBase instanceof Reference)
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newReferenceBase);
+    else if(previousReferenceBase instanceof ReferenceSubDivision)
+      fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, newReferenceBase);
   }
 
   protected void fireFieldChangedEvent(FieldWithUnsavedChanges changedField, Object newValue) {
