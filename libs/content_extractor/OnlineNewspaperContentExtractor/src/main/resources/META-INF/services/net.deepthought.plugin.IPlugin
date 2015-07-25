@@ -1,5 +1,6 @@
 net.deepthought.data.contentextractor.SueddeutscheContentExtractor
 net.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor
+net.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor
 net.deepthought.data.contentextractor.SpiegelContentExtractor
 net.deepthought.data.contentextractor.ZeitContentExtractor
 net.deepthought.data.contentextractor.PostillonContentExtractor
