@@ -66,11 +66,11 @@ public abstract class SearchComparisonTestBase {
   public static void suiteSetup() throws Exception {
     long startTime = new Date().getTime();
 
-//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
+    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
 //    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_3000_Entries/");
 //    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_tests/data/");
 //    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/");
-    ApplicationConfiguration configuration = new TestApplicationConfiguration("/run/media/ganymed/fast_data/programme/DeepThought/data/");
+//    ApplicationConfiguration configuration = new TestApplicationConfiguration("/run/media/ganymed/fast_data/programme/DeepThought/data/");
 
     Application.instantiate(configuration, new DefaultDependencyResolver() {
       @Override
@@ -169,7 +169,7 @@ public abstract class SearchComparisonTestBase {
     final FilterTagsSearchResults searchResults = new FilterTagsSearchResults();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("sz,wiki,post", new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
+    searchEngine.filterTags(new FilterTagsSearch("zeit,mario", new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
       @Override
       public void completed(FilterTagsSearchResults results) {
         for (FilterTagsSearchResult result : results.getResults())

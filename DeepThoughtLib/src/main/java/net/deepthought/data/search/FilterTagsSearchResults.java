@@ -140,6 +140,9 @@ public class FilterTagsSearchResults {
         relevantMatches.add(lastResult.getExactMatch());
       else
         relevantMatches.addAll(lastResult.getAllMatches());
+
+      if(lastResult.hasExactMatch() == false && lastResult.getAllMatchesCount() == 1) // FilterTagsSearchResult has only a single match
+        singleMatchesOfASearchTerm.addAll(lastResult.getAllMatches());
     }
   }
 

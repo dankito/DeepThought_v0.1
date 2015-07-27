@@ -191,12 +191,7 @@ public class EntryTagsControl extends TitledPane {
         setControlsForEnteredTagsFilter(newValue);
       }
     });
-    txtfldFilterTags.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        enterHasBeenPressedInTextFieldFilterTags();
-      }
-    });
+    txtfldFilterTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
     txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
       if(event.getCode() == KeyCode.ESCAPE) {
         txtfldFilterTags.clear();
@@ -287,10 +282,6 @@ public class EntryTagsControl extends TitledPane {
     return false;
   }
 
-
-  protected void enterHasBeenPressedInTextFieldFilterTags() {
-    createNewTagOrToggleTagsAffiliation();
-  }
 
   protected void setControlsForEnteredTagsFilter(String tagsFilter) {
     filterTags(tagsFilter);

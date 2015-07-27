@@ -40,7 +40,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -70,7 +69,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected ObservableList<Tag> tableViewTagsItems = null;
   protected FilteredList<Tag> filteredTags = null;
-  protected SortedList<Tag> sortedFilteredTags = null;
   protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
 
   protected FilterTagsSearch filterTagsSearch = null;
@@ -79,7 +77,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected ObservableSet<Tag> tagsToFilterFor = FXCollections.observableSet();
   protected ObservableSet<Entry> entriesHavingFilteredTags = FXCollections.observableSet();
-  protected Integer tagsToFilterForSize = 0;
+  protected Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
 
   protected MainWindowController mainWindowController;
@@ -144,6 +142,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     txtfldTagsQuickFilter.setPromptText("Quickly filter Tags");
     txtfldTagsQuickFilter.setPrefWidth(80);
     txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> quickFilterTags());
+    txtfldTagsQuickFilter.setOnAction(event -> toggleTagsToFilterFor());
     txtfldTagsQuickFilter.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
       if (event.getCode() == KeyCode.ESCAPE)
         txtfldTagsQuickFilter.clear();
@@ -268,15 +267,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     clearTableViewTagsItemsWithoutInvokingTableViewTagsSelectedItemChangedEvent();
     log.debug("Adding system tags ...");
 
-//    if(tableViewTagsItems.contains(deepThought.AllEntriesSystemTag()) == false)
-      tableViewTagsItems.add(deepThought.AllEntriesSystemTag());
-//    if(tableViewTagsItems.contains(deepThought.EntriesWithoutTagsSystemTag()) == false)
-      tableViewTagsItems.add(deepThought.EntriesWithoutTagsSystemTag());
+    tableViewTagsItems.add(deepThought.AllEntriesSystemTag());
+    tableViewTagsItems.add(deepThought.EntriesWithoutTagsSystemTag());
 
-//    tableViewTagsItems.addAll(deepThought.getTags());
     tableViewTagsItems.addAll(deepThought.getSortedTags());
-
-//    tblvwTags.getSelectionModel().select(deepThought.getSettings().getLastViewedTag());
   }
 
   protected void quickFilterTags() {
@@ -284,71 +278,59 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     if(filterTagsSearch != null)
       filterTagsSearch.interrupt();
 
-    final Tag selectedTag = deepThought.getSettings().getLastViewedTag();
-
-    // TODO: if tagsToFilterFor.size() > 0 filter only tagsOnEntriesContainingFilteredTags
-    // TODO: if quick filter is empty, set filteredTags predicate to true or tagsOnEntriesContainingFilteredTags.contains(tag)
-
-
-    if(tagsToFilterFor.size() == 0 && StringUtils.isNullOrEmpty(txtfldTagsQuickFilter.getText())) {
-      showAllTagsInListViewTags(deepThought);
-      filteredTags.setPredicate((tag) -> true);
-      lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
-      callFilteredTagsChangedListeners(lastFilterTagsResults);
+    if(StringUtils.isNullOrEmpty(txtfldTagsQuickFilter.getText())) {
+      quickFilteringTagsDone(FilterTagsSearchResults.NoFilterSearchResults);
     }
     else {
       filterTagsSearch = new FilterTagsSearch(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
         public void completed(final FilterTagsSearchResults results) {
-          Platform.runLater(() -> {
-            lastFilterTagsResults = results;
-
-            filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
-            callFilteredTagsChangedListeners(results);
-
-            if (results.isMatch(selectedTag))
-              tblvwTags.getSelectionModel().select(selectedTag);
-
-            log.debug("Done quick filtering Tags");
-          });
+          Platform.runLater(() -> quickFilteringTagsDone(results));
         }
       });
       Application.getSearchEngine().filterTags(filterTagsSearch);
     }
-
-//    quickFilterTagsManually();
-//
-//    if(filteredTags.contains(selectedTag))
-//      tblvwTags.getSelectionModel().select(selectedTag);
-//
-//    log.debug("Done quick filtering Tags");
   }
 
-//  protected void quickFilterTagsManually() {
-//    String filter = txtfldTagsQuickFilter.getText();
-//    String lowerCaseFilter = filter.toLowerCase(); // TODO: can filter ever be null?
-//    String[] parts = lowerCaseFilter.split(",");
-//
-//    filteredTags.setPredicate((tag) -> {
-//      // If filter text is empty, display all Tags.
-//      if (/*filter == null || */filter.isEmpty()) {
-//        return true;
-//      }
-//
-//      if (tag instanceof SystemTag)
-//        return false;
-//
-//      String lowerCaseTagName = tag.getName().toLowerCase();
-//
-//      for (String part : parts) {
-//        if (lowerCaseTagName.contains(part.trim())) {
-//          return true; // Filter matches Tag's name
-//        }
-//      }
-//
-//      return false; // Does not match.
-//    });
-//  }
+  protected void quickFilteringTagsDone(FilterTagsSearchResults results) {
+    final Tag selectedTag = deepThought.getSettings().getLastViewedTag();
+
+    lastFilterTagsResults = results;
+    showTagsAdheringFilterAndQuickFilter();
+    callFilteredTagsChangedListeners(results);
+
+    if (results.isMatch(selectedTag))
+      tblvwTags.getSelectionModel().select(selectedTag);
+
+    log.debug("Done quick filtering Tags");
+  }
+
+  protected void showTagsAdheringFilterAndQuickFilter() {
+    if(tagsOnEntriesContainingFilteredTags.size() == 0 && lastFilterTagsResults.getResults().size() == 0)
+      filteredTags.setPredicate((tag) -> true);
+    else if(tagsOnEntriesContainingFilteredTags.size() > 0) {
+      if(lastFilterTagsResults.getResults().size() == 0)
+        filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag));
+      else
+        filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag) && lastFilterTagsResults.isRelevantMatch(tag));
+    }
+    else
+      filteredTags.setPredicate((tag) -> lastFilterTagsResults.isRelevantMatch(tag));
+  }
+
+  protected void toggleTagsToFilterFor() {
+    if(lastFilterTagsResults.getResults().size() == 0)
+      return;
+
+    for(Tag tag : lastFilterTagsResults.getRelevantMatches()) {
+      if(tagsToFilterFor.contains(tag))
+        tagsToFilterFor.remove(tag);
+      else
+        tagsToFilterFor.add(tag);
+    }
+
+    reapplyTagsFilter();
+  }
 
   protected void addTagToTagFilter(Tag tag) {
     if(tagsToFilterFor.contains(tag))
@@ -376,31 +358,28 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     }
 
     tagsToFilterFor.clear();
+    entriesHavingFilteredTags.clear();
+    tagsOnEntriesContainingFilteredTags.clear();
 
-    showAllTagsInListViewTags(deepThought);
-
-    quickFilterTags();
+    showTagsAdheringFilterAndQuickFilter();
   }
 
   protected void reapplyTagsFilter() {
     log.debug("Applying Tags filter for {} tags to filter ... ", tagsToFilterFor.size());
     entriesHavingFilteredTags.clear();
+    tagsOnEntriesContainingFilteredTags.clear();
 
     if(tagsToFilterFor.size() == 0) {
-      showAllTagsInListViewTags(deepThought);
+      showTagsAdheringFilterAndQuickFilter();
     }
     else {
-      final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
       tagsOnEntriesContainingFilteredTags.addAll(tagsToFilterFor);
 
       Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
 
-      clearTableViewTagsItemsWithoutInvokingTableViewTagsSelectedItemChangedEvent();
-      log.debug("Adding all tagsOnEntriesContainingFilteredTags");
-      tableViewTagsItems.addAll(tagsOnEntriesContainingFilteredTags);
+      showTagsAdheringFilterAndQuickFilter();
     }
 
-    quickFilterTags();
     log.debug("Done applying Tags filter");
   }
 
