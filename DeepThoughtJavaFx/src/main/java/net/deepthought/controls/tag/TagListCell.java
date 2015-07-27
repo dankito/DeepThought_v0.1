@@ -72,6 +72,7 @@ public class TagListCell extends ListCell<Tag> {
 //    });
     entryTagsControl.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
 
+    filterTagsSearchResults = entryTagsControl.lastFilterTagsResults;
     entryTagsControl.addFilteredTagsChangedListener(results -> {
       filterTagsSearchResults = results;
       setCellBackgroundColor();

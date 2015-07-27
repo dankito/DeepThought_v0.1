@@ -90,7 +90,7 @@ public class FilterTagsSearchResults {
 
 
   public boolean isRelevantMatchOfLastSearchTerm(Tag tag) {
-    if(results.size() > 0) {
+    if(results.size() > 0 && overAllSearchTerm.endsWith(",") == false) {
       FilterTagsSearchResult lastResult = getLastResult();
       return tag != null && lastResult.getAllMatches().contains(tag);
     }
@@ -99,7 +99,7 @@ public class FilterTagsSearchResults {
   }
 
   public boolean isExactMatchOfLastSearchTerm(Tag tag) {
-    if(results.size() > 0) {
+    if(results.size() > 0 && overAllSearchTerm.endsWith(",") == false) {
       FilterTagsSearchResult lastResult = getLastResult();
       return lastResult.hasExactMatch() && tag != null && tag.equals(lastResult.getExactMatch());
     }
@@ -151,6 +151,11 @@ public class FilterTagsSearchResults {
   public List<FilterTagsSearchResult> getResults() {
     return results;
   }
+
+  public String getOverAllSearchTerm() {
+    return overAllSearchTerm;
+  }
+
 
   public final static FilterTagsSearchResults NoFilterSearchResults = new FilterTagsSearchResults() {
 

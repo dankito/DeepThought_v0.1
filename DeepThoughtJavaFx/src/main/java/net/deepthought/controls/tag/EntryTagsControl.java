@@ -9,8 +9,10 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.FilterTagsSearch;
+import net.deepthought.data.search.FilterTagsSearchResult;
 import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
@@ -76,6 +78,7 @@ public class EntryTagsControl extends TitledPane {
   protected List<TagListCell> tagListCells = new ArrayList<>();
 
   protected FilterTagsSearch filterTagsSearch = null;
+  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected EventHandler<EntryTagsEditedEvent> tagAddedEventHandler = null;
@@ -286,30 +289,21 @@ public class EntryTagsControl extends TitledPane {
 
 
   protected void enterHasBeenPressedInTextFieldFilterTags() {
-    //        if (checkIfTagOfThatNameExists(txtfldFilterTags.getText()) == false)
-//          addNewTagToEntry();
-
-    String tagsFilter = txtfldFilterTags.getText();
-    if(tagsFilter.contains(",") == false) {
-      Tag tagOfThatName = findTagOfThatName(tagsFilter);
-      if (tagOfThatName != null) {
-        if(editedTags.contains(tagOfThatName) == false)
-          addTagToEntry(tagOfThatName);
-        else
-          removeTagFromEntry(tagOfThatName);
-      }
-      else
-        addNewTagToEntry();
-    }
-    else {
-      for(Tag filteredTag : filteredTags)
-        addTagToEntry(filteredTag);
-    }
+    createNewTagOrToggleTagsAffiliation();
   }
 
-  protected void setControlsForEnteredTagsFilter(String newValue) {
-    filterTags(newValue);
-    btnCreateTag.setDisable(checkIfTagOfThatNameExists(newValue));
+  protected void setControlsForEnteredTagsFilter(String tagsFilter) {
+    filterTags(tagsFilter);
+
+    if(tagsFilter.contains(",")) {
+      JavaFxLocalization.bindLabeledText(btnCreateTag, "toggle");
+    }
+    else {
+      JavaFxLocalization.bindLabeledText(btnCreateTag, "new...");
+    }
+
+//    btnCreateTag.setDisable(checkIfTagOfThatNameExists(tagsFilter));
+    btnCreateTag.setDisable(StringUtils.isNullOrEmpty(tagsFilter));
   }
 
   protected boolean checkIfTagOfThatNameExists(String tagName) {
@@ -398,30 +392,62 @@ public class EntryTagsControl extends TitledPane {
 //  }
 
   protected void filterTags(String filterConstraint) {
-    log.debug("Starting to filter Tags for filter " + filterConstraint + " ... ");
     if(filterTagsSearch != null)
       filterTagsSearch.interrupt();
 
     if(StringUtils.isNullOrEmpty(txtfldFilterTags.getText())) {
+      lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
       filteredTags.setPredicate((tag) -> true);
-      callFilteredTagsChangedListeners(FilterTagsSearchResults.NoFilterSearchResults);
+      callFilteredTagsChangedListeners(lastFilterTagsResults);
     }
     else {
       filterTagsSearch = new FilterTagsSearch(txtfldFilterTags.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
         public void completed(final FilterTagsSearchResults results) {
           Platform.runLater(() -> {
+            lastFilterTagsResults = results;
             filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
             callFilteredTagsChangedListeners(results);
-            log.debug("Done filtering Tags");
           });
         }
       });
+
       Application.getSearchEngine().filterTags(filterTagsSearch);
     }
   }
 
+  protected void createNewTagOrToggleTagsAffiliation() {
+    if(lastFilterTagsResults.getResults().size() == 0 || (lastFilterTagsResults.getResults().size() == 1 &&
+        (lastFilterTagsResults.getExactMatches().size() == 0 || lastFilterTagsResults.getOverAllSearchTerm().endsWith(",") == false)))
+      addNewTagToEntry();
+    else {
+      for(FilterTagsSearchResult result : lastFilterTagsResults.getResults()) {
+        if(result.hasExactMatch())
+          toggleTagAffiliation(result.getExactMatch());
+        else {
+//          addNewTagToEntry(result.getSearchTerm());
+          for (Tag match : result.getAllMatches())
+            toggleTagAffiliation(match);
+        }
+      }
+    }
+  }
+
+  protected void toggleTagAffiliation(Tag tag) {
+    if(tag == null)
+      return;
+
+    if(editedTags.contains(tag) == false)
+      addTagToEntry(tag);
+    else
+      removeTagFromEntry(tag);
+  }
+
   protected void addNewTagToEntry() {
+    addNewTagToEntry(txtfldFilterTags.getText());
+  }
+
+  protected void addNewTagToEntry(String tagName) {
     String newTagName = txtfldFilterTags.getText();
     Tag newTag = new Tag(newTagName);
     Application.getDeepThought().addTag(newTag);
@@ -493,7 +519,7 @@ public class EntryTagsControl extends TitledPane {
 
   @FXML
   public void handleButtonCreateTagAction(ActionEvent event) {
-    addNewTagToEntry();
+    createNewTagOrToggleTagsAffiliation();
   }
 
 
@@ -551,14 +577,20 @@ public class EntryTagsControl extends TitledPane {
 
   protected void checkIfTagsHaveBeenUpdated(BaseEntity collectionHolder, BaseEntity entity) {
     if(collectionHolder instanceof DeepThought && entity instanceof Tag) {
+      Tag tag = (Tag)entity;
+
       DeepThought deepThought = (DeepThought)collectionHolder;
       resetListViewAllTagsItems(deepThought);
+
+      if(editedTags.contains(tag))
+        removeTagFromEntry(tag);
     }
   }
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {
     listViewAllTagsItems.clear();
     listViewAllTagsItems.addAll(deepThought.getTags());
+    filterTags(txtfldFilterTags.getText());
   }
 
 
