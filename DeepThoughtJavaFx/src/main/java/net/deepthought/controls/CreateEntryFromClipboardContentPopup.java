@@ -45,9 +45,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -59,10 +57,6 @@ import javafx.stage.Stage;
 public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   private final static Logger log = LoggerFactory.getLogger(CreateEntryFromClipboardContentPopup.class);
-
-  public final static Color BackgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
-
-  protected final static Background OptionMouseOverBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(0)));
 
 
   protected Stage stageToShowIn = null;
@@ -107,7 +101,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 //    Color backgroundColor = Color.LAWNGREEN.deriveColor(0, 1.0, 1.0, 0.15);
 //    Color backgroundColor = Color.DARKGREEN.deriveColor(0, 1.0, 1.0, 0.95);
 //    Color backgroundColor = Color.LIMEGREEN.deriveColor(0, 1.0, 1.0, 0.95);
-    contentPane.setBackground(new Background(new BackgroundFill(BackgroundColor, new CornerRadii(8), new Insets(4))));
+    contentPane.setBackground(Constants.ClipboardContentPopupBackground);
     getScene().setRoot(contentPane);
 
     hidePopupButton = new Button("x");
@@ -424,7 +418,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
         listener.optionInvoked(contentExtractOptions);
     });
 
-    optionLink.setOnMouseEntered(event -> optionLink.setBackground(OptionMouseOverBackground));
+    optionLink.setOnMouseEntered(event -> optionLink.setBackground(Constants.ClipboardContentPopupOptionMouseOverBackground));
     optionLink.setOnMouseExited(event -> optionLink.setBackground(Background.EMPTY));
 
     return optionLink;

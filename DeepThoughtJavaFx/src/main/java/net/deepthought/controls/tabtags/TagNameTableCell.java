@@ -1,11 +1,13 @@
 package net.deepthought.controls.tabtags;
 
 import net.deepthought.Application;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.TextFieldTableCell;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.model.ui.SystemTag;
+import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.util.Alerts;
 
 import java.util.Collection;
@@ -23,9 +25,15 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
   protected Tag tag = null;
 
+  protected FilterTagsSearchResults filterTagsSearchResults = null;
 
-  public TagNameTableCell() {
 
+  public TagNameTableCell(TabTagsControl tabTagsControl) {
+    this.filterTagsSearchResults = tabTagsControl.lastFilterTagsResults;
+    tabTagsControl.addFilteredTagsChangedListener(results -> {
+      filterTagsSearchResults = results;
+      setCellBackgroundColor();
+    });
   }
 
 
@@ -49,6 +57,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   protected void newItemSet(Tag newValue) {
     super.newItemSet(newValue);
     tagChanged(newValue);
+    setCellBackgroundColor();
 
     setEditable(newValue instanceof SystemTag);
   }
@@ -80,7 +89,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   @Override
   public void updateItem(String item, boolean empty) {
     if(getTableRow() != null && getTableRow().getItem() != tag)
-      newItemSet((Tag)getTableRow().getItem());
+      newItemSet((Tag) getTableRow().getItem());
 
     super.updateItem(item, empty);
   }
@@ -109,6 +118,10 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     });
 
     return contextMenu;
+  }
+
+  protected void setCellBackgroundColor() {
+    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
   }
 
   protected void deleteTag(Tag tag) {

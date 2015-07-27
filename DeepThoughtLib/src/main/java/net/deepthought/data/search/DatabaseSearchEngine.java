@@ -25,7 +25,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
 
   @Override
-  public void getEntriesWithoutTags(SearchCompletedListener<Entry> listener) {
+  public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener) {
 //    IEntityManager entityManager = Application.getEntityManager();
 
 //    try {
@@ -56,33 +56,39 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterTags(Search<Tag> search, String[] tagNamesToFilterFor) {
+  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
     IEntityManager entityManager = Application.getEntityManager();
+    List<FilterTagsSearchResult> results = new ArrayList<>();
 
-    String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.TagTableName + " WHERE " +
-        TableConfig.TagDeepThoughtJoinColumnName + " = " + deepThought.getId() + " AND (";
+    String queryPrefix = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.TagTableName + " WHERE " +
+        TableConfig.TagDeepThoughtJoinColumnName + " = " + deepThought.getId() + " AND (" + TableConfig.TagNameColumnName + " LIKE '%";
 
-    if(tagNamesToFilterFor.length > 0)
-      query += TableConfig.TagNameColumnName + " LIKE '%" + tagNamesToFilterFor[0] + "%'";
-    for(int i = 1; i < tagNamesToFilterFor.length; i++)
-      query += " OR " + TableConfig.TagNameColumnName + " LIKE '%" + tagNamesToFilterFor[i] + "%'";
+    String querySuffix = "%'" + ") " + "ORDER BY " + TableConfig.TagNameColumnName + " COLLATE NOCASE";
 
-    query += ") ";
-    query += "ORDER BY " + TableConfig.TagNameColumnName + " COLLATE NOCASE";
+    for(int i = 0; i < tagNamesToFilterFor.length; i++) {
+      if(search.isInterrupted())
+        return;
 
-    if(search.isInterrupted())
-      return;
+      try {
+        String query = queryPrefix + tagNamesToFilterFor[i] + querySuffix;
+        if(search.isInterrupted())
+          return;
 
-    try {
-      List<String[]> results = entityManager.doNativeQuery(query);
-      List<Long> ids = new ArrayList<>(results.size());
-      for(String[] result : results) {
-        ids.add(Long.parseLong(result[0]));
+        List<String[]> queryResults = entityManager.doNativeQuery(query);
+        List<Long> ids = new ArrayList<>(queryResults.size());
+        for(String[] result : queryResults) {
+          ids.add(Long.parseLong(result[0]));
+        }
+
+        if(search.isInterrupted())
+          return;
+
+        search.addResult(new FilterTagsSearchResult(tagNamesToFilterFor[i], new LazyLoadingList<Tag>(Tag.class, ids)));
+      } catch(Exception ex) {
+        log.error("Could not query for Entries without Tags", ex);
       }
-      search.setResults(new LazyLoadingList<Tag>(Tag.class, ids));
-    } catch(Exception ex) {
-      log.error("Could not query for Entries without Tags", ex);
     }
+
     search.fireSearchCompleted();
   }
 

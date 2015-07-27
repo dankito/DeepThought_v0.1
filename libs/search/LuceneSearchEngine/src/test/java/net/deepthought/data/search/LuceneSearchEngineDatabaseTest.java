@@ -90,7 +90,7 @@ public class LuceneSearchEngineDatabaseTest {
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
+    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         entriesWithoutTags.addAll(results);

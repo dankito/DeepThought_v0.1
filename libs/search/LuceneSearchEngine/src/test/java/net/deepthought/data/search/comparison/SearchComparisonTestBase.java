@@ -12,6 +12,9 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.FilterTagsSearch;
+import net.deepthought.data.search.FilterTagsSearchResult;
+import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
@@ -63,9 +66,11 @@ public abstract class SearchComparisonTestBase {
   public static void suiteSetup() throws Exception {
     long startTime = new Date().getTime();
 
-    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
+//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
 //    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_3000_Entries/");
 //    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_tests/data/");
+//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/");
+    ApplicationConfiguration configuration = new TestApplicationConfiguration("/run/media/ganymed/fast_data/programme/DeepThought/data/");
 
     Application.instantiate(configuration, new DefaultDependencyResolver() {
       @Override
@@ -125,7 +130,7 @@ public abstract class SearchComparisonTestBase {
     final List<Entry> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
+    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         logOperationProcessTime("getEntriesWithoutTags");
@@ -146,10 +151,10 @@ public abstract class SearchComparisonTestBase {
     final List<Tag> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new Search<Tag>("Zeit", new SearchCompletedListener<Tag>() {
+    searchEngine.filterTags(new FilterTagsSearch("Zeit", new SearchCompletedListener<FilterTagsSearchResults>() {
       @Override
-      public void completed(Collection<Tag> results) {
-        searchResults.addAll(results);
+      public void completed(FilterTagsSearchResults results) {
+        searchResults.addAll(results.getAllMatches());
         logOperationProcessTime("filterTags");
         countDownLatch.countDown();
       }
@@ -157,6 +162,30 @@ public abstract class SearchComparisonTestBase {
 
     try { countDownLatch.await(); } catch(Exception ex) { }
     Assert.assertEquals(857, searchResults.size());
+  }
+
+  @Test
+  public void filterForMultipleTags() {
+    final FilterTagsSearchResults searchResults = new FilterTagsSearchResults();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterTags(new FilterTagsSearch("sz,wiki,post", new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
+      @Override
+      public void completed(FilterTagsSearchResults results) {
+        for (FilterTagsSearchResult result : results.getResults())
+          searchResults.addSearchResult(result);
+        logOperationProcessTime("filterForMultipleTags");
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, searchResults.getResults().size());
+    for(FilterTagsSearchResult result : searchResults.getResults()) {
+      Assert.assertTrue(result.hasExactMatch() || result.getAllMatchesCount() == 1);
+    }
+    Assert.assertEquals(11, searchResults.getAllMatches().size());
   }
 
 
@@ -197,7 +226,7 @@ public abstract class SearchComparisonTestBase {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
     final List<Person> searchResults = new ArrayList<>();
 
-    searchEngine.filterPersons(new Search<Person>("Dürer", new SearchCompletedListener<Person>() {
+    searchEngine.filterPersons(new Search<Person>("Dürer", new SearchCompletedListener<Collection<Person>>() {
       @Override
       public void completed(Collection<Person> results) {
         logOperationProcessTime("filterPersons");

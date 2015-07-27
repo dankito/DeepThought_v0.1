@@ -20,7 +20,6 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
 import net.deepthought.data.search.results.LazyLoadingReferenceBasesSearchResultsList;
-import net.deepthought.language.LanguageDetector;
 import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -593,7 +592,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   /*        Search          */
 
   @Override
-  public void getEntriesWithoutTags(final SearchCompletedListener<Entry> listener) {
+  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
 //    TermQuery query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
 //    Search<Entry> dummy = new Search<>("", listener);
 //
@@ -640,34 +639,16 @@ public class LuceneSearchEngine extends SearchEngineBase {
     }).start();
   }
 
-  protected void filterTags(Search<Tag> search, String[] tagNamesToFilterFor) {
-    // TODO: remove
-//    Query testQuery = new WildcardQuery(new Term(FieldName.TagName, "*"));
-//    IndexSearcher searcher = getIndexSearcher();
-//
-//    try {
-//      ScoreDoc[] hits = searcher.search(testQuery, 100000).scoreDocs;
-//      if(hits.length > 0) { }
-//    } catch(Exception ex) { }
-//
-//    Query testQuery2 = new WildcardQuery(new Term(FieldName.EntryContent, "*"));
-//
-//    try {
-//      ScoreDoc[] hits = searcher.search(testQuery2, 100000).scoreDocs;
-//      if(hits.length > 0) { }
-//    } catch(Exception ex) { }
-
-    BooleanQuery query = new BooleanQuery();
-
+  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
     for(String tagNameToFilterFor : tagNamesToFilterFor) {
       if(search.isInterrupted())
         return;
       try {
-//        QueryParser parser = new QueryParser(FieldName.TagName, analyzer);
-//        query.add(parser.parse(tagNamesToFilterFor), BooleanClause.Occur.SHOULD);
-        //query.add(new PrefixQuery(new Term(FieldName.TagName, tagNameToFilterFor)), BooleanClause.Occur.SHOULD);
-        tagNameToFilterFor = QueryParser.escape(tagNameToFilterFor);
-        query.add(new WildcardQuery(new Term(FieldName.TagName, "*" + tagNameToFilterFor + "*")), BooleanClause.Occur.SHOULD);
+        Query query = new WildcardQuery(new Term(FieldName.TagName, "*" + tagNameToFilterFor + "*"));
+        if(search.isInterrupted())
+          return;
+
+        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(), query, Tag.class, FieldName.TagId, 1000)));
       } catch(Exception ex) {
         log.error("Could not parse query " + tagNamesToFilterFor, ex);
         // TODO: set error flag in search
@@ -676,7 +657,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       }
     }
 
-    executeQuery(search, query, Tag.class, FieldName.TagId);
+    search.fireSearchCompleted();
   }
 
   public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags) {
@@ -1272,7 +1253,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return allTerms;
   }
 
-  protected LanguageDetector languageDetector = new LanguageDetector();
   protected IndexReader extractTermsFromEntryIndexReader = null;
 
   public List<String> extractTermsFromEntry(Entry entry) {
@@ -1307,7 +1287,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
       if (extractTermsFromEntryIndexReader == null) {
         try {
-          Language textLanguage = languageDetector.detectLanguageOfText(text);
+          Language textLanguage = Application.getLanguageDetector().detectLanguageOfText(text);
 //          IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopAnalyzer(Version.LUCENE_47,
 //              DeepThoughtAnalyzer.getLanguageStopWords(textLanguage))));
           IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopwordAnalyzerBase(Version.LUCENE_47,

@@ -14,6 +14,7 @@ include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
 include ':OpenOfficeDocumentsImporterExporter'
+//include ':JavaFxControls'
 //include ':VideoDownloader'
 //include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
@@ -41,6 +42,8 @@ project(':OnlineNewspaperContentExtractor').projectDir = new File('libs/content_
 project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_extractor/WikipediaOnlineContentExtractor')
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
 project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
+
+//project(':JavaFxControls').projectDir = new File('libs/controls/JavaFxControls')
 
 //project(':SymmetricDS-Core').projectDir = new File('libs/sync/SymmetricDS-Core')
 //project(':SymmetricDS-CSV').projectDir = new File('libs/sync/SymmetricDS-CSV')

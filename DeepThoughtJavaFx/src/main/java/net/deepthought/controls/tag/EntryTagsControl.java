@@ -1,7 +1,6 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
-import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.event.EntryTagsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -9,8 +8,12 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.FilterTagsSearch;
+import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -36,12 +40,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.input.KeyCode;
@@ -50,8 +51,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -75,6 +74,9 @@ public class EntryTagsControl extends TitledPane {
   protected SortedList<Tag> sortedFilteredTags = null;
 
   protected List<TagListCell> tagListCells = new ArrayList<>();
+
+  protected FilterTagsSearch filterTagsSearch = null;
+  protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected EventHandler<EntryTagsEditedEvent> tagAddedEventHandler = null;
   protected EventHandler<EntryTagsEditedEvent> tagRemovedEventHandler = null;
@@ -375,24 +377,48 @@ public class EntryTagsControl extends TitledPane {
     fireTagRemovedEvent(entry, tag);
   }
 
+//  protected void filterTags(String filterConstraint) {
+//    filteredTags.setPredicate((tag) -> {
+//      // If filter text is empty, display all Tags.
+//      if (filterConstraint == null || filterConstraint.isEmpty()) {
+//        return true;
+//      }
+//
+//      String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
+//      String[] parts = lowerCaseFilterConstraint.split(",");
+//
+//      for (String part : parts) {
+//        if (tag.getName().toLowerCase().contains(part.trim())) {
+//          return true; // Filter matches Tag's name
+//        }
+//      }
+//
+//      return false; // Does not match.
+//    });
+//  }
+
   protected void filterTags(String filterConstraint) {
-    filteredTags.setPredicate((tag) -> {
-      // If filter text is empty, display all Tags.
-      if (filterConstraint == null || filterConstraint.isEmpty()) {
-        return true;
-      }
+    log.debug("Starting to filter Tags for filter " + filterConstraint + " ... ");
+    if(filterTagsSearch != null)
+      filterTagsSearch.interrupt();
 
-      String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
-      String[] parts = lowerCaseFilterConstraint.split(",");
-
-      for(String part : parts) {
-        if (tag.getName().toLowerCase().contains(part.trim())) {
-          return true; // Filter matches Tag's name
+    if(StringUtils.isNullOrEmpty(txtfldFilterTags.getText())) {
+      filteredTags.setPredicate((tag) -> true);
+      callFilteredTagsChangedListeners(FilterTagsSearchResults.NoFilterSearchResults);
+    }
+    else {
+      filterTagsSearch = new FilterTagsSearch(txtfldFilterTags.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
+        @Override
+        public void completed(final FilterTagsSearchResults results) {
+          Platform.runLater(() -> {
+            filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
+            callFilteredTagsChangedListeners(results);
+            log.debug("Done filtering Tags");
+          });
         }
-      }
-
-      return false; // Does not match.
-    });
+      });
+      Application.getSearchEngine().filterTags(filterTagsSearch);
+    }
   }
 
   protected void addNewTagToEntry() {
@@ -448,6 +474,20 @@ public class EntryTagsControl extends TitledPane {
 
     for(TagListCell cell : tagListCells)
       cell.setEntry(this.entry);
+  }
+
+
+  public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+    return filteredTagsChangedListeners.add(listener);
+  }
+
+  public boolean removeFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+    return filteredTagsChangedListeners.remove(listener);
+  }
+
+  protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
+    for(IFilteredTagsChangedListener listener : filteredTagsChangedListeners)
+      listener.filteredTagsChanged(results);
   }
 
 

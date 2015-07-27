@@ -5,12 +5,12 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
 
   @Override
-  public void getEntriesWithoutTags(final SearchCompletedListener<Entry> listener) {
+  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
     new Thread(new Runnable() {
       @Override
       public void run() {
@@ -53,9 +53,9 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   @Override
-  public void filterTags(final Search<Tag> search) {
+  public void filterTags(final FilterTagsSearch search) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm())) { // no filter term specified -> return all Tags
-      search.setResults(Application.getDeepThought().getTags());
+      search.setResults(FilterTagsSearchResults.NoFilterSearchResults);
       search.fireSearchCompleted();
       return;
     }
@@ -73,7 +73,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
     }).start();
   }
 
-  protected abstract void filterTags(Search<Tag> search, String[] tagNamesToFilterFor);
+  protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);
 
   @Override
   public void filterEntries(final FilterEntriesSearch search) {

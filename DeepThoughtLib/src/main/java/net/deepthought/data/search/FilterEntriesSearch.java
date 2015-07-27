@@ -26,20 +26,20 @@ public class FilterEntriesSearch extends Search<Entry> {
     this.filterAbstract = filterAbstract;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, SearchCompletedListener<Entry> completedListener) {
+  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, SearchCompletedListener<Collection<Entry>> completedListener) {
     super(searchTerm, completedListener);
 
     this.filterContent = filterContent;
     this.filterAbstract = filterAbstract;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, boolean filterOnlyEntriesWithoutTags, SearchCompletedListener<Entry> completedListener) {
+  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, boolean filterOnlyEntriesWithoutTags, SearchCompletedListener<Collection<Entry>> completedListener) {
     this(searchTerm, filterContent, filterAbstract, completedListener);
 
     this.filterOnlyEntriesWithoutTags = filterOnlyEntriesWithoutTags;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Entry> entriesToFilter, SearchCompletedListener<Entry> completedListener) {
+  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Entry> entriesToFilter, SearchCompletedListener<Collection<Entry>> completedListener) {
     this(searchTerm, filterContent, filterAbstract, completedListener);
 
     this.entriesToFilter = entriesToFilter;

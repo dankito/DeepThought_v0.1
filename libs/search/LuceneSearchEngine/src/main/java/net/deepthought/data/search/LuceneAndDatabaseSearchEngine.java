@@ -2,9 +2,10 @@ package net.deepthought.data.search;
 
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Tag;
 
 import org.apache.lucene.store.Directory;
+
+import java.util.Collection;
 
 /**
  * <p>
@@ -25,12 +26,12 @@ public class LuceneAndDatabaseSearchEngine extends LuceneSearchEngine {
   }
 
   @Override
-  public void getEntriesWithoutTags(SearchCompletedListener<Entry> listener) {
+  public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener) {
     databaseSearchEngine.getEntriesWithoutTags(listener);
   }
 
   @Override
-  protected void filterTags(Search<Tag> search, String[] tagNamesToFilterFor) {
+  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
     databaseSearchEngine.filterTags(search, tagNamesToFilterFor);
   }
 

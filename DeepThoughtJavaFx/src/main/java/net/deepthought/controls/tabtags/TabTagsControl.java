@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
+import net.deepthought.controls.tag.IFilteredTagsChangedListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -12,8 +13,8 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.data.search.FilterEntriesSearch;
-import net.deepthought.data.search.Search;
+import net.deepthought.data.search.FilterTagsSearch;
+import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
@@ -24,9 +25,11 @@ import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -70,7 +73,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected SortedList<Tag> sortedFilteredTags = null;
   protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
 
-  protected Search<Tag> filterTagsSearch = null;
+  protected FilterTagsSearch filterTagsSearch = null;
+  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected ObservableSet<Tag> tagsToFilterFor = FXCollections.observableSet();
   protected ObservableSet<Entry> entriesHavingFilteredTags = FXCollections.observableSet();
@@ -165,14 +170,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     clmnTagName.setCellFactory(new Callback<TableColumn<Tag, String>, TableCell<Tag, String>>() {
       @Override
       public TableCell<Tag, String> call(TableColumn<Tag, String> param) {
-        return new TagNameTableCell();
+        return new TagNameTableCell(TabTagsControl.this);
       }
     });
 
     clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
       @Override
       public TableCell<Tag, Boolean> call(TableColumn<Tag, Boolean> param) {
-        final TagFilterTableCell cell = new TagFilterTableCell(tagsToFilterFor);
+        final TagFilterTableCell cell = new TagFilterTableCell(TabTagsControl.this);
         tagFilterTableCells.add(cell);
 
         cell.isFilteredProperty().addListener(new ChangeListener<Boolean>() {
@@ -281,21 +286,31 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     final Tag selectedTag = deepThought.getSettings().getLastViewedTag();
 
+    // TODO: if tagsToFilterFor.size() > 0 filter only tagsOnEntriesContainingFilteredTags
+    // TODO: if quick filter is empty, set filteredTags predicate to true or tagsOnEntriesContainingFilteredTags.contains(tag)
+
 
     if(tagsToFilterFor.size() == 0 && StringUtils.isNullOrEmpty(txtfldTagsQuickFilter.getText())) {
       showAllTagsInListViewTags(deepThought);
       filteredTags.setPredicate((tag) -> true);
+      lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
+      callFilteredTagsChangedListeners(lastFilterTagsResults);
     }
     else {
-      filterTagsSearch = new Search<Tag>(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<Tag>() {
+      filterTagsSearch = new FilterTagsSearch(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
-        public void completed(final Collection<Tag> results) {
-          filteredTags.setPredicate((tag) -> results.contains(tag));
+        public void completed(final FilterTagsSearchResults results) {
+          Platform.runLater(() -> {
+            lastFilterTagsResults = results;
 
-          if (results.contains(selectedTag))
-            tblvwTags.getSelectionModel().select(selectedTag);
+            filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
+            callFilteredTagsChangedListeners(results);
 
-          log.debug("Done quick filtering Tags");
+            if (results.isMatch(selectedTag))
+              tblvwTags.getSelectionModel().select(selectedTag);
+
+            log.debug("Done quick filtering Tags");
+          });
         }
       });
       Application.getSearchEngine().filterTags(filterTagsSearch);
@@ -424,6 +439,20 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       log.error("Could not sort Tags", ex);
     }
   }
+
+  public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+    return filteredTagsChangedListeners.add(listener);
+  }
+
+  public boolean removeFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+    return filteredTagsChangedListeners.remove(listener);
+  }
+
+  protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
+    for(IFilteredTagsChangedListener listener : filteredTagsChangedListeners)
+      listener.filteredTagsChanged(results);
+  }
+
 
   protected Comparator<Tag> tagComparator = new Comparator<Tag>() {
     @Override

@@ -5,6 +5,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 
@@ -57,6 +58,8 @@ public class TagListCell extends ListCell<Tag> {
 
   protected TextField txtfldEditTagName = null;
 
+  protected FilterTagsSearchResults filterTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
+
 
   public TagListCell(Entry entry, EntryTagsControl entryTagsControl) {
     this.entry = entry;
@@ -68,6 +71,12 @@ public class TagListCell extends ListCell<Tag> {
 //      }
 //    });
     entryTagsControl.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
+
+    entryTagsControl.addFilteredTagsChangedListener(results -> {
+      filterTagsSearchResults = results;
+      setCellBackgroundColor();
+    });
+
 
     if(entry != null)
       entry.addEntityListener(entryListener);
@@ -160,6 +169,12 @@ public class TagListCell extends ListCell<Tag> {
 
       setGraphic(graphicsPane);
     }
+
+    setCellBackgroundColor();
+  }
+
+  protected void setCellBackgroundColor() {
+    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
   }
 
   protected ChangeListener<Boolean> checkBoxIsTagSelectedChangeListener = new ChangeListener<Boolean>() {

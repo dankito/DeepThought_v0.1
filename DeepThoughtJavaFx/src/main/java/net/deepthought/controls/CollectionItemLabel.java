@@ -13,10 +13,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -31,7 +27,7 @@ public abstract class CollectionItemLabel extends HBox {
 
   protected final static Background DefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
 
-  protected final static Background MouseOverBackground = new Background(new BackgroundFill(CreateEntryFromClipboardContentPopup.BackgroundColor, new CornerRadii(4), new Insets(0)));
+  protected final static Background MouseOverBackground = new Background(new BackgroundFill(Constants.ClipboardContentPopupBackgroundColor, new CornerRadii(4), new Insets(0)));
 
 
   protected Button btnRemoveItemFromCollection;

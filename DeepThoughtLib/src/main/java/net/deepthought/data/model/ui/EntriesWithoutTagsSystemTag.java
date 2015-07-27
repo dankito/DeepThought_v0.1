@@ -24,7 +24,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 
     deepThought.addEntityListener(deepThoughtListener);
 
-    Application.getSearchEngine().getEntriesWithoutTags(new SearchCompletedListener<Entry>() {
+    Application.getSearchEngine().getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         filteredEntries = results;

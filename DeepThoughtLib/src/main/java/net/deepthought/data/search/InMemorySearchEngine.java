@@ -16,20 +16,21 @@ import java.util.Set;
  */
 public class InMemorySearchEngine extends SearchEngineBase {
 
-  protected void filterTags(Search<Tag> search, String[] tagNamesToFilterFor) {
-    for(Tag tag : Application.getDeepThought().getTags()) {
-      if(search.isInterrupted())
-        return;
-
-      String lowerCaseTagName = tag.getName().toLowerCase();
-
-      for (String part : tagNamesToFilterFor) {
-        if (lowerCaseTagName.contains(part)) {
-          search.addResult(tag); // Filter matches Tag's name
-          break;
-        }
-      }
-    }
+  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+    // TODO: may implement one day (no need for it right now)
+//    for(Tag tag : Application.getDeepThought().getTags()) {
+//      if(search.isInterrupted())
+//        return;
+//
+//      String lowerCaseTagName = tag.getName().toLowerCase();
+//
+//      for (String part : tagNamesToFilterFor) {
+//        if (lowerCaseTagName.contains(part)) {
+//          search.addResult(tag); // Filter matches Tag's name
+//          break;
+//        }
+//      }
+//    }
 
     search.fireSearchCompleted();
   }

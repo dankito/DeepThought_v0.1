@@ -1,6 +1,8 @@
 package net.deepthought.controls;
 
 import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
+import net.deepthought.data.model.Tag;
+import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
@@ -24,6 +26,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.Cell;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
@@ -57,6 +60,22 @@ public class FXUtils {
 
   public static void setBackgroundToColor(Region region, Color color) {
     region.setBackground(new Background(new BackgroundFill(color, new CornerRadii(0), new Insets(0))));
+  }
+
+  public static void setTagCellBackgroundColor(Tag tag, FilterTagsSearchResults filterTagsSearchResults, Cell cell) {
+    if(tag != null && filterTagsSearchResults.getResults().size() > 0) {
+      if(filterTagsSearchResults.isExactMatchOfLastSearchTerm(tag))
+        cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
+      else if(filterTagsSearchResults.isRelevantMatchOfLastSearchTerm(tag))
+        cell.setBackground(Constants.FilteredTagsLastSearchTermRelevantMatchBackground);
+      else if(filterTagsSearchResults.isExactMatch(tag) || filterTagsSearchResults.isSingleMatchOfASearchTerm(tag))
+        cell.setBackground(Constants.FilteredTagsExactMatchBackground);
+      else if(filterTagsSearchResults.isRelevantMatch(tag))
+        cell.setBackground(Constants.FilteredTagsRelevantMatchBackground);
+      else
+        cell.setBackground(Constants.FilteredTagsDefaultBackground);
+    } else
+      cell.setBackground(Constants.FilteredTagsDefaultBackground);
   }
 
 

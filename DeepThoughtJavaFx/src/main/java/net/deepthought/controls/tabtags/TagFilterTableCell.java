@@ -1,7 +1,9 @@
 package net.deepthought.controls.tabtags;
 
+import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.ui.SystemTag;
+import net.deepthought.data.search.FilterTagsSearchResults;
 
 import java.util.Collection;
 
@@ -20,6 +22,8 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   protected Collection<Tag> tagsToFilterFor = null;
 
   protected CheckBox checkBox = new CheckBox();
+
+  protected FilterTagsSearchResults filterTagsSearchResults = null;
 
 
 //  private ReadOnlyObjectWrapper<Boolean> isChecked = new ReadOnlyObjectWrapper<Boolean>() {
@@ -45,8 +49,13 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   }
 
 
-  public TagFilterTableCell(Collection<Tag> tagsToFilterFor) {
-    this.tagsToFilterFor = tagsToFilterFor;
+  public TagFilterTableCell(TabTagsControl tabTagsControl) {
+    this.tagsToFilterFor = tabTagsControl.tagsToFilterFor;
+    this.filterTagsSearchResults = tabTagsControl.lastFilterTagsResults;
+    tabTagsControl.addFilteredTagsChangedListener(results -> {
+      filterTagsSearchResults = results;
+      setCellBackgroundColor();
+    });
 
     setText(null);
     setAlignment(Pos.CENTER);
@@ -56,7 +65,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   @Override
   protected void updateItem(Boolean item, boolean empty) {
     Object tagCheck = ((TableRow<Tag>)getTableRow()).getItem();
-    if(tagCheck != tag && tagCheck instanceof Tag)
+    if(tagCheck != tag && (tagCheck instanceof Tag || tagCheck == null))
       tagChanged((Tag) tagCheck);
 
     super.updateItem(item, empty);
@@ -68,10 +77,17 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
       checkBox.setSelected(tagsToFilterFor.contains(tag));
       setGraphic(checkBox);
     }
+
+    setCellBackgroundColor();
   }
 
   protected void tagChanged(Tag tag) {
     this.tag = tag;
+    setCellBackgroundColor();
+  }
+
+  protected void setCellBackgroundColor() {
+    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
   }
 
 

@@ -13,9 +13,9 @@ import java.util.Set;
  */
 public interface ISearchEngine {
 
-  public void getEntriesWithoutTags(SearchCompletedListener<Entry> listener);
+  public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener);
 
-  public void filterTags(Search<Tag> search);
+  public void filterTags(FilterTagsSearch search);
 
   public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags);
 
