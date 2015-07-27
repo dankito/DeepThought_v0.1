@@ -6,7 +6,6 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.Tag;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * Created by ganymed on 17/03/15.
@@ -17,7 +16,7 @@ public interface ISearchEngine {
 
   public void filterTags(FilterTagsSearch search);
 
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags);
+  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   public void filterEntries(FilterEntriesSearch search);
 

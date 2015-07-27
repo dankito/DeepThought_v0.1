@@ -15,6 +15,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.FilterTagsSearch;
 import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
@@ -76,7 +77,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected ObservableSet<Tag> tagsToFilterFor = FXCollections.observableSet();
-  protected ObservableSet<Entry> entriesHavingFilteredTags = FXCollections.observableSet();
+  protected Collection<Entry> entriesHavingFilteredTags = new HashSet<>();
   protected Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
 
@@ -187,13 +188,17 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
             else
               removeTagFromTagFilter(cell.getTag());
 
-            btnRemoveTagsFilter.setDisable(tagsToFilterFor.size() == 0);
+            setButtonRemoveTagsFilterDisabledState();
           }
         });
 
         return cell;
       }
     });
+  }
+
+  protected void setButtonRemoveTagsFilterDisabledState() {
+    btnRemoveTagsFilter.setDisable(tagsToFilterFor.size() == 0);
   }
 
   protected ChangeListener<Tag> tableViewTagsSelectedItemChangedListener = new ChangeListener<Tag>() {
@@ -306,10 +311,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void showTagsAdheringFilterAndQuickFilter() {
-    if(tagsOnEntriesContainingFilteredTags.size() == 0 && lastFilterTagsResults.getResults().size() == 0)
+    if(tagsToFilterFor.size() == 0 && lastFilterTagsResults.getResults().size() == 0)
       filteredTags.setPredicate((tag) -> true);
-    else if(tagsOnEntriesContainingFilteredTags.size() > 0) {
-      if(lastFilterTagsResults.getResults().size() == 0)
+    else if(tagsToFilterFor.size() > 0) {
+      if(tagsOnEntriesContainingFilteredTags.size() == 0)
+        filteredTags.setPredicate((tag) -> tagsToFilterFor.contains(tag));
+      else if(lastFilterTagsResults.getResults().size() == 0)
         filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag));
       else
         filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag) && lastFilterTagsResults.isRelevantMatch(tag));
@@ -329,6 +336,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
         tagsToFilterFor.add(tag);
     }
 
+    setButtonRemoveTagsFilterDisabledState();
     reapplyTagsFilter();
   }
 
@@ -366,8 +374,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected void reapplyTagsFilter() {
     log.debug("Applying Tags filter for {} tags to filter ... ", tagsToFilterFor.size());
-    entriesHavingFilteredTags.clear();
-    tagsOnEntriesContainingFilteredTags.clear();
 
     if(tagsToFilterFor.size() == 0) {
       showTagsAdheringFilterAndQuickFilter();
@@ -375,12 +381,18 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     else {
       tagsOnEntriesContainingFilteredTags.addAll(tagsToFilterFor);
 
-      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
+      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+        @Override
+        public void completed(FindAllEntriesHavingTheseTagsResult results) {
+          entriesHavingFilteredTags = results.getEntriesHavingFilteredTags();
+          tagsOnEntriesContainingFilteredTags = results.getTagsOnEntriesContainingFilteredTags();
 
-      showTagsAdheringFilterAndQuickFilter();
+          showTagsAdheringFilterAndQuickFilter();
+
+          log.debug("Done applying Tags filter");
+        }
+      });
     }
-
-    log.debug("Done applying Tags filter");
   }
 
   protected void clearTableViewTagsItemsWithoutInvokingTableViewTagsSelectedItemChangedEvent() {

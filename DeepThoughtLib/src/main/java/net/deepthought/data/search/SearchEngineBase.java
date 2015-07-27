@@ -5,6 +5,7 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
@@ -74,6 +75,18 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);
+
+  @Override
+  public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, listener);
+      }
+    }).start();
+  }
+
+  protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   @Override
   public void filterEntries(final FilterEntriesSearch search) {

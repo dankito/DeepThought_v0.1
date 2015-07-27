@@ -7,8 +7,10 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.LazyLoadingList;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,7 +37,10 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+    Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
+    Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
+
     for (Tag filteredTag : tagsToFilterFor) {
       for (Entry entry : filteredTag.getEntries()) {
         if (entry.hasTags(tagsToFilterFor)) {
@@ -44,6 +49,8 @@ public class InMemorySearchEngine extends SearchEngineBase {
         }
       }
     }
+
+    listener.completed(new FindAllEntriesHavingTheseTagsResult(entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags));
   }
 
   @Override

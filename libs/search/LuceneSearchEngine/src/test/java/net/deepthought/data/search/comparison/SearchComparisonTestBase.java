@@ -15,6 +15,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.FilterTagsSearch;
 import net.deepthought.data.search.FilterTagsSearchResult;
 import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
@@ -166,10 +167,11 @@ public abstract class SearchComparisonTestBase {
 
   @Test
   public void filterForMultipleTags() {
+    String filter = "zeit,Geschich,hom";
     final FilterTagsSearchResults searchResults = new FilterTagsSearchResults();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("zeit,mario", new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
+    searchEngine.filterTags(new FilterTagsSearch(filter, new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
       @Override
       public void completed(FilterTagsSearchResults results) {
         for (FilterTagsSearchResult result : results.getResults())
@@ -182,10 +184,24 @@ public abstract class SearchComparisonTestBase {
     try { countDownLatch.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(3, searchResults.getResults().size());
-    for(FilterTagsSearchResult result : searchResults.getResults()) {
-      Assert.assertTrue(result.hasExactMatch() || result.getAllMatchesCount() == 1);
-    }
-    Assert.assertEquals(11, searchResults.getAllMatches().size());
+//    Assert.assertEquals(11, searchResults.getAllMatches().size());
+//    Assert.assertEquals(11, searchResults.getRelevantMatches().size());
+    Assert.assertEquals(filter, searchResults.getOverAllSearchTerm());
+
+    FilterTagsSearchResult firstResult = searchResults.getResults().get(0);
+    Assert.assertTrue(firstResult.hasExactMatch());
+    Assert.assertEquals(786, firstResult.getAllMatchesCount());
+    Assert.assertEquals("zeit", firstResult.getSearchTerm());
+
+    FilterTagsSearchResult secondResult = searchResults.getResults().get(1);
+    Assert.assertTrue(secondResult.hasExactMatch());
+    Assert.assertEquals(99, secondResult.getAllMatchesCount());
+    Assert.assertEquals("geschich", secondResult.getSearchTerm());
+
+    FilterTagsSearchResult thirdResult = searchResults.getResults().get(2);
+    Assert.assertFalse(thirdResult.hasExactMatch());
+    Assert.assertEquals(59, thirdResult.getAllMatchesCount());
+    Assert.assertEquals("hom", thirdResult.getSearchTerm());
   }
 
 
@@ -194,10 +210,16 @@ public abstract class SearchComparisonTestBase {
     List<Tag> tagsToFilterFor = new ArrayList<>();
     tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 1L));
 
-    Set<Entry> entriesHavingFilteredTags = new HashSet<>();
+    final Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
+      }
+    });
 
     logOperationProcessTime("findAllEntriesHavingTheseTags_ArchäologieOnly");
     Assert.assertEquals(20, entriesHavingFilteredTags.size());
@@ -210,10 +232,16 @@ public abstract class SearchComparisonTestBase {
     tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 41L));
     tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 10L));
 
-    Set<Entry> entriesHavingFilteredTags = new HashSet<>();
+    final Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
+      }
+    });
 
     logOperationProcessTime("findAllEntriesHavingTheseTags_AustralopithecusAfricanusAndLatènezeit");
     Assert.assertEquals(2, entriesHavingFilteredTags.size());

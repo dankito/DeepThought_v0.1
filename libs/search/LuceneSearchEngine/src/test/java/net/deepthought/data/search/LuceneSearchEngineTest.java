@@ -201,10 +201,14 @@ public class LuceneSearchEngineTest {
     newEntry.removeTag(tag1);
 
     List<Tag> tagTwoCollection = new ArrayList<Tag>() {{ add(tag2); }};
-    List<Entry> entriesHavingTheseTags = new ArrayList<>();
-    Set<Tag> notInterestedIn = new HashSet<>();
+    final List<Entry> entriesHavingTheseTags = new ArrayList<>();
 
-    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, entriesHavingTheseTags, notInterestedIn);
+    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
+      }
+    });
 
     Assert.assertEquals(1, entriesHavingTheseTags.size());
     Assert.assertEquals(newEntry, entriesHavingTheseTags.get(0));
@@ -213,7 +217,12 @@ public class LuceneSearchEngineTest {
     List<Tag> tagOneCollection = new ArrayList<Tag>() {{ add(tag1); }};
     entriesHavingTheseTags.clear();
 
-    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, entriesHavingTheseTags, notInterestedIn);
+    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
+      }
+    });
 
     Assert.assertEquals(0, entriesHavingTheseTags.size());
   }
@@ -1429,10 +1438,21 @@ public class LuceneSearchEngineTest {
     tagsToFilterFor.add(tag1);
     tagsToFilterFor.add(tag2);
 
-    Set<Entry> entriesHavingFilteredTags = new HashSet<>();
+    final Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch.countDown();
+      }
+    });
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(1, entriesHavingFilteredTags.size());
     Assert.assertEquals(entryWithTags1, new ArrayList<Entry>(entriesHavingFilteredTags).get(0));
     Assert.assertEquals(2, tagsOnEntriesContainingFilteredTags.size());
@@ -1442,8 +1462,19 @@ public class LuceneSearchEngineTest {
     tagsToFilterFor.add(tag3);
     entriesHavingFilteredTags.clear();
     tagsOnEntriesContainingFilteredTags.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags);
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch2.countDown();
+      }
+    });
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(1, entriesHavingFilteredTags.size());
     Assert.assertEquals(entryWithTags2, new ArrayList<Entry>(entriesHavingFilteredTags).get(0));
     Assert.assertEquals(2, tagsOnEntriesContainingFilteredTags.size());
@@ -1537,9 +1568,21 @@ public class LuceneSearchEngineTest {
     searchEngine.indexEntity(entryWithTags2);
     searchEngine.indexEntity(entryWithoutTags3);
 
-    List<Entry> entriesWithTag1 = new ArrayList<>();
-    Set<Tag> tagsOnEntriesWithTag1 = new HashSet<>();
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), entriesWithTag1, tagsOnEntriesWithTag1);
+    final List<Entry> entriesWithTag1 = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithTag1 = new HashSet<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithTag1.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithTag1.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(1, entriesWithTag1.size());
 
     Assert.assertTrue(entriesWithTag1.contains(entryWithTags1));
@@ -1548,9 +1591,21 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTag1.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTag1.contains(entryWithoutTags3));
 
-    Collection<Entry> entriesWithTag2 = new ArrayList<>();
-    Set<Tag> tagsOnEntriesWithTag2 = new HashSet<>();
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), entriesWithTag2, tagsOnEntriesWithTag2);
+    final Collection<Entry> entriesWithTag2 = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithTag2 = new HashSet<>();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithTag2.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithTag2.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch2.countDown();
+      }
+    });
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(2, entriesWithTag2.size());
 
     Assert.assertTrue(entriesWithTag2.contains(entryWithTags1));
@@ -1559,9 +1614,21 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTag2.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTag2.contains(entryWithoutTags3));
 
-    Collection<Entry> entriesWithTag3 = new ArrayList<>();
-    Set<Tag> tagsOnEntriesWithTag3 = new HashSet<>();
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), entriesWithTag3, tagsOnEntriesWithTag3);
+    final Collection<Entry> entriesWithTag3 = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithTag3 = new HashSet<>();
+    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithTag3.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithTag3.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch3.countDown();
+      }
+    });
+
+    try { countDownLatch3.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(1, entriesWithTag3.size());
 
     Assert.assertFalse(entriesWithTag3.contains(entryWithTags1));
@@ -1570,9 +1637,21 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTag3.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTag3.contains(entryWithoutTags3));
 
-    Collection<Entry> entriesWithTags2And3 = new ArrayList<>();
-    Set<Tag> tagsOnEntriesWithTag2And3 = new HashSet<>();
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), entriesWithTags2And3, tagsOnEntriesWithTag2And3);
+    final Collection<Entry> entriesWithTags2And3 = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithTag2And3 = new HashSet<>();
+    final CountDownLatch countDownLatch4 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithTags2And3.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithTag2And3.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch4.countDown();
+      }
+    });
+
+    try { countDownLatch4.await(); } catch(Exception ex) { }
+
     Assert.assertEquals(1, entriesWithTags2And3.size());
 
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithTags1));

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -209,31 +210,10 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+    Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
+    Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     IEntityManager entityManager = Application.getEntityManager();
-//    List<Tag> tagsToFilterForList = new ArrayList<>(tagsToFilterFor);
-
-//    String entriesQuery = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.EntryTableName +
-//        " JOIN " + TableConfig.EntryTagJoinTableName + " t ON " + TableConfig.BaseEntityIdColumnName + " = " + TableConfig.EntryTagJoinTableEntryIdColumnName + " WHERE (";
-//
-//    if(tagsToFilterForList.size() > 0)
-//      entriesQuery += "t." + TableConfig.EntryTagJoinTableTagIdColumnName + " = " + tagsToFilterForList.get(0).getId();
-//    for(int i = 1; i < tagsToFilterForList.size(); i++)
-//      entriesQuery += " OR t." + TableConfig.EntryTagJoinTableTagIdColumnName + " = " + tagsToFilterForList.get(i).getId();
-//
-//    entriesQuery += ")";
-
-//    String entriesQuery = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.EntryTableName + " WHERE ";
-//
-//    int i = 0;
-//    for(Tag tag : tagsToFilterFor) {
-//      if(i > 0) entriesQuery += " AND ";
-//
-//      entriesQuery += TableConfig.BaseEntityIdColumnName + " IN " + "(SELECT " + TableConfig.EntryTagJoinTableEntryIdColumnName + " FROM " +
-//          TableConfig.EntryTagJoinTableName + " WHERE " + TableConfig.EntryTagJoinTableTagIdColumnName + " = " + tag.getId() + ")";
-//
-//      i++;
-//    }
 
     String whereStatement =  TableConfig.EntryDeepThoughtJoinColumnName + " = " + deepThought.getId();
     for(Tag tag : tagsToFilterFor) {
@@ -242,20 +222,13 @@ public class DatabaseSearchEngine extends SearchEngineBase {
     }
 
     try {
-//      List<String[]> results = entityManager.doNativeQuery(entriesQuery);
-//      for(String[] result : results) {
-//        Long id = Long.parseLong(result[0]);
-//        Entry entry = entityManager.getEntityById(Entry.class, id);
-//        entriesHavingFilteredTags.add(entry);
-//
-//        tagsOnEntriesContainingFilteredTags.addAll(entry.getTags());
-//      }
-
       entriesHavingFilteredTags.addAll(entityManager.queryEntities(Entry.class, whereStatement));
-      for(Entry foundEntry : entriesHavingFilteredTags)
+      for(Entry foundEntry : entriesHavingFilteredTags) // TODO for each loops loads Entries from Database -> find a solution without loading Entries from Database
         tagsOnEntriesContainingFilteredTags.addAll(foundEntry.getTags());
     } catch(Exception ex) {
       log.error("Could not query for Entries with having specific Tags", ex);
     }
+
+    listener.completed(new FindAllEntriesHavingTheseTagsResult(entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags));
   }
 }

@@ -660,7 +660,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+    Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
+    Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
+
     BooleanQuery query = new BooleanQuery();
     for(Tag tag : tagsToFilterFor) {
       query.add(new BooleanClause(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.MUST));
@@ -689,6 +692,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
     } catch(Exception ex) {
       log.error("Could not execute Query " + query.toString(), ex);
     }
+
+    listener.completed(new FindAllEntriesHavingTheseTagsResult(entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags));
   }
 
   @Override
