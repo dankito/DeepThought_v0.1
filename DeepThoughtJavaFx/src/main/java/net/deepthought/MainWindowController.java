@@ -334,17 +334,16 @@ public class MainWindowController implements Initializable {
     clearAllData();
 
     if(deepThought != null) {
+      DeepThoughtSettings settings = deepThought.getSettings();
+
       trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
       selectedCategoryChanged(deepThought.getTopLevelCategory());
 
       tabTagsControl.deepThoughtChanged(deepThought);
       entriesOverviewControl.deepThoughtChanged(deepThought);
 
-      DeepThoughtSettings settings = deepThought.getSettings();
-
       FXUtils.applyWindowSettingsAndListenToChanges(stage, settings.getMainWindowSettings());
       setSelectedTab(settings.getLastSelectedTab());
-      contentPane.setDividerPositions(settings.getMainWindowTabsAndEntriesOverviewDividerPosition());
 
       userDeviceSettingsChanged(); // TODO: isn't this redundant with selecting Tab and current category?
 
@@ -423,6 +422,15 @@ public class MainWindowController implements Initializable {
     setupTabPaneOverview();
 
     setupEntriesOverviewSection();
+
+    if(contentPane.getDividers().size() > 0) {
+      contentPane.getDividers().get(0).positionProperty().addListener(((observableValue, oldValue, newValue) -> {
+        if (deepThought != null) {
+          double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
+          deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
+        }
+      }));
+    }
   }
 
   protected void setupMainMenu() {
@@ -797,10 +805,10 @@ public class MainWindowController implements Initializable {
     stage.widthProperty().addListener(new ChangeListener<Number>() {
       @Override
       public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//        int padding = 50;
-//        if(newValue.doubleValue() < oldValue.doubleValue())
-//          padding += (oldValue.doubleValue() - newValue.doubleValue());
-//        pnTitledPaneEditEntryTagsGraphic.setPrefWidth(pnQuickEditEntry.getWidth() - padding);
+        if (deepThought != null) {
+          double dividerPosition = deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition() / newValue.doubleValue();
+          contentPane.setDividerPosition(0, dividerPosition);
+        }
       }
     });
 

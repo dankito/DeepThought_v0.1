@@ -48,7 +48,6 @@ public class DeepThoughtFx extends Application {
 //    scene.getStylesheets().add(mainDocumentCss);
 
       stage.setScene(scene);
-      stage.setTitle("Ich weiß, dass ich nichts weiß");
       stage.titleProperty().bind(Bindings.createStringBinding(
           () -> Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing") + " - DeepThought", JavaFxLocalization.localeProperty()));
 
