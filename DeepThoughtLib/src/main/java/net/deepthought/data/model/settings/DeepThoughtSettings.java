@@ -43,6 +43,18 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected double entriesOverviewDividerPosition = 0.5;
 
+  protected ColumnSettings entriesOverviewIdColumnSettings = new ColumnSettings(false, 46);
+
+  protected ColumnSettings entriesOverviewReferenceColumnSettings = new ColumnSettings(true, 140);
+
+  protected ColumnSettings entriesOverviewEntryPreviewColumnSettings = new ColumnSettings(true, 265);
+
+  protected ColumnSettings entriesOverviewTagsColumnSettings = new ColumnSettings(true, 150);
+
+  protected ColumnSettings entriesOverviewCreatedColumnSettings = new ColumnSettings(false, 176);
+
+  protected ColumnSettings entriesOverviewModifiedColumnSettings = new ColumnSettings(true, 176);
+
 
   public DeepThoughtSettings() {
 
@@ -155,6 +167,30 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     Object previousValue = this.entriesOverviewDividerPosition;
     this.entriesOverviewDividerPosition = entriesOverviewDividerPosition;
     callSettingsChangedListeners(Setting.DeepThoughtEntriesOverviewDividerPosition, previousValue, entriesOverviewDividerPosition);
+  }
+
+  public ColumnSettings getEntriesOverviewIdColumnSettings() {
+    return entriesOverviewIdColumnSettings;
+  }
+
+  public ColumnSettings getEntriesOverviewReferenceColumnSettings() {
+    return entriesOverviewReferenceColumnSettings;
+  }
+
+  public ColumnSettings getEntriesOverviewEntryPreviewColumnSettings() {
+    return entriesOverviewEntryPreviewColumnSettings;
+  }
+
+  public ColumnSettings getEntriesOverviewTagsColumnSettings() {
+    return entriesOverviewTagsColumnSettings;
+  }
+
+  public ColumnSettings getEntriesOverviewCreatedColumnSettings() {
+    return entriesOverviewCreatedColumnSettings;
+  }
+
+  public ColumnSettings getEntriesOverviewModifiedColumnSettings() {
+    return entriesOverviewModifiedColumnSettings;
   }
 
 }

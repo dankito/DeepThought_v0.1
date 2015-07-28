@@ -146,7 +146,7 @@ public class FilterTagsSearchResults {
     }
   }
 
-  protected FilterTagsSearchResult getLastResult() {
+  public FilterTagsSearchResult getLastResult() {
     return results.get(results.size() - 1);
   }
 

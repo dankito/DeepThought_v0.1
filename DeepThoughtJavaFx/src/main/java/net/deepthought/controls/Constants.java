@@ -25,9 +25,9 @@ public class Constants {
 
   public final static Background FilteredTagsRelevantMatchBackground = new Background(new BackgroundFill(Color.LIGHTGREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsLastSearchTermExactMatchBackground = new Background(new BackgroundFill(Color.DEEPSKYBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background FilteredTagsLastSearchTermExactMatchBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsLastSearchTermRelevantMatchBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background FilteredTagsLastSearchTermRelevantMatchBackground = new Background(new BackgroundFill(Color.DEEPSKYBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
   public final static Background FilteredTagsDefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
 

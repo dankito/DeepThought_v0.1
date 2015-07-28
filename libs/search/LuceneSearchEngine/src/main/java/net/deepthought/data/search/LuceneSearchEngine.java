@@ -153,16 +153,24 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     closeIndexWriter();
 
+    closeDirectory();
+  }
+
+  protected void closeDirectory() {
     try {
-      if(directory != null)
+      if(directory != null) {
         directory.close();
+        directory = null;
+      }
     } catch(Exception ex) { log.error("Could not close directory", ex); }
   }
 
   protected void closeIndexSearcher() {
     try {
-      if(directoryReader != null)
+      if(directoryReader != null) {
         directoryReader.close();
+        directoryReader = null;
+      }
     } catch(Exception ex) {
       log.error("Could not close DirectoryReader", ex);
     }
@@ -172,8 +180,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected void closeIndexWriter() {
     try {
-      if(indexWriter != null)
+      if(indexWriter != null) {
         indexWriter.close();
+        indexWriter = null;
+      }
     } catch(Exception ex) {
       log.error("Could not close IndexWriter", ex);
     }
@@ -460,6 +470,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void indexCategory(Category category) {
+    if(category.getParentCategory() == null) // TopLevelCategory
+      return;
+
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
@@ -500,7 +513,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     doc.add(new LongField(FieldName.ReferenceBaseId, reference.getId(), Field.Store.YES));
 //    doc.add(new Field(FieldName.ReferenceTitle, getReferenceTitleValue(reference), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.ReferenceTitle, reference.getPreview() + " " + reference.getSubTitle(), TextField.TYPE_STORED));
+    doc.add(new Field(FieldName.ReferenceTitle, reference.getPreview() + " " + reference.getIssueOrPublishingDate() + " " + reference.getSubTitle(), TextField.TYPE_STORED));
     if(reference.getPublishingDate() != null)
       addDateFieldToDocument(doc, FieldName.ReferencePublishingDate, reference.getPublishingDate());
 

@@ -2,6 +2,7 @@ package net.deepthought.controls;
 
 import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -31,6 +32,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
@@ -67,7 +69,8 @@ public class FXUtils {
       if(filterTagsSearchResults.isExactMatchOfLastSearchTerm(tag))
         cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
       else if(filterTagsSearchResults.isRelevantMatchOfLastSearchTerm(tag))
-        cell.setBackground(Constants.FilteredTagsLastSearchTermRelevantMatchBackground);
+//        cell.setBackground(Constants.FilteredTagsLastSearchTermRelevantMatchBackground);
+        cell.setBackground(Constants.FilteredTagsDefaultBackground);
       else if(filterTagsSearchResults.isExactMatch(tag) || filterTagsSearchResults.isSingleMatchOfASearchTerm(tag))
         cell.setBackground(Constants.FilteredTagsExactMatchBackground);
       else if(filterTagsSearchResults.isRelevantMatch(tag))
@@ -76,6 +79,14 @@ public class FXUtils {
         cell.setBackground(Constants.FilteredTagsDefaultBackground);
     } else
       cell.setBackground(Constants.FilteredTagsDefaultBackground);
+  }
+
+  public static void applyColumnSettingsAndSaveChanges(TableColumn column, ColumnSettings settings) {
+    column.setVisible(settings.isVisible());
+    column.setPrefWidth(settings.getWidth());
+
+    column.visibleProperty().addListener(((observableValue, oldValue, newValue) -> settings.setIsVisible(newValue)));
+    column.widthProperty().addListener(((observableValue, oldValue, newValue) -> settings.setWidth(newValue.intValue())));
   }
 
 

@@ -1,13 +1,11 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
 import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.helper.MockEntityManager;
+import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.EntityManagerConfiguration;
-import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.util.StringUtils;
 
 import org.junit.After;
@@ -29,12 +27,7 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
   public void setup() {
     contentExtractor = createOnlineNewspaperContentExtractor();
 
-    Application.instantiate(new TestApplicationConfiguration(), new DefaultDependencyResolver() {
-      @Override
-      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new MockEntityManager();
-      }
-    });
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
   }
 
   @After

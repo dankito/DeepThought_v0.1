@@ -2,6 +2,7 @@ package net.deepthought.data.search;
 
 import net.deepthought.Application;
 import net.deepthought.data.TestApplicationConfiguration;
+import net.deepthought.data.helper.MockEntityManager;
 import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -12,16 +13,14 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.CombinedLazyLoadingList;
-import net.deepthought.data.persistence.EntityManagerConfiguration;
-import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,18 +51,22 @@ public class LuceneSearchEngineTest {
 
   @Before
   public void setup() throws IOException {
-//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver() {
-      @Override
-      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new OrmLiteJavaSeEntityManager(configuration);
-      }
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
+//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new OrmLiteJavaSeEntityManager()) {
 
       @Override
       public ISearchEngine createSearchEngine() {
         try {
-//          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine(new RAMDirectory());
-          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine();
+          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine() {
+            @Override
+            protected void setDirectory(Directory directory) {
+              if(directory instanceof RAMDirectory)
+                super.setDirectory(directory);
+              else
+                super.setDirectory(new RAMDirectory());
+            }
+          };
+//          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine();
         } catch(Exception ex) {
           log.error("Could not create LuceneSearchEngine", ex);
         }
@@ -79,7 +82,8 @@ public class LuceneSearchEngineTest {
 
   @After
   public void tearDown() {
-    searchEngine.close();
+//    searchEngine.close();
+    Application.shutdown();
   }
 
 
@@ -202,13 +206,17 @@ public class LuceneSearchEngineTest {
 
     List<Tag> tagTwoCollection = new ArrayList<Tag>() {{ add(tag2); }};
     final List<Entry> entriesHavingTheseTags = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
       public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
+        countDownLatch.countDown();
       }
     });
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesHavingTheseTags.size());
     Assert.assertEquals(newEntry, entriesHavingTheseTags.get(0));
@@ -216,13 +224,17 @@ public class LuceneSearchEngineTest {
     // ensure tag1 cannot be found anymore
     List<Tag> tagOneCollection = new ArrayList<Tag>() {{ add(tag1); }};
     entriesHavingTheseTags.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
     searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
       public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
+        countDownLatch2.countDown();
       }
     });
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(0, entriesHavingTheseTags.size());
   }
@@ -1217,6 +1229,7 @@ public class LuceneSearchEngineTest {
     deepThought.addReference(newReference);
 
     ReferenceSubDivision newSubDivision = new ReferenceSubDivision("subDivision");
+    deepThought.addReferenceSubDivision(newSubDivision);
     newReference.addSubDivision(newSubDivision);
 
     final List<ReferenceBase> results = new ArrayList<>();
@@ -1242,6 +1255,7 @@ public class LuceneSearchEngineTest {
     deepThought.addReference(newReference);
 
     ReferenceSubDivision newSubDivision = new ReferenceSubDivision("subDivision");
+    deepThought.addReferenceSubDivision(newSubDivision);
     newReference.addSubDivision(newSubDivision);
     newSubDivision.setTitle("Aphrodite");
 
@@ -1326,10 +1340,15 @@ public class LuceneSearchEngineTest {
     Reference newReference = new Reference("SZ");
     deepThought.addReference(newReference);
 
-    ReferenceSubDivision newSubDivision = new ReferenceSubDivision("Die Pharmaindustrie ist schlimmer als die Mafia", "Kritik an Arzneimittelherstellern");
-    newReference.addSubDivision(newSubDivision);
-    newReference.addSubDivision(new ReferenceSubDivision("BND versucht NSA-Aufklärer in die Falle zu locken"));
-    newReference.addSubDivision(new ReferenceSubDivision("Privatsphäre kostet extra"));
+    ReferenceSubDivision newSubDivision1 = new ReferenceSubDivision("Die Pharmaindustrie ist schlimmer als die Mafia", "Kritik an Arzneimittelherstellern");
+    deepThought.addReferenceSubDivision(newSubDivision1);
+    newReference.addSubDivision(newSubDivision1);
+    ReferenceSubDivision newSubDivision2 = new ReferenceSubDivision("BND versucht NSA-Aufklärer in die Falle zu locken");
+    deepThought.addReferenceSubDivision(newSubDivision2);
+    newReference.addSubDivision(newSubDivision2);
+    ReferenceSubDivision newSubDivision3 = new ReferenceSubDivision("Privatsphäre kostet extra");
+    deepThought.addReferenceSubDivision(newSubDivision3);
+    newReference.addSubDivision(newSubDivision3);
 
     final List<Reference> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -1345,7 +1364,7 @@ public class LuceneSearchEngineTest {
     try { countDownLatch.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
-    Assert.assertEquals(newSubDivision, results.get(0));
+    Assert.assertEquals(newSubDivision1, results.get(0));
 
 
     results.clear();
@@ -1362,7 +1381,7 @@ public class LuceneSearchEngineTest {
     try { countDownLatch2.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
-    Assert.assertEquals(newSubDivision, results.get(0));
+    Assert.assertEquals(newSubDivision1, results.get(0));
 
     results.clear();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
@@ -1507,11 +1526,12 @@ public class LuceneSearchEngineTest {
     entryWithTags2.addTag(tag2);
     entryWithTags2.addTag(tag3);
 
-    searchEngine.indexEntity(entryWithoutTags1);
-    searchEngine.indexEntity(entryWithTags1);
-    searchEngine.indexEntity(entryWithoutTags2);
-    searchEngine.indexEntity(entryWithTags2);
-    searchEngine.indexEntity(entryWithoutTags3);
+    // TODO: is this really necessary?
+//    searchEngine.indexEntity(entryWithoutTags1);
+//    searchEngine.indexEntity(entryWithTags1);
+//    searchEngine.indexEntity(entryWithoutTags2);
+//    searchEngine.indexEntity(entryWithTags2);
+//    searchEngine.indexEntity(entryWithoutTags3);
 
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -1659,74 +1679,6 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags1));
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags3));
-
-  }
-
-  @Test
-  public void filterTestReferences() {
-    final CombinedLazyLoadingList<ReferenceBase> results = new CombinedLazyLoadingList<ReferenceBase>();
-    final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-    searchEngine.filterAllReferenceBaseTypesForSameFilter(new Search<ReferenceBase>("wikip", new SearchCompletedListener<Collection<ReferenceBase>>() {
-      @Override
-      public void completed(Collection<ReferenceBase> result) {
-        results.setUnderlyingCollection(result);
-        countDownLatch.countDown();
-      }
-    }), "wikip");
-
-    try { countDownLatch.await(); } catch(Exception ex) { }
-
-    Assert.assertEquals(5, results.size());
-
-
-    results.clear();
-    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
-
-    searchEngine.filterAllReferenceBaseTypesForSameFilter(new Search<ReferenceBase>("sz", new SearchCompletedListener<Collection<ReferenceBase>>() {
-      @Override
-      public void completed(Collection<ReferenceBase> result) {
-        results.setUnderlyingCollection(result);
-        countDownLatch.countDown();
-      }
-    }), "sz");
-
-    try { countDownLatch2.await(); } catch(Exception ex) { }
-
-    Assert.assertEquals(468, results.size());
-
-
-//    results.clear();
-//    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
-//
-//    searchEngine.filterReferenceBases(new Search<Reference>("2012", new SearchCompletedListener<Reference>() {
-//      @Override
-//      public void completed(Collection<Reference> result) {
-//        results.addAll(result);
-//        countDownLatch3.countDown();
-//      }
-//    }));
-//
-//    try { countDownLatch3.await(); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(1, results.size());
-//    Assert.assertEquals(newReference, results.get(0));
-//
-//
-//    results.clear();
-//    final CountDownLatch countDownLatch4 = new CountDownLatch(1);
-//
-//    searchEngine.filterReferenceBases(new Search<Reference>("Liebe", new SearchCompletedListener<Reference>() {
-//      @Override
-//      public void completed(Collection<Reference> result) {
-//        results.addAll(result);
-//        countDownLatch4.countDown();
-//      }
-//    }));
-//
-//    try { countDownLatch4.await(); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(0, results.size());
   }
 
 }

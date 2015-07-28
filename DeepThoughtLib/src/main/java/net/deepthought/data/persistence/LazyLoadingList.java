@@ -52,6 +52,12 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
   }
 
   @Override
+  public void clear() {
+    entityIds.clear();
+    cachedResults.clear();
+  }
+
+  @Override
   public T get(int index) {
     if(cachedResults.containsKey(index))
       return cachedResults.get(index);

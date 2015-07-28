@@ -10,7 +10,6 @@ import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.person.PersonLabel;
 import net.deepthought.controls.reference.EntryReferenceBaseLabel;
-import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -19,6 +18,7 @@ import net.deepthought.data.model.EntryPersonAssociation;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.model.ui.SystemTag;
@@ -47,7 +47,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -60,13 +59,10 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
@@ -188,10 +184,19 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     this.deepThought = newDeepThought;
 
     if(newDeepThought != null) {
-      if (deepThought.getSettings().getLastViewedEntry() != null) {
+      DeepThoughtSettings settings = deepThought.getSettings();
+
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnId, settings.getEntriesOverviewIdColumnSettings());
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnReferencePreview, settings.getEntriesOverviewReferenceColumnSettings());
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnEntryPreview, settings.getEntriesOverviewEntryPreviewColumnSettings());
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnTags, settings.getEntriesOverviewTagsColumnSettings());
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnCreated, settings.getEntriesOverviewCreatedColumnSettings());
+      FXUtils.applyColumnSettingsAndSaveChanges(clmnModified, settings.getEntriesOverviewModifiedColumnSettings());
+
+      if (settings.getLastViewedEntry() != null) {
         // no, don't set Entry, as TableView then iterates through all Entries in Table to find selected Entry -> would eventually load a lot of Entries from Database
 //        tblvwEntries.getSelectionModel().select(deepThought.getSettings().getLastViewedEntry());
-        selectedEntryChanged(deepThought.getSettings().getLastViewedEntry());
+        selectedEntryChanged(settings.getLastViewedEntry());
       }
     }
   }

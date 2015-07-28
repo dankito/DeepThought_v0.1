@@ -227,7 +227,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
   public void setPublishingDate(Date publishingDate) {
+    Object previousValue = this.publishingDate;
     this.publishingDate = publishingDate;
+    preview = null;
+    callPropertyChangedListeners(TableConfig.ReferencePublishingDateColumnName, previousValue, publishingDate);
   }
 
   @Override

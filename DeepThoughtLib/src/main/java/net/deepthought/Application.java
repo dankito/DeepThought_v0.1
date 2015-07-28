@@ -214,12 +214,26 @@ public class Application {
       entityManager.close();
     entityManager = null;
     entityManagerConfiguration = null;
+    dataFolderPath = CouldNotGetDataFolderPath;
 
     if(searchEngine != null)
       searchEngine.close();
     searchEngine = null;
 
     dependencyResolver = null;
+
+    if(searchEngine != null) {
+      searchEngine.close();
+      searchEngine = null;
+    }
+
+    if(pluginManager != null) {
+      pluginManager = null;
+    }
+
+    if(backupManager != null) {
+      backupManager = null;
+    }
   }
 
 

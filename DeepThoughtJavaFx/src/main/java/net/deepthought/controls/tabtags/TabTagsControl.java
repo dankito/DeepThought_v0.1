@@ -53,6 +53,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
@@ -141,7 +142,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     hboxTagsBar.getChildren().add(1, txtfldTagsQuickFilter);
     HBox.setHgrow(txtfldTagsQuickFilter, Priority.ALWAYS);
     txtfldTagsQuickFilter.setPromptText("Quickly filter Tags");
-    txtfldTagsQuickFilter.setPrefWidth(80);
+    txtfldTagsQuickFilter.setMinWidth(60);
+    txtfldTagsQuickFilter.setPrefWidth(Region.USE_COMPUTED_SIZE);
     txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> quickFilterTags());
     txtfldTagsQuickFilter.setOnAction(event -> toggleTagsToFilterFor());
     txtfldTagsQuickFilter.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
@@ -366,8 +368,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     }
 
     tagsToFilterFor.clear();
-    entriesHavingFilteredTags.clear();
-    tagsOnEntriesContainingFilteredTags.clear();
+    try {
+      tagsOnEntriesContainingFilteredTags.clear();
+      entriesHavingFilteredTags.clear();
+    } catch(Exception ex) { log.error("Could not clear tagsOnEntriesContainingFilteredTags or entriesHavingFilteredTags", ex); }
 
     showTagsAdheringFilterAndQuickFilter();
   }

@@ -1,14 +1,12 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
 import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.helper.MockEntityManager;
+import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.EntityManagerConfiguration;
-import net.deepthought.data.persistence.IEntityManager;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -29,12 +27,7 @@ public class WikipediaOnlineContentExtractorTest {
   public void setup() {
     wikipediaOnlineContentExtractor = new WikipediaOnlineContentExtractor();
 
-    Application.instantiate(new TestApplicationConfiguration(), new DefaultDependencyResolver() {
-      @Override
-      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new MockEntityManager();
-      }
-    });
+    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
   }
 
   @After

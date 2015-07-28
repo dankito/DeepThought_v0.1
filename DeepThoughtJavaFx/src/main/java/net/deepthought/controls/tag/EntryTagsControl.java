@@ -398,6 +398,10 @@ public class EntryTagsControl extends TitledPane {
           Platform.runLater(() -> {
             lastFilterTagsResults = results;
             filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
+
+            if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
+              lstvwAllTags.scrollTo(results.getLastResult().getExactMatch());
+
             callFilteredTagsChangedListeners(results);
           });
         }
@@ -409,7 +413,7 @@ public class EntryTagsControl extends TitledPane {
 
   protected void createNewTagOrToggleTagsAffiliation() {
     if(lastFilterTagsResults.getResults().size() == 0 || (lastFilterTagsResults.getResults().size() == 1 &&
-        (lastFilterTagsResults.getExactMatches().size() == 0 || lastFilterTagsResults.getOverAllSearchTerm().endsWith(",") == false)))
+        lastFilterTagsResults.getExactMatches().size() == 0 && lastFilterTagsResults.getOverAllSearchTerm().endsWith(",") == false))
       addNewTagToEntry();
     else {
       for(FilterTagsSearchResult result : lastFilterTagsResults.getResults()) {

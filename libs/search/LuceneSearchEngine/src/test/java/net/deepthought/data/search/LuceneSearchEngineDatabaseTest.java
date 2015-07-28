@@ -81,11 +81,12 @@ public class LuceneSearchEngineDatabaseTest {
     entryWithTags2.addTag(tag2);
     entryWithTags2.addTag(tag3);
 
-    searchEngine.indexEntity(entryWithoutTags1);
-    searchEngine.indexEntity(entryWithTags1);
-    searchEngine.indexEntity(entryWithoutTags2);
-    searchEngine.indexEntity(entryWithTags2);
-    searchEngine.indexEntity(entryWithoutTags3);
+    // TODO: is this really necessary?
+//    searchEngine.indexEntity(entryWithoutTags1);
+//    searchEngine.indexEntity(entryWithTags1);
+//    searchEngine.indexEntity(entryWithoutTags2);
+//    searchEngine.indexEntity(entryWithTags2);
+//    searchEngine.indexEntity(entryWithoutTags3);
 
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
