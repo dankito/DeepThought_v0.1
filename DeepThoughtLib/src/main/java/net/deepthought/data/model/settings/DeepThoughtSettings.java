@@ -43,6 +43,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected double entriesOverviewDividerPosition = 0.5;
 
+  protected WindowSettings mainWindowSettings = new WindowSettings(-1, -1, 1157, 621);
+
   protected ColumnSettings entriesOverviewIdColumnSettings = new ColumnSettings(false, 46);
 
   protected ColumnSettings entriesOverviewReferenceColumnSettings = new ColumnSettings(true, 140);
@@ -167,6 +169,10 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     Object previousValue = this.entriesOverviewDividerPosition;
     this.entriesOverviewDividerPosition = entriesOverviewDividerPosition;
     callSettingsChangedListeners(Setting.DeepThoughtEntriesOverviewDividerPosition, previousValue, entriesOverviewDividerPosition);
+  }
+
+  public WindowSettings getMainWindowSettings() {
+    return mainWindowSettings;
   }
 
   public ColumnSettings getEntriesOverviewIdColumnSettings() {

@@ -27,6 +27,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.SelectedTab;
@@ -70,7 +71,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -85,7 +85,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
@@ -93,7 +92,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
@@ -342,9 +340,11 @@ public class MainWindowController implements Initializable {
       tabTagsControl.deepThoughtChanged(deepThought);
       entriesOverviewControl.deepThoughtChanged(deepThought);
 
-      setSelectedTab(deepThought.getSettings().getLastSelectedTab());
+      DeepThoughtSettings settings = deepThought.getSettings();
 
-      contentPane.setDividerPositions(deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition());
+      FXUtils.applyWindowSettingsAndListenToChanges(stage, settings.getMainWindowSettings());
+      setSelectedTab(settings.getLastSelectedTab());
+      contentPane.setDividerPositions(settings.getMainWindowTabsAndEntriesOverviewDividerPosition());
 
       userDeviceSettingsChanged(); // TODO: isn't this redundant with selecting Tab and current category?
 

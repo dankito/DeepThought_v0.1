@@ -3,6 +3,7 @@ package net.deepthought.controls;
 import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
+import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.search.FilterTagsSearchResults;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -43,6 +44,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -81,7 +83,22 @@ public class FXUtils {
       cell.setBackground(Constants.FilteredTagsDefaultBackground);
   }
 
-  public static void applyColumnSettingsAndSaveChanges(TableColumn column, ColumnSettings settings) {
+  public static void applyWindowSettingsAndListenToChanges(Stage stage, WindowSettings settings) {
+    if(settings.getX() > 0)
+      stage.setX(settings.getX());
+    if(settings.getY() > 0)
+      stage.setY(settings.getY());
+    stage.setWidth(settings.getWidth());
+    stage.setHeight(settings.getHeight());
+
+    // TODO: remove these listeners if DeepThought changes
+    stage.xProperty().addListener(((observableValue, oldValue, newValue) -> settings.setX(newValue.doubleValue())));
+    stage.yProperty().addListener(((observableValue, oldValue, newValue) -> settings.setY(newValue.doubleValue())));
+    stage.widthProperty().addListener(((observableValue, oldValue, newValue) -> settings.setWidth(newValue.doubleValue())));
+    stage.heightProperty().addListener(((observableValue, oldValue, newValue) -> settings.setHeight(newValue.doubleValue())));
+  }
+
+  public static void applyColumnSettingsAndListenToChanges(TableColumn column, ColumnSettings settings) {
     column.setVisible(settings.isVisible());
     column.setPrefWidth(settings.getWidth());
 

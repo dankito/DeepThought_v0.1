@@ -186,12 +186,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(newDeepThought != null) {
       DeepThoughtSettings settings = deepThought.getSettings();
 
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnId, settings.getEntriesOverviewIdColumnSettings());
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnReferencePreview, settings.getEntriesOverviewReferenceColumnSettings());
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnEntryPreview, settings.getEntriesOverviewEntryPreviewColumnSettings());
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnTags, settings.getEntriesOverviewTagsColumnSettings());
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnCreated, settings.getEntriesOverviewCreatedColumnSettings());
-      FXUtils.applyColumnSettingsAndSaveChanges(clmnModified, settings.getEntriesOverviewModifiedColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnId, settings.getEntriesOverviewIdColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnReferencePreview, settings.getEntriesOverviewReferenceColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnEntryPreview, settings.getEntriesOverviewEntryPreviewColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnTags, settings.getEntriesOverviewTagsColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnCreated, settings.getEntriesOverviewCreatedColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnModified, settings.getEntriesOverviewModifiedColumnSettings());
 
       if (settings.getLastViewedEntry() != null) {
         // no, don't set Entry, as TableView then iterates through all Entries in Table to find selected Entry -> would eventually load a lot of Entries from Database
