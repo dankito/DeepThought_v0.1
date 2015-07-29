@@ -20,28 +20,21 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
-import net.deepthought.util.Empty;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
-import org.controlsfx.control.textfield.CustomTextField;
-import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
@@ -50,18 +43,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends TitledPane {
+public class EntryReferenceControl extends TitledPane implements ISelectedReferenceHolder {
 
   private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
 
@@ -99,13 +90,7 @@ public class EntryReferenceControl extends TitledPane {
   @FXML
   protected TextField txtfldReferenceIndication;
 
-  @FXML
-  protected Pane paneSearchForReference;
-  @FXML
-  protected CustomTextField txtfldSearchForReference;
-
-  @FXML
-  protected ListView<ReferenceBase> lstvwReferences;
+  protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
 
   public EntryReferenceControl() {
@@ -188,7 +173,6 @@ public class EntryReferenceControl extends TitledPane {
 
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      resetListViewReferenceBasesItems(deepThought);
     }
   }
 
@@ -206,44 +190,8 @@ public class EntryReferenceControl extends TitledPane {
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->
         fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndication, txtfldReferenceIndication.getText()));
 
-    // replace normal TextField txtfldSearchForPerson with a SearchTextField (with a cross to clear selection)
-    paneSearchForReference.getChildren().remove(txtfldSearchForReference);
-    txtfldSearchForReference = (CustomTextField) TextFields.createClearableTextField();
-    txtfldSearchForReference.setId("txtfldSearchForReference");
-    paneSearchForReference.getChildren().add(1, txtfldSearchForReference);
-    HBox.setHgrow(txtfldSearchForReference, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForReference, "search.for.reference");
-    txtfldSearchForReference.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        filterReferenceBases();
-      }
-    });
-    txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
-
-    lstvwReferences.setCellFactory((listView) -> new ReferenceBaseListCell(this));
-
-    listViewReferenceBasesItems = new LazyLoadingObservableList<>();
-//    listViewReferenceBasesItems = new CombinedLazyLoadingObservableList<>();
-    lstvwReferences.setItems(listViewReferenceBasesItems);
-
-    // TODO: - check if DeepThough != null  - react on changes to SeriesTitles etc. - Make ListView items searchable
-    if(Application.getDeepThought() != null)
-      resetListViewReferenceBasesItems(Application.getDeepThought());
-  }
-
-  protected void filterReferenceBases() {
-    if(filterReferenceBasesSearch != null && filterReferenceBasesSearch.isCompleted() == false)
-      filterReferenceBasesSearch.interrupt();
-
-    filterReferenceBasesSearch = new Search<>(txtfldSearchForReference.getText(), (results) -> {
-      listViewReferenceBasesItems.setUnderlyingCollection(results);
-    });
-    Application.getSearchEngine().filterReferenceBases(filterReferenceBasesSearch);
-  }
-
-  protected void handleTextFieldSearchForReferenceAction() {
-
+    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(this);
+    setContent(searchAndSelectReferenceControl);
   }
 
 
@@ -277,7 +225,7 @@ public class EntryReferenceControl extends TitledPane {
     });
   }
 
-  protected void selectedReferenceBaseChanged(final ReferenceBase newReferenceBase) {
+  public void selectedReferenceBaseChanged(final ReferenceBase newReferenceBase) {
     if(Platform.isFxApplicationThread())
       selectedReferenceBaseChangedOnUiThread(newReferenceBase);
     else
@@ -339,42 +287,6 @@ public class EntryReferenceControl extends TitledPane {
   };
 
 
-  protected ChangeListener<ReferenceBase> cmbxSeriesTitleOrReferenceValueChangedListener = new ChangeListener<ReferenceBase>() {
-    @Override
-    public void changed(ObservableValue<? extends ReferenceBase> observable, ReferenceBase oldValue, ReferenceBase newValue) {
-      log.debug("Selected reference changed to {}", newValue);
-      if(newValue instanceof Reference) {
-        if(newValue != entry.getReference())
-//        entry.setReference(newValue);
-          fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newValue);
-        if(((Reference)newValue).getSeries() != entry.getSeries())
-          fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newValue);
-      }
-      else if(newValue instanceof SeriesTitle) {
-        if(newValue != entry.getSeries())
-          fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newValue);
-        if(entry.getReference() != null)
-          fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newValue);
-      }
-
-      if(newValue == null || Empty.Reference.equals(newValue)) {
-        btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.New);
-        btnNewOrEditReference.setShowNewMenuItem(false);
-      }
-      else {
-        if(newValue instanceof SeriesTitle) {
-          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-          btnNewOrEditReference.setShowNewMenuItem(true);
-        }
-        else {
-          btnNewOrEditReference.setButtonFunction(NewOrEditButton.ButtonFunction.Edit);
-          btnNewOrEditReference.setShowNewMenuItem(true);
-        }
-      }
-    }
-  };
-
-
   protected EntityListener entryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
@@ -432,15 +344,13 @@ public class EntryReferenceControl extends TitledPane {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      checkIfReferencesHaveBeenUpdated(collectionHolder, addedEntity);
+
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       // TODO: this is not working this way
       if(updatedEntity.equals(entry.getSeries()) || updatedEntity.equals(entry.getReference()) || updatedEntity.equals(entry.getReferenceSubDivision())) {
-//        cmbxSeriesTitleOrReference.valueProperty().removeListener(cmbxSeriesTitleOrReferenceValueChangedListener);
-
         if(entry.getReferenceSubDivision() != null)
           selectedReferenceBaseChanged(entry.getReferenceSubDivision());
         else if(entry.getReference() != null)
@@ -449,42 +359,14 @@ public class EntryReferenceControl extends TitledPane {
           selectedReferenceBaseChanged(entry.getSeries());
         else
           selectedReferenceBaseChanged(null);
-
-//        cmbxSeriesTitleOrReference.valueProperty().addListener(cmbxSeriesTitleOrReferenceValueChangedListener);
       }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      checkIfReferencesHaveBeenUpdated(collectionHolder, removedEntity);
+
     }
   };
-
-  protected void checkIfReferencesHaveBeenUpdated(BaseEntity collectionHolder, BaseEntity entity) {
-    if(collectionHolder instanceof DeepThought) {
-      DeepThought deepThought = (DeepThought)collectionHolder;
-      if(entity instanceof SeriesTitle || entity instanceof Reference || entity instanceof ReferenceSubDivision) {
-        resetListViewReferenceBasesItems(deepThought); // TODO: actually only SeriesTitles or References have to be updated
-      }
-    }
-  }
-
-  protected void resetListViewReferenceBasesItems(DeepThought deepThought) {
-//    listViewReferenceBasesItems.clear();
-//
-//    listViewReferenceBasesItems.addAll(deepThought.getSeriesTitles());
-//    listViewReferenceBasesItems.addAll(deepThought.getReferences());
-////    for(Reference reference : deepThought.getReferences()) {
-////      listViewReferenceBasesItems.add(reference);
-////      listViewReferenceBasesItems.addAll(reference.getSubDivisions());
-////    }
-//    listViewReferenceBasesItems.addAll(deepThought.getReferenceSubDivisions());
-
-    listViewReferenceBasesItems.setUnderlyingCollection(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles(), Application.getDeepThought().getReferences(),
-        Application.getDeepThought().getReferenceSubDivisions()));
-
-    filterReferenceBases();
-  }
 
 
 
@@ -523,23 +405,5 @@ public class EntryReferenceControl extends TitledPane {
   public String getReferenceIndication() {
     return txtfldReferenceIndication.getText();
   }
-
-
-  protected Comparator<ReferenceBase> referenceBaseComparator = new Comparator<ReferenceBase>() {
-    @Override
-    public int compare(ReferenceBase o1, ReferenceBase o2) {
-      if(o1 == null && o2 == null)
-        return 0;
-      else if(o1 != null && o2 == null)
-        return -1;
-      if(o1 == null && o2 != null)
-        return 1;
-
-      String preview1 = o1.getTextRepresentation();
-      String preview2 = o2.getTextRepresentation();
-
-      return preview1.compareToIgnoreCase(preview2);
-    }
-  };
 
 }

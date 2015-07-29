@@ -43,7 +43,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   private final static Logger log = LoggerFactory.getLogger(ReferenceBaseListCell.class);
 
 
-  protected EntryReferenceControl entryReferenceControl;
+  protected ISelectedReferenceHolder selectedReferenceHolder;
 
   protected HBox graphicPane = new HBox();
 
@@ -55,9 +55,9 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   protected Button btnDeleteReferenceBase = new Button();
 
 
-  public ReferenceBaseListCell(EntryReferenceControl entryReferenceControl) {
-    this.entryReferenceControl = entryReferenceControl;
-    entryReferenceControl.addFieldChangedEvent(event -> setButtonAddOrRemoveReferenceBaseState());
+  public ReferenceBaseListCell(ISelectedReferenceHolder selectedReferenceHolder) {
+    this.selectedReferenceHolder = selectedReferenceHolder;
+    selectedReferenceHolder.addFieldChangedEvent(event -> setButtonAddOrRemoveReferenceBaseState());
 
     setText(null);
     setupGraphic();
@@ -174,7 +174,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   }
 
   protected boolean isReferenceBaseSetOnEntity(ReferenceBase referenceBase) {
-    return referenceBase.equals(entryReferenceControl.getSelectedReferenceBase());
+    return referenceBase.equals(selectedReferenceHolder.getSelectedReferenceBase());
   }
 
 
@@ -259,12 +259,12 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   }
 
   protected void addReferenceBaseToEntry(ReferenceBase referenceBase) {
-    entryReferenceControl.selectedReferenceBaseChanged(referenceBase);
+    selectedReferenceHolder.selectedReferenceBaseChanged(referenceBase);
     setButtonAddOrRemoveReferenceBaseState();
   }
 
   protected void removeReferenceBaseFromEntry(ReferenceBase referenceBase) {
-    entryReferenceControl.selectedReferenceBaseChanged(null);
+    selectedReferenceHolder.selectedReferenceBaseChanged(null);
     setButtonAddOrRemoveReferenceBaseState();
   }
 
