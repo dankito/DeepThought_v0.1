@@ -6,7 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<fx:root fx:id="pnContent" maxHeight="230.0" minHeight="230.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="pnContent" maxHeight="1.7976931348623157E308" minHeight="230.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <HBox fx:id="pnFilterTags" alignment="CENTER_LEFT" prefHeight="40.0">
          <children>
@@ -21,6 +21,6 @@
             <Insets bottom="6.0" top="6.0" />
          </VBox.margin>
       </HBox>
-      <ListView fx:id="lstvwAllTags" editable="true" minHeight="150.0" />
+      <ListView fx:id="lstvwAllTags" editable="true" maxHeight="1.7976931348623157E308" minHeight="150.0" VBox.vgrow="ALWAYS" />
    </children>
 </fx:root>

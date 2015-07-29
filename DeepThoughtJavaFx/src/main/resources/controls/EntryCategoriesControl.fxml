@@ -29,7 +29,7 @@
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" maxHeight="230.0" maxWidth="1.7976931348623157E308" minHeight="230.0">
+      <VBox fx:id="pnContent">
          <children>
             <HBox fx:id="pnFilterCategories" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
@@ -44,7 +44,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <TreeView fx:id="trvwCategories" editable="true" minHeight="150.0" showRoot="false" />
+            <TreeView fx:id="trvwCategories" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="230.0" showRoot="false" />
          </children>
       </VBox>
    </content>

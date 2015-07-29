@@ -93,46 +93,39 @@
                               <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />
                            </content>
                         </TitledPane>
-                        <HBox fx:id="paneTagsAndCategories">
+                        <HBox fx:id="paneTagsAndCategories" VBox.vgrow="ALWAYS">
                            <VBox.margin>
                               <Insets top="6.0" />
                            </VBox.margin>
                         </HBox>
-                        <VBox>
-                           <children>
-                              <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false">
-                                 <graphic>
-                                    <HBox alignment="CENTER_LEFT">
-                                       <children>
-                                          <Label text="%files" />
-                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
-                                             <HBox.margin>
-                                                <Insets left="6.0" right="6.0" />
-                                             </HBox.margin>
-                                          </Button>
-                                          <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                    </HBox>
-                                 </graphic>
-                                 <VBox.margin>
-                                    <Insets top="12.0" />
-                                 </VBox.margin>
-                                 <content>
-                                    <TreeTableView fx:id="trtblvwFiles" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
-                                      <columns>
-                                        <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
-                                      </columns>
-                                       <columnResizePolicy>
-                                          <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                       </columnResizePolicy>
-                                    </TreeTableView>
-                                 </content>
-                              </TitledPane>
-                           </children>
+                        <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false" VBox.vgrow="SOMETIMES">
+                           <graphic>
+                              <HBox alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label text="%files" />
+                                    <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
+                                       <HBox.margin>
+                                          <Insets left="6.0" right="6.0" />
+                                       </HBox.margin>
+                                    </Button>
+                                    <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                 </children>
+                              </HBox>
+                           </graphic>
                            <VBox.margin>
-                              <Insets top="6.0" />
+                              <Insets top="12.0" />
                            </VBox.margin>
-                        </VBox>
+                           <content>
+                              <TreeTableView fx:id="trtblvwFiles" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
+                                <columns>
+                                  <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TreeTableView>
+                           </content>
+                        </TitledPane>
                      </children>
                   </VBox>
                </content>

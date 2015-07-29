@@ -6,7 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<fx:root animated="false" maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root animated="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" type="javafx.scene.control.TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <graphic>
       <HBox fx:id="pnPersonsGraphic" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="22.0">
          <children>
@@ -20,7 +20,7 @@
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" prefHeight="200.0">
+      <VBox fx:id="pnContent" maxHeight="1.7976931348623157E308" minHeight="200.0">
          <children>
             <HBox fx:id="hboxSearchForPerson" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>

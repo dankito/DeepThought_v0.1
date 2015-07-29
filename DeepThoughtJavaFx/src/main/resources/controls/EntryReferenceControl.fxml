@@ -6,9 +6,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<fx:root minWidth="375.0" type="TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="1.7976931348623157E308" minWidth="375.0" type="TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <content>
-      <VBox maxWidth="1.7976931348623157E308" prefHeight="286.0">
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="286.0">
             <children>
             <HBox fx:id="paneSearchForReference" alignment="CENTER_LEFT">
                <children>
@@ -23,7 +23,7 @@
                   <Insets top="6.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="lstvwReferences" minHeight="200.0" prefHeight="200.0">
+            <ListView fx:id="lstvwReferences" maxHeight="1.7976931348623157E308" minHeight="200.0">
                <VBox.margin>
                   <Insets top="6.0" />
                </VBox.margin>
