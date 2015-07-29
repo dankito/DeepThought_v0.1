@@ -52,7 +52,7 @@ public class SearchAndSelectTagsControl extends VBox {
 
 
   protected Entry entry = null;
-  protected EntryTagsControl entryTagsControl = null;
+  protected IEditedTagsHolder editedTagsHolder = null;
 
   protected DeepThought deepThought = null;
 
@@ -77,9 +77,9 @@ public class SearchAndSelectTagsControl extends VBox {
   protected ListView<Tag> lstvwAllTags;
 
 
-  public SearchAndSelectTagsControl(Entry entry, EntryTagsControl entryTagsControl) {
+  public SearchAndSelectTagsControl(Entry entry, IEditedTagsHolder editedTagsHolder) {
     this.entry = entry;
-    this.entryTagsControl = entryTagsControl;
+    this.editedTagsHolder = editedTagsHolder;
 
     deepThought = Application.getDeepThought();
 
@@ -134,7 +134,7 @@ public class SearchAndSelectTagsControl extends VBox {
     JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "Find tags to add");
 
     lstvwAllTags.setCellFactory(listView -> {
-      return new TagListCell(this, entryTagsControl);
+      return new TagListCell(this, editedTagsHolder);
     });
 
     listViewAllTagsItems = lstvwAllTags.getItems();
@@ -218,10 +218,10 @@ public class SearchAndSelectTagsControl extends VBox {
     if(tag == null)
       return;
 
-    if(entryTagsControl.editedTags.contains(tag) == false)
-      entryTagsControl.addTagToEntry(tag);
+    if(editedTagsHolder.containsEditedTag(tag) == false)
+      editedTagsHolder.addTagToEntry(tag);
     else
-      entryTagsControl.removeTagFromEntry(tag);
+      editedTagsHolder.removeTagFromEntry(tag);
   }
 
   protected void addNewTagToEntry() {
@@ -232,7 +232,7 @@ public class SearchAndSelectTagsControl extends VBox {
     Tag newTag = new Tag(tagName);
     Application.getDeepThought().addTag(newTag);
 
-    entryTagsControl.addTagToEntry(newTag);
+    editedTagsHolder.addTagToEntry(newTag);
 
     btnCreateTag.setDisable(true);
   }

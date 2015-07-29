@@ -38,7 +38,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryTagsControl extends TitledPane {
+public class EntryTagsControl extends TitledPane implements IEditedTagsHolder {
 
   private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
 
@@ -157,7 +157,7 @@ public class EntryTagsControl extends TitledPane {
     }
   }
 
-  protected void addTagToEntry(Tag tag) {
+  public void addTagToEntry(Tag tag) {
     if(removedTags.contains(tag)) {
       removedTags.remove(tag);
     }
@@ -176,7 +176,7 @@ public class EntryTagsControl extends TitledPane {
     editedTags.add(tag);
   }
 
-  protected void removeTagFromEntry(Tag tag) {
+  public void removeTagFromEntry(Tag tag) {
     if(addedTags.contains(tag)) {
       addedTags.remove(tag);
     } else {
@@ -187,6 +187,10 @@ public class EntryTagsControl extends TitledPane {
 
     showEntryTags(entry);
     fireTagRemovedEvent(entry, tag);
+  }
+
+  public boolean containsEditedTag(Tag tag) {
+    return editedTags.contains(tag);
   }
 
   public void setEntry(Entry entry) {

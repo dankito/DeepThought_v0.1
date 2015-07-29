@@ -45,7 +45,7 @@ public class TagListCell extends ListCell<Tag> {
 
   protected Tag tag = null;
 
-  protected EntryTagsControl entryTagsControl = null;
+  protected IEditedTagsHolder editedTagsHolder = null;
 
   protected HBox graphicsPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
@@ -58,9 +58,9 @@ public class TagListCell extends ListCell<Tag> {
   protected FilterTagsSearchResults filterTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
 
 
-  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, EntryTagsControl entryTagsControl) {
-    this.entryTagsControl = entryTagsControl;
-    entryTagsControl.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
+  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedTagsHolder editedTagsHolder) {
+    this.editedTagsHolder = editedTagsHolder;
+    editedTagsHolder.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
 
     filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
     searchAndSelectTagsControl.addFilteredTagsChangedListener(results -> {
@@ -138,7 +138,7 @@ public class TagListCell extends ListCell<Tag> {
 
       chkbxIsTagSelected.selectedProperty().removeListener(checkBoxIsTagSelectedChangeListener);
 
-      chkbxIsTagSelected.setSelected(entryTagsControl.getEditedTags().contains(item));
+      chkbxIsTagSelected.setSelected(editedTagsHolder.containsEditedTag(item));
 
       chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
 
@@ -184,9 +184,9 @@ public class TagListCell extends ListCell<Tag> {
 
   protected void handleCheckBoxSelectedChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
     if(newValue == true)
-      entryTagsControl.addTagToEntry(getItem());
+      editedTagsHolder.addTagToEntry(getItem());
     else
-      entryTagsControl.removeTagFromEntry(getItem());
+      editedTagsHolder.removeTagFromEntry(getItem());
   }
 
   protected void handleButtonEditTagAction(ActionEvent event) {
@@ -199,10 +199,10 @@ public class TagListCell extends ListCell<Tag> {
         //Dialogs.showEditTagDialog(getItem());
 
         if (getItem() != null) {
-          if (entryTagsControl.getEditedTags().contains(getItem()) == false)
-            entryTagsControl.addTagToEntry(getItem());
+          if (editedTagsHolder.containsEditedTag(getItem()) == false)
+            editedTagsHolder.addTagToEntry(getItem());
           else
-            entryTagsControl.removeTagFromEntry(getItem());
+            editedTagsHolder.removeTagFromEntry(getItem());
         }
       }
 

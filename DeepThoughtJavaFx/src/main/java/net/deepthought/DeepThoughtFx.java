@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Application;
 import javafx.application.HostServices;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -48,8 +47,7 @@ public class DeepThoughtFx extends Application {
 //    scene.getStylesheets().add(mainDocumentCss);
 
       stage.setScene(scene);
-      stage.titleProperty().bind(Bindings.createStringBinding(
-          () -> Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing") + " - DeepThought", JavaFxLocalization.localeProperty()));
+      JavaFxLocalization.bindStageTitle(stage, "main.window.title");
 
       MainWindowController controller = (MainWindowController)loader.getController();
       controller.setStage(stage);
