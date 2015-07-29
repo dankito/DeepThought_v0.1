@@ -20,17 +20,17 @@
       </HBox>
    </graphic>
    <content>
-      <VBox fx:id="pnContent" maxHeight="1.7976931348623157E308" minHeight="200.0">
+      <VBox fx:id="pnContent" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0">
          <children>
-            <HBox fx:id="hboxSearchForPerson" alignment="CENTER_LEFT" prefHeight="40.0">
+            <HBox fx:id="hboxSearchForPerson" alignment="CENTER_LEFT" prefHeight="32.0">
                <children>
                   <Label text="%search">
                      <HBox.margin>
                         <Insets right="6.0" />
                      </HBox.margin>
                   </Label>
-                  <CustomTextField fx:id="txtfldSearchForPerson" prefHeight="35.0" promptText="search.for.person" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnNewPerson" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonNewPersonAction" prefHeight="40.0" text="%new...">
+                  <CustomTextField fx:id="txtfldSearchForPerson" promptText="search.for.person" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnNewPerson" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonNewPersonAction" text="%new...">
                      <HBox.margin>
                         <Insets left="6.0" />
                      </HBox.margin>
@@ -40,7 +40,7 @@
                   <Insets bottom="6.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="lstvwAllPersons" minHeight="150.0" />
+            <ListView fx:id="lstvwAllPersons" maxHeight="1.7976931348623157E308" minHeight="150.0" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </content>

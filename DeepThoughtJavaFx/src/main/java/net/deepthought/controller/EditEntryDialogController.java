@@ -247,10 +247,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryPersonsControl.setExpanded(false);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
     contentPane.getChildren().add(contentPane.getChildren().size() - 1, entryPersonsControl);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));

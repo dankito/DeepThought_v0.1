@@ -10,127 +10,110 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" prefHeight="700.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
-   <center>
-      <BorderPane BorderPane.alignment="CENTER">
-         <bottom>
-            <AnchorPane prefHeight="42.0">
+   <bottom>
+      <AnchorPane prefHeight="42.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets right="6.0" />
-                           </HBox.margin>
-                        </Button>
-                        <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
-                           <font>
-                              <Font name="System Bold" size="15.0" />
-                           </font>
-                        </ToggleButton>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="40.0" prefWidth="120.0" text="%cancel">
-                           <HBox.margin>
-                              <Insets right="12.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="40.0" prefWidth="120.0" text="%apply">
-                           <HBox.margin>
-                              <Insets right="12.0" />
-                           </HBox.margin>
-                        </Button>
-                        <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="40.0" prefWidth="120.0" text="%ok" />
-                     </children>
-                     <BorderPane.margin>
-                        <Insets bottom="6.0" top="6.0" />
-                     </BorderPane.margin>
-                  </HBox>
+                  <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin>
+                  </Button>
+                  <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
+                     <font>
+                        <Font name="System Bold" size="15.0" />
+                     </font>
+                  </ToggleButton>
                </children>
-            </AnchorPane>
-         </bottom>
-         <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER" VBox.vgrow="ALWAYS">
-               <content>
-                  <VBox fx:id="contentPane" maxHeight="1.7976931348623157E308">
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="40.0" prefWidth="120.0" text="%cancel">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="40.0" prefWidth="120.0" text="%apply">
+                     <HBox.margin>
+                        <Insets right="12.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="40.0" prefWidth="120.0" text="%ok" />
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="6.0" top="6.0" />
+               </BorderPane.margin>
+            </HBox>
+         </children>
+      </AnchorPane>
+   </bottom>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+         <content>
+            <VBox fx:id="contentPane" maxHeight="1.7976931348623157E308">
+               <children>
+                  <AnchorPane maxHeight="40.0" VBox.vgrow="NEVER">
                      <children>
-                        <AnchorPane maxHeight="40.0">
+                        <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
-                                    <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                    </TextField>
-                                    <Rectangle arcHeight="5.0" arcWidth="5.0" height="34.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="3.0">
-                                       <HBox.margin>
-                                          <Insets left="6.0" />
-                                       </HBox.margin>
-                                    </Rectangle>
-                                 </children>
-                              </HBox>
+                              <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
+                              <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets />
+                                 </HBox.margin>
+                              </TextField>
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" height="34.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="3.0">
+                                 <HBox.margin>
+                                    <Insets left="6.0" />
+                                 </HBox.margin>
+                              </Rectangle>
                            </children>
-                        </AnchorPane>
-                        <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS">
-                           <VBox.margin>
-                              <Insets top="6.0" />
-                           </VBox.margin>
-                           <content>
-                              <HTMLEditor fx:id="htmledAbstract" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="120.0" prefHeight="150.0" />
-                           </content>
-                        </TitledPane>
-                        <TitledPane fx:id="ttldpnContent" animated="false" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
-                           <VBox.margin>
-                              <Insets top="6.0" />
-                           </VBox.margin>
-                           <content>
-                              <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />
-                           </content>
-                        </TitledPane>
-                        <HBox fx:id="paneTagsAndCategories" VBox.vgrow="ALWAYS">
-                           <VBox.margin>
-                              <Insets top="6.0" />
-                           </VBox.margin>
                         </HBox>
-                        <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false" VBox.vgrow="SOMETIMES">
-                           <graphic>
-                              <HBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label text="%files" />
-                                    <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
-                                       <HBox.margin>
-                                          <Insets left="6.0" right="6.0" />
-                                       </HBox.margin>
-                                    </Button>
-                                    <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
-                                 </children>
-                              </HBox>
-                           </graphic>
-                           <VBox.margin>
-                              <Insets top="12.0" />
-                           </VBox.margin>
-                           <content>
-                              <TreeTableView fx:id="trtblvwFiles" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
-                                <columns>
-                                  <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
-                                </columns>
-                                 <columnResizePolicy>
-                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TreeTableView>
-                           </content>
-                        </TitledPane>
                      </children>
-                  </VBox>
-               </content>
-            </ScrollPane>
-         </center>
-      </BorderPane>
+                  </AnchorPane>
+                  <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS">
+                     <content>
+                        <HTMLEditor fx:id="htmledAbstract" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="120.0" prefHeight="150.0" />
+                     </content>
+                  </TitledPane>
+                  <TitledPane fx:id="ttldpnContent" animated="false" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
+                     <content>
+                        <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />
+                     </content>
+                  </TitledPane>
+                  <HBox fx:id="paneTagsAndCategories" maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES" />
+                  <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false" maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES">
+                     <graphic>
+                        <HBox alignment="CENTER_LEFT">
+                           <children>
+                              <Label text="%files" />
+                              <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
+                                 <HBox.margin>
+                                    <Insets left="6.0" right="6.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                           </children>
+                        </HBox>
+                     </graphic>
+                     <content>
+                        <TreeTableView fx:id="trtblvwFiles" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
+                          <columns>
+                            <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
+                          </columns>
+                           <columnResizePolicy>
+                              <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </TreeTableView>
+                     </content>
+                  </TitledPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
    </center>
 </BorderPane>

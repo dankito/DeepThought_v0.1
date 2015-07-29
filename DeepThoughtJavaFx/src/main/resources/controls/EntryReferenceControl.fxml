@@ -6,24 +6,24 @@
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 
-<fx:root maxHeight="1.7976931348623157E308" minWidth="375.0" type="TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="375.0" type="TitledPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <content>
-      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="286.0">
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0">
             <children>
-            <HBox fx:id="paneSearchForReference" alignment="CENTER_LEFT">
+            <HBox fx:id="paneSearchForReference" alignment="CENTER_LEFT" prefHeight="32.0">
                <children>
-                  <Label prefHeight="40.0" text="%search">
+                  <Label text="%search">
                      <HBox.margin>
                         <Insets right="6.0" />
                      </HBox.margin>
                   </Label>
-                  <CustomTextField fx:id="txtfldSearchForReference" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                  <CustomTextField fx:id="txtfldSearchForReference" HBox.hgrow="ALWAYS" />
                </children>
                <VBox.margin>
                   <Insets top="6.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="lstvwReferences" maxHeight="1.7976931348623157E308" minHeight="200.0">
+            <ListView fx:id="lstvwReferences" maxHeight="1.7976931348623157E308" minHeight="150.0" VBox.vgrow="ALWAYS">
                <VBox.margin>
                   <Insets top="6.0" />
                </VBox.margin>
