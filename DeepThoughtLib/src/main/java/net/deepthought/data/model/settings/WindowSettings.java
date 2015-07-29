@@ -5,13 +5,13 @@ package net.deepthought.data.model.settings;
  */
 public class WindowSettings {
 
-  protected double x;
+  protected double x = -1;
 
-  protected double y;
+  protected double y = -1;
 
-  protected double width;
+  protected double width = -1;
 
-  protected double height;
+  protected double height = -1;
 
   protected Long idOfShownEntity = null;
 

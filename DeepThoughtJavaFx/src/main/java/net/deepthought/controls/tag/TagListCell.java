@@ -1,7 +1,6 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.controls.FXUtils;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -35,7 +34,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.util.StringConverter;
 
 /**
  * Created by ganymed on 30/11/14.
@@ -45,10 +43,9 @@ public class TagListCell extends ListCell<Tag> {
   private final static Logger log = LoggerFactory.getLogger(TagListCell.class);
 
 
-  protected Entry entry = null;
   protected Tag tag = null;
 
-  protected EntryTagsControl entryTagsControl;
+  protected EntryTagsControl entryTagsControl = null;
 
   protected HBox graphicsPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
@@ -61,26 +58,15 @@ public class TagListCell extends ListCell<Tag> {
   protected FilterTagsSearchResults filterTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
 
 
-  public TagListCell(Entry entry, EntryTagsControl entryTagsControl) {
-    this.entry = entry;
+  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, EntryTagsControl entryTagsControl) {
     this.entryTagsControl = entryTagsControl;
-//    entryTagsControl.getEditedTags().addListener(new SetChangeListener<Tag>() {
-//      @Override
-//      public void onChanged(Change<? extends Tag> change) {
-//
-//      }
-//    });
     entryTagsControl.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
 
-    filterTagsSearchResults = entryTagsControl.lastFilterTagsResults;
-    entryTagsControl.addFilteredTagsChangedListener(results -> {
+    filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
+    searchAndSelectTagsControl.addFilteredTagsChangedListener(results -> {
       filterTagsSearchResults = results;
       setCellBackgroundColor();
     });
-
-
-    if(entry != null)
-      entry.addEntityListener(entryListener);
 
     setupGraphics();
 
@@ -128,15 +114,6 @@ public class TagListCell extends ListCell<Tag> {
     chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
     btnEditTag.setOnAction((event) -> handleButtonEditTagAction(event));
     btnDeleteTag.setOnAction((event) -> handleButtonDeleteTagAction(event));
-
-    setOnMouseClicked(event -> {
-//      if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) { // add Tag to Entry on Double Click
-//        if(entryTagsControl.getEditedTags().contains(getItem()) == false)
-//          entryTagsControl.addTagToEntry(getItem());
-//        else
-//          entryTagsControl.removeTagFromEntry(getItem());
-//      }
-    });
   }
 
   @Override
@@ -161,10 +138,7 @@ public class TagListCell extends ListCell<Tag> {
 
       chkbxIsTagSelected.selectedProperty().removeListener(checkBoxIsTagSelectedChangeListener);
 
-      if(entry != null)
-        chkbxIsTagSelected.setSelected(entryTagsControl.getEditedTags().contains(item));
-      else
-        chkbxIsTagSelected.setSelected(false);
+      chkbxIsTagSelected.setSelected(entryTagsControl.getEditedTags().contains(item));
 
       chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
 
@@ -209,14 +183,9 @@ public class TagListCell extends ListCell<Tag> {
 
 
   protected void handleCheckBoxSelectedChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-    if(entry == null) // should actually never be the case
-      return;
-
     if(newValue == true)
-//      entry.addTag(getItem());
       entryTagsControl.addTagToEntry(getItem());
     else
-//      entry.removeTag(getItem());
       entryTagsControl.removeTagFromEntry(getItem());
   }
 
@@ -314,33 +283,9 @@ public class TagListCell extends ListCell<Tag> {
     setText(getTagStringRepresentation(tag));
   }
 
-  public void setEntry(Entry entry) {
-    if(this.entry != null)
-      this.entry.removeEntityListener(entryListener);
-
-    this.entry = entry;
-
-    if(this.entry != null)
-      this.entry.addEntityListener(entryListener);
-
-    updateItem(getItem(), getItem() == null);
-  }
-
   protected void handleButtonDeleteTagAction(ActionEvent event) {
     Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag);
   }
-
-  protected StringConverter<Tag> tagStringConverter = new StringConverter<Tag>() {
-    @Override
-    public String toString(Tag tag) {
-      return getTagStringRepresentation(tag);
-    }
-
-    @Override
-    public Tag fromString(String string) {
-      return null;
-    }
-  };
 
 
   protected EntityListener tagListener = new EntityListener() {
@@ -362,30 +307,6 @@ public class TagListCell extends ListCell<Tag> {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       tagUpdated();
-    }
-  };
-
-  protected EntityListener entryListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == entry.getTags() && addedEntity.equals(getItem()))
-        tagUpdated();
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == entry.getTags() && removedEntity.equals(getItem()))
-        tagUpdated();
     }
   };
 

@@ -57,6 +57,8 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected ColumnSettings entriesOverviewModifiedColumnSettings = new ColumnSettings(true, 176);
 
+  protected WindowSettings searchAndSelectTagsToolWindowSettings = new WindowSettings(-1, -1, 400, 375);
+
 
   public DeepThoughtSettings() {
 
@@ -197,6 +199,10 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   public ColumnSettings getEntriesOverviewModifiedColumnSettings() {
     return entriesOverviewModifiedColumnSettings;
+  }
+
+  public WindowSettings getSearchAndSelectTagsToolWindowSettings() {
+    return searchAndSelectTagsToolWindowSettings;
   }
 
 }

@@ -1,6 +1,8 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
+import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.event.EntryTagsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -8,51 +10,30 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.FilterTagsSearch;
-import net.deepthought.data.search.FilterTagsSearchResult;
-import net.deepthought.data.search.FilterTagsSearchResults;
-import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
-import net.deepthought.util.StringUtils;
 
-import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -63,23 +44,12 @@ public class EntryTagsControl extends TitledPane {
 
 
   protected Entry entry = null;
-  protected boolean hasEntryBeenSetBefore = false;
 
   protected DeepThought deepThought = null;
 
   protected ObservableSet<Tag> editedTags = FXCollections.observableSet();
   protected Set<Tag> addedTags = new HashSet<>();
   protected Set<Tag> removedTags = new HashSet<>();
-
-  protected ObservableList<Tag> listViewAllTagsItems = null;
-  protected FilteredList<Tag> filteredTags = null;
-  protected SortedList<Tag> sortedFilteredTags = null;
-
-  protected List<TagListCell> tagListCells = new ArrayList<>();
-
-  protected FilterTagsSearch filterTagsSearch = null;
-  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
-  protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected EventHandler<EntryTagsEditedEvent> tagAddedEventHandler = null;
   protected EventHandler<EntryTagsEditedEvent> tagRemovedEventHandler = null;
@@ -88,20 +58,13 @@ public class EntryTagsControl extends TitledPane {
   @FXML
   protected Pane pnGraphicsPane;
   @FXML
+  protected ToggleButton btnShowHideSearchTagsToolWindow;
+  @FXML
   protected Label lblTags;
   @FXML
   protected FlowPane pnSelectedTagsPreview;
 
-  @FXML
-  protected Pane pnContent;
-  @FXML
-  protected Pane pnFilterTags;
-  @FXML
-  protected TextField txtfldFilterTags;
-  @FXML
-  protected Button btnCreateTag;
-  @FXML
-  protected ListView<Tag> lstvwAllTags;
+  protected SearchAndSelectTagsControl searchAndSelectTagsControl = null;
 
 
   public EntryTagsControl() {
@@ -152,175 +115,46 @@ public class EntryTagsControl extends TitledPane {
 
     this.deepThought = newDeepThought;
 
-    listViewAllTagsItems.clear();
-
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      listViewAllTagsItems.addAll(deepThought.getTags());
     }
   }
 
   protected void setupControl() {
     this.setExpanded(false);
 
-    pnContent.setPrefHeight(175);
+    btnShowHideSearchTagsToolWindow.setGraphic(new ImageView(Constants.WindowIconPath));
+    btnShowHideSearchTagsToolWindow.selectedProperty().addListener(((observableValue, oldValue, newValue) -> btnShowHideSearchTagsToolWindowIsSelectedChanged(newValue)));
 
-    // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)
-    pnFilterTags.getChildren().remove(txtfldFilterTags);
-    txtfldFilterTags = TextFields.createClearableTextField();
-    pnFilterTags.getChildren().add(0, txtfldFilterTags);
-    HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
-    txtfldFilterTags.setPromptText("Find tags to add");
-
-    lstvwAllTags.setCellFactory(listView -> {
-      TagListCell cell = new TagListCell(entry, this);
-      tagListCells.add(cell);
-      return cell;
-    });
-
-    listViewAllTagsItems = lstvwAllTags.getItems();
-    if(deepThought != null)
-      listViewAllTagsItems.addAll(deepThought.getTags());
-    filteredTags = new FilteredList<>(listViewAllTagsItems, tag -> true);
-    sortedFilteredTags = new SortedList<>(filteredTags, tagComparator);
-    lstvwAllTags.setItems(sortedFilteredTags);
-
-    txtfldFilterTags.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        setControlsForEnteredTagsFilter(newValue);
-      }
-    });
-    txtfldFilterTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
-    txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-      if(event.getCode() == KeyCode.ESCAPE) {
-        txtfldFilterTags.clear();
-        event.consume();
-      }
-    });
+    searchAndSelectTagsControl = new SearchAndSelectTagsControl(entry, this);
+//    searchAndSelectTagsControl.setMaxHeight(200);
+    this.setContent(searchAndSelectTagsControl);
 
     showEntryTags(entry);
 
-//    this.sceneProperty().addListener(new ChangeListener<Scene>() {
-//      @Override
-//      public void changed(ObservableValue<? extends Scene> observable, Scene oldValue, Scene newValue) {
-//        newValue.getWindow().widthProperty().addListener(new ChangeListener<Number>() {
-//          @Override
-//          public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//            pnGraphicsPane.setPrefWidth(newValue.doubleValue() - 50);
-//          }
-//        });
-//      }
-//    });
-
-//    widthProperty().addListener((observable, oldValue, newValue) -> {
-//      pnSelectedTagsPreview.setPrefWrapLength(newValue.doubleValue() - lblTags.getWidth() - 50);
-//    });
-
     // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
-    this.widthProperty().addListener((observable, oldValue, newValue) -> {
-      if(lblTags.getWidth() > 0)
-        pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60);
-    });
-    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 60));
-  }
-
-  protected void showEntryTags(Entry entry) {
-//    if(hasEntryBeenSetBefore == false) { // doing this in setupControls() is too early as Dialog hasn't been fully layouted yet, so do it here
-//      hasEntryBeenSetBefore = true;
-//
-//      // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
-//      ChangeListener<? super Number> setWrapLengthListener = (observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength();
-//      this.widthProperty().addListener(setWrapLengthListener);
-//      lblTags.widthProperty().addListener(setWrapLengthListener);
-//    }
-
-    pnSelectedTagsPreview.getChildren().clear();
-
-    if(entry != null) {
-//      for(final Tag tag : entry.getTagsSorted()) {
-      for(final Tag tag : new TreeSet<>(editedTags)) {
-        pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> {
-          removeTagFromEntry(tag);
-          for (TagListCell cell : tagListCells) {
-            if (tag.equals(cell.tag)) {
-              cell.setComboBoxToUnselected();
-              break;
-            }
-          }
-        }));
-      }
-    }
+    this.widthProperty().addListener((observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength());
+    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength());
   }
 
   protected void setPaneSelectedTagsPreviewWrapLength() {
-    if(lblTags.getWidth() > 0) { // on the first call this.getWidth() == 0 -> maxWidth would be less than zero -> less than zero this means 'MAX_VALUE'
-      double adjustment = /*isInScrollPane() ? 90 :*/ 70;
-      double debug1 = this.getWidth();
-      double debug2 = lblTags.getWidth();
-      double debug3 = getScene().getWidth();
-      double debug = this.getWidth() - lblTags.getWidth() - adjustment;
-//      pnSelectedTagsPreview.setPrefWidth(this.getWidth() - lblTags.getWidth() - adjustment);
-      pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - adjustment);
-//      pnSelectedTagsPreview.setMaxWidth(this.getWidth() - lblTags.getWidth() - adjustment);
-//      pnSelectedTagsPreview.setPrefWrapLength(pnSelectedTagsPreview.getMaxWidth());
-//      pnSelectedTagsPreview.setPrefWidth(pnSelectedTagsPreview.getPrefWrapLength());
-//      pnSelectedTagsPreview.setPrefWidth(Region.USE_COMPUTED_SIZE);
-//      pnSelectedTagsPreview.getChildren().add(dummy);
-//      pnSelectedTagsPreview.getChildren().remove(dummy);
+    if(lblTags.getWidth() > 0) {
+      if(getScene() != null && this.getWidth() > getScene().getWidth()) { // when Window was maximized, stage width is set yet but control width isn't yet
+        pnSelectedTagsPreview.setPrefWrapLength(getMinWidth()); // -> setting WrapLength to control width would result in a way to large wrap length and therefor control being larger than space is available
+      }
+      else
+        pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 86);
     }
-//    else
-//      pnSelectedTagsPreview.setPrefWrapLength(this.getMinWidth() / 2);
   }
 
-  protected boolean isInScrollPane() {
-    if(this.getParent().getClass().getName().contains("ScrollPane"))
-      return true;
-    else if(this.getParent().getParent().getClass().getName().contains("ScrollPane"))
-      return true;
+  protected void showEntryTags(Entry entry) {
+    pnSelectedTagsPreview.getChildren().clear();
 
-    return false;
-  }
-
-
-  protected void setControlsForEnteredTagsFilter(String tagsFilter) {
-    filterTags(tagsFilter);
-
-    if(tagsFilter.contains(",")) {
-      JavaFxLocalization.bindLabeledText(btnCreateTag, "toggle");
+    if(entry != null) {
+      for(final Tag tag : new TreeSet<>(editedTags)) {
+        pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> removeTagFromEntry(tag)));
+      }
     }
-    else {
-      JavaFxLocalization.bindLabeledText(btnCreateTag, "new...");
-    }
-
-//    btnCreateTag.setDisable(checkIfTagOfThatNameExists(tagsFilter));
-    btnCreateTag.setDisable(StringUtils.isNullOrEmpty(tagsFilter));
-  }
-
-  protected boolean checkIfTagOfThatNameExists(String tagName) {
-    if(tagName == null || tagName.isEmpty())
-      return true;
-
-    if(checkIfSystemTagOfThatNameExists(tagName))
-      return true;
-
-    if(findTagOfThatName(tagName) != null) return true;
-
-    return false;
-  }
-
-  protected Tag findTagOfThatName(String tagName) {
-    for(Tag tag : Application.getDeepThought().getTags()) {
-      if(tagName.equals(tag.getName()))
-        return tag;
-    }
-
-    return null;
-  }
-
-  protected boolean checkIfSystemTagOfThatNameExists(String tagName) {
-    return Localization.getLocalizedStringForResourceKey("system.tag.all.entries").equals(tagName) ||
-        Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags").equals(tagName);
   }
 
   protected void addTagToEntry(Tag tag) {
@@ -339,20 +173,13 @@ public class EntryTagsControl extends TitledPane {
   }
 
   protected void addTagToEditedTags(Tag tag) {
-//    SortedSet<Tag> sortedTags = new TreeSet<>(editedTags);
-//    sortedTags.add(tag);
-//
-//    editedTags.clear();
-//    editedTags.addAll(sortedTags);
-
     editedTags.add(tag);
   }
 
   protected void removeTagFromEntry(Tag tag) {
     if(addedTags.contains(tag)) {
       addedTags.remove(tag);
-    }
-    else {
+    } else {
       removedTags.add(tag);
     }
 
@@ -361,118 +188,6 @@ public class EntryTagsControl extends TitledPane {
     showEntryTags(entry);
     fireTagRemovedEvent(entry, tag);
   }
-
-//  protected void filterTags(String filterConstraint) {
-//    filteredTags.setPredicate((tag) -> {
-//      // If filter text is empty, display all Tags.
-//      if (filterConstraint == null || filterConstraint.isEmpty()) {
-//        return true;
-//      }
-//
-//      String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
-//      String[] parts = lowerCaseFilterConstraint.split(",");
-//
-//      for (String part : parts) {
-//        if (tag.getName().toLowerCase().contains(part.trim())) {
-//          return true; // Filter matches Tag's name
-//        }
-//      }
-//
-//      return false; // Does not match.
-//    });
-//  }
-
-  protected void filterTags(String filterConstraint) {
-    if(filterTagsSearch != null)
-      filterTagsSearch.interrupt();
-
-    if(StringUtils.isNullOrEmpty(txtfldFilterTags.getText())) {
-      lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
-      filteredTags.setPredicate((tag) -> true);
-      callFilteredTagsChangedListeners(lastFilterTagsResults);
-    }
-    else {
-      filterTagsSearch = new FilterTagsSearch(txtfldFilterTags.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
-        @Override
-        public void completed(final FilterTagsSearchResults results) {
-          Platform.runLater(() -> {
-            lastFilterTagsResults = results;
-            filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
-
-            if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
-              lstvwAllTags.scrollTo(results.getLastResult().getExactMatch());
-
-            callFilteredTagsChangedListeners(results);
-          });
-        }
-      });
-
-      Application.getSearchEngine().filterTags(filterTagsSearch);
-    }
-  }
-
-  protected void createNewTagOrToggleTagsAffiliation() {
-    if(lastFilterTagsResults.getResults().size() == 0 || (lastFilterTagsResults.getResults().size() == 1 &&
-        lastFilterTagsResults.getExactMatches().size() == 0 && lastFilterTagsResults.getOverAllSearchTerm().endsWith(",") == false))
-      addNewTagToEntry();
-    else {
-      for(FilterTagsSearchResult result : lastFilterTagsResults.getResults()) {
-        if(result.hasExactMatch())
-          toggleTagAffiliation(result.getExactMatch());
-        else {
-//          addNewTagToEntry(result.getSearchTerm());
-          for (Tag match : result.getAllMatches())
-            toggleTagAffiliation(match);
-        }
-      }
-    }
-  }
-
-  protected void toggleTagAffiliation(Tag tag) {
-    if(tag == null)
-      return;
-
-    if(editedTags.contains(tag) == false)
-      addTagToEntry(tag);
-    else
-      removeTagFromEntry(tag);
-  }
-
-  protected void addNewTagToEntry() {
-    addNewTagToEntry(txtfldFilterTags.getText());
-  }
-
-  protected void addNewTagToEntry(String tagName) {
-    String newTagName = txtfldFilterTags.getText();
-    Tag newTag = new Tag(newTagName);
-    Application.getDeepThought().addTag(newTag);
-
-    //entry.addTag(newTag);
-    addTagToEntry(newTag);
-
-    btnCreateTag.setDisable(true);
-  }
-
-  protected Comparator<Tag> tagComparator = new Comparator<Tag>() {
-    @Override
-    public int compare(Tag tag1, Tag tag2) {
-      if(tag1 == null && tag2 == null) {
-//        log.debug("This should actually never be the case, both tag's name are null");
-        return 0;
-      }
-      if(tag1 == null || tag1.getName() == null) {
-//        log.debug("tag1 {} or its name is null", tag1);
-        return -1;
-      }
-      if(tag2 == null || tag2.getName() == null) {
-//        log.debug("tag2 {} or its name is null", tag2);
-        return 1;
-      }
-
-      return tag1.compareTo(tag2);
-    }
-  };
-
 
   public void setEntry(Entry entry) {
     if(this.entry != null)
@@ -490,31 +205,31 @@ public class EntryTagsControl extends TitledPane {
     }
 
     setDisable(entry == null);
-    txtfldFilterTags.clear();
     showEntryTags(entry);
-
-    for(TagListCell cell : tagListCells)
-      cell.setEntry(this.entry);
   }
 
-
-  public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
-    return filteredTagsChangedListeners.add(listener);
+  public void setSearchAndSelectTagsControlHeight(double height) {
+    searchAndSelectTagsControl.setMinHeight(height);
+    searchAndSelectTagsControl.setMaxHeight(height);
   }
 
-  public boolean removeFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
-    return filteredTagsChangedListeners.remove(listener);
+  protected Stage toolWindowSearchTags = null;
+
+  protected void btnShowHideSearchTagsToolWindowIsSelectedChanged(Boolean isSelected) {
+    if(isSelected == false)
+      toolWindowSearchTags.hide();
+    else {
+      if(toolWindowSearchTags == null)
+        toolWindowSearchTags = createToolWindowSearchTags();
+      toolWindowSearchTags.show();
+    }
   }
 
-  protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
-    for(IFilteredTagsChangedListener listener : filteredTagsChangedListeners)
-      listener.filteredTagsChanged(results);
-  }
+  protected Stage createToolWindowSearchTags() {
+    Stage stage = Dialogs.createToolWindowStage(new SearchAndSelectTagsControl(entry, this), getScene().getWindow(), "tags", deepThought.getSettings().getSearchAndSelectTagsToolWindowSettings());
+    stage.setOnHidden(event -> btnShowHideSearchTagsToolWindow.setSelected(false));
 
-
-  @FXML
-  public void handleButtonCreateTagAction(ActionEvent event) {
-    createNewTagOrToggleTagsAffiliation();
+    return stage;
   }
 
 
@@ -575,17 +290,10 @@ public class EntryTagsControl extends TitledPane {
       Tag tag = (Tag)entity;
 
       DeepThought deepThought = (DeepThought)collectionHolder;
-      resetListViewAllTagsItems(deepThought);
 
-      if(editedTags.contains(tag))
+      if(editedTags.contains(tag)) // TODO: is this correct? as also entityAddedToCollection() calls this method
         removeTagFromEntry(tag);
     }
-  }
-
-  protected void resetListViewAllTagsItems(DeepThought deepThought) {
-    listViewAllTagsItems.clear();
-    listViewAllTagsItems.addAll(deepThought.getTags());
-    filterTags(txtfldFilterTags.getText());
   }
 
 

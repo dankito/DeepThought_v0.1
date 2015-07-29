@@ -289,6 +289,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
     currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
+    currentEditedEntryTagsControl.setSearchAndSelectTagsControlHeight(190);
 
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) -> {
       Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
@@ -374,6 +375,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
       txtfldEntryAbstract.setText(selectedEntry.getAbstractAsPlainText());
+      txtfldEntryAbstract.positionCaret(0);
       htmledEntryContent.setHtmlText(selectedEntry.getContent());
       txtfldEntryAbstract.selectAll();
 

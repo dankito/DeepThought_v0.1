@@ -84,12 +84,17 @@ public class FXUtils {
   }
 
   public static void applyWindowSettingsAndListenToChanges(Stage stage, WindowSettings settings) {
+    if(settings == null)
+      return;
+
     if(settings.getX() > 0)
       stage.setX(settings.getX());
     if(settings.getY() > 0)
       stage.setY(settings.getY());
-    stage.setWidth(settings.getWidth());
-    stage.setHeight(settings.getHeight());
+    if(settings.getWidth() > 0)
+      stage.setWidth(settings.getWidth());
+    if(settings.getHeight() > 0)
+      stage.setHeight(settings.getHeight());
 
     // TODO: remove these listeners if DeepThought changes
     stage.xProperty().addListener(((observableValue, oldValue, newValue) -> settings.setX(newValue.doubleValue())));

@@ -20,6 +20,8 @@ public class Constants {
 
   public final static String UpdateIconPath = "icons/update_icon_32x32.png";
 
+  public final static String WindowIconPath = "icons/windows_icon_16x16.png";
+
 
   public final static Background FilteredTagsExactMatchBackground = new Background(new BackgroundFill(Color.GREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 

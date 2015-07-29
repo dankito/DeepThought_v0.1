@@ -2,13 +2,16 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 
 /**
  * Created by ganymed on 31/12/14.
@@ -32,6 +36,8 @@ public class Dialogs {
   private final static Logger log = LoggerFactory.getLogger(Dialogs.class);
 
   public final static String DialogsBaseFolder = "dialogs/";
+
+  public final static String ControlsBaseFolder = "controls/";
 
 
   protected static ObservableSet<Stage> openedChildWindows = FXCollections.observableSet();
@@ -287,7 +293,7 @@ public class Dialogs {
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
         public void windowClosing(Stage stage, ChildWindowsController controller) {
-          if(listener != null)
+          if (listener != null)
             listener.windowClosing(stage, controller);
         }
 
@@ -295,7 +301,7 @@ public class Dialogs {
         public void windowClosed(Stage stage, ChildWindowsController controller) {
           removeClosedChildWindow(stage);
 
-          if(listener != null)
+          if (listener != null)
             listener.windowClosed(stage, controller);
         }
       });
@@ -360,8 +366,17 @@ public class Dialogs {
   }
 
   protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality) throws java.io.IOException {
+    return createStage(loader, dialogFilename, stageStyle, modality, false);
+  }
+
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, boolean isToolWindow) throws java.io.IOException {
     loader.setResources(Localization.getStringsResourceBundle());
-    loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
+
+    if(isToolWindow == false)
+      loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
+    else
+      loader.setLocation(Dialogs.class.getClassLoader().getResource(ControlsBaseFolder + dialogFilename));
+
     Parent parent = loader.load();
 
     // Create the dialog Stage.
@@ -375,6 +390,31 @@ public class Dialogs {
     dialogStage.setScene(scene);
     return dialogStage;
   }
+
+
+  public static Stage createToolWindowStage(Parent parent, Window owner) {
+    return createToolWindowStage(parent, owner, "");
+  }
+
+  public static Stage createToolWindowStage(Parent parent, Window owner, String windowTitle) {
+    return createToolWindowStage(parent, owner, windowTitle, new WindowSettings());
+  }
+
+  public static Stage createToolWindowStage(Parent parent, Window owner, String windowTitle, WindowSettings settings) {
+    Stage stage = new Stage(StageStyle.UTILITY);
+
+    if(owner != null)
+      stage.initOwner(owner);
+
+    Scene scene = new Scene(parent);
+
+    stage.setScene(scene);
+    FXUtils.applyWindowSettingsAndListenToChanges(stage, settings);
+    JavaFxLocalization.bindStageTitle(stage, windowTitle);
+
+    return stage;
+  }
+
 
   protected static void addOpenedChildWindow(final Stage childWindow) {
     openedChildWindows.add(childWindow);

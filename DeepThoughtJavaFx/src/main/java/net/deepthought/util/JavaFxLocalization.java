@@ -10,6 +10,7 @@ import javafx.scene.control.Labeled;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Tooltip;
+import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 22/12/14.
@@ -56,6 +57,11 @@ public class JavaFxLocalization {
 
   public static void bindTextInputControlPromptText(TextInputControl control, final String key, final Object... formatArguments) {
     control.promptTextProperty().bind(Bindings.createStringBinding(
+        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+  }
+
+  public static void bindStageTitle(Stage stage, final String key, final Object... formatArguments) {
+    stage.titleProperty().bind(Bindings.createStringBinding(
         () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
