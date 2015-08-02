@@ -723,11 +723,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     if(search.filterOnlyEntriesWithoutTags())
       query.add(new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue)), BooleanClause.Occur.MUST);
-    else if(search.getEntriesToFilter().size() > 0) {
+    else if(search.getEntriesMustHaveTheseTags().size() > 0) {
       BooleanQuery filterEntriesQuery = new BooleanQuery();
-      // TODO: what if entriesToFilter are more than 1024 in size? A BooleanQuery can have at maximum 1024 clauses
-      for (Entry entry : search.getEntriesToFilter())
-        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryId, getByteRefFromLong(entry.getId()))), BooleanClause.Occur.SHOULD);
+      for (Tag tag : search.getEntriesMustHaveTheseTags())
+        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.SHOULD);
       query.add(filterEntriesQuery, BooleanClause.Occur.MUST);
     }
 

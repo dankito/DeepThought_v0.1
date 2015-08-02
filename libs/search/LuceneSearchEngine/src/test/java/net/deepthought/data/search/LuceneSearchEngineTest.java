@@ -533,7 +533,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntriesSpecifyWhichEntriesToFilter_OnlySpecifiedEntriesGetFound() {
+  public void filterEntriesWithSpecificTag_OnlyEntriesWithSpecifiedTagGetFound() {
     Entry entry1 = new Entry("Love");
     Entry entry2 = new Entry("Love");
     Entry entry3 = new Entry("Love");
@@ -541,12 +541,17 @@ public class LuceneSearchEngineTest {
     deepThought.addEntry(entry2);
     deepThought.addEntry(entry3);
 
-    Collection<Entry> entriesToFilter = Arrays.asList(new Entry[] { entry1, entry3 });
+    Tag tagToFind = new Tag("Tag");
+    deepThought.addTag(tagToFind);
+    entry1.addTag(tagToFind);
+    entry3.addTag(tagToFind);
+
+    Collection<Tag> tagsEntriesMustHave = Arrays.asList(new Tag[] { tagToFind });
 
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("love", true, false, entriesToFilter, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new FilterEntriesSearch("love", true, false, tagsEntriesMustHave, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);

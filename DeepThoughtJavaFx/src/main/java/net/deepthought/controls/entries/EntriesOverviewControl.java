@@ -617,7 +617,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       if(selectedTag instanceof EntriesWithoutTagsSystemTag)
         filterEntriesSearch.setFilterOnlyEntriesWithoutTags(true);
       else if(selectedTag instanceof SystemTag == false) {
-        filterEntriesSearch.setEntriesToFilter(unfilteredCurrentEntriesToShow);
+        filterEntriesSearch.addTagEntriesMustHave(deepThought.getSettings().getLastViewedTag());
       }
 
       Application.getSearchEngine().filterEntries(filterEntriesSearch);

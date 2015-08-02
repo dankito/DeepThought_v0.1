@@ -1,6 +1,7 @@
 package net.deepthought.data.search.specific;
 
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
 
@@ -15,6 +16,8 @@ public class FilterEntriesSearch extends Search<Entry> {
   protected boolean filterAbstract;
 
   protected boolean filterContent;
+
+  protected Collection<Tag> entriesMustHaveTheseTags = new ArrayList<>();
 
   protected Collection<Entry> entriesToFilter = new ArrayList<>();
 
@@ -41,10 +44,10 @@ public class FilterEntriesSearch extends Search<Entry> {
     this.filterOnlyEntriesWithoutTags = filterOnlyEntriesWithoutTags;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Entry> entriesToFilter, SearchCompletedListener<Collection<Entry>> completedListener) {
+  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Tag> entriesMustHaveTheseTags, SearchCompletedListener<Collection<Entry>> completedListener) {
     this(searchTerm, filterContent, filterAbstract, completedListener);
 
-    this.entriesToFilter = entriesToFilter;
+    this.entriesMustHaveTheseTags = entriesMustHaveTheseTags;
   }
 
 
@@ -64,12 +67,16 @@ public class FilterEntriesSearch extends Search<Entry> {
     this.filterContent = filterContent;
   }
 
-  public Collection<Entry> getEntriesToFilter() {
-    return entriesToFilter;
+  public Collection<Tag> getEntriesMustHaveTheseTags() {
+    return entriesMustHaveTheseTags;
   }
 
-  public void setEntriesToFilter(Collection<Entry> entriesToFilter) {
-    this.entriesToFilter = entriesToFilter;
+  public void setEntriesMustHaveTheseTags(Collection<Tag> entriesMustHaveTheseTags) {
+    this.entriesMustHaveTheseTags = entriesMustHaveTheseTags;
+  }
+
+  public boolean addTagEntriesMustHave(Tag tag) {
+    return entriesMustHaveTheseTags.add(tag);
   }
 
   public boolean filterOnlyEntriesWithoutTags() {
