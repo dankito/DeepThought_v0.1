@@ -49,7 +49,7 @@ public abstract class AbstractBackupFileService implements IBackupFileService {
 
 
   protected BackupFileServiceType findFileServiceTypeForKey(String fileServiceTypeKey) {
-    String translatedKey = Localization.getLocalizedStringForResourceKey(fileServiceTypeKey);
+    String translatedKey = Localization.getLocalizedString(fileServiceTypeKey);
 
     for(BackupFileServiceType fileServiceType : Application.getDeepThought().getBackupFileServiceTypes()) {
       if(fileServiceType.getName().equals(translatedKey))
@@ -358,7 +358,7 @@ public abstract class AbstractBackupFileService implements IBackupFileService {
 
   @Override
   public String toString() {
-//    return Localization.getLocalizedStringForResourceKey(getFileTypeKey());
+//    return Localization.getLocalizedString(getFileTypeKey());
     return "" + getFileServiceType();
   }
 }

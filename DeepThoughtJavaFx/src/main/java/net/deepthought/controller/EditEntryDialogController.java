@@ -597,9 +597,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected void updateWindowTitle(String entryTitle) {
     if(this.entry.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.entry", entryTitle));
+      windowStage.setTitle(Localization.getLocalizedString("create.entry", entryTitle));
     else
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.entry", entryTitle));
+      windowStage.setTitle(Localization.getLocalizedString("edit.entry", entryTitle));
   }
 
 

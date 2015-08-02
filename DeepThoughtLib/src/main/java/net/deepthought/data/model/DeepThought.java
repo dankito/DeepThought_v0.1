@@ -587,7 +587,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
         entry.setSeries(null);
 
       if(subDivision.getReference() != null)
-        subDivision.getReference().removeSubDivision(subDivision);
+        subDivision.setReference(null);
       if(subDivision.getParentSubDivision() != null)
         subDivision.getParentSubDivision().removeSubDivision(subDivision);
       for(ReferenceSubDivision subSubDivision : new ArrayList<>(subDivision.getSubDivisions()))

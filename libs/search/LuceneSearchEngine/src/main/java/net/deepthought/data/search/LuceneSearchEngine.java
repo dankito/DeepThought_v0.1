@@ -20,6 +20,12 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
 import net.deepthought.data.search.results.LazyLoadingReferenceBasesSearchResultsList;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
+import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.FilterTagsSearchResult;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.data.search.specific.IndexTerm;
 import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -673,7 +679,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
     Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
     Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
@@ -719,6 +725,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       query.add(new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue)), BooleanClause.Occur.MUST);
     else if(search.getEntriesToFilter().size() > 0) {
       BooleanQuery filterEntriesQuery = new BooleanQuery();
+      // TODO: what if entriesToFilter are more than 1024 in size? A BooleanQuery can have at maximum 1024 clauses
       for (Entry entry : search.getEntriesToFilter())
         filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryId, getByteRefFromLong(entry.getId()))), BooleanClause.Occur.SHOULD);
       query.add(filterEntriesQuery, BooleanClause.Occur.MUST);
@@ -731,7 +738,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //        QueryParser parser = new QueryParser(FieldName.EntryContent, analyzer);
 //        query.add(parser.parse(contentFilter), BooleanClause.Occur.SHOULD);
         contentFilter = QueryParser.escape(contentFilter);
-        textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryContent, contentFilter)), BooleanClause.Occur.SHOULD);
+        for(String singleFilter : contentFilter.split(" "))
+          textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryContent, singleFilter)), BooleanClause.Occur.MUST);
       } catch(Exception ex) {
         log.error("Could not parse query " + contentFilter, ex);
         // TODO: set error flag in search
@@ -744,7 +752,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //        QueryParser parser = new QueryParser(FieldName.EntryAbstract, analyzer);
 //        query.add(parser.parse(abstractFilter), BooleanClause.Occur.SHOULD);
         abstractFilter = QueryParser.escape(abstractFilter);
-        textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryAbstract, abstractFilter)), BooleanClause.Occur.SHOULD);
+        for(String singleFilter : abstractFilter.split(" "))
+          textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryAbstract, singleFilter)), BooleanClause.Occur.MUST);
       } catch(Exception ex) {
         log.error("Could not parse query " + abstractFilter, ex);
         // TODO: set error flag in search
@@ -806,7 +815,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(Search search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
     CombinedLazyLoadingList<ReferenceBase> searchResults = new CombinedLazyLoadingList<>();
     IndexSearcher searcher = getIndexSearcher();
     referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
@@ -894,7 +903,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //  }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     BooleanQuery query = new BooleanQuery();
 
     if(seriesTitleFilter != null) {
@@ -936,8 +945,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
         return;
       }
     }
-    else if(referenceSubDivisionFilter == null)
-      query.add(new TermQuery(new Term(FieldName.ReferenceTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
+//    else if(referenceSubDivisionFilter == null)
+//      query.add(new TermQuery(new Term(FieldName.ReferenceTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
 //      try {
 //        query.add((new QueryParser(Version.LUCENE_47, FieldName.ReferenceTitle, defaultAnalyzer)).parse(NoReferenceFieldValue), BooleanClause.Occur.MUST);
 //      } catch(Exception ex) { }
@@ -960,8 +969,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
         return;
       }
     }
-    else
-      query.add(new TermQuery(new Term(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
+//    else
+//      query.add(new TermQuery(new Term(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
 //    try {
 //      query.add((new QueryParser(Version.LUCENE_47, FieldName.ReferenceSubDivisionTitle, defaultAnalyzer)).parse(NoReferenceFieldValue), BooleanClause.Occur.MUST);
 //    } catch(Exception ex) { }
@@ -1235,8 +1244,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //    directory.close();
 //  }
 
-  public List<IndexTerm> getAllTerms() throws IOException {
-    List<IndexTerm> allTerms = new ArrayList<>();
+  public List<net.deepthought.data.search.specific.IndexTerm> getAllTerms() throws IOException {
+    List<net.deepthought.data.search.specific.IndexTerm> allTerms = new ArrayList<>();
     DirectoryReader reader = DirectoryReader.open(directory);
     Fields fields = MultiFields.getFields(reader);
 
@@ -1250,7 +1259,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       BytesRef text;
       while((text = termsEnum.next()) != null) {
         count++;
-        IndexTerm indexTerm = new IndexTerm(text.utf8ToString(), termsEnum.docFreq());
+        net.deepthought.data.search.specific.IndexTerm indexTerm = new IndexTerm(text.utf8ToString(), termsEnum.docFreq());
         allTerms.add(indexTerm);
 
         docsEnum = termsEnum.docs(liveDocs, docsEnum, DocsEnum.FLAG_FREQS);

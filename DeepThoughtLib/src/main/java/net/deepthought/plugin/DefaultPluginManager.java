@@ -70,7 +70,7 @@ public class DefaultPluginManager implements IPluginManager {
           if(plugin instanceof IContentExtractor)
             Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
 
-          Application.notifyUser(new Notification(NotificationType.PluginLoaded, Localization.getLocalizedStringForResourceKey("plugin.loaded", plugin.getName()), plugin));
+          Application.notifyUser(new Notification(NotificationType.PluginLoaded, Localization.getLocalizedString("plugin.loaded", plugin.getName()), plugin));
         } catch(Exception ex) {
           log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
         }

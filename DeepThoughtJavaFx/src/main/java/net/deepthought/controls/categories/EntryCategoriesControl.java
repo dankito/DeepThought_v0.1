@@ -215,8 +215,8 @@ public class EntryCategoriesControl extends TitledPane {
   }
 
   protected boolean checkIfSystemCategoryOfThatNameExists(String tagName) { // dankl, you're so dumb: We're in Categories, not Tags
-    return Localization.getLocalizedStringForResourceKey("system.tag.all.entries").equals(tagName) ||
-        Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags").equals(tagName);
+    return Localization.getLocalizedString("system.tag.all.entries").equals(tagName) ||
+        Localization.getLocalizedString("system.tag.entries.with.no.tags").equals(tagName);
   }
 
   protected void filterCategories(String filterConstraint) {

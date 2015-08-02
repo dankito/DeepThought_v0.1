@@ -35,12 +35,12 @@ public class JavaFxLocalization {
 
   public static void bindLabeledText(Labeled labeled, final String key, final Object... formatArguments) {
     labeled.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindMenuItemText(MenuItem menuItem, final String key, final Object... formatArguments) {
     menuItem.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindControlToolTip(Control control, String key, Object... formatArguments) {
@@ -51,18 +51,18 @@ public class JavaFxLocalization {
   public static Tooltip createBoundTooltip(final String key, final Object[] formatArguments) {
     Tooltip tooltip = new Tooltip();
     tooltip.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
     return tooltip ;
   }
 
   public static void bindTextInputControlPromptText(TextInputControl control, final String key, final Object... formatArguments) {
     control.promptTextProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindStageTitle(Stage stage, final String key, final Object... formatArguments) {
     stage.titleProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedStringForResourceKey(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
 }

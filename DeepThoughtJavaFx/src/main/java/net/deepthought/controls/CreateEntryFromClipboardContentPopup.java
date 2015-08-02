@@ -196,7 +196,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     final ContentExtractOption contentExtractOption = contentExtractOptions.getContentExtractOptions().get(0);
     final IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)contentExtractOption.getContentExtractor();
 
-    headerLabel.setText(Localization.getLocalizedStringForResourceKey("ask.create.entry.from.online.article",
+    headerLabel.setText(Localization.getLocalizedString("ask.create.entry.from.online.article",
         ((IOnlineArticleContentExtractor) contentExtractOptions.getContentExtractOptions().get(0).getContentExtractor()).getSiteBaseUrl())); // TODO: is it always true that  OnlineArticleContentExtractors contain only one IContentExtractor?
 
     addOptionToCreateEntryFromContentExtractorPopup(contentExtractOptions, "create.entry.from.online.article.option.directly.add.entry", InputManager.getInstance().getCreateEntryFromClipboardDirectlyAddEntryKeyCombination(),
@@ -229,7 +229,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   }
 
   protected void createCreateEntryFromFileOptions(final ContentExtractOptions contentExtractOptions) {
-    headerLabel.setText(Localization.getLocalizedStringForResourceKey("ask.create.entry.from.local.file",
+    headerLabel.setText(Localization.getLocalizedString("ask.create.entry.from.local.file",
         FileUtils.getFileNameIncludingExtension((String) contentExtractOptions.getSource())));
 
     Control lastOption = null;
@@ -394,7 +394,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected Control addOptionToCreateEntryFromContentExtractorPopup(final ContentExtractOptions contentExtractOptions,
                                                                     String optionNameResourceKey, KeyCombination optionKeyCombination, final OptionInvokedListener listener) {
-    String optionText = Localization.getLocalizedStringForResourceKey(optionNameResourceKey);
+    String optionText = Localization.getLocalizedString(optionNameResourceKey);
     if(optionKeyCombination != null)
       optionText += " (" + optionKeyCombination.getDisplayText() + ")";
 
@@ -464,6 +464,6 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
     log.error("Could not create Entry from Source " + source, error.getException());
-    Alerts.showErrorMessage(stageToShowIn, error.getNotificationMessage(), Localization.getLocalizedStringForResourceKey("can.not.create.entry.from", source));
+    Alerts.showErrorMessage(stageToShowIn, error.getNotificationMessage(), Localization.getLocalizedString("can.not.create.entry.from", source));
   }
 }

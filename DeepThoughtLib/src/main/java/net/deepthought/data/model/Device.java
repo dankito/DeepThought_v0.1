@@ -219,7 +219,7 @@ public class Device extends UserDataEntity {
   public static Device createUserDefaultDevice(User user) {
     String universallyUniqueId = UUID.randomUUID().toString();
     String platform = System.getProperty("os.name");
-    Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedStringForResourceKey("users.default.device.name", user.getUserName(), platform),
+    Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
         platform, System.getProperty("os.version"));
 
 //    , System.getProperty("os.arch")

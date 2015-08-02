@@ -4,7 +4,7 @@ import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.model.settings.WindowSettings;
-import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 

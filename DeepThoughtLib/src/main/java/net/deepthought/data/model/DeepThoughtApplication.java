@@ -320,7 +320,7 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
       }
     }
 
-    String applicationLanguageEnglish = Localization.getLocalizedStringForResourceKey("application.language.english");
+    String applicationLanguageEnglish = Localization.getLocalizedString("application.language.english");
 
     for(ApplicationLanguage language : application.getApplicationLanguages()) {
       if(language.getName().equals(applicationLanguageEnglish)) {

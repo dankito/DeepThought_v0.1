@@ -9,7 +9,7 @@ public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
 
   @Override
   public String getName() {
-    return Localization.getLocalizedStringForResourceKey("remote.file.content.extractor");
+    return Localization.getLocalizedString("remote.file.content.extractor");
   }
 
   @Override

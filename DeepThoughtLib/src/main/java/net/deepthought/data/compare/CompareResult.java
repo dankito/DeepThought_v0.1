@@ -20,19 +20,19 @@ public enum CompareResult {
   public String toString() {
     switch(this) {
       case Unchanged:
-        return Localization.getLocalizedStringForResourceKey("compare.result.unchanged");
+        return Localization.getLocalizedString("compare.result.unchanged");
       case NoMatchingEntityFound:
-        return Localization.getLocalizedStringForResourceKey("compare.result.no.matching.entity.found");
+        return Localization.getLocalizedString("compare.result.no.matching.entity.found");
       case Newer:
-        return Localization.getLocalizedStringForResourceKey("compare.result.newer");
+        return Localization.getLocalizedString("compare.result.newer");
       case Older:
-        return Localization.getLocalizedStringForResourceKey("compare.result.older");
+        return Localization.getLocalizedString("compare.result.older");
       case Created:
-        return Localization.getLocalizedStringForResourceKey("compare.result.created");
+        return Localization.getLocalizedString("compare.result.created");
       case Deleted:
-        return Localization.getLocalizedStringForResourceKey("compare.result.deleted");
+        return Localization.getLocalizedString("compare.result.deleted");
       default:
-        return Localization.getLocalizedStringForResourceKey("compare.result.unknown");
+        return Localization.getLocalizedString("compare.result.unknown");
     }
   }
 }

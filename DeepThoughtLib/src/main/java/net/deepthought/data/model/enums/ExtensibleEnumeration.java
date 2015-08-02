@@ -71,7 +71,7 @@ public class ExtensibleEnumeration extends UserDataEntity implements Comparable<
     if(name != name && name.isEmpty() == false) // if name is explicitly set, use that value
       return name;
     else if(nameResourceKey != null) // but usually a resource key is set, so translate name to User's language
-      return Localization.getLocalizedStringForResourceKey(nameResourceKey);
+      return Localization.getLocalizedString(nameResourceKey);
 
     return name;
   }

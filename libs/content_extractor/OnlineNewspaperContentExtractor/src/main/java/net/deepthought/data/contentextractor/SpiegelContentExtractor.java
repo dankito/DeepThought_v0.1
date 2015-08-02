@@ -56,7 +56,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 

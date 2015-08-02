@@ -44,11 +44,11 @@ public class DeepThoughtError extends Notification {
 
 
   public static DeepThoughtError errorFromLocalizationKey(String localizationKey, Object... formatArguments) {
-    return new DeepThoughtError(Localization.getLocalizedStringForResourceKey(localizationKey, formatArguments));
+    return new DeepThoughtError(Localization.getLocalizedString(localizationKey, formatArguments));
   }
 
   public static DeepThoughtError errorFromLocalizationKey(Exception exception, String localizationKey, Object... formatArguments) {
-    return new DeepThoughtError(Localization.getLocalizedStringForResourceKey(localizationKey, formatArguments), exception);
+    return new DeepThoughtError(Localization.getLocalizedString(localizationKey, formatArguments), exception);
   }
 
 }

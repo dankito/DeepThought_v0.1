@@ -23,6 +23,7 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
+import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
@@ -190,7 +191,7 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->
         fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndication, txtfldReferenceIndication.getText()));
 
-    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(this);
+    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.All, this);
     setContent(searchAndSelectReferenceControl);
   }
 

@@ -269,15 +269,15 @@ public class MainWindowController implements Initializable {
     else if(error.isSevere() == true) {
       Action response = Dialogs.create()
           .owner(stage)
-          .title(Localization.getLocalizedStringForResourceKey("alert.message.title.severe.error.occurred"))
-          .message(Localization.getLocalizedStringForResourceKey("alert.message.message.severe.error.occurred", error.getNotificationMessage()))
+          .title(Localization.getLocalizedString("alert.message.title.severe.error.occurred"))
+          .message(Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage()))
           .actions(Dialog.ACTION_OK)
           .showException(error.getException());
     }
     else {
       Dialogs dialog = Dialogs.create()
           .owner(stage)
-          .title(Localization.getLocalizedStringForResourceKey("alert.message.title.error.occurred"))
+          .title(Localization.getLocalizedString("alert.message.title.error.occurred"))
           .message(error.getNotificationMessage())
           .actions(Dialog.ACTION_OK);
 
@@ -393,7 +393,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void windowClosing() {
-    setStatusLabelText(Localization.getLocalizedStringForResourceKey("backing.up.data"));
+    setStatusLabelText(Localization.getLocalizedString("backing.up.data"));
     Application.shutdown();
 
     for(Stage openedWindow : net.deepthought.controller.Dialogs.getOpenedChildWindows()) {
@@ -723,7 +723,7 @@ public class MainWindowController implements Initializable {
 
   protected void addClipboardMenuItem(final ContentExtractOptions contentExtractOptions, String optionNameResourceKey, KeyCombination optionKeyCombination,
                                       final OptionInvokedListener listener) {
-    final MenuItem optionMenu = new MenuItem(Localization.getLocalizedStringForResourceKey(optionNameResourceKey));
+    final MenuItem optionMenu = new MenuItem(Localization.getLocalizedString(optionNameResourceKey));
 //    if(optionKeyCombination != null)
     optionMenu.setAccelerator(optionKeyCombination);
     mnitmFileClipboard.getItems().add(optionMenu);

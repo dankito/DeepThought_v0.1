@@ -120,7 +120,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     else
       selectedItems.remove(item);
 
-    lblCountSelectedItems.setText(Localization.getLocalizedStringForResourceKey("count.items.selected", selectedItems.size()));
+    lblCountSelectedItems.setText(Localization.getLocalizedString("count.items.selected", selectedItems.size()));
 
     btnAddSelected.setDisable(selectedItems.size() == 0);
     btnViewSelected.setDisable(selectedItems.size() == 0);
@@ -191,6 +191,6 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
     log.error("Could not create Entry from Source " + source, error.getException());
-    Alerts.showErrorMessage(windowStage, error.getNotificationMessage(), Localization.getLocalizedStringForResourceKey("can.not.create.entry.from", source));
+    Alerts.showErrorMessage(windowStage, error.getNotificationMessage(), Localization.getLocalizedString("can.not.create.entry.from", source));
   }
 }

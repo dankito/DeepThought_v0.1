@@ -139,7 +139,7 @@ public class DatabaseBackupFileService extends AbstractBackupFileService {
             restoreDeepThought(application, params);
             return;
           } else
-            errorMessage = Localization.getLocalizedStringForResourceKey("error.no.data.found.in.backup.file");
+            errorMessage = Localization.getLocalizedString("error.no.data.found.in.backup.file");
         }
       } catch (Exception ex) {
         log.error("Could not deserialize AppSettings from Database Backup file " + backup.getFilePath(), ex);
@@ -207,7 +207,7 @@ public class DatabaseBackupFileService extends AbstractBackupFileService {
       DeepThoughtError error = occurredErrorsContainer.size() == 0 ? DeepThoughtError.Success : occurredErrorsContainer.get(0);
       String stepResult = null;
       if(newFileNameContainer.size() > 0)
-        stepResult = Localization.getLocalizedStringForResourceKey("copied.backup.file.back.to", newFileNameContainer.get(0).getAbsolutePath());
+        stepResult = Localization.getLocalizedString("copied.backup.file.back.to", newFileNameContainer.get(0).getAbsolutePath());
 
       listener.stepDone(new RestoreBackupStepResult(backup, BackupStep.CopyBackupFileToDataFolder, error, BackupStep.Done, stepResult));
       listener.restoreBackupDone(successful, new RestoreBackupResult(backup, error));

@@ -16,7 +16,7 @@ public class DefaultLocalFileContentExtractor implements ILocalFileContentExtrac
 
   @Override
   public String getName() {
-    return Localization.getLocalizedStringForResourceKey("local.file.content.extractor");
+    return Localization.getLocalizedString("local.file.content.extractor");
   }
 
   @Override

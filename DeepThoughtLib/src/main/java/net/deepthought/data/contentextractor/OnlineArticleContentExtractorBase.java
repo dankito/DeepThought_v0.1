@@ -51,7 +51,7 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   public void createEntryFromUrlAsync(final String url, final CreateEntryListener listener) {
     if(canCreateEntryFromUrl(url) == false) {
       if(listener != null)
-        listener.entryCreated(new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("can.not.create.entry.from.url"))));
+        listener.entryCreated(new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("can.not.create.entry.from.url"))));
     }
     else {
       new Thread(new Runnable() {
@@ -87,7 +87,7 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
     if(contentExtractOption.isUrl())
       createEntryFromUrlAsync(contentExtractOption.getUrl(), listener);
     else if(listener != null)
-      listener.entryCreated(new EntryCreationResult(contentExtractOption, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("can.not.create.entry.from.clipboard.content"))));
+      listener.entryCreated(new EntryCreationResult(contentExtractOption, new DeepThoughtError(Localization.getLocalizedString("can.not.create.entry.from.clipboard.content"))));
 
   }
 
@@ -98,7 +98,7 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
       return parseHtmlToEntry(articleUrl, document);
     } catch(Exception ex) {
       log.error("Could not retrieve Article's HTML Code from Url " + articleUrl, ex);
-      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.retrieve.articles.html.code", articleUrl), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", articleUrl), ex));
     }
   }
 

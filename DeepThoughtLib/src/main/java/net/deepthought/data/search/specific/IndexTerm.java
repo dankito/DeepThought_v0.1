@@ -1,4 +1,4 @@
-package net.deepthought.data.search;
+package net.deepthought.data.search.specific;
 
 import java.util.ArrayList;
 import java.util.List;

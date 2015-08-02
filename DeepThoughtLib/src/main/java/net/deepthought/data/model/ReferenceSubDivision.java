@@ -5,6 +5,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -90,9 +91,21 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
     return reference;
   }
 
-  protected void setReference(Reference reference) {
+  public void setReference(Reference reference) {
     Object previousValue = this.reference;
+    List<Entry> entriesBackup = new ArrayList<>(entries); // after calling reference.removeSubDivision() entries will be empty
+    if(this.reference != null && this.reference.equals(reference) == false)
+      this.reference.removeSubDivision(this);
+
     this.reference = reference;
+
+    if(reference != null)
+      reference.addSubDivision(this);
+
+    for(Entry entry : entriesBackup)
+//      entry.setReference(reference);
+      entry.setReferenceSubDivision(this);
+
     callPropertyChangedListeners(TableConfig.ReferenceSubDivisionReferenceJoinColumnName, previousValue, reference);
   }
 

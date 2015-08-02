@@ -13,6 +13,12 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
+import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.data.search.specific.ReferenceBaseType;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -95,7 +101,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("Love", true, false, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("Love", true, false, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -119,7 +125,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("love", true, false, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("love", true, false, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -136,7 +142,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("schaaf", true, false, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("schaaf", true, false, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -159,7 +165,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("equ", false, true, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("equ", false, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -176,7 +182,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("ega", false, true, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("ega", false, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -208,9 +214,9 @@ public class LuceneSearchEngineTest {
     final List<Entry> entriesHavingTheseTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
         countDownLatch.countDown();
       }
@@ -226,9 +232,9 @@ public class LuceneSearchEngineTest {
     entriesHavingTheseTags.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
         countDownLatch2.countDown();
       }
@@ -485,7 +491,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("love", true, false, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("love", true, false, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -512,7 +518,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("love", true, false, true, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("love", true, false, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -540,7 +546,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterEntries(new FilterEntriesSearch("love", true, false, entriesToFilter, new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.filterEntries(new net.deepthought.data.search.specific.FilterEntriesSearch("love", true, false, entriesToFilter, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> result) {
         results.addAll(result);
@@ -556,6 +562,62 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(results.contains(entry2));
   }
 
+  @Test
+  public void filterEntriesContent_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
+    Entry entry1 = new Entry("Love");
+    Entry entry2 = new Entry("Kill");
+    Entry entry3 = new Entry("Love kills");
+    deepThought.addEntry(entry1);
+    deepThought.addEntry(entry2);
+    deepThought.addEntry(entry3);
+
+    final List<Entry> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterEntries(new FilterEntriesSearch("love kill", true, false, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size()); // only that one without Tags is found
+    Assert.assertFalse(results.contains(entry1));
+    Assert.assertFalse(results.contains(entry2));
+    Assert.assertTrue(results.contains(entry3));
+  }
+
+  @Test
+  public void filterEntriesAbstract_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
+    Entry entry1 = new Entry("", "Love");
+    Entry entry2 = new Entry("", "Kill");
+    Entry entry3 = new Entry("", "Love kills");
+    deepThought.addEntry(entry1);
+    deepThought.addEntry(entry2);
+    deepThought.addEntry(entry3);
+
+    final List<Entry> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterEntries(new FilterEntriesSearch("love kill", false, true, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size()); // only that one without Tags is found
+    Assert.assertFalse(results.contains(entry1));
+    Assert.assertFalse(results.contains(entry2));
+    Assert.assertTrue(results.contains(entry3));
+  }
+
 
   @Test
   public void addTag_TagGetsIndexed() {
@@ -565,9 +627,9 @@ public class LuceneSearchEngineTest {
     final List<Tag> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("Tag", new SearchCompletedListener<FilterTagsSearchResults>() {
+    searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("Tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
-      public void completed(FilterTagsSearchResults result) {
+      public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
         results.addAll(result.getAllMatches());
         countDownLatch.countDown();
       }
@@ -589,9 +651,9 @@ public class LuceneSearchEngineTest {
     final List<Tag> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("swag", new SearchCompletedListener<FilterTagsSearchResults>() {
+    searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("swag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
-      public void completed(FilterTagsSearchResults result) {
+      public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
         results.addAll(result.getAllMatches());
         countDownLatch.countDown();
       }
@@ -606,9 +668,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("tag", new SearchCompletedListener<FilterTagsSearchResults>() {
+    searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
-      public void completed(FilterTagsSearchResults result) {
+      public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
         results.addAll(result.getAllMatches());
         nextCountDownLatch.countDown();
       }
@@ -629,7 +691,7 @@ public class LuceneSearchEngineTest {
     final List<Tag> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("Tag", new SearchCompletedListener<FilterTagsSearchResults>() {
+    searchEngine.filterTags(new FilterTagsSearch("Tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
       public void completed(FilterTagsSearchResults result) {
         results.addAll(result.getAllMatches());
@@ -866,12 +928,12 @@ public class LuceneSearchEngineTest {
     SeriesTitle newSeriesTitle = new SeriesTitle("series");
     deepThought.addSeriesTitle(newSeriesTitle);
 
-    final List<SeriesTitle> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<SeriesTitle>("Series", new SearchCompletedListener<Collection<SeriesTitle>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("Series", ReferenceBaseType.SeriesTitle, new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<SeriesTitle> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -893,7 +955,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("aphrodite", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("aphrodite", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -910,7 +972,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("series", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("series", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -933,7 +995,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("subtitle", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("subtitle", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -950,7 +1012,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("find", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("find", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -973,7 +1035,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("sz", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("sz", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -990,7 +1052,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("untert", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("untert", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1007,7 +1069,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("unterd", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("unterd", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1026,12 +1088,12 @@ public class LuceneSearchEngineTest {
     Reference newReference = new Reference("reference");
     deepThought.addReference(newReference);
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("Reference", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("Reference", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1050,12 +1112,12 @@ public class LuceneSearchEngineTest {
 
     newReference.setTitle("Aphrodite");
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("aphrodite", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("aphrodite", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1070,9 +1132,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("Hephaistos", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("Hephaistos", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         nextCountDownLatch.countDown();
       }
@@ -1090,12 +1152,12 @@ public class LuceneSearchEngineTest {
 
     newReference.setSubTitle("Hephaistos");
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("heph", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("heph", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1110,9 +1172,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("find", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("find", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         nextCountDownLatch.countDown();
       }
@@ -1130,12 +1192,12 @@ public class LuceneSearchEngineTest {
 
     newReference.setIssueOrPublishingDate("03/2010");
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("2010", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("2010", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1155,12 +1217,12 @@ public class LuceneSearchEngineTest {
     deepThought.addReference(new Reference("Befreiung vom Überfluss", "Auf dem Weg in die Postwachstumsökonomie"));
     deepThought.addReference(new Reference("Schulden", "Die ersten 5000 Jahre"));
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("denk", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("denk", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1175,9 +1237,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("wider", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("wider", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch2.countDown();
       }
@@ -1192,9 +1254,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("2012", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("2012", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch3.countDown();
       }
@@ -1209,9 +1271,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch4 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("Liebe", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("Liebe", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch4.countDown();
       }
@@ -1235,7 +1297,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("SUB", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("SUB", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1262,7 +1324,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("aphrodite", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("aphrodite", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1279,9 +1341,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("subDivision", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("subDivision", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         nextCountDownLatch.countDown();
       }
@@ -1305,7 +1367,7 @@ public class LuceneSearchEngineTest {
     final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<ReferenceBase>("heph", new SearchCompletedListener<Collection<ReferenceBase>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("heph", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1322,9 +1384,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("find", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("find", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         nextCountDownLatch.countDown();
       }
@@ -1350,12 +1412,12 @@ public class LuceneSearchEngineTest {
     deepThought.addReferenceSubDivision(newSubDivision3);
     newReference.addSubDivision(newSubDivision3);
 
-    final List<Reference> results = new ArrayList<>();
+    final List<ReferenceBase> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("phar", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("phar", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch.countDown();
       }
@@ -1370,9 +1432,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("krit", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("krit", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch2.countDown();
       }
@@ -1386,9 +1448,9 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.filterReferenceBases(new Search<Reference>("Liebe", new SearchCompletedListener<Collection<Reference>>() {
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("Liebe", new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
-      public void completed(Collection<Reference> result) {
+      public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
         countDownLatch3.countDown();
       }
@@ -1397,6 +1459,112 @@ public class LuceneSearchEngineTest {
     try { countDownLatch3.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
+  }
+
+  @Test
+  public void filterSeriesTitlesOnly_OtherReferenceBaseTypesDontGetFound() {
+    SeriesTitle seriesTitle = new SeriesTitle("Test");
+    deepThought.addSeriesTitle(seriesTitle);
+    Reference reference = new Reference("Test");
+    deepThought.addReference(reference);
+    ReferenceSubDivision subDivision = new ReferenceSubDivision("Test");
+    deepThought.addReferenceSubDivision(subDivision);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("test", ReferenceBaseType.SeriesTitle, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(seriesTitle, results.get(0));
+  }
+
+  @Test
+  public void filterReferencesOnly_OtherReferenceBaseTypesDontGetFound() {
+    SeriesTitle seriesTitle = new SeriesTitle("Test");
+    deepThought.addSeriesTitle(seriesTitle);
+    Reference reference = new Reference("Test");
+    deepThought.addReference(reference);
+    ReferenceSubDivision subDivision = new ReferenceSubDivision("Test");
+    deepThought.addReferenceSubDivision(subDivision);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("test", ReferenceBaseType.Reference, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(reference, results.get(0));
+  }
+
+  @Test
+  public void filterReferenceSubDivisionsOnly_OtherReferenceBaseTypesDontGetFound() {
+    SeriesTitle seriesTitle = new SeriesTitle("Test");
+    deepThought.addSeriesTitle(seriesTitle);
+    Reference reference = new Reference("Test");
+    deepThought.addReference(reference);
+    ReferenceSubDivision subDivision = new ReferenceSubDivision("Test");
+    deepThought.addReferenceSubDivision(subDivision);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("test", ReferenceBaseType.ReferenceSubDivision, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(subDivision, results.get(0));
+  }
+
+  @Test
+  public void filterAllReferenceBaseTypes_AllGetFound() {
+    SeriesTitle seriesTitle = new SeriesTitle("Test");
+    deepThought.addSeriesTitle(seriesTitle);
+    Reference reference = new Reference("Test");
+    deepThought.addReference(reference);
+    ReferenceSubDivision subDivision = new ReferenceSubDivision("Test");
+    deepThought.addReferenceSubDivision(subDivision);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("test", ReferenceBaseType.All, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+    Assert.assertTrue(results.contains(seriesTitle));
+    Assert.assertTrue(results.contains(reference));
+    Assert.assertTrue(results.contains(subDivision));
   }
 
 
@@ -1461,9 +1629,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch.countDown();
@@ -1483,9 +1651,9 @@ public class LuceneSearchEngineTest {
     tagsOnEntriesContainingFilteredTags.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch2.countDown();
@@ -1592,9 +1760,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag1 = new HashSet<>();
     final CountDownLatch countDownLatch1 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag1.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag1.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch1.countDown();
@@ -1615,9 +1783,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag2 = new HashSet<>();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag2.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag2.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch2.countDown();
@@ -1638,9 +1806,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag3 = new HashSet<>();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag3.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag3.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch3.countDown();
@@ -1661,7 +1829,7 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag2And3 = new HashSet<>();
     final CountDownLatch countDownLatch4 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
       @Override
       public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTags2And3.addAll(results.getEntriesHavingFilteredTags());

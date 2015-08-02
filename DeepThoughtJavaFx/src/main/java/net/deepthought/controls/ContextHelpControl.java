@@ -63,7 +63,7 @@ public class ContextHelpControl extends ScrollPane {
   }
 
   public void showContextHelpForResourceKey(String contextHelpResourceKey) {
-    showContextHelp(Localization.getLocalizedStringForResourceKey(helpTextResourceKeyPrefix + contextHelpResourceKey));
+    showContextHelp(Localization.getLocalizedString(helpTextResourceKeyPrefix + contextHelpResourceKey));
   }
 
   public void showContextHelp(String contextHelp) {

@@ -193,9 +193,9 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
   protected void updateWindowTitle() {
     if(file.getId() == null)
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("add.file", file.getTextRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("add.file", file.getTextRepresentation()));
     else
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.file", file.getTextRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("edit.file", file.getTextRepresentation()));
   }
 
 
@@ -326,7 +326,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
           @Override
           public void run() {
             org.controlsfx.dialog.Dialogs.create()
-                                         .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
+                                         .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
                                          .message(error.getNotificationMessage())
                                          .showError();
           }
@@ -355,7 +355,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
           @Override
           public void run() {
             org.controlsfx.dialog.Dialogs.create()
-                .title(Localization.getLocalizedStringForResourceKey("error.could.not.copy.file.to.destination"))
+                .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
                 .message(error.getNotificationMessage())
                 .showError();
           }

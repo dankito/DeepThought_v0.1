@@ -24,7 +24,7 @@ import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.data.search.FilterEntriesSearch;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
 
@@ -515,7 +515,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 //
 //      // Create the dialog Stage.
 //      Stage dialogStage = new Stage();
-////      dialogStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.entry"));
+////      dialogStage.setTitle(Localization.getLocalizedString("edit.entry"));
 //      dialogStage.initModality(Modality.NONE);
 ////      windowStage.initOwner(stage);
 //      Scene scene = new Scene(parent);

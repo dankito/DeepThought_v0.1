@@ -317,7 +317,7 @@ public class User extends BaseEntity implements Serializable {
       user = new User(universallyUniqueId, System.getProperty("user.name"), true);
     } catch(Exception ex) {
       log.error("Could not get System property user.name", ex);
-      user = new User(universallyUniqueId, Localization.getLocalizedStringForResourceKey("default.user.name"), true);
+      user = new User(universallyUniqueId, Localization.getLocalizedString("default.user.name"), true);
     }
 
     Group userGroup = Group.createUserDefaultGroup(user);

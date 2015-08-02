@@ -13,7 +13,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/build/classes/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/test" />
     <exclude-output />
@@ -53,7 +53,6 @@
     <orderEntry type="library" exported="" name="boilerpipe-1.1.0" level="project" />
     <orderEntry type="library" exported="" name="rome-1.0" level="project" />
     <orderEntry type="library" exported="" name="vorbis-java-core-0.6" level="project" />
-    <orderEntry type="library" exported="" name="sqlite-jdbc-3.8.6" level="project" />
     <orderEntry type="library" exported="" name="juniversalchardet-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="jhighlight-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="java-libpst-0.8.1" level="project" />
@@ -96,6 +95,7 @@
     <orderEntry type="library" exported="" name="httpcore-4.2.5" level="project" />
     <orderEntry type="library" exported="" name="guava-17.0" level="project" />
     <orderEntry type="library" exported="" name="httpclient-4.2.6" level="project" />
+    <orderEntry type="library" exported="" name="sqlite-jdbc-3.8.6" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="sqlite-jdbc-3.8.7" level="project" />
     <orderEntry type="library" exported="" name="OcrTextContentExtractor.OcrTextContentExtractor" level="project" />

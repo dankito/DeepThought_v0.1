@@ -15,11 +15,11 @@ public enum FileLinkOptions {
   public String toString() {
     switch(this) {
       case CopyToDataFolder:
-        return Localization.getLocalizedStringForResourceKey("file.link.options.copy.to.data.folder");
+        return Localization.getLocalizedString("file.link.options.copy.to.data.folder");
       case MoveToDataFolder:
-        return Localization.getLocalizedStringForResourceKey("file.link.options.move.to.data.folder");
+        return Localization.getLocalizedString("file.link.options.move.to.data.folder");
       default:
-        return Localization.getLocalizedStringForResourceKey("file.link.options.link");
+        return Localization.getLocalizedString("file.link.options.link");
     }
   }
 }

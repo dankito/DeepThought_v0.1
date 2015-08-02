@@ -3,7 +3,7 @@ package net.deepthought.controls.tabtags;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.ui.SystemTag;
-import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FilterTagsSearchResults;
 
 import java.util.Collection;
 

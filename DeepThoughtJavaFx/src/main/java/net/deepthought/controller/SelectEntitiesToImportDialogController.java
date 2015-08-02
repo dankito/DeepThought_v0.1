@@ -247,7 +247,7 @@ public class SelectEntitiesToImportDialogController extends ChildWindowsControll
     setWindowStage(dialogStage);
     this.parentDataEntityToImport = parentDataEntityToImport;
 
-    dialogStage.setTitle(Localization.getLocalizedStringForResourceKey("select.entities.to.import.dialog.title", parentDataEntityToImport));
+    dialogStage.setTitle(Localization.getLocalizedString("select.entities.to.import.dialog.title", parentDataEntityToImport));
 
     trtblvwDataToImportEntities.setRoot(new ImportDataTreeItem(parentDataEntityToImport));
     trtblvwDataToImportEntities.getRoot().setExpanded(true);

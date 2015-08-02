@@ -1,4 +1,7 @@
-package net.deepthought.data.search;
+package net.deepthought.data.search.specific;
+
+import net.deepthought.data.search.SearchBase;
+import net.deepthought.data.search.SearchCompletedListener;
 
 /**
  * Created by ganymed on 27/07/15.

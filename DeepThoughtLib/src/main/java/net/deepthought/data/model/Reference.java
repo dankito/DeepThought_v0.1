@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -90,6 +91,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   public void setSeries(SeriesTitle series) {
     Object previousValue = this.series;
+    List<Entry> entriesBackup = new ArrayList<>(entries);
     if(this.series != null)
       this.series.removeSerialPart(this);
 
@@ -101,8 +103,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 //      series.serialParts.add(this);
     }
 
-    for(Entry entry : new ArrayList<>(entries))
-      entry.setSeries(series);
+    for(Entry entry : entriesBackup)
+//      entry.setSeries(series);
+      entry.setReference(this);
 
     callPropertyChangedListeners(TableConfig.ReferenceSeriesTitleJoinColumnName, previousValue, series);
   }
@@ -119,14 +122,17 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return subDivisions;
   }
 
-  public boolean addSubDivision(ReferenceSubDivision subDivision) {
-    if(subDivisions.add(subDivision)) {
-      subDivision.setSubDivisionOrder(subDivisions.size() - 1);
-      subDivision.setReference(this);
-      subDivisionsSorted = null;
+  protected boolean containsSubDivision(ReferenceSubDivision subDivision) {
+    return subDivisions.contains(subDivision);
+  }
 
-//      if(subDivision.getDeepThought() == null && this.deepThought != null)
-//        deepThought.addReferenceSubDivision(subDivision);
+  public boolean addSubDivision(ReferenceSubDivision subDivision) {
+    if(containsSubDivision(subDivision) == false && subDivisions.add(subDivision)) {
+      subDivisionsSorted = null;
+      if(this.equals(subDivision.getReference()) == false) {
+        subDivision.setReference(this);
+        subDivision.setSubDivisionOrder(subDivisions.size() - 1);
+      }
 
       callEntityAddedListeners(subDivisions, subDivision);
       return true;
@@ -136,6 +142,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
   public boolean removeSubDivision(ReferenceSubDivision subDivision) {
+    if(containsSubDivision(subDivision) == false)
+      return false;
+
     int removeSubDivisionOrder = subDivision.getSubDivisionOrder();
     if(subDivisions.remove(subDivision)) {
       // TODO: remove from database

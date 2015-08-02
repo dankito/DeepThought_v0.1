@@ -43,6 +43,11 @@
                                  <children>
                                     <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
                                        <children>
+                                          <ToggleButton fx:id="btnShowHideSearchReference" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" text="▼">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
                                           <Label minWidth="60.0" text="%reference">
                                              <font>
                                                 <Font name="System Bold" size="15.0" />
@@ -87,7 +92,7 @@
                                  <children>
                                     <Label prefWidth="200.0" text="%issue.or.publishing.date">
                                        <HBox.margin>
-                                          <Insets />
+                                          <Insets right="6.0" />
                                        </HBox.margin>
                                     </Label>
                                     <TextField fx:id="txtfldIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
@@ -293,6 +298,11 @@
                                  <children>
                                     <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                                        <children>
+                                          <ToggleButton fx:id="btnShowHideSearchSeriesTitle" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" text="▼">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
                                           <Label minWidth="60.0" prefHeight="40.0" text="%series.title">
                                              <font>
                                                 <Font name="System Bold" size="15.0" />

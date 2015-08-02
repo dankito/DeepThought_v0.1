@@ -8,6 +8,9 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.LazyLoadingList;
+import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +40,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
     Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
     Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
@@ -54,7 +57,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(FilterEntriesSearch search, String contentFilter, String abstractFilter) {
+  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter) {
     for(Entry entry : Application.getDeepThought().getEntries()) {
       if(search.isInterrupted())
         return;
@@ -68,7 +71,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(Search search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
     for(SeriesTitle seriesTitle : Application.getDeepThought().getSeriesTitles()) {
       if(search.isInterrupted())
         return;
@@ -97,7 +100,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     if(seriesTitleFilter != null &&
         referenceFilter == null && referenceSubDivisionFilter == null) // cannot fulfill all filters
       filterSeriesTitles(search, seriesTitleFilter);
@@ -108,7 +111,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterSeriesTitles(Search search, String seriesTitleFilter) {
+  protected void filterSeriesTitles(FilterReferenceBasesSearch search, String seriesTitleFilter) {
     for(SeriesTitle seriesTitle : Application.getDeepThought().getSeriesTitles()) {
       if(search.isInterrupted())
         return;
@@ -120,7 +123,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterReferences(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterReferences(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     for(Reference reference : Application.getDeepThought().getReferences()) {
       if(search.isInterrupted())
         return;
@@ -137,7 +140,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterReferenceSubDivisions(Search search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterReferenceSubDivisions(FilterReferenceBasesSearch search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     for(ReferenceSubDivision subDivision : reference.getSubDivisions()) {
       if(search.isInterrupted())
         return;

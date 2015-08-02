@@ -89,14 +89,14 @@ public class PersonLabel extends CollectionItemLabel {
   protected ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
-    MenuItem editMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("edit"));
+    MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
     FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
     editMenuItem.setOnAction(event -> Dialogs.showEditPersonDialog(this.person));
     contextMenu.getItems().add(editMenuItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("copy.person.text.to.clipboard"));
+    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.person.text.to.clipboard"));
     copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getToolTipText()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 

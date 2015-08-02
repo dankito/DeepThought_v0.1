@@ -403,8 +403,8 @@ public class DefaultDataManager implements IDataManager {
       Application.getDataMerger().addToCurrentData(new ArrayList<BaseEntity>() {{ add(data); }}, null);
     } catch(Exception ex) {
       log.error("Could not replace existing Data Collection with " + data, ex);
-      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.could.not.replace.existing.data.collection"),
-          ex, false, Localization.getLocalizedStringForResourceKey("alert.message.title.could.not.replace.existing.data.collection")));
+      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.could.not.replace.existing.data.collection"),
+          ex, false, Localization.getLocalizedString("alert.message.title.could.not.replace.existing.data.collection")));
     }
   }
 
@@ -416,8 +416,8 @@ public class DefaultDataManager implements IDataManager {
     } catch(Exception ex) {
       log.error("Could not recreate EntityManager", ex);
       // TODO: show a different error message than for replaceExistingDataCollectionWithData() ?
-      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedStringForResourceKey("alert.message.message.could.not.replace.existing.data.collection"),
-          ex, false, Localization.getLocalizedStringForResourceKey("alert.message.title.could.not.replace.existing.data.collection")));
+      callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.could.not.replace.existing.data.collection"),
+          ex, false, Localization.getLocalizedString("alert.message.title.could.not.replace.existing.data.collection")));
     }
   }
 

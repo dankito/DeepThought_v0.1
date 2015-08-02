@@ -1,6 +1,6 @@
 package net.deepthought.controls.tag;
 
-import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FilterTagsSearchResults;
 
 /**
  * Created by ganymed on 27/07/15.

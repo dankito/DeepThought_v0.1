@@ -130,9 +130,9 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
   protected void updateStageTitle() {
     if(person.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.person", person.getNameRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("create.person", person.getNameRepresentation()));
     else
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.person", person.getNameRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("edit.person", person.getNameRepresentation()));
   }
 
 

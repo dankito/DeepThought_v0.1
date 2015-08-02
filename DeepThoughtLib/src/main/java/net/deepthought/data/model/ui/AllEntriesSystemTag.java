@@ -17,7 +17,7 @@ public class AllEntriesSystemTag extends SystemTag {
 
 
   public AllEntriesSystemTag(DeepThought deepThought) {
-    super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.all.entries")); // TODO: this will not react on Language change
+    super(deepThought, Localization.getLocalizedString("system.tag.all.entries")); // TODO: this will not react on Language change
 
     deepThought.addEntityListener(deepThoughtListener);
     this.filteredEntries = deepThought.getEntries();

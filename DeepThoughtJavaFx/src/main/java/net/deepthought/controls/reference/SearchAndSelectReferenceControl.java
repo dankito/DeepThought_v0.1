@@ -11,9 +11,9 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.Search;
+import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -46,13 +46,15 @@ public class SearchAndSelectReferenceControl extends VBox {
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectReferenceControl.class);
 
 
+  protected ReferenceBaseType type = null;
+
   protected ISelectedReferenceHolder selectedReferenceHolder = null;
 
   protected DeepThought deepThought = null;
 
   protected LazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
 
-  protected Search<ReferenceBase> filterReferenceBasesSearch = null;
+  protected FilterReferenceBasesSearch filterReferenceBasesSearch = null;
 
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
 
@@ -65,7 +67,8 @@ public class SearchAndSelectReferenceControl extends VBox {
   @FXML
   protected ListView<ReferenceBase> lstvwReferences;
 
-  public SearchAndSelectReferenceControl(ISelectedReferenceHolder selectedReferenceHolder) {
+  public SearchAndSelectReferenceControl(ReferenceBaseType type, ISelectedReferenceHolder selectedReferenceHolder) {
+    this.type = type;
     this.selectedReferenceHolder = selectedReferenceHolder;
     deepThought = Application.getDeepThought();
 
@@ -140,10 +143,14 @@ public class SearchAndSelectReferenceControl extends VBox {
   }
 
   protected void filterReferenceBases() {
-    if(filterReferenceBasesSearch != null && filterReferenceBasesSearch.isCompleted() == false)
+    filterReferenceBases(txtfldSearchForReference.getText());
+  }
+
+  protected void filterReferenceBases(String filter) {
+    if(filterReferenceBasesSearch != null)
       filterReferenceBasesSearch.interrupt();
 
-    filterReferenceBasesSearch = new Search<>(txtfldSearchForReference.getText(), (results) -> {
+    filterReferenceBasesSearch = new FilterReferenceBasesSearch(filter, type, (results) -> {
       listViewReferenceBasesItems.setUnderlyingCollection(results);
     });
     Application.getSearchEngine().filterReferenceBases(filterReferenceBasesSearch);
@@ -186,20 +193,7 @@ public class SearchAndSelectReferenceControl extends VBox {
   }
 
   protected void resetListViewReferenceBasesItems(DeepThought deepThought) {
-//    listViewReferenceBasesItems.clear();
-//
-//    listViewReferenceBasesItems.addAll(deepThought.getSeriesTitles());
-//    listViewReferenceBasesItems.addAll(deepThought.getReferences());
-////    for(Reference reference : deepThought.getReferences()) {
-////      listViewReferenceBasesItems.add(reference);
-////      listViewReferenceBasesItems.addAll(reference.getSubDivisions());
-////    }
-//    listViewReferenceBasesItems.addAll(deepThought.getReferenceSubDivisions());
-
-    listViewReferenceBasesItems.setUnderlyingCollection(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles(), Application.getDeepThought().getReferences(),
-        Application.getDeepThought().getReferenceSubDivisions()));
-
-    filterReferenceBases();
+    filterReferenceBases("");
   }
 
 

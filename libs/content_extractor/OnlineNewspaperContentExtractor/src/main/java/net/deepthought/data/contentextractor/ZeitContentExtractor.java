@@ -49,7 +49,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     try {
       Element articleBodyElement = getElementByClassAndNodeName(document.body(), "div", "article-body");
       if(articleBodyElement == null)
-        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html")));
+        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html")));
 
       ReferenceSubDivision reference = createReference(articleUrl, articleBodyElement);
 
@@ -61,7 +61,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 

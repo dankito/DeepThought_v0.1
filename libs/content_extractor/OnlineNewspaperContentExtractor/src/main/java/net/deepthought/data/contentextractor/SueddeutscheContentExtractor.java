@@ -95,7 +95,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 
@@ -113,7 +113,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
     if(bodySection == null) {
       log.error("Could not find Article Body section for Sueddeutsche Article " + articleElement.baseUri());
-      throw new Exception(Localization.getLocalizedStringForResourceKey("could.not.find.sueddeutsche.article.body.section", articleElement.baseUri()));
+      throw new Exception(Localization.getLocalizedString("could.not.find.sueddeutsche.article.body.section", articleElement.baseUri()));
     }
 
     return extractEntryFromBodySection(bodySection);
@@ -129,7 +129,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
     if(content.length() == 0) {
       log.error("Could not extract content from Body section for Sueddeutsche Article " + bodySection.baseUri());
-      throw new Exception(Localization.getLocalizedStringForResourceKey("could.not.extract.content.from.sueddeutsche.article.body.section", bodySection.baseUri()));
+      throw new Exception(Localization.getLocalizedString("could.not.extract.content.from.sueddeutsche.article.body.section", bodySection.baseUri()));
     }
 
     entry.setContent(content.replaceAll("\u00A0", " ")); // Converting nbsp entities

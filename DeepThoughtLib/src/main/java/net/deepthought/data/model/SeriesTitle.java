@@ -66,13 +66,11 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     if(containsSerialParts(serialPart) == false && serialParts.add(serialPart)) {
       serialPartsSorted = null;
       if(this.equals(serialPart.getSeries()) == false) {
-        serialPart.setSeries(this); // causes a Stackoverflow
-//      serialPart.associatedSeriesTitles = this;
+        serialPart.setSeries(this);
         serialPart.setSeriesOrder(serialParts.size() - 1);
       }
 
 
-//      if(serialPart.isPersisted())
       callEntityAddedListeners(serialParts, serialPart);
       return true;
     }

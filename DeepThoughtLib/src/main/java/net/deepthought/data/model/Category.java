@@ -70,7 +70,7 @@ public class Category extends UserDataEntity {
 
 
   public Category() {
-    this(Localization.getLocalizedStringForResourceKey("new.category.default.name"));
+    this(Localization.getLocalizedString("new.category.default.name"));
   }
 
   public Category(String name) {
@@ -247,7 +247,7 @@ public class Category extends UserDataEntity {
 
 
   public static Category createTopLevelCategory() {
-    Category topLevelCategory = new Category(Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing"));
+    Category topLevelCategory = new Category(Localization.getLocalizedString("i.know.me.nothing.knowing"));
 
     return topLevelCategory;
   }

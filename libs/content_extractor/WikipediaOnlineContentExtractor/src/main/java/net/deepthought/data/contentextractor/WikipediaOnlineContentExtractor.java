@@ -25,7 +25,7 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
   @Override
   public String getName() {
-    return Localization.getLocalizedStringForResourceKey("named.content.extractor", "Wikipedia");
+    return Localization.getLocalizedString("named.content.extractor", "Wikipedia");
   }
 
   @Override
@@ -72,7 +72,7 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 

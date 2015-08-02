@@ -45,7 +45,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
       Element textElement = getElementByClassAndNodeName(document.body(), "div", "text");
       if(textElement == null) {
         log.warn("Could not find text Element");
-        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.find.element.of.class.to.extract.article", "text")));
+        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "text")));
       }
 
       ReferenceSubDivision articleReference = createReference(textElement, articleUrl);
@@ -60,7 +60,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
       Element fliesstextElement = getElementByClassAndNodeName(textElement, "div", "fliesstext");
       if(fliesstextElement == null) {
         log.warn("Could not find fliesstext Element");
-        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.find.element.of.class.to.extract.article", "fliesstext")));
+        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "fliesstext")));
       }
 
       String content = parseContent(fliesstextElement);
@@ -73,7 +73,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
       return new EntryCreationResult(document.baseUri(), articleEntry);
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedStringForResourceKey("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 
@@ -227,7 +227,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
   }
 
   protected void addNewspaperCategory(Entry articleEntry) {
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedStringForResourceKey("periodicals"));
+    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     Category sueddeutscheCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
     Category szMagazinCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, "jetzt");
 

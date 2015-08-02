@@ -1,6 +1,8 @@
-package net.deepthought.data.search;
+package net.deepthought.data.search.specific;
 
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.search.Search;
+import net.deepthought.data.search.SearchCompletedListener;
 
 import java.util.ArrayList;
 import java.util.Collection;

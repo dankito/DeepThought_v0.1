@@ -57,7 +57,7 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
   @Override
   public String getName() {
-    return Localization.getLocalizedStringForResourceKey("named.content.extractor", getNewspaperName());
+    return Localization.getLocalizedString("named.content.extractor", getNewspaperName());
   }
 
   protected Reference findOrCreateReferenceForThatDate(String articleDate) {
@@ -99,13 +99,13 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   }
 
   protected void addNewspaperCategory(Entry articleEntry, String newspaperName, boolean isOnlineArticle) {
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedStringForResourceKey("periodicals"));
+    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     Category newspaperCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
 
     if(isOnlineArticle == false)
       newspaperCategory.addEntry(articleEntry);
     else {
-      Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedStringForResourceKey("online"));
+      Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedString("online"));
       newspaperOnlineCategory.addEntry(articleEntry);
     }
   }

@@ -4,6 +4,8 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 
 import org.controlsfx.control.action.Action;
@@ -31,8 +33,8 @@ public class Alerts {
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {
     Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedStringForResourceKey("confirm.delete"))
-        .message(Localization.getLocalizedStringForResourceKey("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()))
+        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
+        .message(Localization.getLocalizedString("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()))
         .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
         .showConfirm();
 
@@ -55,8 +57,8 @@ public class Alerts {
 
   public static boolean showConfirmDeleteTagWithEntriesAlert(Tag tag) {
     Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedStringForResourceKey("confirm.delete"))
-        .message(Localization.getLocalizedStringForResourceKey("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()))
+        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
+        .message(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()))
         .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
         .showConfirm();
 
@@ -79,13 +81,33 @@ public class Alerts {
 
   public static boolean showConfirmDeletePersonWithEntriesAlert(Person person) {
     Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedStringForResourceKey("confirm.delete"))
-        .message(Localization.getLocalizedStringForResourceKey("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()))
+        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
+        .message(Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()))
         .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
         .showConfirm();
 
     return Dialog.ACTION_YES.equals(response);
   }
+
+
+  public static boolean askUserIfEditedSeriesTitleShouldBeSaved(SeriesTitle seriesTitle) {
+    return askUserIfEditedReferenceBaseShouldBeSaved(seriesTitle.getTextRepresentation(), Localization.getLocalizedString("series.title"));
+  }
+
+  public static boolean askUserIfEditedReferenceShouldBeSaved(Reference reference) {
+    return askUserIfEditedReferenceBaseShouldBeSaved(reference.getPreview(), Localization.getLocalizedString("reference"));
+  }
+
+  protected static boolean askUserIfEditedReferenceBaseShouldBeSaved(String referenceBasePreview, String localizedReferenceBaseName) {
+    Action response = org.controlsfx.dialog.Dialogs.create()
+        .title(Localization.getLocalizedString("alert.title.should.edited.data.be.saved"))
+        .message(Localization.getLocalizedString("alert.message.ask.save.entity", localizedReferenceBaseName, referenceBasePreview))
+        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
+        .showConfirm();
+
+    return Dialog.ACTION_YES.equals(response);
+  }
+
 
   public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle) {
     if(Platform.isFxApplicationThread())

@@ -92,20 +92,20 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
   protected ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
-    MenuItem editMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("edit"));
+    MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
     FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
     editMenuItem.setOnAction(event -> Dialogs.showEditReferenceDialog(this.referenceBase));
     contextMenu.getItems().add(editMenuItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("copy.reference.text.to.clipboard"));
+    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.text.to.clipboard"));
     copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(this.referenceBase.getTextRepresentation()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     final String referenceUrl = getReferenceUrl();
     if(referenceUrl != null) {
-      MenuItem copyReferenceUrlMenuItem = new MenuItem(Localization.getLocalizedStringForResourceKey("copy.reference.url.to.clipboard"));
+      MenuItem copyReferenceUrlMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.url.to.clipboard"));
       copyReferenceUrlMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(referenceUrl));
       contextMenu.getItems().add(copyReferenceUrlMenuItem);
     }

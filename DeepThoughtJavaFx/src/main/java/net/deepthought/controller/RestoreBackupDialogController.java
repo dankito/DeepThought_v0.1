@@ -264,8 +264,8 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
       BackupFileServiceType fileServiceType = getFileServiceTypeForBackupFile(txtfldChooseBackupFilePath.getText());
       if(fileServiceType == FileServiceTypeNotFoundForThisFile) {
         org.controlsfx.dialog.Dialogs.create()
-            .title(Localization.getLocalizedStringForResourceKey("error.can.not.restore.backup.file"))
-            .message(Localization.getLocalizedStringForResourceKey("error.can.not.restore.backup.file.of.this.type", txtfldChooseBackupFilePath.getText()))
+            .title(Localization.getLocalizedString("error.can.not.restore.backup.file"))
+            .message(Localization.getLocalizedString("error.can.not.restore.backup.file.of.this.type", txtfldChooseBackupFilePath.getText()))
             .showError();
         return;
       }
@@ -338,13 +338,13 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
           public void run() {
             if(successful)
               org.controlsfx.dialog.Dialogs.create()
-                  .title(Localization.getLocalizedStringForResourceKey("restoring.backup.was.successful"))
-                  .message(Localization.getLocalizedStringForResourceKey("successfully.restored.backup.file", result.getBackup().getFilePath()))
+                  .title(Localization.getLocalizedString("restoring.backup.was.successful"))
+                  .message(Localization.getLocalizedString("successfully.restored.backup.file", result.getBackup().getFilePath()))
                   .showInformation();
             else
               org.controlsfx.dialog.Dialogs.create()
-                  .title(Localization.getLocalizedStringForResourceKey("error.could.not.restore.backup"))
-                  .message(Localization.getLocalizedStringForResourceKey("error.could.not.restore.backup.file", result.getBackup().getFilePath(), result.getError()))
+                  .title(Localization.getLocalizedString("error.could.not.restore.backup"))
+                  .message(Localization.getLocalizedString("error.could.not.restore.backup.file", result.getBackup().getFilePath(), result.getError()))
                   .showError();
 
             closeDialog(DialogResult.Ok);
@@ -389,7 +389,7 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
   public void setWindowStage(Stage windowStage) {
     super.setWindowStage(windowStage);
 
-    windowStage.setTitle(Localization.getLocalizedStringForResourceKey("restore.backup.dialog.title"));
+    windowStage.setTitle(Localization.getLocalizedString("restore.backup.dialog.title"));
   }
 
   public static class RestoreProgressItem {

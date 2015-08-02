@@ -52,7 +52,7 @@ public class Localization {
   }
 
 
-  public static String getLocalizedStringForResourceKey(String resourceKey) {
+  public static String getLocalizedString(String resourceKey) {
     try {
       return getStringsResourceBundle().getString(resourceKey);
     } catch(Exception ex) {
@@ -62,8 +62,8 @@ public class Localization {
     return resourceKey;
   }
 
-  public static String getLocalizedStringForResourceKey(String resourceKey, Object... formatArguments) {
-    return String.format(getLocalizedStringForResourceKey(resourceKey), formatArguments);
+  public static String getLocalizedString(String resourceKey, Object... formatArguments) {
+    return String.format(getLocalizedString(resourceKey), formatArguments);
   }
 
 

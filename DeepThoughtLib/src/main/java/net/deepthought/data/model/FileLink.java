@@ -190,7 +190,7 @@ public class FileLink extends UserDataEntity implements Serializable {
   @Transient
   public String getTextRepresentation() {
     if(isFolder)
-      return Localization.getLocalizedStringForResourceKey("folder") + " " + name + " (" + uriString + ")";
+      return Localization.getLocalizedString("folder") + " " + name + " (" + uriString + ")";
     else
       return name + " (" + uriString + ")";
   }

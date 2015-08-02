@@ -23,7 +23,7 @@ public class OcrTextContentExtractor implements ITextContentExtractor {
 
   @Override
   public String getName() {
-    return Localization.getLocalizedStringForResourceKey("ocr.text.content.extractor");
+    return Localization.getLocalizedString("ocr.text.content.extractor");
   }
 
   @Override

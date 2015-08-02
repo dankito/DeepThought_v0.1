@@ -3,10 +3,15 @@ package net.deepthought.data.search;
 import net.deepthought.Application;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.FilterTagsSearchResult;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +64,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   @Override
   protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
     IEntityManager entityManager = Application.getEntityManager();
-    List<FilterTagsSearchResult> results = new ArrayList<>();
+    List<net.deepthought.data.search.specific.FilterTagsSearchResult> results = new ArrayList<>();
 
     String queryPrefix = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.TagTableName + " WHERE " +
         TableConfig.TagDeepThoughtJoinColumnName + " = " + deepThought.getId() + " AND (" + TableConfig.TagNameColumnName + " LIKE '%";
@@ -94,12 +99,12 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(FilterEntriesSearch search, String contentFilter, String abstractFilter) {
+  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter) {
     search.fireSearchCompleted(); // TODO
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(Search search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
     IEntityManager entityManager = Application.getEntityManager();
 
     String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (" +
@@ -111,7 +116,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
       for(String[] result : results) {
         ids.add(Long.parseLong(result[0]));
       }
-      search.setResults(new LazyLoadingList<Person>(Person.class, ids));
+      search.setResults(new LazyLoadingList<ReferenceBase>(ReferenceBase.class, ids));
     } catch(Exception ex) {
       log.error("Could not query for Entries without Tags", ex);
     }
@@ -121,7 +126,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
   // there's no way to complete this search with SQL -> do it in memory (very slow for a large amount of ReferenceBases) or with Lucene
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
 //    IEntityManager entityManager = Application.getEntityManager();
 //
 //    String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (";
@@ -210,7 +215,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
     Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
     Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     IEntityManager entityManager = Application.getEntityManager();

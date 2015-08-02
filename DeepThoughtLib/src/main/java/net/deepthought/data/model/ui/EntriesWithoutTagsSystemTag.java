@@ -20,7 +20,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 
 
   public EntriesWithoutTagsSystemTag(DeepThought deepThought) {
-    super(deepThought, Localization.getLocalizedStringForResourceKey("system.tag.entries.with.no.tags"));
+    super(deepThought, Localization.getLocalizedString("system.tag.entries.with.no.tags"));
 
     deepThought.addEntityListener(deepThoughtListener);
 

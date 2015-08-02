@@ -31,7 +31,7 @@ public class LuceneAndDatabaseSearchEngine extends LuceneSearchEngine {
   }
 
   @Override
-  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+  protected void filterTags(net.deepthought.data.search.specific.FilterTagsSearch search, String[] tagNamesToFilterFor) {
     databaseSearchEngine.filterTags(search, tagNamesToFilterFor);
   }
 

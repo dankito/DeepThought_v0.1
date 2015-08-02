@@ -6,10 +6,13 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.controls.person.ReferencePersonsControl;
 import net.deepthought.controls.person.ReferenceSubDivisionPersonsControl;
 import net.deepthought.controls.person.SeriesTitlePersonsControl;
+import net.deepthought.controls.reference.ISelectedReferenceHolder;
+import net.deepthought.controls.reference.SearchAndSelectReferenceControl;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -23,6 +26,8 @@ import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
@@ -107,6 +112,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   protected Pane paneSeriesTitleHeader;
+  @FXML
+  protected ToggleButton btnShowHideSearchSeriesTitle;
+  protected SearchAndSelectReferenceControl searchAndSelectSeriesTitleControl = null;
 
   @FXML
   protected Pane paneSeriesTitleTitle;
@@ -161,6 +169,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   protected Button btnChooseFieldsToShow;
+
+  @FXML
+  protected ToggleButton btnShowHideSearchReference;
+  protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
   @FXML
   protected Pane paneTitle;
@@ -298,9 +310,33 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   protected void setupSeriesTitleControls() {
+    searchAndSelectSeriesTitleControl = new SearchAndSelectReferenceControl(ReferenceBaseType.SeriesTitle, new ISelectedReferenceHolder() {
+      @Override
+      public ReferenceBase getSelectedReferenceBase() {
+        return seriesTitle;
+      }
+
+      @Override
+      public void selectedReferenceBaseChanged(ReferenceBase newReferenceBase) {
+        setSeriesTitle((SeriesTitle) newReferenceBase);
+      }
+
+      @Override
+      public void addFieldChangedEvent(EventHandler<FieldChangedEvent> fieldChangedEvent) {
+
+      }
+    });
+
+    searchAndSelectSeriesTitleControl.setVisible(false);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectSeriesTitleControl);
+    searchAndSelectSeriesTitleControl.visibleProperty().bind(btnShowHideSearchSeriesTitle.selectedProperty());
+    searchAndSelectSeriesTitleControl.setMinHeight(190);
+    searchAndSelectSeriesTitleControl.setMaxHeight(190);
+    paneSeriesTitle.getChildren().add(1, searchAndSelectSeriesTitleControl);
+
     txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
-      if(editedReferenceBase instanceof SeriesTitle)
+      if (editedReferenceBase instanceof SeriesTitle)
         updateWindowTitle(editedReferenceBase);
     });
 
@@ -331,13 +367,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleFiles);
 
-//    clmnSeriesTitleFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-//      @Override
-//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-//        return new FileTreeTableCell(seriesTitle);
-//      }
-//    });
-
     contextHelpControl = new ContextHelpControl("context.help.series.title.");
     dialogPane.setRight(contextHelpControl);
 
@@ -348,8 +377,48 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
+  protected void setSeriesTitle(SeriesTitle newSeriesTitle) {
+    if(hasSeriesTitleBeenEdited()) {
+      if(Alerts.askUserIfEditedSeriesTitleShouldBeSaved(seriesTitle) == true) {
+        if (seriesTitle.isPersisted() == false)
+          Application.getDeepThought().addSeriesTitle(seriesTitle);
+        saveEditedFieldsOnSeriesTitle();
+      }
+    }
+
+    seriesTitle = newSeriesTitle;
+    if(seriesTitle == null)
+      this.seriesTitle = new SeriesTitle();
+
+    setSeriesTitleValues(seriesTitle);
+  }
+
   protected void setupReferenceControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
+
+    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.Reference, new ISelectedReferenceHolder() {
+      @Override
+      public ReferenceBase getSelectedReferenceBase() {
+        return reference;
+      }
+
+      @Override
+      public void selectedReferenceBaseChanged(ReferenceBase newReferenceBase) {
+        setReference((Reference) newReferenceBase);
+      }
+
+      @Override
+      public void addFieldChangedEvent(EventHandler<FieldChangedEvent> fieldChangedEvent) {
+
+      }
+    });
+
+    searchAndSelectReferenceControl.setVisible(false);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectReferenceControl);
+    searchAndSelectReferenceControl.visibleProperty().bind(btnShowHideSearchReference.selectedProperty());
+    searchAndSelectReferenceControl.setMinHeight(190);
+    searchAndSelectReferenceControl.setMaxHeight(190);
+    paneReference.getChildren().add(1, searchAndSelectReferenceControl);
 
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
@@ -367,7 +436,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     FXUtils.addHtmlEditorTextChangedListener(htmledTableOfContents, event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents));
 
     referencePersonsControl = new ReferencePersonsControl();
-    referencePersonsControl.setExpanded(true);
+    referencePersonsControl.setExpanded(false);
     referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
@@ -398,12 +467,28 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    });
   }
 
+  protected void setReference(Reference newReference) {
+    if(hasReferenceBeenEdited()) {
+      if(Alerts.askUserIfEditedReferenceShouldBeSaved(reference) == true) {
+        if (reference.isPersisted() == false)
+          Application.getDeepThought().addReference(reference);
+        saveEditedFieldsOnReference();
+      }
+    }
+
+    reference = newReference;
+    setReferenceValues(reference);
+
+    if(newReference.getSeries() != seriesTitle)
+      setSeriesTitle(newReference.getSeries());
+  }
+
   protected void setupReferenceSubDivisionControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
 
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
-      if(editedReferenceBase instanceof ReferenceSubDivision)
+      if (editedReferenceBase instanceof ReferenceSubDivision)
         updateWindowTitle(editedReferenceBase);
     });
 
@@ -485,12 +570,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
-    if(seriesTitle.isPersisted() && hasSeriesTitleBeenEdited())
-      saveEditedFieldsOnSeriesTitle();
-    if(reference.isPersisted() && hasReferenceBeenEdited())
-      saveEditedFieldsOnReference();
-    if(referenceSubDivision.isPersisted() && hasReferenceSubDivisionBeenEdited())
-      saveEditedFieldsOnReferenceSubDivision();
+    saveChanges();
   }
 
   @FXML
@@ -509,6 +589,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void handleButtonOkAction(ActionEvent actionEvent) {
     setDialogResult(DialogResult.Ok);
 
+    saveChanges();
+
+    closeDialog();
+  }
+
+  protected void saveChanges() {
     // TODO: also check if a previously set Entity now has been unset
 
     // TODO: save async while closing the dialog? Would make Dialog closing faster
@@ -551,7 +637,19 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         editedReferenceBase = referenceSubDivision;
     }
 
-    closeDialog();
+    if(reference.isPersisted()) {
+      if(seriesTitle.isPersisted() == false && reference.getSeries() != null)
+        reference.setSeries(null);
+      else if(seriesTitle.isPersisted() == true && reference.getSeries() != seriesTitle)
+        reference.setSeries(seriesTitle);
+    }
+
+    if(referenceSubDivision.isPersisted()) {
+      if(reference.isPersisted() == false && referenceSubDivision.getReference() != null)
+        referenceSubDivision.setReference(reference);
+      else if(reference.isPersisted() == true && referenceSubDivision.getReference() != reference)
+        referenceSubDivision.setReference(reference);
+    }
   }
 
   protected boolean hasSeriesTitleBeenEdited() {
@@ -813,17 +911,32 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
-    txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
-    txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
+    if(seriesTitle != null) {
+      txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
+      txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
 
-    txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
-    htmledSeriesTitleTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
+      txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
+      htmledSeriesTitleTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
 
-    seriesTitlePersonsControl.setSeries(seriesTitle);
+      txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
 
-    txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
+      txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
 
-    txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
+      seriesTitlePersonsControl.setSeries(seriesTitle);
+    }
+    else {
+      txtfldSeriesTitleTitle.setText("");
+      txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
+
+      txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
+      htmledSeriesTitleTableOfContents.setHtmlText(seriesTitle.getTableOfContents());
+
+      txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
+
+      txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
+
+      seriesTitlePersonsControl.setSeries(seriesTitle);
+    }
 
 //    trtblvwSeriesTitleFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
@@ -1032,7 +1145,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       if(reference == null && persistedParentReferenceBase instanceof Reference) // it should never be the case that referenceSubDivision.getReference() == null and
       // persistedParentReferenceBase is not a Reference
         this.reference = (Reference)persistedParentReferenceBase;
-      this.seriesTitle = reference.getSeries();
+
+      if(reference == null)
+        reference = new Reference();
+      else
+        this.seriesTitle = reference.getSeries();
       if(this.seriesTitle == null)
         this.seriesTitle = new SeriesTitle();
     }
@@ -1126,9 +1243,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void updateWindowTitle(ReferenceBase referenceBase) {
     if(editedReferenceBase == null)
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("create.reference"));
+      windowStage.setTitle(Localization.getLocalizedString("create.reference"));
     else
-      windowStage.setTitle(Localization.getLocalizedStringForResourceKey("edit.reference", referenceBase.getTextRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("edit.reference", referenceBase.getTextRepresentation()));
   }
 
 

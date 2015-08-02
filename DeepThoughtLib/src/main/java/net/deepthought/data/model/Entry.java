@@ -869,7 +869,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
 
   public static Entry createTopLevelEntry() {
-    Entry topLevelEntry = new Entry(Localization.getLocalizedStringForResourceKey("i.know.me.nothing.knowing"));
+    Entry topLevelEntry = new Entry(Localization.getLocalizedString("i.know.me.nothing.knowing"));
 
     return topLevelEntry;
   }

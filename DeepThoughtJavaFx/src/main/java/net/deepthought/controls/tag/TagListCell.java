@@ -4,7 +4,7 @@ import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 

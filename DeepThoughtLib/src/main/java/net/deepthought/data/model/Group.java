@@ -179,7 +179,7 @@ public class Group extends UserDataEntity {
 
   public static Group createUserDefaultGroup(User user) {
     String universallyUniqueId = UUID.randomUUID().toString();
-    Group userGroup = new Group(universallyUniqueId, Localization.getLocalizedStringForResourceKey("users.group", user.getUserName()), user);
+    Group userGroup = new Group(universallyUniqueId, Localization.getLocalizedString("users.group", user.getUserName()), user);
 
     return userGroup;
   }
