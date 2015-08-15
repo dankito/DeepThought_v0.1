@@ -16,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,6 +47,8 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   protected IOnlineArticleContentExtractor articleContentExtractor = null;
 
+  protected List<OverviewItemListCell> overviewItemListCells = new ArrayList<>();
+
   protected ObservableSet<ArticlesOverviewItem> selectedItems = FXCollections.observableSet();
 
 
@@ -71,6 +75,21 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     setupControls();
   }
 
+  @Override
+  protected void closeDialog() {
+    selectedItems.clear();
+    lstvwArticleOverviewItems.getItems().clear();
+
+    articleContentExtractor = null;
+
+    for(OverviewItemListCell cell : overviewItemListCells) {
+      cell.cleanUpControl();
+    }
+    overviewItemListCells.clear();
+
+    super.closeDialog();
+  }
+
   protected void setupControls() {
     btnUpdateArticlesOverview.setGraphic(new ImageView(Constants.UpdateIconPath));
 
@@ -78,6 +97,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
       final OverviewItemListCell cell = new OverviewItemListCell(selectedItems);
       cell.setItemSelectionChangedEventHandler((item, isSelected) -> itemSelectionChanged(item, isSelected));
       cell.setOnItemClicked((item, event) -> onItemClicked(item, event));
+      overviewItemListCells.add(cell);
       return cell;
     });
   }
@@ -101,7 +121,9 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
           if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
             articlesOverviewUpdateStarted.set(false);
             lstvwArticleOverviewItems.getItems().clear();
+            selectedItems.clear();
           }
+          // TODO: show error message if retrieving Article Overview Items failed
 
           addOverviewItemsToListView(items);
         });
@@ -141,8 +163,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Cancel);
-    closeDialog();
+    closeDialog(DialogResult.Cancel);
   }
 
   @FXML

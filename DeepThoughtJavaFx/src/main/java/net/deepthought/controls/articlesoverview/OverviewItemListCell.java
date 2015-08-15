@@ -1,9 +1,9 @@
 package net.deepthought.controls.articlesoverview;
 
 import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
@@ -24,14 +24,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
 /**
  * Created by ganymed on 17/07/15.
  */
-public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
+public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> implements ICleanableControl {
 
   public interface ItemSelectionChangedEventHandler {
     void itemSelectionChanged(ArticlesOverviewItem item, boolean isSelected);
@@ -84,6 +83,16 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
     listViewProperty().addListener((observable, oldValue, newValue) -> listViewChanged(newValue));
 
     setOnMouseClicked(event -> mouseClicked(event));
+  }
+
+  @Override
+  public void cleanUpControl() {
+    item = null;
+
+    selectedItems = null;
+
+    itemSelectionChangedEventHandler = null;
+    onItemClickedEventHandler = null;
   }
 
   protected void listViewChanged(ListView<ArticlesOverviewItem> listView) {
@@ -170,9 +179,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> {
 
       imgvwItemPreviewImage.setVisible(item.hasPreviewImageUrl());
       if(item.hasPreviewImageUrl()) {
-        Platform.runLater(() -> {
-          imgvwItemPreviewImage.setImage(new Image(item.getPreviewImageUrl()));
-        });
+        imgvwItemPreviewImage.setImage(new Image(item.getPreviewImageUrl(), true));
       }
 
       lblItemSubTitle.setVisible(item.hasSubTitle());
