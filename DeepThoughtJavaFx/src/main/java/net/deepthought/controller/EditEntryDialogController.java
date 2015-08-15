@@ -48,7 +48,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -77,7 +76,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 /**
@@ -470,7 +468,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     btnApplyChanges.setDisable(true);
   }
 
-  protected void askIfStageShouldBeClosed(WindowEvent event) {
+  @Override
+  protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
@@ -480,14 +479,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
           .showConfirm();
 
       if(response.equals(Dialog.ACTION_CANCEL))
-        event.consume(); // consume event so that stage doesn't get closed
+        return false;
       else if(response.equals(Dialog.ACTION_YES)) {
         saveEntry();
-        closeDialog();
       }
-      else
-        closeDialog();
     }
+
+    return true;
   }
 
 
@@ -559,12 +557,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
     this.entry = entry;
 
     updateWindowTitle(entry.getPreview());
-    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        askIfStageShouldBeClosed(event);
-      }
-    });
 
     setupControls();
 

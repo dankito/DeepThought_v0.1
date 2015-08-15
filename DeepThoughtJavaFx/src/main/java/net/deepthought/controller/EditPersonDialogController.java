@@ -22,7 +22,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -33,7 +32,6 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 /**
  * Created by ganymed on 31/12/14.
@@ -179,18 +177,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   @Override
-  public void setWindowStage(Stage windowStage) {
-    super.setWindowStage(windowStage);
-
-    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        askIfStageShouldBeClosed(event);
-      }
-    });
-  }
-
-  protected void askIfStageShouldBeClosed(WindowEvent event) {
+  protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
@@ -200,14 +187,13 @@ public class EditPersonDialogController extends ChildWindowsController implement
           .showConfirm();
 
       if(response.equals(Dialog.ACTION_CANCEL))
-        event.consume(); // consume event so that stage doesn't get closed
+        return false;
       else if(response.equals(Dialog.ACTION_YES)) {
         saveEditedFields();
-        closeDialog();
       }
-      else
-        closeDialog();
     }
+
+    return true;
   }
 
 

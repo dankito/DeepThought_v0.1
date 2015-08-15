@@ -53,5 +53,18 @@ public class ChildWindowsController {
 
   public void setWindowStage(Stage windowStage) {
     this.windowStage = windowStage;
+
+    windowStage.setOnCloseRequest(event -> {
+      event.consume();
+
+      if(askIfStageShouldBeClosed() == true) {
+        windowStage.setOnCloseRequest(null);
+        closeDialog(DialogResult.Cancel);
+      }
+    });
+  }
+
+  protected boolean askIfStageShouldBeClosed() {
+    return true;
   }
 }

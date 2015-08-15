@@ -74,7 +74,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.StringConverter;
 
 /**
@@ -866,25 +865,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   @Override
-  public void setWindowStage(Stage windowStage) {
-    super.setWindowStage(windowStage);
-
-    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        askIfStageShouldBeClosed(event);
-      }
-    });
-
-//    windowStage.widthProperty().addListener(new ChangeListener<Number>() {
-//      @Override
-//      public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//
-//      }
-//    });
-  }
-
-  protected void askIfStageShouldBeClosed(WindowEvent event) {
+  protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
@@ -894,14 +875,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
           .showConfirm();
 
       if(response.equals(Dialog.ACTION_CANCEL))
-        event.consume(); // consume event so that stage doesn't get closed
+        return false;
       else if(response.equals(Dialog.ACTION_YES)) {
         saveEditedFieldsOnReference();
-        closeDialog();
       }
-      else
-        closeDialog();
     }
+
+    return true;
   }
 
 
@@ -1223,12 +1203,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     super.setWindowStage(windowStage);
 
     updateWindowTitle(editedReferenceBase);
-    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        askIfStageShouldBeClosed(event);
-      }
-    });
 
     setupControls();
 

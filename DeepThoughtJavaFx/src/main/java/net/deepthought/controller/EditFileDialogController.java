@@ -6,9 +6,9 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
-import net.deepthought.util.Localization;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
 
@@ -27,7 +27,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -39,7 +38,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 /**
  * Created by ganymed on 31/12/14.
@@ -326,16 +324,16 @@ public class EditFileDialogController extends ChildWindowsController implements 
           @Override
           public void run() {
             org.controlsfx.dialog.Dialogs.create()
-                                         .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
-                                         .message(error.getNotificationMessage())
-                                         .showError();
+                .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
+                .message(error.getNotificationMessage())
+                .showError();
           }
         });
       }
 
       @Override
       public void fileOperationDone(boolean successful, File destinationFile) {
-        if(successful)
+        if (successful)
           file = new FileLink(destinationFile.getPath());
       }
     });
@@ -364,25 +362,14 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
       @Override
       public void fileOperationDone(boolean successful, File destinationFile) {
-        if(successful)
+        if (successful)
           file = new FileLink(destinationFile.getPath());
       }
     });
   }
 
   @Override
-  public void setWindowStage(Stage windowStage) {
-    super.setWindowStage(windowStage);
-
-    windowStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        askIfStageShouldBeClosed(event);
-      }
-    });
-  }
-
-  protected void askIfStageShouldBeClosed(WindowEvent event) {
+  protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
       Action response = org.controlsfx.dialog.Dialogs.create()
           .owner(windowStage)
@@ -392,14 +379,13 @@ public class EditFileDialogController extends ChildWindowsController implements 
           .showConfirm();
 
       if(response.equals(Dialog.ACTION_CANCEL))
-        event.consume(); // consume event so that stage doesn't get closed
+        return false;
       else if(response.equals(Dialog.ACTION_YES)) {
         saveEditedFields();
-        closeDialog();
       }
-      else
-        closeDialog();
     }
+
+    return true;
   }
 
 }
