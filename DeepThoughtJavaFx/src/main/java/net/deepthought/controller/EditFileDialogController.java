@@ -250,19 +250,17 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Cancel);
-    closeDialog();
+    closeDialog(DialogResult.Cancel);
   }
 
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Ok);
     saveEditedFields();
 
     if(file.isPersisted() == false)
       Application.getDeepThought().addFile(file);
 
-    closeDialog();
+    closeDialog(DialogResult.Ok);
   }
 
   @Override

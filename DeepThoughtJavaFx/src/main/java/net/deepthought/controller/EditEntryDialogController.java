@@ -325,16 +325,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Cancel);
-    closeDialog();
+    closeDialog(DialogResult.Cancel);
   }
 
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Ok);
-
     saveEntry();
-    closeDialog();
+    closeDialog(DialogResult.Ok);
   }
 
   @Override
@@ -541,7 +538,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
       @Override
       public void windowClosed(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
-          entry.addFile(newFile);
+          entry.addFile(newFile); // TODO: no, don't add file directly, wait till 'OK' button has been pressed
         }
       }
     });

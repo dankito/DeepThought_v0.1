@@ -141,15 +141,13 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Cancel);
-    closeDialog();
+    closeDialog(DialogResult.Cancel);
   }
 
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Ok);
     saveEditedFields();
-    closeDialog();
+    closeDialog(DialogResult.Ok);
   }
 
   @Override

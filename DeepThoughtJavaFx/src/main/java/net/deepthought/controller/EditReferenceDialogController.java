@@ -576,8 +576,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Cancel);
-    closeDialog();
+    closeDialog(DialogResult.Cancel);
   }
 
   protected ReferenceBase editedReferenceBase = null;
@@ -588,11 +587,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   public void handleButtonOkAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Ok);
-
     saveChanges();
 
-    closeDialog();
+    closeDialog(DialogResult.Ok);
   }
 
   protected void saveChanges() {
