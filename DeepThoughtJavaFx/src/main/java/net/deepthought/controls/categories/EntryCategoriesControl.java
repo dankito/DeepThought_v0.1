@@ -1,6 +1,8 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.Application;
+import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.event.EntryCategoriesEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
@@ -29,6 +31,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -39,7 +42,7 @@ import javafx.scene.layout.Pane;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryCategoriesControl extends TitledPane {
+public class EntryCategoriesControl extends TitledPane implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoriesControl.class);
 
@@ -86,17 +89,7 @@ public class EntryCategoriesControl extends TitledPane {
   public EntryCategoriesControl(Entry entry) {
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        EntryCategoriesControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryCategoriesControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -116,9 +109,37 @@ public class EntryCategoriesControl extends TitledPane {
     }
   }
 
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      EntryCategoriesControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
+
   public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
     if(deepThought != null)
       deepThought.removeEntityListener(deepThoughtListener);
+
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    clearEntryCategoryLabels();
+
+    ((TopLevelCategoryTreeItem)trvwCategories.getRoot()).cleanUpControl();
+    trvwCategories.setRoot(null);
+
+    for(EntryCategoryTreeCell cell : entryCategoryTreeCells)
+      cell.cleanUpControl();
+
+    categoryAddedEventHandler = null;
+    categoryRemovedEventHandler = null;
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -174,7 +195,7 @@ public class EntryCategoriesControl extends TitledPane {
   }
 
   protected void showEntryCategories(Entry entry) {
-    pnSelectedCategoriesPreview.getChildren().clear();
+    clearEntryCategoryLabels();
 
     if(entry != null) {
 //      for(Category category : entry.getCategories()) {
@@ -191,6 +212,10 @@ public class EntryCategoriesControl extends TitledPane {
         }));
       }
     }
+  }
+
+  protected void clearEntryCategoryLabels() {
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedCategoriesPreview);
   }
 
 

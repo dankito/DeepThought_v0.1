@@ -1,6 +1,8 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.Application;
+import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
@@ -47,7 +49,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public abstract class PersonsControl extends TitledPane {
+public abstract class PersonsControl extends TitledPane implements ICleanableControl {
 
   protected final static Logger log = LoggerFactory.getLogger(PersonsControl.class);
 
@@ -91,17 +93,7 @@ public abstract class PersonsControl extends TitledPane {
   public PersonsControl() {
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        PersonsControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/PersonsControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -117,6 +109,30 @@ public abstract class PersonsControl extends TitledPane {
     } catch (IOException ex) {
       log.error("Could not load PersonsControl", ex);
     }
+  }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      PersonsControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
+
+
+  @Override
+  public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
+    if(this.deepThought != null)
+      this.deepThought.removeEntityListener(deepThoughtListener);
+
+    for(PersonListCell cell : personListCells)
+      cell.cleanUpControl();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -173,9 +189,6 @@ public abstract class PersonsControl extends TitledPane {
   }
 
   protected abstract PersonListCell createPersonListCell();
-//  protected PersonListCell createPersonListCell() {
-//    return new PersonListCell(this);
-//  }
 
   protected void setEntityPersons(Set<Person> persons) {
     currentlySetPersonsOnEntity = persons;
@@ -188,8 +201,7 @@ public abstract class PersonsControl extends TitledPane {
   }
 
   protected void updatePersonsSetOnEntityPreview() {
-    pnSelectedPersonsPreview.getChildren().clear();
-
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersonsPreview);
 
     for(Person person : new TreeSet<>(editedEntityPersons)) {
       pnSelectedPersonsPreview.getChildren().add(createPersonPreviewLabel(person));
@@ -240,52 +252,6 @@ public abstract class PersonsControl extends TitledPane {
         listViewAllPersonsItems.setUnderlyingCollection(results);
     });
     Application.getSearchEngine().filterPersons(filterPersonsSearch);
-
-//    filterPersonsManually();
-  }
-
-//  protected void filterPersonsManually() {
-//    String filter = txtfldSearchForPerson.getText();
-//    String lowerCaseFilter = filter == null ? "" : filter.toLowerCase();
-//    final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");
-//    String lastNameFilterTemp, firstNameFilterTemp = null;
-//
-//    if(filterForFirstAndLastName == false)
-//      lastNameFilterTemp = firstNameFilterTemp = lowerCaseFilter;
-//    else {
-//      lastNameFilterTemp = lowerCaseFilter.substring(0, lowerCaseFilter.indexOf(",")).trim();
-//      firstNameFilterTemp = lowerCaseFilter.substring(lowerCaseFilter.indexOf(","));
-//      firstNameFilterTemp = firstNameFilterTemp.substring(1).trim();
-//    }
-//
-//    final String lastNameFilter = lastNameFilterTemp;
-//    final String firstNameFilter = firstNameFilterTemp;
-//
-//    filteredPersons.setPredicate((person) -> {
-//      // If filter text is empty, display all Persons.
-//      if (filter == null || filter.isEmpty()) {
-//        return true;
-//      }
-//
-//
-//      if(filterForFirstAndLastName == false) {
-//        if (person.getLastName().toLowerCase().contains(lowerCaseFilter)) {
-//          return true; // Filter matches last name
-//        } else if (person.getFirstName().toLowerCase().contains(lowerCaseFilter)) {
-//          return true; // Filter matches first name
-//        }
-//      }
-//      else {
-//        return person.getLastName().toLowerCase().contains(lastNameFilter) && person.getFirstName().toLowerCase().contains(firstNameFilter);
-//      }
-//
-//      return false; // Does not match.
-//    });
-//  }
-
-  public void close() {
-    if(deepThought != null)
-      deepThought.removeEntityListener(deepThoughtListener);
   }
 
 

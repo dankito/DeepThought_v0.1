@@ -165,24 +165,26 @@ public class EditEntryDialogController extends ChildWindowsController implements
       }
     });
 
-    Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
-      @Override
-      public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-        if (setting == Setting.UserDeviceShowCategories) {
-          entryCategoriesControl.setVisible((boolean) newValue);
-          if ((boolean) newValue) {
-            paneTagsAndCategories.getChildren().add(entryCategoriesControl);
-//            contentPane.getChildren().add(entryCategoriesControl);
-          } else
-            paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
-//            contentPane.getChildren().remove(entryCategoriesControl);
-        } else if (setting == Setting.UserDeviceDialogFieldsDisplay)
-          dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
-      }
-    });
+    Application.getSettings().addSettingsChangedListener(settingsChangedListener);
 
     // TODO: what to do when DeepThought changes -> close dialog
   }
+
+  protected SettingsChangedListener settingsChangedListener = new SettingsChangedListener() {
+    @Override
+    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+      if (setting == Setting.UserDeviceShowCategories) {
+        entryCategoriesControl.setVisible((boolean) newValue);
+        if ((boolean) newValue) {
+          paneTagsAndCategories.getChildren().add(entryCategoriesControl);
+//            contentPane.getChildren().add(entryCategoriesControl);
+        } else
+          paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
+//            contentPane.getChildren().remove(entryCategoriesControl);
+      } else if (setting == Setting.UserDeviceDialogFieldsDisplay)
+        dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
+    }
+  };
 
   protected void setupControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
@@ -301,15 +303,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
     ttldpnAbstract.setExpanded(entry.hasAbstract());
 
     htmledContent.setHtmlText(entry.getContent());
-    // TODO: check which Content format Content has
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
-    entryCategoriesControl.setExpanded(entryTagsControl.isExpanded());
+    entryCategoriesControl.setExpanded(entry.hasCategories() == false);
 
-    ttldpnFiles.setExpanded(entry.hasFiles());
+    ttldpnFiles.setExpanded(entry.hasFiles() == false);
     trtblvwFiles.setRoot(new FileRootTreeItem(entry));
 
-    entryReferenceControl.setVisible(true);
     entryReferenceControl.setExpanded(entry.isAReferenceSet() == false);
 
     fieldsWithUnsavedChanges.clear();
@@ -342,8 +342,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @Override
   protected void closeDialog() {
     entry.removeEntityListener(entryListener);
+    Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
 
+    entryTagsControl.cleanUpControl();
     entryCategoriesControl.cleanUpControl();
+    entryReferenceControl.cleanUpControl();
+    entryPersonsControl.cleanUpControl();
+
+    ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUpControl();
 
     super.closeDialog();
   }

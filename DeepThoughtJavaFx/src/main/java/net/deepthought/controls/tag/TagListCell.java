@@ -1,6 +1,7 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -38,12 +39,14 @@ import javafx.scene.text.Font;
 /**
  * Created by ganymed on 30/11/14.
  */
-public class TagListCell extends ListCell<Tag> {
+public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(TagListCell.class);
 
 
   protected Tag tag = null;
+
+  protected SearchAndSelectTagsControl searchAndSelectTagsControl = null;
 
   protected IEditedTagsHolder editedTagsHolder = null;
 
@@ -59,14 +62,13 @@ public class TagListCell extends ListCell<Tag> {
 
 
   public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedTagsHolder editedTagsHolder) {
+    this.searchAndSelectTagsControl = searchAndSelectTagsControl;
     this.editedTagsHolder = editedTagsHolder;
-    editedTagsHolder.getEditedTags().addListener((SetChangeListener.Change<? extends Tag> change) -> tagUpdated());
+
+    editedTagsHolder.getEditedTags().addListener(editedTagsChangedListener);
 
     filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
-    searchAndSelectTagsControl.addFilteredTagsChangedListener(results -> {
-      filterTagsSearchResults = results;
-      setCellBackgroundColor();
-    });
+    searchAndSelectTagsControl.addFilteredTagsChangedListener(filteredTagsChangedListener);
 
     setupGraphics();
 
@@ -79,6 +81,26 @@ public class TagListCell extends ListCell<Tag> {
 
     setOnMouseClicked(event -> mouseClicked(event));
   }
+
+  @Override
+  public void cleanUpControl() {
+    editedTagsHolder.getEditedTags().removeListener(editedTagsChangedListener);
+    editedTagsHolder = null;
+
+    searchAndSelectTagsControl.removeFilteredTagsChangedListener(filteredTagsChangedListener);
+    searchAndSelectTagsControl = null;
+    filterTagsSearchResults = null;
+
+    if(this.tag != null)
+      this.tag.removeEntityListener(tagListener);
+  }
+
+  protected SetChangeListener<Tag> editedTagsChangedListener = change -> tagUpdated();
+
+  protected IFilteredTagsChangedListener filteredTagsChangedListener = results -> {
+    filterTagsSearchResults = results;
+    setCellBackgroundColor();
+  };
 
   protected void setupGraphics() {
     setText(null);
@@ -310,11 +332,4 @@ public class TagListCell extends ListCell<Tag> {
     }
   };
 
-  public void setComboBoxToUnselected() {
-    chkbxIsTagSelected.selectedProperty().removeListener(checkBoxIsTagSelectedChangeListener);
-
-    chkbxIsTagSelected.setSelected(false);
-
-    chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
-  }
 }

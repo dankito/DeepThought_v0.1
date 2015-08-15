@@ -1293,8 +1293,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addReference(reference);
-
-    entry.setReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
     entry.setReferenceSubDivision(subDivision);
@@ -1330,6 +1329,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 

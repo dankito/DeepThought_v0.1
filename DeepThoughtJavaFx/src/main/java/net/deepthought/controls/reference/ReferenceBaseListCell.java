@@ -4,6 +4,7 @@ import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -38,10 +39,12 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
+public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(ReferenceBaseListCell.class);
 
+
+  protected ReferenceBase referenceBase = null;
 
   protected ISelectedReferenceHolder selectedReferenceHolder;
 
@@ -73,6 +76,13 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+  }
+
+  @Override
+  public void cleanUpControl() {
+    if(getItem() != null) {
+      getItem().removeEntityListener(referenceBaseListener);
+    }
   }
 
   protected void setupGraphic() {
@@ -192,9 +202,10 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> {
   }
 
   protected void itemChanged(ReferenceBase newValue) {
-    if(getItem() != null) {
-      getItem().removeEntityListener(referenceBaseListener);
-    }
+    if(referenceBase != null)
+      referenceBase.removeEntityListener(referenceBaseListener);
+
+    referenceBase = newValue;
 
     if(newValue != null) {
       newValue.addEntityListener(referenceBaseListener);

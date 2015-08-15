@@ -7,6 +7,7 @@ import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.file.FileUtils;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -59,10 +60,11 @@ public abstract class DataModelTestBase {
   public void tearDown() {
     entityManager.deleteEntity(Application.getApplication()); // damn, why doesn't it close the db properly? So next try: delete DeepThoughtApplication object
     entityManager.close();
-//    String databasePath = Application.getDataManager().getDataCollectionSavePath();
-//    boolean deletionResult = FileUtils.deleteFile(entityManager.getDatabasePath());
+    String databasePath = Application.getDataManager().getDataCollectionSavePath();
     Application.shutdown();
-//    Assert.assertTrue("Could not delete Test Database file", deletionResult);
+
+    boolean deletionResult = FileUtils.deleteFile(entityManager.getDatabasePath());
+    Assert.assertTrue("Could not delete Test Database file", deletionResult);
   }
 
 

@@ -44,6 +44,15 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
     itemDisplayNameUpdated();
   }
 
+
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(referenceBase != null)
+      referenceBase.removeEntityListener(referenceBaseListener);
+  }
+
   @Override
   protected String getItemDisplayName() {
     if(referenceBase != null)

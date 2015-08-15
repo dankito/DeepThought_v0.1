@@ -24,6 +24,15 @@ public class ReferencePersonListCell extends PersonListCell {
   }
 
 
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(this.reference != null) {
+      this.reference.removeEntityListener(referenceListener);
+    }
+  }
+
   public void setReference(Reference reference) {
     if(this.reference != null) {
       this.reference.removeEntityListener(referenceListener);

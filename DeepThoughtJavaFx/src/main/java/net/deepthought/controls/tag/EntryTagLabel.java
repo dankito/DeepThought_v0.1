@@ -34,12 +34,14 @@ public class EntryTagLabel extends CollectionItemLabel {
     itemDisplayNameUpdated();
   }
 
-//  @Override
-//  public void onButtonRemoveItemFromCollectionAction(ActionEvent event) {
-//    entry.removeTag(tag);
-//
-//    super.onButtonRemoveItemFromCollectionAction(event);
-//  }
+
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(tag != null)
+      tag.removeEntityListener(tagListener);
+  }
 
   @Override
   protected String getItemDisplayName() {

@@ -40,6 +40,15 @@ public class PersonLabel extends CollectionItemLabel {
     itemDisplayNameUpdated();
   }
 
+
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(person != null)
+      person.removeEntityListener(personListener);
+  }
+
   @Override
   protected String getItemDisplayName() {
     if(person != null)

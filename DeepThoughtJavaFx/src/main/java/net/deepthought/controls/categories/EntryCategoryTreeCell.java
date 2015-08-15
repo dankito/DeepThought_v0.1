@@ -1,6 +1,7 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
@@ -38,7 +39,7 @@ import javafx.scene.text.Font;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class EntryCategoryTreeCell extends TreeCell<Category> {
+public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoryTreeCell.class);
 
@@ -82,6 +83,12 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+  }
+
+  @Override
+  public void cleanUpControl() {
+    if(this.category != null)
+      this.category.removeEntityListener(categoryListener);
   }
 
   protected void setupGraphic() {
@@ -266,16 +273,9 @@ public class EntryCategoryTreeCell extends TreeCell<Category> {
 
 
   public void setEntry(Entry entry) {
-//    if(this.entry != null)
-//      this.entry.removeEntityListener(list)
-
     this.entry = entry;
     isEntryInCategoryCheckBox.setDisable(entry == null);
 
-//    if(category == null)
-//      isEntryInCategoryCheckBox.setSelected(false);
-//    else
-//      isEntryInCategoryCheckBox.setSelected(category.containsEntry(entry));
     categoryPropertiesHaveBeenUpdated(category);
 
   }

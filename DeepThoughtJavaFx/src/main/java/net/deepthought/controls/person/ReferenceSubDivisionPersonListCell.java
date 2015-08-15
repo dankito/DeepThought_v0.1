@@ -24,6 +24,15 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
   }
 
 
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(this.subDivision != null) {
+      this.subDivision.removeEntityListener(referenceSubDivisionListener);
+    }
+  }
+
   public void setSubDivision(ReferenceSubDivision subDivision) {
     if(this.subDivision != null) {
       this.subDivision.removeEntityListener(referenceSubDivisionListener);

@@ -1,6 +1,7 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -33,10 +34,12 @@ import javafx.scene.text.Font;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class PersonListCell extends ListCell<Person> {
+public class PersonListCell extends ListCell<Person> implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(PersonListCell.class);
 
+
+  protected Person person = null;
 
   protected PersonsControl personsControl;
 
@@ -63,6 +66,17 @@ public class PersonListCell extends ListCell<Person> {
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+  }
+
+  @Override
+  public void cleanUpControl() {
+    if(getItem() != null) {
+      getItem().removeEntityListener(personListener);
+    }
+
+    if(person != null) { // don't know why but sometimes getItem() == null and person isn't
+      person.removeEntityListener(personListener);
+    }
   }
 
   protected void setupGraphic() {
@@ -159,9 +173,11 @@ public class PersonListCell extends ListCell<Person> {
   }
 
   protected void itemChanged(Person newValue) {
-    if(getItem() != null) {
-      getItem().removeEntityListener(personListener);
+    if(person != null) {
+      person.removeEntityListener(personListener);
     }
+
+    person = newValue;
 
     if(newValue != null) {
       newValue.addEntityListener(personListener);

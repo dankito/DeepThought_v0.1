@@ -222,11 +222,6 @@ public class Application {
 
     dependencyResolver = null;
 
-    if(searchEngine != null) {
-      searchEngine.close();
-      searchEngine = null;
-    }
-
     if(pluginManager != null) {
       pluginManager = null;
     }

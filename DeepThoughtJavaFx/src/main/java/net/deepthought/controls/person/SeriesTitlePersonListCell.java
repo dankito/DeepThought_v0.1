@@ -24,6 +24,15 @@ public class SeriesTitlePersonListCell extends PersonListCell {
   }
 
 
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(this.series != null) {
+      this.series.removeEntityListener(seriesTitleListener);
+    }
+  }
+
   public void setSeries(SeriesTitle series) {
     if(this.series != null) {
       this.series.removeEntityListener(seriesTitleListener);

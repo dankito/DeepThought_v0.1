@@ -51,8 +51,11 @@ public class SeriesTitlePersonsControl extends PersonsControl {
   }
 
   @Override
-  public void close() {
-    series.removeEntityListener(seriesTitleListener);
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(this.series != null)
+      series.removeEntityListener(seriesTitleListener);
   }
 
 

@@ -1,5 +1,6 @@
 package net.deepthought.controls.file;
 
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.listener.EntityListener;
@@ -18,7 +19,7 @@ import javafx.scene.control.TreeItem;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class FileRootTreeItem extends TreeItem<FileLink> {
+public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(FileRootTreeItem.class);
 
@@ -37,6 +38,12 @@ public class FileRootTreeItem extends TreeItem<FileLink> {
     }
 
     setExpanded(true);
+  }
+
+  @Override
+  public void cleanUpControl() {
+    if(entry != null)
+      entry.removeEntityListener(entryListener);
   }
 
   protected void addFileToChildren(FileLink file) {

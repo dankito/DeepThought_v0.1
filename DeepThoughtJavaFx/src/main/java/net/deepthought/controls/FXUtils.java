@@ -41,6 +41,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.web.HTMLEditor;
@@ -126,6 +127,18 @@ public class FXUtils {
     }
 
     return false;
+  }
+
+
+  public static void cleanUpChildrenAndClearPane(Pane pane) {
+    for(Node node : pane.getChildren()) {
+      if(node instanceof ICleanableControl) {
+        ICleanableControl label = (ICleanableControl)node;
+        label.cleanUpControl();
+      }
+    }
+
+    pane.getChildren().clear();
   }
 
 

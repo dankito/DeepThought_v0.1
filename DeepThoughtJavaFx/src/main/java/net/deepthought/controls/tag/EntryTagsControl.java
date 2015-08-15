@@ -3,6 +3,8 @@ package net.deepthought.controls.tag;
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.event.EntryTagsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -38,7 +40,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryTagsControl extends TitledPane implements IEditedTagsHolder {
+public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
 
@@ -81,17 +83,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder {
     setDisable(entry == null);
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        EntryTagsControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryTagsControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -107,6 +99,35 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder {
     } catch (IOException ex) {
       log.error("Could not load EntryTagsControl", ex);
     }
+  }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      EntryTagsControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
+
+  public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    if(entry != null)
+      entry.removeEntityListener(entryListener);
+
+    clearEntryTagLabels();
+
+    searchAndSelectTagsControl.cleanUpControl();
+
+    tagAddedEventHandler = null;
+    tagRemovedEventHandler = null;
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -148,13 +169,17 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder {
   }
 
   protected void showEntryTags(Entry entry) {
-    pnSelectedTagsPreview.getChildren().clear();
+    clearEntryTagLabels();
 
     if(entry != null) {
       for(final Tag tag : new TreeSet<>(editedTags)) {
         pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> removeTagFromEntry(tag)));
       }
     }
+  }
+
+  protected void clearEntryTagLabels() {
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedTagsPreview);
   }
 
   public void addTagToEntry(Tag tag) {

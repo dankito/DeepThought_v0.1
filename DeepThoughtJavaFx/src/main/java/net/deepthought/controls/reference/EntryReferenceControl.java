@@ -7,6 +7,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
@@ -53,7 +54,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends TitledPane implements ISelectedReferenceHolder {
+public class EntryReferenceControl extends TitledPane implements ISelectedReferenceHolder, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
 
@@ -75,6 +76,10 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
   protected Search<ReferenceBase> filterReferenceBasesSearch = null;
 
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
+
+  protected EntryReferenceBaseLabel currentReferenceLabel = null;
+
+  protected ChangeListener<? super Number> currentWidthListener = null;
 
 
   @FXML
@@ -106,17 +111,7 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
   public EntryReferenceControl(Entry entry) {
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        EntryReferenceControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryReferenceControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -135,6 +130,18 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
       log.error("Could not load EntryReferenceControl", ex);
     }
   }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      EntryReferenceControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
 
   public void setEntry(Entry entry) {
     if(this.entry != null)
@@ -162,6 +169,21 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     }
 
     setDisable(entry == null);
+  }
+
+  public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    searchAndSelectReferenceControl.cleanUpControl();
+
+    fieldChangedEvents.clear();
+    clearCurrentReferenceLabel();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -234,16 +256,10 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
   }
 
   protected void selectedReferenceBaseChangedOnUiThread(ReferenceBase newReferenceBase) {
-    if(currentWidthListener != null) {
-      this.widthProperty().removeListener(currentWidthListener);
-      paneReferenceIndicationSettings.widthProperty().removeListener(currentWidthListener);
-    }
     ReferenceBase previousReferenceBase = this.selectedReferenceBase;
     this.selectedReferenceBase = newReferenceBase;
 
-    if(paneSelectedReferenceBase.getChildren().size() > 0)
-      ((EntryReferenceBaseLabel)paneSelectedReferenceBase.getChildren().get(0)).setOnButtonRemoveItemFromCollectionEventHandler(null);
-    paneSelectedReferenceBase.getChildren().clear();
+    clearCurrentReferenceLabel();
 
     if (selectedReferenceBase != null)
       createEntryReferenceBaseLabel(newReferenceBase);
@@ -259,18 +275,33 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     fireFieldChangedEvent(newReferenceBase, previousReferenceBase);
   }
 
-  protected ChangeListener<? super Number> currentWidthListener = null;
-
   protected void createEntryReferenceBaseLabel(ReferenceBase newReferenceBase) {
-    final EntryReferenceBaseLabel label = new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler);
+    clearCurrentReferenceLabel();
+
+    currentReferenceLabel = new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler);
 
     // laborious but works: Before if EntryReferenceBaseLabel was to broad to be fully displayed it broadened the whole EntryReferenceControl and there moved the Splitter of SplitPane
-    currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(label);
+    currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(currentReferenceLabel);
     this.widthProperty().addListener(currentWidthListener);
     paneReferenceIndicationSettings.widthProperty().addListener(currentWidthListener);
-    setEntryReferenceBaseLabelMaxWidth(label);
+    setEntryReferenceBaseLabelMaxWidth(currentReferenceLabel);
 
-    paneSelectedReferenceBase.getChildren().add(label);
+    paneSelectedReferenceBase.getChildren().add(currentReferenceLabel);
+  }
+
+  protected void clearCurrentReferenceLabel() {
+    if(currentReferenceLabel != null) {
+      currentReferenceLabel.cleanUpControl();
+      currentReferenceLabel = null;
+    }
+
+    paneSelectedReferenceBase.getChildren().clear();
+
+    if(currentWidthListener != null) {
+      this.widthProperty().removeListener(currentWidthListener);
+      paneReferenceIndicationSettings.widthProperty().removeListener(currentWidthListener);
+      currentWidthListener = null;
+    }
   }
 
   protected void setEntryReferenceBaseLabelMaxWidth(EntryReferenceBaseLabel label) {

@@ -2,6 +2,7 @@ package net.deepthought.controls.reference;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.data.listener.ApplicationListener;
@@ -24,8 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -41,7 +44,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectReferenceControl extends VBox {
+public class SearchAndSelectReferenceControl extends VBox implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectReferenceControl.class);
 
@@ -58,6 +61,8 @@ public class SearchAndSelectReferenceControl extends VBox {
 
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
 
+  protected List<ReferenceBaseListCell> referenceBaseListCells = new ArrayList<>();
+
 
   @FXML
   protected Pane paneSearchForReference;
@@ -72,17 +77,7 @@ public class SearchAndSelectReferenceControl extends VBox {
     this.selectedReferenceHolder = selectedReferenceHolder;
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        SearchAndSelectReferenceControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchAndSelectReferenceControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -98,6 +93,31 @@ public class SearchAndSelectReferenceControl extends VBox {
     } catch (IOException ex) {
       log.error("Could not load SearchAndSelectReferenceControl", ex);
     }
+  }
+
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      SearchAndSelectReferenceControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
+
+
+  @Override
+  public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    for(ReferenceBaseListCell cell : referenceBaseListCells)
+      cell.cleanUpControl();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -131,7 +151,11 @@ public class SearchAndSelectReferenceControl extends VBox {
     txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
 
     // TODO: set cell
-    lstvwReferences.setCellFactory((listView) -> new ReferenceBaseListCell(selectedReferenceHolder));
+    lstvwReferences.setCellFactory((listView) -> {
+      ReferenceBaseListCell cell = new ReferenceBaseListCell(selectedReferenceHolder);
+      referenceBaseListCells.add(cell);
+      return cell;
+    });
 
     listViewReferenceBasesItems = new LazyLoadingObservableList<>();
 //    listViewReferenceBasesItems = new CombinedLazyLoadingObservableList<>();

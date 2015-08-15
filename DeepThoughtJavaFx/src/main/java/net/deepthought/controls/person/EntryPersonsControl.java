@@ -48,10 +48,12 @@ public class EntryPersonsControl extends PersonsControl {
   }
 
   @Override
-  public void close() {
-    entry.removeEntryPersonListener(entryPersonListener);
-  }
+  public void cleanUpControl() {
+    super.cleanUpControl();
 
+    if(this.entry != null)
+      this.entry.removeEntryPersonListener(entryPersonListener);
+  }
 
   protected EntryPersonListener entryPersonListener = new EntryPersonListener() {
     @Override

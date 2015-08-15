@@ -22,12 +22,15 @@ public class EntryPersonListCell extends PersonListCell {
     setEntry(entry);
   }
 
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    removeListeners();
+  }
 
   public void setEntry(Entry entry) {
-    if(this.entry != null) {
-      this.entry.removeEntityListener(entryListener);
-      this.entry.removeEntryPersonListener(entryPersonListener);
-    }
+    removeListeners();
 
     this.entry = entry;
 
@@ -38,6 +41,13 @@ public class EntryPersonListCell extends PersonListCell {
     }
     else {
 //      setDefaultPersonRole(null);
+    }
+  }
+
+  protected void removeListeners() {
+    if(this.entry != null) {
+      this.entry.removeEntityListener(entryListener);
+      this.entry.removeEntryPersonListener(entryPersonListener);
     }
   }
 

@@ -393,9 +393,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     pnReference.setVisible(selectedEntry.isAReferenceSet());
     pnPersons.setVisible(selectedEntry.hasPersons());
 
-    pnSelectedReference.getChildren().clear();
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedReference);
     //txtfldReferenceIndication.setText("");
-    pnSelectedPersons.getChildren().clear();
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersons);
 
     if(selectedEntry.isAReferenceSet()) {
       if(selectedEntry.hasPersons())
@@ -409,7 +409,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(selectedEntry.hasPersons()) {
       pnReferenceAndPersonsScrollPane.setMinHeight(46);
       for(final Person person : new TreeSet<>(selectedEntry.getPersons())) {
-        final PersonLabel label = new PersonLabel(person);
+        PersonLabel label = new PersonLabel(person);
         pnSelectedPersons.getChildren().add(label);
         HBox.setMargin(label, new Insets(0, 6, 0, 0));
 

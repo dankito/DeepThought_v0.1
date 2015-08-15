@@ -1,6 +1,7 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -46,7 +47,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectTagsControl extends VBox {
+public class SearchAndSelectTagsControl extends VBox implements ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectTagsControl.class);
 
@@ -63,6 +64,8 @@ public class SearchAndSelectTagsControl extends VBox {
   protected FilterTagsSearch filterTagsSearch = null;
   protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
+
+  protected List<TagListCell> tagListCells = new ArrayList<>();
 
 
   @FXML
@@ -83,17 +86,7 @@ public class SearchAndSelectTagsControl extends VBox {
 
     deepThought = Application.getDeepThought();
 
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        SearchAndSelectTagsControl.this.deepThoughtChanged(deepThought);
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchAndSelectTagsControl.fxml"));
     fxmlLoader.setRoot(this);
@@ -109,6 +102,38 @@ public class SearchAndSelectTagsControl extends VBox {
     } catch (IOException ex) {
       log.error("Could not load SearchAndSelectTagsControl", ex);
     }
+  }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      SearchAndSelectTagsControl.this.deepThoughtChanged(deepThought);
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
+
+
+  @Override
+  public void cleanUpControl() {
+    Application.removeApplicationListener(applicationListener);
+
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    editedTagsHolder = null;
+
+    filteredTagsChangedListeners.clear();
+
+    filterTagsSearch = null;
+    lastFilterTagsResults = null;
+
+    for(TagListCell cell : tagListCells)
+      cell.cleanUpControl();
+    tagListCells.clear();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -134,7 +159,9 @@ public class SearchAndSelectTagsControl extends VBox {
     JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "Find tags to add");
 
     lstvwAllTags.setCellFactory(listView -> {
-      return new TagListCell(this, editedTagsHolder);
+      TagListCell cell = new TagListCell(this, editedTagsHolder);
+      tagListCells.add(cell);
+      return cell;
     });
 
     listViewAllTagsItems = lstvwAllTags.getItems();

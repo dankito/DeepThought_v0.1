@@ -51,8 +51,11 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
   }
 
   @Override
-  public void close() {
-    subDivision.removeEntityListener(referenceSubDivisionListener);
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(this.subDivision != null)
+      subDivision.removeEntityListener(referenceSubDivisionListener);
   }
 
 

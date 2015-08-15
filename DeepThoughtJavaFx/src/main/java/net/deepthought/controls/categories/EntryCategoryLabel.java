@@ -35,12 +35,14 @@ public class EntryCategoryLabel extends CollectionItemLabel {
     itemDisplayNameUpdated();
   }
 
-//  @Override
-//  public void onButtonRemoveItemFromCollectionAction(ActionEvent event) {
-//    category.removeEntry(entry);
-//
-//    super.onButtonRemoveItemFromCollectionAction(event);
-//  }
+
+  @Override
+  public void cleanUpControl() {
+    super.cleanUpControl();
+
+    if(category != null)
+      category.removeEntityListener(categoryListener);
+  }
 
   @Override
   protected String getItemDisplayName() {
