@@ -116,8 +116,13 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     if(deepThought != null)
       deepThought.removeEntityListener(deepThoughtListener);
 
+    selectedReferenceHolder = null;
+
+    filterReferenceBasesSearch = null;
+
     for(ReferenceBaseListCell cell : referenceBaseListCells)
       cell.cleanUpControl();
+    referenceBaseListCells.clear();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {

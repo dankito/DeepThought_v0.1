@@ -103,7 +103,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
 
-  public void setEditPerson(Stage dialogStage, Person personToEdit) {
+  public void setPersonAndStage(Stage dialogStage, Person personToEdit) {
     setWindowStage(dialogStage);
     this.person = personToEdit;
 

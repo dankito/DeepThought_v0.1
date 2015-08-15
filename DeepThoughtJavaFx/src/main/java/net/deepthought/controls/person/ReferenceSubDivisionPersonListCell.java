@@ -17,10 +17,7 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
   public ReferenceSubDivisionPersonListCell(PersonsControl personsControl, ReferenceSubDivision subDivision) {
     super(personsControl);
 
-    this.subDivision = subDivision;
-    if(subDivision != null) {
-      subDivision.addEntityListener(referenceSubDivisionListener);
-    }
+    setSubDivision(subDivision);
   }
 
 
@@ -30,6 +27,7 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
 
     if(this.subDivision != null) {
       this.subDivision.removeEntityListener(referenceSubDivisionListener);
+      this.subDivision = null;
     }
   }
 
@@ -42,10 +40,6 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
 
     if(subDivision != null) {
       subDivision.addEntityListener(referenceSubDivisionListener);
-//      setDefaultPersonRole(null);
-    }
-    else {
-//      setDefaultPersonRole(null);
     }
   }
 

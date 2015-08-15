@@ -44,7 +44,6 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -131,8 +130,14 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
+    listViewAllPersonsItems.clear();
+
     for(PersonListCell cell : personListCells)
       cell.cleanUpControl();
+    personListCells.clear();
+
+    personAddedEventHandler = null;
+    personRemovedEventHandler = null;
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {

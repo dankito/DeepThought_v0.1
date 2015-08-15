@@ -159,7 +159,7 @@ public class Dialogs {
 
       // Set the person into the controller.
       EditPersonDialogController controller = loader.getController();
-      controller.setEditPerson(dialogStage, person);
+      controller.setPersonAndStage(dialogStage, person);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override

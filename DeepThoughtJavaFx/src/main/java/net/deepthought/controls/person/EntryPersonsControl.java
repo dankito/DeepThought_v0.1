@@ -15,10 +15,6 @@ public class EntryPersonsControl extends PersonsControl {
   protected Entry entry = null;
 
 
-  public EntryPersonsControl() {
-    this(null);
-  }
-
   public EntryPersonsControl(Entry entry) {
     super();
 

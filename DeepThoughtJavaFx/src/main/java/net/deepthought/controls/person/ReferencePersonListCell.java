@@ -17,10 +17,7 @@ public class ReferencePersonListCell extends PersonListCell {
   public ReferencePersonListCell(PersonsControl personsControl, Reference reference) {
     super(personsControl);
 
-    this.reference = reference;
-    if(reference != null) {
-      reference.addEntityListener(referenceListener);
-    }
+    setReference(reference);
   }
 
 
@@ -30,6 +27,7 @@ public class ReferencePersonListCell extends PersonListCell {
 
     if(this.reference != null) {
       this.reference.removeEntityListener(referenceListener);
+      this.reference = null;
     }
   }
 
@@ -42,10 +40,6 @@ public class ReferencePersonListCell extends PersonListCell {
 
     if(reference != null) {
       reference.addEntityListener(referenceListener);
-//      setDefaultPersonRole(null);
-    }
-    else {
-//      setDefaultPersonRole(null);
     }
   }
 

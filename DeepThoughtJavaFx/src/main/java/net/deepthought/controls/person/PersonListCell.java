@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -77,6 +76,8 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     if(person != null) { // don't know why but sometimes getItem() == null and person isn't
       person.removeEntityListener(personListener);
     }
+
+    personsControl = null;
   }
 
   protected void setupGraphic() {

@@ -80,9 +80,12 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
 
   @Override
   public void cleanUpControl() {
-    if(getItem() != null) {
+    if(getItem() != null)
       getItem().removeEntityListener(referenceBaseListener);
-    }
+    if(referenceBase != null)
+      referenceBase.removeEntityListener(referenceBaseListener);
+
+    selectedReferenceHolder = null;
   }
 
   protected void setupGraphic() {

@@ -291,16 +291,18 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       }
     });
 
-    Application.getSettings().addSettingsChangedListener(new SettingsChangedListener() {
-      @Override
-      public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-        if (setting == Setting.UserDeviceDialogFieldsDisplay)
-          dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
-      }
-    });
+    Application.getSettings().addSettingsChangedListener(settingsChangedListener);
 
     // TODO: what to do when DeepThought changes -> close dialog
   }
+
+  protected SettingsChangedListener settingsChangedListener = new SettingsChangedListener() {
+    @Override
+    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+      if (setting == Setting.UserDeviceDialogFieldsDisplay)
+        dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
+    }
+  };
 
   protected void setupControls() {
     setupSeriesTitleControls();
@@ -669,11 +671,37 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @Override
   protected void closeDialog() {
+    Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
+
     seriesTitle.removeEntityListener(seriesTitleListener);
     reference.removeEntityListener(referenceListener);
     referenceSubDivision.removeEntityListener(referenceSubDivisionListener);
 
+    cleanUpControls();
+
     super.closeDialog();
+  }
+
+  protected void cleanUpControls() {
+    // i don't get it: referencePersonsControl never gets removed from Memory, all others in approximately 50 % of all cases
+    // TODO: find Memory leaks
+    searchAndSelectSeriesTitleControl.cleanUpControl();
+    paneSeriesTitle.getChildren().remove(searchAndSelectSeriesTitleControl);
+    searchAndSelectSeriesTitleControl = null;
+    seriesTitlePersonsControl.cleanUpControl();
+    paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
+    seriesTitlePersonsControl = null;
+
+    searchAndSelectReferenceControl.cleanUpControl();
+    paneReference.getChildren().remove(searchAndSelectReferenceControl);
+    searchAndSelectReferenceControl = null;
+    referencePersonsControl.cleanUpControl();
+    paneReference.getChildren().remove(referencePersonsControl);
+    referencePersonsControl = null;
+
+    referenceSubDivisionPersonsControl.cleanUpControl();
+    paneReferenceSubDivision.getChildren().remove(referenceSubDivisionPersonsControl);
+    referenceSubDivisionPersonsControl = null;
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {
