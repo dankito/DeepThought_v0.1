@@ -2,7 +2,7 @@ apply plugin: 'java'
 
 dependencies {
     compile project(':DeepThoughtLib')
-    compile project(':ormlite-jdbc')
+    compile project(':ormlite-jpa-jdbc')
 
 //    compile 'org.apache.derby:derby:10.11.1.1'
 //    compile 'com.h2database:h2:1.4.182'

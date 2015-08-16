@@ -20,9 +20,9 @@
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" filepath="$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-core/ormlite-jpa-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-core/ormlite-jpa-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-jdbc/ormlite-jpa-jdbc.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-jdbc/ormlite-jpa-jdbc.iml" />
       <module fileurl="file://$PROJECT_DIR$/tess-two/tess-two.iml" filepath="$PROJECT_DIR$/tess-two/tess-two.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/textfairy/tess-two/tess-two/tess-two-tess-two.iml" filepath="$PROJECT_DIR$/libs/content_extractor/textfairy/tess-two/tess-two/tess-two-tess-two.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/textfairy/app/textfairy.iml" filepath="$PROJECT_DIR$/libs/content_extractor/textfairy/app/textfairy.iml" />

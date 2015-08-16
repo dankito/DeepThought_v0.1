@@ -1,7 +1,7 @@
 include ':DeepThoughtLib'
 include ':DeepThoughtJavaFx'
 include ':DeepThoughtAndroid'
-include ':ormlite-core',':ormlite-android',':ormlite-jdbc'
+include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
 include ':json-io', ':DeepThoughtJson-io'
@@ -23,9 +23,10 @@ include ':OpenOfficeDocumentsImporterExporter'
 //        ':SymmetricDS-Server'
 
 
-project(':ormlite-core').projectDir = new File('libs/persistence/database/ormlite-core')
-project(':ormlite-android').projectDir = new File('libs/persistence/database/ormlite-android')
-project(':ormlite-jdbc').projectDir = new File('libs/persistence/database/ormlite-jdbc')
+project(':ormlite-jpa-core').projectDir = new File('libs/persistence/database/ormlite-jpa-core')
+project(':ormlite-jpa-jdbc').projectDir = new File('libs/persistence/database/ormlite-jpa-jdbc')
+project(':ormlite-jpa-android').projectDir = new File('libs/persistence/database/ormlite-jpa-android')
+
 project(':AndroidOrmLiteEntityManager').projectDir = new File('libs/persistence/database/AndroidOrmLiteEntityManager')
 project(':JavaSeOrmLiteEntityManager').projectDir = new File('libs/persistence/database/JavaSeOrmLiteEntityManager')
 

@@ -1,6 +1,0 @@
-
-https://github.com/Norconex/language-detection (a fork of https://code.google.com/p/language-detection/)
-(Original project is licenced under The Apache License, Version 2.0., so i guess the same applies to its fork)
-
-https://github.com/Norconex/language-detector:
-The Apache License, Version 2.0.

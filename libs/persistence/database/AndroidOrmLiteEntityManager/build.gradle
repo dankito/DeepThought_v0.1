@@ -44,8 +44,8 @@ android {
 
 dependencies {
     compile project(':DeepThoughtLib')
-    compile project(':ormlite-core')
-    compile project(':ormlite-android')
+    compile project(':ormlite-jpa-core')
+    compile project(':ormlite-jpa-android')
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
     androidTestCompile 'org.slf4j:slf4j-android:1.7.10'

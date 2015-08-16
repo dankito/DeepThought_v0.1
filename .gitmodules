@@ -1,3 +1,12 @@
 [submodule "libs/content_extractor/textfairy"]
 	path = libs/content_extractor/textfairy
 	url = https://github.com/renard314/textfairy.git
+[submodule "libs/persistence/database/ormlite-jpa-core"]
+	path = libs/persistence/database/ormlite-jpa-core
+	url = https://github.com/dankito/ormlite-jpa-core.git
+[submodule "libs/persistence/database/ormlite-jpa-jdbc"]
+	path = libs/persistence/database/ormlite-jpa-jdbc
+	url = https://github.com/dankito/ormlite-jpa-jdbc.git
+[submodule "libs/persistence/database/ormlite-jpa-android"]
+	path = libs/persistence/database/ormlite-jpa-android
+	url = https://github.com/dankito/ormlite-jpa-android.git
