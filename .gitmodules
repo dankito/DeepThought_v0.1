@@ -1,0 +1,3 @@
+[submodule "libs/content_extractor/textfairy"]
+	path = libs/content_extractor/textfairy
+	url = https://github.com/renard314/textfairy.git

@@ -9,7 +9,9 @@ include ':LuceneSearchEngine'
 include ':WGetFileDownloader'
 include ':commons-lang'
 include ':RemoteFileContentExtractor'
-include ':OcrTextContentExtractor'
+include ':OcrTextContentExtractorJava'
+include ':tess-two:tess-two', ':textfairy'
+include ':OcrTextContentExtractorAndroid'
 include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
@@ -37,7 +39,12 @@ project(':WGetFileDownloader').projectDir = new File('libs/downloader/WGetFileDo
 project(':commons-lang').projectDir = new File('libs/utils/commons-lang')
 
 project(':RemoteFileContentExtractor').projectDir = new File('libs/content_extractor/RemoteFileContentExtractor')
-project(':OcrTextContentExtractor').projectDir = new File('libs/content_extractor/OcrTextContentExtractor')
+
+project(':OcrTextContentExtractorJava').projectDir = new File('libs/content_extractor/OcrTextContentExtractorJava')
+project(':tess-two:tess-two').projectDir = new File('libs/content_extractor/textfairy/tess-two/tess-two')
+project(':textfairy').projectDir = new File('libs/content_extractor/textfairy/app')
+project(':OcrTextContentExtractorAndroid').projectDir = new File('libs/content_extractor/OcrTextContentExtractorAndroid')
+
 project(':OnlineNewspaperContentExtractor').projectDir = new File('libs/content_extractor/OnlineNewspaperContentExtractor')
 project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_extractor/WikipediaOnlineContentExtractor')
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')

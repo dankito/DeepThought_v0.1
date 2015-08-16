@@ -249,10 +249,6 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
     return configuration;
   }
 
-  public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder) {
-    return createDefaultConfiguration(dataFolder, false);
-  }
-
   public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder, boolean createTables) {
     return createDefaultConfiguration(dataFolder, createTables, DatabaseType.SQLite);
   }

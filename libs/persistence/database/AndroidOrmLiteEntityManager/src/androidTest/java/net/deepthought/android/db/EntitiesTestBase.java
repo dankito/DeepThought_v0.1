@@ -7,6 +7,7 @@ import com.j256.ormlite.dao.cda.jointable.JoinTableDaoRegistry;
 import net.deepthought.Application;
 import net.deepthought.DefaultDependencyResolver;
 import net.deepthought.android.db.helper.TestJoinTableDaoRegistry;
+import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 
@@ -28,7 +29,7 @@ public class EntitiesTestBase extends AndroidTestCase {
     EntityManagerConfiguration configuration = EntityManagerConfiguration.createTestConfiguration();
     entityManager = new OrmLiteAndroidEntityManager(this.getContext(), configuration);
 
-    Application.instantiate(new DefaultDependencyResolver(entityManager));
+    Application.instantiate(new TestApplicationConfiguration(), new DefaultDependencyResolver(entityManager));
     JoinTableDaoRegistry.setJoinTableRegistry(new TestJoinTableDaoRegistry());
 
 //    entityManager.clearData();
@@ -38,7 +39,6 @@ public class EntitiesTestBase extends AndroidTestCase {
 
   @Override
   public void tearDown() throws Exception {
-//    entityManager.close();
     super.tearDown();
 
     Application.shutdown();

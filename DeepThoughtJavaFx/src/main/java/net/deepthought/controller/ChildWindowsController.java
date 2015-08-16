@@ -65,6 +65,6 @@ public class ChildWindowsController {
   }
 
   protected boolean askIfStageShouldBeClosed() {
-    return true;
+    return true; // maybe subclasses want to perform their own checks (e.g. to save unsaved changes)
   }
 }

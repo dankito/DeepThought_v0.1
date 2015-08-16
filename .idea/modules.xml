@@ -10,7 +10,8 @@
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" filepath="$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" filepath="$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractor/OcrTextContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractor/OcrTextContentExtractor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorAndroid/OcrTextContentExtractorAndroid.iml" filepath="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorAndroid/OcrTextContentExtractorAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorJava/OcrTextContentExtractorJava.iml" filepath="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorJava/OcrTextContentExtractorJava.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/OnlineNewspaperContentExtractor/OnlineNewspaperContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/OnlineNewspaperContentExtractor/OnlineNewspaperContentExtractor.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/OpenOfficeDocumentsImporterExporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/OpenOfficeDocumentsImporterExporter.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/RemoteFileContentExtractor/RemoteFileContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/RemoteFileContentExtractor/RemoteFileContentExtractor.iml" />
@@ -22,6 +23,9 @@
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-android/ormlite-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-core/ormlite-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jdbc/ormlite-jdbc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tess-two/tess-two.iml" filepath="$PROJECT_DIR$/tess-two/tess-two.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/textfairy/tess-two/tess-two/tess-two-tess-two.iml" filepath="$PROJECT_DIR$/libs/content_extractor/textfairy/tess-two/tess-two/tess-two-tess-two.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/textfairy/app/textfairy.iml" filepath="$PROJECT_DIR$/libs/content_extractor/textfairy/app/textfairy.iml" />
     </modules>
   </component>
 </project>
