@@ -1,10 +1,9 @@
 package net.deepthought.activities;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -19,7 +18,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 
 import net.deepthought.Application;
 import net.deepthought.R;
@@ -130,6 +128,13 @@ public class EditEntryActivity extends AppCompatActivity {
     }
   }
 
+  @Override
+  protected void onDestroy() {
+    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter)
+      ((EntryTagsAdapter)lstvwEditEntryTags.getAdapter()).cleanUp();
+
+    super.onDestroy();
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -223,17 +228,6 @@ public class EditEntryActivity extends AppCompatActivity {
     }
   }
 
-  protected View.OnClickListener btnOkOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      saveEntry();
-
-      Intent resultIntent = new Intent();
-      setResult(Activity.RESULT_OK, resultIntent);
-      finish();
-    }
-  };
-
   protected void saveEntry() {
     entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
     entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
@@ -243,14 +237,6 @@ public class EditEntryActivity extends AppCompatActivity {
     if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
   }
-
-  protected View.OnClickListener btnCancelOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      setResult(RESULT_CANCELED);
-      finish();
-    }
-  };
 
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override

@@ -220,6 +220,10 @@ public class Application {
       searchEngine.close();
     searchEngine = null;
 
+    languageDetector = null;
+
+    htmlHelper = null;
+
     dependencyResolver = null;
 
     if(pluginManager != null) {
@@ -229,6 +233,17 @@ public class Application {
     if(backupManager != null) {
       backupManager = null;
     }
+
+    dataComparer = null;
+    dataMerger = null;
+
+    contentExtractorManager = null;
+
+    downloader = null;
+
+    firefoxPluginCommunicator = null;
+
+    listeners.clear();
   }
 
 

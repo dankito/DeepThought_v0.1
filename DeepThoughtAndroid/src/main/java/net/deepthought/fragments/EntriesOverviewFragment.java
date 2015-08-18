@@ -25,6 +25,7 @@ import net.deepthought.data.model.Entry;
 public class EntriesOverviewFragment extends Fragment {
 
 
+  private EntriesOverviewAdapter entriesOverviewAdapter;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -37,13 +38,21 @@ public class EntriesOverviewFragment extends Fragment {
     View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
 
     ListView lstvwEntries = (ListView)rootView.findViewById(R.id.lstvwEntries);
-    lstvwEntries.setAdapter(new EntriesOverviewAdapter(getActivity()));
+    entriesOverviewAdapter = new EntriesOverviewAdapter(getActivity());
+    lstvwEntries.setAdapter(entriesOverviewAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
 
     return rootView;
   }
 
+  @Override
+  public void onDestroyView() {
+    if(entriesOverviewAdapter != null)
+      entriesOverviewAdapter.cleanUp();
+
+    super.onDestroyView();
+  }
 
   protected AdapterView.OnItemClickListener lstvwEntriesOnItemClickListener = new AdapterView.OnItemClickListener() {
     @Override

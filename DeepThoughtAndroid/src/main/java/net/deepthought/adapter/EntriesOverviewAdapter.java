@@ -29,30 +29,32 @@ public class EntriesOverviewAdapter extends BaseAdapter {
     this.context = context;
 
     // TODO: unregister listeners again to avoid memory leaks
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        if (EntriesOverviewAdapter.this.deepThought != null)
-          EntriesOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
-
-        EntriesOverviewAdapter.this.deepThought = deepThought;
-
-        if (EntriesOverviewAdapter.this.deepThought != null)
-          EntriesOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
-
-        notifyDataSetChangedThreadSafe();
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     deepThought = Application.getDeepThought();
     if(deepThought != null)
       deepThought.addEntityListener(deepThoughtListener);
   }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      if (EntriesOverviewAdapter.this.deepThought != null)
+        EntriesOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
+
+      EntriesOverviewAdapter.this.deepThought = deepThought;
+
+      if (EntriesOverviewAdapter.this.deepThought != null)
+        EntriesOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
+
+      notifyDataSetChangedThreadSafe();
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
 
 
   @Override
@@ -106,21 +108,6 @@ public class EntriesOverviewAdapter extends BaseAdapter {
   }
 
 
-//  @Override
-//  public void entryAdded(Entry entry) {
-//    notifyDataSetChangedThreadSafe();
-//  }
-//
-//  @Override
-//  public void entryUpdated(Entry entry) {
-//    notifyDataSetChangedThreadSafe();
-//  }
-//
-//  @Override
-//  public void entryRemoved(Entry entry) {
-//    notifyDataSetChangedThreadSafe();
-//  }
-
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
@@ -145,4 +132,11 @@ public class EntriesOverviewAdapter extends BaseAdapter {
         notifyDataSetChangedThreadSafe();
     }
   };
+
+  public void cleanUp() {
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    Application.removeApplicationListener(applicationListener);
+  }
 }

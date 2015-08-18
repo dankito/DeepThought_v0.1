@@ -134,6 +134,13 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     edtxtSearchContent.addTextChangedListener(edtxtSearchContentOnTextChangedListener);
   }
 
+  @Override
+  public void onDestroyView() {
+    if(lstvwSearchTags.getAdapter() instanceof SearchForTagsAdapter)
+      ((SearchForTagsAdapter)lstvwSearchTags.getAdapter()).cleanUp();
+
+    super.onDestroyView();
+  }
 
   protected View.OnClickListener txtvwSearchSectionTitleTagsOnClickListener = new View.OnClickListener() {
     @Override

@@ -207,15 +207,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         if(resultCode == RESULT_OK && data != null) {
           Entry entry = ActivityManager.getInstance().getEntryToBeEdited();
 
-//          try {
-//            DeepThought deepThought = Application.getDeepThought();
-//
-//            if(deepThought.containsEntry(entry) == false)
-//              deepThought.addEntry(entry);
-//          } catch(Exception ex) {
-//            log.error("Could not persist DeepThought", ex);
-//            // TODO: show alert dialog
-//          }
         }
         break;
     }

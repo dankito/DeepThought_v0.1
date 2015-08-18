@@ -49,48 +49,49 @@ public class SearchForTagsAdapter extends BaseAdapter implements Filterable, Tag
     this.tagsToSearchFor = tagsToSearchFor;
 
     tagsFilter = new TagsFilter(this);
-
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-        if (SearchForTagsAdapter.this.deepThought != null) {
-//          SearchForTagsAdapter.this.deepThought.removeEntriesChangedListener(SearchForTagsAdapter.this);
-          SearchForTagsAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
-//          SearchForTagsAdapter.this.deepThought.removeTagsChangedListener(SearchForTagsAdapter.this);
-        }
-
-        SearchForTagsAdapter.this.deepThought = deepThought;
-        tagsFilter.reapplyFilter();
-
-        if (SearchForTagsAdapter.this.deepThought != null) {
-//          SearchForTagsAdapter.this.deepThought.addEntriesChangedListener(SearchForTagsAdapter.this);
-          SearchForTagsAdapter.this.deepThought.addEntityListener(deepThoughtListener);
-//          SearchForTagsAdapter.this.deepThought.addTagsChangedListener(SearchForTagsAdapter.this);
-        }
-
-        notifyDataSetChangedThreadSafe();
-      }
-
-      @Override
-      public void notification(Notification notification) {
-
-      }
-    });
+    Application.addApplicationListener(applicationListener);
 
     deepThought = Application.getDeepThought();
 
     if(deepThought != null) {
-//      deepThought.addTagsChangedListener(this);
       deepThought.addEntityListener(deepThoughtListener);
-//      deepThought.addEntriesChangedListener(this);
 
-      filteredTags = new ArrayList<>(deepThought.getTags());
-      Collections.sort(filteredTags);
+      filteredTags = new ArrayList<>(deepThought.getSortedTags());
     }
     else {
       filteredTags = new ArrayList<>();
     }
   }
+
+  public void cleanUp() {
+    if(deepThought != null)
+      deepThought.removeEntityListener(deepThoughtListener);
+
+    Application.removeApplicationListener(applicationListener);
+  }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+      if (SearchForTagsAdapter.this.deepThought != null) {
+        SearchForTagsAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
+      }
+
+      SearchForTagsAdapter.this.deepThought = deepThought;
+      tagsFilter.reapplyFilter();
+
+      if (SearchForTagsAdapter.this.deepThought != null) {
+        SearchForTagsAdapter.this.deepThought.addEntityListener(deepThoughtListener);
+      }
+
+      notifyDataSetChangedThreadSafe();
+    }
+
+    @Override
+    public void notification(Notification notification) {
+
+    }
+  };
 
   public SearchForTagsAdapter(Activity context, List<Tag> tagsToSearchFor, TagsToSearchForChangedListener listener) {
     this(context, tagsToSearchFor);

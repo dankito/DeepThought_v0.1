@@ -12,10 +12,16 @@ import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.CreateEntryListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by ganymed on 18/08/15.
  */
 public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
+
+  private final static Logger log = LoggerFactory.getLogger(OcrContentExtractorAndroid.class);
+
 
   protected Context context;
 
@@ -55,11 +61,16 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
 
   @Override
   protected void captureImagesAndRecognizeText(RecognizeTextListener listener) {
-    OcrResultBroadcastReceiver ocrResultBroadcastReceiver = new OcrResultBroadcastReceiver(context, listener);
+    try {
+      OcrResultBroadcastReceiver ocrResultBroadcastReceiver = new OcrResultBroadcastReceiver(context, listener);
 
-    ActivityInfo activityInfo = resolveInfo.activityInfo;
-    Intent intent = new Intent();
-    intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
-    context.startActivity(intent);
+      ActivityInfo activityInfo = resolveInfo.activityInfo;
+      Intent intent = new Intent();
+      intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      context.startActivity(intent);
+    } catch(Exception ex) {
+      log.error("Could not start OcrContentExtractor plugin", ex);
+    }
   }
 }

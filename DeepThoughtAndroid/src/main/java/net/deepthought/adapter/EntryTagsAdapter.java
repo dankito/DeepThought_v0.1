@@ -49,17 +49,22 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
     tagsFilter = new TagsFilter(this);
 
     DeepThought deepThought = Application.getDeepThought();
-    filteredTags = new ArrayList<>(deepThought.getTags());
-    Collections.sort(filteredTags);
-//    deepThought.addTagsChangedListener(this);
+    filteredTags = new ArrayList<>(deepThought.getSortedTags());
+
     deepThought.addEntityListener(deepThoughtListener);
-//    deepThought.addEntriesChangedListener(this);
     entry.addEntityListener(entryListener);
   }
 
   public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags, EntryTagsChangedListener entryTagsChangedListener) {
     this(context, entry, entryTags);
     this.entryTagsChangedListener = entryTagsChangedListener;
+  }
+
+  public void cleanUp() {
+    entry.removeEntityListener(entryListener);
+
+    if(Application.getDeepThought() != null)
+      Application.getDeepThought().removeEntityListener(deepThoughtListener);
   }
 
   @Override
