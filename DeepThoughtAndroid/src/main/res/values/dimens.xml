@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="toolbar_height">46dp</dimen>
+
     <dimen name="list_item_entry_min_height">60dp</dimen>
     <dimen name="list_item_entry_height">80dp</dimen>
     <dimen name="list_item_entry_title_height">30dp</dimen>

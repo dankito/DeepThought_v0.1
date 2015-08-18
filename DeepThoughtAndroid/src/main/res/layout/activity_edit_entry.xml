@@ -6,13 +6,12 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
-        android:minHeight="?attr/actionBarSize"
-        android:background="#2196F3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/toolbar_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:background="@color/toolbar_background">
     </android.support.v7.widget.Toolbar>
 
     <TextView
@@ -139,41 +138,10 @@
         android:layout_below="@+id/txtvwEditEntryTextLabel"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_above="@+id/btnEditEntryOk"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="8dp"
         android:gravity="start"
-        />
-
-    <Button
-        android:id="@+id/btnEditEntryOk"
-        android:text="@string/edit_entry_button_ok_text"
-        android:layout_width="@dimen/edit_entry_buttons_width"
-        android:layout_height="@dimen/edit_entry_buttons_height"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
-
-    <Button
-        android:id="@+id/btnEditEntryCancel"
-        android:text="@string/edit_entry_button_cancel_text"
-        android:layout_width="@dimen/edit_entry_buttons_width"
-        android:layout_height="@dimen/edit_entry_buttons_height"
-        android:layout_alignParentBottom="true"
-        android:layout_alignTop="@+id/btnEditEntryOk"
-        android:layout_toLeftOf="@+id/btnEditEntryOk"
-        />
-
-    <Button
-        android:id="@+id/btnAddContentFromOcr"
-        android:drawableLeft="@android:drawable/ic_input_add"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:layout_width="40dp"
-        android:layout_height="@dimen/edit_entry_buttons_height"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignTop="@+id/btnEditEntryOk"
-        android:visibility="gone"
         />
 
 </RelativeLayout>

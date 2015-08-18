@@ -3,14 +3,13 @@ package net.deepthought;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,21 +18,11 @@ import android.view.ViewGroup;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
-import net.deepthought.android.db.OrmLiteAndroidEntityManager;
-import net.deepthought.data.AndroidDataManager;
-import net.deepthought.data.DeepThoughtAndroidApplicationConfiguration;
-import net.deepthought.data.IDataManager;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.persistence.EntityManagerConfiguration;
-import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.ISearchEngine;
-import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
-import net.deepthought.plugin.AndroidPluginManager;
-import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
@@ -42,9 +31,12 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
   private final static Logger log = LoggerFactory.getLogger(MainActivity.class);
+
+
+  protected static boolean hasDeepThoughtBeenSetup = false;
 
 
   protected ProgressDialog loadingDataProgressDialog = null;
@@ -64,108 +56,95 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      */
     ViewPager mViewPager;
 
-    @Override
+  @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+      super.onCreate(savedInstanceState);
 
-      Application.addApplicationListener(new ApplicationListener() {
-        @Override
-        public void deepThoughtChanged(final DeepThought deepThought) {
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              setControlsEnabledState(deepThought != null);
-            }
-          });
-        }
+      if(hasDeepThoughtBeenSetup == false) {
+        setupDeepThought();
 
-        @Override
-        public void notification(Notification notification) {
-          // TODO: show error message
-        }
-      });
+        ActivityManager.createInstance(this);
+        hasDeepThoughtBeenSetup = true;
+      }
 
-      // TODO: create Android Dependency Resolver
-      Application.instantiateAsync(new DeepThoughtAndroidApplicationConfiguration(this), new DefaultDependencyResolver() {
-        @Override
-        public IEntityManager createEntityManager(EntityManagerConfiguration configuration) {
-          try {
-            return new OrmLiteAndroidEntityManager(MainActivity.this.getApplicationContext(), configuration);
-          } catch(Exception ex) {
-            Log.e("MainActivity", "Could not create OrmLiteAndroidEntityManager", ex);
+      setupUi();
+    }
+
+  protected void setupDeepThought() {
+    // TODO: unregister listeners again to avoid memory leaks
+    Application.addApplicationListener(new ApplicationListener() {
+      @Override
+      public void deepThoughtChanged(final DeepThought deepThought) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            setControlsEnabledState(deepThought != null);
           }
+        });
+      }
 
-          return null; // TODO: what to do in this case?
-        }
+      @Override
+      public void notification(Notification notification) {
+        // TODO: show error message
+      }
+    });
 
-        @Override
-        public IDataManager createDataManager(IEntityManager entityManager) {
-          return new AndroidDataManager(entityManager);
-        }
-
-        @Override
-        public ISearchEngine createSearchEngine() {
-          try {
-            return new LuceneSearchEngine();
-          } catch(Exception ex) {
-            log.error("Could not initialize LuceneSearchEngine", ex);
-          }
-          return null; // TODO: abort application?
-        }
-
-        @Override
-        public IPluginManager createPluginManager() {
-          return new AndroidPluginManager(MainActivity.this);
-        }
-      });
-
+    if (Application.getDeepThought() == null) {
       loadingDataProgressDialog = new ProgressDialog(this);
       loadingDataProgressDialog.setMessage(getString(R.string.loading_data_wait_message));
       loadingDataProgressDialog.setIndeterminate(true);
       loadingDataProgressDialog.setCancelable(false);
       loadingDataProgressDialog.show();
-
-        setContentView(R.layout.activity_main);
-
-        // Set up the action bar.
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        // When swiping between different sections, select the corresponding
-        // tab. We can also use ActionBar.Tab#select() to do this if we have
-        // a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-        // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            // Create a tab with text corresponding to the page title defined by
-            // the adapter. Also specify this Activity object, which implements
-            // the TabListener interface, as the callback (listener) for when
-            // this tab is selected.
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
-        }
-
-
-      ActivityManager.createInstance(this);
-
-//      testLucene();
     }
+  }
+
+  protected void setupUi() {
+    try {
+      setContentView(R.layout.activity_main);
+
+      // Set up the action bar.
+      final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+      setSupportActionBar(toolbar);
+
+//        final ActionBar actionBar = getSupportActionBar();
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+      // Create the adapter that will return a fragment for each of the three
+      // primary sections of the activity.
+      mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+      // Set up the ViewPager with the sections adapter.
+      mViewPager = (ViewPager) findViewById(R.id.pager);
+      mViewPager.setAdapter(mSectionsPagerAdapter);
+
+      TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+      tabLayout.setupWithViewPager(mViewPager);
+
+      // When swiping between different sections, select the corresponding
+      // tab. We can also use ActionBar.Tab#select() to do this if we have
+      // a reference to the Tab.
+      mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
+//                actionBar.setSelectedNavigationItem(position);
+        }
+      });
+      tabLayout.setOnTabSelectedListener(this);
+
+//      // For each of the sections in the app, add a tab to the action bar.
+//      for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+//        // Create a tab with text corresponding to the page title defined by
+//        // the adapter. Also specify this Activity object, which implements
+//        // the TabListener interface, as the callback (listener) for when
+//        // this tab is selected.
+//          tabLayout.addTab(
+//                  tabLayout.newTab()
+//                          .setText(mSectionsPagerAdapter.getPageTitle(i)));
+//      }
+    } catch(Exception ex) {
+      log.error("Could not setup UI", ex);
+    }
+  }
 
   private void setControlsEnabledState(boolean enable) {
     if(loadingDataProgressDialog != null) {
@@ -197,7 +176,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
   @Override
   protected void onDestroy() {
     loadingDataProgressDialog = null;
-    Application.shutdown();
     super.onDestroy();
   }
 
@@ -219,21 +197,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-  @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        // When the given tab is selected, switch to the corresponding page in
-        // the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
 
@@ -258,6 +221,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     }
 
     super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  @Override
+  public void onTabSelected(TabLayout.Tab tab) {
+    mViewPager.setCurrentItem(tab.getPosition());
+  }
+
+  @Override
+  public void onTabUnselected(TabLayout.Tab tab) {
+
+  }
+
+  @Override
+  public void onTabReselected(TabLayout.Tab tab) {
+
   }
 
   /**

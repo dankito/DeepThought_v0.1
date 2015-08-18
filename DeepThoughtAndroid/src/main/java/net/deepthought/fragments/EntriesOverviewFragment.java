@@ -67,6 +67,7 @@ public class EntriesOverviewFragment extends Fragment {
       onActionAddEntrySelected();
       return true;
     }
+
     return super.onOptionsItemSelected(item);
   }
 

@@ -28,17 +28,16 @@ public class EntriesOverviewAdapter extends BaseAdapter {
   public EntriesOverviewAdapter(Activity context) {
     this.context = context;
 
+    // TODO: unregister listeners again to avoid memory leaks
     Application.addApplicationListener(new ApplicationListener() {
       @Override
       public void deepThoughtChanged(DeepThought deepThought) {
         if (EntriesOverviewAdapter.this.deepThought != null)
-//          EntryOverviewAdapter.this.deepThought.removeEntriesChangedListener(EntryOverviewAdapter.this);
           EntriesOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
 
         EntriesOverviewAdapter.this.deepThought = deepThought;
 
         if (EntriesOverviewAdapter.this.deepThought != null)
-//          EntryOverviewAdapter.this.deepThought.addEntriesChangedListener(EntryOverviewAdapter.this);
           EntriesOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
 
         notifyDataSetChangedThreadSafe();
@@ -52,8 +51,7 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
     deepThought = Application.getDeepThought();
     if(deepThought != null)
-//      deepThought.addEntriesChangedListener(this);
-    deepThought.addEntityListener(deepThoughtListener);
+      deepThought.addEntityListener(deepThoughtListener);
   }
 
 

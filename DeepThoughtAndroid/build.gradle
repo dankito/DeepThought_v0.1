@@ -12,13 +12,13 @@ println "DeepThoughtAndroid: isAndroid = " + project.isAndroid
 System.properties.put("isAndroid", true)
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "net.deepthought"
         minSdkVersion 8
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "0.0.1"
     }
@@ -80,8 +80,9 @@ android {
 
 dependencies {
 //    compile 'com.android.support:appcompat-v7:19.1.0'
-    compile 'com.android.support:appcompat-v7:21.0.3'
-//    compile 'com.android.support:appcompat-v7:22.2.1'
+//    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:22.2.1'
+    compile 'com.android.support:design:22.2.1'
 
     compile project(':DeepThoughtAndroidLib')
     compile project(':AndroidOrmLiteEntityManager')

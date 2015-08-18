@@ -39,7 +39,6 @@
     <orderEntry type="library" exported="" name="httpcore-4.1.4" level="project" />
     <orderEntry type="library" exported="" name="commons-logging-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.4" level="project" />
-    <orderEntry type="library" exported="" name="DeepThoughtJson-io.DeepThoughtJson-io" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

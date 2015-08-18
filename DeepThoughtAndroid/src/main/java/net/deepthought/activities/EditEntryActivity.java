@@ -3,10 +3,14 @@ package net.deepthought.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
@@ -15,6 +19,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import net.deepthought.Application;
 import net.deepthought.R;
@@ -35,7 +40,7 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EditEntryActivity extends Activity {
+public class EditEntryActivity extends AppCompatActivity {
 
   public final static String EntryArgumentKey = "EntryArgument";
   public final static int RequestCode = 1;
@@ -62,53 +67,52 @@ public class EditEntryActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_edit_entry);
 
-//    getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_new_entry));
-//    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//    setSupportActionBar(toolbar);
+    setupUi();
 
-    edtxtEditEntryAbstract = (EditText)findViewById(R.id.edtxtEditEntryAbstract);
-    edtxtEditEntryContent = (EditText)findViewById(R.id.edtxtEditEntryContent);
+    setEntryValues();
+  }
 
-    rlydTags = (RelativeLayout)findViewById(R.id.rlydTags);
-    rlydTags.setOnClickListener(rlydTagsOnClickListener);
+  protected void setupUi() {
+    try {
+      setContentView(R.layout.activity_edit_entry);
 
-    rlydEditEntryEditTags = (RelativeLayout)findViewById(R.id.rlydEditEntryEditTags);
-    rlydEditEntryEditTags.setVisibility(View.GONE);
+      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      setSupportActionBar(toolbar);
 
-    txtvwEditEntryTags = (TextView)findViewById(R.id.txtvwEditEntryTags);
-    edtxtEditEntrySearchTag = (EditText)findViewById(R.id.edtxtEditEntrySearchTag);
-    edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
-    edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
+      ActionBar actionBar = getSupportActionBar();
+      if(actionBar != null) {
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+      }
 
-    Button btnEditEntryNewTag = (Button)findViewById(R.id.btnEditEntryNewTag);
-    btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
+      edtxtEditEntryAbstract = (EditText) findViewById(R.id.edtxtEditEntryAbstract);
+      edtxtEditEntryContent = (EditText) findViewById(R.id.edtxtEditEntryContent);
 
-    lstvwEditEntryTags = (ListView)findViewById(R.id.lstvwEditEntryTags);
+      rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
+      rlydTags.setOnClickListener(rlydTagsOnClickListener);
 
-    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
-      Button btnAddContentFromOcr = (Button) findViewById(R.id.btnAddContentFromOcr);
-      btnAddContentFromOcr.setVisibility(View.VISIBLE);
-      btnAddContentFromOcr.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
-            @Override
-            public void textRecognized(TextRecognitionResult result) {
-              EditEntryActivity.this.textRecognized(result);
-            }
-          });
-        }
-      });
+      rlydEditEntryEditTags = (RelativeLayout) findViewById(R.id.rlydEditEntryEditTags);
+      rlydEditEntryEditTags.setVisibility(View.GONE);
+
+      txtvwEditEntryTags = (TextView) findViewById(R.id.txtvwEditEntryTags);
+      edtxtEditEntrySearchTag = (EditText) findViewById(R.id.edtxtEditEntrySearchTag);
+      edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
+      edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
+
+      Button btnEditEntryNewTag = (Button) findViewById(R.id.btnEditEntryNewTag);
+      btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
+
+      lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
+    } catch(Exception ex) {
+      log.error("Could not setup UI", ex);
+      AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
+      finish();
     }
+  }
 
-    Button btnEditEntryOk = (Button)findViewById(R.id.btnEditEntryOk);
-    btnEditEntryOk.setOnClickListener(btnOkOnClickListener);
-
-    Button btnEditEntryCancel = (Button)findViewById(R.id.btnEditEntryCancel);
-    btnEditEntryCancel.setOnClickListener(btnCancelOnClickListener);
-
+  protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
 
     if(entry != null) {
@@ -123,10 +127,58 @@ public class EditEntryActivity extends Activity {
           setTextViewEditEntryTags();
         }
       }));
-
-      if(entry.isPersisted()) // not a new entry, entry is already persisted in db
-        getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_entry_format, entry.getPreview()));
     }
+  }
+
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
+
+    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
+      MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddContentFromOcr);
+      mnitmActionAddContentFromOcr.setVisible(true);
+
+      mnitmActionAddContentFromOcr.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+          addContentFromOcr();
+          return true;
+        }
+      });
+    }
+
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    if(id == android.R.id.home) {
+      return ifHasUnsavedChangesAskUserToSave();
+    }
+    if (id == R.id.mnitmActionSaveEntry) {
+      saveEntry();
+      return true;
+    }
+    else if (id == R.id.mnitmActionAddContentFromOcr) {
+      addContentFromOcr();
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onBackPressed() {
+    ifHasUnsavedChangesAskUserToSave();
+    super.onBackPressed();
+  }
+
+  protected boolean ifHasUnsavedChangesAskUserToSave() {
+    // TODO:
+    return false;
   }
 
   protected void setTextViewEditEntryTags() {
@@ -142,6 +194,19 @@ public class EditEntryActivity extends Activity {
       tags = getString(R.string.edit_entry_no_tags_set);
 
     txtvwEditEntryTags.setText(tags);
+  }
+
+
+  protected void addContentFromOcr() {
+    if(Application.getContentExtractorManager().hasOcrContentExtractors() == false)
+      return;
+
+    Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
+      @Override
+      public void textRecognized(TextRecognitionResult result) {
+        EditEntryActivity.this.textRecognized(result);
+      }
+    });
   }
 
   protected void textRecognized(TextRecognitionResult result) {
@@ -161,19 +226,23 @@ public class EditEntryActivity extends Activity {
   protected View.OnClickListener btnOkOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
+      saveEntry();
+
       Intent resultIntent = new Intent();
-      entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
-      entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
-
-      if(entry.isPersisted() == false) // a new Entry
-        Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
-
-      entry.setTags(entryTags);
-
       setResult(Activity.RESULT_OK, resultIntent);
       finish();
     }
   };
+
+  protected void saveEntry() {
+    entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
+    entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
+
+    entry.setTags(entryTags);
+
+    if(entry.isPersisted() == false) // a new Entry
+      Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
+  }
 
   protected View.OnClickListener btnCancelOnClickListener = new View.OnClickListener() {
     @Override
