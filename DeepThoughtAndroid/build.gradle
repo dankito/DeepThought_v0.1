@@ -82,7 +82,8 @@ dependencies {
 //    compile 'com.android.support:appcompat-v7:19.1.0'
     compile 'com.android.support:appcompat-v7:21.0.3'
 //    compile 'com.android.support:appcompat-v7:22.2.1'
-    //    compile project(':DeepThoughtLib')
+
+    compile project(':DeepThoughtAndroidLib')
     compile project(':AndroidOrmLiteEntityManager')
         compile project(':LuceneSearchEngine')
     compile 'org.slf4j:slf4j-android:1.7.10'

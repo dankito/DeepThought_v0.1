@@ -133,7 +133,7 @@
         />
 
     <EditText
-        android:id="@+id/edtxtEditEntryText"
+        android:id="@+id/edtxtEditEntryContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtvwEditEntryTextLabel"
@@ -164,7 +164,7 @@
         />
 
     <Button
-        android:id="@+id/btnExtractContentFromCameraPhotos"
+        android:id="@+id/btnAddContentFromOcr"
         android:drawableLeft="@android:drawable/ic_input_add"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
@@ -173,6 +173,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/btnEditEntryOk"
+        android:visibility="gone"
         />
 
 </RelativeLayout>

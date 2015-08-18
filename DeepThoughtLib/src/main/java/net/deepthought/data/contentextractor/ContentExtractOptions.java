@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 import net.deepthought.util.file.FileUtils;
 
 import java.util.ArrayList;
@@ -112,17 +113,17 @@ public class ContentExtractOptions {
 
   public boolean isTextContentExtractor() {
     for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof ITextContentExtractor)
+      if(contentExtractOption.getContentExtractor() instanceof IOcrContentExtractor)
         return true;
     }
 
     return false;
   }
 
-  public ITextContentExtractor getTextContentExtractor() {
+  public IOcrContentExtractor getTextContentExtractor() {
     for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof ITextContentExtractor)
-        return (ITextContentExtractor)contentExtractOption.getContentExtractor();
+      if(contentExtractOption.getContentExtractor() instanceof IOcrContentExtractor)
+        return (IOcrContentExtractor)contentExtractOption.getContentExtractor();
     }
 
     return null;

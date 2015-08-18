@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,8 +19,14 @@ import android.widget.Toast;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
+import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.helper.AlertHelper;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,11 +43,14 @@ public class EditEntryActivity extends Activity {
 
   public final static int RecognizeTextFromCameraPhotoRequestCode = 2;
 
+  private final static Logger log = LoggerFactory.getLogger(EditEntryActivity.class);
+
+
   protected Entry entry;
   protected List<Tag> entryTags = new ArrayList<>();
 
   protected EditText edtxtEditEntryAbstract;
-  protected EditText edtxtEditEntryText;
+  protected EditText edtxtEditEntryContent;
 
   protected RelativeLayout rlydTags;
   protected RelativeLayout rlydEditEntryEditTags;
@@ -59,7 +69,7 @@ public class EditEntryActivity extends Activity {
 //    setSupportActionBar(toolbar);
 
     edtxtEditEntryAbstract = (EditText)findViewById(R.id.edtxtEditEntryAbstract);
-    edtxtEditEntryText = (EditText)findViewById(R.id.edtxtEditEntryText);
+    edtxtEditEntryContent = (EditText)findViewById(R.id.edtxtEditEntryContent);
 
     rlydTags = (RelativeLayout)findViewById(R.id.rlydTags);
     rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -77,14 +87,21 @@ public class EditEntryActivity extends Activity {
 
     lstvwEditEntryTags = (ListView)findViewById(R.id.lstvwEditEntryTags);
 
-    Button btnExtractContentFromCameraPhotos = (Button)findViewById(R.id.btnExtractContentFromCameraPhotos);
-    btnExtractContentFromCameraPhotos.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-//        startActivityForResult(new Intent(EditEntryActivity.this, RecognizeTextActivity.class), RecognizeTextFromCameraPhotoRequestCode);
-//        startActivityForResult(new Intent(EditEntryActivity.this, com.renard.ocr.DocumentGridActivity.class), RecognizeTextFromCameraPhotoRequestCode);
-      }
-    });
+    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
+      Button btnAddContentFromOcr = (Button) findViewById(R.id.btnAddContentFromOcr);
+      btnAddContentFromOcr.setVisibility(View.VISIBLE);
+      btnAddContentFromOcr.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
+            @Override
+            public void textRecognized(TextRecognitionResult result) {
+              EditEntryActivity.this.textRecognized(result);
+            }
+          });
+        }
+      });
+    }
 
     Button btnEditEntryOk = (Button)findViewById(R.id.btnEditEntryOk);
     btnEditEntryOk.setOnClickListener(btnOkOnClickListener);
@@ -98,8 +115,8 @@ public class EditEntryActivity extends Activity {
       entryTags = new ArrayList<>(entry.getTagsSorted());
       setTextViewEditEntryTags();
 
-      edtxtEditEntryAbstract.setText(entry.getAbstract());
-      edtxtEditEntryText.setText(entry.getContent());
+      edtxtEditEntryAbstract.setText(Html.fromHtml(entry.getAbstract()));
+      edtxtEditEntryContent.setText(Html.fromHtml(entry.getContent()));
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
         public void entryTagsChanged(List<Tag> entryTags) {
@@ -127,12 +144,26 @@ public class EditEntryActivity extends Activity {
     txtvwEditEntryTags.setText(tags);
   }
 
+  protected void textRecognized(TextRecognitionResult result) {
+    try {
+      if (result.isUserCancelled()) {
+        // nothing to do, user knows that he/she cancelled capturing/recognition
+      } else if (result.recognitionSuccessful() == false) {
+        AlertHelper.showErrorMessage(this, result.getErrorMessage());
+      } else {
+        edtxtEditEntryContent.getText().insert(edtxtEditEntryContent.getSelectionEnd(), Html.fromHtml(result.getRecognizedText()));
+      }
+    } catch(Exception ex) {
+      log.error("Could not handle TextRecognitionResult " + result, ex);
+    }
+  }
+
   protected View.OnClickListener btnOkOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       Intent resultIntent = new Intent();
-      entry.setAbstract(edtxtEditEntryAbstract.getText().toString());
-      entry.setContent(edtxtEditEntryText.getText().toString());
+      entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
+      entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
 
       if(entry.isPersisted() == false) // a new Entry
         Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below

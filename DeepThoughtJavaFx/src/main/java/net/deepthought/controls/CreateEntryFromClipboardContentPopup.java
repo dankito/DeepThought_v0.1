@@ -10,7 +10,7 @@ import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
-import net.deepthought.data.contentextractor.ITextContentExtractor;
+import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.download.DownloadConfig;
@@ -336,7 +336,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   public void tryToExtractText(ContentExtractOptions options) {
     final ContentExtractOption extractTextOption = options.getExtractTextOption();
-    final ITextContentExtractor textContentExtractor = (ITextContentExtractor)extractTextOption.getContentExtractor();
+    final IOcrContentExtractor textContentExtractor = (IOcrContentExtractor)extractTextOption.getContentExtractor();
 
     if(options.isRemoteFile()) {
       downloadToTempFile(extractTextOption.getUrl(), (successful, tempFile) -> {
@@ -351,7 +351,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     }
   }
 
-  protected void tryToExtractText(ContentExtractOption extractTextOption, ITextContentExtractor textContentExtractor) {
+  protected void tryToExtractText(ContentExtractOption extractTextOption, IOcrContentExtractor textContentExtractor) {
     textContentExtractor.createEntryFromClipboardContentAsync(extractTextOption, result -> {
       if (result.successful())
         Dialogs.showEditEntryDialog(result.getCreatedEntry());
@@ -369,7 +369,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
           ContentExtractOption extractTextOption = options.getExtractTextOption();
-          ITextContentExtractor textContentExtractor = (ITextContentExtractor)extractTextOption.getContentExtractor();
+          IOcrContentExtractor textContentExtractor = (IOcrContentExtractor)extractTextOption.getContentExtractor();
           textContentExtractor.createEntryFromUrlAsync(newFile.getUriString(), result -> {
             if (result.successful()) {
               Entry newEntry = result.getCreatedEntry();

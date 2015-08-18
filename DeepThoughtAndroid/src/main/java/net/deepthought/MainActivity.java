@@ -32,6 +32,8 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.LuceneSearchEngine;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
+import net.deepthought.plugin.AndroidPluginManager;
+import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
@@ -109,6 +111,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             log.error("Could not initialize LuceneSearchEngine", ex);
           }
           return null; // TODO: abort application?
+        }
+
+        @Override
+        public IPluginManager createPluginManager() {
+          return new AndroidPluginManager(MainActivity.this);
         }
       });
 

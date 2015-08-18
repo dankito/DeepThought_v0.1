@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
@@ -15,7 +16,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
   protected List<IContentExtractor> contentExtractors = new CopyOnWriteArrayList<>();
 
-  protected List<ITextContentExtractor> textContentExtractors = new CopyOnWriteArrayList<>();
+  protected List<IOcrContentExtractor> ocrContentExtractors = new CopyOnWriteArrayList<>();
 
   protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = new CopyOnWriteArrayList<>();
 
@@ -33,17 +34,20 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
   @Override
   public boolean addContentExtractor(IContentExtractor contentExtractor) {
-    if(contentExtractor instanceof ITextContentExtractor)
-      return addTextContentExtractor((ITextContentExtractor)contentExtractor);
+    if(contentExtractor instanceof IOcrContentExtractor)
+      return addOcrContentExtractor((IOcrContentExtractor) contentExtractor); // TODO: in this way a class implementing multiple IContentExtractor interfaces only gets added to ocrContentExtractors
     if(contentExtractor instanceof IOnlineArticleContentExtractor)
-      return addOnlineArticleContentExtractor((IOnlineArticleContentExtractor)contentExtractor);
-//    return contentExtractors.add(contentExtractor);
+      return addOnlineArticleContentExtractor((IOnlineArticleContentExtractor) contentExtractor);
+
+    if(contentExtractor instanceof IOcrContentExtractor == false && contentExtractor instanceof IOnlineArticleContentExtractor == false)
+      return contentExtractors.add(contentExtractor);
+
     return false;
   }
 
   //@Override
-  public boolean addTextContentExtractor(ITextContentExtractor contentExtractor) {
-    return textContentExtractors.add(contentExtractor);
+  public boolean addOcrContentExtractor(IOcrContentExtractor contentExtractor) {
+    return ocrContentExtractors.add(contentExtractor);
   }
 
   //@Override
@@ -102,7 +106,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
       if(isAttachableFile(url)) {
         ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, canSetFileAsEntryContent(url));
-        for(ITextContentExtractor textContentExtractor : textContentExtractors) {
+        for(IOcrContentExtractor textContentExtractor : ocrContentExtractors) {
           if(textContentExtractor.canCreateEntryFromUrl(url))
             contentExtractOptions.addContentExtractOption(new ContentExtractOption(textContentExtractor, url, true));
         }
@@ -130,6 +134,19 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 //    return FileUtils.isImageFile(FileUtils.getMimeType(url));
     String mimeType = FileUtils.getMimeType(url);
     return mimeType.endsWith("jpg") || mimeType.endsWith("jpeg") || mimeType.endsWith("jpe") || mimeType.endsWith("png") || mimeType.endsWith("gif");
+  }
+
+
+  public boolean hasOcrContentExtractors() {
+    return ocrContentExtractors.size() > 0;
+  }
+
+  public IOcrContentExtractor getPreferredOcrContentExtractor() {
+    if(hasOcrContentExtractors()) {
+      return ocrContentExtractors.get(0); // TODO: if there are multiple ones available may judge which fits best
+    }
+
+    return null;
   }
 
 }
