@@ -7,4 +7,6 @@ public interface IPlugin {
 
   public String getName();
 
+//  public void initialize();
+
 }

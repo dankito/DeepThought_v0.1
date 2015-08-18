@@ -34,6 +34,8 @@ public class EditEntryActivity extends Activity {
   public final static int RequestCode = 1;
   public final static String ResultKey = "EntryResult";
 
+  public final static int RecognizeTextFromCameraPhotoRequestCode = 2;
+
   protected Entry entry;
   protected List<Tag> entryTags = new ArrayList<>();
 
@@ -52,7 +54,9 @@ public class EditEntryActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_edit_entry);
 
-    getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_new_entry));
+//    getActionBar().setTitle(getString(R.string.edit_entry_action_bar_title_new_entry));
+//    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//    setSupportActionBar(toolbar);
 
     edtxtEditEntryAbstract = (EditText)findViewById(R.id.edtxtEditEntryAbstract);
     edtxtEditEntryText = (EditText)findViewById(R.id.edtxtEditEntryText);
@@ -72,6 +76,15 @@ public class EditEntryActivity extends Activity {
     btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
 
     lstvwEditEntryTags = (ListView)findViewById(R.id.lstvwEditEntryTags);
+
+    Button btnExtractContentFromCameraPhotos = (Button)findViewById(R.id.btnExtractContentFromCameraPhotos);
+    btnExtractContentFromCameraPhotos.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+//        startActivityForResult(new Intent(EditEntryActivity.this, RecognizeTextActivity.class), RecognizeTextFromCameraPhotoRequestCode);
+//        startActivityForResult(new Intent(EditEntryActivity.this, com.renard.ocr.DocumentGridActivity.class), RecognizeTextFromCameraPhotoRequestCode);
+      }
+    });
 
     Button btnEditEntryOk = (Button)findViewById(R.id.btnEditEntryOk);
     btnEditEntryOk.setOnClickListener(btnOkOnClickListener);

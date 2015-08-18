@@ -1,6 +1,6 @@
 include ':DeepThoughtLib'
 include ':DeepThoughtJavaFx'
-include ':DeepThoughtAndroid'
+include ':DeepThoughtAndroid', ':DeepThoughtAndroidLib'
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
@@ -10,8 +10,6 @@ include ':WGetFileDownloader'
 include ':commons-lang'
 include ':RemoteFileContentExtractor'
 include ':OcrTextContentExtractorJava'
-include ':tess-two:tess-two', ':textfairy'
-include ':OcrTextContentExtractorAndroid'
 include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
@@ -22,6 +20,7 @@ include ':OpenOfficeDocumentsImporterExporter'
 //        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
 //        ':SymmetricDS-Server'
 
+project(':DeepThoughtAndroidLib').projectDir = new File('libs/os/DeepThoughtAndroidLib')
 
 project(':ormlite-jpa-core').projectDir = new File('libs/persistence/database/ormlite-jpa-core')
 project(':ormlite-jpa-jdbc').projectDir = new File('libs/persistence/database/ormlite-jpa-jdbc')
@@ -42,9 +41,6 @@ project(':commons-lang').projectDir = new File('libs/utils/commons-lang')
 project(':RemoteFileContentExtractor').projectDir = new File('libs/content_extractor/RemoteFileContentExtractor')
 
 project(':OcrTextContentExtractorJava').projectDir = new File('libs/content_extractor/OcrTextContentExtractorJava')
-project(':tess-two:tess-two').projectDir = new File('libs/content_extractor/textfairy/tess-two/tess-two')
-project(':textfairy').projectDir = new File('libs/content_extractor/textfairy/app')
-project(':OcrTextContentExtractorAndroid').projectDir = new File('libs/content_extractor/OcrTextContentExtractorAndroid')
 
 project(':OnlineNewspaperContentExtractor').projectDir = new File('libs/content_extractor/OnlineNewspaperContentExtractor')
 project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_extractor/WikipediaOnlineContentExtractor')

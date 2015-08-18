@@ -7,13 +7,13 @@ properties.put("isAndroid", true)
 println "AndroidOrmLite: isAndroid = " + properties.get("isAndroid")
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
 //        applicationId "net.deepthought.android"
         minSdkVersion 8
-        targetSdkVersion 19
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -39,6 +39,10 @@ android {
         exclude 'Strings_de.properties'
         exclude 'DeepThoughtFx.properties'
         exclude 'logback-test.xml'
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
