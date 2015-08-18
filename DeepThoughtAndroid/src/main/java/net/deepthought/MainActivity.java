@@ -266,8 +266,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     return getString(R.string.title_section_entries_overview).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section_search).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
             }
             return null;
         }

@@ -6,8 +6,8 @@
         android:id="@+id/mnitmActionAddContentFromOcr"
         android:title="@string/ocr"
         android:icon="@android:drawable/ic_menu_camera"
-        android:visible="false"
         app:showAsAction="always"
+        android:visible="false"
         />
 
     <item
@@ -15,6 +15,7 @@
         android:title="@string/save"
         android:icon="@android:drawable/ic_menu_save"
         app:showAsAction="always"
+        android:enabled="false"
         />
 
 </menu>

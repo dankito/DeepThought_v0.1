@@ -1,7 +1,9 @@
 package net.deepthought.activities;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -61,6 +63,10 @@ public class EditEntryActivity extends AppCompatActivity {
   protected EditText edtxtEditEntrySearchTag;
   protected ListView lstvwEditEntryTags;
 
+  protected MenuItem mnitmActionSaveEntry;
+
+  protected boolean hasEntryBeenEdited = false;
+
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +75,8 @@ public class EditEntryActivity extends AppCompatActivity {
     setupUi();
 
     setEntryValues();
+
+    unsetEntryHasBeenEdited();
   }
 
   protected void setupUi() {
@@ -86,7 +94,9 @@ public class EditEntryActivity extends AppCompatActivity {
       }
 
       edtxtEditEntryAbstract = (EditText) findViewById(R.id.edtxtEditEntryAbstract);
+      edtxtEditEntryAbstract.addTextChangedListener(entryAbstractOrContentChangedWatcher);
       edtxtEditEntryContent = (EditText) findViewById(R.id.edtxtEditEntryContent);
+      edtxtEditEntryContent.addTextChangedListener(entryAbstractOrContentChangedWatcher);
 
       rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
       rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -122,6 +132,7 @@ public class EditEntryActivity extends AppCompatActivity {
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
         public void entryTagsChanged(List<Tag> entryTags) {
+          setEntryHasBeenEdited();
           setTextViewEditEntryTags();
         }
       }));
@@ -139,6 +150,8 @@ public class EditEntryActivity extends AppCompatActivity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
+
+    mnitmActionSaveEntry = menu.findItem(R.id.mnitmActionSaveEntry);
 
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
       MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddContentFromOcr);
@@ -175,15 +188,69 @@ public class EditEntryActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
+
+  protected TextWatcher entryAbstractOrContentChangedWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
+  };
+
+  protected void setEntryHasBeenEdited() {
+    hasEntryBeenEdited = true;
+    if(mnitmActionSaveEntry != null)
+      mnitmActionSaveEntry.setEnabled(hasEntryBeenEdited);
+  }
+
+  protected void unsetEntryHasBeenEdited() {
+    hasEntryBeenEdited = false;
+    if(mnitmActionSaveEntry != null)
+      mnitmActionSaveEntry.setEnabled(hasEntryBeenEdited);
+  }
+
+
   @Override
   public void onBackPressed() {
     ifHasUnsavedChangesAskUserToSave();
-    super.onBackPressed();
+//    super.onBackPressed();
   }
 
   protected boolean ifHasUnsavedChangesAskUserToSave() {
-    // TODO:
-    return false;
+    if(hasEntryBeenEdited == true) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(this);
+      TextView view = new TextView(this);
+      view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
+      builder.setView(view);
+
+      builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+          finish();
+        }
+      });
+
+      builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+          saveEntry();
+          finish();
+        }
+      });
+
+      builder.create().show();
+    }
+
+    return true;
   }
 
   protected void setTextViewEditEntryTags() {
@@ -236,6 +303,8 @@ public class EditEntryActivity extends AppCompatActivity {
 
     if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
+
+    unsetEntryHasBeenEdited();
   }
 
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
