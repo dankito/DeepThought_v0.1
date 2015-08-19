@@ -2,20 +2,35 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--<item-->
+        <!--android:id="@+id/test"-->
+        <!--android:title="@string/ocr"-->
+        <!--android:icon="@android:drawable/ic_input_add"-->
+        <!--app:showAsAction="always"-->
+        <!-->-->
+        <!--<menu>-->
+            <!--<item-->
+                <!--android:title="Liebe"-->
+                <!--android:icon="@android:drawable/ic_dialog_email"/>-->
+            <!--<item-->
+                <!--android:title="Hiebe"-->
+                <!--android:icon="@android:drawable/ic_dialog_info" />-->
+        <!--</menu>-->
+    <!--</item>-->
+
     <item
         android:id="@+id/mnitmActionAddContentFromOcr"
         android:title="@string/ocr"
         android:icon="@android:drawable/ic_menu_camera"
         app:showAsAction="always"
         android:visible="false"
-        />
+        >
+    </item>
 
     <item
-        android:id="@+id/mnitmActionSaveEntry"
-        android:title="@string/save"
-        android:icon="@android:drawable/ic_menu_save"
-        app:showAsAction="always"
-        android:enabled="false"
+        android:id="@+id/mnitmActionCancel"
+        android:title="@string/cancel"
+        app:showAsAction="always|withText"
         />
 
 </menu>

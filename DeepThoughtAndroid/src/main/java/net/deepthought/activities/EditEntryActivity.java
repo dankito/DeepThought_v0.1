@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -85,6 +86,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
       Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
       setSupportActionBar(toolbar);
+      setLogo(toolbar);
 
       ActionBar actionBar = getSupportActionBar();
       if(actionBar != null) {
@@ -120,6 +122,19 @@ public class EditEntryActivity extends AppCompatActivity {
     }
   }
 
+  protected void setLogo(Toolbar toolbar) {
+    ImageView logoView = new ImageView(this);
+    logoView.setImageResource(android.R.drawable.ic_menu_save);
+    toolbar.addView(logoView);
+
+    logoView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        saveEntryAndCloseActivity();
+      }
+    });
+  }
+
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
 
@@ -151,8 +166,6 @@ public class EditEntryActivity extends AppCompatActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
 
-    mnitmActionSaveEntry = menu.findItem(R.id.mnitmActionSaveEntry);
-
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
       MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddContentFromOcr);
       mnitmActionAddContentFromOcr.setVisible(true);
@@ -174,10 +187,10 @@ public class EditEntryActivity extends AppCompatActivity {
     int id = item.getItemId();
 
     if(id == android.R.id.home) {
-      return ifHasUnsavedChangesAskUserToSave();
+      saveEntryIfNeeded();
     }
-    if (id == R.id.mnitmActionSaveEntry) {
-      saveEntry();
+    else if (id == R.id.mnitmActionCancel) {
+      finish();
       return true;
     }
     else if (id == R.id.mnitmActionAddContentFromOcr) {
@@ -208,49 +221,42 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void setEntryHasBeenEdited() {
     hasEntryBeenEdited = true;
-    if(mnitmActionSaveEntry != null)
-      mnitmActionSaveEntry.setEnabled(hasEntryBeenEdited);
   }
 
   protected void unsetEntryHasBeenEdited() {
     hasEntryBeenEdited = false;
-    if(mnitmActionSaveEntry != null)
-      mnitmActionSaveEntry.setEnabled(hasEntryBeenEdited);
   }
 
 
   @Override
   public void onBackPressed() {
-    ifHasUnsavedChangesAskUserToSave();
-//    super.onBackPressed();
+    if(hasEntryBeenEdited == true)
+      askUserIfChangesShouldBeSaved();
+    else
+      super.onBackPressed();
   }
 
-  protected boolean ifHasUnsavedChangesAskUserToSave() {
-    if(hasEntryBeenEdited == true) {
-      AlertDialog.Builder builder = new AlertDialog.Builder(this);
-      TextView view = new TextView(this);
-      view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
-      builder.setView(view);
+  protected void askUserIfChangesShouldBeSaved() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    TextView view = new TextView(this);
+    view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
+    builder.setView(view);
 
-      builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-          finish();
-        }
-      });
+    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        finish();
+      }
+    });
 
-      builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-          saveEntry();
-          finish();
-        }
-      });
+    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        saveEntryAndCloseActivity();
+      }
+    });
 
-      builder.create().show();
-    }
-
-    return true;
+    builder.create().show();
   }
 
   protected void setTextViewEditEntryTags() {
@@ -295,14 +301,24 @@ public class EditEntryActivity extends AppCompatActivity {
     }
   }
 
+  protected void saveEntryAndCloseActivity() {
+    saveEntryIfNeeded();
+    finish();
+  }
+
+  protected void saveEntryIfNeeded() {
+    if(hasEntryBeenEdited == true)
+      saveEntry();
+  }
+
   protected void saveEntry() {
     entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
     entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
 
-    entry.setTags(entryTags);
-
     if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
+
+    entry.setTags(entryTags);
 
     unsetEntryHasBeenEdited();
   }

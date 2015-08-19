@@ -12,6 +12,7 @@
     <string name="action_settings">Einstellungen</string>
     <string name="add">Hinzufügen</string>
     <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
     <string name="ocr">OCR</string>
 
     <string name="loading_data_wait_message">Lade daten ...</string>
