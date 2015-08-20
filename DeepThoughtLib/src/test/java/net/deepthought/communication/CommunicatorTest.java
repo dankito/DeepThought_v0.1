@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.AllowDeviceToRegisterResult;
-import net.deepthought.communication.model.ConnectedPeer;
 import net.deepthought.communication.model.HostInfo;
 
 import org.junit.Assert;
@@ -23,25 +22,14 @@ public class CommunicatorTest extends CommunicationTestBase {
   @Test
   public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
-//    CountDownLatch
 
-    testMethodConnectorListener = new DeepThoughtsConnectorListener() {
+    connector.openUserDeviceRegistrationServer(new MessagesReceiverListener() {
       @Override
       public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         methodCalled.set(true);
         return AllowDeviceToRegisterResult.createDenyRegistrationResult();
       }
-
-      @Override
-      public void registeredDeviceConnected(ConnectedPeer peer) {
-
-      }
-
-      @Override
-      public void registeredDeviceDisconnected(ConnectedPeer peer) {
-
-      }
-    };
+    });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), null);
 
@@ -52,22 +40,12 @@ public class CommunicatorTest extends CommunicationTestBase {
   public void askForDeviceRegistration_ServerResponseIsReceived() {
     final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
 
-    testMethodConnectorListener = new DeepThoughtsConnectorListener() {
+    connector.openUserDeviceRegistrationServer(new MessagesReceiverListener() {
       @Override
       public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         return AllowDeviceToRegisterResult.createDenyRegistrationResult();
       }
-
-      @Override
-      public void registeredDeviceConnected(ConnectedPeer peer) {
-
-      }
-
-      @Override
-      public void registeredDeviceDisconnected(ConnectedPeer peer) {
-
-      }
-    };
+    });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
       @Override
@@ -83,22 +61,12 @@ public class CommunicatorTest extends CommunicationTestBase {
   public void askForDeviceRegistration_RegistrationIsProhibitedByServer_RegistrationDeniedResponseIsReceived() {
     final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
 
-    testMethodConnectorListener = new DeepThoughtsConnectorListener() {
+    connector.openUserDeviceRegistrationServer(new MessagesReceiverListener() {
       @Override
       public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         return AllowDeviceToRegisterResult.createDenyRegistrationResult();
       }
-
-      @Override
-      public void registeredDeviceConnected(ConnectedPeer peer) {
-
-      }
-
-      @Override
-      public void registeredDeviceDisconnected(ConnectedPeer peer) {
-
-      }
-    };
+    });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
       @Override
@@ -114,22 +82,12 @@ public class CommunicatorTest extends CommunicationTestBase {
   public void askForDeviceRegistration_ServerAllowsRegistration_RegistrationAllowedResponseIsReceived() {
     final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
 
-    testMethodConnectorListener = new DeepThoughtsConnectorListener() {
+    connector.openUserDeviceRegistrationServer(new MessagesReceiverListener() {
       @Override
       public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         return AllowDeviceToRegisterResult.createAllowRegistrationResult(true);
       }
-
-      @Override
-      public void registeredDeviceConnected(ConnectedPeer peer) {
-
-      }
-
-      @Override
-      public void registeredDeviceDisconnected(ConnectedPeer peer) {
-
-      }
-    };
+    });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
       @Override

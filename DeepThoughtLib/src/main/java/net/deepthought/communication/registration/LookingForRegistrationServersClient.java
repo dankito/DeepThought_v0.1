@@ -66,7 +66,7 @@ public class LookingForRegistrationServersClient {
     try {
       socket.receive(packet);
       HostInfo serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
-      if(Application.getDeepThoughtsConnector().isDeviceRegistered(serverInfo) == false) {
+      if(Application.getDeepThoughtsConnector().getRegisteredPeersManager().isDeviceRegistered(serverInfo) == false) {
         boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(buffer, packet.getLength());
 
         if (isOpenRegistrationServer == true && listener != null) {

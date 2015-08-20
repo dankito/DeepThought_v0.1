@@ -70,7 +70,7 @@ public class Group extends UserDataEntity {
     return universallyUniqueId;
   }
 
-  protected void setUniversallyUniqueId(String universallyUniqueId) {
+  public void setUniversallyUniqueId(String universallyUniqueId) {
     Object previousValue = this.universallyUniqueId;
     this.universallyUniqueId = universallyUniqueId;
     callPropertyChangedListeners(TableConfig.GroupUniversallyUniqueIdColumnName, previousValue, universallyUniqueId);

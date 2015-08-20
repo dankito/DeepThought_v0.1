@@ -8,7 +8,11 @@ import net.deepthought.data.model.User;
  */
 public class HostInfo {
 
+  protected String userUniqueId = "";
+
   protected String userName = "";
+
+  protected String deviceUniqueId = "";
 
   protected String deviceName = "";
 
@@ -27,20 +31,30 @@ public class HostInfo {
 
   }
 
-  public HostInfo(String userName, String deviceName, String platform, String osVersion, String platformArchitecture) {
+  public HostInfo(String userUniqueId, String userName, String deviceUniqueId, String deviceName, String platform, String osVersion, String platformArchitecture) {
+    this.userUniqueId = userUniqueId;
     this.userName = userName;
+    this.deviceUniqueId = deviceUniqueId;
     this.deviceName = deviceName;
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
   }
 
-  public HostInfo(String userName, String deviceName, String platform, String osVersion, String platformArchitecture, String ipAddress, int port) {
-    this(userName, deviceName, platform, osVersion, platformArchitecture);
+  public HostInfo(String userUniqueId, String userName, String deviceUniqueId, String deviceName, String platform, String osVersion, String platformArchitecture, String ipAddress, int port) {
+    this(userUniqueId, userName, deviceUniqueId, deviceName, platform, osVersion, platformArchitecture);
     this.ipAddress = ipAddress;
     this.port = port;
   }
 
+
+  public String getUserUniqueId() {
+    return userUniqueId;
+  }
+
+  public void setUserUniqueId(String userUniqueId) {
+    this.userUniqueId = userUniqueId;
+  }
 
   public String getUserName() {
     return userName;
@@ -48,6 +62,14 @@ public class HostInfo {
 
   public void setUserName(String userName) {
     this.userName = userName;
+  }
+
+  public String getDeviceUniqueId() {
+    return deviceUniqueId;
+  }
+
+  public void setDeviceUniqueId(String deviceUniqueId) {
+    this.deviceUniqueId = deviceUniqueId;
   }
 
   public String getDeviceName() {
@@ -106,11 +128,13 @@ public class HostInfo {
 
 
   public static HostInfo fromUserAndDevice(User user, Device device) {
-    return new HostInfo(user.getUserName(), device.getName(), device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
+    return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
+        device.getOsVersion(), device.getPlatformArchitecture());
   }
 
   public static HostInfo fromUserAndDevice(User user, Device device, String ipAddress, int port) {
-    return new HostInfo(user.getUserName(), device.getName(), device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture(), ipAddress, port);
+    return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
+        device.getOsVersion(), device.getPlatformArchitecture(), ipAddress, port);
   }
 
 }

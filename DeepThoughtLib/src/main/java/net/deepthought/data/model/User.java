@@ -119,7 +119,7 @@ public class User extends BaseEntity implements Serializable {
     return universallyUniqueId;
   }
 
-  protected void setUniversallyUniqueId(String universallyUniqueId) {
+  public void setUniversallyUniqueId(String universallyUniqueId) {
     Object previousValue = this.universallyUniqueId;
     this.universallyUniqueId = universallyUniqueId;
     callPropertyChangedListeners(TableConfig.UserUniversallyUniqueIdColumnName, previousValue, universallyUniqueId);

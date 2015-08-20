@@ -1,7 +1,13 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
-import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.model.AllowDeviceToRegisterResult;
+import net.deepthought.communication.registration.LookingForRegistrationServersClient;
+import net.deepthought.communication.registration.RegisteredPeersManager;
+import net.deepthought.communication.registration.RegistrationRequestListener;
+import net.deepthought.communication.registration.RegistrationServer;
+import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 
@@ -24,7 +30,16 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected MessagesReceiver messagesReceiver;
 
+  protected RegisteredPeersManager registeredPeersManager;
+
   protected DeepThoughtsConnectorListener listener;
+
+  protected ConnectorMessagesCreator connectorMessagesCreator;
+
+  protected RegistrationServer registrationServer = null;
+  protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = null;
+
+  protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
 
   public DeepThoughtsConnector(DeepThoughtsConnectorListener listener) {
@@ -39,6 +54,9 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.messageReceiverPort = messageReceiverPort;
     this.communicator = communicator;
     this.listener = listener;
+
+    this.registeredPeersManager = new RegisteredPeersManager(); // TODO: make configurable
+    this.connectorMessagesCreator = new ConnectorMessagesCreator();
   }
 
 
@@ -64,19 +82,27 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected void startMessageReceiver(int messageReceiverPort) {
     try {
-      messagesReceiver = new MessagesReceiver(messageReceiverPort, listener); // TODO: if already in use, find an unused port
+      messagesReceiver = new MessagesReceiver(messageReceiverPort, messagesReceiverListener);
       messagesReceiver.start();
 
       this.messageReceiverPort = messageReceiverPort;
     } catch(Exception ex) {
+      stopMessagesReceiver();
+
       if(isPortAlreadyInUseException(ex) == true)
-        startMessageReceiver(++messageReceiverPort); // TODO: check if new port value is larger than 2e16, if so start at 1025 again
+        startMessageReceiver(messageReceiverPort + determineNextPortNumber(messageReceiverPort));
       else {
-        messagesReceiver = null;
         log.error("Could not start MessagesReceiver", ex);
         Application.notifyUser(new DeepThoughtError(Localization.getLocalizedString("could.not.start.messages.receiver"), ex));
       }
     }
+  }
+
+  protected int determineNextPortNumber(int messageReceiverPort) {
+    // TODO: what if by any reason no port is available? then this would produce an infinite loop and therefore a stack overflow
+    if(messageReceiverPort < 65535)
+      return ++messageReceiverPort;
+    return 1025; // maximum port number of 2e16 reached -> restart at first not well known port again
   }
 
   protected boolean isPortAlreadyInUseException(Exception exception) {
@@ -85,17 +111,59 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   @Override
   public void shutDown() {
+    closeUserDeviceRegistrationServer();
+    stopSearchingOtherUserDevicesToRegisterAt();
+
+    stopMessagesReceiver();
+  }
+
+  protected void stopMessagesReceiver() {
     try {
       if(messagesReceiver != null) {
         messagesReceiver.stop();
+        messagesReceiver.unsetListener();
         messagesReceiver = null;
       }
-    } catch(Exception ex) { log.error("Could not close Connection", ex); }
+    } catch(Exception ex) { log.error("Could not close MessagesReceiver", ex); }
   }
 
 
-  public boolean isDeviceRegistered(HostInfo info) {
-    return false; // TODO: implement
+  @Override
+  public void openUserDeviceRegistrationServer(UserDeviceRegistrationRequestListener listener) {
+    if(registrationServer != null)
+      closeUserDeviceRegistrationServer();
+
+    this.userDeviceRegistrationRequestListener = listener;
+
+    registrationServer = new RegistrationServer(connectorMessagesCreator);
+    registrationServer.startRegistrationServerAsync();
+  }
+
+  @Override
+  public void closeUserDeviceRegistrationServer() {
+    if(registrationServer != null) {
+      registrationServer.closeRegistrationServer();
+      registrationServer = null;
+    }
+
+    this.userDeviceRegistrationRequestListener = null;
+  }
+
+  @Override
+  public void findOtherUserDevicesToRegisterAtAsync(RegistrationRequestListener listener) {
+    if(searchRegistrationServersClient != null)
+      stopSearchingOtherUserDevicesToRegisterAt();
+
+    searchRegistrationServersClient = new LookingForRegistrationServersClient(connectorMessagesCreator);
+    searchRegistrationServersClient.findRegistrationServersAsync(listener);
+  }
+
+  @Override
+  public void stopSearchingOtherUserDevicesToRegisterAt() {
+    if(searchRegistrationServersClient != null) {
+      searchRegistrationServersClient.stopSearchingForRegistrationServers();
+      searchRegistrationServersClient = null;
+    }
   }
 
 
@@ -109,7 +177,23 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return communicator;
   }
 
+  @Override
+  public RegisteredPeersManager getRegisteredPeersManager() {
+    return registeredPeersManager;
+  }
+
+  @Override
   public boolean isStarted() {
     return messagesReceiver != null && messagesReceiver.wasStarted();
   }
+
+
+  protected MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
+    @Override
+    public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      if(userDeviceRegistrationRequestListener != null)
+        return userDeviceRegistrationRequestListener.registerDeviceRequestRetrieved(request);
+      return null;
+    }
+  };
 }

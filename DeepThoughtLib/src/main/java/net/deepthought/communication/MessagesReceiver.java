@@ -26,12 +26,16 @@ public class MessagesReceiver extends NanoHTTPD {
   private final static Logger log = LoggerFactory.getLogger(MessagesReceiver.class);
 
 
-  protected DeepThoughtsConnectorListener listener;
+  protected MessagesReceiverListener listener;
 
 
-  public MessagesReceiver(int port, DeepThoughtsConnectorListener listener) {
+  public MessagesReceiver(int port, MessagesReceiverListener listener) {
     super(port);
     this.listener = listener;
+  }
+
+  public void unsetListener() {
+    this.listener = null;
   }
 
   @Override
@@ -74,11 +78,10 @@ public class MessagesReceiver extends NanoHTTPD {
   protected Response respondToAskForDeviceRegistrationRequest(IHTTPSession session) {
     AskForDeviceRegistrationRequest request = (AskForDeviceRegistrationRequest)parseRequestBody(session, AskForDeviceRegistrationRequest.class);
 
-    AllowDeviceToRegisterResult userAllowsRegistration = AllowDeviceToRegisterResult.createDenyRegistrationResult();
-    if(listener != null)
-      userAllowsRegistration = listener.registerDeviceRequestRetrieved(request);
+    AllowDeviceToRegisterResult userAllowsRegistration = listener.registerDeviceRequestRetrieved(request);
 
     if(userAllowsRegistration.allowsDeviceToRegister()) {
+      Application.getDeepThoughtsConnector().getRegisteredPeersManager().registerDevice(request, userAllowsRegistration.useServersUserInformation() == false);
       return createResponse(AskForDeviceRegistrationResponse.createAllowRegistrationResponse(userAllowsRegistration.useServersUserInformation(),
           Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()));
     }

@@ -53,7 +53,7 @@ public class RegistrationServerTest extends CommunicationTestBase {
       }
     });
 
-    try { waitForResponseLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForResponseLatch.await(100, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, serverInfos.size());
 

@@ -6,6 +6,10 @@
 
 package net.deepthought;
 
+import net.deepthought.communication.DeepThoughtsConnectorListener;
+import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.model.AllowDeviceToRegisterResult;
+import net.deepthought.communication.model.ConnectedPeer;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.FXUtils;
@@ -838,6 +842,25 @@ public class MainWindowController implements Initializable {
         chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
         chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
       }
+    }
+  };
+
+
+  protected DeepThoughtsConnectorListener connectorListener = new DeepThoughtsConnectorListener() {
+    @Override
+    public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      Alerts.askUserIf
+      return null;
+    }
+
+    @Override
+    public void registeredDeviceConnected(ConnectedPeer peer) {
+
+    }
+
+    @Override
+    public void registeredDeviceDisconnected(ConnectedPeer peer) {
+
     }
   };
 

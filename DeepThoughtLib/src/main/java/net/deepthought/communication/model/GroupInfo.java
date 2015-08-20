@@ -11,10 +11,17 @@ public class GroupInfo {
 
   protected String name = "";
 
+  protected String description = "";
+
 
   public GroupInfo(String universallyUniqueId, String name) {
     this.universallyUniqueId = universallyUniqueId;
     this.name = name;
+  }
+
+  public GroupInfo(String universallyUniqueId, String name, String description) {
+    this(universallyUniqueId, name);
+    this.description = description;
   }
 
 
@@ -34,9 +41,17 @@ public class GroupInfo {
     this.name = name;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
 
   public static GroupInfo fromGroup(Group group) {
-    return new GroupInfo(group.getUniversallyUniqueId(), group.getName());
+    return new GroupInfo(group.getUniversallyUniqueId(), group.getName(), group.getDescription());
   }
 
 }
