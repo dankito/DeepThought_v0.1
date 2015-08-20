@@ -265,7 +265,7 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
 //    else if(entity instanceof Device)
 //      callEntityOfCollectionUpdatedListeners(getDevices(), entity);
 //    else if(entity instanceof ApplicationLanguage)
-//      callEntityOfCollectionUpdatedListeners(getApplicationLanguages(), entity);
+//      callEntityOfCollectionUpdatedListeners(getApplicationLanguages(), entity);osVersion
 //    else
 //      log.warn("Updated entity of type " + entity.getClass() + " retrieved, but don't know what to do with this type");
 //  }

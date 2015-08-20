@@ -83,6 +83,10 @@ public class User extends BaseEntity implements Serializable {
   )
   protected Set<Device> devices = new HashSet<>();
 
+  @OneToOne(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST } )
+  @JoinColumn(name = TableConfig.UserUsersDefaultGroupJoinColumnName)
+  protected Group usersDefaultGroup = null;
+
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.UserGroupJoinTableName,
@@ -248,6 +252,19 @@ public class User extends BaseEntity implements Serializable {
   }
 
 
+  public Group getUsersDefaultGroup() {
+    return usersDefaultGroup;
+  }
+
+  protected void setUsersDefaultGroup(Group usersDefaultGroup) {
+    if(groups.contains(usersDefaultGroup) == false)
+      addGroup(usersDefaultGroup);
+
+    Object previousValue = this.usersDefaultGroup;
+    this.usersDefaultGroup = usersDefaultGroup;
+    callPropertyChangedListeners(TableConfig.UserUsersDefaultGroupJoinColumnName, previousValue, usersDefaultGroup);
+  }
+
   public Set<Group> getGroups() {
     return groups;
   }
@@ -321,7 +338,7 @@ public class User extends BaseEntity implements Serializable {
     }
 
     Group userGroup = Group.createUserDefaultGroup(user);
-    user.addGroup(userGroup);
+    user.setUsersDefaultGroup(userGroup);
 
     return user;
   }

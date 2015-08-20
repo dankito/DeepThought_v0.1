@@ -289,9 +289,10 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void textRecognized(TextRecognitionResult result) {
     try {
-      if (result.isUserCancelled()) {
+      if (result.isUserCancelled() || (result.isDone() && result.getRecognizedText() == null)) {
         // nothing to do, user knows that he/she cancelled capturing/recognition
-      } else if (result.recognitionSuccessful() == false) {
+      }
+      else if (result.recognitionSuccessful() == false) {
         AlertHelper.showErrorMessage(this, result.getErrorMessage());
       } else {
         edtxtEditEntryContent.getText().insert(edtxtEditEntryContent.getSelectionEnd(), Html.fromHtml(result.getRecognizedText()));

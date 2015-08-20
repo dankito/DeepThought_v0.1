@@ -76,6 +76,8 @@ public class TextRecognitionResult {
   public String toString() {
     if(isUserCancelled())
       return "User cancelled";
+    else if(isDone())
+      return "Done";
     else if(recognitionSuccessful() == false)
       return "Recognition failed: " + getErrorMessage();
     else

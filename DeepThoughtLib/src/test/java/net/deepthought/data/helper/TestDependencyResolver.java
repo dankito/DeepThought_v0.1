@@ -1,6 +1,7 @@
 package net.deepthought.data.helper;
 
 import net.deepthought.DefaultDependencyResolver;
+import net.deepthought.communication.DeepThoughtsConnectorListener;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.persistence.IEntityManager;
@@ -16,6 +17,14 @@ public class TestDependencyResolver extends DefaultDependencyResolver {
 
   public TestDependencyResolver(IEntityManager entityManager) {
     super(entityManager);
+  }
+
+  public TestDependencyResolver(DeepThoughtsConnectorListener connectorListener) {
+    super(connectorListener);
+  }
+
+  public TestDependencyResolver(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
+    super(entityManager, connectorListener);
   }
 
   public TestDependencyResolver(IEntityManager entityManager, IBackupManager backupManager) {

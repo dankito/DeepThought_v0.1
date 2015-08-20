@@ -1,5 +1,8 @@
 package net.deepthought;
 
+import net.deepthought.communication.DeepThoughtsConnector;
+import net.deepthought.communication.DeepThoughtsConnectorListener;
+import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.DefaultBackupManager;
@@ -28,7 +31,7 @@ import net.deepthought.plugin.IPluginManager;
  */
 public class DefaultDependencyResolver implements IDependencyResolver {
 
-  protected IEntityManager entityManager;
+  protected IEntityManager entityManager = null;
 
   protected IBackupManager backupManager = null;
 
@@ -42,13 +45,24 @@ public class DefaultDependencyResolver implements IDependencyResolver {
 
   protected IHtmlHelper htmlHelper = null;
 
+  protected DeepThoughtsConnectorListener connectorListener = null;
+
 
   public DefaultDependencyResolver() {
-    this(null);
+
   }
 
   public DefaultDependencyResolver(IEntityManager entityManager) {
     this.entityManager = entityManager;
+  }
+
+  public DefaultDependencyResolver(DeepThoughtsConnectorListener connectorListener) {
+    this.connectorListener = connectorListener;
+  }
+
+  public DefaultDependencyResolver(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
+    this(entityManager);
+    this.connectorListener = connectorListener;
   }
 
   public DefaultDependencyResolver(IEntityManager entityManager, IBackupManager backupManager) {
@@ -122,6 +136,11 @@ public class DefaultDependencyResolver implements IDependencyResolver {
   @Override
   public IContentExtractorManager createContentExtractorManager() {
     return new DefaultContentExtractorManager();
+  }
+
+  @Override
+  public IDeepThoughtsConnector createDeepThoughtsConnector() {
+    return new DeepThoughtsConnector(connectorListener);
   }
 
 }

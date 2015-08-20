@@ -52,6 +52,7 @@ public class TableConfig {
   public final static String UserIsLocalUserColumnName = "is_local_user";
   public final static String UserUserDeviceSettingsColumnName = "settings";
   public final static String UserLastViewedDeepThoughtColumnName = "last_viewed_deep_thought";
+  public final static String UserUsersDefaultGroupJoinColumnName = "default_group";
   public final static String UserDeepThoughtApplicationJoinColumnName = "application_id";
 
 

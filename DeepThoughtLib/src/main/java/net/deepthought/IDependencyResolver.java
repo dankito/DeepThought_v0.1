@@ -1,5 +1,6 @@
 package net.deepthought;
 
+import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -39,5 +40,7 @@ public interface IDependencyResolver {
   public IPluginManager createPluginManager();
 
   public IContentExtractorManager createContentExtractorManager();
+
+  public IDeepThoughtsConnector createDeepThoughtsConnector();
 
 }

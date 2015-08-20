@@ -3,6 +3,7 @@ package net.deepthought.data.model;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
+import net.deepthought.util.OsHelper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,9 @@ public class Device extends UserDataEntity {
   @Column(name = TableConfig.DeviceOsVersionColumnName)
   protected String osVersion = "";
 
+  @Column(name = TableConfig.DevicePlatformArchitectureColumnName)
+  protected String platformArchitecture = "";
+
   @Column(name = TableConfig.DeviceLastKnownIpColumnName)
   protected String lastKnownIpAddress = "";
 
@@ -72,6 +76,11 @@ public class Device extends UserDataEntity {
   public Device(String universallyUniqueId, String name, String platform, String osVersion) {
     this(universallyUniqueId, name, platform);
     this.osVersion = osVersion;
+  }
+
+  public Device(String universallyUniqueId, String name, String platform, String osVersion, String platformArchitecture) {
+    this(universallyUniqueId, name, platform, osVersion);
+    this.platformArchitecture = platformArchitecture;
   }
 
 
@@ -107,6 +116,18 @@ public class Device extends UserDataEntity {
 
   public String getPlatform() {
     return platform;
+  }
+
+  public void setPlatform(String platform) {
+    this.platform = platform;
+  }
+
+  public String getPlatformArchitecture() {
+    return platformArchitecture;
+  }
+
+  public void setPlatformArchitecture(String platformArchitecture) {
+    this.platformArchitecture = platformArchitecture;
   }
 
   public String getOsVersion() {
@@ -219,8 +240,11 @@ public class Device extends UserDataEntity {
   public static Device createUserDefaultDevice(User user) {
     String universallyUniqueId = UUID.randomUUID().toString();
     String platform = System.getProperty("os.name");
+    if(OsHelper.isRunningOnAndroid())
+      platform = "Android";
+
     Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
-        platform, System.getProperty("os.version"));
+        platform, System.getProperty("os.version"), System.getProperty("os.arch"));
 
 //    , System.getProperty("os.arch")
 //    userDefaultDevice.setUserRegion(System.getProperty("user.country"));

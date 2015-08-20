@@ -1,5 +1,6 @@
 package net.deepthought;
 
+import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
@@ -66,6 +67,8 @@ public class Application {
   protected static IPluginManager pluginManager = null;
 
   protected static IContentExtractorManager contentExtractorManager = null;
+
+  protected static IDeepThoughtsConnector deepThoughtsConnector = null;
 
   protected static FirefoxPluginCommunicator firefoxPluginCommunicator = null;
 
@@ -139,6 +142,9 @@ public class Application {
 
       Application.pluginManager = dependencyResolver.createPluginManager();
       pluginManager.loadPluginsAsync();
+
+      Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
+      deepThoughtsConnector.runAsync();
 
 //      firefoxPluginCommunicator = new FirefoxPluginCommunicator();
     } catch(Exception ex) {
@@ -241,6 +247,11 @@ public class Application {
 
     downloader = null;
 
+    if(deepThoughtsConnector != null) {
+      deepThoughtsConnector.shutDown();
+      deepThoughtsConnector = null;
+    }
+
     firefoxPluginCommunicator = null;
 
     listeners.clear();
@@ -334,6 +345,10 @@ public class Application {
 
   public static IContentExtractorManager getContentExtractorManager() {
     return contentExtractorManager;
+  }
+
+  public static IDeepThoughtsConnector getDeepThoughtsConnector() {
+    return deepThoughtsConnector;
   }
 
   public static DeepThoughtApplication getApplication() {

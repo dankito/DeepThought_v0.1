@@ -61,7 +61,7 @@ public class JsonIoJsonHelper {
       String json = DeepThoughtJsonWriter.objectToJson(object, arguments);
       return new SerializationResult(json);
     } catch (Exception e) {
-      log.error("Error generate json", e);
+      log.error("Error generating json", e);
       return new SerializationResult(e);
     }
   }
