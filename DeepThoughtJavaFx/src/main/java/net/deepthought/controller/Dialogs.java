@@ -316,6 +316,38 @@ public class Dialogs {
   }
 
 
+  public static void showRegisterUserDevicesDialog(Stage owner) {
+    try {
+      FXMLLoader loader = new FXMLLoader();
+      Stage dialogStage = createStage(loader, "RegisterUserDevicesDialog.fxml");
+
+      dialogStage.initOwner(owner);
+
+      RegisterUserDevicesDialogController controller = loader.getController();
+      controller.setWindowStage(dialogStage);
+
+      controller.setListener(new ChildWindowsControllerListener() {
+        @Override
+        public void windowClosing(Stage stage, ChildWindowsController controller) {
+
+        }
+
+        @Override
+        public void windowClosed(Stage stage, ChildWindowsController controller) {
+          removeClosedChildWindow(stage);
+        }
+      });
+
+      addOpenedChildWindow(dialogStage);
+
+      dialogStage.show();
+      dialogStage.requestFocus();
+    } catch(Exception ex) {
+      log.error("Could not load / show RegisterUserDevicesDialog", ex);
+    }
+  }
+
+
   public static void showRestoreBackupDialog(Stage owner) {
     try {
       FXMLLoader loader = new FXMLLoader();

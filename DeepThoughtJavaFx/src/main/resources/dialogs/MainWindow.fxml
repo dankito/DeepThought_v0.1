@@ -100,7 +100,7 @@
                               </MenuItem>
                         </items>
                       </Menu>
-                      <Menu mnemonicParsing="false" text="%edit" />
+                      <Menu mnemonicParsing="false" text="%edit" visible="false" />
                         <Menu mnemonicParsing="false" text="%view">
                           <items>
                               <Menu mnemonicParsing="false" text="%dialogs.fields.display">
@@ -116,6 +116,8 @@
                         </Menu>
                         <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
                            <items>
+                              <MenuItem mnemonicParsing="false" onAction="#handleMenuItemToolsDeviceRegistrationAction" text="%device.registration..." />
+                              <SeparatorMenuItem mnemonicParsing="false" />
                             <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -123,7 +125,7 @@
                               </MenuItem>
                            </items>
                         </Menu>
-                        <Menu fx:id="mnitmMainMenuWindow" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />
+                        <Menu fx:id="mnitmMainMenuWindow" disable="true" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />
                       <Menu mnemonicParsing="false" text="%help">
                         <items>
                           <MenuItem disable="true" mnemonicParsing="false" text="About" />

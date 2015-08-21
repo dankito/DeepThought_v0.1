@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -49,31 +54,51 @@ public class LookingForRegistrationServersClient {
       byte[] message = messagesCreator.createLookingForRegistrationServerMessage();
       DatagramPacket findRegistrationServersPacket = new DatagramPacket(message, message.length, NetworkHelper.getBroadcastAddress(), Constants.RegistrationServerPort);
 
+      Map<InetAddress, Map<String, List<String>>> receivedResponses = new HashMap<>();
+
       while(isSocketOpened) {
         socket.send(findRegistrationServersPacket);
 
-        waitForResponsePackets(listener);
+        waitForResponsePackets(listener, receivedResponses);
       }
     } catch(Exception ex) {
       log.error("An error occurred trying to find RegistrationServers", ex);
     }
   }
 
-  protected void waitForResponsePackets(RegistrationRequestListener listener) {
+  protected void waitForResponsePackets(RegistrationRequestListener listener, Map<InetAddress, Map<String, List<String>>> receivedResponses) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
     try {
       socket.receive(packet);
       HostInfo serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
+
+      while(hasResponseOfThisServerAlreadyBeenHandled(packet, serverInfo, receivedResponses)) { // request of this client already received and handled
+        socket.receive(packet);
+        serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
+      }
+
       if(Application.getDeepThoughtsConnector().getRegisteredPeersManager().isDeviceRegistered(serverInfo) == false) {
         boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(buffer, packet.getLength());
 
         if (isOpenRegistrationServer == true && listener != null) {
           listener.openRegistrationServerFound(serverInfo);
         }
+
+        InetAddress address = packet.getAddress();
+        if(receivedResponses.containsKey(address) == false)
+          receivedResponses.put(address, new HashMap<String, List<String>>());
+        if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
+          receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new ArrayList<String>());
+        receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
       }
     } catch(Exception ex) { } // a receive time out (may notify user about that
+  }
+
+  protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, List<String>>> receivedResponses) {
+    return receivedResponses.containsKey(packet.getAddress()) && receivedResponses.get(packet.getAddress()).containsKey((serverInfo.getDeviceUniqueId())) &&
+        receivedResponses.get(packet.getAddress()).get(serverInfo.getDeviceUniqueId()).contains(serverInfo.getUserUniqueId());
   }
 
   public void stopSearchingForRegistrationServers() {

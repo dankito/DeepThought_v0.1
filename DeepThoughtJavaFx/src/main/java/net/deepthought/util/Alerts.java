@@ -1,6 +1,10 @@
 package net.deepthought.util;
 
 import net.deepthought.Application;
+import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
+import net.deepthought.communication.model.DeviceInfo;
+import net.deepthought.communication.model.UserInfo;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
@@ -106,6 +110,50 @@ public class Alerts {
         .showConfirm();
 
     return Dialog.ACTION_YES.equals(response);
+  }
+
+
+  public static boolean showDeviceAsksForRegistrationAlert(AskForDeviceRegistrationRequest request, Stage windowStage) {
+    Action response = org.controlsfx.dialog.Dialogs.create()
+        .title(Localization.getLocalizedString("alert.title.ask.for.device.registration"))
+        .message(Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())))
+        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
+        .owner(windowStage)
+        .showConfirm();
+
+    return Dialog.ACTION_YES.equals(response);
+  }
+
+  public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+    org.controlsfx.dialog.Dialogs.create()
+        .title(Localization.getLocalizedString("alert.title.device.registration.successful"))
+        .message(Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())))
+        .actions(Dialog.ACTION_OK)
+        .owner(windowStage)
+        .showInformation();
+  }
+
+  public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+    org.controlsfx.dialog.Dialogs.create()
+        .title(Localization.getLocalizedString("alert.title.device.registration.denied"))
+        .message(Localization.getLocalizedString("alert.message.server.denied.device.registration"))
+        .actions(Dialog.ACTION_OK)
+        .owner(windowStage)
+        .showInformation();
+  }
+
+  protected static String extractUserInfoString(UserInfo user) {
+    String userInfo = user.getUserName();
+
+    if(StringUtils.isNotNullOrEmpty(user.getFirstName()) || StringUtils.isNotNullOrEmpty(user.getLastName()))
+      userInfo += " (" + user.getFirstName() + " " + user.getLastName() + ")";
+
+    return userInfo;
+  }
+
+  protected static String extractDeviceInfoString(DeviceInfo device) {
+    String deviceInfo = device.getPlatform() + " " + device.getOsVersion();
+    return deviceInfo;
   }
 
 

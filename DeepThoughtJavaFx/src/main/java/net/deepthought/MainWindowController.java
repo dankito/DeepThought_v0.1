@@ -7,8 +7,6 @@
 package net.deepthought;
 
 import net.deepthought.communication.DeepThoughtsConnectorListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.model.AllowDeviceToRegisterResult;
 import net.deepthought.communication.model.ConnectedPeer;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
@@ -193,7 +191,7 @@ public class MainWindowController implements Initializable {
       }
     });
 
-    Application.instantiateAsync(new DeepThoughtFxApplicationConfiguration(), new DefaultDependencyResolver() {
+    Application.instantiateAsync(new DeepThoughtFxApplicationConfiguration(), new DefaultDependencyResolver(connectorListener) {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return new OrmLiteJavaSeEntityManager(configuration);
@@ -230,6 +228,8 @@ public class MainWindowController implements Initializable {
           addMenuItemToWindowMenu(c.getElementAdded());
         if (c.wasRemoved())
           removeMenuItemFromWindowMenu(c.getElementRemoved());
+
+        mnitmMainMenuWindow.setDisable(net.deepthought.controller.Dialogs.getOpenedChildWindows().isEmpty());
       }
     });
   }
@@ -739,6 +739,11 @@ public class MainWindowController implements Initializable {
   }
 
   @FXML
+  public void handleMenuItemToolsDeviceRegistrationAction(Event event) {
+    net.deepthought.controller.Dialogs.showRegisterUserDevicesDialog(stage);
+  }
+
+  @FXML
   public void handleMenuItemToolsBackupsAction(Event event) {
     net.deepthought.controller.Dialogs.showRestoreBackupDialog(stage);
   }
@@ -847,11 +852,6 @@ public class MainWindowController implements Initializable {
 
 
   protected DeepThoughtsConnectorListener connectorListener = new DeepThoughtsConnectorListener() {
-    @Override
-    public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-      Alerts.askUserIf
-      return null;
-    }
 
     @Override
     public void registeredDeviceConnected(ConnectedPeer peer) {

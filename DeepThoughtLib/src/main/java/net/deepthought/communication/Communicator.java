@@ -37,6 +37,8 @@ public class Communicator {
     AskForDeviceRegistrationResponse response = (AskForDeviceRegistrationResponse)sendMessage(address, request, AskForDeviceRegistrationResponse.class);
     if(listener != null)
       listener.serverResponded(response);
+
+    // TODO: send confirmation to server that it knows that registration process successfully completed
   }
 
   protected Response sendMessage(String address, AskForDeviceRegistrationRequest request, Class<? extends Response> responseClass) {

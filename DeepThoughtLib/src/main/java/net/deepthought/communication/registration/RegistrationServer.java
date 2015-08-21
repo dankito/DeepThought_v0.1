@@ -13,10 +13,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -58,7 +54,6 @@ public class RegistrationServer {
 
       byte[] buffer = new byte[1024];
       DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-      Map<InetAddress, List<Integer>> receivedRequests = new HashMap<>();
 
       while(isSocketOpened) {
         try {
@@ -72,7 +67,7 @@ public class RegistrationServer {
           }
         }
 
-        requestReceived(listener, buffer, packet, receivedRequests);
+        requestReceived(listener, buffer, packet);
 
       }
     } catch(Exception ex) {
@@ -91,23 +86,16 @@ public class RegistrationServer {
   }
 
 
-  protected void requestReceived(RegistrationServerListener listener, byte[] buffer, DatagramPacket packet, Map<InetAddress, List<Integer>> receivedRequests) {
-    if(hasRequestOfThisClientAlreadyBeenHandled(packet, receivedRequests)) // request of this client already received and handled
-      return;
-
+  protected void requestReceived(RegistrationServerListener listener, byte[] buffer, DatagramPacket packet) {
     if (messagesCreator.isLookingForRegistrationServerMessage(buffer, packet.getLength())) {
       if(listener != null)
         listener.registrationRequestReceived(messagesCreator.getHostInfoFromMessage(buffer, packet.getLength()));
 
-      respondToRegistrationRequest(packet, receivedRequests);
+      respondToRegistrationRequest(packet);
     }
   }
 
-  protected boolean hasRequestOfThisClientAlreadyBeenHandled(DatagramPacket packet, Map<InetAddress, List<Integer>> receivedRequests) {
-    return receivedRequests.containsKey(packet.getAddress()) && receivedRequests.get(packet.getAddress()).contains((Integer) packet.getPort());
-  }
-
-  protected void respondToRegistrationRequest(DatagramPacket requestPacket, Map<InetAddress, List<Integer>> receivedRequests) {
+  protected void respondToRegistrationRequest(DatagramPacket requestPacket) {
     InetAddress address = requestPacket.getAddress();
 
     try {
@@ -115,10 +103,6 @@ public class RegistrationServer {
       byte[] message = messagesCreator.createOpenRegistrationServerInfoMessage();
 
       responseSocket.send(new DatagramPacket(message, message.length, address, requestPacket.getPort()));
-
-      if(receivedRequests.containsKey(address) == false)
-        receivedRequests.put(address, new ArrayList<Integer>());
-      receivedRequests.get(address).add(requestPacket.getPort());
     } catch(Exception ex) {
       log.error("Could not send response to Registration request from " + address, ex);
       Application.notifyUser(new DeepThoughtError(Localization.getLocalizedString("could.not.send.message.to.address", address), ex));
