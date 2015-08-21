@@ -7,7 +7,7 @@
 package net.deepthought;
 
 import net.deepthought.communication.DeepThoughtsConnectorListener;
-import net.deepthought.communication.model.ConnectedPeer;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.FXUtils;
@@ -27,6 +27,7 @@ import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
@@ -45,6 +46,7 @@ import net.deepthought.language.LanguageDetector;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.IconManager;
 import net.deepthought.util.InputManager;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -72,6 +74,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -89,6 +92,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -132,11 +136,13 @@ public class MainWindowController implements Initializable {
   protected MenuButton btnOnlineArticleExtractors;
 
   @FXML
-  protected Pane statusLabelPane;
+  protected Pane statusBar;
   @FXML
   protected Label statusLabel;
   @FXML
   protected Label statusLabelCountEntries;
+  @FXML
+  protected Pane pnConnectedDevices;
 
 
   @FXML
@@ -854,14 +860,42 @@ public class MainWindowController implements Initializable {
   protected DeepThoughtsConnectorListener connectorListener = new DeepThoughtsConnectorListener() {
 
     @Override
-    public void registeredDeviceConnected(ConnectedPeer peer) {
-
+    public void registeredDeviceConnected(ConnectedDevice device) {
+      Platform.runLater(() -> addConnectedDeviceIcon(device));
     }
 
     @Override
-    public void registeredDeviceDisconnected(ConnectedPeer peer) {
-
+    public void registeredDeviceDisconnected(ConnectedDevice device) {
+      Platform.runLater(() -> removeConnectedDeviceIcon(device));
     }
   };
+
+  protected void addConnectedDeviceIcon(ConnectedDevice connectedDevice) {
+    Device device = connectedDevice.getDevice();
+
+    ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
+    icon.setPreserveRatio(true);
+    icon.setFitHeight(24);
+    icon.maxHeight(24);
+    icon.setUserData(connectedDevice);
+
+    pnConnectedDevices.getChildren().add(icon);
+    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
+    icon.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+      @Override
+      public void handle(ContextMenuEvent event) {
+        // TODO:
+      }
+    });
+  }
+
+  protected void removeConnectedDeviceIcon(ConnectedDevice device) {
+    for(Node node : pnConnectedDevices.getChildren()) {
+      if(node instanceof ImageView && device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in registeredDeviceConnected event
+        pnConnectedDevices.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
+        break;
+      }
+    }
+  }
 
 }

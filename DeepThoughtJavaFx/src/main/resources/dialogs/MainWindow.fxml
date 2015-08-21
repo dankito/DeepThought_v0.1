@@ -17,12 +17,21 @@
    <center>
    </center>
    <bottom>
-      <HBox fx:id="statusLabelPane" alignment="CENTER_LEFT" prefHeight="24.0" prefWidth="433.0" BorderPane.alignment="CENTER_LEFT">
+      <GridPane fx:id="statusBar" alignment="CENTER_LEFT" maxHeight="24.0" minHeight="24.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+         </rowConstraints>
          <children>
-            <Label fx:id="statusLabel" text="Ready" HBox.hgrow="ALWAYS" />
-            <Label fx:id="statusLabelCountEntries" prefWidth="100.0" textAlignment="RIGHT" />
+            <Label fx:id="statusLabelCountEntries" prefWidth="100.0" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.valignment="CENTER" />
+            <Label fx:id="statusLabel" text="Ready" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" />
+            <HBox fx:id="pnConnectedDevices" alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES" />
          </children>
-      </HBox>
+      </GridPane>
    </bottom>
    <center>
       <SplitPane fx:id="contentPane" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">

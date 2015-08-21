@@ -20,7 +20,23 @@ public class Constants {
 
   public final static String UpdateIconPath = "icons/update_icon_32x32.png";
 
-  public final static String WindowIconPath = "icons/windows_icon_16x16.png";
+  public final static String WindowIconPath = "icons/window_icon_16x16.png";
+
+
+  public final static String AndroidIconPath = "icons/os/android_icon.png";
+  public final static String AndroidLogoPath = "icons/os/android_logo.png";
+
+  public final static String LinuxIconPath = "icons/os/linux_icon.png";
+  public final static String LinuxLogoPath = "icons/os/linux_logo.png";
+
+  public final static String WindowsIconPath = "icons/os/windows_icon.png";
+  public final static String WindowsLogoPath = "icons/os/windows_logo.png";
+
+  public final static String AppleIconPath = "icons/os/apple_icon.png";
+  public final static String AppleLogoPath = "icons/os/apple_logo.png";
+
+  public final static String SolarisIconPath = "icons/os/sun-solaris_icon.png";
+  public final static String SolarisLogoPath = "icons/os/sun-solaris_logo.png";
 
 
   public final static Background FilteredTagsExactMatchBackground = new Background(new BackgroundFill(Color.GREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));

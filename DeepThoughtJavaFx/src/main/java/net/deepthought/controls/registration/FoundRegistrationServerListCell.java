@@ -3,14 +3,17 @@ package net.deepthought.controls.registration;
 import net.deepthought.Application;
 import net.deepthought.communication.AskForDeviceRegistrationListener;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -27,7 +30,7 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
 
   protected GridPane graphicsPane = new GridPane();
 
-  protected ImageView imgvwIcon = new ImageView();
+  protected ImageView imgvwOsLogo = new ImageView();
 
   protected Label lblUserInfo = new Label();
   protected Label lblDeviceInfo = new Label();
@@ -47,16 +50,24 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
     setAlignment(Pos.CENTER_LEFT);
 
     graphicsPane.getColumnConstraints().add(new ColumnConstraints(60, 60, 60, Priority.NEVER, HPos.CENTER, false));
-    graphicsPane.getColumnConstraints().add(new ColumnConstraints(-1, -1, -1, Priority.ALWAYS, HPos.CENTER, true));
-    graphicsPane.getColumnConstraints().add(new ColumnConstraints(180, 180, 180, Priority.SOMETIMES, HPos.CENTER, false));
+    graphicsPane.getColumnConstraints().add(new ColumnConstraints(-1, -1, -1, Priority.ALWAYS, HPos.LEFT, true));
+    graphicsPane.getColumnConstraints().add(new ColumnConstraints(180, 180, 180, Priority.SOMETIMES, HPos.RIGHT, false));
 
     graphicsPane.getRowConstraints().add(new RowConstraints(30, 30, 30));
     graphicsPane.getRowConstraints().add(new RowConstraints(30, 30, 30));
 
-    graphicsPane.add(imgvwIcon, 0, 0, 1, 2);
+    graphicsPane.add(imgvwOsLogo, 0, 0, 1, 2);
     graphicsPane.add(lblUserInfo, 1, 0);
     graphicsPane.add(lblDeviceInfo, 1, 1);
     graphicsPane.add(btnAskForRegistration, 2, 0, 1, 2);
+
+    imgvwOsLogo.maxWidth(56);
+    imgvwOsLogo.maxHeight(56);
+    imgvwOsLogo.setPreserveRatio(true);
+    imgvwOsLogo.setFitWidth(56);
+    imgvwOsLogo.setFitHeight(56);
+    GridPane.setHalignment(imgvwOsLogo, HPos.CENTER);
+    GridPane.setValignment(imgvwOsLogo, VPos.CENTER);
 
     lblUserInfo.setMinHeight(26);
     lblUserInfo.setMaxHeight(26);
@@ -90,6 +101,12 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
       setGraphic(null);
     else {
       setGraphic(graphicsPane);
+
+      String logoPath = IconManager.getInstance().getLogoForOperatingSystem(item.getPlatform(), item.getOsVersion(), item.getPlatformArchitecture());
+      if(logoPath != null)
+        imgvwOsLogo.setImage(new Image(logoPath));
+      else
+        imgvwOsLogo.setVisible(false);
 
       lblUserInfo.setText(item.getUserName());
       lblDeviceInfo.setText(item.getPlatform() + " " + item.getOsVersion() + " (" + item.getIpAddress() + ")");

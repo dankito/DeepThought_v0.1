@@ -1,9 +1,11 @@
 package net.deepthought.communication.model;
 
+import net.deepthought.data.model.Device;
+
 /**
  * Created by ganymed on 20/08/15.
  */
-public class ConnectedPeer {
+public class ConnectedDevice {
 
   protected String uniqueDeviceId;
 
@@ -17,14 +19,16 @@ public class ConnectedPeer {
 
   protected boolean canDoOcr = false;
 
+  protected Device device = null;
 
-  public ConnectedPeer(String uniqueDeviceId, String address, int messagesPort) {
+
+  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort) {
     this.uniqueDeviceId = uniqueDeviceId;
     this.address = address;
     this.messagesPort = messagesPort;
   }
 
-  public ConnectedPeer(String uniqueDeviceId, String address, int messagesPort, boolean hasCaptureDevice, boolean canDoOcr) {
+  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort, boolean hasCaptureDevice, boolean canDoOcr) {
     this(uniqueDeviceId, address, messagesPort);
     this.hasCaptureDevice = hasCaptureDevice;
     this.canDoOcr = canDoOcr;
@@ -57,6 +61,14 @@ public class ConnectedPeer {
 
   public void setCanDoOcr(boolean canDoOcr) {
     this.canDoOcr = canDoOcr;
+  }
+
+  public Device getDevice() {
+    return device;
+  }
+
+  public void setDevice(Device device) {
+    this.device = device;
   }
 
 

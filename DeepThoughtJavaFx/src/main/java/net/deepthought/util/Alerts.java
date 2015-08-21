@@ -114,6 +114,10 @@ public class Alerts {
 
 
   public static boolean showDeviceAsksForRegistrationAlert(AskForDeviceRegistrationRequest request, Stage windowStage) {
+    windowStage.show();
+    windowStage.requestFocus();
+    windowStage.toFront();
+
     Action response = org.controlsfx.dialog.Dialogs.create()
         .title(Localization.getLocalizedString("alert.title.ask.for.device.registration"))
         .message(Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())))
@@ -125,6 +129,10 @@ public class Alerts {
   }
 
   public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+    windowStage.show();
+    windowStage.requestFocus();
+    windowStage.toFront();
+
     org.controlsfx.dialog.Dialogs.create()
         .title(Localization.getLocalizedString("alert.title.device.registration.successful"))
         .message(Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())))
@@ -134,6 +142,10 @@ public class Alerts {
   }
 
   public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+    windowStage.show();
+    windowStage.requestFocus();
+    windowStage.toFront();
+
     org.controlsfx.dialog.Dialogs.create()
         .title(Localization.getLocalizedString("alert.title.device.registration.denied"))
         .message(Localization.getLocalizedString("alert.message.server.denied.device.registration"))
