@@ -8,11 +8,12 @@ import net.deepthought.data.helper.NoOperationBackupManager;
 import net.deepthought.data.helper.TestDataManager;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.platform.IPlatformConfiguration;
 
 /**
  * Created by ganymed on 22/08/15.
  */
-public class TestApplicationConfiguration extends DefaultDependencyResolver implements IApplicationConfiguration {
+public class TestApplicationConfiguration extends DependencyResolverBase implements IApplicationConfiguration {
 
 
   protected EntityManagerConfiguration entityManagerConfiguration;
@@ -68,6 +69,31 @@ public class TestApplicationConfiguration extends DefaultDependencyResolver impl
     if(backupManager != null)
       return backupManager;
     return new NoOperationBackupManager();
+  }
+
+  @Override
+  public IPlatformConfiguration getPlatformConfiguration() {
+    return new IPlatformConfiguration() {
+      @Override
+      public String getUserName() {
+        return "test_user";
+      }
+
+      @Override
+      public String getPlatformName() {
+        return "TestPlatform";
+      }
+
+      @Override
+      public String getOsVersion() {
+        return "-1 preAlpha";
+      }
+
+      @Override
+      public boolean hasCaptureDevice() {
+        return false;
+      }
+    };
   }
 
 }

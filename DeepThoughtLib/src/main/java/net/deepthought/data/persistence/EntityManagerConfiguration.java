@@ -190,12 +190,10 @@ public class EntityManagerConfiguration {
     this.dataCollectionPersistencePath = dataCollectionPersistencePath;
   }
 
-  @Override
   public int getDataBaseCurrentDataModelVersion() {
     return dataBaseCurrentDataModelVersion;
   }
 
-  @Override
   public void setDataBaseCurrentDataModelVersion(int dataBaseCurrentDataModelVersion) {
     this.dataBaseCurrentDataModelVersion = dataBaseCurrentDataModelVersion;
   }

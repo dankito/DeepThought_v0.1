@@ -132,9 +132,8 @@ public class ConnectorMessagesCreator {
   }
 
   protected String createConnectedDeviceMessageString() {
-    // TODO: how to determine if host can capture images? i need a device independent solution
     ConnectedDevice device = new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getIPAddressString(true),
-        Application.getDeepThoughtsConnector().getMessageReceiverPort(), false, Application.getContentExtractorManager().hasOcrContentExtractors());
+        Application.getDeepThoughtsConnector().getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());
 
     return createConnectedDeviceMessageString(device);
   }

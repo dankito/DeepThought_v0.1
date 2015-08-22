@@ -12,6 +12,7 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
+import net.deepthought.platform.IPlatformConfiguration;
 import net.deepthought.plugin.IPluginManager;
 
 /**
@@ -42,5 +43,7 @@ public interface IDependencyResolver {
   public IContentExtractorManager createContentExtractorManager();
 
   public IDeepThoughtsConnector createDeepThoughtsConnector();
+
+  public IPlatformConfiguration getPlatformConfiguration();
 
 }

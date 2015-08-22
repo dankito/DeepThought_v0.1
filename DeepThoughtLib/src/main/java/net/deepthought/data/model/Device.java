@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
@@ -239,12 +240,12 @@ public class Device extends UserDataEntity {
 
   public static Device createUserDefaultDevice(User user) {
     String universallyUniqueId = UUID.randomUUID().toString();
-    String platform = System.getProperty("os.name");
+    String platform = Application.getPlatformConfiguration().getPlatformName();
     if(OsHelper.isRunningOnAndroid())
       platform = "Android";
 
     Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
-        platform, System.getProperty("os.version"), System.getProperty("os.arch"));
+        platform, Application.getPlatformConfiguration().getOsVersion(), System.getProperty("os.arch"));
 
 //    , System.getProperty("os.arch")
 //    userDefaultDevice.setUserRegion(System.getProperty("user.country"));

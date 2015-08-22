@@ -1,6 +1,6 @@
 package net.deepthought.platform;
 
-import net.deepthought.DefaultDependencyResolver;
+import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
 import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.data.DeepThoughtFxProperties;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by ganymed on 22/08/15.
  */
-public class JavaSeApplicationConfiguration extends DefaultDependencyResolver implements IApplicationConfiguration {
+public class JavaSeApplicationConfiguration extends DependencyResolverBase implements IApplicationConfiguration {
 
   private final static Logger log = LoggerFactory.getLogger(JavaSeApplicationConfiguration.class);
 
@@ -35,6 +35,10 @@ public class JavaSeApplicationConfiguration extends DefaultDependencyResolver im
     this.entityManagerConfiguration = new EntityManagerConfiguration(getDataFolder());
   }
 
+  @Override
+  public IPlatformConfiguration getPlatformConfiguration() {
+    return new JavaSePlatformConfiguration();
+  }
 
   @Override
   public EntityManagerConfiguration getEntityManagerConfiguration() {

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 
-import net.deepthought.DefaultDependencyResolver;
+import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
 import net.deepthought.android.db.OrmLiteAndroidEntityManager;
 import net.deepthought.data.AndroidDataManager;
@@ -24,7 +24,7 @@ import java.io.File;
 /**
  * Created by ganymed on 22/08/15.
  */
-public class AndroidApplicationConfiguration extends DefaultDependencyResolver implements IApplicationConfiguration {
+public class AndroidApplicationConfiguration extends DependencyResolverBase implements IApplicationConfiguration {
 
   private final static Logger log = LoggerFactory.getLogger(AndroidApplicationConfiguration.class);
 
@@ -79,6 +79,11 @@ public class AndroidApplicationConfiguration extends DefaultDependencyResolver i
   @Override
   public IPluginManager createPluginManager() {
     return new AndroidPluginManager(context);
+  }
+
+  @Override
+  public IPlatformConfiguration getPlatformConfiguration() {
+    return new AndroidPlatformConfiguration(context);
   }
 
 

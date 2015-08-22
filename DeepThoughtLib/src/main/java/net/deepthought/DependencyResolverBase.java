@@ -29,7 +29,7 @@ import net.deepthought.plugin.IPluginManager;
 /**
  * Created by ganymed on 05/01/15.
  */
-public class DefaultDependencyResolver implements IDependencyResolver {
+public abstract class DependencyResolverBase implements IDependencyResolver {
 
   protected IEntityManager entityManager = null;
 
@@ -48,25 +48,25 @@ public class DefaultDependencyResolver implements IDependencyResolver {
   protected DeepThoughtsConnectorListener connectorListener = null;
 
 
-  public DefaultDependencyResolver() {
+  public DependencyResolverBase() {
 
   }
 
-  public DefaultDependencyResolver(IEntityManager entityManager) {
+  public DependencyResolverBase(IEntityManager entityManager) {
     this();
     this.entityManager = entityManager;
   }
 
-  public DefaultDependencyResolver(DeepThoughtsConnectorListener connectorListener) {
+  public DependencyResolverBase(DeepThoughtsConnectorListener connectorListener) {
     this.connectorListener = connectorListener;
   }
 
-  public DefaultDependencyResolver(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
+  public DependencyResolverBase(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
     this(entityManager);
     this.connectorListener = connectorListener;
   }
 
-  public DefaultDependencyResolver(IEntityManager entityManager, IBackupManager backupManager) {
+  public DependencyResolverBase(IEntityManager entityManager, IBackupManager backupManager) {
     this.entityManager = entityManager;
     this.backupManager = backupManager;
   }

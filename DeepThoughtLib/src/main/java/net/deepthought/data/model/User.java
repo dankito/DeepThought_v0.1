@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.SettingsBase;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -335,7 +336,7 @@ public class User extends BaseEntity implements Serializable {
     String universallyUniqueId = UUID.randomUUID().toString();
 
     try {
-      user = new User(universallyUniqueId, System.getProperty("user.name"), true);
+      user = new User(universallyUniqueId, Application.getPlatformConfiguration().getUserName(), true);
     } catch(Exception ex) {
       log.error("Could not get System property user.name", ex);
       user = new User(universallyUniqueId, Localization.getLocalizedString("default.user.name"), true);

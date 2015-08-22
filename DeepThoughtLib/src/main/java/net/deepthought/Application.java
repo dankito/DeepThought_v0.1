@@ -18,6 +18,7 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
+import net.deepthought.platform.IPlatformConfiguration;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -47,6 +48,8 @@ public class Application {
   protected static String dataFolderPath = CouldNotGetDataFolderPath;
 
   protected static IDependencyResolver dependencyResolver = null;
+  protected static IPlatformConfiguration platformConfiguration;
+
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
   protected static IEntityManager entityManager = null;
 
@@ -91,6 +94,8 @@ public class Application {
     log.info("Starting to resolve dependencies ...");
 
     Application.dependencyResolver = applicationConfiguration;
+    Application.platformConfiguration = dependencyResolver.getPlatformConfiguration();
+
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
     Application.contentExtractorManager = dependencyResolver.createContentExtractorManager();
@@ -100,9 +105,7 @@ public class Application {
 
     Application.languageDetector = dependencyResolver.createLanguageDetector();
 
-    try {
-      Application.searchEngine = dependencyResolver.createSearchEngine();
-    } catch(Exception ex) { log.error("Could not create SearchEngine", ex); }
+    Application.searchEngine = dependencyResolver.createSearchEngine();
 
     if(openDatabase(dependencyResolver) == false)
       return;
@@ -280,6 +283,10 @@ public class Application {
 
   public static IDependencyResolver getDependencyResolver() {
     return dependencyResolver;
+  }
+
+  public static IPlatformConfiguration getPlatformConfiguration() {
+    return platformConfiguration;
   }
 
   public static EntityManagerConfiguration getEntityManagerConfiguration() {

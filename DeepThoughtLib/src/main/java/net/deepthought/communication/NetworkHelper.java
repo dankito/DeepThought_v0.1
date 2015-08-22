@@ -62,6 +62,8 @@ public class NetworkHelper {
    * @return  address or empty string
    */
   public static InetAddress getIPAddress(boolean useIPv4) {
+    // TODO: what about if device is connected to more than one network, which address to choose then? Is important for example for LookingForRegistrationServersClient as this
+    // determines to which network it sends packets to (all other networks will be invisible for it)
     try {
       List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
       for (NetworkInterface anInterface : interfaces) {
