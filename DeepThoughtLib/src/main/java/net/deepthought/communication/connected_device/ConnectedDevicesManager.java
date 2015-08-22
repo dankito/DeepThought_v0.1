@@ -17,7 +17,14 @@ public class ConnectedDevicesManager {
 
   public boolean connectedToDevice(ConnectedDevice device) {
     if(connectedDevices.add(device)) {
-      // TODO: call listener
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean disconnectedFromDevice(ConnectedDevice device) {
+    if(connectedDevices.remove(device)) {
       return true;
     }
 
@@ -33,4 +40,14 @@ public class ConnectedDevicesManager {
 
     return false;
   }
+
+
+  public int getConnectedDevicesCount() {
+    return connectedDevices.size();
+  }
+
+  public List<ConnectedDevice> getConnectedDevices() {
+    return connectedDevices;
+  }
+
 }

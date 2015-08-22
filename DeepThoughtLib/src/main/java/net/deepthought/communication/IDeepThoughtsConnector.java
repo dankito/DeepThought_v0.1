@@ -24,6 +24,8 @@ public interface IDeepThoughtsConnector {
 
   Communicator getCommunicator();
 
+  boolean isRegisteredDevicesSearcherRunning();
+
   RegisteredDevicesManager getRegisteredDevicesManager();
 
   ConnectedDevicesManager getConnectedDevicesManager();

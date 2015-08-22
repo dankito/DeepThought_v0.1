@@ -10,6 +10,8 @@ import net.deepthought.communication.model.HostInfo;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -107,5 +109,21 @@ public class CommunicatorTest extends CommunicationTestBase {
     hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
 
     return hostInfo;
+  }
+
+
+  protected void sendMessagesToCommunicator(int port, String... messages) throws IOException, InterruptedException {
+    Runtime rt = Runtime.getRuntime();
+    Process pr = rt.exec("telnet localhost " + port);
+    Thread.sleep(50); // wait till connection has been established
+
+    PrintStream streamWriter = new PrintStream(pr.getOutputStream());
+    for(String message : messages) {
+      streamWriter.print(message);
+      streamWriter.flush();
+    }
+
+    streamWriter.close();
+    pr.destroy();
   }
 }

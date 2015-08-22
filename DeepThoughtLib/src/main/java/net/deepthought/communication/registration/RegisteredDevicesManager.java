@@ -17,9 +17,14 @@ import net.deepthought.data.model.User;
 public class RegisteredDevicesManager {
 
 
-  public boolean hasRegisteredDevices() { // TODO: Only search periodically for registered devices if this method returns true and not all registered devices have been found yet
-    return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices().size() > 1; // TODO: will there ever be other Devices than User's Devices in his/her own group?
+  public boolean hasRegisteredDevices() {
+    return getRegisteredDevicesCount() > 0;
   }
+
+  public int getRegisteredDevicesCount() {
+    return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices().size() - 1; // TODO: will there ever be other Devices than User's Devices in his/her own group?
+  }
+
 
   public boolean isDeviceRegistered(HostInfo info) {
     User loggedOnUser = Application.getLoggedOnUser();
