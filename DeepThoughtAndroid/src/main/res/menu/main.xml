@@ -1,6 +1,13 @@
 <menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity">
+
+    <item android:id="@+id/action_device_registration"
+          android:title="@string/device_registration"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
 
     <!--<item android:id="@+id/action_settings"-->
         <!--android:title="@string/action_settings"-->
