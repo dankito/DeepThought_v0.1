@@ -52,7 +52,11 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     HostInfo serverInfo = (HostInfo)getItem(i);
 
     // TODO: set OS logo
-    ImageView imgvwOsLogo = (ImageView)convertView.findViewById(R.id.imgvwOsLogo);
+    int osLogoId = getOsLogoId(serverInfo);
+    if(osLogoId > 0) {
+      ImageView imgvwOsLogo = (ImageView) convertView.findViewById(R.id.imgvwOsLogo);
+      imgvwOsLogo.setImageResource(osLogoId);
+    }
 
     TextView txtvwUserInfo = (TextView)convertView.findViewById(R.id.txtvwUserInfo);
     txtvwUserInfo.setText(serverInfo.getUserName());
@@ -67,6 +71,23 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     btnAskForRegistration.setOnClickListener(btnAskForRegistrationOnClickListener);
 
     return convertView;
+  }
+
+  protected int getOsLogoId(HostInfo serverInfo) {
+    String platform = serverInfo.getPlatform().toLowerCase();
+
+    if(platform.contains("android"))
+      return R.drawable.android_logo;
+    else if(platform.contains("linux"))
+      return R.drawable.linux_logo;
+    else if(platform.contains("windows"))
+      return R.drawable.windows_logo;
+    else if(platform.contains("mac"))
+      return R.drawable.apple_logo;
+    else if(platform.contains("solaris"))
+      return R.drawable.sun_solaris_logo;
+
+    return 0; // TODO: create a placeholder logo
   }
 
 

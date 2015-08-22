@@ -22,7 +22,7 @@ import net.deepthought.communication.registration.UserDeviceRegistrationRequestL
 
 public class RegisterUserDevicesDialog extends DialogFragment {
 
-  public final static String Tag = RegisterUserDevicesDialog.class.getSimpleName();
+  public final static String TAG = RegisterUserDevicesDialog.class.getSimpleName();
 
 
   protected boolean isStarted = false;
@@ -68,7 +68,8 @@ public class RegisterUserDevicesDialog extends DialogFragment {
     btnClose.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        getFragmentManager().popBackStack();
+        stop();
+        dismiss();
       }
     });
   }

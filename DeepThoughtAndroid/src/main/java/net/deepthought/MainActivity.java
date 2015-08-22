@@ -1,13 +1,15 @@
 package net.deepthought;
 
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -15,9 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
+import net.deepthought.adapter.NavigationDrawerAdapter;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -41,6 +46,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
 
   protected ProgressDialog loadingDataProgressDialog = null;
+
+  protected Toolbar toolbar;
+
+  protected ActionBarDrawerToggle mDrawerToggle;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -69,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
 
       setupUi();
-
-    new RegisterUserDevicesDialog().show(getFragmentManager(), RegisterUserDevicesDialog.Tag);
     }
 
   protected void setupDeepThought() {
@@ -106,11 +113,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       setContentView(R.layout.activity_main);
 
       // Set up the action bar.
-      final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+      toolbar = (Toolbar) findViewById(R.id.toolbar);
       setSupportActionBar(toolbar);
-
-//        final ActionBar actionBar = getSupportActionBar();
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
       // Create the adapter that will return a fragment for each of the three
       // primary sections of the activity.
@@ -144,12 +148,74 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //                  tabLayout.newTab()
 //                          .setText(mSectionsPagerAdapter.getPageTitle(i)));
 //      }
+
+      initNavigationDrawer();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
     }
   }
 
-  private void setControlsEnabledState(boolean enable) {
+  private void initNavigationDrawer() {
+    final ListView drawer = (ListView) findViewById(R.id.left_drawer);
+    DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+    mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,  R.string.drawer_open, R.string.drawer_close) {
+
+      /** Called when a drawer has settled in a completely closed state. */
+      public void onDrawerClosed(View view) {
+      }
+
+      /** Called when a drawer has settled in a completely open state. */
+      public void onDrawerOpened(View drawerView) {
+      }
+    };
+
+    // Set the drawer toggle as the DrawerListener
+    drawerLayout.setDrawerListener(mDrawerToggle);
+    // Set the adapter for the list view
+    drawer.setAdapter(new NavigationDrawerAdapter(this));
+    drawer.setOnItemClickListener(drawerItemSelectedListener);
+
+    // Enable ActionBar app icon to behave as action to toggle nav drawer
+    getSupportActionBar().setHomeButtonEnabled(true);
+    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_drawer);
+    mDrawerToggle.setDrawerIndicatorEnabled(true);
+  }
+
+  protected AdapterView.OnItemClickListener drawerItemSelectedListener = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      switch(position){
+        case 0:
+          FragmentManager fragmentManager = getFragmentManager();
+          new RegisterUserDevicesDialog().show(fragmentManager, RegisterUserDevicesDialog.TAG);
+          break;
+//        case 1:
+//          Intent i = new Intent(DocumentGridActivity.this, OCRLanguageActivity.class);
+//          startActivity(i);
+//          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//          break;
+//        case 2:
+//          startActivity(new Intent(DocumentGridActivity.this,HelpActivity.class));
+//          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//          break;
+//        case 3:
+//          startActivity(new Intent(DocumentGridActivity.this,ContributeActivity.class));
+//          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//          break;
+//        case 4:
+//          startActivity(new Intent(DocumentGridActivity.this,AboutActivity.class));
+//          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//          break;
+//        case 5:
+//          //TODO start product tour
+//          break;
+      }
+
+    }
+  };
+
+  protected void setControlsEnabledState(boolean enable) {
     if(loadingDataProgressDialog != null) {
       if(enable)
         loadingDataProgressDialog.hide();
@@ -238,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public SectionsPagerAdapter(android.support.v4.app.FragmentManager fm) {
             super(fm);
         }
 
