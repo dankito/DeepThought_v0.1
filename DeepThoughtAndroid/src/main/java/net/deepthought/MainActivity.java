@@ -21,6 +21,7 @@ import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
 import net.deepthought.util.Notification;
@@ -68,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
 
       setupUi();
+
+    new RegisterUserDevicesDialog().show(getFragmentManager(), RegisterUserDevicesDialog.Tag);
     }
 
   protected void setupDeepThought() {

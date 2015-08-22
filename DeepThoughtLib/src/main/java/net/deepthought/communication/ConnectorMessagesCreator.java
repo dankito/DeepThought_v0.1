@@ -119,7 +119,7 @@ public class ConnectorMessagesCreator {
 
   protected String createHostInfoMessageString(User loggedOnUser, Device localDevice) {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setIpAddress(NetworkHelper.getHostIpAddressString());
+    hostInfo.setIpAddress(NetworkHelper.getIPAddressString(true));
     hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
 
     SerializationResult result = JsonIoJsonHelper.generateJsonString(hostInfo);
@@ -133,7 +133,7 @@ public class ConnectorMessagesCreator {
 
   protected String createConnectedDeviceMessageString() {
     // TODO: how to determine if host can capture images? i need a device independent solution
-    ConnectedDevice device = new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getHostIpAddressString(),
+    ConnectedDevice device = new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getIPAddressString(true),
         Application.getDeepThoughtsConnector().getMessageReceiverPort(), false, Application.getContentExtractorManager().hasOcrContentExtractors());
 
     return createConnectedDeviceMessageString(device);

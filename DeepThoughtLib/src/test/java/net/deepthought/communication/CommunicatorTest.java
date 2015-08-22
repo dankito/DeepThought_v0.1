@@ -105,7 +105,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   protected HostInfo createLocalHostServerInfo() {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-    hostInfo.setIpAddress(NetworkHelper.getHostIpAddressString());
+    hostInfo.setIpAddress(NetworkHelper.getIPAddressString(true));
     hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
 
     return hostInfo;

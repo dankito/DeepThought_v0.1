@@ -48,5 +48,14 @@
     <string name="search_ends_with_text">Ends with</string>
     <string name="search_equals_text">Equals</string>
 
+    <string name="close">Close</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
+    <string name="device_registration">Device Registration</string>
+    <string name="option_device_registration_open_server">Open Registration Server</string>
+    <string name="option_device_search_registration_servers">Search for Registration Servers</string>
+    <string name="option_device_show_registered_devices">Show Registered Devices</string>
+    <string name="ask_for_registration">Register</string>
 
 </resources>

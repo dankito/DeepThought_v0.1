@@ -196,12 +196,14 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
   protected AskForDeviceRegistrationListener askForDeviceRegistrationListener = new AskForDeviceRegistrationListener() {
     @Override
-    public void serverResponded(AskForDeviceRegistrationResponse response) {
+    public void serverResponded(final AskForDeviceRegistrationResponse response) {
       Platform.runLater(() -> {
-        if(response.allowsRegistration())
-          Alerts.showDeviceRegistrationSuccessfulAlert(response, windowStage);
-        else
-          Alerts.showServerDeniedDeviceRegistrationAlert(response, windowStage);
+        if(response != null) {
+          if (response.allowsRegistration())
+            Alerts.showDeviceRegistrationSuccessfulAlert(response, windowStage);
+          else
+            Alerts.showServerDeniedDeviceRegistrationAlert(response, windowStage);
+        }
       });
     }
   };

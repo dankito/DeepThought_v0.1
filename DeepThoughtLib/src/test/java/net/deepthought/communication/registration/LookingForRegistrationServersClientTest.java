@@ -83,7 +83,7 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
 
     HostInfo serverInfo = serverInfos.get(0);
     Assert.assertNotNull(serverInfo);
-    Assert.assertEquals(NetworkHelper.getHostIpAddressString(), serverInfo.getIpAddress());
+    Assert.assertEquals(NetworkHelper.getIPAddressString(true), serverInfo.getIpAddress());
 
     registrationServer.closeRegistrationServer();
     client.stopSearchingForRegistrationServers();

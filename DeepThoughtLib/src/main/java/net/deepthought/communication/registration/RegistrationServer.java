@@ -59,7 +59,7 @@ public class RegistrationServer {
         try {
           serverSocket.receive(packet);
         } catch(Exception ex) {
-          if(NetworkHelper.isSocketCloseException(ex) == true) // communication has been cancelled by close() method
+          if(isSocketCloseException(ex) == true) // communication has been cancelled by close() method
             break;
           else {
             log.error("An Error occurred receiving Packets. serverSocket = " + serverSocket, ex);
@@ -73,6 +73,10 @@ public class RegistrationServer {
     } catch(Exception ex) {
       log.error("An error occurred starting RegistrationServer", ex);
     }
+  }
+
+  protected boolean isSocketCloseException(Exception ex) {
+    return NetworkHelper.isSocketCloseException(ex);
   }
 
   public void closeRegistrationServer() {

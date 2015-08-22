@@ -97,8 +97,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.11" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="langdetect-1.3.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="tika-core-1.8" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="module" module-name="json-io" exported="" />
     <orderEntry type="module" module-name="ormlite-jpa-android" exported="" />
     <orderEntry type="module" module-name="ormlite-jpa-core" exported="" />
