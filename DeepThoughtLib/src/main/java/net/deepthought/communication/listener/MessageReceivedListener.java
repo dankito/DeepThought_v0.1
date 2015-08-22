@@ -1,4 +1,4 @@
-package net.deepthought.communication;
+package net.deepthought.communication.listener;
 
 /**
  * Created by ganymed on 19/08/15.

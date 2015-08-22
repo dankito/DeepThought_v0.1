@@ -1,7 +1,7 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
-import net.deepthought.communication.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.AllowDeviceToRegisterResult;

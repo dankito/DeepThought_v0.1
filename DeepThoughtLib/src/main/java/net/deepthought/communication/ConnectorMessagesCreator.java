@@ -1,6 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
@@ -18,6 +19,9 @@ public class ConnectorMessagesCreator {
 
   public final static String LookingForRegistrationServerMessageHeader = "Looking for Registration Server";
   public final static String OpenRegistrationServerInfoMessageHeader = "Open Registration Server Info";
+
+  public final static String SearchingForRegisteredDevicesMessage = "Searching for Registered Devices";
+  public final static String RegisteredDeviceFoundMessage = "Registered Device Found";
 
 
   private final static Logger log = LoggerFactory.getLogger(ConnectorMessagesCreator.class);
@@ -41,6 +45,24 @@ public class ConnectorMessagesCreator {
     return receivedMessage.startsWith(OpenRegistrationServerInfoMessageHeader);
   }
 
+  public byte[] createSearchingForRegisteredDevicesMessage() {
+    return createMessage(SearchingForRegisteredDevicesMessage, createHostInfoMessageString());
+  }
+
+  public boolean isSearchingForRegisteredDevicesMessage(byte[] receivedBytes, int packetLength) {
+    String receivedMessage = parseBytesToString(receivedBytes, packetLength);
+    return receivedMessage.startsWith(SearchingForRegisteredDevicesMessage);
+  }
+
+  public byte[] createRegisteredDeviceFoundMessage() {
+    return createMessage(RegisteredDeviceFoundMessage, createConnectedDeviceMessageString());
+  }
+
+  public boolean isRegisteredDeviceFoundMessage(byte[] receivedBytes, int packetLength) {
+    String receivedMessage = parseBytesToString(receivedBytes, packetLength);
+    return receivedMessage.startsWith(RegisteredDeviceFoundMessage);
+  }
+
   public HostInfo getHostInfoFromMessage(byte[] receivedBytes, int packetLength) {
     String messageBody = getMessageBodyFromMessage(receivedBytes, packetLength);
     DeserializationResult<HostInfo> result = JsonIoJsonHelper.parseJsonString(messageBody, HostInfo.class);
@@ -48,6 +70,26 @@ public class ConnectorMessagesCreator {
       return result.getResult();
 
     log.error("Could not deserialize message body " + messageBody + " to HostInfo", result.getError());
+    return null;
+  }
+
+  public ConnectedDevice getConnectedDeviceFromMessage(byte[] receivedBytes, int packetLength) {
+    String messageBody = getMessageBodyFromMessage(receivedBytes, packetLength);
+    DeserializationResult<ConnectedDevice> result = JsonIoJsonHelper.parseJsonString(messageBody, ConnectedDevice.class);
+    if(result.successful()) {
+      ConnectedDevice device = result.getResult();
+      for(Device userDevice : Application.getLoggedOnUser().getDevices()) {
+        if(device.getUniqueDeviceId().equals(userDevice.getUniversallyUniqueId())) {
+          device.setDevice(userDevice);
+          return device;
+        }
+      }
+
+      log.error("Could not find local device with unique id " + device.getUniqueDeviceId());
+      return result.getResult();
+    }
+
+    log.error("Could not deserialize message body " + messageBody + " to ConnectedDevice", result.getError());
     return null;
   }
 
@@ -88,4 +130,23 @@ public class ConnectorMessagesCreator {
     log.error("Could not serialize HostInfo " + hostInfo, result.getError());
     return "";
   }
+
+  protected String createConnectedDeviceMessageString() {
+    // TODO: how to determine if host can capture images? i need a device independent solution
+    ConnectedDevice device = new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getHostIpAddressString(),
+        Application.getDeepThoughtsConnector().getMessageReceiverPort(), false, Application.getContentExtractorManager().hasOcrContentExtractors());
+
+    return createConnectedDeviceMessageString(device);
+  }
+
+  protected String createConnectedDeviceMessageString(ConnectedDevice device) {
+    SerializationResult result = JsonIoJsonHelper.generateJsonString(device);
+    if(result.successful()) {
+      return result.getSerializationResult();
+    }
+
+    log.error("Could not serialize ConnectedDevice " + device, result.getError());
+    return "";
+  }
+
 }

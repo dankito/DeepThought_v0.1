@@ -34,7 +34,7 @@ public class Localization {
   }
 
   public static void setLanguageLocale(Locale languageLocale) {
-    LanguageLocale = languageLocale;languageLocale = new Locale("","","");
+    LanguageLocale = languageLocale;
     StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
   }
 

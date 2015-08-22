@@ -55,6 +55,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="lucene-misc-4.7.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="lucene-queries-4.7.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="lucene-sandbox-4.7.2" level="project" />
+    <orderEntry type="library" exported="" name="WikipediaImporter.WikipediaImporter" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

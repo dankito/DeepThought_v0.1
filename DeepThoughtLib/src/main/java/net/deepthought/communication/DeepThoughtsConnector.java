@@ -1,10 +1,12 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
+import net.deepthought.communication.connected_device.ConnectedDevicesManager;
+import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.AllowDeviceToRegisterResult;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
-import net.deepthought.communication.registration.RegisteredPeersManager;
+import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.RegistrationServer;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -30,9 +32,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected MessagesReceiver messagesReceiver;
 
-  protected RegisteredPeersManager registeredPeersManager;
+  protected RegisteredDevicesManager registeredDevicesManager;
 
-  protected DeepThoughtsConnectorListener listener;
+  protected ConnectedDevicesManager connectedDevicesManager;
+
+  protected net.deepthought.communication.listener.DeepThoughtsConnectorListener listener;
 
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
@@ -42,20 +46,21 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
 
-  public DeepThoughtsConnector(DeepThoughtsConnectorListener listener) {
+  public DeepThoughtsConnector(net.deepthought.communication.listener.DeepThoughtsConnectorListener listener) {
     this(Constants.MessageHandlerDefaultPort, listener);
   }
 
-  public DeepThoughtsConnector(int messageReceiverPort, DeepThoughtsConnectorListener listener) {
+  public DeepThoughtsConnector(int messageReceiverPort, net.deepthought.communication.listener.DeepThoughtsConnectorListener listener) {
     this(messageReceiverPort, new Communicator(), listener);
   }
 
-  public DeepThoughtsConnector(int messageReceiverPort, Communicator communicator, DeepThoughtsConnectorListener listener) {
+  public DeepThoughtsConnector(int messageReceiverPort, Communicator communicator, net.deepthought.communication.listener.DeepThoughtsConnectorListener listener) {
     this.messageReceiverPort = messageReceiverPort;
     this.communicator = communicator;
     this.listener = listener;
 
-    this.registeredPeersManager = new RegisteredPeersManager(); // TODO: make configurable
+    this.registeredDevicesManager = new RegisteredDevicesManager(); // TODO: make configurable
+    this.connectedDevicesManager = new ConnectedDevicesManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator();
   }
 
@@ -177,9 +182,26 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return communicator;
   }
 
+  protected void setCommunicator(Communicator communicator) {
+    this.communicator = communicator;
+  }
+
   @Override
-  public RegisteredPeersManager getRegisteredPeersManager() {
-    return registeredPeersManager;
+  public RegisteredDevicesManager getRegisteredDevicesManager() {
+    return registeredDevicesManager;
+  }
+
+  public void setRegisteredDevicesManager(RegisteredDevicesManager registeredDevicesManager) {
+    this.registeredDevicesManager = registeredDevicesManager;
+  }
+
+  @Override
+  public ConnectedDevicesManager getConnectedDevicesManager() {
+    return connectedDevicesManager;
+  }
+
+  public void setConnectedDevicesManager(ConnectedDevicesManager connectedDevicesManager) {
+    this.connectedDevicesManager = connectedDevicesManager;
   }
 
   @Override
@@ -188,7 +210,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
 
-  protected MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
+  protected net.deepthought.communication.listener.MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
     @Override
     public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
       if(userDeviceRegistrationRequestListener != null)

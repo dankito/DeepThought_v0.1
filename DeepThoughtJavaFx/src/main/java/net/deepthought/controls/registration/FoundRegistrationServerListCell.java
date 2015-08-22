@@ -1,7 +1,7 @@
 package net.deepthought.controls.registration;
 
 import net.deepthought.Application;
-import net.deepthought.communication.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;

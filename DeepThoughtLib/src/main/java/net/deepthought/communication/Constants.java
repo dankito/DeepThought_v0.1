@@ -11,6 +11,8 @@ public class Constants {
 
   public final static int RegistrationServerPort = 27387;
 
+  public final static int RegisteredDevicesListenerPort = 27384;
+
   public final static Charset MessagesCharset = Charset.forName("utf8");
 
   public final static String JsonMimeType = "application/json";

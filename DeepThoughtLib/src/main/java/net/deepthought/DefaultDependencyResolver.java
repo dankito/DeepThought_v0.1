@@ -1,7 +1,7 @@
 package net.deepthought;
 
 import net.deepthought.communication.DeepThoughtsConnector;
-import net.deepthought.communication.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;

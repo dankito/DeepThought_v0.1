@@ -1,7 +1,7 @@
 package net.deepthought.data.helper;
 
 import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.communication.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.persistence.IEntityManager;

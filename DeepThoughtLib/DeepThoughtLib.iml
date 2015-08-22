@@ -41,6 +41,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.11" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="logback-core-1.1.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="logback-classic-1.1.2" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="mockito-all-1.10.19" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-core-1.3" level="project" />
     <orderEntry type="library" exported="" name="DeepThoughtLib.DeepThoughtLib" level="project" />
     <orderEntry type="library" exported="" name="DeepThoughtLib.test-DeepThoughtLib" level="project" />

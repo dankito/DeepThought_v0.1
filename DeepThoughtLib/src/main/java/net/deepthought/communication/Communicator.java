@@ -28,7 +28,7 @@ public class Communicator {
   private final static Logger log = LoggerFactory.getLogger(Communicator.class);
 
 
-  public void askForDeviceRegistration(HostInfo serverInfo, AskForDeviceRegistrationListener listener) {
+  public void askForDeviceRegistration(HostInfo serverInfo, net.deepthought.communication.listener.AskForDeviceRegistrationListener listener) {
     String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getIpAddress(), serverInfo.getPort());
 
     User user = Application.getLoggedOnUser();

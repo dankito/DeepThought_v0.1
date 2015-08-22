@@ -51,6 +51,7 @@
     <orderEntry type="library" exported="" name="commons-codec-1.4" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="sqlite-jdbc-3.8.7" level="project" />
+    <orderEntry type="library" exported="" name="WGetFileDownloader.WGetFileDownloader" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

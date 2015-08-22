@@ -28,6 +28,28 @@ public class DeepThoughtsConnectorTest {
     Assert.assertNotEquals(connector1.getMessageReceiverPort(), connector2.getMessageReceiverPort());
   }
 
+
+  @Test
+  public void registeredDevicesExists_NotConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
+    Assert.fail();
+  }
+
+  @Test
+  public void registeredDevicesExists_AlreadyConnectedToAllRegisteredDevices_RegisteredDevicesSearcherWontBeStarted() {
+    Assert.fail();
+  }
+
+  @Test
+  public void connectsToARegisteredDevice_IsNowConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStopped() {
+    Assert.fail();
+  }
+
+  @Test
+  public void disconnectsFromARegisteredDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
+    Assert.fail();
+  }
+
+
   protected void sendMessagesToDeepThoughtsConnector(int port, String... messages) throws IOException, InterruptedException {
     Runtime rt = Runtime.getRuntime();
     Process pr = rt.exec("telnet localhost " + port);

@@ -1,6 +1,7 @@
 package net.deepthought.communication;
 
-import net.deepthought.communication.registration.RegisteredPeersManager;
+import net.deepthought.communication.connected_device.ConnectedDevicesManager;
+import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 
@@ -23,7 +24,9 @@ public interface IDeepThoughtsConnector {
 
   Communicator getCommunicator();
 
-  RegisteredPeersManager getRegisteredPeersManager();
+  RegisteredDevicesManager getRegisteredDevicesManager();
+
+  ConnectedDevicesManager getConnectedDevicesManager();
 
   boolean isStarted();
 

@@ -225,6 +225,10 @@ public class User extends BaseEntity implements Serializable {
     return getDevices().size() > 0;
   }
 
+  public boolean containsDevice(Device device) {
+    return getDevices().contains(device);
+  }
+
   public boolean addDevice(Device device) {
     if(devices.contains(device) == false) {
       if(devices.add(device)) {

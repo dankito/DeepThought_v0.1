@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -44,4 +45,9 @@ public class NetworkHelper {
 
     return null;
   }
+
+  public static boolean isSocketCloseException(Exception exception) {
+    return exception instanceof SocketException && "Socket closed".equals(exception.getMessage());
+  }
+
 }

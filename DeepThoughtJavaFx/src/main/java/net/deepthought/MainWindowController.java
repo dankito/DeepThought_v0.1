@@ -6,7 +6,7 @@
 
 package net.deepthought;
 
-import net.deepthought.communication.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;

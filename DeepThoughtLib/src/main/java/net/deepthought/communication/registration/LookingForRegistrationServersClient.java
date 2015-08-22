@@ -1,8 +1,8 @@
 package net.deepthought.communication.registration;
 
 import net.deepthought.Application;
-import net.deepthought.communication.Constants;
 import net.deepthought.communication.ConnectorMessagesCreator;
+import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.model.HostInfo;
 
@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -54,7 +54,7 @@ public class LookingForRegistrationServersClient {
       byte[] message = messagesCreator.createLookingForRegistrationServerMessage();
       DatagramPacket findRegistrationServersPacket = new DatagramPacket(message, message.length, NetworkHelper.getBroadcastAddress(), Constants.RegistrationServerPort);
 
-      Map<InetAddress, Map<String, List<String>>> receivedResponses = new HashMap<>();
+      Map<InetAddress, Map<String, Set<String>>> receivedResponses = new HashMap<>();
 
       while(isSocketOpened) {
         socket.send(findRegistrationServersPacket);
@@ -66,7 +66,7 @@ public class LookingForRegistrationServersClient {
     }
   }
 
-  protected void waitForResponsePackets(RegistrationRequestListener listener, Map<InetAddress, Map<String, List<String>>> receivedResponses) {
+  protected void waitForResponsePackets(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
@@ -79,7 +79,7 @@ public class LookingForRegistrationServersClient {
         serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
       }
 
-      if(Application.getDeepThoughtsConnector().getRegisteredPeersManager().isDeviceRegistered(serverInfo) == false) {
+      if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(serverInfo) == false) {
         boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(buffer, packet.getLength());
 
         if (isOpenRegistrationServer == true && listener != null) {
@@ -88,15 +88,15 @@ public class LookingForRegistrationServersClient {
 
         InetAddress address = packet.getAddress();
         if(receivedResponses.containsKey(address) == false)
-          receivedResponses.put(address, new HashMap<String, List<String>>());
+          receivedResponses.put(address, new HashMap<String, Set<String>>());
         if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
-          receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new ArrayList<String>());
+          receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new HashSet<String>());
         receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
       }
     } catch(Exception ex) { } // a receive time out (may notify user about that
   }
 
-  protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, List<String>>> receivedResponses) {
+  protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
     return receivedResponses.containsKey(packet.getAddress()) && receivedResponses.get(packet.getAddress()).containsKey((serverInfo.getDeviceUniqueId())) &&
         receivedResponses.get(packet.getAddress()).get(serverInfo.getDeviceUniqueId()).contains(serverInfo.getUserUniqueId());
   }

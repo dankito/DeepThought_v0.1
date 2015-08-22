@@ -2,6 +2,7 @@ package net.deepthought.communication.registration;
 
 import net.deepthought.Application;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
@@ -13,7 +14,7 @@ import net.deepthought.data.model.User;
 /**
  * Created by ganymed on 21/08/15.
  */
-public class RegisteredPeersManager {
+public class RegisteredDevicesManager {
 
 
   public boolean hasRegisteredDevices() { // TODO: Only search periodically for registered devices if this method returns true and not all registered devices have been found yet
@@ -30,6 +31,11 @@ public class RegisteredPeersManager {
     }
 
     return false;
+  }
+
+  public boolean isDeviceRegistered(ConnectedDevice device) {
+    User loggedOnUser = Application.getLoggedOnUser();
+    return device != null && loggedOnUser.containsDevice(device.getDevice());
   }
 
   public boolean registerDevice(AskForDeviceRegistrationRequest request, boolean useOtherSidesUserInfo) { // TODO: after calling this start searching for registered devices
