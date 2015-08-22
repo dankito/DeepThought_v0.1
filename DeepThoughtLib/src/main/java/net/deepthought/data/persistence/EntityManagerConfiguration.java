@@ -1,5 +1,6 @@
 package net.deepthought.data.persistence;
 
+import net.deepthought.Application;
 import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -44,7 +45,7 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   protected String dataCollectionFileName = null;
   protected String dataCollectionPersistencePath = null;
 
-  protected int currentDataModelVersion;
+  protected int dataBaseCurrentDataModelVersion;
   protected boolean createDatabase = false;
 
   protected DatabaseType databaseType;
@@ -56,12 +57,28 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   protected boolean dropTables = false;
 
 
-  public EntityManagerConfiguration() {
 
+  public EntityManagerConfiguration(String dataFolder) {
+    this(dataFolder, DatabaseType.SQLite);
   }
 
-  public EntityManagerConfiguration(Class<? extends IEntityManager> entityManagerClass) {
-    this.entityManagerClass = entityManagerClass;
+  public EntityManagerConfiguration(String dataFolder, int databaseCurrentDataModelVersion) {
+    this(dataFolder);
+    setDataBaseCurrentDataModelVersion(databaseCurrentDataModelVersion);
+  }
+
+  public EntityManagerConfiguration(String dataFolder, DatabaseType databaseType) {
+    this(dataFolder, databaseType, false);
+  }
+
+  public EntityManagerConfiguration(String dataFolder, DatabaseType databaseType, boolean createTables) {
+    setDatabaseType(databaseType);
+    setDataFolder(dataFolder);
+    setDataBaseCurrentDataModelVersion(Application.CurrentDataModelVersion);
+
+    setDatabaseConfiguration(databaseType, createTables);
+
+    addEntities();
   }
 
 
@@ -117,8 +134,7 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
 
 
   public EntityManagerConfiguration copy() {
-    EntityManagerConfiguration copy = new EntityManagerConfiguration();
-    copy.setDataFolder(dataFolder);
+    EntityManagerConfiguration copy = new EntityManagerConfiguration(dataFolder);
     copy.setDataCollectionFileName(dataCollectionFileName);
 
     copy.setDatabaseDriver(databaseDriver);
@@ -176,13 +192,13 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   }
 
   @Override
-  public int getCurrentDataModelVersion() {
-    return currentDataModelVersion;
+  public int getDataBaseCurrentDataModelVersion() {
+    return dataBaseCurrentDataModelVersion;
   }
 
   @Override
-  public void setCurrentDataModelVersion(int currentDataModelVersion) {
-    this.currentDataModelVersion = currentDataModelVersion;
+  public void setDataBaseCurrentDataModelVersion(int dataBaseCurrentDataModelVersion) {
+    this.dataBaseCurrentDataModelVersion = dataBaseCurrentDataModelVersion;
   }
 
   public boolean createDatabase() {
@@ -245,7 +261,7 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
 
   public static EntityManagerConfiguration createDefaultConfiguration(ApplicationConfiguration applicationConfiguration) {
     EntityManagerConfiguration configuration = createDefaultConfiguration(applicationConfiguration.getDataFolder(), false);
-    configuration.setCurrentDataModelVersion(applicationConfiguration.getCurrentDataModelVersion());
+    configuration.setDataBaseCurrentDataModelVersion(applicationConfiguration.getDataBaseCurrentDataModelVersion());
     return configuration;
   }
 
@@ -254,61 +270,51 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   }
 
   public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder, boolean createTables, DatabaseType databaseType) {
-    EntityManagerConfiguration configuration = new EntityManagerConfiguration();
-    configuration.setDatabaseType(databaseType);
+    EntityManagerConfiguration configuration = new EntityManagerConfiguration(dataFolder, databaseType, createTables);
 
-    // TODO: at this point of time Application.getDataFolderPath()  is for sure not set yet -> find a solution for that
-    configuration.setDataFolder(dataFolder);
+    return configuration;
+  }
 
-    switch(configuration.getDatabaseType()) {
+  protected void setDatabaseConfiguration(DatabaseType databaseType, boolean createTables) {
+    switch(databaseType) {
       case SQLite:
-        configuration.setDataCollectionFileName("DeepThoughtDb_SQLite.db");
-        configuration.setDatabaseDriverUrl("jdbc:sqlite:");
-        configuration.setDatabaseDriver("org.sqlite.JDBC");
+        setDataCollectionFileName("DeepThoughtDb_SQLite.db");
+        setDatabaseDriverUrl("jdbc:sqlite:");
+        setDatabaseDriver("org.sqlite.JDBC");
         break;
       case H2Embedded:
-        configuration.setDataCollectionFileName("DeepThoughtDb_H2.mv.db");
-        configuration.setDatabaseDriverUrl("jdbc:h2:");
-        configuration.setDatabaseDriver("org.h2.Driver");
+        setDataCollectionFileName("DeepThoughtDb_H2.mv.db");
+        setDatabaseDriverUrl("jdbc:h2:");
+        setDatabaseDriver("org.h2.Driver");
         break;
       case H2Mem:
-        configuration.setDataCollectionFileName("DeepThoughtDb_H2.mv.db");
-        configuration.setDatabaseDriverUrl("jdbc:h2:mem:");
-        configuration.setDatabaseDriver("org.h2.Driver");
+        setDataCollectionFileName("DeepThoughtDb_H2.mv.db");
+        setDatabaseDriverUrl("jdbc:h2:mem:");
+        setDatabaseDriver("org.h2.Driver");
         break;
       case Derby:
-        configuration.setDataCollectionFileName("DeepThoughtDb_Derby");
-        configuration.setDatabaseDriverUrl("jdbc:derby:");
-        configuration.setDatabaseDriver("org.apache.derby.jdbc.EmbeddedDriver");
+        setDataCollectionFileName("DeepThoughtDb_Derby");
+        setDatabaseDriverUrl("jdbc:derby:");
+        setDatabaseDriver("org.apache.derby.jdbc.EmbeddedDriver");
         break;
       case HSQLDB:
-        configuration.setDataCollectionFileName("DeepThoughtDb_HSQL/db");
-        configuration.setDatabaseDriverUrl("jdbc:hsqldb:file:");
-        configuration.setDatabaseDriver("org.hsqldb.jdbcDriver");
+        setDataCollectionFileName("DeepThoughtDb_HSQL/db");
+        setDatabaseDriverUrl("jdbc:hsqldb:file:");
+        setDatabaseDriver("org.hsqldb.jdbcDriver");
         break;
     }
 
-    if(new File(configuration.getDataCollectionPersistencePath()).exists() == false) { // TODO: apply the same for createDefaultConfiguration()
-      configuration.setCreateDatabase(true);
-      configuration.setCreateTables(true);
+    if(new File(getDataCollectionPersistencePath()).exists() == false) { // TODO: apply the same for createDefaultConfiguration()
+      setCreateDatabase(true);
+      setCreateTables(true);
     }
 
     if(createTables)
-      configuration.setCreateTables(true);
-    
-    addEntities(configuration);
-
-    return configuration;
+      setCreateTables(true);
   }
 
   public static EntityManagerConfiguration createTestConfiguration() {
     return createTestConfiguration("data/tests/");
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration(ApplicationConfiguration applicationConfiguration) {
-    EntityManagerConfiguration configuration = createTestConfiguration(applicationConfiguration.getDataFolder(), false);
-    configuration.setCurrentDataModelVersion(applicationConfiguration.getCurrentDataModelVersion());
-    return configuration;
   }
 
   public static EntityManagerConfiguration createTestConfiguration(String dataFolder) {
@@ -350,7 +356,7 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   }
 
 
-  protected static void addEntities(EntityManagerConfiguration configuration) {
+  protected void addEntities() {
     Class[] entities = new Class[] {
 
         DeepThoughtApplication.class,
@@ -384,7 +390,7 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
 
     };
     
-    configuration.setEntityClasses(entities);
+    setEntityClasses(entities);
   }
 
 }

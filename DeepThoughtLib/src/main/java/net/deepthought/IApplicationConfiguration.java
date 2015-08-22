@@ -1,14 +1,12 @@
 package net.deepthought;
 
+import net.deepthought.data.persistence.EntityManagerConfiguration;
+
 /**
  * Created by ganymed on 15/08/15.
  */
-public interface IApplicationConfiguration {
+public interface IApplicationConfiguration extends IDependencyResolver {
 
-  IDependencyResolver getDependencyResolver();
-
-  Class[] getEntityClasses();
-
-  String getDataFolder();
+  EntityManagerConfiguration getEntityManagerConfiguration();
 
 }

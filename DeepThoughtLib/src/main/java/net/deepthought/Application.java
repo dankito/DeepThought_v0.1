@@ -76,27 +76,23 @@ public class Application {
 
 
 
-  public static void instantiateAsync(final ApplicationConfiguration applicationConfiguration, final IDependencyResolver dependencyResolver) {
+  public static void instantiateAsync(final IApplicationConfiguration applicationConfiguration) {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        instantiate(applicationConfiguration, dependencyResolver);
+        instantiate(applicationConfiguration);
       }
     }).start();
-
-//    ForkJoinPool pool = new ForkJoinPool();
-//    pool.execute(new Runnable() {
-//      @Override
-//      public void run() {
-//        instantiate(dependencyResolver);
-//      }
-//    });
   }
 
   public static void instantiate(ApplicationConfiguration applicationConfiguration, IDependencyResolver dependencyResolver) {
     EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration);
 
     instantiate(entityManagerConfiguration, dependencyResolver);
+  }
+
+  public static void instantiate(IApplicationConfiguration applicationConfiguration) {
+    instantiate(applicationConfiguration.getEntityManagerConfiguration(), applicationConfiguration);
   }
 
   public static void instantiate(EntityManagerConfiguration configuration, IDependencyResolver dependencyResolver) {

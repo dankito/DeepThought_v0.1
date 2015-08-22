@@ -1,0 +1,38 @@
+package net.deepthought;
+
+import net.deepthought.data.persistence.EntityManagerConfiguration;
+
+/**
+ * Created by ganymed on 22/08/15.
+ */
+public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
+
+  public TestEntityManagerConfiguration() {
+    super("data/tests/");
+  }
+
+  @Override
+  protected void setDatabaseConfiguration(DatabaseType databaseType, boolean createTables) {
+    super.setDatabaseConfiguration(databaseType, createTables);
+
+    switch(databaseType) {
+      case SQLite:
+        setDataCollectionFileName("DeepThoughtDb_Tests_SQLite.db");
+        break;
+      case H2Embedded:
+      case H2Mem:
+        setDataCollectionFileName("DeepThoughtDb_Tests_H2.mv.db");
+        break;
+      case Derby:
+        setDataCollectionFileName("DeepThoughtDb_Tests_Derby");
+        break;
+      case HSQLDB:
+        setDataCollectionFileName("DeepThoughtDb_HSQL_Tests");
+        break;
+    }
+
+    setCreateDatabase(true);
+    setCreateTables(true);
+//    setDropTables(true);
+  }
+}

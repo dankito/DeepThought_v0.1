@@ -43,6 +43,7 @@ import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
+import net.deepthought.platform.JavaSeApplicationConfiguration;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
@@ -187,7 +188,6 @@ public class MainWindowController implements Initializable {
     Application.addApplicationListener(new ApplicationListener() {
       @Override
       public void deepThoughtChanged(DeepThought deepThought) {
-//        ((LuceneSearchEngine)Application.getSearchEngine()).rebuildIndex();
         deepThoughtChangedThreadSafe(deepThought);
       }
 
@@ -197,33 +197,7 @@ public class MainWindowController implements Initializable {
       }
     });
 
-    Application.instantiateAsync(new DeepThoughtFxApplicationConfiguration(), new DefaultDependencyResolver(connectorListener) {
-      @Override
-      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new OrmLiteJavaSeEntityManager(configuration);
-      }
-
-      @Override
-      public ISearchEngine createSearchEngine() {
-        try {
-//          return new LuceneSearchEngine();
-          return new LuceneAndDatabaseSearchEngine();
-        } catch(Exception ex) {
-          log.error("Could not initialize LuceneSearchEngine", ex);
-        }
-        return new InMemorySearchEngine(); // TODO: abort application?
-      }
-
-      @Override
-      public IFileDownloader createDownloader() {
-        return new WGetFileDownloader();
-      }
-
-      @Override
-      public ILanguageDetector createLanguageDetector() {
-        return new LanguageDetector();
-      }
-    });
+    Application.instantiateAsync(new JavaSeApplicationConfiguration(connectorListener));
 
     setupControls();
 

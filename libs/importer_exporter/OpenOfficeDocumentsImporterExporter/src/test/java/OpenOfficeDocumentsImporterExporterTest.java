@@ -44,12 +44,12 @@ public class OpenOfficeDocumentsImporterExporterTest {
       }
 
       @Override
-      public int getCurrentDataModelVersion() {
+      public int getDataBaseCurrentDataModelVersion() {
         return 0;
       }
 
       @Override
-      public void setCurrentDataModelVersion(int newDataModelVersion) {
+      public void setDataBaseCurrentDataModelVersion(int newDataModelVersion) {
 
       }
     }, new DefaultDependencyResolver() {

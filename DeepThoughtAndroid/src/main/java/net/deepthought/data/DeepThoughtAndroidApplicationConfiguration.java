@@ -44,12 +44,12 @@ public class DeepThoughtAndroidApplicationConfiguration extends ApplicationConfi
   }
 
   @Override
-  public int getCurrentDataModelVersion() {
+  public int getDataBaseCurrentDataModelVersion() {
     return 0; // not needed on Android, is done by SQliteOpenHelper
   }
 
   @Override
-  public void setCurrentDataModelVersion(int newDataModelVersion) {
+  public void setDataBaseCurrentDataModelVersion(int newDataModelVersion) {
     // not needed on Android, is done by SQliteOpenHelper
   }
 

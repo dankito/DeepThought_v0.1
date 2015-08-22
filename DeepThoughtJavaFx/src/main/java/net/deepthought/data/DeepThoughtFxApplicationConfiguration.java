@@ -21,12 +21,12 @@ public class DeepThoughtFxApplicationConfiguration extends ApplicationConfigurat
   }
 
   @Override
-  public int getCurrentDataModelVersion() {
+  public int getDataBaseCurrentDataModelVersion() {
     return DeepThoughtFxProperties.getDataModelVersion();
   }
 
   @Override
-  public void setCurrentDataModelVersion(int newDataModelVersion) {
+  public void setDataBaseCurrentDataModelVersion(int newDataModelVersion) {
     DeepThoughtFxProperties.setDataModelVersion(newDataModelVersion);
   }
 }

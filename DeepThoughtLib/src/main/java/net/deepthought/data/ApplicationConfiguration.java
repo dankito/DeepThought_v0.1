@@ -9,8 +9,8 @@ public abstract class ApplicationConfiguration {
 
   public abstract void setDataFolder(String dataFolder);
 
-  public abstract int getCurrentDataModelVersion();
+  public abstract int getDataBaseCurrentDataModelVersion();
 
-  public abstract void setCurrentDataModelVersion(int newDataModelVersion);
+  public abstract void setDataBaseCurrentDataModelVersion(int newDataModelVersion);
 
 }
