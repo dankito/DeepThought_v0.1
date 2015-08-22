@@ -1,8 +1,7 @@
 package net.deepthought.data.helper;
 
 import net.deepthought.Application;
-import net.deepthought.data.ApplicationConfiguration;
-import net.deepthought.data.TestApplicationConfiguration;
+import net.deepthought.IApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class MockEntityManager implements IEntityManager {
 
-  protected ApplicationConfiguration configuration = new TestApplicationConfiguration();
+  protected IApplicationConfiguration configuration = new net.deepthought.TestApplicationConfiguration();
 
   protected Map<Class, Long> lastEntityIndices = new HashMap<>();
 
@@ -57,7 +56,7 @@ public class MockEntityManager implements IEntityManager {
 
   @Override
   public String getDatabasePath() {
-    return new File(configuration.getDataFolder(), "Mock.db").getAbsolutePath();
+    return new File(configuration.getEntityManagerConfiguration().getDataFolder(), "Mock.db").getAbsolutePath();
   }
 
   @Override

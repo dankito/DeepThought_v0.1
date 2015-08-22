@@ -1,7 +1,6 @@
 package net.deepthought.data.persistence;
 
 import net.deepthought.Application;
-import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
@@ -32,7 +31,7 @@ import java.util.Map;
 /**
  * Created by ganymed on 03/01/15.
  */
-public class EntityManagerConfiguration extends ApplicationConfiguration {
+public class EntityManagerConfiguration {
   
   public enum DatabaseType { SQLite, H2Embedded, H2Mem, Derby, HSQLDB }
   
