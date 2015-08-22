@@ -2,7 +2,6 @@ package net.deepthought.data.importer_exporter;
 
 import net.deepthought.Application;
 import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
@@ -33,12 +32,9 @@ public class WikipediaIndexer {
   public void setup() throws SQLException {
     importer = new WikipediaImporter();
 
-    ApplicationConfiguration applicationConfiguration = new EntityManagerConfiguration();
-    applicationConfiguration.setDataFolder("data/tests/big_data/");
-//    configuration = EntityManagerConfiguration.createTestConfiguration(applicationConfiguration.getDataFolder(), true, EntityManagerConfiguration.DatabaseType.SQLite);
-    configuration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration);
+    configuration = new EntityManagerConfiguration("data/tests/big_data/");
 
-    Application.instantiate(applicationConfiguration, new DefaultDependencyResolver() {
+    Application.instantiate(configuration, new DefaultDependencyResolver() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         entityManager = new OrmLiteJavaSeEntityManager(configuration);

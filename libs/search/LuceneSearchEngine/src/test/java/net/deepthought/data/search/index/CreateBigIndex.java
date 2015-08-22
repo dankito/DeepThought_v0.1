@@ -1,9 +1,6 @@
 package net.deepthought.data.search.index;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.data.ApplicationConfiguration;
-import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.importer_exporter.WikipediaImporter;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -47,9 +44,7 @@ public class CreateBigIndex {
 
   @Before
   public void setup() throws SQLException {
-    ApplicationConfiguration applicationConfiguration = new TestApplicationConfiguration("data/tests/big_data_new/");
-
-    Application.instantiate(applicationConfiguration, new DefaultDependencyResolver() {
+    Application.instantiate(new net.deepthought.TestApplicationConfiguration("data/tests/big_data_new/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return new OrmLiteJavaSeEntityManager(configuration);

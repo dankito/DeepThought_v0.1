@@ -1,8 +1,8 @@
 package net.deepthought.data.search;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.data.TestApplicationConfiguration;
+import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.TestEntityManagerConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -40,12 +40,12 @@ public class LuceneSearchEngineDatabaseTest {
   public void setup() throws Exception {
     searchEngine = new LuceneSearchEngine(new RAMDirectory());
 
-    configuration = EntityManagerConfiguration.createTestConfiguration(true);
+    configuration = new TestEntityManagerConfiguration(true);
 //    FileUtils.deleteFile(configuration.getDataCollectionPersistencePath());
 
     entityManager = new OrmLiteJavaSeEntityManager(configuration);
 
-    Application.instantiate(new TestApplicationConfiguration(), new DefaultDependencyResolver(entityManager));
+    Application.instantiate(new TestApplicationConfiguration(entityManager));
     deepThought = Application.getDeepThought();
   }
 

@@ -1,9 +1,7 @@
 package net.deepthought.data.importer_exporter;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.MockEntityManager;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.DeepThought;
 
 import org.junit.Before;
@@ -23,7 +21,7 @@ public class WikipediaImporterTest {
 
   @Before
   public void setup() throws SQLException {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
+    Application.instantiate(new TestApplicationConfiguration());
 
     deepThought = Application.getDeepThought();
 

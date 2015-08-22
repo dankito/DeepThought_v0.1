@@ -7,9 +7,19 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
  */
 public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
 
+
   public TestEntityManagerConfiguration() {
-    super("data/tests/");
+    this("data/tests/");
   }
+
+  public TestEntityManagerConfiguration(String dataFolder) {
+    super(dataFolder, 0);
+  }
+
+  public TestEntityManagerConfiguration(boolean createTables) {
+    super("data/tests/", DatabaseType.SQLite, createTables);
+  }
+
 
   @Override
   protected void setDatabaseConfiguration(DatabaseType databaseType, boolean createTables) {

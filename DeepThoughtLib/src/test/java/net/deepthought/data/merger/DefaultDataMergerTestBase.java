@@ -1,10 +1,9 @@
 package net.deepthought.data.merger;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestsRequiringFileSystemDatabaseTestBase;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.helper.AssertSetToTrue;
 import net.deepthought.data.helper.DatabaseHelper;
-import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -28,7 +27,7 @@ import java.util.Set;
 /**
  * Created by ganymed on 18/01/15.
  */
-public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystemDatabaseTestBase {
+public abstract class DefaultDataMergerTestBase {
 
   protected IDataMerger dataMerger;
 
@@ -38,11 +37,9 @@ public abstract class DefaultDataMergerTestBase extends TestsRequiringFileSystem
 
   @Before
   public void setup() throws Exception {
-    super.setup();
-
     dataMerger = new DefaultDataMerger();
 
-    Application.instantiate(databaseOnFileSystemConfiguration, new TestDependencyResolver() {
+    Application.instantiate(new TestApplicationConfiguration() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return DefaultDataMergerTestBase.this.createEntityManager(configuration);

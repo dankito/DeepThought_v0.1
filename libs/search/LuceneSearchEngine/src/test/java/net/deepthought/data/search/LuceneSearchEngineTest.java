@@ -1,9 +1,7 @@
 package net.deepthought.data.search;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.MockEntityManager;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -57,8 +55,8 @@ public class LuceneSearchEngineTest {
 
   @Before
   public void setup() throws IOException {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
-//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new OrmLiteJavaSeEntityManager()) {
+    Application.instantiate(new TestApplicationConfiguration() {
+//    Application.instantiate(new TestApplicationConfiguration(new OrmLiteJavaSeEntityManager()) {
 
       @Override
       public ISearchEngine createSearchEngine() {

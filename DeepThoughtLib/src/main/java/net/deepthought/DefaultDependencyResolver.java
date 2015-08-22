@@ -53,6 +53,7 @@ public class DefaultDependencyResolver implements IDependencyResolver {
   }
 
   public DefaultDependencyResolver(IEntityManager entityManager) {
+    this();
     this.entityManager = entityManager;
   }
 

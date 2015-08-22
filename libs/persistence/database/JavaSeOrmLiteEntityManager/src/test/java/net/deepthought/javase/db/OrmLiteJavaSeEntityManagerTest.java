@@ -1,8 +1,8 @@
 package net.deepthought.javase.db;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.TestEntityManagerConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -27,9 +27,9 @@ public class OrmLiteJavaSeEntityManagerTest {
 
   @Before
   public void setup() throws SQLException {
-    entityManager = new OrmLiteJavaSeEntityManager(EntityManagerConfiguration.createTestConfiguration(true));
+    entityManager = new OrmLiteJavaSeEntityManager(new TestEntityManagerConfiguration(true));
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager));
+    Application.instantiate(new TestApplicationConfiguration(entityManager));
     deepThought = Application.getDeepThought();
   }
 

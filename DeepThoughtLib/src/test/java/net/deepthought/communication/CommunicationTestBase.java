@@ -1,9 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.MockEntityManager;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 
 import org.junit.After;
 import org.junit.Before;
@@ -23,7 +21,7 @@ public class CommunicationTestBase {
 
   @Before
   public void setup() {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
+    Application.instantiate(new TestApplicationConfiguration());
 
     connector = Application.getDeepThoughtsConnector();
     communicator = connector.getCommunicator();

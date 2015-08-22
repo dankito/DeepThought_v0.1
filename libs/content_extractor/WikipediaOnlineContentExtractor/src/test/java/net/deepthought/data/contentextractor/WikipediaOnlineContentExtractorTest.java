@@ -1,9 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.MockEntityManager;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -27,7 +25,7 @@ public class WikipediaOnlineContentExtractorTest {
   public void setup() {
     wikipediaOnlineContentExtractor = new WikipediaOnlineContentExtractor();
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
+    Application.instantiate(new TestApplicationConfiguration());
   }
 
   @After

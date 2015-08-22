@@ -3,8 +3,8 @@ package net.deepthought.android.db;
 import android.test.AndroidTestCase;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.TestEntityManagerConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -28,10 +28,10 @@ public class OrmLiteAndroidEntityManagerTest extends AndroidTestCase {
   public void setUp() throws Exception {
     super.setUp();
 
-    EntityManagerConfiguration configuration = EntityManagerConfiguration.createTestConfiguration();
+    EntityManagerConfiguration configuration = new TestEntityManagerConfiguration();
     entityManager = new OrmLiteAndroidEntityManager(getContext(), configuration);
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(entityManager));
+    Application.instantiate(new TestApplicationConfiguration(entityManager));
     deepThought = Application.getDeepThought();
   }
 

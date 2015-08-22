@@ -1,8 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 
@@ -55,7 +54,7 @@ public abstract class LoadTagTestBase extends DataModelTestBase {
 
     Application.shutdown();
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver() {
+    Application.instantiate(new TestApplicationConfiguration() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         entityManager = getEntityManager(configuration);

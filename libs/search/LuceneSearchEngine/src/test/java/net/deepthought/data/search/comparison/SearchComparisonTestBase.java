@@ -1,9 +1,7 @@
 package net.deepthought.data.search.comparison;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.data.ApplicationConfiguration;
-import net.deepthought.data.TestApplicationConfiguration;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.helper.NoOperationBackupManager;
 import net.deepthought.data.model.DeepThought;
@@ -12,13 +10,13 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.Search;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.deepthought.data.search.ISearchEngine;
-import net.deepthought.data.search.Search;
-import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.junit.After;
@@ -67,13 +65,9 @@ public abstract class SearchComparisonTestBase {
   public static void suiteSetup() throws Exception {
     long startTime = new Date().getTime();
 
-    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data/");
-//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_3000_Entries/");
-//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/tests/big_data_tests/data/");
-//    ApplicationConfiguration configuration = new TestApplicationConfiguration("data/");
-//    ApplicationConfiguration configuration = new TestApplicationConfiguration("/run/media/ganymed/fast_data/programme/DeepThought/data/");
-
-    Application.instantiate(configuration, new DefaultDependencyResolver() {
+    Application.instantiate(new TestApplicationConfiguration("data/tests/big_data/") {
+//    Application.instantiate(new estApplicationConfiguration("data/tests/big_data_3000_Entries/") {
+//    Application.instantiate(new TestApplicationConfiguration("data/tests/big_data_tests/data/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         entityManager = new OrmLiteJavaSeEntityManager(configuration);

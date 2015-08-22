@@ -1,12 +1,10 @@
 package net.deepthought.data.persistence;
 
 import net.deepthought.Application;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;
-import net.deepthought.data.TestApplicationConfiguration;
 import net.deepthought.data.helper.DataHelper;
-import net.deepthought.data.helper.MockEntityManager;
-import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.User;
@@ -30,7 +28,7 @@ public class DeepThoughtJsonWriterTest {
 
   @Before
   public void setup() throws Exception {
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()) {
+    Application.instantiate(new TestApplicationConfiguration() {
 //      @Override
 //      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
 //        return new MockEntityManagerWithPredefinedData();

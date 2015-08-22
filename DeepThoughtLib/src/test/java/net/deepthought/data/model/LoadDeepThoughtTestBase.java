@@ -1,8 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestApplicationConfiguration;
-import net.deepthought.data.helper.TestDependencyResolver;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.ExtensibleEnumeration;
 import net.deepthought.data.model.enums.Language;
@@ -43,7 +42,7 @@ public abstract class LoadDeepThoughtTestBase extends DataModelTestBase {
 //    entityManager.close();
     Application.shutdown();
 
-    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver() {
+    Application.instantiate(new TestApplicationConfiguration() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         entityManager = getEntityManager(configuration);

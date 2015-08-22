@@ -259,22 +259,6 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
   }
 
 
-  public static EntityManagerConfiguration createDefaultConfiguration(ApplicationConfiguration applicationConfiguration) {
-    EntityManagerConfiguration configuration = createDefaultConfiguration(applicationConfiguration.getDataFolder(), false);
-    configuration.setDataBaseCurrentDataModelVersion(applicationConfiguration.getDataBaseCurrentDataModelVersion());
-    return configuration;
-  }
-
-  public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder, boolean createTables) {
-    return createDefaultConfiguration(dataFolder, createTables, DatabaseType.SQLite);
-  }
-
-  public static EntityManagerConfiguration createDefaultConfiguration(String dataFolder, boolean createTables, DatabaseType databaseType) {
-    EntityManagerConfiguration configuration = new EntityManagerConfiguration(dataFolder, databaseType, createTables);
-
-    return configuration;
-  }
-
   protected void setDatabaseConfiguration(DatabaseType databaseType, boolean createTables) {
     switch(databaseType) {
       case SQLite:
@@ -311,48 +295,6 @@ public class EntityManagerConfiguration extends ApplicationConfiguration {
 
     if(createTables)
       setCreateTables(true);
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration() {
-    return createTestConfiguration("data/tests/");
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration(String dataFolder) {
-    return createTestConfiguration(dataFolder, false);
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration(boolean createTables) {
-    return createTestConfiguration("data/tests/", createTables);
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration(String dataFolder, boolean createTables) {
-    return createTestConfiguration(dataFolder, createTables, DatabaseType.H2Mem);
-  }
-
-  public static EntityManagerConfiguration createTestConfiguration(String dataFolder, boolean createTables, DatabaseType databaseType) {
-    EntityManagerConfiguration configuration = createDefaultConfiguration(dataFolder, createTables, databaseType);
-
-    switch(configuration.getDatabaseType()) {
-      case SQLite:
-        configuration.setDataCollectionFileName("DeepThoughtDb_Tests_SQLite.db");
-        break;
-      case H2Embedded:
-      case H2Mem:
-        configuration.setDataCollectionFileName("DeepThoughtDb_Tests_H2.mv.db");
-        break;
-      case Derby:
-        configuration.setDataCollectionFileName("DeepThoughtDb_Tests_Derby");
-        break;
-      case HSQLDB:
-        configuration.setDataCollectionFileName("DeepThoughtDb_HSQL_Tests");
-        break;
-    }
-
-    configuration.setCreateDatabase(true);
-    configuration.setCreateTables(true);
-//    configuration.setDropTables(true);
-
-    return configuration;
   }
 
 

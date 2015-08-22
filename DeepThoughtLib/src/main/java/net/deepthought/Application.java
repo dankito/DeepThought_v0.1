@@ -1,7 +1,6 @@
 package net.deepthought;
 
 import net.deepthought.communication.IDeepThoughtsConnector;
-import net.deepthought.data.ApplicationConfiguration;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -85,24 +84,14 @@ public class Application {
     }).start();
   }
 
-  public static void instantiate(ApplicationConfiguration applicationConfiguration, IDependencyResolver dependencyResolver) {
-    EntityManagerConfiguration entityManagerConfiguration = EntityManagerConfiguration.createDefaultConfiguration(applicationConfiguration);
-
-    instantiate(entityManagerConfiguration, dependencyResolver);
-  }
-
   public static void instantiate(IApplicationConfiguration applicationConfiguration) {
-    instantiate(applicationConfiguration.getEntityManagerConfiguration(), applicationConfiguration);
-  }
-
-  public static void instantiate(EntityManagerConfiguration configuration, IDependencyResolver dependencyResolver) {
-    dataFolderPath = configuration.getDataFolder();
+    dataFolderPath = applicationConfiguration.getEntityManagerConfiguration().getDataFolder();
 
     Date startTime = new Date();
     log.info("Starting to resolve dependencies ...");
 
-    Application.dependencyResolver = dependencyResolver;
-    Application.entityManagerConfiguration = configuration;
+    Application.dependencyResolver = applicationConfiguration;
+    Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
     Application.contentExtractorManager = dependencyResolver.createContentExtractorManager();
 

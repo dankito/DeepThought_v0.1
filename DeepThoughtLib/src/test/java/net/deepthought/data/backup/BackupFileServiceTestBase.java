@@ -1,7 +1,8 @@
 package net.deepthought.data.backup;
 
 import net.deepthought.Application;
-import net.deepthought.data.TestsRequiringFileSystemDatabaseTestBase;
+import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.TestEntityManagerConfiguration;
 import net.deepthought.data.backup.enums.BackupRestoreType;
 import net.deepthought.data.backup.enums.BackupStep;
 import net.deepthought.data.backup.enums.CreateBackupResult;
@@ -11,7 +12,6 @@ import net.deepthought.data.helper.AssertSetToFalse;
 import net.deepthought.data.helper.AssertSetToTrue;
 import net.deepthought.data.helper.DataHelper;
 import net.deepthought.data.helper.TestBackupManager;
-import net.deepthought.data.helper.TestDependencyResolver;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * Created by ganymed on 05/01/15.
  */
-public abstract class BackupFileServiceTestBase extends TestsRequiringFileSystemDatabaseTestBase {
+public abstract class BackupFileServiceTestBase {
 
   protected IBackupManager backupManager = null;
 
@@ -47,18 +47,16 @@ public abstract class BackupFileServiceTestBase extends TestsRequiringFileSystem
 
   @BeforeClass
   public static void suiteSetup() {
-    FileUtils.copyFile(DataHelper.getLatestDataModelVersionDatabaseFile(), new File(EntityManagerConfiguration.createTestConfiguration().getDataCollectionPersistencePath()));
+    FileUtils.copyFile(DataHelper.getLatestDataModelVersionDatabaseFile(), new File(new TestEntityManagerConfiguration().getDataCollectionPersistencePath()));
   }
 
   @Before
   public void setup() throws Exception {
-    super.setup();
-
     backupManager = createBackupManager();
 
     backupFileService = createBackupFileService();
 
-    Application.instantiate(databaseOnFileSystemConfiguration, new TestDependencyResolver(null, backupManager) {
+    Application.instantiate(new TestApplicationConfiguration(null, backupManager) {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return BackupFileServiceTestBase.this.createTestEntityManager(configuration);

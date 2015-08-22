@@ -1,8 +1,7 @@
 import com.example.OpenOfficeDocumentsImporterExporter;
 
 import net.deepthought.Application;
-import net.deepthought.DefaultDependencyResolver;
-import net.deepthought.data.ApplicationConfiguration;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -30,29 +29,9 @@ public class OpenOfficeDocumentsImporterExporterTest {
   public void setup() {
     importer = new OpenOfficeDocumentsImporterExporter();
 
-//    Application.instantiate(new TestApplicationConfiguration(), new TestDependencyResolver(new MockEntityManager()));
+//    Application.instantiate(new TestApplicationConfiguration(new MockEntityManager()));
 
-    Application.instantiate(new ApplicationConfiguration() {
-      @Override
-      public String getDataFolder() {
-        return "data/tests/manual/data/";
-      }
-
-      @Override
-      public void setDataFolder(String dataFolder) {
-
-      }
-
-      @Override
-      public int getDataBaseCurrentDataModelVersion() {
-        return 0;
-      }
-
-      @Override
-      public void setDataBaseCurrentDataModelVersion(int newDataModelVersion) {
-
-      }
-    }, new DefaultDependencyResolver() {
+    Application.instantiate(new TestApplicationConfiguration("data/tests/manual/data/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return new OrmLiteJavaSeEntityManager(configuration);
