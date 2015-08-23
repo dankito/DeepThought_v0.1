@@ -61,5 +61,7 @@
     <string name="device_registration_server_allowed_registration">Server hat die Registrierung gestattet</string>
     <string name="device_registration_server_denied_registration">Server hat die Registrierung abgelehnt</string>
     <string name="device_registration_successfully_registered_device">Gerät %s wurde erfolgreich registriert</string>
+    <string name="alert_title_ask_for_device_registration">Bitte um Geräteregistration empfangen</string>
+    <string name="alert_message_ask_for_device_registration">Diesem Gerät die Registrierung erlauben?\nNutzername: %1$s\nGerät: %2$s\nIP: %3$s</string>
 
 </resources>

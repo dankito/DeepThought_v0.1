@@ -1,7 +1,9 @@
 package net.deepthought.dialogs;
 
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +22,13 @@ import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMe
 import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.messages.ResponseValue;
+import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.helper.AlertHelper;
+import net.deepthought.util.StringUtils;
 
 public class RegisterUserDevicesDialog extends DialogFragment {
 
@@ -137,9 +142,30 @@ public class RegisterUserDevicesDialog extends DialogFragment {
 
 
   protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
-    // TODO: implement: ask user if he/she allows registration
-//    boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, windowStage);
-    boolean userAllowsDeviceRegistration = false;
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    builder = builder.setTitle(R.string.alert_title_ask_for_device_registration);
+    String message = String.format(getActivity().getString(R.string.alert_message_ask_for_device_registration), extractUserInfoString(request.getUser()),
+        extractDeviceInfoString(request.getDevice()), request.getIpAddress());
+    builder = builder.setMessage(message);
+
+    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        sendAskUserIfRegisteringDeviceIsAllowedResponse(request, true);
+      }
+    });
+
+    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        sendAskUserIfRegisteringDeviceIsAllowedResponse(request, false);
+      }
+    });
+
+    builder.create().show();
+  }
+
+  protected void sendAskUserIfRegisteringDeviceIsAllowedResponse(final AskForDeviceRegistrationRequest request, boolean userAllowsDeviceRegistration) {
     final AskForDeviceRegistrationResponseMessage result;
 
     if(userAllowsDeviceRegistration == false)
@@ -152,11 +178,25 @@ public class RegisterUserDevicesDialog extends DialogFragment {
     Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
-        if(result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
+        if (result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
           AlertHelper.showInfoMessage(getActivity(), getActivity().getString(R.string.device_registration_successfully_registered_device, request.getDevice()));
         }
       }
     });
+  }
+
+  protected String extractUserInfoString(UserInfo user) {
+    String userInfo = user.getUserName();
+
+    if(StringUtils.isNotNullOrEmpty(user.getFirstName()) || StringUtils.isNotNullOrEmpty(user.getLastName()))
+      userInfo += " (" + user.getFirstName() + " " + user.getLastName() + ")";
+
+    return userInfo;
+  }
+
+  protected static String extractDeviceInfoString(DeviceInfo device) {
+    String deviceInfo = device.getPlatform() + " " + device.getOsVersion();
+    return deviceInfo;
   }
 
 
