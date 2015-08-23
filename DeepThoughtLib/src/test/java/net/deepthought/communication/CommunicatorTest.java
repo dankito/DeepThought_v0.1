@@ -3,9 +3,9 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.model.AllowDeviceToRegisterResult;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,11 +26,10 @@ public class CommunicatorTest extends CommunicationTestBase {
   public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
 
-    connector.openUserDeviceRegistrationServer(new net.deepthought.communication.listener.MessagesReceiverListener() {
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
-      public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         methodCalled.set(true);
-        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
       }
     });
 
@@ -41,18 +40,19 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void askForDeviceRegistration_ServerResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
+    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
 
-    connector.openUserDeviceRegistrationServer(new net.deepthought.communication.listener.MessagesReceiverListener() {
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
-      public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+//        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
+        // TODO:
       }
     });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new net.deepthought.communication.listener.AskForDeviceRegistrationListener() {
       @Override
-      public void serverResponded(AskForDeviceRegistrationResponse response) {
+      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
       }
     });
@@ -62,18 +62,19 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void askForDeviceRegistration_RegistrationIsProhibitedByServer_RegistrationDeniedResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
+    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
 
-    connector.openUserDeviceRegistrationServer(new net.deepthought.communication.listener.MessagesReceiverListener() {
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
-      public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+//        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
+        // TODO:
       }
     });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new net.deepthought.communication.listener.AskForDeviceRegistrationListener() {
       @Override
-      public void serverResponded(AskForDeviceRegistrationResponse response) {
+      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
       }
     });
@@ -83,18 +84,19 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void askForDeviceRegistration_ServerAllowsRegistration_RegistrationAllowedResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
+    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
 
-    connector.openUserDeviceRegistrationServer(new net.deepthought.communication.listener.MessagesReceiverListener() {
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
-      public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        return AllowDeviceToRegisterResult.createAllowRegistrationResult(true);
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+//        return AllowDeviceToRegisterResult.createAllowRegistrationResult(true);
+        // TODO:
       }
     });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
       @Override
-      public void serverResponded(AskForDeviceRegistrationResponse response) {
+      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
       }
     });

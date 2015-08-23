@@ -9,7 +9,10 @@ import net.deepthought.data.model.User;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class AskForDeviceRegistrationResponse extends Response {
+public class AskForDeviceRegistrationResponseMessage extends Request {
+
+  public final static AskForDeviceRegistrationResponseMessage Deny = new AskForDeviceRegistrationResponseMessage(false);
+
 
   protected boolean allowsRegistration = false;
 
@@ -21,12 +24,14 @@ public class AskForDeviceRegistrationResponse extends Response {
 
   protected DeviceInfo device;
 
+  protected int requestMessageId;
 
-  public AskForDeviceRegistrationResponse(boolean allowsRegistration) {
+
+  public AskForDeviceRegistrationResponseMessage(boolean allowsRegistration) {
     this.allowsRegistration = allowsRegistration;
   }
 
-  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useServersUserInformation, UserInfo user, GroupInfo group, DeviceInfo device) {
+  public AskForDeviceRegistrationResponseMessage(boolean allowsRegistration, boolean useServersUserInformation, UserInfo user, GroupInfo group, DeviceInfo device) {
     this(allowsRegistration);
     this.useServersUserInformation = useServersUserInformation;
     this.user = user;
@@ -40,7 +45,7 @@ public class AskForDeviceRegistrationResponse extends Response {
     return allowsRegistration;
   }
 
-  public boolean isUseServersUserInformation() {
+  public boolean useServersUserInformation() {
     return useServersUserInformation;
   }
 
@@ -56,6 +61,14 @@ public class AskForDeviceRegistrationResponse extends Response {
     return device;
   }
 
+  public int getRequestMessageId() {
+    return requestMessageId;
+  }
+
+  public void setRequestMessageId(int requestMessageId) {
+    this.requestMessageId = requestMessageId;
+  }
+
 
   @Override
   public String toString() {
@@ -63,12 +76,8 @@ public class AskForDeviceRegistrationResponse extends Response {
   }
 
 
-  public static AskForDeviceRegistrationResponse createDenyRegistrationResponse() {
-    return new AskForDeviceRegistrationResponse(false);
-  }
-
-  public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useServersUserInformation, User user, Device device) {
-    return new AskForDeviceRegistrationResponse(true, useServersUserInformation, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()), DeviceInfo.fromDevice(device));
+  public static AskForDeviceRegistrationResponseMessage createAllowRegistrationResponse(boolean useServersUserInformation, User user, Device device) {
+    return new AskForDeviceRegistrationResponseMessage(true, useServersUserInformation, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()), DeviceInfo.fromDevice(device));
   }
 
 }

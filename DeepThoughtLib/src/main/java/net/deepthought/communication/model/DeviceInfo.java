@@ -101,6 +101,11 @@ public class DeviceInfo {
   }
 
 
+  @Override
+  public String toString() {
+    return platform + " " + osVersion;
+  }
+
   public static DeviceInfo fromDevice(Device device) {
     return new DeviceInfo(device.getUniversallyUniqueId(), device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
   }

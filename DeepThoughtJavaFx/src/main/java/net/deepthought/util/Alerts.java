@@ -2,7 +2,7 @@ package net.deepthought.util;
 
 import net.deepthought.Application;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.data.model.Category;
@@ -128,7 +128,7 @@ public class Alerts {
     return Dialog.ACTION_YES.equals(response);
   }
 
-  public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+  public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
@@ -141,17 +141,13 @@ public class Alerts {
         .showInformation();
   }
 
-  public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
+  public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
 
-    org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.device.registration.denied"))
-        .message(Localization.getLocalizedString("alert.message.server.denied.device.registration"))
-        .actions(Dialog.ACTION_OK)
-        .owner(windowStage)
-        .showInformation();
+    showInfoMessage(windowStage, Localization.getLocalizedString("alert.title.device.registration.denied"),
+                                 Localization.getLocalizedString("alert.message.server.denied.device.registration"));
   }
 
   protected static String extractUserInfoString(UserInfo user) {
@@ -168,6 +164,22 @@ public class Alerts {
     return deviceInfo;
   }
 
+
+  public static void showInfoMessage(final Stage owner, final String infoMessage, final String alertTitle) {
+    if(Platform.isFxApplicationThread())
+      showInfoMessageOnUiThread(owner, infoMessage, alertTitle);
+    else
+      Platform.runLater(() -> showInfoMessageOnUiThread(owner, infoMessage, alertTitle));
+  }
+
+  protected static void showInfoMessageOnUiThread(Stage owner, String infoMessage, String alertTitle) {
+    org.controlsfx.dialog.Dialogs.create()
+        .title(alertTitle)
+        .message(infoMessage)
+        .actions(Dialog.ACTION_OK)
+        .owner(owner)
+        .showInformation();
+  }
 
   public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle) {
     if(Platform.isFxApplicationThread())

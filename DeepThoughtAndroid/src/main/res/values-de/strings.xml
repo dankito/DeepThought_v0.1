@@ -60,5 +60,6 @@
     <string name="ask_for_registration">Registrieren</string>
     <string name="device_registration_server_allowed_registration">Server hat die Registrierung gestattet</string>
     <string name="device_registration_server_denied_registration">Server hat die Registrierung abgelehnt</string>
+    <string name="device_registration_successfully_registered_device">Gerät %s wurde erfolgreich registriert</string>
 
 </resources>

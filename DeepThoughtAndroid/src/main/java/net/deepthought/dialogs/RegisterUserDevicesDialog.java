@@ -14,11 +14,15 @@ import android.widget.Spinner;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.DeviceRegistrationDevicesAdapter;
+import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.model.AllowDeviceToRegisterResult;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.Response;
+import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.helper.AlertHelper;
 
 public class RegisterUserDevicesDialog extends DialogFragment {
 
@@ -131,10 +135,39 @@ public class RegisterUserDevicesDialog extends DialogFragment {
   }
 
 
+  protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
+    // TODO: implement: ask user if he/she allows registration
+//    boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, windowStage);
+    boolean userAllowsDeviceRegistration = false;
+    final AskForDeviceRegistrationResponseMessage result;
+
+    if(userAllowsDeviceRegistration == false)
+      result = AskForDeviceRegistrationResponseMessage.Deny;
+    else {
+      result = AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+      // TODO: check if user information differ and if so ask which one to use
+    }
+
+    Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
+      @Override
+      public void responseReceived(Response response) {
+        if(result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
+          AlertHelper.showInfoMessage(getActivity(), getActivity().getString(R.string.device_registration_successfully_registered_device, request.getDevice()));
+        }
+      }
+    });
+  }
+
+
   protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = new UserDeviceRegistrationRequestListener() {
     @Override
-    public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-      return AllowDeviceToRegisterResult.createDenyRegistrationResult(); // TODO: implement: ask user if he/she allows registration
+    public void registerDeviceRequestRetrieved(final AskForDeviceRegistrationRequest request) {
+      getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          askUserIfRegisteringDeviceIsAllowed(request);
+        }
+      });
     }
   };
 

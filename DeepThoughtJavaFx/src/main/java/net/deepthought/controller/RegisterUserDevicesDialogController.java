@@ -2,9 +2,12 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.model.AllowDeviceToRegisterResult;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.Request;
+import net.deepthought.communication.messages.Response;
+import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -15,14 +18,13 @@ import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.registration.FoundRegistrationServerListCell;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -168,24 +170,32 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
   protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = new UserDeviceRegistrationRequestListener() {
     @Override
-    public AllowDeviceToRegisterResult registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-      AtomicBoolean userAllowsDeviceRegistration = new AtomicBoolean(false);
-      CountDownLatch waitForUserChoice = new CountDownLatch(1);
-
-      Platform.runLater(() -> {
-        userAllowsDeviceRegistration.set(Alerts.showDeviceAsksForRegistrationAlert(request, windowStage)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
-        waitForUserChoice.countDown();
-      });
-
-      try { waitForUserChoice.await(); } catch(Exception ex) { }
-
-      if(userAllowsDeviceRegistration.get() == false)
-        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
-
-      // TODO: check if user information differ and if so ask which one to use
-      return AllowDeviceToRegisterResult.createAllowRegistrationResult(true);
+    public void registerDeviceRequestRetrieved(final AskForDeviceRegistrationRequest request) {
+      Platform.runLater(() -> askUserIfRegisteringDeviceIsAllowed(request)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
     }
   };
+
+  protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
+    boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, windowStage);
+    final AskForDeviceRegistrationResponseMessage result;
+
+    if(userAllowsDeviceRegistration == false)
+      result = AskForDeviceRegistrationResponseMessage.Deny;
+    else {
+      result = AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+      // TODO: check if user information differ and if so ask which one to use
+    }
+
+    Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
+      @Override
+      public void responseReceived(Request request1, Response response) {
+        if(result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
+          Alerts.showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.device", request.getDevice()),
+              Localization.getLocalizedString("alert.title.device.registration.successful"));
+        }
+      }
+    });
+  }
 
   protected RegistrationRequestListener registrationRequestListener = new RegistrationRequestListener() {
     @Override
@@ -196,7 +206,7 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
   protected AskForDeviceRegistrationListener askForDeviceRegistrationListener = new AskForDeviceRegistrationListener() {
     @Override
-    public void serverResponded(final AskForDeviceRegistrationResponse response) {
+    public void serverResponded(final AskForDeviceRegistrationResponseMessage response) {
       Platform.runLater(() -> {
         if(response != null) {
           if (response.allowsRegistration())

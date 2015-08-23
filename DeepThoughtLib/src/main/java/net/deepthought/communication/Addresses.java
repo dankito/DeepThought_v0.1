@@ -14,11 +14,13 @@ public class Addresses {
 
   public final static String AskForDeviceRegistrationMethodName = "AskForDeviceRegistration";
 
+  public final static String SendAskForDeviceRegistrationResponseMethodName = "AskForDeviceRegistrationResponse";
+
   protected final static List<String> MethodNames;
 
 
   static {
-    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName);
+    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, SendAskForDeviceRegistrationResponseMethodName);
   }
 
 
@@ -29,6 +31,10 @@ public class Addresses {
 
   public static String getAskForDeviceRegistrationAddress(String host, int port) {
     return createAddress(host, port, AskForDeviceRegistrationMethodName);
+  }
+
+  public static String getSendAskForDeviceRegistrationResponseAddress(String host, int port) {
+    return createAddress(host, port, SendAskForDeviceRegistrationResponseMethodName);
   }
 
   protected static String createAddress(String host, int port, String methodName) {

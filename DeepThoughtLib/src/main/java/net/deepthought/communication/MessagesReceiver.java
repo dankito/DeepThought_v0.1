@@ -1,10 +1,10 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
+import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.model.AllowDeviceToRegisterResult;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -26,12 +26,16 @@ public class MessagesReceiver extends NanoHTTPD {
   private final static Logger log = LoggerFactory.getLogger(MessagesReceiver.class);
 
 
-  protected net.deepthought.communication.listener.MessagesReceiverListener listener;
+  protected MessagesReceiverListener listener;
+
+  protected IDeepThoughtsConnector connector;
 
 
-  public MessagesReceiver(int port, net.deepthought.communication.listener.MessagesReceiverListener listener) {
+  public MessagesReceiver(int port, MessagesReceiverListener listener) {
     super(port);
     this.listener = listener;
+
+    this.connector = Application.getDeepThoughtsConnector();
   }
 
   public void unsetListener() {
@@ -70,24 +74,34 @@ public class MessagesReceiver extends NanoHTTPD {
     switch(methodName) {
       case Addresses.AskForDeviceRegistrationMethodName:
         return respondToAskForDeviceRegistrationRequest(session);
+      case Addresses.SendAskForDeviceRegistrationResponseMethodName:
+        return respondToSendAskForDeviceRegistrationResponse(session);
     }
 
     return null;
   }
 
+
   protected Response respondToAskForDeviceRegistrationRequest(IHTTPSession session) {
     AskForDeviceRegistrationRequest request = (AskForDeviceRegistrationRequest)parseRequestBody(session, AskForDeviceRegistrationRequest.class);
 
-    AllowDeviceToRegisterResult userAllowsRegistration = listener.registerDeviceRequestRetrieved(request);
+    listener.registerDeviceRequestRetrieved(request);
 
-    if(userAllowsRegistration.allowsDeviceToRegister()) {
-      Application.getDeepThoughtsConnector().getRegisteredDevicesManager().registerDevice(request, userAllowsRegistration.useServersUserInformation() == false);
-      return createResponse(AskForDeviceRegistrationResponse.createAllowRegistrationResponse(userAllowsRegistration.useServersUserInformation(),
-          Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()));
+    if(connector.isRegistrationServerRunning()) {
+      return createResponse(net.deepthought.communication.messages.Response.OK);
     }
     else
-      return createResponse(Response.Status.FORBIDDEN, AskForDeviceRegistrationResponse.createDenyRegistrationResponse());
+      return createResponse(Response.Status.FORBIDDEN, net.deepthought.communication.messages.Response.Denied);
   }
+
+  protected Response respondToSendAskForDeviceRegistrationResponse(IHTTPSession session) {
+    AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage)parseRequestBody(session, AskForDeviceRegistrationRequest.class);
+
+    listener.askForDeviceRegistrationResponseReceived(message);
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
 
   protected Request parseRequestBody(IHTTPSession session, Class<? extends Request> requestClass) {
     Map<String, String> bodyValues = new HashMap<>();

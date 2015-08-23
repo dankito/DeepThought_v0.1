@@ -1,7 +1,6 @@
 package net.deepthought.adapter;
 
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -12,8 +11,9 @@ import android.widget.TextView;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.helper.AlertHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,7 +122,7 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
 
       Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, new AskForDeviceRegistrationListener() {
         @Override
-        public void serverResponded(final AskForDeviceRegistrationResponse response) {
+        public void serverResponded(final AskForDeviceRegistrationResponseMessage response) {
           if (response != null) {
             context.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
               @Override
@@ -136,15 +136,10 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     }
   };
 
-  protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+  protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponseMessage response) {
     if (response.allowsRegistration())
-      builder = builder.setMessage(R.string.device_registration_server_allowed_registration);
+      AlertHelper.showInfoMessage(context, R.string.device_registration_server_allowed_registration);
     else
-      builder = builder.setMessage(R.string.device_registration_server_denied_registration);
-
-    builder.setNegativeButton(R.string.ok, null);
-
-    builder.create().show();
+      AlertHelper.showInfoMessage(context, R.string.device_registration_server_denied_registration);
   }
 }
