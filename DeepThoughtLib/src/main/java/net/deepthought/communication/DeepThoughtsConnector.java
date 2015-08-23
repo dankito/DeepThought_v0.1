@@ -217,16 +217,25 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
   }
 
-
-  protected void connectedToRegisteredDevice(ConnectedDevice device) {
-    connectedDevicesManager.connectedToDevice(device);
-
+  protected void mayStopRegisteredDevicesSearcher() {
     if(isRegisteredDevicesSearcherRunning() &&
         connectedDevicesManager.getConnectedDevicesCount() >= registeredDevicesManager.getRegisteredDevicesCount())
       stopRegisteredDevicesSearcher();
+  }
 
-    for(ConnectedDevicesListener listener : connectedDevicesListeners)
-      listener.registeredDeviceConnected(device);
+
+  protected void connectedToRegisteredDevice(ConnectedDevice device) {
+    if(device.getDevice() == null)
+      device.setStoredDeviceInstance(); // if it's from a Communicator message locally stored Device instance isn't set yet
+
+    if(connectedDevicesManager.connectedToDevice(device)) {
+      communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
+
+      for (ConnectedDevicesListener listener : connectedDevicesListeners)
+        listener.registeredDeviceConnected(device);
+    }
+
+    mayStopRegisteredDevicesSearcher();
   }
 
   protected void disconnectedFromRegisteredDevice(ConnectedDevice device) {
@@ -335,7 +344,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected void registerDevice(AskForDeviceRegistrationRequest message, boolean useOtherSidesUserInfo) {
     registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
 
-    mayStartRegisteredDevicesSearcher();
+//    mayStartRegisteredDevicesSearcher();
+    communicator.notifyRemoteWeHaveConnected(new ConnectedDevice(message.getDevice().getUniversallyUniqueId(), message.getAddress(), message.getPort()));
 
   }
 
@@ -374,6 +384,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
       for(MessagesReceiverListener listener : messagesReceiverListeners)
         listener.askForDeviceRegistrationResponseReceived(message);
+    }
+
+    @Override
+    public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
+      connectedToRegisteredDevice(connectedDevice);
     }
 
     @Override

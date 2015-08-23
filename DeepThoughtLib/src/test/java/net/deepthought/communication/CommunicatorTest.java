@@ -207,6 +207,11 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
 
       @Override
+      public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
+
+      }
+
+      @Override
       public void ocrResult(OcrResultResponse response) {
 
       }

@@ -47,6 +47,7 @@ public class RegisteredDevicesManager {
     User loggedOnUser = Application.getLoggedOnUser();
     Device peerDevice = extractDeviceInformation(response);
 
+    Application.getApplication().addDevice(peerDevice);
     loggedOnUser.addDevice(peerDevice);
     loggedOnUser.getUsersDefaultGroup().addDevice(peerDevice);
 

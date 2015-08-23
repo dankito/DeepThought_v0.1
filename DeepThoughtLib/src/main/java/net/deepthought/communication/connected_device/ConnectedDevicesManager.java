@@ -16,8 +16,17 @@ public class ConnectedDevicesManager {
 
 
   public boolean connectedToDevice(ConnectedDevice device) {
-    if(connectedDevices.add(device)) {
-      return true;
+    if(containsDevice(device) == false) {
+      return connectedDevices.add(device);
+    }
+
+    return false;
+  }
+
+  private boolean containsDevice(ConnectedDevice device) {
+    for(ConnectedDevice connectedDevice : connectedDevices) {
+      if(connectedDevice.getUniqueDeviceId().equals(device.getUniqueDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
+        return true;
     }
 
     return false;

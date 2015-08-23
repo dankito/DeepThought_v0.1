@@ -9,6 +9,7 @@ import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.GenericRequest;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
@@ -89,6 +90,19 @@ public class Communicator {
 
         if(response.allowsRegistration() && communicatorResponse.getResponseValue() == ResponseValue.Ok)
           communicatorListener.serverAllowedDeviceRegistration(request, response);
+      }
+    });
+  }
+
+  public void notifyRemoteWeHaveConnected(ConnectedDevice connectedDevice) {
+    String address = Addresses.getNotifyRemoteWeHaveConnectedAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
+    ConnectedDevice self = ConnectedDevice.createSelfInstance();
+    final Request request = new GenericRequest<ConnectedDevice>(self);
+
+    sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse);
       }
     });
   }
@@ -252,6 +266,11 @@ public class Communicator {
           break;
         }
       }
+    }
+
+    @Override
+    public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
+
     }
 
     @Override

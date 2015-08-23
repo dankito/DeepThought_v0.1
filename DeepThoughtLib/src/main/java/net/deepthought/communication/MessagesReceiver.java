@@ -5,9 +5,11 @@ import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.GenericRequest;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -79,6 +81,8 @@ public class MessagesReceiver extends NanoHTTPD {
         return respondToAskForDeviceRegistrationRequest(session);
       case Addresses.SendAskForDeviceRegistrationResponseMethodName:
         return respondToSendAskForDeviceRegistrationResponse(session);
+      case Addresses.NotifyRemoteWeHaveConnectedMethodName:
+        return respondToNotifyRemoteWeHaveConnectedMessage(session);
       case Addresses.StartCaptureImageAndDoOcrMethodName:
         return respondToStartCaptureImageAndDoOcrRequest(session);
       case Addresses.OcrResultMethodName:
@@ -101,6 +105,14 @@ public class MessagesReceiver extends NanoHTTPD {
     }
     else
       return createResponse(Response.Status.FORBIDDEN, net.deepthought.communication.messages.Response.Denied);
+  }
+
+  protected Response respondToNotifyRemoteWeHaveConnectedMessage(IHTTPSession session) {
+    GenericRequest<ConnectedDevice> message = (GenericRequest<ConnectedDevice>)parseRequestBody(session, GenericRequest.class);
+
+    listener.notifyRegisteredDeviceConnected(message.getRequestBody());
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
   }
 
   protected Response respondToSendAskForDeviceRegistrationResponse(IHTTPSession session) {

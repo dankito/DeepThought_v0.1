@@ -78,15 +78,9 @@ public class ConnectorMessagesCreator {
     DeserializationResult<ConnectedDevice> result = JsonIoJsonHelper.parseJsonString(messageBody, ConnectedDevice.class);
     if(result.successful()) {
       ConnectedDevice device = result.getResult();
-      for(Device userDevice : Application.getLoggedOnUser().getDevices()) {
-        if(device.getUniqueDeviceId().equals(userDevice.getUniversallyUniqueId())) {
-          device.setDevice(userDevice);
-          return device;
-        }
-      }
+      device.setStoredDeviceInstance();
 
-      log.error("Could not find local device with unique id " + device.getUniqueDeviceId());
-      return result.getResult();
+      return device;
     }
 
     log.error("Could not deserialize message body " + messageBody + " to ConnectedDevice", result.getError());
@@ -132,8 +126,7 @@ public class ConnectorMessagesCreator {
   }
 
   protected String createConnectedDeviceMessageString() {
-    ConnectedDevice device = new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getIPAddressString(true),
-        Application.getDeepThoughtsConnector().getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());
+    ConnectedDevice device = ConnectedDevice.createSelfInstance();
 
     return createConnectedDeviceMessageString(device);
   }

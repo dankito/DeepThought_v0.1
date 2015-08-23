@@ -66,7 +66,7 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 
     this.databasePath = getDatabasePath(DATABASE_NAME);
 
-    deleteRegisteredDevice();
+//    deleteRegisteredDevice();
 
 //    insertMissingColumns();
 
