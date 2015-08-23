@@ -84,6 +84,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -850,46 +851,23 @@ public class MainWindowController implements Initializable {
     icon.setPreserveRatio(true);
     icon.setFitHeight(24);
     icon.maxHeight(24);
-    icon.setUserData(connectedDevice);
+//    icon.setUserData(connectedDevice);
 
-    pnConnectedDevices.getChildren().add(icon);
-    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
-    icon.setOnContextMenuRequested(event -> createConnectedDeviceContextMenu(connectedDevice, icon));
-  }
+//    pnConnectedDevices.getChildren().add(icon);
+//    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
 
-  protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, ImageView icon) {
-    ContextMenu contextMenu = new ContextMenu();
+    Label label = new Label(null, icon);
+    label.setUserData(connectedDevice);
+    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
+        connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
 
-    if(connectedDevice.hasCaptureDevice()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener));
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    if(connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
-      captureImageMenuItem.setOnAction(event -> {
-        // TODO: load image which text should be recognized
-//        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
-      });
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    contextMenu.show(icon, Side.TOP, 0, 0);
+    pnConnectedDevices.getChildren().add(label);
+    HBox.setMargin(label, new Insets(0, 4, 0, 0));
   }
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
     for(Node node : pnConnectedDevices.getChildren()) {
-      if(node instanceof ImageView && device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in registeredDeviceConnected event
+      if(device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in registeredDeviceConnected event
         pnConnectedDevices.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
         break;
       }
@@ -906,13 +884,6 @@ public class MainWindowController implements Initializable {
     @Override
     public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
       // TODO
-    }
-  };
-
-  protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
-    @Override
-    public void ocrResult(TextRecognitionResult ocrResult) {
-
     }
   };
 

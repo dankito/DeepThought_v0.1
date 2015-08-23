@@ -1,6 +1,9 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.Constants;
@@ -14,7 +17,9 @@ import net.deepthought.controls.html.DeepThoughtHTMLEditor;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
@@ -29,6 +34,7 @@ import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -43,6 +49,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -58,6 +65,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -123,6 +131,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected TitledPane ttldpnContent;
   @FXML
+  protected Pane pnConnectedDevices;
+  @FXML
   protected HTMLEditor htmledContent;
 
 //  @FXML
@@ -164,6 +174,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     });
 
     Application.getSettings().addSettingsChangedListener(settingsChangedListener);
+
+    Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
 
     // TODO: what to do when DeepThought changes -> close dialog
   }
@@ -211,6 +223,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.addHtmlEditorTextChangedListener(htmledContent, editor -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
     });
+
+    for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices())
+      addConnectedDeviceIcon(connectedDevice);
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -338,6 +353,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected void closeDialog() {
     entry.removeEntityListener(entryListener);
     Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
+    Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
 
     entryTagsControl.cleanUpControl();
     entryCategoriesControl.cleanUpControl();
@@ -624,6 +640,89 @@ public class EditEntryDialogController extends ChildWindowsController implements
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
 
+    }
+  };
+
+
+  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
+
+    @Override
+    public void registeredDeviceConnected(ConnectedDevice device) {
+      Platform.runLater(() -> addConnectedDeviceIcon(device));
+    }
+
+    @Override
+    public void registeredDeviceDisconnected(ConnectedDevice device) {
+      Platform.runLater(() -> removeConnectedDeviceIcon(device));
+    }
+  };
+
+  protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
+    Device device = connectedDevice.getDevice();
+
+    ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
+    icon.setPreserveRatio(true);
+    icon.setFitHeight(24);
+    icon.maxHeight(24);
+//    icon.setUserData(connectedDevice);
+
+//    pnConnectedDevices.getChildren().add(icon);
+//    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
+
+    Label label = new Label(null, icon);
+    label.setUserData(connectedDevice);
+    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
+        connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
+
+    pnConnectedDevices.getChildren().add(label);
+    HBox.setMargin(label, new Insets(0, 4, 0, 0));
+    label.setOnContextMenuRequested(event -> createConnectedDeviceContextMenu(connectedDevice, label));
+  }
+
+  protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, Node icon) {
+    ContextMenu contextMenu = new ContextMenu();
+
+    if(connectedDevice.hasCaptureDevice()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener));
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    if(connectedDevice.canDoOcr()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
+      captureImageMenuItem.setOnAction(event -> {
+        // TODO: load image which text should be recognized
+//        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
+      });
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    contextMenu.show(icon, Side.BOTTOM, 0, 0);
+  }
+
+  protected void removeConnectedDeviceIcon(ConnectedDevice device) {
+    for(Node node : pnConnectedDevices.getChildren()) {
+      if(/*node instanceof ImageView &&*/ device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in  registeredDeviceConnected event
+        pnConnectedDevices.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
+        break;
+      }
+    }
+  }
+
+  protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
+    @Override
+    public void ocrResult(final TextRecognitionResult ocrResult) {
+      if(ocrResult.recognitionSuccessful())
+        Platform.runLater(() -> htmledContent.setHtmlText(htmledContent.getHtmlText() + ocrResult.getRecognizedText()));
     }
   };
 
