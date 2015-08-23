@@ -17,6 +17,7 @@ import net.deepthought.adapter.DeviceRegistrationDevicesAdapter;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.model.HostInfo;
@@ -150,7 +151,7 @@ public class RegisterUserDevicesDialog extends DialogFragment {
 
     Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
       @Override
-      public void responseReceived(Response response) {
+      public void responseReceived(Request request1, Response response) {
         if(result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
           AlertHelper.showInfoMessage(getActivity(), getActivity().getString(R.string.device_registration_successfully_registered_device, request.getDevice()));
         }
