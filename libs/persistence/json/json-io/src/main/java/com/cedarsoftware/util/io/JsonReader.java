@@ -624,7 +624,7 @@ public class JsonReader implements Closeable
                 remains = remains.trim();
                 if (!remains.equals(",") && (!remains.equals("T")))
                 {
-                    error("Issue parsing data/time, other characters present: " + remains);
+                    error("Issue parsing date/time, other characters present: " + remains);
                 }
             }
 

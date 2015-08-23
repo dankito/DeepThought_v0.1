@@ -1,5 +1,7 @@
 package net.deepthought.communication;
 
+import org.apache.http.protocol.HTTP;
+
 import java.nio.charset.Charset;
 
 /**
@@ -14,6 +16,7 @@ public class Constants {
   public final static int RegisteredDevicesListenerPort = 27384;
 
   public final static Charset MessagesCharset = Charset.forName("utf8");
+  public final static String MessagesCharsetName = HTTP.UTF_8;
 
   public final static String JsonMimeType = "application/json";
 

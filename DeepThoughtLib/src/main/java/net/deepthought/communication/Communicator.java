@@ -1,8 +1,10 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
+import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
+import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.model.User;
@@ -28,20 +30,36 @@ public class Communicator {
   private final static Logger log = LoggerFactory.getLogger(Communicator.class);
 
 
-  public void askForDeviceRegistration(HostInfo serverInfo, net.deepthought.communication.listener.AskForDeviceRegistrationListener listener) {
+  public void askForDeviceRegistration(HostInfo serverInfo, final AskForDeviceRegistrationListener listener) {
     String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getIpAddress(), serverInfo.getPort());
 
     User user = Application.getLoggedOnUser();
     AskForDeviceRegistrationRequest request = AskForDeviceRegistrationRequest.fromUserAndDevice(user, Application.getApplication().getLocalDevice());
 
-    AskForDeviceRegistrationResponse response = (AskForDeviceRegistrationResponse)sendMessage(address, request, AskForDeviceRegistrationResponse.class);
-    if(listener != null)
-      listener.serverResponded(response);
+    sendMessageAsync(address, request, AskForDeviceRegistrationResponse.class, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        AskForDeviceRegistrationResponse response = (AskForDeviceRegistrationResponse)communicatorResponse;
+        if(listener != null)
+          listener.serverResponded(response);
+      }
+    });
 
     // TODO: send confirmation to server that it knows that registration process successfully completed
   }
 
-  protected Response sendMessage(String address, AskForDeviceRegistrationRequest request, Class<? extends Response> responseClass) {
+  protected void sendMessageAsync(final String address, final Request request, final Class<? extends Response> responseClass, final CommunicatorResponseListener listener) {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        Response response = sendMessage(address, request, responseClass);
+        if(listener != null)
+          listener.responseReceived(response);
+      }
+    }).start();
+  }
+
+  protected Response sendMessage(String address, Request request, Class<? extends Response> responseClass) {
     try {
       HttpClient httpClient = new DefaultHttpClient();
 
@@ -51,7 +69,9 @@ public class Communicator {
         log.error("Could not generate Json from Request", result.getError()); // TODO: what to do in this case?
       }
 
-      postRequest.setEntity(new StringEntity(result.getSerializationResult(), Constants.JsonMimeType, Constants.MessagesCharset.displayName()));
+      StringEntity postEntity = new StringEntity(result.getSerializationResult(), Constants.MessagesCharsetName);
+      postEntity.setContentType(Constants.JsonMimeType);
+      postRequest.setEntity(postEntity);
 
       HttpResponse response = httpClient.execute(postRequest);
       HttpEntity entity = response.getEntity();

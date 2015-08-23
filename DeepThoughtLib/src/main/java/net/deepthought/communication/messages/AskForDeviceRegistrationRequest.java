@@ -11,11 +11,16 @@ import net.deepthought.data.model.User;
  */
 public class AskForDeviceRegistrationRequest extends Request {
 
+  protected static int MessageId = 0;
+
+
   protected UserInfo user;
 
   protected GroupInfo group;
 
   protected DeviceInfo device;
+
+  protected int messageId = MessageId++; // to be able to assign Server Response to Request
 
 
   public AskForDeviceRegistrationRequest(UserInfo user, GroupInfo group, DeviceInfo device) {

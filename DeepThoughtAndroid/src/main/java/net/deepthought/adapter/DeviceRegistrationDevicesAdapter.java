@@ -1,6 +1,7 @@
 package net.deepthought.adapter;
 
 import android.app.Activity;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -8,7 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import net.deepthought.Application;
 import net.deepthought.R;
+import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.messages.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.HostInfo;
 
 import java.util.ArrayList;
@@ -51,7 +55,6 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
 
     HostInfo serverInfo = (HostInfo)getItem(i);
 
-    // TODO: set OS logo
     int osLogoId = getOsLogoId(serverInfo);
     if(osLogoId > 0) {
       ImageView imgvwOsLogo = (ImageView) convertView.findViewById(R.id.imgvwOsLogo);
@@ -69,6 +72,7 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
 
     Button btnAskForRegistration = (Button)convertView.findViewById(R.id.btnAskForRegistration);
     btnAskForRegistration.setOnClickListener(btnAskForRegistrationOnClickListener);
+    btnAskForRegistration.setTag(serverInfo);
 
     return convertView;
   }
@@ -114,13 +118,33 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
   protected View.OnClickListener btnAskForRegistrationOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      // TODO: implement
-//      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(, new AskForDeviceRegistrationListener() {
-//        @Override
-//        public void serverResponded(AskForDeviceRegistrationResponse response) {
-//
-//        }
-//      });
+      HostInfo serverInfo = (HostInfo) view.getTag();
+
+      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, new AskForDeviceRegistrationListener() {
+        @Override
+        public void serverResponded(final AskForDeviceRegistrationResponse response) {
+          if (response != null) {
+            context.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
+              @Override
+              public void run() {
+                showAskForDeviceRegistrationResponseToUser(response);
+              }
+            });
+          }
+        }
+      });
     }
   };
+
+  protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    if (response.allowsRegistration())
+      builder = builder.setMessage(R.string.device_registration_server_allowed_registration);
+    else
+      builder = builder.setMessage(R.string.device_registration_server_denied_registration);
+
+    builder.setNegativeButton(R.string.ok, null);
+
+    builder.create().show();
+  }
 }

@@ -28,7 +28,6 @@ public class EntriesOverviewAdapter extends BaseAdapter {
   public EntriesOverviewAdapter(Activity context) {
     this.context = context;
 
-    // TODO: unregister listeners again to avoid memory leaks
     Application.addApplicationListener(applicationListener);
 
     deepThought = Application.getDeepThought();

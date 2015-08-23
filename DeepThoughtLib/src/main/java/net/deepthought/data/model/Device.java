@@ -14,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
@@ -58,6 +59,10 @@ public class Device extends UserDataEntity {
 
   @ManyToMany(fetch = FetchType.EAGER, mappedBy = "devices")
   protected Set<Group> groups = new HashSet<>();
+
+  @Column(name = TableConfig.DeviceIconColumnName)
+  @Lob
+  protected byte[] deviceIcon = null;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.DeviceDeepThoughtApplicationJoinColumnName)
@@ -209,6 +214,14 @@ public class Device extends UserDataEntity {
     }
 
     return false;
+  }
+
+  public byte[] getDeviceIcon() {
+    return deviceIcon;
+  }
+
+  public void setDeviceIcon(byte[] deviceIcon) {
+    this.deviceIcon = deviceIcon;
   }
 
   public DeepThoughtApplication getApplication() {

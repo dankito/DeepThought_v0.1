@@ -78,11 +78,45 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 
     this.databasePath = getDatabasePath(DATABASE_NAME);
 
+//    insertMissingColumns();
+
 //    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfigurationAndCreateTablesIfNotExists(configuration.getEntityClasses());
     EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfiguration(configuration.getEntityClasses());
     for(EntityConfig entity : entities) {
       entity.setDao(new BaseDaoImpl(entity, connectionSource) { }); // TODO: create a new Dao only in one place in code
       mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
+    }
+  }
+
+  protected void insertMissingColumns() {
+    SQLiteDatabase writableDatabase = getWritableDatabase();
+
+    try {
+      String query = "ALTER TABLE user_dt ADD default_group BIGINT";
+      writableDatabase.execSQL(query);
+    } catch(Exception ex) {
+      String error = ex.getMessage();
+    }
+
+    try {
+      String query = "UPDATE user_dt SET default_group = 1 where id = 1";
+      writableDatabase.execSQL(query);
+    } catch(Exception ex) {
+      String error = ex.getMessage();
+    }
+
+    try {
+      String query = "ALTER TABLE device ADD device_icon longvarbinary";
+      writableDatabase.execSQL(query);
+    } catch(Exception ex) {
+      String error = ex.getMessage();
+    }
+
+    try {
+      String query = "ALTER TABLE device ADD platform_architecture VARCHAR";
+      writableDatabase.execSQL(query);
+    } catch(Exception ex) {
+      String error = ex.getMessage();
     }
   }
 

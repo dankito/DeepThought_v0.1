@@ -33,7 +33,7 @@
     <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
     <string name="edit_entry_button_new_tag_text">Neu</string>
     <string name="edit_entry_entry_label">Eintrag</string>
-    <string name="edit_entry_button_ok_text">OK</string>
+    <string name="ok">OK</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
 
     <string name="alert_dialog_entry_has_unsaved_changes_text">Eintrag beinhaltet nicht gespeicherte Änderungen. Möchten Sie sie speichern?</string>
@@ -58,5 +58,7 @@
     <string name="option_device_search_registration_servers">Registrierungsserver suchen</string>
     <string name="option_device_show_registered_devices">Registrierte Geräte anzeigen</string>
     <string name="ask_for_registration">Registrieren</string>
+    <string name="device_registration_server_allowed_registration">Server hat die Registrierung gestattet</string>
+    <string name="device_registration_server_denied_registration">Server hat die Registrierung abgelehnt</string>
 
 </resources>
