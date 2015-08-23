@@ -143,15 +143,15 @@ public class Communicator {
   }
 
   public void sendCapturedImage(final CaptureImageOrDoOcrRequest request, final byte[] imageBytes, final ResponseListener listener) {
-    String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
-    final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
-
-    sendMessageAsync(address, response, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(response, communicatorResponse, listener);
-      }
-    });
+//    String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
+//    final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
+//
+//    sendMessageAsync(address, response, new CommunicatorResponseListener() {
+//      @Override
+//      public void responseReceived(Response communicatorResponse) {
+//        dispatchResponse(response, communicatorResponse, listener);
+//      }
+//    });
   }
 
   public void stopCaptureImage(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {

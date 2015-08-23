@@ -224,8 +224,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
     });
 
-    for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices())
-      addConnectedDeviceIcon(connectedDevice);
+    for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices()) {
+      if(connectedDevice.hasCaptureDevice() || connectedDevice.canDoOcr())
+        addConnectedDeviceIcon(connectedDevice);
+    }
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
