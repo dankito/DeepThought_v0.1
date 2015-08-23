@@ -7,6 +7,7 @@ public enum NotificationType {
 
   Error,
   Info,
-  PluginLoaded
+  PluginLoaded,
+  DeepThoughtsConnectorStarted
 
 }

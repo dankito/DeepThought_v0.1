@@ -78,12 +78,16 @@ public class RegisterUserDevicesDialog extends DialogFragment {
     btnClose.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        stop();
         dismiss();
       }
     });
   }
 
+  @Override
+  public void onDismiss(DialogInterface dialog) {
+    stop();
+    super.onDismiss(dialog);
+  }
 
   protected AdapterView.OnItemSelectedListener spnDeviceRegistrationOptionsItemSelectedListener = new AdapterView.OnItemSelectedListener() {
     @Override
@@ -145,7 +149,7 @@ public class RegisterUserDevicesDialog extends DialogFragment {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder = builder.setTitle(R.string.alert_title_ask_for_device_registration);
     String message = String.format(getActivity().getString(R.string.alert_message_ask_for_device_registration), extractUserInfoString(request.getUser()),
-        extractDeviceInfoString(request.getDevice()), request.getIpAddress());
+        extractDeviceInfoString(request.getDevice()), request.getAddress());
     builder = builder.setMessage(message);
 
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

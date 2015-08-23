@@ -47,7 +47,7 @@ public class ConnectedDevice {
     return messagesPort;
   }
 
-  public boolean isHasCaptureDevice() {
+  public boolean hasCaptureDevice() {
     return hasCaptureDevice;
   }
 
@@ -55,7 +55,7 @@ public class ConnectedDevice {
     this.hasCaptureDevice = hasCaptureDevice;
   }
 
-  public boolean isCanDoOcr() {
+  public boolean canDoOcr() {
     return canDoOcr;
   }
 

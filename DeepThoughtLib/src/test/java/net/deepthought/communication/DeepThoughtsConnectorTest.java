@@ -8,9 +8,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
-import java.io.PrintStream;
-
 /**
  * Created by ganymed on 19/08/15.
  */
@@ -22,7 +19,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 //    DeepThoughtsConnector connector1 = new DeepThoughtsConnector(null);
 //    connector1.runAsync();
 
-    DeepThoughtsConnector connector2 = new DeepThoughtsConnector(null);
+    DeepThoughtsConnector connector2 = new DeepThoughtsConnector();
     connector2.runAsync();
 
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
@@ -62,7 +59,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 
   @Test
   public void connectsToARegisteredDevice_IsNowConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStopped() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector(null);
+    DeepThoughtsConnector connector = new DeepThoughtsConnector();
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 1);
@@ -78,7 +75,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 
   @Test
   public void disconnectsFromARegisteredDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector(null);
+    DeepThoughtsConnector connector = new DeepThoughtsConnector();
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 2);

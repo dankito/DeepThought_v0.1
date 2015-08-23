@@ -2,10 +2,18 @@ package net.deepthought.communication;
 
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.OcrResultResponse;
+import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -21,19 +31,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class CommunicatorTest extends CommunicationTestBase {
 
+  @Override
+  public void setup() {
+    super.setup();
+
+    try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
+  }
 
   @Test
   public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
 
     connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
       public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
         methodCalled.set(true);
+        waitLatch.countDown();
       }
     });
 
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
 
     Assert.assertTrue(methodCalled.get());
   }
@@ -41,21 +62,20 @@ public class CommunicatorTest extends CommunicationTestBase {
   @Test
   public void askForDeviceRegistration_ServerResponseIsReceived() {
     final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
-      @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-//        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
-        // TODO:
-      }
-    });
+    connector.openUserDeviceRegistrationServer(null);
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new net.deepthought.communication.listener.AskForDeviceRegistrationListener() {
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
       @Override
       public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
+        waitLatch.countDown();
       }
     });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
 
     Assert.assertEquals(1, responses.size());
   }
@@ -63,12 +83,12 @@ public class CommunicatorTest extends CommunicationTestBase {
   @Test
   public void askForDeviceRegistration_RegistrationIsProhibitedByServer_RegistrationDeniedResponseIsReceived() {
     final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
 
     connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
       public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-//        return AllowDeviceToRegisterResult.createDenyRegistrationResult();
-        // TODO:
+        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.Deny, null);
       }
     });
 
@@ -76,8 +96,12 @@ public class CommunicatorTest extends CommunicationTestBase {
       @Override
       public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
+        waitLatch.countDown();
       }
     });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
 
     Assert.assertFalse(responses.get(0).allowsRegistration());
   }
@@ -85,12 +109,13 @@ public class CommunicatorTest extends CommunicationTestBase {
   @Test
   public void askForDeviceRegistration_ServerAllowsRegistration_RegistrationAllowedResponseIsReceived() {
     final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
 
     connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
       @Override
       public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-//        return AllowDeviceToRegisterResult.createAllowRegistrationResult(true);
-        // TODO:
+        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true,
+            Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
       }
     });
 
@@ -98,11 +123,150 @@ public class CommunicatorTest extends CommunicationTestBase {
       @Override
       public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
         responses.add(response);
+        waitLatch.countDown();
       }
     });
 
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
+
     Assert.assertTrue(responses.get(0).allowsRegistration());
   }
+
+
+  @Test
+  public void startCaptureImageAndDoOcr_RequestIsReceived() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+      }
+    });
+
+    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+  @Test
+  public void startCaptureImageAndDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() {
+    final List<TextRecognitionResult> ocrResults = new ArrayList<>();
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final String recognizedText = "Hyper, hyper";
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        communicator.sendOcrResult(request, TextRecognitionResult.createRecognitionSuccessfulResult(recognizedText), null);
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+      }
+    });
+
+    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), new CaptureImageOrDoOcrResponseListener() {
+      @Override
+      public void ocrResult(TextRecognitionResult ocrResult) {
+        methodCalled.set(true);
+        ocrResults.add(ocrResult);
+        waitLatch.countDown();
+      }
+    });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+    Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
+  }
+
+
+  @Test
+  public void stopCaptureImageAndDoOcr_RequestIsReceived() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addMessagesReceiverListener(new MessagesReceiverListener() {
+      @Override
+      public void askForDeviceRegistrationResponseReceived(AskForDeviceRegistrationResponseMessage message) {
+
+      }
+
+      @Override
+      public void ocrResult(OcrResultResponse response) {
+
+      }
+
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+
+      }
+    });
+
+    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+  @Test
+  public void stopCaptureImageAndDoOcr_ListenerGetsCalledCorrectly() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+    });
+
+    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+  protected CaptureImageOrDoOcrResponseListener ocrResponseListener = new CaptureImageOrDoOcrResponseListener() {
+    @Override
+    public void ocrResult(TextRecognitionResult ocrResult) {
+
+    }
+  };
 
 
   protected HostInfo createLocalHostServerInfo() {

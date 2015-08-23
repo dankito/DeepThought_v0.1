@@ -2,7 +2,6 @@ package net.deepthought.platform;
 
 import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.data.DeepThoughtFxProperties;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
@@ -29,9 +28,7 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   protected EntityManagerConfiguration entityManagerConfiguration;
 
 
-  public JavaSeApplicationConfiguration(DeepThoughtsConnectorListener connectorListener) {
-    super(connectorListener);
-
+  public JavaSeApplicationConfiguration() {
     this.entityManagerConfiguration = new EntityManagerConfiguration(getDataFolder());
   }
 

@@ -61,22 +61,12 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   protected Map<Class, Dao> mapEntityClassesToDaos = new HashMap<>();
 
 
-//  public OrmLiteAndroidEntityManager(Context context) throws SQLException {
-//    super(context, getDatabasePath(DATABASE_NAME), null, Application.CurrentDataModelVersion/*, R.raw.ormlite_config*/);
-//
-//    this.databasePath = getDatabasePath(DATABASE_NAME);
-//    setupEntities();
-//
-////    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfiguration(new ArrayList<Class>(mapEntityClassesToDaos.keySet()).toArray(new Class[mapEntityClassesToDaos.size()]));
-//
-//    Instances.setFieldTypeCreator(new RelationFieldTypeCreator());
-//    TableInfoRegistry.getInstance().createTableInfos(connectionSource, new ArrayList<Class>(mapEntityClassesToDaos.keySet()).toArray(new Class[mapEntityClassesToDaos.size()]));
-//  }
-
   public OrmLiteAndroidEntityManager(Context context, EntityManagerConfiguration configuration) throws SQLException {
     super(context, getDatabasePath(DATABASE_NAME), null, Application.CurrentDataModelVersion/*, R.raw.ormlite_config*/); // TODO: get real database path (e.g. on SD Card) according to EntityManagerConfiguration
 
     this.databasePath = getDatabasePath(DATABASE_NAME);
+
+    deleteRegisteredDevice();
 
 //    insertMissingColumns();
 
@@ -85,6 +75,26 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
     for(EntityConfig entity : entities) {
       entity.setDao(new BaseDaoImpl(entity, connectionSource) { }); // TODO: create a new Dao only in one place in code
       mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
+    }
+  }
+
+  protected void deleteRegisteredDevice() {
+    try {
+      SQLiteDatabase writableDatabase = getWritableDatabase();
+      Cursor cursor = writableDatabase.rawQuery("SELECT * from device", new String[0]);
+      List rows = new ArrayList<String[]>();
+
+      while(cursor.moveToNext()) {
+        String[] row = new String[cursor.getColumnCount()];
+        for(int i = 0; i < row.length; i++)
+          row[i] = cursor.getString(i);
+        rows.add(row);
+      }
+
+      int countDevices = rows.size();
+//      writableDatabase.execSQL("DELETE FROM user_device_join_table WHERE device_id = 2");
+    } catch(Exception ex) {
+      String error = ex.getMessage();
     }
   }
 

@@ -6,7 +6,11 @@
 
 package net.deepthought;
 
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
@@ -21,6 +25,7 @@ import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -38,6 +43,7 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.InputManager;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
@@ -66,6 +72,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -82,7 +89,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -186,7 +192,7 @@ public class MainWindowController implements Initializable {
       }
     });
 
-    Application.instantiateAsync(new JavaSeApplicationConfiguration(connectorListener));
+    Application.instantiateAsync(new JavaSeApplicationConfiguration());
 
     setupControls();
 
@@ -220,6 +226,10 @@ public class MainWindowController implements Initializable {
       if(notification.getParameter() instanceof IPlugin) {
         pluginLoaded((IPlugin)notification.getParameter());
       }
+    }
+    else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
+      Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
+      Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
     }
   }
 
@@ -820,7 +830,7 @@ public class MainWindowController implements Initializable {
   };
 
 
-  protected DeepThoughtsConnectorListener connectorListener = new DeepThoughtsConnectorListener() {
+  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
 
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
@@ -833,7 +843,7 @@ public class MainWindowController implements Initializable {
     }
   };
 
-  protected void addConnectedDeviceIcon(ConnectedDevice connectedDevice) {
+  protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
     Device device = connectedDevice.getDevice();
 
     ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
@@ -844,12 +854,37 @@ public class MainWindowController implements Initializable {
 
     pnConnectedDevices.getChildren().add(icon);
     HBox.setMargin(icon, new Insets(0, 4, 0, 0));
-    icon.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
-      @Override
-      public void handle(ContextMenuEvent event) {
-        // TODO:
-      }
-    });
+    icon.setOnContextMenuRequested(event -> createConnectedDeviceContextMenu(connectedDevice, icon));
+  }
+
+  protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, ImageView icon) {
+    ContextMenu contextMenu = new ContextMenu();
+
+    if(connectedDevice.hasCaptureDevice()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener));
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    if(connectedDevice.canDoOcr()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
+      captureImageMenuItem.setOnAction(event -> {
+        // TODO: load image which text should be recognized
+//        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
+      });
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
+
+    contextMenu.show(icon, Side.TOP, 0, 0);
   }
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
@@ -860,5 +895,25 @@ public class MainWindowController implements Initializable {
       }
     }
   }
+
+
+  protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+    @Override
+    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+      // TODO
+    }
+
+    @Override
+    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+      // TODO
+    }
+  };
+
+  protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
+    @Override
+    public void ocrResult(TextRecognitionResult ocrResult) {
+
+    }
+  };
 
 }

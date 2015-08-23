@@ -3,16 +3,19 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.CommunicatorListener;
+import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
-import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
-import net.deepthought.communication.messages.ResponseValue;
+import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
@@ -21,6 +24,8 @@ import net.deepthought.communication.registration.RegistrationServer;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,25 +62,22 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
-  protected Set<DeepThoughtsConnectorListener> connectorListeners = new HashSet<>();
+  protected Set<ConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
+
+  protected Set<CaptureImageOrDoOcrListener> captureImageOrDoOcrListeners = new HashSet<>();
 
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  protected DeepThoughtsConnector() {
-    this(null);
+  public DeepThoughtsConnector() {
+    this(Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtsConnector(DeepThoughtsConnectorListener listener) {
-    this(Constants.MessageHandlerDefaultPort, listener);
-  }
-
-  public DeepThoughtsConnector(int messageReceiverPort, DeepThoughtsConnectorListener listener) {
+  public DeepThoughtsConnector(int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
-    addConnectorListener(listener);
 
     // TODO: make configurable
-    this.communicator = new Communicator(this, responseListener);
+    this.communicator = new Communicator(this, communicatorListener);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator();
@@ -107,6 +109,12 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected void run() throws Exception {
     startMessageReceiver();
 
+    mayStartRegisteredDevicesSearcher();
+
+    Application.notifyUser(new Notification(NotificationType.DeepThoughtsConnectorStarted, Localization.getLocalizedString("deep.thoughts.connector.started")));
+  }
+
+  protected void mayStartRegisteredDevicesSearcher() {
     if(registeredDevicesManager.hasRegisteredDevices() && connectedDevicesManager.getConnectedDevicesCount() < registeredDevicesManager.getRegisteredDevicesCount()) {
       startRegisteredDevicesSearcher();
     }
@@ -142,7 +150,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
   protected boolean isPortAlreadyInUseException(Exception exception) {
-    return (exception instanceof BindException || exception instanceof SocketException) && "Address already in use".equals(exception.getMessage());
+    return (exception instanceof BindException || exception instanceof SocketException) && (
+        "Address already in use".equals(exception.getMessage()) || "Socket is closed".equals(exception.getMessage()));
   }
 
   protected void stopMessagesReceiver() {
@@ -216,7 +225,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
         connectedDevicesManager.getConnectedDevicesCount() >= registeredDevicesManager.getRegisteredDevicesCount())
       stopRegisteredDevicesSearcher();
 
-    for(DeepThoughtsConnectorListener listener : connectorListeners)
+    for(ConnectedDevicesListener listener : connectedDevicesListeners)
       listener.registeredDeviceConnected(device);
   }
 
@@ -227,7 +236,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
         registeredDevicesManager.getRegisteredDevicesCount() > connectedDevicesManager.getConnectedDevicesCount())
       startRegisteredDevicesSearcher();
 
-    for(DeepThoughtsConnectorListener listener : connectorListeners)
+    for(ConnectedDevicesListener listener : connectedDevicesListeners)
       listener.registeredDeviceDisconnected(device);
   }
 
@@ -285,12 +294,20 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
 
-  public boolean addConnectorListener(DeepThoughtsConnectorListener listener) {
-    return connectorListeners.add(listener);
+  public boolean addConnectedDevicesListener(ConnectedDevicesListener listener) {
+    return connectedDevicesListeners.add(listener);
   }
 
-  public boolean removeConnectorListener(DeepThoughtsConnectorListener listener) {
-    return connectorListeners.remove(listener);
+  public boolean removeConnectedDevicesListener(ConnectedDevicesListener listener) {
+    return connectedDevicesListeners.remove(listener);
+  }
+
+  public boolean addCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener) {
+    return captureImageOrDoOcrListeners.add(listener);
+  }
+
+  public boolean removeCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener) {
+    return captureImageOrDoOcrListeners.remove(listener);
   }
 
   public boolean addMessagesReceiverListener(MessagesReceiverListener listener) {
@@ -302,12 +319,48 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
 
+  protected CommunicatorListener communicatorListener = new CommunicatorListener() {
+
+    @Override
+    public void responseReceived(Request request, Response response) {
+
+    }
+
+    @Override
+    public void serverAllowedDeviceRegistration(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponseMessage response) {
+      registerDevice(request, response.useServersUserInformation() == false);
+    }
+  };
+
+  protected void registerDevice(AskForDeviceRegistrationRequest message, boolean useOtherSidesUserInfo) {
+    registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
+
+    mayStartRegisteredDevicesSearcher();
+
+  }
+
+  protected RegisteredDeviceConnectedListener registeredDeviceConnectedListener = new RegisteredDeviceConnectedListener() {
+    @Override
+    public void registeredDeviceConnected(ConnectedDevice device) {
+      connectedToRegisteredDevice(device);
+    }
+  };
+
+  protected RegisteredDeviceDisconnectedListener registeredDeviceDisconnectedListener = new RegisteredDeviceDisconnectedListener() {
+    @Override
+    public void registeredDeviceDisconnected(ConnectedDevice device) {
+      disconnectedFromRegisteredDevice(device);
+    }
+  };
+
   protected MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
 
     @Override
     public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
       if(userDeviceRegistrationRequestListener != null)
         userDeviceRegistrationRequestListener.registerDeviceRequestRetrieved(request);
+      else // if listener is null it's not possible that the user chooses whether she/he likes to allow register or not -> send a deny directly
+        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.Deny, null);
 
       for(MessagesReceiverListener listener : messagesReceiverListeners)
         listener.registerDeviceRequestRetrieved(request);
@@ -322,34 +375,29 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       for(MessagesReceiverListener listener : messagesReceiverListeners)
         listener.askForDeviceRegistrationResponseReceived(message);
     }
-  };
 
-  protected ResponseListener responseListener = new ResponseListener() {
     @Override
-    public void responseReceived(Request request, Response response) {
-      if(request instanceof AskForDeviceRegistrationResponseMessage) {
-        AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage)request;
-        if(message.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok)
-          registerDevice(message, message.useServersUserInformation() == false);
-      }
+    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+      for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+        listener.startCaptureImageOrDoOcr(request);
+
+      for(MessagesReceiverListener listener : messagesReceiverListeners)
+        listener.startCaptureImageOrDoOcr(request);
     }
-  };
 
-  protected void registerDevice(AskForDeviceRegistrationResponseMessage message, boolean useOtherSidesUserInfo) {
-    registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
-  }
-
-  protected RegisteredDeviceConnectedListener registeredDeviceConnectedListener = new RegisteredDeviceConnectedListener() {
     @Override
-    public void registeredDeviceConnected(ConnectedDevice device) {
-      connectedToRegisteredDevice(device);
+    public void ocrResult(OcrResultResponse ocrResult) {
+      for(MessagesReceiverListener listener : messagesReceiverListeners)
+        listener.ocrResult(ocrResult);
     }
-  };
 
-  protected RegisteredDeviceDisconnectedListener registeredDeviceDisconnectedListener = new RegisteredDeviceDisconnectedListener() {
     @Override
-    public void registeredDeviceDisconnected(ConnectedDevice device) {
-      disconnectedFromRegisteredDevice(device);
+    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+      for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+        listener.stopCaptureImageOrDoOcr(request);
+
+      for(MessagesReceiverListener listener : messagesReceiverListeners)
+        listener.stopCaptureImageOrDoOcr(request);
     }
   };
 

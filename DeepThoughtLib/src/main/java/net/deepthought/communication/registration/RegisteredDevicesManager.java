@@ -1,7 +1,7 @@
 package net.deepthought.communication.registration;
 
 import net.deepthought.Application;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
@@ -43,27 +43,28 @@ public class RegisteredDevicesManager {
     return device != null && loggedOnUser.containsDevice(device.getDevice());
   }
 
-  public boolean registerDevice(AskForDeviceRegistrationResponseMessage response, boolean useOtherSidesUserInfo) { // TODO: after calling this start searching for registered devices
+  public boolean registerDevice(AskForDeviceRegistrationRequest response, boolean useOtherSidesUserInfo) { // TODO: after calling this start searching for registered devices
     User loggedOnUser = Application.getLoggedOnUser();
     Device peerDevice = extractDeviceInformation(response);
 
     loggedOnUser.addDevice(peerDevice);
+    loggedOnUser.getUsersDefaultGroup().addDevice(peerDevice);
 
     if(useOtherSidesUserInfo)
       mergeUserInfo(response, loggedOnUser, peerDevice);
     return false;
   }
 
-  protected Device extractDeviceInformation(AskForDeviceRegistrationResponseMessage response) {
+  protected Device extractDeviceInformation(AskForDeviceRegistrationRequest response) {
     DeviceInfo deviceInfo = response.getDevice();
     Device device = new Device(deviceInfo.getUniversallyUniqueId(), deviceInfo.getName(),  deviceInfo.getPlatform(), deviceInfo.getOsVersion(), deviceInfo.getPlatformArchitecture());
     device.setDescription(deviceInfo.getDescription());
-    device.setLastKnownIpAddress(deviceInfo.getIpAddress());
+    device.setLastKnownIpAddress(response.getAddress());
 
     return device;
   }
 
-  protected void mergeUserInfo(AskForDeviceRegistrationResponseMessage response, User loggedOnUser, Device peerDevice) {
+  protected void mergeUserInfo(AskForDeviceRegistrationRequest response, User loggedOnUser, Device peerDevice) {
     String previousUserName = loggedOnUser.getUserName();
 
     UserInfo userInfo = response.getUser();
@@ -77,8 +78,6 @@ public class RegisteredDevicesManager {
     group.setUniversallyUniqueId(groupInfo.getUniversallyUniqueId());
     group.setName(groupInfo.getName());
     group.setDescription(groupInfo.getDescription());
-
-    group.addDevice(peerDevice);
 
     if(group.getName().contains(previousUserName))
       group.setName(group.getName().replace(previousUserName, loggedOnUser.getUserName()));

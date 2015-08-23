@@ -1,7 +1,8 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.RegistrationRequestListener;
@@ -37,8 +38,11 @@ public interface IDeepThoughtsConnector {
 
   boolean isStarted();
 
-  boolean addConnectorListener(DeepThoughtsConnectorListener listener);
-  boolean removeConnectorListener(DeepThoughtsConnectorListener listener);
+  boolean addConnectedDevicesListener(ConnectedDevicesListener listener);
+  boolean removeConnectedDevicesListener(ConnectedDevicesListener listener);
+
+  boolean addCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener);
+  boolean removeCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener);
 
   boolean addMessagesReceiverListener(MessagesReceiverListener listener);
   boolean removeMessagesReceiverListener(MessagesReceiverListener listener);

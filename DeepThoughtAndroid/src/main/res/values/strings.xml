@@ -63,6 +63,6 @@
     <string name="device_registration_server_denied_registration">Server denied registration</string>
     <string name="device_registration_successfully_registered_device">Successfully registered device %s</string>
     <string name="alert_title_ask_for_device_registration">Device Registration request received</string>
-    <string name="alert_message_ask_for_device_registration" formatted="false">Allow this Device to register?\nUser name: %1$s\nDevice: %2$s\nIP: %3$s</string>
+    <string name="alert_message_ask_for_device_registration" formatted="false">Allow this Device to register?\n\nUser name: %1$s\nDevice: %2$s\nIP: %3$s</string>
 
 </resources>

@@ -1,7 +1,6 @@
 package net.deepthought;
 
 import net.deepthought.communication.DeepThoughtsConnector;
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;
@@ -19,8 +18,8 @@ import net.deepthought.data.merger.DefaultDataMerger;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.NoOpLanguageDetector;
 import net.deepthought.plugin.DefaultPluginManager;
@@ -45,8 +44,6 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
 
   protected IHtmlHelper htmlHelper = null;
 
-  protected DeepThoughtsConnectorListener connectorListener = null;
-
 
   public DependencyResolverBase() {
 
@@ -55,15 +52,6 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
   public DependencyResolverBase(IEntityManager entityManager) {
     this();
     this.entityManager = entityManager;
-  }
-
-  public DependencyResolverBase(DeepThoughtsConnectorListener connectorListener) {
-    this.connectorListener = connectorListener;
-  }
-
-  public DependencyResolverBase(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
-    this(entityManager);
-    this.connectorListener = connectorListener;
   }
 
   public DependencyResolverBase(IEntityManager entityManager, IBackupManager backupManager) {
@@ -141,7 +129,7 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
 
   @Override
   public IDeepThoughtsConnector createDeepThoughtsConnector() {
-    return new DeepThoughtsConnector(connectorListener);
+    return new DeepThoughtsConnector();
   }
 
 }

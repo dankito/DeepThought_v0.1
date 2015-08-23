@@ -11,10 +11,7 @@ import net.deepthought.data.model.User;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class AskForDeviceRegistrationRequest extends Request {
-
-  protected static int MessageId = 0;
-
+public class AskForDeviceRegistrationRequest extends RequestWithAsynchronousResponse {
 
   protected UserInfo user;
 
@@ -22,19 +19,17 @@ public class AskForDeviceRegistrationRequest extends Request {
 
   protected DeviceInfo device;
 
-  protected String ipAddress;
 
-  protected int port;
+  protected AskForDeviceRegistrationRequest() {
 
-  protected int messageId = MessageId++; // to be able to assign Server Response to Request
-
+  }
 
   public AskForDeviceRegistrationRequest(UserInfo user, GroupInfo group, DeviceInfo device, String ipAddress, int port) {
+    super(ipAddress, port);
+
     this.user = user;
     this.group = group;
     this.device = device;
-    this.ipAddress = ipAddress;
-    this.port = port;
   }
 
 
@@ -48,18 +43,6 @@ public class AskForDeviceRegistrationRequest extends Request {
 
   public DeviceInfo getDevice() {
     return device;
-  }
-
-  public String getIpAddress() {
-    return ipAddress;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public int getMessageId() {
-    return messageId;
   }
 
 

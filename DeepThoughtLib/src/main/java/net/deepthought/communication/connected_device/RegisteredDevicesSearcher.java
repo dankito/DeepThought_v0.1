@@ -105,6 +105,11 @@ public class RegisteredDevicesSearcher {
   protected void serverReceivedPacket(byte[] buffer, DatagramPacket packet) {
     if(messagesCreator.isSearchingForRegisteredDevicesMessage(buffer, packet.getLength())) {
       HostInfo clientInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
+      if(Application.getLoggedOnUser().getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
+          Application.getApplication().getLocalDevice().getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
+          clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true)))
+        return; // a self send packet
+
       if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(clientInfo) == true &&
           Application.getDeepThoughtsConnector().getConnectedDevicesManager().isConnectedToDevice(clientInfo) == false) {
         respondToSearchingForRegisteredDevicesMessage(packet);

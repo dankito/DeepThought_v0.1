@@ -4,7 +4,10 @@ import net.deepthought.Application;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
+import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -76,6 +79,12 @@ public class MessagesReceiver extends NanoHTTPD {
         return respondToAskForDeviceRegistrationRequest(session);
       case Addresses.SendAskForDeviceRegistrationResponseMethodName:
         return respondToSendAskForDeviceRegistrationResponse(session);
+      case Addresses.StartCaptureImageAndDoOcrMethodName:
+        return respondToStartCaptureImageAndDoOcrRequest(session);
+      case Addresses.OcrResultMethodName:
+        return respondToOcrResultResponse(session);
+      case Addresses.StopCaptureImageAndDoOcrMethodName:
+        return respondToStopCaptureImageAndDoOcrRequest(session);
     }
 
     return null;
@@ -98,6 +107,31 @@ public class MessagesReceiver extends NanoHTTPD {
     AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage)parseRequestBody(session, AskForDeviceRegistrationRequest.class);
 
     listener.askForDeviceRegistrationResponseReceived(message);
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
+
+  protected Response respondToStartCaptureImageAndDoOcrRequest(IHTTPSession session) {
+    CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)parseRequestBody(session, CaptureImageOrDoOcrRequest.class);
+
+    listener.startCaptureImageOrDoOcr(request);
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
+  protected Response respondToOcrResultResponse(IHTTPSession session) {
+    OcrResultResponse request = (OcrResultResponse)parseRequestBody(session, OcrResultResponse.class);
+
+    listener.ocrResult(request);
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
+  protected Response respondToStopCaptureImageAndDoOcrRequest(IHTTPSession session) {
+    StopCaptureImageOrDoOcrRequest request = (StopCaptureImageOrDoOcrRequest)parseRequestBody(session, StopCaptureImageOrDoOcrRequest.class);
+
+    listener.stopCaptureImageOrDoOcr(request);
 
     return createResponse(net.deepthought.communication.messages.Response.OK);
   }

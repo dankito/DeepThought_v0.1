@@ -1,6 +1,5 @@
 package net.deepthought;
 
-import net.deepthought.communication.listener.DeepThoughtsConnectorListener;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.helper.MockEntityManager;
@@ -29,14 +28,6 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
 
   public TestApplicationConfiguration(IEntityManager entityManager) {
     super(entityManager);
-  }
-
-  public TestApplicationConfiguration(DeepThoughtsConnectorListener connectorListener) {
-    super(connectorListener);
-  }
-
-  public TestApplicationConfiguration(IEntityManager entityManager, DeepThoughtsConnectorListener connectorListener) {
-    super(entityManager, connectorListener);
   }
 
   public TestApplicationConfiguration(IEntityManager entityManager, IBackupManager backupManager) {

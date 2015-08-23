@@ -34,19 +34,15 @@ public class RegistrationServer {
 
 
   public void startRegistrationServerAsync() {
-    startRegistrationServerAsync(null);
-  }
-
-  public void startRegistrationServerAsync(final RegistrationServerListener listener) {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        startRegistrationServer(listener);
+        startRegistrationServer();
       }
     }).start();
   }
 
-  protected void startRegistrationServer(RegistrationServerListener listener) {
+  protected void startRegistrationServer() {
     try {
       serverSocket = new DatagramSocket(Constants.RegistrationServerPort);
       isSocketOpened = true;
@@ -63,11 +59,11 @@ public class RegistrationServer {
             break;
           else {
             log.error("An Error occurred receiving Packets. serverSocket = " + serverSocket, ex);
-            startRegistrationServer(listener);
+            startRegistrationServer();
           }
         }
 
-        requestReceived(listener, buffer, packet);
+        requestReceived(buffer, packet);
 
       }
     } catch(Exception ex) {
@@ -90,11 +86,8 @@ public class RegistrationServer {
   }
 
 
-  protected void requestReceived(RegistrationServerListener listener, byte[] buffer, DatagramPacket packet) {
+  protected void requestReceived(byte[] buffer, DatagramPacket packet) {
     if (messagesCreator.isLookingForRegistrationServerMessage(buffer, packet.getLength())) {
-      if(listener != null)
-        listener.registrationRequestReceived(messagesCreator.getHostInfoFromMessage(buffer, packet.getLength()));
-
       respondToRegistrationRequest(packet);
     }
   }

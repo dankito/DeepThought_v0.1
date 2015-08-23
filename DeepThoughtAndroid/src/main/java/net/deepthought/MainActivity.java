@@ -19,13 +19,27 @@ import android.view.ViewGroup;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.listener.ResponseListener;
+import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.Request;
+import net.deepthought.communication.messages.Response;
+import net.deepthought.communication.messages.ResponseValue;
+import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
+import net.deepthought.helper.AlertHelper;
+import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +104,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
 
       @Override
-      public void notification(Notification notification) {
-        // TODO: show error message
+      public void notification(final Notification notification) {
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            notifyUser(notification);
+          }
+        });
       }
     });
 
@@ -101,6 +120,20 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       loadingDataProgressDialog.setIndeterminate(true);
       loadingDataProgressDialog.setCancelable(false);
       loadingDataProgressDialog.show();
+    }
+  }
+
+  protected void notifyUser(Notification notification) {
+    if(notification instanceof DeepThoughtError)
+      AlertHelper.showErrorMessage(this, (DeepThoughtError) notification);
+    else if(notification.getType() == NotificationType.Info)
+      AlertHelper.showInfoMessage(this, notification);
+    else if(notification.getType() == NotificationType.PluginLoaded) {
+//      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
+    }
+    else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
+      Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
+      Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
     }
   }
 
@@ -224,13 +257,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   }
 
-  private void testLucene() {
-//    KeywordExtractor extractor = new KeywordExtractor();
-//    List<String> keywords = extractor.extractKeywords("Dann bin ich mal gespannt. Gewichtiges Wort. Harald Junke");
-//    if(keywords.size() > 0) {
-//
-//    }
-  }
 
   @Override
   protected void onStop() {
@@ -296,6 +322,62 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   public void onTabReselected(TabLayout.Tab tab) {
+
+  }
+
+
+  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
+    @Override
+    public void registeredDeviceConnected(ConnectedDevice device) {
+      // TODO
+    }
+
+    @Override
+    public void registeredDeviceDisconnected(ConnectedDevice device) {
+
+    }
+  };
+
+  protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+    @Override
+    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+      if(request.captureImage() == true && request.doOcr() == false)
+        captureImageAndSendToCaller(request);
+      else if(request.captureImage() == true && request.doOcr() == true)
+        captureImageAndDoOcr(request);
+      else if(request.captureImage() == false && request.doOcr() == true)
+        doOcrAndSendToCaller(request);
+    }
+
+    @Override
+    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+    }
+  };
+
+  protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
+
+  }
+
+  protected void captureImageAndDoOcr(final CaptureImageOrDoOcrRequest request) {
+    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
+      Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
+        @Override
+        public void textRecognized(TextRecognitionResult result) {
+          Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
+            @Override
+            public void responseReceived(Request request, Response response) {
+              if(response.getResponseValue() == ResponseValue.Error) {
+                // TODO: stop process then
+              }
+            }
+          });
+        }
+      });
+    }
+  }
+
+  protected void doOcrAndSendToCaller(CaptureImageOrDoOcrRequest request) {
 
   }
 
