@@ -5,6 +5,7 @@ import com.github.axet.wget.info.DownloadInfo;
 import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 
+import net.deepthought.Application;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -28,12 +29,12 @@ public class WGetFileDownloader implements IFileDownloader {
 
 
   public void downloadAsync(final DownloadConfig config, final DownloadListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         download(config, listener);
       }
-    }).start();
+    });
   }
 
   protected void download(DownloadConfig config, DownloadListener listener) {

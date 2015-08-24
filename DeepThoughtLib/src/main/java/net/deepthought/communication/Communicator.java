@@ -207,14 +207,14 @@ public class Communicator {
   }
 
   protected void sendMessageAsync(final String address, final Request request, final Class<? extends Response> responseClass, final CommunicatorResponseListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         Response response = sendMessage(address, request, responseClass);
         if(listener != null)
           listener.responseReceived(response);
       }
-    }).start();
+    });
   }
 
   protected Response sendMessage(String address, Request request, Class<? extends Response> responseClass) {

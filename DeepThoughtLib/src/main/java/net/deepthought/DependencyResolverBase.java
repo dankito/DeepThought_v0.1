@@ -24,6 +24,8 @@ import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.NoOpLanguageDetector;
 import net.deepthought.plugin.DefaultPluginManager;
 import net.deepthought.plugin.IPluginManager;
+import net.deepthought.util.IThreadPool;
+import net.deepthought.util.ThreadPool;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -59,6 +61,11 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
     this.backupManager = backupManager;
   }
 
+
+  @Override
+  public IThreadPool createThreadPool() {
+    return new ThreadPool();
+  }
 
   @Override
   public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {

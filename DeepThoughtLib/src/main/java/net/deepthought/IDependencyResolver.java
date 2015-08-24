@@ -14,11 +14,14 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformConfiguration;
 import net.deepthought.plugin.IPluginManager;
+import net.deepthought.util.IThreadPool;
 
 /**
  * Created by ganymed on 05/01/15.
  */
 public interface IDependencyResolver {
+
+  IThreadPool createThreadPool();
 
   public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception;
 

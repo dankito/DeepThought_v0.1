@@ -61,12 +61,12 @@ public class RegisteredDevicesSearcher {
 
 
   protected void startServerAsync() {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startServer();
       }
-    }).start();
+    });
   }
 
   protected void startServer() {
@@ -133,12 +133,12 @@ public class RegisteredDevicesSearcher {
 
 
   protected void startClientAsync(final RegisteredDeviceConnectedListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startClient(listener);
       }
-    }).start();
+    });
   }
 
   protected void startClient(RegisteredDeviceConnectedListener listener) {

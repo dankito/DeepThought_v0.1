@@ -168,12 +168,12 @@ public class FileUtils {
   }
 
   public static void copyFileAsync(final File sourceFile, final File destinationFile, final FileOperationListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         copyFile(sourceFile, destinationFile, listener);
       }
-    }).start();
+    });
   }
 
   public static boolean copyFile(File sourceFile, File destinationFile) {

@@ -41,12 +41,12 @@ public class DefaultPluginManager implements IPluginManager {
   }
 
   public void loadPluginsAsync() {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         loadPlugins();
       }
-    }).start();
+    });
   }
 
   protected void loadPlugins() {

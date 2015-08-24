@@ -8,6 +8,7 @@ import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.GenericRequest;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
+import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
@@ -75,6 +76,7 @@ public class MessagesReceiver extends NanoHTTPD {
 
   protected Response respondToRequest(IHTTPSession session) {
     String methodName = extractMethodName(session.getUri());
+    log.debug("Received " + methodName + " message");
 
     switch(methodName) {
       case Addresses.AskForDeviceRegistrationMethodName:
@@ -93,7 +95,7 @@ public class MessagesReceiver extends NanoHTTPD {
         return respondToStopCaptureImageAndDoOcrRequest(session);
     }
 
-    return null;
+    return createResponse(Response.Status.NOT_FOUND, new net.deepthought.communication.messages.Response(ResponseValue.Error, "Method not found"));
   }
 
 

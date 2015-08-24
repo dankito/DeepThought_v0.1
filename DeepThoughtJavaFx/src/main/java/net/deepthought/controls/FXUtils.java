@@ -1,5 +1,6 @@
 package net.deepthought.controls;
 
+import net.deepthought.Application;
 import net.deepthought.controls.event.HtmlEditorTextChangedEvent;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
@@ -147,7 +148,7 @@ public class FXUtils {
    * @param nodeToFocus
    */
   public static void focusNode(final Node nodeToFocus) {
-    new Thread(new Task<Void>() {
+    Application.getThreadPool().runTaskAsync(new Task<Void>() {
       @Override
       protected Void call() throws Exception {// This is NOT on FX thread
         Thread.sleep(100);
@@ -158,7 +159,7 @@ public class FXUtils {
       public void succeeded() { // This is called on FX thread.
         nodeToFocus.requestFocus();
       }
-    }).start();
+    });
   }
 
 

@@ -7,6 +7,7 @@ import com.github.axet.vget.vhs.VimeoInfo;
 import com.github.axet.vget.vhs.YoutubeInfo;
 import com.github.axet.wget.info.DownloadInfo;
 
+import net.deepthought.Application;
 import net.deepthought.data.download.DownloadConfig;
 
 import java.io.File;
@@ -22,12 +23,12 @@ public class YouTubeAndVimeoDownloader {
 
 
   public void downloadAsync(final DownloadConfig config, final Object listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         download(config, listener);
       }
-    }).start();
+    });
   }
 
   protected void download(DownloadConfig config, Object listener) {

@@ -1,5 +1,6 @@
 package net.deepthought.communication;
 
+import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
 import net.deepthought.communication.listener.ResponseListener;
@@ -57,7 +58,7 @@ public class ConnectionsAliveWatcher {
 
   protected void checkIfConnectedDevicesStillAreConnected(final RegisteredDeviceDisconnectedListener listener) {
     for(final ConnectedDevice connectedDevice : connectedDevicesManager.getConnectedDevices()) {
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           communicator.sendHeartbeat(connectedDevice, new ResponseListener() {
@@ -68,7 +69,7 @@ public class ConnectionsAliveWatcher {
             }
           });
         }
-      }).start();
+      });
     }
   }
 

@@ -34,12 +34,12 @@ public class RegistrationServer {
 
 
   public void startRegistrationServerAsync() {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startRegistrationServer();
       }
-    }).start();
+    });
   }
 
   protected void startRegistrationServer() {

@@ -95,7 +95,7 @@ public class ConnectedDevice {
     for(Device userDevice : Application.getLoggedOnUser().getDevices()) {
       if(getUniqueDeviceId().equals(userDevice.getUniversallyUniqueId())) {
         setDevice(userDevice);
-        break;
+        return;
       }
     }
 

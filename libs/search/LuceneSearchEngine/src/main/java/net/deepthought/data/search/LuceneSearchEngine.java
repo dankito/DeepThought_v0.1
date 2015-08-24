@@ -646,7 +646,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 ////      return entriesWithoutTags;
 //      listener.completed(entriesWithoutTags);
 
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         try {
@@ -655,7 +655,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
           log.error("Could not search for Entries without Tags", ex);
         }
       }
-    }).start();
+    });
   }
 
   protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {

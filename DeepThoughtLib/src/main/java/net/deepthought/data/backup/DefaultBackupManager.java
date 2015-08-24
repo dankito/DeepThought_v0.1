@@ -63,12 +63,12 @@ public class DefaultBackupManager implements IBackupManager {
 
 
   public void restoreBackupAsync(final RestoreBackupParams params) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         restoreBackup(params);
       }
-    }).start();
+    });
   }
 
   public void restoreBackup(RestoreBackupParams params) {

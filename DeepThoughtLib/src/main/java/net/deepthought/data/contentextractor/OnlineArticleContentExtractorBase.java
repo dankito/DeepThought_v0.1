@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.Application;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 
@@ -54,12 +55,12 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
         listener.entryCreated(new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("can.not.create.entry.from.url"))));
     }
     else {
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           createEntryFromUrl(url, listener);
         }
-      }).start();
+      });
     }
   }
 

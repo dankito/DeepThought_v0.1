@@ -21,6 +21,7 @@ import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformConfiguration;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.file.FileUtils;
@@ -49,6 +50,7 @@ public class Application {
 
   protected static IDependencyResolver dependencyResolver = null;
   protected static IPlatformConfiguration platformConfiguration;
+  protected static IThreadPool threadPool;
 
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
   protected static IEntityManager entityManager = null;
@@ -79,12 +81,20 @@ public class Application {
 
 
   public static void instantiateAsync(final IApplicationConfiguration applicationConfiguration) {
-    new Thread(new Runnable() {
+//    new Thread(new Runnable() {
+//      @Override
+//      public void run() {
+//        instantiate(applicationConfiguration);
+//      }
+//    }).start();
+
+    threadPool = applicationConfiguration.createThreadPool();
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         instantiate(applicationConfiguration);
       }
-    }).start();
+    });
   }
 
   public static void instantiate(IApplicationConfiguration applicationConfiguration) {
@@ -94,6 +104,8 @@ public class Application {
     log.info("Starting to resolve dependencies ...");
 
     Application.dependencyResolver = applicationConfiguration;
+    if(threadPool == null)
+      threadPool = dependencyResolver.createThreadPool();
     Application.platformConfiguration = dependencyResolver.getPlatformConfiguration();
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
@@ -204,6 +216,9 @@ public class Application {
     }
     dataManager = null;
 
+    threadPool.shutDown();
+    threadPool = null;
+
     if(entityManager != null)
       entityManager.close();
     entityManager = null;
@@ -287,6 +302,10 @@ public class Application {
 
   public static IPlatformConfiguration getPlatformConfiguration() {
     return platformConfiguration;
+  }
+
+  public static IThreadPool getThreadPool() {
+    return threadPool;
   }
 
   public static EntityManagerConfiguration getEntityManagerConfiguration() {

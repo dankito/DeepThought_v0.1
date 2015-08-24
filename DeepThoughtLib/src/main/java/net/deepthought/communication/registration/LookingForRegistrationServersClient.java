@@ -37,12 +37,12 @@ public class LookingForRegistrationServersClient {
 
 
   public void findRegistrationServersAsync(final RegistrationRequestListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         findRegistrationServers(listener);
       }
-    }).start();
+    });
   }
 
   protected void findRegistrationServers(RegistrationRequestListener listener) {

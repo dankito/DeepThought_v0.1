@@ -40,12 +40,12 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   @Override
   public void getArticlesOverviewAsync(final ArticlesOverviewListener listener) {
     if(hasArticlesOverview()) {
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           getArticlesOverview(listener);
         }
-      }).start();
+      });
     }
     else
       listener.overviewItemsRetrieved(this, new ArrayList<ArticlesOverviewItem>(), true);

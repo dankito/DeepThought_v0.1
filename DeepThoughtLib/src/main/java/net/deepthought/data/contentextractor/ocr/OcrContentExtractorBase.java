@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor.ocr;
 
+import net.deepthought.Application;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.CreateEntryListener;
@@ -27,12 +28,12 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor {
 
   @Override
   public void createEntryFromUrlAsync(final String url, final CreateEntryListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         createEntryFromUrl(url, listener);
       }
-    }).start();
+    });
   }
 
   protected void createEntryFromUrl(String url, CreateEntryListener listener) {
@@ -68,12 +69,12 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor {
 
   @Override
   public void createEntryFromClipboardContentAsync(final ContentExtractOption contentExtractOption, final CreateEntryListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         createEntryFromClipboardContent(contentExtractOption, listener);
       }
-    }).start();
+    });
   }
 
   protected void createEntryFromClipboardContent(ContentExtractOption contentExtractOption, CreateEntryListener listener) {
@@ -88,12 +89,12 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor {
 
   @Override
   public void captureImagesAndRecognizeTextAsync(final RecognizeTextListener listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         captureImagesAndRecognizeText(listener);
       }
-    }).start();
+    });
   }
 
   protected void captureImagesAndRecognizeText(RecognizeTextListener listener) {

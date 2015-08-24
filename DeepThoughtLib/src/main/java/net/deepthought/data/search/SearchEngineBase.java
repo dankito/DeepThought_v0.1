@@ -43,19 +43,19 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
   @Override
   public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         List<Entry> entriesWithoutTags = new ArrayList<>();
 
-        for(Entry entry : Application.getDeepThought().getEntries()) {
-          if(entry.hasTags() == false)
+        for (Entry entry : Application.getDeepThought().getEntries()) {
+          if (entry.hasTags() == false)
             entriesWithoutTags.add(entry);
         }
 
         listener.completed(entriesWithoutTags);
       }
-    }).start();
+    });
   }
 
   @Override
@@ -71,24 +71,24 @@ public abstract class SearchEngineBase implements ISearchEngine {
     for(int i = 0; i < tagNamesToFilterFor.length; i++)
       tagNamesToFilterFor[i] = tagNamesToFilterFor[i].trim();
 
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         filterTags(search, tagNamesToFilterFor);
       }
-    }).start();
+    });
   }
 
   protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);
 
   @Override
   public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, listener);
       }
-    }).start();
+    });
   }
 
   protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
@@ -105,12 +105,12 @@ public abstract class SearchEngineBase implements ISearchEngine {
     final String contentFilter = search.filterContent() ? lowerCaseFilter : null;
     final String abstractFilter = search.filterAbstract() ? lowerCaseFilter : null;
 
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         filterEntries(search, contentFilter, abstractFilter);
       }
-    }).start();
+    });
   }
 
   protected abstract void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter);
@@ -130,12 +130,12 @@ public abstract class SearchEngineBase implements ISearchEngine {
     if(search.getType() != ReferenceBaseType.All)
       filterOnlyOneTypeOfReferenceBase(search, lowerCaseFilter);
     else if(filterForReferenceHierarchy == false) {
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           filterAllReferenceBaseTypesForSameFilter(search, lowerCaseFilter);
         }
-      }).start();
+      });
     }
     else {
       filterEachReferenceBaseWithSeparateFilter(search, lowerCaseFilter);
@@ -186,12 +186,12 @@ public abstract class SearchEngineBase implements ISearchEngine {
     final String finalReferenceFilter = referenceFilter;
     final String finalReferenceSubDivisionFilter = referenceSubDivisionFilter;
 
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         filterEachReferenceBaseWithSeparateFilter(search, finalSeriesTitleFilter, finalReferenceFilter, finalReferenceSubDivisionFilter);
       }
-    }).start();
+    });
   }
 
   protected abstract void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter);
@@ -210,23 +210,23 @@ public abstract class SearchEngineBase implements ISearchEngine {
     final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");
 
     if(filterForFirstAndLastName == false) {
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           filterPersons(search, lowerCaseFilter);
         }
-      }).start();
+      });
     }
     else {
       final String lastNameFilter = lowerCaseFilter.substring(0, lowerCaseFilter.indexOf(",")).trim();
       final String firstNameFilter = lowerCaseFilter.substring(lowerCaseFilter.indexOf(",") + 1).trim();
 
-      new Thread(new Runnable() {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
           filterPersons(search, lastNameFilter, firstNameFilter);
         }
-      }).start();
+      });
     }
 
 //    search.fireSearchCompleted();

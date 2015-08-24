@@ -88,14 +88,14 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   @Override
   public void runAsync() {
-    new Thread(new Runnable() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         try {
           DeepThoughtsConnector.this.run();
         } catch(Exception ex) { log.error("An error occurred trying to run DeepThoughtsConnector on port " + messageReceiverPort, ex); }
       }
-    }).start();
+    });
   }
 
   @Override
