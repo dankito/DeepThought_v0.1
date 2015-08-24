@@ -2,7 +2,6 @@ package net.deepthought.platform;
 
 import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
-import net.deepthought.data.DeepThoughtFxProperties;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -25,16 +24,28 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   private final static Logger log = LoggerFactory.getLogger(JavaSeApplicationConfiguration.class);
 
 
+  protected IPreferencesStore preferencesStore;
+
+  protected IPlatformConfiguration platformConfiguration;
+
   protected EntityManagerConfiguration entityManagerConfiguration;
 
 
   public JavaSeApplicationConfiguration() {
-    this.entityManagerConfiguration = new EntityManagerConfiguration(getDataFolder());
+    this.preferencesStore = new JavaSePreferencesStore();
+    this.platformConfiguration = new JavaSePlatformConfiguration();
+    this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder());
+  }
+
+
+  @Override
+  public IPreferencesStore getPreferencesStore() {
+    return preferencesStore;
   }
 
   @Override
   public IPlatformConfiguration getPlatformConfiguration() {
-    return new JavaSePlatformConfiguration();
+    return platformConfiguration;
   }
 
   @Override
@@ -68,20 +79,4 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
     return new LanguageDetector();
   }
 
-
-  public String getDataFolder() {
-    return DeepThoughtFxProperties.getDataFolderOrCreateDefaultValuesOnNull();
-  }
-
-  public void setDataFolder(String dataFolder) {
-    DeepThoughtFxProperties.setDataFolder(dataFolder);
-  }
-
-  public int getCurrentDataModelVersion() {
-    return DeepThoughtFxProperties.getDataModelVersion();
-  }
-
-  public void setCurrentDataModelVersion(int newDataModelVersion) {
-    DeepThoughtFxProperties.setDataModelVersion(newDataModelVersion);
-  }
 }

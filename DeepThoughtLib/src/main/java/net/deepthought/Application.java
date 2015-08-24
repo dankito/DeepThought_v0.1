@@ -19,6 +19,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformConfiguration;
+import net.deepthought.platform.IPreferencesStore;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
@@ -49,6 +50,7 @@ public class Application {
   protected static String dataFolderPath = CouldNotGetDataFolderPath;
 
   protected static IDependencyResolver dependencyResolver = null;
+  protected static IPreferencesStore preferencesStore;
   protected static IPlatformConfiguration platformConfiguration;
   protected static IThreadPool threadPool;
 
@@ -106,7 +108,8 @@ public class Application {
     Application.dependencyResolver = applicationConfiguration;
     if(threadPool == null)
       threadPool = dependencyResolver.createThreadPool();
-    Application.platformConfiguration = dependencyResolver.getPlatformConfiguration();
+    Application.preferencesStore = applicationConfiguration.getPreferencesStore();
+    Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
@@ -147,6 +150,8 @@ public class Application {
       deepThoughtsConnector.runAsync();
 
 //      firefoxPluginCommunicator = new FirefoxPluginCommunicator();
+      long duration = new Date().getTime() - startTime.getTime();
+      if(duration > 1000) { }
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
@@ -298,6 +303,10 @@ public class Application {
 
   public static IDependencyResolver getDependencyResolver() {
     return dependencyResolver;
+  }
+
+  public static IPreferencesStore getPreferencesStore() {
+    return preferencesStore;
   }
 
   public static IPlatformConfiguration getPlatformConfiguration() {

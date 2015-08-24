@@ -47,6 +47,4 @@ public interface IDependencyResolver {
 
   public IDeepThoughtsConnector createDeepThoughtsConnector();
 
-  public IPlatformConfiguration getPlatformConfiguration();
-
 }

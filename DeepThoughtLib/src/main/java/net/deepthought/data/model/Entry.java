@@ -66,7 +66,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Column(name = TableConfig.EntryEntryIndexColumnName)
   protected int entryIndex;
 
-  @ManyToMany(fetch = FetchType.EAGER, mappedBy = "entries") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Category?
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "entries") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Category?
   protected Set<Category> categories = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
