@@ -867,8 +867,8 @@ public class MainWindowController implements Initializable {
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
     for(Node node : pnConnectedDevices.getChildren()) {
-      if(device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in registeredDeviceConnected event
-        pnConnectedDevices.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
+      if(device.equals(node.getUserData())) {
+        pnConnectedDevices.getChildren().remove(node);
         break;
       }
     }

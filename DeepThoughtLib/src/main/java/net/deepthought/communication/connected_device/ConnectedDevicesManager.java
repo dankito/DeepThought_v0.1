@@ -23,18 +23,18 @@ public class ConnectedDevicesManager {
     return false;
   }
 
-  private boolean containsDevice(ConnectedDevice device) {
-    for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(connectedDevice.getUniqueDeviceId().equals(device.getUniqueDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
-        return true;
+  public boolean disconnectedFromDevice(ConnectedDevice device) {
+    if(containsDevice(device)) {
+      return connectedDevices.remove(device);
     }
 
     return false;
   }
 
-  public boolean disconnectedFromDevice(ConnectedDevice device) {
-    if(connectedDevices.remove(device)) {
-      return true;
+  public boolean containsDevice(ConnectedDevice device) {
+    for(ConnectedDevice connectedDevice : connectedDevices) {
+      if(connectedDevice.getUniqueDeviceId().equals(device.getUniqueDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
+        return true;
     }
 
     return false;
@@ -50,6 +50,10 @@ public class ConnectedDevicesManager {
     return false;
   }
 
+
+  public boolean areDevicesConnected() {
+    return getConnectedDevicesCount() > 0;
+  }
 
   public int getConnectedDevicesCount() {
     return connectedDevices.size();

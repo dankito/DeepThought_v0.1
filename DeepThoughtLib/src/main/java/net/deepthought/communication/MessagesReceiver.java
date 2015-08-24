@@ -83,6 +83,8 @@ public class MessagesReceiver extends NanoHTTPD {
         return respondToSendAskForDeviceRegistrationResponse(session);
       case Addresses.NotifyRemoteWeHaveConnectedMethodName:
         return respondToNotifyRemoteWeHaveConnectedMessage(session);
+      case Addresses.HeartbeatMethodName:
+        return respondToHeartbeatMessage(session);
       case Addresses.StartCaptureImageAndDoOcrMethodName:
         return respondToStartCaptureImageAndDoOcrRequest(session);
       case Addresses.OcrResultMethodName:
@@ -108,6 +110,14 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected Response respondToNotifyRemoteWeHaveConnectedMessage(IHTTPSession session) {
+    GenericRequest<ConnectedDevice> message = (GenericRequest<ConnectedDevice>)parseRequestBody(session, GenericRequest.class);
+
+    listener.notifyRegisteredDeviceConnected(message.getRequestBody());
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
+  protected Response respondToHeartbeatMessage(IHTTPSession session) {
     GenericRequest<ConnectedDevice> message = (GenericRequest<ConnectedDevice>)parseRequestBody(session, GenericRequest.class);
 
     listener.notifyRegisteredDeviceConnected(message.getRequestBody());

@@ -15,6 +15,9 @@ public class Constants {
 
   public final static int RegisteredDevicesListenerPort = 27384;
 
+  public final static int ConnectionsAliveWatcherDefaultInterval = 10000; // every 10 seconds
+
+
   public final static Charset MessagesCharset = Charset.forName("utf8");
   public final static String MessagesCharsetName = HTTP.UTF_8;
 

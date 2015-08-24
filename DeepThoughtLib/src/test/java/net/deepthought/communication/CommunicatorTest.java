@@ -133,6 +133,39 @@ public class CommunicatorTest extends CommunicationTestBase {
     Assert.assertTrue(responses.get(0).allowsRegistration());
   }
 
+  @Test
+  public void askForDeviceRegistrationDone_ListenerGetsRemoved() {
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+      @Override
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true,
+            Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
+      }
+    });
+
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
+      @Override
+      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
+        waitLatch.countDown();
+      }
+    });
+
+    Assert.assertEquals(1, communicator.askForDeviceRegistrationListeners.size());
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
+
+    Assert.assertEquals(0, communicator.askForDeviceRegistrationListeners.size());
+  }
+
+
+  @Test
+  public void notifyRemoteWeHaveConnected() {
+    Assert.fail("Yet to implement");
+  }
+
 
   @Test
   public void startCaptureImageAndDoOcr_RequestIsReceived() {
@@ -212,6 +245,11 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
 
       @Override
+      public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
+
+      }
+
+      @Override
       public void ocrResult(OcrResultResponse response) {
 
       }
@@ -266,12 +304,47 @@ public class CommunicatorTest extends CommunicationTestBase {
     Assert.assertTrue(methodCalled.get());
   }
 
+  @Test
+  public void stopCaptureImageAndDoOcrDone_ListenerGetsRemoved() {
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+        waitLatch.countDown();
+      }
+    });
+
+    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    Assert.assertEquals(1, communicator.captureImageOrDoOcrListeners.size());
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, communicator.captureImageOrDoOcrListeners.size());
+  }
+
   protected CaptureImageOrDoOcrResponseListener ocrResponseListener = new CaptureImageOrDoOcrResponseListener() {
     @Override
     public void ocrResult(TextRecognitionResult ocrResult) {
 
     }
   };
+
+
+  @Test
+  public void sendOcrResult() {
+    Assert.fail("Yet to implement");
+  }
+
+  @Test
+  public void sendCapturedImage() {
+    Assert.fail("Yet to implement");
+  }
 
 
   protected HostInfo createLocalHostServerInfo() {

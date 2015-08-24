@@ -14,6 +14,8 @@ public interface MessagesReceiverListener extends UserDeviceRegistrationRequestL
 
   void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice);
 
+  void deviceIsStillConnected(ConnectedDevice connectedDevice);
+
   void ocrResult(OcrResultResponse response);
 
 }

@@ -62,6 +62,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
+  protected ConnectionsAliveWatcher connectionsAliveWatcher = null;
+
   protected Set<ConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
 
   protected Set<CaptureImageOrDoOcrListener> captureImageOrDoOcrListeners = new HashSet<>();
@@ -115,7 +117,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
   protected void mayStartRegisteredDevicesSearcher() {
-    if(registeredDevicesManager.hasRegisteredDevices() && connectedDevicesManager.getConnectedDevicesCount() < registeredDevicesManager.getRegisteredDevicesCount()) {
+    if(registeredDevicesManager.hasRegisteredDevices() && connectedDevicesManager.getConnectedDevicesCount() < registeredDevicesManager.getRegisteredDevicesCount() &&
+        isRegisteredDevicesSearcherRunning() == false) {
       startRegisteredDevicesSearcher();
     }
   }
@@ -178,6 +181,30 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
   }
 
+  protected void startConnectionsAliveWatcher() {
+    stopConnectionsAliveWatcher();
+
+    connectionsAliveWatcher = new ConnectionsAliveWatcher(connectedDevicesManager, communicator);
+    connectionsAliveWatcher.startWatchingAsync(registeredDeviceDisconnectedListener);
+  }
+
+  protected void mayStartConnectionsAliveWatcher() {
+    if(connectedDevicesManager.areDevicesConnected() && isConnectionWatcherRunning() == false)
+      startConnectionsAliveWatcher();
+  }
+
+  protected void stopConnectionsAliveWatcher() {
+    if(connectionsAliveWatcher != null) {
+      connectionsAliveWatcher.stopWatching();
+      connectionsAliveWatcher = null;
+    }
+  }
+
+  protected void mayStopConnectionsAliveWatcher() {
+    if(connectedDevicesManager.getConnectedDevicesCount() == 0 && isConnectionWatcherRunning() == true)
+      stopConnectionsAliveWatcher();
+  }
+
 
   @Override
   public void openUserDeviceRegistrationServer(UserDeviceRegistrationRequestListener listener) {
@@ -187,7 +214,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.userDeviceRegistrationRequestListener = listener;
 
     registrationServer = new RegistrationServer(connectorMessagesCreator);
-    registrationServer.startRegistrationServerAsync();
+      registrationServer.startRegistrationServerAsync();
   }
 
   @Override
@@ -236,17 +263,18 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
 
     mayStopRegisteredDevicesSearcher();
+    mayStartConnectionsAliveWatcher();
   }
 
   protected void disconnectedFromRegisteredDevice(ConnectedDevice device) {
-    connectedDevicesManager.disconnectedFromDevice(device);
+    if(connectedDevicesManager.disconnectedFromDevice(device)) {
 
-    if(isRegisteredDevicesSearcherRunning() == false &&
-        registeredDevicesManager.getRegisteredDevicesCount() > connectedDevicesManager.getConnectedDevicesCount())
-      startRegisteredDevicesSearcher();
+      mayStartRegisteredDevicesSearcher();
+      mayStopConnectionsAliveWatcher();
 
-    for(ConnectedDevicesListener listener : connectedDevicesListeners)
-      listener.registeredDeviceDisconnected(device);
+      for (ConnectedDevicesListener listener : connectedDevicesListeners)
+        listener.registeredDeviceDisconnected(device);
+    }
   }
 
 
@@ -277,6 +305,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   @Override
   public boolean isRegisteredDevicesSearcherRunning() {
     return registeredDevicesSearcher != null;
+  }
+
+  @Override
+  public boolean isConnectionWatcherRunning() {
+    return connectionsAliveWatcher != null;
   }
 
   @Override
@@ -389,6 +422,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     @Override
     public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
       connectedToRegisteredDevice(connectedDevice);
+    }
+
+    @Override
+    public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
+
     }
 
     @Override

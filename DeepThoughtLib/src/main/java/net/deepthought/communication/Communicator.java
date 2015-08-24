@@ -25,7 +25,6 @@ import net.deepthought.data.persistence.serializer.SerializationResult;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -106,6 +105,20 @@ public class Communicator {
       }
     });
   }
+
+  public void sendHeartbeat(ConnectedDevice connectedDevice, final ResponseListener listener) {
+    String address = Addresses.getHeartbeatAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
+    ConnectedDevice self = ConnectedDevice.createSelfInstance();
+    final Request request = new GenericRequest<ConnectedDevice>(self);
+
+    sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse, listener);
+      }
+    });
+  }
+
 
   public void startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
     startCaptureImageAndDoOcr(deviceToDoTheJob, true, false, listener);
@@ -206,7 +219,7 @@ public class Communicator {
 
   protected Response sendMessage(String address, Request request, Class<? extends Response> responseClass) {
     try {
-      HttpClient httpClient = new DefaultHttpClient();
+      DefaultHttpClient httpClient = new DefaultHttpClient();
 
       HttpPost postRequest = new HttpPost(address);
       SerializationResult result = JsonIoJsonHelper.generateJsonString(request);
@@ -282,6 +295,11 @@ public class Communicator {
 
     @Override
     public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
+
+    }
+
+    @Override
+    public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
 
     }
 

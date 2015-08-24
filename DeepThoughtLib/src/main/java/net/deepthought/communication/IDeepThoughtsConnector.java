@@ -23,20 +23,22 @@ public interface IDeepThoughtsConnector {
   void findOtherUserDevicesToRegisterAtAsync(RegistrationRequestListener listener);
   void stopSearchingOtherUserDevicesToRegisterAt();
 
-  int getMessageReceiverPort();
-
-  Communicator getCommunicator();
+  boolean isStarted();
 
   boolean isRegistrationServerRunning();
   boolean isSearchRegistrationServersClientRunning();
 
   boolean isRegisteredDevicesSearcherRunning();
 
+  boolean isConnectionWatcherRunning();
+
+  int getMessageReceiverPort();
+
+  Communicator getCommunicator();
+
   RegisteredDevicesManager getRegisteredDevicesManager();
 
   ConnectedDevicesManager getConnectedDevicesManager();
-
-  boolean isStarted();
 
   boolean addConnectedDevicesListener(ConnectedDevicesListener listener);
   boolean removeConnectedDevicesListener(ConnectedDevicesListener listener);
