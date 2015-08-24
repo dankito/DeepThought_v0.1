@@ -7,7 +7,6 @@
 package net.deepthought;
 
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
@@ -25,7 +24,6 @@ import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
-import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -58,6 +56,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -72,7 +72,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -84,7 +83,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -231,6 +229,8 @@ public class MainWindowController implements Initializable {
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
       Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
+      for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices())
+        addConnectedDeviceIcon(connectedDevice);
     }
   }
 
@@ -844,7 +844,12 @@ public class MainWindowController implements Initializable {
     }
   };
 
+  protected Map<String, Node> connectedDeviceIcons = new HashMap<>();
+
   protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
+    if(connectedDeviceIcons.containsKey(connectedDevice.getUniqueDeviceId()))
+      return;
+
     Device device = connectedDevice.getDevice();
 
     ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
@@ -863,14 +868,13 @@ public class MainWindowController implements Initializable {
 
     pnConnectedDevices.getChildren().add(label);
     HBox.setMargin(label, new Insets(0, 4, 0, 0));
+    connectedDeviceIcons.put(connectedDevice.getUniqueDeviceId(), label);
   }
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
-    for(Node node : pnConnectedDevices.getChildren()) {
-      if(device.equals(node.getUserData())) {
-        pnConnectedDevices.getChildren().remove(node);
-        break;
-      }
+    if(connectedDeviceIcons.containsKey(device.getUniqueDeviceId())) {
+      Node icon = connectedDeviceIcons.remove(device.getUniqueDeviceId());
+      pnConnectedDevices.getChildren().remove(icon);
     }
   }
 
