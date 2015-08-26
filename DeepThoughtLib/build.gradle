@@ -72,7 +72,7 @@ else {
 //}
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.10'
+    compile 'org.slf4j:slf4j-api:1.7.12'
     compile project(':json-io')
     compile 'org.eclipse.persistence:javax.persistence:2.1.0'
     compile 'com.norconex.language:langdetect:1.3.0'

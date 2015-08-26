@@ -30,10 +30,11 @@
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="module" module-name="json-io" exported="" />
     <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
-    <orderEntry type="module" module-name="ormlite-jpa-jdbc" exported="" />
+    <orderEntry type="module" module-name="EntityManagerTools" exported="" />
     <orderEntry type="module" module-name="ormlite-jpa-core" exported="" />
+    <orderEntry type="module" module-name="ormlite-jpa-jdbc" exported="" />
     <orderEntry type="library" exported="" name="wget-1.2.12" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.12" level="project" />
     <orderEntry type="library" exported="" name="javax.persistence-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="langdetect-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="tika-core-1.8" level="project" />
@@ -51,6 +52,7 @@
     <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="junit-4.8.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="sqlite-jdbc-3.8.7" level="project" />
+    <orderEntry type="library" exported="" name="WGetFileDownloader.WGetFileDownloader" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

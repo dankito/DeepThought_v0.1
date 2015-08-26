@@ -8,6 +8,8 @@ import net.deepthought.data.helper.TestDataManager;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.platform.IPlatformConfiguration;
+import net.deepthought.platform.IPreferencesStore;
+import net.deepthought.platform.PreferencesStoreBase;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -82,6 +84,26 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
 
       @Override
       public boolean hasCaptureDevice() {
+        return false;
+      }
+    };
+  }
+
+  @Override
+  public IPreferencesStore getPreferencesStore() {
+    return new PreferencesStoreBase() {
+      @Override
+      protected String readValueFromStore(String key, String defaultValue) {
+        return "";
+      }
+
+      @Override
+      protected void saveValueToStore(String key, String value) {
+
+      }
+
+      @Override
+      protected boolean doesValueExist(String key) {
         return false;
       }
     };

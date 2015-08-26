@@ -4,10 +4,8 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jpa.EntityConfig;
-import com.j256.ormlite.jpa.JpaEntityConfigurationReader;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.StatementExecutor;
-import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 import net.deepthought.Application;
@@ -15,6 +13,7 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.db.EntitiesConfigurator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +36,9 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
 
   protected JdbcConnectionSource connectionSource = null;
 
-  protected final static String DbUpgradeBackupTablePrefix = "bak_";
-
 
   protected String databasePath = null;
 
-//  // the DAO objects we use to access the DeepThought table
   protected Map<Class, Dao> mapEntityClassesToDaos = new HashMap<>();
 
   protected StatementExecutor statementExecutor;
@@ -52,157 +48,23 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
     connectionSource = new JdbcConnectionSource(configuration.getDatabasePathIncludingDriverUrl());
     this.databasePath = configuration.getDataCollectionPersistencePath();
 
-    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfigurationAndCreateTablesIfNotExists(configuration.getEntityClasses());
-    for(EntityConfig entity : entities)
-      mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
+    EntitiesConfigurator configurator = new EntitiesConfigurator();
+    EntityConfig[] entities = configurator.readEntityConfiguration(configuration, connectionSource);
+
+    getDaosAndMayCreateTables(configuration, entities);
 
     statementExecutor = new StatementExecutor(connectionSource.getDatabaseType(), entities[0], entities[0].getDao());
   }
 
-//  /**
-//   * This is called when the database is first created. Usually you should call createTable statements here to create
-//   * the tables that will store your data.
-//   */
-//  @Override
-//  public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
-//    try {
-//      Log.i(OrmLiteAndroidEntityManager.class.getName(), "onCreate");
-//
-//      createAllTables(connectionSource);
-//    } catch (SQLException e) {
-//      Log.e(OrmLiteAndroidEntityManager.class.getName(), "Can't create database", e);
-//      throw new RuntimeException(e);
-//    }
-////// here we try inserting data in the on-create as a test
-////    RuntimeExceptionDao<Entry, Long> dao = getSimpleDataDao();
-////// create some deepThought in the onCreate
-////    Entry testEntry = new Entry("Test Entry", "Lorem ipsum");
-//////    DeepThought deepThought = new DeepThought();
-//////    deepThought.addAsAuthorOnEntry(testEntry);
-//////    dao.create(deepThought);
-////    dao.create(testEntry);
-////    Log.i(OrmLiteDeepThoughtPersistenceManager.class.getName(), "created new deepThought in onCreate");
-//  }
-//
-//  /**
-//   * This is called when your application is upgraded and it has a higher version number. This allows you to adjust
-//   * the various data to match the new version number.
-//   */
-//  @Override
-//  public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
-//    // TODO: check which tables from oldVersion to newVersion really changed and only upgrade that ones
-//    try {
-//      Log.i(OrmLiteAndroidEntityManager.class.getName(), "onUpgrade");
-//
-//      List<String> tableNames = new ArrayList<>();
-//      for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet()) {
-//        tableNames.add(TableConfig.getTableNameForClass(entityClass));
-//      }
-//
-//      Map<String, List<String>> tablesColumnNames = backupTables(db, tableNames);
-//
-//      dropAllTables(connectionSource);
-//
-//// after we drop the old databases, we create the new ones
-//      onCreate(db, connectionSource);
-//      copyDataFromBackupTablesAndDropBackups(db, tablesColumnNames);
-//    } catch (SQLException e) {
-//      Log.e(OrmLiteAndroidEntityManager.class.getName(), "Can't drop databases", e);
-//      throw new RuntimeException(e);
-//    }
-//  }
+  protected void getDaosAndMayCreateTables(EntityManagerConfiguration configuration, EntityConfig[] entities) throws SQLException {
+    for(EntityConfig entity : entities) {
+      mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
 
-  protected void createAllTables(ConnectionSource connectionSource) throws SQLException {
-    for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet())
-      TableUtils.createTable(connectionSource, entityClass);
-  }
-
-  protected void dropAllTables(ConnectionSource connectionSource) throws SQLException {
-    for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet()) {
-      try {
-        TableUtils.dropTable(connectionSource, entityClass, true);
-      } catch(Exception ex) { log.error("Could not drop table for class " + entityClass, ex); }
+      if (configuration.getDataBaseCurrentDataModelVersion() == 0)
+        TableUtils.createTableIfNotExists(this.connectionSource, entity.getEntityClass());
     }
   }
 
-//  protected Map<String, List<String>> backupTables(SQLiteDatabase db, List<String> tableNames) {
-//    Map<String, List<String>> tablesColumnNames = new HashMap<>();
-//
-//    for(String tableName : tableNames) {
-//      try {
-//        List<String> tableColumnNames = backupTable(db, tableName);
-//        tablesColumnNames.put(tableName, tableColumnNames); }
-//      catch(Exception ex) { log.error("Could not backup table " + tableName, ex); }
-//    }
-//
-//    return tablesColumnNames;
-//  }
-//
-//  protected List<String> backupTable(SQLiteDatabase db, String tableName) {
-//    List<String> columns = GetColumns(db, tableName);
-//
-//    String backupDatabaseStatement = "ALTER table " + tableName + " RENAME TO '" + DbUpgradeBackupTablePrefix + tableName + "'";
-//    db.execSQL(backupDatabaseStatement);
-//
-//    return columns;
-//  }
-//
-//  protected void copyDataFromBackupTablesAndDropBackups(SQLiteDatabase db, Map<String, List<String>> previousTablesColumnNames) {
-//    for(String tableName : previousTablesColumnNames.keySet()) {
-//      try {
-//        copyDataFromBackupTableAndDrop(db, previousTablesColumnNames, tableName);
-//      } catch(Exception ex) { log.error("Could not copyFile data from backup table " + tableName, ex); }
-//    }
-//  }
-//
-//  protected void copyDataFromBackupTableAndDrop(SQLiteDatabase db, Map<String, List<String>> previousTablesColumnNames, String tableName) {
-//    List<String> tablePreviousColumns = previousTablesColumnNames.get(tableName);
-//    tablePreviousColumns.retainAll(GetColumns(db, tableName)); // intersect previous and new column names
-//
-//    String columnsString = join(tablePreviousColumns, ",");
-//    db.execSQL(String.format( "INSERT INTO %s (%s) SELECT %s from " + DbUpgradeBackupTablePrefix + "%s", tableName, columnsString, columnsString, tableName));
-//
-//    db.execSQL("DROP table " + DbUpgradeBackupTablePrefix + tableName);
-//  }
-//
-//  public static List<String> GetColumns(SQLiteDatabase db, String tableName) {
-//    List<String> ar = null;
-//    Cursor c = null;
-//    try {
-//      c = db.rawQuery("select * from " + tableName + " limit 1", null);
-//      if (c != null) {
-//        ar = new ArrayList<String>(Arrays.asList(c.getColumnNames()));
-//      }
-//    } catch (Exception e) {
-//      Log.v(tableName, e.getMessage(), e);
-//      e.printStackTrace();
-//    } finally {
-//      if (c != null)
-//        c.close();
-//    }
-//    return ar;
-//  }
-//
-//  public static String join(List<String> list, String delim) {
-//    StringBuilder buf = new StringBuilder();
-//    int num = list.size();
-//    for (int i = 0; i < num; i++) {
-//      if (i != 0)
-//        buf.append(delim);
-//      buf.append((String) list.get(i));
-//    }
-//    return buf.toString();
-//  }
-
-
-  public void clearData() {
-    try {
-      dropAllTables(connectionSource);
-      createAllTables(connectionSource);
-    } catch (SQLException ex) {
-      log.error("Could not clear data (drop all tables)", ex);
-    }
-  }
 
   /**
    * Close the database connections and clear any cached DAOs.
@@ -380,45 +242,8 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
     return new ArrayList<>();
   }
 
-
-  /*      Versuch ein Backup der Datenbank zu erstellen      */
-
-//  @Override
-//  public void onOpen(SQLiteDatabase db) {
-////    try {
-////      makeBackupOfDatabase(db);
-////    } catch(Exception ex) { log.error("Could not create a backup of database file " + db.getPath(), ex); }
-//
-//    this.databasePath = db.getPath();
-//
-//    super.onOpen(db);
-//  }
-
-//  protected void makeBackupOfDatabase(SQLiteDatabase db) {
-//    String databasePath = db.getPath();
-//
-//    File maxBackupFile = new File(databasePath + DatabaseBackupDatabaseNameSuffix + MaxDatabaseBackupsToKeep);
-//    if(maxBackupFile.exists())
-//      maxBackupFile.delete();
-//
-//    for(int i = MaxDatabaseBackupsToKeep - 1; i > 0; i--) {
-//      File backupFile = new File(databasePath + DatabaseBackupDatabaseNameSuffix + i);
-//      if(backupFile.exists())
-//        backupFile.renameTo(new File(databasePath + DatabaseBackupDatabaseNameSuffix + (i + 1)));
-//    }
-//
-//    File currentDatabaseFile = new File(databasePath);
-//    if(currentDatabaseFile.exists())
-//      copyFile(currentDatabaseFile, new File(databasePath + DatabaseBackupDatabaseNameSuffix + 1));
-//
-//    tryToCopyToExternalStorage(db);
-//  }
-
   public String getDatabasePath() {
     return databasePath;
   }
 
-  private static String getDatabasePath(String databaseName) {
-    return databaseName;
-  }
 }

@@ -30,11 +30,12 @@
     <orderEntry type="module" module-name="DeepThoughtLib" exported="" />
     <orderEntry type="module" module-name="json-io" exported="" />
     <orderEntry type="module" module-name="JavaSeOrmLiteEntityManager" exported="" />
-    <orderEntry type="module" module-name="ormlite-jpa-jdbc" exported="" />
+    <orderEntry type="module" module-name="EntityManagerTools" exported="" />
     <orderEntry type="module" module-name="ormlite-jpa-core" exported="" />
+    <orderEntry type="module" module-name="ormlite-jpa-jdbc" exported="" />
     <orderEntry type="module" module-name="LuceneSearchEngine" exported="" />
     <orderEntry type="library" exported="" name="bliki-core-3.0.19" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-api-1.7.12" level="project" />
     <orderEntry type="library" exported="" name="javax.persistence-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="langdetect-1.3.0" level="project" />
     <orderEntry type="library" exported="" name="tika-core-1.8" level="project" />
@@ -55,6 +56,7 @@
     <orderEntry type="library" exported="" scope="TEST" name="lucene-misc-4.7.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="lucene-queries-4.7.2" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="lucene-sandbox-4.7.2" level="project" />
+    <orderEntry type="library" exported="" name="WikipediaImporter.WikipediaImporter" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

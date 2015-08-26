@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtJavaFx/DeepThoughtJavaFx.iml" filepath="$PROJECT_DIR$/DeepThoughtJavaFx/DeepThoughtJavaFx.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/DeepThoughtJson-io/DeepThoughtJson-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/DeepThoughtJson-io/DeepThoughtJson-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" filepath="$PROJECT_DIR$/DeepThoughtLib/DeepThoughtLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/EntityManagerTools/EntityManagerTools.iml" filepath="$PROJECT_DIR$/libs/persistence/database/EntityManagerTools/EntityManagerTools.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager/JavaSeOrmLiteEntityManager.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" filepath="$PROJECT_DIR$/libs/search/LuceneSearchEngine/LuceneSearchEngine.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorJava/OcrTextContentExtractorJava.iml" filepath="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorJava/OcrTextContentExtractorJava.iml" />

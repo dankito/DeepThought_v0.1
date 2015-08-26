@@ -7,10 +7,8 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
-import com.j256.ormlite.dao.BaseDaoImpl;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.jpa.EntityConfig;
-import com.j256.ormlite.jpa.JpaEntityConfigurationReader;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
@@ -19,6 +17,7 @@ import net.deepthought.Application;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.db.EntitiesConfigurator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +69,9 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 
 //    insertMissingColumns();
 
-//    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfigurationAndCreateTablesIfNotExists(configuration.getEntityClasses());
-    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfiguration(configuration.getEntityClasses());
+    EntitiesConfigurator configurer = new EntitiesConfigurator();
+    EntityConfig[] entities = configurer.readEntityConfiguration(configuration, connectionSource);
     for(EntityConfig entity : entities) {
-      entity.setDao(new BaseDaoImpl(entity, connectionSource) { }); // TODO: create a new Dao only in one place in code
       mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
     }
   }
@@ -130,44 +128,13 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
     }
   }
 
-//  protected void setupEntities() {
-//    mapEntityClassesToDaos.put(DeepThoughtApplication.class, null);
-////    mapEntityClassesToDaos.put(AppSettings.class, null);
-//
-//    mapEntityClassesToDaos.put(User.class, null);
-//    mapEntityClassesToDaos.put(Device.class, null);
-//    mapEntityClassesToDaos.put(Group.class, null);
-//
-//    mapEntityClassesToDaos.put(DeepThought.class, null);
-//    mapEntityClassesToDaos.put(Category.class, null);
-//    mapEntityClassesToDaos.put(Entry.class, null);
-//    mapEntityClassesToDaos.put(EntriesLinkGroup.class, null);
-//    mapEntityClassesToDaos.put(Tag.class, null);
-//    mapEntityClassesToDaos.put(IndexTerm.class, null);
-//    mapEntityClassesToDaos.put(Person.class, null);
-//    mapEntityClassesToDaos.put(PersonRole.class, null);
-//    mapEntityClassesToDaos.put(EntryPersonAssociation.class, null);
-//
-//    mapEntityClassesToDaos.put(Note.class, null);
-//    mapEntityClassesToDaos.put(NoteType.class, null);
-//    mapEntityClassesToDaos.put(FileLink.class, null);
-//    mapEntityClassesToDaos.put(EntriesLinkGroup.class, null);
-//
-//    mapEntityClassesToDaos.put(ReferenceBase.class, null);
-//    mapEntityClassesToDaos.put(ReferenceBasePersonAssociation.class, null);
-//    mapEntityClassesToDaos.put(Reference.class, null);
-//    mapEntityClassesToDaos.put(ReferenceCategory.class, null);
-//    mapEntityClassesToDaos.put(ReferenceSubDivision.class, null);
-//    mapEntityClassesToDaos.put(ReferenceSubDivisionCategory.class, null);
-//    mapEntityClassesToDaos.put(SeriesTitle.class, null);
-//    mapEntityClassesToDaos.put(SeriesTitleCategory.class, null);
-//    mapEntityClassesToDaos.put(ReferenceIndicationUnit.class, null);
-//    mapEntityClassesToDaos.put(Publisher.class, null);
-//
-//    mapEntityClassesToDaos.put(ApplicationLanguage.class, null);
-//    mapEntityClassesToDaos.put(Language.class, null);
-//    mapEntityClassesToDaos.put(BackupFileServiceType.class, null);
-//  }
+
+  @Override
+  public void onOpen(SQLiteDatabase db) {
+    this.databasePath = db.getPath();
+
+    super.onOpen(db);
+  }
 
   /**
    * This is called when the database is first created. Usually you should call createTable statements here to create
@@ -184,23 +151,6 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
         log.error("Could not create Table for Entity " + entityClass);
       }
     }
-
-//    try {
-//      createAllTables(connectionSource);
-//    } catch (SQLException e) {
-//      Log.e(OrmLiteAndroidEntityManager.class.getName(), "Can't create database", e);
-//      throw new RuntimeException(e);
-//    }
-
-//// here we try inserting data in the on-create as a test
-//    RuntimeExceptionDao<Entry, Long> dao = getSimpleDataDao();
-//// create some deepThought in the onCreate
-//    Entry testEntry = new Entry("Test Entry", "Lorem ipsum");
-////    DeepThought deepThought = new DeepThought();
-////    deepThought.addAsAuthorOnEntry(testEntry);
-////    dao.create(deepThought);
-//    dao.create(testEntry);
-//    Log.i(OrmLiteDeepThoughtPersistenceManager.class.getName(), "created new deepThought in onCreate");
   }
 
   /**
@@ -212,175 +162,7 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
     Log.i(OrmLiteAndroidEntityManager.class.getName(), "onUpgrade");
 
 //    // TODO: check which tables from oldVersion to newVersion really changed and only upgrade that ones
-//    try {
-//      List<String> tableNames = new ArrayList<>();
-//      for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet()) {
-//        tableNames.add(TableConfig.getTableNameForClass(entityClass));
-//      }
-//
-//      Map<String, List<String>> tablesColumnNames = backupTables(db, tableNames);
-//
-//      dropAllTables(connectionSource);
-//
-//// after we drop the old databases, we create the new ones
-//      onCreate(db, connectionSource);
-//      copyDataFromBackupTablesAndDropBackups(db, tablesColumnNames);
-//    } catch (SQLException e) {
-//      Log.e(OrmLiteAndroidEntityManager.class.getName(), "Can't drop databases", e);
-//      throw new RuntimeException(e);
-//    }
   }
-
-//  protected void createAllTables(ConnectionSource connectionSource) throws SQLException {
-//    for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet())
-//      TableUtils.createTable(connectionSource, entityClass);
-//  }
-//
-//  protected void dropAllTables(ConnectionSource connectionSource) throws SQLException {
-//    for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet()) {
-//      try {
-//        TableUtils.dropTable(connectionSource, entityClass, true);
-//      } catch(Exception ex) { log.error("Could not drop table for class " + entityClass, ex); }
-//    }
-//  }
-
-//  protected Map<String, List<String>> backupTables(SQLiteDatabase db, List<String> tableNames) {
-//    Map<String, List<String>> tablesColumnNames = new HashMap<>();
-//
-//    for(String tableName : tableNames) {
-//      try {
-//        List<String> tableColumnNames = backupTable(db, tableName);
-//        tablesColumnNames.put(tableName, tableColumnNames); }
-//      catch(Exception ex) { log.error("Could not backup table " + tableName, ex); }
-//    }
-//
-//    return tablesColumnNames;
-//  }
-//
-//  protected List<String> backupTable(SQLiteDatabase db, String tableName) {
-//    List<String> columns = GetColumns(db, tableName);
-//
-//    String backupDatabaseStatement = "ALTER table " + tableName + " RENAME TO '" + DbUpgradeBackupTablePrefix + tableName + "'";
-//    db.execSQL(backupDatabaseStatement);
-//
-//    return columns;
-//  }
-//
-//  protected void copyDataFromBackupTablesAndDropBackups(SQLiteDatabase db, Map<String, List<String>> previousTablesColumnNames) {
-//    for(String tableName : previousTablesColumnNames.keySet()) {
-//      try {
-//        copyDataFromBackupTableAndDrop(db, previousTablesColumnNames, tableName);
-//      } catch(Exception ex) { log.error("Could not copyFile data from backup table " + tableName, ex); }
-//    }
-//  }
-//
-//  protected void copyDataFromBackupTableAndDrop(SQLiteDatabase db, Map<String, List<String>> previousTablesColumnNames, String tableName) {
-//    List<String> tablePreviousColumns = previousTablesColumnNames.get(tableName);
-//    tablePreviousColumns.retainAll(GetColumns(db, tableName)); // intersect previous and new column names
-//
-//    String columnsString = join(tablePreviousColumns, ",");
-//    db.execSQL(String.format( "INSERT INTO %s (%s) SELECT %s from " + DbUpgradeBackupTablePrefix + "%s", tableName, columnsString, columnsString, tableName));
-//
-//    db.execSQL("DROP table " + DbUpgradeBackupTablePrefix + tableName);
-//  }
-//
-//  public static List<String> GetColumns(SQLiteDatabase db, String tableName) {
-//    List<String> ar = null;
-//    Cursor c = null;
-//    try {
-//      c = db.rawQuery("select * from " + tableName + " limit 1", null);
-//      if (c != null) {
-//        ar = new ArrayList<String>(Arrays.asList(c.getColumnNames()));
-//      }
-//    } catch (Exception e) {
-//      Log.v(tableName, e.getMessage(), e);
-//      e.printStackTrace();
-//    } finally {
-//      if (c != null)
-//        c.close();
-//    }
-//    return ar;
-//  }
-//
-//  public static String join(List<String> list, String delim) {
-//    StringBuilder buf = new StringBuilder();
-//    int num = list.size();
-//    for (int i = 0; i < num; i++) {
-//      if (i != 0)
-//        buf.append(delim);
-//      buf.append((String) list.get(i));
-//    }
-//    return buf.toString();
-//  }
-//
-//  protected void createAllDaos() throws SQLException {
-//    boolean successful = true;
-//
-//    for(Class<? extends BaseEntity> entityClass : mapEntityClassesToDaos.keySet()) {
-//      successful &= createDao(entityClass);
-//    }
-//  }
-
-//  protected boolean createDao(Class<? extends BaseEntity> entityClass) throws SQLException {
-//    try {
-//      Dao dao = getDao(entityClass);
-//      dao.setObjectCache(true);
-////      dao.setAutoCommit(getConnectionSource().getReadWriteConnection(), true); // TODO: is this of any use (does it do anything)?
-////      ((BaseDaoImpl)dao).initialize(); // TODO: why do i have to call this now, worked till now without
-//
-//      mapEntityClassesToDaos.put(entityClass, dao);
-//      return true;
-//    } catch(Exception ex) {
-//      log.error("Could not create Dao for Class " + entityClass, ex);
-//    }
-//
-//    return false;
-//  }
-
-//  /**
-//   * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our DeepThought class. It will
-//   * create it or just give the cached value. RuntimeExceptionDao only through RuntimeExceptions.
-//   */
-//  public RuntimeExceptionDao<DeepThought, Long> getSimpleDataDao() {
-//    if (deepThoughtRuntimeDao == null) {
-//      deepThoughtRuntimeDao = getRuntimeExceptionDao(DeepThought.class);
-//    }
-//    return deepThoughtRuntimeDao;
-//  }
-//
-//  public Dao<Category, Long> getCategoryDao() throws SQLException {
-//    if (categoryDao == null) {
-//      createAllDaos();
-//    }
-//
-//    return categoryDao;
-//  }
-//
-//  public Dao<Entry, Long> getEntryDao() throws SQLException {
-//    if (entryDao == null) {
-//      createAllDaos();
-//    }
-//
-//    return entryDao;
-//  }
-//
-//  public Dao<Tag, Long> getTagDao() throws SQLException {
-//    if (tagDao == null) {
-//      createAllDaos();
-//    }
-//
-//    return tagDao;
-//  }
-
-
-//  public void clearData() {
-//    try {
-//      dropAllTables(getConnectionSource());
-//      createAllTables(getConnectionSource());
-//    } catch (SQLException ex) {
-//      log.error("Could not clear data (drop all tables)", ex);
-//    }
-//  }
 
   /**
    * Close the database connections and clear any cached DAOs.
@@ -557,37 +339,6 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 
 
   /*      Versuch ein Backup der Datenbank zu erstellen      */
-
-  @Override
-  public void onOpen(SQLiteDatabase db) {
-//    try {
-//      makeBackupOfDatabase(db);
-//    } catch(Exception ex) { log.error("Could not create a backup of database file " + db.getPath(), ex); }
-
-    this.databasePath = db.getPath();
-
-    super.onOpen(db);
-  }
-
-//  protected void makeBackupOfDatabase(SQLiteDatabase db) {
-//    String databasePath = db.getPath();
-//
-//    File maxBackupFile = new File(databasePath + DatabaseBackupDatabaseNameSuffix + MaxDatabaseBackupsToKeep);
-//    if(maxBackupFile.exists())
-//      maxBackupFile.delete();
-//
-//    for(int i = MaxDatabaseBackupsToKeep - 1; i > 0; i--) {
-//      File backupFile = new File(databasePath + DatabaseBackupDatabaseNameSuffix + i);
-//      if(backupFile.exists())
-//        backupFile.renameTo(new File(databasePath + DatabaseBackupDatabaseNameSuffix + (i + 1)));
-//    }
-//
-//    File currentDatabaseFile = new File(databasePath);
-//    if(currentDatabaseFile.exists())
-//      copyFile(currentDatabaseFile, new File(databasePath + DatabaseBackupDatabaseNameSuffix + 1));
-//
-//    tryToCopyToExternalStorage(db);
-//  }
 
   private void tryToCopyToExternalStorage(SQLiteDatabase db) {
     try {

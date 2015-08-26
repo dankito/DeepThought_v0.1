@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -20,9 +21,9 @@ public class JavaSePreferencesStore extends PreferencesStoreBase {
   private final static Logger log = LoggerFactory.getLogger(JavaSePreferencesStore.class);
 
 
-  protected static Properties deepThoughtProperties = null;
+  protected Properties deepThoughtProperties = null;
 
-  protected static Boolean doesPropertiesFileExist = null;
+  protected Boolean doesPropertiesFileExist = null;
 
   public JavaSePreferencesStore() {
     deepThoughtProperties = loadDeepThoughtProperties();
@@ -35,19 +36,39 @@ public class JavaSePreferencesStore extends PreferencesStoreBase {
       doesPropertiesFileExist = true;
       return deepThoughtProperties;
     } catch(Exception ex) {
-      log.warn("Could not load data folder from " + DeepThoughtPropertiesFileName, ex);
+      if(ex instanceof FileNotFoundException)
+        return tryToCreateSettingsFile();
+      else
+        log.warn("Could not load data folder from " + DeepThoughtPropertiesFileName, ex);
     }
 
     doesPropertiesFileExist = false;
     return null;
   }
 
-  protected static void saveDeepThoughtProperties() {
+  protected void saveDeepThoughtProperties() {
+    saveDeepThoughtProperties(deepThoughtProperties);
+  }
+
+  protected boolean saveDeepThoughtProperties(Properties deepThoughtProperties) {
     try {
       if (deepThoughtProperties != null) {
         deepThoughtProperties.store(new OutputStreamWriter(new FileOutputStream(DeepThoughtPropertiesFileName), "UTF-8"), null);
+        return true;
       }
     } catch(Exception ex) { log.error("Could not save DeepThoughtProperties to " + DeepThoughtPropertiesFileName, ex); }
+
+    return false;
+  }
+
+  protected Properties tryToCreateSettingsFile() {
+    Properties newFile = new Properties();
+    if(saveDeepThoughtProperties(newFile)) {
+      doesPropertiesFileExist = true;
+      return newFile;
+    }
+
+    return null;
   }
 
   protected String readValueFromStore(String key, String defaultValue) {
@@ -60,7 +81,11 @@ public class JavaSePreferencesStore extends PreferencesStoreBase {
 
   protected void saveValueToStore(String key, String value) {
     if(deepThoughtProperties != null) {
-      deepThoughtProperties.setProperty(key, value);
+      if(value == null)
+        value = "";
+//      if(doesValueExist(key) == false)
+        deepThoughtProperties.put(key, value);
+//      deepThoughtProperties.setProperty(key, value);
 
       saveDeepThoughtProperties();
     }

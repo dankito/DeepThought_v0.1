@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter" />
             <option value="$PROJECT_DIR$/libs/os/DeepThoughtAndroidLib" />
             <option value="$PROJECT_DIR$/libs/persistence/database/AndroidOrmLiteEntityManager" />
+            <option value="$PROJECT_DIR$/libs/persistence/database/EntityManagerTools" />
             <option value="$PROJECT_DIR$/libs/persistence/database/JavaSeOrmLiteEntityManager" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android" />
             <option value="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-core" />

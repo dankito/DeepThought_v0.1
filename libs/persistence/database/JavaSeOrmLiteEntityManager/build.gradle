@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
-    compile project(':DeepThoughtLib')
+    compile project(':EntityManagerTools')
     compile project(':ormlite-jpa-jdbc')
 
 //    compile 'org.apache.derby:derby:10.11.1.1'

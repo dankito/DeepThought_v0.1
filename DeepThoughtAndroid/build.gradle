@@ -90,5 +90,5 @@ dependencies {
 //    compile 'com.android.support:appcompat-v7:23.0.0'
     compile 'com.android.support:design:22.2.1'
 
-    compile 'org.slf4j:slf4j-android:1.7.10'
+    compile 'org.slf4j:slf4j-android:1.7.12'
 }

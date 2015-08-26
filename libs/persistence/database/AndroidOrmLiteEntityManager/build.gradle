@@ -47,12 +47,11 @@ android {
 }
 
 dependencies {
-    compile project(':DeepThoughtLib')
-    compile project(':ormlite-jpa-core')
+    compile project(':EntityManagerTools')
     compile project(':ormlite-jpa-android')
 
     androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
-    androidTestCompile 'org.slf4j:slf4j-android:1.7.10'
+    androidTestCompile 'org.slf4j:slf4j-android:1.7.12'
 
     // to include test cases from DeepThoughtLib
 //    androidTestCompile project(':DeepThoughtLib').sourceSets.test.output
