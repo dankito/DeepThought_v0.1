@@ -6,7 +6,6 @@ import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
 import net.deepthought.data.contentextractor.IContentExtractorManager;
 import net.deepthought.data.download.IFileDownloader;
-import net.deepthought.data.exchange.FirefoxPluginCommunicator;
 import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.merger.IDataMerger;
@@ -76,20 +75,11 @@ public class Application {
 
   protected static IDeepThoughtsConnector deepThoughtsConnector = null;
 
-  protected static FirefoxPluginCommunicator firefoxPluginCommunicator = null;
-
   protected static Set<ApplicationListener> listeners = new HashSet<>();
 
 
 
   public static void instantiateAsync(final IApplicationConfiguration applicationConfiguration) {
-//    new Thread(new Runnable() {
-//      @Override
-//      public void run() {
-//        instantiate(applicationConfiguration);
-//      }
-//    }).start();
-
     threadPool = applicationConfiguration.createThreadPool();
     threadPool.runTaskAsync(new Runnable() {
       @Override
@@ -149,7 +139,6 @@ public class Application {
       Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
       deepThoughtsConnector.runAsync();
 
-//      firefoxPluginCommunicator = new FirefoxPluginCommunicator();
       long duration = new Date().getTime() - startTime.getTime();
       if(duration > 1000) { }
     } catch(Exception ex) {
@@ -259,8 +248,6 @@ public class Application {
       deepThoughtsConnector.shutDown();
       deepThoughtsConnector = null;
     }
-
-    firefoxPluginCommunicator = null;
 
     listeners.clear();
   }

@@ -39,7 +39,7 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected Long lastViewedEntryId;
 
-  protected double mainWindowTabsAndEntriesOverviewDividerPosition = 0.3;
+  protected double mainWindowTabsAndEntriesOverviewDividerPosition = 300;
 
   protected double entriesOverviewDividerPosition = 0.5;
 
