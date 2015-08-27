@@ -20,26 +20,7 @@ public class EntitiesConfigurator {
 
 
   public EntityConfig[] readEntityConfiguration(EntityManagerConfiguration configuration, ConnectionSource connectionSource) throws SQLException {
-//    String storedEntityConfiguration = Application.getPreferencesStore().getDataModel();
-//    if (IPreferencesStore.DefaultDataModelString.equals(storedEntityConfiguration) == false) {
-//      log.debug("Trying to deserialize stored Entities Configuration ...");
-//      try {
-//        return (EntityConfig[]) ConfigurationReader.jsonToJava(storedEntityConfiguration, connectionSource);
-//      } catch(Exception ex) {
-//        log.error("Could not deserialize stored Entities Configuration", ex); }
-//    }
-
-//    EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfigurationAndCreateTablesIfNotExists(configuration.getEntityClasses());
     EntityConfig[] entities = new JpaEntityConfigurationReader(connectionSource).readConfiguration(configuration.getEntityClasses());
-
-//    try {
-//      String json = ConfigurationWriter.objectToJson(entities);
-//      if(json != null) {
-//        Application.getPreferencesStore().setDataModel(json);
-//      }
-//    } catch(Exception ex) {
-//      log.error("Could not read json string", ex);
-//    }
 
     return entities;
   }
