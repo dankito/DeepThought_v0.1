@@ -6,3 +6,8 @@ or clone and run
 
    git submodule init
    git submodule update
+
+
+To start the Desktop Application go to
+   DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought
+, right click on 'DeepThoughtFx' and choose Debug or Run
