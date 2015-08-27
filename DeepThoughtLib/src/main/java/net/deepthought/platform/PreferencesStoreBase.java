@@ -9,8 +9,6 @@ public abstract class PreferencesStoreBase implements IPreferencesStore {
 
   public final static String DatabaseDataModelVersionKey = "data.model.version";
 
-  public final static String DataModelKey = "data.model";
-
 
   protected abstract String readValueFromStore(String key, String defaultValue);
 
@@ -37,16 +35,6 @@ public abstract class PreferencesStoreBase implements IPreferencesStore {
   @Override
   public void setDatabaseDataModelVersion(int newDataModelVersion) {
     saveIntValue(DatabaseDataModelVersionKey, newDataModelVersion);
-  }
-
-  @Override
-  public String getDataModel() {
-    return readStringValue(DataModelKey, DefaultDataModelString);
-  }
-
-  @Override
-  public void setDataModel(String dataModel) {
-    saveStringValue(DataModelKey, dataModel);
   }
 
 

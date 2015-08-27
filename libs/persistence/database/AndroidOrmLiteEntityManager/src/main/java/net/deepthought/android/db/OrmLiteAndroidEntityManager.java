@@ -69,11 +69,19 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
 
 //    insertMissingColumns();
 
-    EntitiesConfigurator configurer = new EntitiesConfigurator();
-    EntityConfig[] entities = configurer.readEntityConfiguration(configuration, connectionSource);
+    EntitiesConfigurator configurator = new EntitiesConfigurator();
+    EntityConfig[] entities = configurator.readEntityConfiguration(configuration, connectionSource);
+
+    getDaosAndMayCreateTables(configuration, entities);
+  }
+
+  protected void getDaosAndMayCreateTables(EntityManagerConfiguration configuration, EntityConfig[] entities) throws SQLException {
     for(EntityConfig entity : entities) {
       mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
     }
+
+    if (configuration.getDataBaseCurrentDataModelVersion() == 0)
+      Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 
   protected void deleteRegisteredDevice() {

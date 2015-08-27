@@ -45,6 +45,7 @@ public class EntityManagerConfiguration {
   protected String dataCollectionPersistencePath = null;
 
   protected int dataBaseCurrentDataModelVersion;
+  protected int applicationDataModelVersion;
   protected boolean createDatabase = false;
 
   protected DatabaseType databaseType;
@@ -73,7 +74,7 @@ public class EntityManagerConfiguration {
   public EntityManagerConfiguration(String dataFolder, DatabaseType databaseType, boolean createTables) {
     setDatabaseType(databaseType);
     setDataFolder(dataFolder);
-    setDataBaseCurrentDataModelVersion(Application.CurrentDataModelVersion);
+    setApplicationDataModelVersion(Application.CurrentDataModelVersion);
 
     setDatabaseConfiguration(databaseType, createTables);
 
@@ -196,6 +197,14 @@ public class EntityManagerConfiguration {
 
   public void setDataBaseCurrentDataModelVersion(int dataBaseCurrentDataModelVersion) {
     this.dataBaseCurrentDataModelVersion = dataBaseCurrentDataModelVersion;
+  }
+
+  public int getApplicationDataModelVersion() {
+    return applicationDataModelVersion;
+  }
+
+  public void setApplicationDataModelVersion(int applicationDataModelVersion) {
+    this.applicationDataModelVersion = applicationDataModelVersion;
   }
 
   public boolean createDatabase() {

@@ -9,8 +9,6 @@ public interface IPreferencesStore {
 
   public final static int DefaultDatabaseDataModelVersion = 0;
 
-  public final static String DefaultDataModelString = "";
-
 
   String getDataFolder();
 
@@ -19,9 +17,5 @@ public interface IPreferencesStore {
   int getDatabaseDataModelVersion();
 
   void setDatabaseDataModelVersion(int newDataModelVersion);
-
-  String getDataModel();
-
-  void setDataModel(String dataModel);
 
 }
