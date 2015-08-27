@@ -17,6 +17,8 @@ import net.deepthought.plugin.IPluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
+
 /**
  * Created by ganymed on 22/08/15.
  */
@@ -49,14 +51,8 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   }
 
   @Override
-  public IEntityManager createEntityManager(EntityManagerConfiguration configuration) {
-    try {
-      return new OrmLiteAndroidEntityManager(context, configuration);
-    } catch (Exception ex) {
-      log.error("Could not create OrmLiteAndroidEntityManager", ex);
-    }
-
-    return null; // TODO: what to do in this case?
+  public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws SQLException {
+    return new OrmLiteAndroidEntityManager(context, configuration);
   }
 
   @Override
