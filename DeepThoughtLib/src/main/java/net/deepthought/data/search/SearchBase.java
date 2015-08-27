@@ -54,12 +54,16 @@ public abstract class SearchBase {
 
     completed = true;
     long millisecondsElapsed = (new Date().getTime() - startTime);
-    log.debug("Search " + searchTerm + " took " + (millisecondsElapsed / 1000) + "." + String.format("%03d", millisecondsElapsed).substring(0, 3) + " seconds to complete");
+//    log.debug("Search " + searchTerm + " took " + (millisecondsElapsed / 1000) + "." + String.format("%03d", millisecondsElapsed).substring(0, 3) + " seconds to complete");
+    log.debug("Search {} took {}.{} seconds to complete and had {} results", searchTerm, (millisecondsElapsed / 1000), String.format("%03d", millisecondsElapsed).substring(0, 3),
+        getResultsCount());
 
     callCompletedListener();
   }
 
   protected abstract void callCompletedListener();
+
+  protected abstract int getResultsCount();
 
 
   @Override

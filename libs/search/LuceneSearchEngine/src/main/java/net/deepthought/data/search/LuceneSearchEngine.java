@@ -716,7 +716,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(FilterEntriesSearch search, String contentFilter, String abstractFilter) {
+  protected void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor) {
     // TODO: i think it's better to analyze content- and abstractFilter as they are being used on analyzed fields
 //    Analyzer analyzer = getAnalyzerForTextLanguage(search.getSearchTerm());
     BooleanQuery query = new BooleanQuery();
@@ -726,39 +726,22 @@ public class LuceneSearchEngine extends SearchEngineBase {
     else if(search.getEntriesMustHaveTheseTags().size() > 0) {
       BooleanQuery filterEntriesQuery = new BooleanQuery();
       for (Tag tag : search.getEntriesMustHaveTheseTags())
-        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.SHOULD);
+        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.MUST);
       query.add(filterEntriesQuery, BooleanClause.Occur.MUST);
     }
 
     BooleanQuery textFilterQuery = new BooleanQuery();
 
-    if(contentFilter != null) {
-      try {
-//        QueryParser parser = new QueryParser(FieldName.EntryContent, analyzer);
-//        query.add(parser.parse(contentFilter), BooleanClause.Occur.SHOULD);
-        contentFilter = QueryParser.escape(contentFilter);
-        for(String singleFilter : contentFilter.split(" "))
-          textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryContent, singleFilter)), BooleanClause.Occur.MUST);
-      } catch(Exception ex) {
-        log.error("Could not parse query " + contentFilter, ex);
-        // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
-      }
-    }
-    if(abstractFilter != null) {
-      try {
-//        QueryParser parser = new QueryParser(FieldName.EntryAbstract, analyzer);
-//        query.add(parser.parse(abstractFilter), BooleanClause.Occur.SHOULD);
-        abstractFilter = QueryParser.escape(abstractFilter);
-        for(String singleFilter : abstractFilter.split(" "))
-          textFilterQuery.add(new PrefixQuery(new Term(FieldName.EntryAbstract, singleFilter)), BooleanClause.Occur.MUST);
-      } catch(Exception ex) {
-        log.error("Could not parse query " + abstractFilter, ex);
-        // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
-      }
+    for(String term : termsToFilterFor) {
+      term = QueryParser.escape(term);
+      BooleanQuery termQuery = new BooleanQuery();
+
+      if(search.filterContent())
+        termQuery.add(new PrefixQuery(new Term(FieldName.EntryContent, term)), BooleanClause.Occur.SHOULD);
+      if(search.filterAbstract())
+        termQuery.add(new PrefixQuery(new Term(FieldName.EntryAbstract, term)), BooleanClause.Occur.SHOULD);
+
+      textFilterQuery.add(termQuery, BooleanClause.Occur.MUST);
     }
 
     query.add(textFilterQuery, BooleanClause.Occur.MUST);

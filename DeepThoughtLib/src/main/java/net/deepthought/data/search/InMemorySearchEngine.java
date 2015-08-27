@@ -8,6 +8,7 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.LazyLoadingList;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
@@ -57,14 +58,16 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter) {
+  protected void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor) {
     for(Entry entry : Application.getDeepThought().getEntries()) {
       if(search.isInterrupted())
         return;
 
-      if((search.filterContent() && entry.getContentAsPlainText().toLowerCase().contains(contentFilter)) ||
-          (search.filterAbstract() && entry.getAbstractAsPlainText().toLowerCase().contains(abstractFilter)))
-        search.addResult(entry);
+      for(String term : termsToFilterFor) {
+        if ((search.filterContent() && entry.getContentAsPlainText().toLowerCase().contains(term)) ||
+            (search.filterAbstract() && entry.getAbstractAsPlainText().toLowerCase().contains(term)))
+          search.addResult(entry);
+      }
     }
 
     search.fireSearchCompleted();

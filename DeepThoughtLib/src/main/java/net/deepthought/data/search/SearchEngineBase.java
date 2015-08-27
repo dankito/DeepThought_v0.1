@@ -7,6 +7,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
@@ -94,7 +95,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
   protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   @Override
-  public void filterEntries(final net.deepthought.data.search.specific.FilterEntriesSearch search) {
+  public void filterEntries(final FilterEntriesSearch search) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
       search.setResults(Application.getDeepThought().getEntries());
       search.fireSearchCompleted();
@@ -102,18 +103,17 @@ public abstract class SearchEngineBase implements ISearchEngine {
     }
 
     String lowerCaseFilter = search.getSearchTerm().toLowerCase();
-    final String contentFilter = search.filterContent() ? lowerCaseFilter : null;
-    final String abstractFilter = search.filterAbstract() ? lowerCaseFilter : null;
+    final String[] termsToFilterFor = lowerCaseFilter.split(" ");
 
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        filterEntries(search, contentFilter, abstractFilter);
+        filterEntries(search, termsToFilterFor);
       }
     });
   }
 
-  protected abstract void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter);
+  protected abstract void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor);
 
 
   @Override

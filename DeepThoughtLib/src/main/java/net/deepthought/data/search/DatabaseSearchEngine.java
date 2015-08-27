@@ -80,6 +80,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
         if(search.isInterrupted())
           return;
 
+        log.debug("Filtering Tags for " + search.getSearchTerm() + " with query: " + query);
         List<String[]> queryResults = entityManager.doNativeQuery(query);
         List<Long> ids = new ArrayList<>(queryResults.size());
         for(String[] result : queryResults) {
@@ -99,7 +100,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String contentFilter, String abstractFilter) {
+  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String[] termsToFilterFor) {
     search.fireSearchCompleted(); // TODO
   }
 

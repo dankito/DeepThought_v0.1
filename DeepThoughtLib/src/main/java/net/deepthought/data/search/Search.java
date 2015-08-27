@@ -46,6 +46,11 @@ public class Search<T> extends SearchBase {
       completedListener.completed(results);
   }
 
+  @Override
+  protected int getResultsCount() {
+    return results.size();
+  }
+
 
   @Override
   public String toString() {

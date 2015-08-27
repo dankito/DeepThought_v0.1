@@ -33,6 +33,12 @@ public class FilterTagsSearch extends SearchBase {
       completedListener.completed(results);
   }
 
+  @Override
+  protected int getResultsCount() {
+    return results.getAllMatches().size();
+  }
+
+
   public boolean addResult(FilterTagsSearchResult result) {
     return this.results.addSearchResult(result);
   }

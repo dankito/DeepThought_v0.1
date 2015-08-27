@@ -39,6 +39,12 @@ public class FilterReferenceBasesSearch extends SearchBase {
       completedListener.completed(results);
   }
 
+  @Override
+  protected int getResultsCount() {
+    return results.size();
+  }
+
+
   public boolean addResult(ReferenceBase result) {
     return this.results.add(result);
   }
