@@ -1,8 +1,8 @@
 .gradle
-gradle
 #.idea/
 /.idea/workspace.xml
 /.idea/libraries
+*.iml
 /.nb-gradle
 **/build
 /local.properties
