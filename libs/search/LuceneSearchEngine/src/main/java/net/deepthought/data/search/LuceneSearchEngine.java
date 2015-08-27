@@ -730,8 +730,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
       query.add(filterEntriesQuery, BooleanClause.Occur.MUST);
     }
 
-//    BooleanQuery textFilterQuery = new BooleanQuery();
-
     for(String term : termsToFilterFor) {
       term = QueryParser.escape(term);
       BooleanQuery termQuery = new BooleanQuery();
@@ -741,11 +739,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
       if(search.filterAbstract())
         termQuery.add(new PrefixQuery(new Term(FieldName.EntryAbstract, term)), BooleanClause.Occur.SHOULD);
 
-//      textFilterQuery.add(termQuery, BooleanClause.Occur.MUST);
       query.add(termQuery, BooleanClause.Occur.MUST);
     }
-
-//    query.add(textFilterQuery, BooleanClause.Occur.MUST);
 
     executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending);
   }
