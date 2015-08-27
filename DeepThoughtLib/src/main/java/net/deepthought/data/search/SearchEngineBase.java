@@ -104,6 +104,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
     String lowerCaseFilter = search.getSearchTerm().toLowerCase();
     // manually replacing accents as for such short text language often can't be identified correctly (LanguageAnalyzer normalize accents exactly like this)
+    // TODO: àáâãä and å.
     lowerCaseFilter = lowerCaseFilter.replace('ä', 'a').replace('ö', 'o').replace('ü', 'u').replace("ß", "ss");
     lowerCaseFilter = lowerCaseFilter.replace('á', 'a').replace('à', 'o').replace('é', 'e').replace('è', 'e').replace('ô', 'o').replace('ç', 'c');
 

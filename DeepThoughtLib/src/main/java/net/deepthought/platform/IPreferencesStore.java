@@ -5,11 +5,6 @@ package net.deepthought.platform;
  */
 public interface IPreferencesStore {
 
-  public final static String DefaultDataFolder = "data/";
-
-  public final static int DefaultDatabaseDataModelVersion = 0;
-
-
   String getDataFolder();
 
   void setDataFolder(String dataFolder);

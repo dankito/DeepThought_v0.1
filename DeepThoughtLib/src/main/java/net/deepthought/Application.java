@@ -90,7 +90,8 @@ public class Application {
   }
 
   public static void instantiate(IApplicationConfiguration applicationConfiguration) {
-    dataFolderPath = applicationConfiguration.getEntityManagerConfiguration().getDataFolder();
+    Application.preferencesStore = applicationConfiguration.getPreferencesStore();
+    Application.dataFolderPath = preferencesStore.getDataFolder();
 
     Date startTime = new Date();
     log.info("Starting to resolve dependencies ...");
@@ -98,7 +99,6 @@ public class Application {
     Application.dependencyResolver = applicationConfiguration;
     if(threadPool == null)
       threadPool = dependencyResolver.createThreadPool();
-    Application.preferencesStore = applicationConfiguration.getPreferencesStore();
     Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();

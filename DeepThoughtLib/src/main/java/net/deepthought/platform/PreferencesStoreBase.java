@@ -10,11 +10,25 @@ public abstract class PreferencesStoreBase implements IPreferencesStore {
   public final static String DatabaseDataModelVersionKey = "data.model.version";
 
 
+  public static String DefaultDataFolder = "data/";
+
+  public final static int DefaultDatabaseDataModelVersion = 0;
+
+
   protected abstract String readValueFromStore(String key, String defaultValue);
 
   protected abstract void saveValueToStore(String key, String value);
 
   protected abstract boolean doesValueExist(String key);
+
+
+  public PreferencesStoreBase() {
+    DefaultDataFolder = getDefaultDataFolder();
+  }
+
+  protected String getDefaultDataFolder() {
+    return "data/";
+  }
 
 
   @Override

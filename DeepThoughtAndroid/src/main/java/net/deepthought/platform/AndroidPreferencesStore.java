@@ -15,6 +15,8 @@ public class AndroidPreferencesStore extends PreferencesStoreBase {
 
   protected SharedPreferences preferences = null;
 
+  protected String androidDefaultDataFolderPath = getDefaultDataFolder();
+
 
   public AndroidPreferencesStore(Context context) {
     this.context = context;
@@ -23,6 +25,9 @@ public class AndroidPreferencesStore extends PreferencesStoreBase {
 
 
   protected String readValueFromStore(String key, String defaultValue) {
+    if(DataFolderKey.equals(key))
+      defaultValue = androidDefaultDataFolderPath;
+
     if(preferences != null)
       return preferences.getString(key, defaultValue);
     return defaultValue;
@@ -42,23 +47,25 @@ public class AndroidPreferencesStore extends PreferencesStoreBase {
     return preferences != null && preferences.contains(key);
   }
 
+  @Override
   protected String getDefaultDataFolder() {
+    File dataFolderFile = null;
+
     if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-      File folder = Environment.getExternalStorageDirectory();
-      folder = new File(folder, "DeepThought");
-      if (folder.exists() == false)
-        folder.mkdir();
-      return folder.getAbsolutePath() + "/";
+      dataFolderFile = Environment.getExternalStorageDirectory();
+      dataFolderFile = new File(dataFolderFile, "DeepThought");
+      dataFolderFile = new File(dataFolderFile, "data");
     }
     else {
-      File dataFolderFile = new File(Environment.getDataDirectory(), "data");
-      dataFolderFile = new File(dataFolderFile, "net.deepthought");
-      dataFolderFile = new File(dataFolderFile, "data");
-      if (dataFolderFile.exists() == false) {
-        dataFolderFile.mkdirs();
-        dataFolderFile.mkdir();
-      }
-      return dataFolderFile.getAbsolutePath() + "/";
+      dataFolderFile = new File(Environment.getDataDirectory(), "data");
+//      dataFolderFile = new File(dataFolderFile, "net.deepthought");
+//      dataFolderFile = new File(dataFolderFile, "data");
     }
+
+    if (dataFolderFile.exists() == false) {
+      dataFolderFile.mkdirs();
+      dataFolderFile.mkdir();
+    }
+    return dataFolderFile.getAbsolutePath() + "/";
   }
 }
