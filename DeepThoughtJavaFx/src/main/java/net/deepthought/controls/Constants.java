@@ -47,6 +47,8 @@ public class Constants {
 
   public final static Background FilteredTagsLastSearchTermRelevantMatchBackground = new Background(new BackgroundFill(Color.DEEPSKYBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
+  public final static Background FilteredTagsSelectedBackground = new Background(new BackgroundFill(Color.SKYBLUE, new CornerRadii(0), new Insets(0)));
+
   public final static Background FilteredTagsDefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
 
 

@@ -1,5 +1,6 @@
 package net.deepthought.controls.tag;
 
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Tag;
@@ -80,6 +81,13 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+
+    selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == true)
+        setBackground(Constants.FilteredTagsSelectedBackground);
+      else
+        FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, TagListCell.this);
+    });
   }
 
   @Override
@@ -262,17 +270,20 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
       @Override
       public void handle(KeyEvent t) {
-        if (t.getCode() == KeyCode.ENTER) {
-          if (txtfldEditTagName.getText().equals(getTagStringRepresentation(tag)) == false)
-            tag.setName(txtfldEditTagName.getText());
-          try {
-            commitEdit(getItem());
-          } catch (Exception ex) {
-            log.error("Could not commit changes to tag " + tag, ex);
-          }
-        } else if (t.getCode() == KeyCode.ESCAPE) {
+        if (t.getCode() == KeyCode.ESCAPE) {
           cancelEdit();
         }
+      }
+    });
+
+    txtfldEditTagName.setOnAction(event -> {
+      if (txtfldEditTagName.getText().equals(getTagStringRepresentation(tag)) == false)
+        tag.setName(txtfldEditTagName.getText());
+      try {
+//        commitEdit(getItem()); // throws an UnsupportedOperationException
+        cancelEdit();
+      } catch (Exception ex) {
+        log.error("Could not commit changes to tag " + tag, ex);
       }
     });
 
@@ -290,6 +301,13 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     super.cancelEdit();
 
     showCellInNotEditingState();
+  }
+
+  @Override
+  public void commitEdit(Tag newValue) {
+    showCellInNotEditingState();
+
+    super.commitEdit(newValue);
   }
 
   protected void showCellInEditingState() {
