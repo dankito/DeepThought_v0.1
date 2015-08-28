@@ -31,18 +31,23 @@ android {
 
     // to solve packaging errors
     packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'LICENSE.txt'
+        pickFirst 'META-INF/LICENSE'
+        pickFirst 'META-INF/NOTICE'
+        pickFirst 'LICENSE.txt'
 
-        exclude 'Strings.properties'
-        exclude 'Strings_de.properties'
-        exclude 'DeepThoughtFx.properties'
         exclude 'logback-test.xml'
     }
 
     lintOptions {
         abortOnError false
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            output.resourcesDir = output.classesDir
+        }
     }
 }
 

@@ -1,0 +1,142 @@
+package net.deepthought.controls.html;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker;
+import javafx.event.EventHandler;
+import javafx.scene.Parent;
+import javafx.scene.web.PopupFeatures;
+import javafx.scene.web.PromptData;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebEvent;
+import javafx.scene.web.WebView;
+import javafx.util.Callback;
+
+/**
+ * Created by ganymed on 28/08/15.
+ */
+public class DeepThoughtFxHtmlEditor extends Parent implements IJavaScriptExecutor {
+
+  private final static Logger log = LoggerFactory.getLogger(DeepThoughtFxHtmlEditor.class);
+
+
+  protected WebView webView = new WebView();
+
+  protected WebEngine engine;
+
+  protected HtmlEditor htmlEditor;
+
+
+  public DeepThoughtFxHtmlEditor() {
+    this.engine = webView.getEngine();
+    this.htmlEditor = new HtmlEditor(this);
+
+    setupHtmlEditor();
+  }
+
+  protected void setupHtmlEditor() {
+    this.minHeight(200);
+//    this.maxHeight(Double.MAX_VALUE);
+    webView.setMinHeight(200);
+//    webView.setMaxHeight(Double.MAX_VALUE);
+//    webView.prefHeightProperty().bind(this.hei);
+    this.getChildren().add(webView);
+
+    loadCKEditor();
+
+    testEvents();
+  }
+
+  protected void loadCKEditor() {
+    engine.getLoadWorker().stateProperty().addListener(
+        new ChangeListener<Worker.State>() {
+          @Override
+          public void changed(ObservableValue<? extends Worker.State> ov, Worker.State oldState, Worker.State newState) {
+            if (newState == Worker.State.SUCCEEDED) {
+              htmlEditor.editorLoaded();
+            } else if (newState == Worker.State.FAILED) {
+              log.error("Loading CKEditor failed");
+              // TODO: notify user
+            }
+          }
+        }
+    );
+
+//    engine.setUserDataDirectory(directory);
+    engine.load(htmlEditor.getHtmlEditorPath());
+  }
+
+
+  public String getHtml() {
+    return htmlEditor.getHtml();
+  }
+
+  public void setHtml(String html) {
+    htmlEditor.setHtml(html);
+  }
+
+
+  protected void testEvents() {
+    engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
+      @Override
+      public void handle(WebEvent<String> event) {
+
+      }
+
+    });
+
+    engine.setConfirmHandler(new Callback<String, Boolean>()
+
+                             {
+                               @Override
+                               public Boolean call (String param){
+                                 return false;
+                               }
+                             }
+
+    );
+
+    engine.setPromptHandler(new Callback<PromptData, String>()
+
+                            {
+                              @Override
+                              public String call(PromptData param) {
+                                return null;
+                              }
+                            }
+
+    );
+
+    engine.setCreatePopupHandler(new Callback<PopupFeatures, WebEngine>()
+
+                                 {
+                                   @Override
+                                   public WebEngine call(PopupFeatures param) {
+                                     return null;
+                                   }
+                                 }
+
+    );
+
+    engine.setOnAlert(new EventHandler<WebEvent<String>>()
+
+                      {
+                        @Override
+                        public void handle(WebEvent<String> event) {
+
+                        }
+                      }
+
+    );
+  }
+
+
+  @Override
+  public Object executeScript(String javaScript) {
+    return engine.executeScript(javaScript);
+  }
+
+  }

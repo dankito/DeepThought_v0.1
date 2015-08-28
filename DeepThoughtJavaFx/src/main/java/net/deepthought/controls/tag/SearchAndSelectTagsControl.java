@@ -156,7 +156,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     txtfldFilterTags = TextFields.createClearableTextField();
     pnFilterTags.getChildren().add(0, txtfldFilterTags);
     HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "Find tags to add");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "find.tags.to.add");
 
     lstvwAllTags.setCellFactory(listView -> {
       TagListCell cell = new TagListCell(this, editedTagsHolder);

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="ckeditor/ckeditor.js"></script>
+	<script src="jquery-2.1.4.js"></script>
+</head>
+
+<body>
+<div>
+	<a onclick="callJava();">Java</a>
+<textarea cols="80" id="editor" name="editor" rows="10">
+
+</textarea>
+</div>
+
+<script type="text/javascript">
+	if ( !CKEDITOR.env.ie || CKEDITOR.env.version > 7 )
+	   CKEDITOR.env.isCompatible = true;
+
+	   CKEDITOR.config.forcePasteAsPlainText = true;
+        CKEDITOR.disableAutoInline = true;
+                CKEDITOR.on("instanceReady", function(event){
+                    $jQ(".cke_top,.cke_bottom").css("-moz-box-shadow", "0 1px #333 inset");
+                    $jQ(".cke_top,.cke_bottom").css("-webkit-box-shadow", "0 1px #333 inset");
+                    $jQ(".cke_top,.cke_bottom").css("box-shadow", "0 1px #333 inset");
+                    $jQ(".cke_top,.cke_bottom").css("backgroundImage", $jQ(".boton").css("backgroundImage"));
+                });
+
+    $( document ).ready( function() {
+
+	CKEDITOR.env.isCompatible = true;
+
+	var editor = CKEDITOR.replace( 'editor', {
+		height: 260
+	} );
+
+	editor.on('change', function() {
+		<!-- Notify Java code that Html text has changed -->
+		if(typeof app !== 'undefined') {
+			app.htmlChanged(editor.getData());
+		}
+	});
+  	});
+
+</script>
+
+<script type="text/javascript">
+        function callJava(){
+        	if(typeof app !== 'undefined') {
+				app.htmlChanged(editor.getData());
+            }
+        }
+    </script>
+</body>
+
+</html> 

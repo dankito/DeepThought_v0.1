@@ -36,11 +36,11 @@
    <center>
       <SplitPane fx:id="contentPane" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <items>
-            <TabPane fx:id="tbpnOverview" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="tbpnOverview" prefWidth="300.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
                 <Tab fx:id="tabCategories" text="%categories">
                      <content>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox prefWidth="300.0">
                            <children>
                               <AnchorPane maxHeight="40.0" prefHeight="40.0">
                                  <children>
@@ -67,7 +67,7 @@
                                     </Button>
                                  </children>
                               </AnchorPane>
-                              <TreeView fx:id="trvwCategories" editable="true" prefHeight="200.0" prefWidth="200.0" showRoot="false" VBox.vgrow="ALWAYS" />
+                              <TreeView fx:id="trvwCategories" editable="true" showRoot="false" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                      </content>

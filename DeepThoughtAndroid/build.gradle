@@ -40,22 +40,13 @@ android {
 
     // to solve packaging errors
     packagingOptions {
-//        pickFirst 'org/apache/lucene/util/SPIClassIterator.class'
-//        pickFirst 'META-INF/services/org.apache.lucene.codecs.Codec'
-//        pickFirst 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
-//        pickFirst 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
+        pickFirst 'META-INF/LICENSE'
+        pickFirst 'META-INF/NOTICE'
+        pickFirst 'META-INF/LICENSE.txt'
+        pickFirst 'META-INF/NOTICE.txt'
 
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-//        exclude 'META-INF/services/org.apache.lucene.codecs.Codec'
-//        exclude 'META-INF/services/org.apache.lucene.codecs.PostingsFormat'
-//        exclude 'META-INF/services/org.apache.lucene.codecs.DocValuesFormat'
-
-        exclude 'Strings.properties'
-        exclude 'Strings_de.properties'
-        exclude 'DeepThoughtFx.properties'
+        pickFirst 'Strings.properties'
+        pickFirst 'Strings_de.properties'
     }
 
     lintOptions {
@@ -64,19 +55,13 @@ android {
 
 }
 
-//sourceSets {
-//    main {
-//        java {
-//            srcDir 'src/main/java'
-//            output.classesDir   = 'build/classes/main'
-//        }
-//        resources {
-//            srcDir 'src/main/resources'
-//            include '*.properties'
-//            output.resourcesDir = 'build/resources/main'
-//        }
-//    }
-//}
+sourceSets {
+    main {
+        resources {
+            output.resourcesDir = output.classesDir
+        }
+    }
+}
 
 dependencies {
 

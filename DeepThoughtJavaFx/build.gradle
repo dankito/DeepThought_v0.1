@@ -30,6 +30,7 @@ mainClassName = 'net.deepthought.DeepThoughtFx'
 def version = '0.1 Beta'
 def title = 'Deep Thought'
 
+
 // create a single Jar with all dependencies. Taken from: http://www.mkyong.com/gradle/gradle-create-a-jar-file-with-dependencies/
 task fatJar(type: Jar) {
     manifest {

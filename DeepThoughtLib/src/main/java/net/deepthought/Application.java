@@ -1,6 +1,7 @@
 package net.deepthought;
 
 import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -100,6 +101,8 @@ public class Application {
     if(threadPool == null)
       threadPool = dependencyResolver.createThreadPool();
     Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
+
+    HtmlEditor.extractHtmlEditorIfNeededAsync();
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 

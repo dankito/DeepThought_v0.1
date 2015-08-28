@@ -13,6 +13,7 @@ import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.file.FileRootTreeItem;
 import net.deepthought.controls.file.FileTreeTableCell;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.deepthought.controls.html.DeepThoughtHTMLEditor;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
@@ -124,9 +125,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected TitledPane ttldpnAbstract;
   @FXML
-  protected TextArea txtarAbstract;
-  @FXML
   protected HTMLEditor htmledAbstract;
+  protected DeepThoughtFxHtmlEditor htmledFxAbstract;
 
   @FXML
   protected TitledPane ttldpnContent;
@@ -215,6 +215,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.addHtmlEditorTextChangedListener(htmledAbstract, editor -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract);
     });
+//    htmledFxAbstract = new DeepThoughtFxHtmlEditor();
+//    ttldpnAbstract.setContent(htmledFxAbstract);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
     htmledContent = new DeepThoughtHTMLEditor();
@@ -315,6 +317,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
     htmledAbstract.setHtmlText(entry.getAbstract());
+    htmledFxAbstract.setHtml(entry.getAbstract());
+
     ttldpnAbstract.setExpanded(entry.hasAbstract());
 
     htmledContent.setHtmlText(entry.getContent());

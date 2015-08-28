@@ -23,8 +23,8 @@ public class Localization {
   public final static String StringsResourceBundleName = "Strings";
 
 
-//  protected static Locale LanguageLocale = Locale.getDefault();
-  protected static Locale LanguageLocale = Locale.GERMAN;
+  protected static Locale LanguageLocale = Locale.getDefault();
+//  protected static Locale LanguageLocale = Locale.GERMAN;
 
   protected static ResourceBundle StringsResourceBundle = null;
 
@@ -93,8 +93,9 @@ public class Localization {
           }
         }
       } else {
-        stream = loader.getResourceAsStream(resourceName);
+        stream = Localization.class.getClassLoader().getResourceAsStream(resourceName);
       }
+
       if (stream != null) {
         try {
           // Only this line is changed to make it to read properties files as UTF-8.
