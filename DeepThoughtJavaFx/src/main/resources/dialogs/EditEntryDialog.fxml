@@ -75,11 +75,7 @@
                         </HBox>
                      </children>
                   </AnchorPane>
-                  <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS">
-                     <content>
-                        <HTMLEditor fx:id="htmledAbstract" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" minHeight="120.0" prefHeight="150.0" />
-                     </content>
-                  </TitledPane>
+                  <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS" />
                   <TitledPane fx:id="ttldpnContent" animated="false" contentDisplay="RIGHT" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
                      <content>
                         <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />

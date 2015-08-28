@@ -1,7 +1,6 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
-import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +39,17 @@ public class HtmlEditor {
 
   protected String htmlToSetWhenLoaded = null;
 
+  protected HtmlEditorListener listener = null;
+
 
 
   public HtmlEditor(IJavaScriptExecutor scriptExecutor) {
     this.scriptExecutor = scriptExecutor;
+  }
+
+  public HtmlEditor(IJavaScriptExecutor scriptExecutor, HtmlEditorListener listener) {
+    this(scriptExecutor);
+    this.listener = listener;
   }
 
 
@@ -83,7 +89,7 @@ public class HtmlEditor {
       if(isCKEditorLoaded == false)
         htmlToSetWhenLoaded = html;
       else {
-        scriptExecutor.executeScript("editor.setData(\'" + html + "\');");
+        scriptExecutor.executeScript("CKEDITOR.instances.editor.setData(\'" + html + "\');");
         htmlToSetWhenLoaded = null;
       }
     } catch(Exception ex) {
@@ -91,11 +97,20 @@ public class HtmlEditor {
     }
   }
 
+  public HtmlEditorListener getListener() {
+    return listener;
+  }
+
+  public void setListener(HtmlEditorListener listener) {
+    this.listener = listener;
+  }
+
 
   /*    Methods over which JavaScript running in Browser communicates with Java code        */
 
   public void htmlChanged(String newHtmlCode) {
-    // TODO: call listener
+    if(listener != null)
+      listener.htmlCodeUpdated(newHtmlCode);
   }
 
 
@@ -110,17 +125,16 @@ public class HtmlEditor {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-    if(htmlEditorDirectory.exists())
-      FileUtils.deleteFile(htmlEditorDirectory);
+//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
-//    if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
+    if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();
-//    }
-//    else {
-//      try {
-//        unzippedHtmlEditorFilePath = new File(htmlEditorDirectory, HtmlEditorFileName).toURI().toURL().toExternalForm();
-//      } catch (Exception ex) { log.error("Could not build  from " + htmlEditorDirectory + " and " + HtmlEditorFileName, ex); } // TODO: what to do in error case?
-//    }
+    }
+    else {
+      try {
+        unzippedHtmlEditorFilePath = new File(htmlEditorDirectory, HtmlEditorFileName).toURI().toURL().toExternalForm();
+      } catch (Exception ex) { log.error("Could not build  from " + htmlEditorDirectory + " and " + HtmlEditorFileName, ex); } // TODO: what to do in error case?
+    }
   }
 
   protected static String extractCKEditorToHtmlEditorFolder() {

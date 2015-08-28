@@ -15,6 +15,7 @@ import net.deepthought.controls.file.FileRootTreeItem;
 import net.deepthought.controls.file.FileTreeTableCell;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.deepthought.controls.html.DeepThoughtHTMLEditor;
+import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
@@ -124,8 +125,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   @FXML
   protected TitledPane ttldpnAbstract;
-  @FXML
-  protected HTMLEditor htmledAbstract;
+
   protected DeepThoughtFxHtmlEditor htmledFxAbstract;
 
   @FXML
@@ -210,13 +210,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     ttldpnAbstract.setExpanded(false);
 
-    htmledAbstract = new DeepThoughtHTMLEditor();
-    ttldpnAbstract.setContent(htmledAbstract);
-    FXUtils.addHtmlEditorTextChangedListener(htmledAbstract, editor -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract);
-    });
-//    htmledFxAbstract = new DeepThoughtFxHtmlEditor();
-//    ttldpnAbstract.setContent(htmledFxAbstract);
+    htmledFxAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
+    ttldpnAbstract.setContent(htmledFxAbstract);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
     htmledContent = new DeepThoughtHTMLEditor();
@@ -316,7 +311,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //    txtfldTitle.setText(entry.getTitle());
 
 
-    htmledAbstract.setHtmlText(entry.getAbstract());
     htmledFxAbstract.setHtml(entry.getAbstract());
 
     ttldpnAbstract.setExpanded(entry.hasAbstract());
@@ -403,12 +397,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
-      if(FXUtils.hasHtmlEditorDefaultText(htmledAbstract)) {
-        if(StringUtils.isNotNullOrEmpty(entry.getAbstract()))
-          entry.setAbstract("");
-      }
-      else
-        entry.setAbstract(htmledAbstract.getHtmlText());
+      entry.setAbstract(htmledFxAbstract.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
@@ -624,8 +613,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.EntryAbstractColumnName)) {
-        if(htmledAbstract.getHtmlText().equals(((Entry) entity).getAbstract()) == false) // don't update Html Control if change has been committed by it
-          htmledAbstract.setHtmlText(((Entry) entity).getAbstract());
+        if(htmledFxAbstract.getHtml().equals(((Entry) entity).getAbstract()) == false) // don't update Html Control if change has been committed by it
+          htmledFxAbstract.setHtml(((Entry) entity).getAbstract());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
         if(htmledContent.getHtmlText().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
@@ -646,6 +635,21 @@ public class EditEntryDialogController extends ChildWindowsController implements
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
 
+    }
+  };
+
+
+  protected HtmlEditorListener abstractListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract);
+    }
+  };
+
+  protected HtmlEditorListener contentListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
     }
   };
 

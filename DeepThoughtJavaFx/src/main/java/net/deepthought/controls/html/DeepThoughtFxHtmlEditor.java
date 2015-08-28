@@ -1,5 +1,7 @@
 package net.deepthought.controls.html;
 
+import net.deepthought.controls.ICleanableControl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,7 +9,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
-import javafx.scene.Parent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.PromptData;
 import javafx.scene.web.WebEngine;
@@ -18,7 +21,7 @@ import javafx.util.Callback;
 /**
  * Created by ganymed on 28/08/15.
  */
-public class DeepThoughtFxHtmlEditor extends Parent implements IJavaScriptExecutor {
+public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(DeepThoughtFxHtmlEditor.class);
 
@@ -31,8 +34,12 @@ public class DeepThoughtFxHtmlEditor extends Parent implements IJavaScriptExecut
 
 
   public DeepThoughtFxHtmlEditor() {
+    this(null);
+  }
+
+  public DeepThoughtFxHtmlEditor(HtmlEditorListener listener) {
     this.engine = webView.getEngine();
-    this.htmlEditor = new HtmlEditor(this);
+    this.htmlEditor = new HtmlEditor(this, listener);
 
     setupHtmlEditor();
   }
@@ -44,6 +51,7 @@ public class DeepThoughtFxHtmlEditor extends Parent implements IJavaScriptExecut
 //    webView.setMaxHeight(Double.MAX_VALUE);
 //    webView.prefHeightProperty().bind(this.hei);
     this.getChildren().add(webView);
+    HBox.setHgrow(webView, Priority.ALWAYS);
 
     loadCKEditor();
 
@@ -139,4 +147,9 @@ public class DeepThoughtFxHtmlEditor extends Parent implements IJavaScriptExecut
     return engine.executeScript(javaScript);
   }
 
+  @Override
+  public void cleanUpControl() {
+    htmlEditor.setListener(null);
   }
+
+}
