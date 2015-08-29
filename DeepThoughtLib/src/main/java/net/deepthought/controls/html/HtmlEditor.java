@@ -16,6 +16,8 @@ import java.util.jar.JarFile;
 import netscape.javascript.JSObject;
 
 /**
+ * A Java Wrapper class for the JavaScript CKEditor.
+ *
  * Created by ganymed on 28/08/15.
  */
 public class HtmlEditor {
@@ -36,6 +38,8 @@ public class HtmlEditor {
   protected IJavaScriptExecutor scriptExecutor = null;
 
   protected boolean isCKEditorLoaded = false;
+
+  protected JSObject ckEditor = null;
 
   protected String htmlToSetWhenLoaded = null;
 
@@ -62,6 +66,8 @@ public class HtmlEditor {
       JSObject win = (JSObject) scriptExecutor.executeScript("window");
       win.setMember("app", this);
 
+      ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
+
       isCKEditorLoaded = true;
       if (htmlToSetWhenLoaded != null)
         setHtml(htmlToSetWhenLoaded);
@@ -74,7 +80,8 @@ public class HtmlEditor {
   public String getHtml() {
     try {
       if(isCKEditorLoaded) {
-        Object obj = scriptExecutor.executeScript("CKEDITOR.instances.editor.getData();");
+//        Object obj = scriptExecutor.executeScript("CKEDITOR.instances.editor.getData();");
+        Object obj = ckEditor.call("getData");
         return obj.toString();
       }
     } catch(Exception ex) {
@@ -89,7 +96,7 @@ public class HtmlEditor {
       if(isCKEditorLoaded == false)
         htmlToSetWhenLoaded = html;
       else {
-        scriptExecutor.executeScript("CKEDITOR.instances.editor.setData(\'" + html + "\');");
+        ckEditor.call("setData", html);
         htmlToSetWhenLoaded = null;
       }
     } catch(Exception ex) {
