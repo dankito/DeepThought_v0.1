@@ -3,23 +3,31 @@ package net.deepthought.controls.articlesoverview;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.util.ClipboardHelper;
+import net.deepthought.util.Localization;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -68,9 +76,14 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
 
   protected Label lblItemSummary = new Label();
 
+  protected ContextMenu contextMenu = null;
+  protected MenuItem copyUrlToClipboardItem = null;
+
 
   public OverviewItemListCell(ObservableSet<ArticlesOverviewItem> selectedItems) {
     this.selectedItems = selectedItems;
+    selectedItems.addListener(selectedItemsListener);
+
     setText(null);
     setupGraphic();
 
@@ -89,6 +102,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
   public void cleanUpControl() {
     item = null;
 
+    selectedItems.removeListener(selectedItemsListener);
     selectedItems = null;
 
     itemSelectionChangedEventHandler = null;
@@ -130,7 +144,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
 
     graphicPane.add(itemTextLinesPane, 2, 0, 1, 2);
 
-    GridPane.setMargin(itemTextLinesPane, new Insets(0, 9, 0, 6));
+    GridPane.setMargin(itemTextLinesPane, new Insets(0, 12, 0, 6));
 
     itemTextLinesPane.setPrefHeight(VBox.USE_COMPUTED_SIZE);
     itemTextLinesPane.setMaxHeight(Double.MAX_VALUE);
@@ -150,7 +164,10 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
     VBox.setVgrow(lblItemSummary, Priority.ALWAYS);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSummary);
     lblItemSummary.setWrapText(true);
+
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
+
 
   protected EventHandler<ActionEvent> chkbxSelectItemOnAction = new EventHandler<ActionEvent>() {
     @Override
@@ -159,6 +176,24 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
         itemSelectionChangedEventHandler.itemSelectionChanged(item, chkbxSelectItem.isSelected());
     }
   };
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    if(contextMenu == null)
+      contextMenu = createContextMenu();
+
+    copyUrlToClipboardItem.setOnAction(actionEvent -> ClipboardHelper.copyStringToClipboard(item.getUrl()));
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
+  }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    copyUrlToClipboardItem = new MenuItem(Localization.getLocalizedString("copy.article.url.to.clipboard"));
+    contextMenu.getItems().add(copyUrlToClipboardItem);
+
+    return contextMenu;
+  }
 
 
   @Override
@@ -238,5 +273,14 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
   public void setOnItemClicked(OnItemClickedEventHandler onItemClickedEventHandler) {
     this.onItemClickedEventHandler = onItemClickedEventHandler;
   }
+
+
+
+  protected SetChangeListener<ArticlesOverviewItem> selectedItemsListener = new SetChangeListener<ArticlesOverviewItem>() {
+    @Override
+    public void onChanged(Change<? extends ArticlesOverviewItem> change) {
+      chkbxSelectItem.setSelected(selectedItems.contains(item));
+    }
+  };
 
 }

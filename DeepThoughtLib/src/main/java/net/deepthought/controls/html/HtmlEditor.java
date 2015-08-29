@@ -37,8 +37,6 @@ public class HtmlEditor {
 
   protected IJavaScriptExecutor scriptExecutor = null;
 
-  protected boolean isCKEditorLoaded = false;
-
   protected JSObject ckEditor = null;
 
   protected String htmlToSetWhenLoaded = null;
@@ -68,7 +66,6 @@ public class HtmlEditor {
 
       ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
 
-      isCKEditorLoaded = true;
       if (htmlToSetWhenLoaded != null)
         setHtml(htmlToSetWhenLoaded);
     } catch(Exception ex) {
@@ -77,9 +74,13 @@ public class HtmlEditor {
   }
 
 
+  public boolean isCKEditorLoaded() {
+    return ckEditor != null;
+  }
+
   public String getHtml() {
     try {
-      if(isCKEditorLoaded) {
+      if(isCKEditorLoaded()) {
 //        Object obj = scriptExecutor.executeScript("CKEDITOR.instances.editor.getData();");
         Object obj = ckEditor.call("getData");
         return obj.toString();
@@ -93,7 +94,7 @@ public class HtmlEditor {
 
   public void setHtml(String html) {
     try {
-      if(isCKEditorLoaded == false)
+      if(isCKEditorLoaded() == false)
         htmlToSetWhenLoaded = html;
       else {
         ckEditor.call("setData", html);

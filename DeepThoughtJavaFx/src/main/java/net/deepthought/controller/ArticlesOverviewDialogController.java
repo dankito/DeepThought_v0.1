@@ -77,7 +77,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   @Override
   protected void closeDialog() {
-    selectedItems.clear();
+    clearSelectedItems();
     lstvwArticleOverviewItems.getItems().clear();
 
     articleContentExtractor = null;
@@ -118,10 +118,10 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
       @Override
       public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final Collection<ArticlesOverviewItem> items, boolean isDone) {
         Platform.runLater(() -> {
-          if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
+          if (articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
             articlesOverviewUpdateStarted.set(false);
             lstvwArticleOverviewItems.getItems().clear();
-            selectedItems.clear();
+            clearSelectedItems();
           }
           // TODO: show error message if retrieving Article Overview Items failed
 
@@ -142,6 +142,16 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     else
       selectedItems.remove(item);
 
+    setControlsDependingOnSelectedItems();
+  }
+
+  protected void clearSelectedItems() {
+    selectedItems.clear();
+
+    setControlsDependingOnSelectedItems();
+  }
+
+  protected void setControlsDependingOnSelectedItems() {
     lblCountSelectedItems.setText(Localization.getLocalizedString("count.items.selected", selectedItems.size()));
 
     btnAddSelected.setDisable(selectedItems.size() == 0);
@@ -167,23 +177,17 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
   }
 
   @FXML
-  public void handleButtonAddSelectedAction(ActionEvent actionEvent) {
+  public void handleButtonAddSelectedItemsToDeepThoughtAction(ActionEvent actionEvent) {
     for(ArticlesOverviewItem item : selectedItems)
       extractAndAddEntryToDeepThought(item);
-    selectedItems.clear();
-
-//    setDialogResult(DialogResult.Ok);
-//    closeDialog();
+    clearSelectedItems();
   }
 
   @FXML
   public void handleButtonViewSelectedAction(ActionEvent actionEvent) {
     for(ArticlesOverviewItem item : selectedItems)
       extractEntryAndShowInEditEntryDialog(item);
-    selectedItems.clear();
-
-//    setDialogResult(DialogResult.Ok);
-//    closeDialog();
+    clearSelectedItems();
   }
 
   protected void extractAndAddEntryToDeepThought(ArticlesOverviewItem item) {
