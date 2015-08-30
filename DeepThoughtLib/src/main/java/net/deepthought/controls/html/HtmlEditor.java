@@ -1,6 +1,7 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,16 +62,12 @@ public class HtmlEditor {
     return unzippedHtmlEditorFilePath;
   }
 
-  public void editorLoaded(int width, int height) {
+  public void editorLoaded() {
     try {
       JSObject win = (JSObject) scriptExecutor.executeScript("window");
       win.setMember("app", this);
 
       ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
-
-      scriptExecutor.executeScript("CKEDITOR.instances.editor.on('loaded', function() {" +
-              "CKEDITOR.instances.editor.resize(" + (width - SizeAdjustment) + ", " + (height - SizeAdjustment) + ");" +
-          "});");
 
       if (htmlToSetWhenLoaded != null)
         setHtml(htmlToSetWhenLoaded);
@@ -111,12 +108,6 @@ public class HtmlEditor {
     }
   }
 
-  public void setSize(int width, int height) {
-    if(isCKEditorLoaded())
-//      scriptExecutor.executeScript("CKEDITOR.instances.editor.resize(" + width + ", " + height + ");");
-      ckEditor.call("resize", width - SizeAdjustment, height - SizeAdjustment);
-  }
-
   public HtmlEditorListener getListener() {
     return listener;
   }
@@ -145,7 +136,7 @@ public class HtmlEditor {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();

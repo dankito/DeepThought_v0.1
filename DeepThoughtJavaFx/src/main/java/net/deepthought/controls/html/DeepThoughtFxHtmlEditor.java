@@ -1,6 +1,5 @@
 package net.deepthought.controls.html;
 
-import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.PromptData;
 import javafx.scene.web.WebEngine;
@@ -53,9 +51,6 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     HBox.setHgrow(webView, Priority.ALWAYS);
     webView.prefHeightProperty().bind(this.heightProperty());
 
-    this.widthProperty().addListener((observable, oldValue, newValue) -> updateEditorsSize());
-    this.heightProperty().addListener((observable, oldValue, newValue) -> updateEditorsSize());
-
     loadCKEditor();
 
     testEvents();
@@ -67,7 +62,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
           @Override
           public void changed(ObservableValue<? extends Worker.State> ov, Worker.State oldState, Worker.State newState) {
             if (newState == Worker.State.SUCCEEDED) {
-              htmlEditor.editorLoaded((int)getWidth(), (int)getHeight());
+              htmlEditor.editorLoaded();
             } else if (newState == Worker.State.FAILED) {
               log.error("Loading CKEditor failed");
               // TODO: notify user
@@ -78,10 +73,6 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
 //    engine.setUserDataDirectory(directory);
     engine.load(htmlEditor.getHtmlEditorPath());
-  }
-
-  protected void updateEditorsSize() {
-    htmlEditor.setSize((int)this.getWidth(), (int)this.getHeight());
   }
 
 
