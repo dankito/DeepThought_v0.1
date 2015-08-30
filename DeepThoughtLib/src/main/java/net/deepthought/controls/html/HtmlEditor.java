@@ -28,6 +28,8 @@ public class HtmlEditor {
 
   public final static String HtmlEditorFolderAndFileName = new File(HtmlEditorFolderName, HtmlEditorFileName).getPath();
 
+  public final static int SizeAdjustment = 16;
+
 
   private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
 
@@ -59,12 +61,16 @@ public class HtmlEditor {
     return unzippedHtmlEditorFilePath;
   }
 
-  public void editorLoaded() {
+  public void editorLoaded(int width, int height) {
     try {
       JSObject win = (JSObject) scriptExecutor.executeScript("window");
       win.setMember("app", this);
 
       ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
+
+      scriptExecutor.executeScript("CKEDITOR.instances.editor.on('loaded', function() {" +
+              "CKEDITOR.instances.editor.resize(" + (width - SizeAdjustment) + ", " + (height - SizeAdjustment) + ");" +
+          "});");
 
       if (htmlToSetWhenLoaded != null)
         setHtml(htmlToSetWhenLoaded);
@@ -103,6 +109,12 @@ public class HtmlEditor {
     } catch(Exception ex) {
       log.error("Could not set HtmlEditor's html text", ex);
     }
+  }
+
+  public void setSize(int width, int height) {
+    if(isCKEditorLoaded())
+//      scriptExecutor.executeScript("CKEDITOR.instances.editor.resize(" + width + ", " + height + ");");
+      ckEditor.call("resize", width - SizeAdjustment, height - SizeAdjustment);
   }
 
   public HtmlEditorListener getListener() {
