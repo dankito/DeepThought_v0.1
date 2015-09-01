@@ -133,6 +133,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void setupHtmlEditor() {
     final WebView webView = new WebView(this);
+    webView.getSettings().setJavaScriptEnabled(true);
     rlydTags.addView(webView);
 
     final HtmlEditor htmlEditor = new HtmlEditor(new IJavaScriptExecutor() {

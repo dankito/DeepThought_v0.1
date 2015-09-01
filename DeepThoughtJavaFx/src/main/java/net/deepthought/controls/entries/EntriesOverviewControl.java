@@ -8,6 +8,8 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
+import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.PersonLabel;
 import net.deepthought.controls.reference.EntryReferenceBaseLabel;
 import net.deepthought.controls.tag.EntryTagsControl;
@@ -63,6 +65,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
@@ -152,8 +155,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   @FXML
   Pane pnSelectedPersons;
 
-  @FXML
-  protected HTMLEditor htmledEntryContent;
+  protected DeepThoughtFxHtmlEditor htmledEntryContent;
 
 
 
@@ -279,11 +281,21 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         selectedEntry.setAbstract(txtfldEntryAbstract.getText());
     });
 
-    FXUtils.addHtmlEditorTextChangedListener(htmledEntryContent, event -> {
-      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
-      if (selectedEntry != null)
-        selectedEntry.setContent(htmledEntryContent.getHtmlText());
+
+    htmledEntryContent = new DeepThoughtFxHtmlEditor(new HtmlEditorListener() {
+      @Override
+      public void htmlCodeUpdated(String newHtmlCode) {
+        Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
+        if (selectedEntry != null) // TODO: avoid setting Content just because viewed Entry has changed
+          selectedEntry.setContent(htmledEntryContent.getHtml());
+      }
     });
+    htmledEntryContent.setMinHeight(250);
+    htmledEntryContent.setMaxHeight(Double.MAX_VALUE);
+    VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
+
+    pnQuickEditEntry.getChildren().remove(pnQuickEditEntry.getChildren().size() - 1); // remove HtmlEditor set in JavaFX Scene Builder
+    pnQuickEditEntry.getChildren().add(htmledEntryContent);
 
     currentEditedEntryTagsControl = new EntryTagsControl();
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
@@ -376,14 +388,14 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
       txtfldEntryAbstract.setText(selectedEntry.getAbstractAsPlainText());
       txtfldEntryAbstract.positionCaret(0);
-      htmledEntryContent.setHtmlText(selectedEntry.getContent());
+      htmledEntryContent.setHtml(selectedEntry.getContent());
       txtfldEntryAbstract.selectAll();
 
       setPaneReferenceAndPersons(selectedEntry);
     }
     else {
       txtfldEntryAbstract.setText("");
-      htmledEntryContent.setHtmlText("");
+      htmledEntryContent.setHtml("");
       pnReferenceAndPersonsScrollPane.setVisible(false);
     }
   }
@@ -566,8 +578,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
           txtfldReferenceIndication.setText(((Entry) entity).getIndication());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
-        if(htmledEntryContent.getHtmlText().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been commited by it
-          htmledEntryContent.setHtmlText(((Entry) entity).getContent());
+        if(htmledEntryContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been commited by it
+          htmledEntryContent.setHtml(((Entry) entity).getContent());
       }
       else if(propertyName.equals(TableConfig.EntrySeriesTitleJoinColumnName) || propertyName.equals(TableConfig.EntryReferenceJoinColumnName) ||
           propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {

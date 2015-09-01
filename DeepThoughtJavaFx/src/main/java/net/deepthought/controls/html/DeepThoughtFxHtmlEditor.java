@@ -46,7 +46,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   protected void setupHtmlEditor() {
     setMinHeight(200);
+    setMaxHeight(Double.MAX_VALUE);
     webView.setMinHeight(200);
+    webView.setMaxHeight(Double.MAX_VALUE);
+
     this.getChildren().add(webView);
     HBox.setHgrow(webView, Priority.ALWAYS);
     webView.prefHeightProperty().bind(this.heightProperty());

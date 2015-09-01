@@ -69,7 +69,6 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
@@ -126,14 +125,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected TitledPane ttldpnAbstract;
 
-  protected DeepThoughtFxHtmlEditor htmledFxAbstract;
+  protected DeepThoughtFxHtmlEditor htmledAbstract;
 
   @FXML
   protected TitledPane ttldpnContent;
   @FXML
   protected Pane pnConnectedDevices;
-  @FXML
-  protected HTMLEditor htmledContent;
+
+  protected DeepThoughtFxHtmlEditor htmledContent;
 
 //  @FXML
 //  protected BorderPane paneTagsAndCategories;
@@ -210,16 +209,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
     ttldpnAbstract.setExpanded(false);
 
-    htmledFxAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
-    ttldpnAbstract.setContent(htmledFxAbstract);
+    htmledAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
+    ttldpnAbstract.setContent(htmledAbstract);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
-    htmledContent = new DeepThoughtHTMLEditor();
+    htmledContent = new DeepThoughtFxHtmlEditor(contentListener);
     ttldpnContent.setContent(htmledContent);
-//    txtarContent.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent));
-    FXUtils.addHtmlEditorTextChangedListener(htmledContent, editor -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
-    });
 
     for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices()) {
       if(connectedDevice.hasCaptureDevice() || connectedDevice.canDoOcr())
@@ -311,11 +306,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //    txtfldTitle.setText(entry.getTitle());
 
 
-    htmledFxAbstract.setHtml(entry.getAbstract());
+    htmledAbstract.setHtml(entry.getAbstract());
 
     ttldpnAbstract.setExpanded(entry.hasAbstract());
 
-    htmledContent.setHtmlText(entry.getContent());
+    htmledContent.setHtml(entry.getContent());
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
     entryCategoriesControl.setExpanded(entry.hasCategories() == false);
@@ -397,17 +392,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
-      entry.setAbstract(htmledFxAbstract.getHtml());
+      entry.setAbstract(htmledAbstract.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
-      if(FXUtils.hasHtmlEditorDefaultText(htmledContent)) {
-        if(StringUtils.isNotNullOrEmpty(entry.getContent()))
-          entry.setContent("");
-      }
-      else
-        entry.setContent(htmledContent.getHtmlText());
+      entry.setContent(htmledContent.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
 
@@ -613,12 +603,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.EntryAbstractColumnName)) {
-        if(htmledFxAbstract.getHtml().equals(((Entry) entity).getAbstract()) == false) // don't update Html Control if change has been committed by it
-          htmledFxAbstract.setHtml(((Entry) entity).getAbstract());
+        if(htmledAbstract.getHtml().equals(((Entry) entity).getAbstract()) == false) // don't update Html Control if change has been committed by it
+          htmledAbstract.setHtml(((Entry) entity).getAbstract());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
-        if(htmledContent.getHtmlText().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
-          htmledContent.setHtmlText(((Entry) entity).getContent());
+        if(htmledContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
+          htmledContent.setHtml(((Entry) entity).getContent());
       }
     }
 
@@ -732,7 +722,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     @Override
     public void ocrResult(final TextRecognitionResult ocrResult) {
       if(ocrResult.recognitionSuccessful())
-        Platform.runLater(() -> htmledContent.setHtmlText(htmledContent.getHtmlText() + ocrResult.getRecognizedText()));
+        Platform.runLater(() -> htmledContent.setHtml(htmledContent.getHtml() + ocrResult.getRecognizedText()));
     }
   };
 
