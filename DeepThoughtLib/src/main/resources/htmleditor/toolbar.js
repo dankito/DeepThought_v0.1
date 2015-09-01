@@ -13,7 +13,7 @@ function customizeToolbar(editor) {
 
     groupInsertItems(editor);
 
-    configureSpellCheckAndBidiToolbar(editor);
+    //configureSpellCheckAndBidiToolbar(editor); // may give BiDi options their own Drop Down Menu back again; placing them in More Styles Drop Down is not that senseful
 
     configureMaximizeAndRareUsedItemsToolbar(editor);
 
@@ -34,11 +34,11 @@ function setToolbarGroups() {
     		{ name: 'styles', groups: [ 'styles', 'basicstyles' ] },
     		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
     		{ name: 'format', groups: [ /*'list_and_indent',*/ 'justify_and_insert', 'colors', 'find' ] },
-    		{ name: 'language_and_rare_items', groups: [ 'spellchecker', 'bidi', 'maximize_and_rare_used_items' ] },
+    		{ name: 'language_and_rare_items', groups: [ 'spellchecker', /*'bidi',*/ 'maximize_and_rare_used_items' ] }, // may show Language button again and give BiDi options their own Drop Down back again
     		{ name: 'hidden', groups: [ 'hidden' ] } // to circumvent that a lot of items aren't shown in Drop Down menus, see explanation below
     	];
 
-    CKEDITOR.config.removeButtons = 'Styles,Paste,PasteText,PasteFromWord,Replace,BidiLtr,BidiRtl';
+    CKEDITOR.config.removeButtons = 'Styles,Paste,PasteText,PasteFromWord,Replace';
 }
 
 /*  This costed me a lot of time to find out: A lot of commands aren't show as item in Drop Down menus if they haven't been registered otherwise
@@ -193,6 +193,21 @@ function groupMoreStylesItems(editor) {
         command: 'indent',
         directional: true,
         order: 50
+    };
+
+    // also not that logic but for saving some space on the toolbar i also added them here
+    items.bidiltr = {
+        label: editor.lang.bidi.ltr,
+        group: 'more_styles_group',
+        command: 'bidiltr',
+        order: 70
+    };
+
+    items.bidirtl = {
+        label: editor.lang.bidi.rtl,
+        group: 'more_styles_group',
+        command: 'bidirtl',
+        order: 70
     };
 
     items.removeFormat = {
@@ -409,12 +424,20 @@ function groupInsertItems(editor) {
         order: 40
     };
 
-    items.horizontalrule = {
-        label: editor.lang.horizontalrule.toolbar,
-        group: 'insert_group',
-        command: 'horizontalrule',
-        order: 60
-    };
+//    items.videodetector = {
+//        label: 'Insert a Youtube, Vimeo or Dailymotion video', // TODO: translate
+//        group: 'insert_group',
+//        command: 'videodetector',
+//        icon: CKEDITOR.plugins.getPath('videodetector') + '/icons/videodetector_gray.png',
+//        order: 60
+//    };
+//
+//    items.videodetector = {
+//        label : editor.lang.youtube.button,
+//        group: 'insert_group',
+//        command: 'youtube',
+//        order: 60
+//    };
 
     items.smiley = {
         label: editor.lang.smiley.toolbar,
@@ -427,6 +450,13 @@ function groupInsertItems(editor) {
         label: editor.lang.specialchar.toolbar,
         group: 'insert_group',
         command: 'specialchar',
+        order: 60
+    };
+
+    items.horizontalrule = {
+        label: editor.lang.horizontalrule.toolbar,
+        group: 'insert_group',
+        command: 'horizontalrule',
         order: 60
     };
 

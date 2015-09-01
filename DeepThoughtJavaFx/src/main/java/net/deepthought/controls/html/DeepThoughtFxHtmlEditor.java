@@ -11,6 +11,7 @@ import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.web.PopupFeatures;
 import javafx.scene.web.PromptData;
 import javafx.scene.web.WebEngine;
@@ -46,8 +47,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   protected void setupHtmlEditor() {
     setMinHeight(200);
+    setPrefHeight(Region.USE_COMPUTED_SIZE);
     setMaxHeight(Double.MAX_VALUE);
     webView.setMinHeight(200);
+    webView.setPrefHeight(Region.USE_COMPUTED_SIZE);
     webView.setMaxHeight(Double.MAX_VALUE);
 
     this.getChildren().add(webView);
@@ -124,7 +127,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
                                  {
                                    @Override
                                    public WebEngine call(PopupFeatures param) {
-                                     return null;
+                                     return engine;
                                    }
                                  }
 
