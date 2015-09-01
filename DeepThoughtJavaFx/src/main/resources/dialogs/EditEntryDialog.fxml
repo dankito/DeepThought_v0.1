@@ -9,7 +9,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" prefHeight="700.0" prefWidth="820.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="500.0" minWidth="500.0" prefHeight="700.0" prefWidth="905.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
    <bottom>
       <AnchorPane prefHeight="42.0" BorderPane.alignment="CENTER">
          <children>
@@ -78,7 +78,7 @@
                   <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS" />
                   <TitledPane fx:id="ttldpnContent" animated="false" contentDisplay="RIGHT" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
                      <content>
-                        <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="800.0" minHeight="250.0" minWidth="250.0" />
+                        <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="250.0" />
                      </content>
                      <graphic>
                         <GridPane alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="24.0" prefWidth="350.0">

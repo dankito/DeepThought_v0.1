@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<script src="ckeditor/ckeditor.js"></script>
+	<script src="toolbar.js"></script>
 	<script src="jquery-2.1.4.js"></script>
 </head>
 
@@ -24,12 +25,16 @@
 	   	left: 0,
 	   	width : '100%',
 	   	height : '100%',
-        resize_enabled: false,
-        removePlugins: 'elementspath,resize',
+
+        on: {
+			pluginsLoaded: function() {
+			   customizeToolbar(editor);
+			}
+		}
 	} );
 
 	editor.on('loaded', function() {
-		editor.resize($(window).width(), $(window).height() - 18);
+		editor.resize($(window).width(), $(window).height());
 	});
 
 	editor.on('change', function() {
@@ -39,9 +44,15 @@
 		}
 	});
 
-		window.onresize = function() {
-			editor.resize($(window).width(), $(window).height());
-		};
+	<!--editor.on('beforeCommandExec', function(evt) {-->
+		<!--alert(evt.data.name);-->
+		<!--return false; // command then won't be executed-->
+	<!--});-->
+
+	$(window).resize( function() {
+		<!-- This is curious, mostly it fits perfectly in window then, but sometimes it gets a margin -->
+		editor.resize($(window).width() - 16, $(window).height() - 16);
+	});
 
 </script>
 
