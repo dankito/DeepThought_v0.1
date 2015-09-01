@@ -216,7 +216,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
     Elements imgElements = figureNode.getElementsByTag("img");
     if(imgElements.size() > 0)
-      imageHtml += imgElements.get(0).outerHtml();
+      imageHtml += extractImgElementHtml(imgElements.get(0));
 
     Elements descriptionElements = figureNode.getElementsByClass("entry-title");
     if(descriptionElements.size() > 0)
@@ -442,7 +442,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
     for(Element anchorChild : anchorElement.children()) {
       if("img".equals(anchorChild.nodeName()))
-        item.setPreviewImageUrl(anchorChild.attr("src"));
+        item.setPreviewImageUrl(extractImageUrlFromImgElement(anchorChild));
       else if("strong".equals(anchorChild.nodeName()))
         item.setSubTitle(anchorChild.text().trim());
       else if("em".equals(anchorChild.nodeName()))
@@ -452,6 +452,22 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     tryToExtractLabel(item, anchorElement);
 
     return item;
+  }
+
+  protected String extractImageUrlFromImgElement(Element imgElement) {
+    if(imgElement.hasClass("lazyload") && imgElement.hasAttr("data-src"))
+      return imgElement.attr("data-src");
+    return imgElement.attr("src");
+  }
+
+  protected String extractImgElementHtml(Element imgElement) {
+    if(imgElement.hasClass("lazyload") && imgElement.hasAttr("data-src")) {
+      imgElement.attr("src", imgElement.attr("data-src"));
+      imgElement.removeClass("lazyload");
+      imgElement.removeAttr("data-src");
+    }
+
+    return imgElement.outerHtml();
   }
 
   protected List<ArticlesOverviewItem> extractOneLinerTeaserItemsFromTeaserElement(Element teaser) {

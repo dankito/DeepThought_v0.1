@@ -14,6 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,6 +30,8 @@ import android.widget.Toast;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
+import net.deepthought.controls.html.HtmlEditor;
+import net.deepthought.controls.html.IJavaScriptExecutor;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
@@ -115,11 +122,53 @@ public class EditEntryActivity extends AppCompatActivity {
       btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
 
       lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
+
+//      setupHtmlEditor();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
       finish();
     }
+  }
+
+  protected void setupHtmlEditor() {
+    final WebView webView = new WebView(this);
+    rlydTags.addView(webView);
+
+    final HtmlEditor htmlEditor = new HtmlEditor(new IJavaScriptExecutor() {
+      @Override
+      public Object executeScript(String javaScript) {
+        webView.evaluateJavascript(javaScript, new ValueCallback<String>() {
+          @Override
+          public void onReceiveValue(String value) {
+
+          }
+        });
+
+        return null;
+      }
+    });
+
+    webView.setWebViewClient(new WebViewClient() {
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+//        htmlEditor.editorLoaded();
+      }
+
+      @Override
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        super.onReceivedError(view, errorCode, description, failingUrl);
+      }
+    });
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override
+      public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+        return super.onJsAlert(view, url, message, result);
+      }
+    });
+
+    webView.loadUrl(htmlEditor.getHtmlEditorPath());
   }
 
   protected void setLogo(Toolbar toolbar) {

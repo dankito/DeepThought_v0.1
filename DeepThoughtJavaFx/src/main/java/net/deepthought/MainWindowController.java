@@ -333,10 +333,6 @@ public class MainWindowController implements Initializable {
 
 //    if(deepThought.getLastViewedCategory() != null)
 //      trvwCategories.getSelectionModel().(deepThought.getLastViewedCategory());
-
-//      OpenOfficeDocumentsImporterExporter importer = new OpenOfficeDocumentsImporterExporter();
-//      List<Entry> extractedEntries = importer.extractEntriesFromDankitosSchneisenImWald
-//          ("/run/media/ganymed/fast_data/coding/Android/self/DeepThought/libs/importer_exporter/OpenOfficeDocumentsImporterExporter/src/test/resources/Schneisen im Wald 4.odt");
     }
   }
 
