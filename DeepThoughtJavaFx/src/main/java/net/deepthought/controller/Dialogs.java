@@ -9,6 +9,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.JavaFxLocalization;
@@ -16,6 +17,8 @@ import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -144,6 +147,62 @@ public class Dialogs {
       dialogStage.requestFocus();
     } catch(Exception ex) {
       log.error("Could not load / show EditEntryDialog", ex);
+    }
+  }
+
+
+  public static void showEditTagDialog(Tag tag) {
+    showEditTagDialog(tag, -1, -1, null, false);
+  }
+
+  public static void showEditTagDialog(Tag tag, double centerX, double y, Window window, boolean modal) {
+    showEditTagDialog(tag, centerX, y, window, modal, null);
+  }
+
+  public static void showEditTagDialog(final Tag tag, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
+    try {
+      FXMLLoader loader = new FXMLLoader();
+      Stage dialogStage = createStage(loader, "EditTagDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
+
+      // Set the tag into the controller.
+      EditTagDialogController controller = loader.getController();
+      controller.setTagAndStage(dialogStage, tag);
+
+      controller.setListener(new ChildWindowsControllerListener() {
+        @Override
+        public void windowClosing(Stage stage, ChildWindowsController controller) {
+          if (controller.getDialogResult() == DialogResult.Ok) {
+            if (tag.isPersisted() == false) { // a new Tag
+              Application.getDeepThought().addTag(tag);
+            }
+          }
+
+          if (listener != null)
+            listener.windowClosing(stage, controller);
+        }
+
+        @Override
+        public void windowClosed(Stage stage, ChildWindowsController controller) {
+          removeClosedChildWindow(stage);
+
+          if (listener != null)
+            listener.windowClosed(stage, controller);
+        }
+      });
+
+      addOpenedChildWindow(dialogStage);
+
+      dialogStage.show();
+      dialogStage.requestFocus();
+
+      if(centerX > 0) {
+        double x = centerX - dialogStage.getWidth() / 2;
+        dialogStage.setX(x);
+      }
+      if(y > 0)
+        dialogStage.setY(y);
+    } catch(Exception ex) {
+      log.error("Could not load / show EditTagDialog", ex);
     }
   }
 
@@ -398,25 +457,29 @@ public class Dialogs {
   }
 
   protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality) throws java.io.IOException {
-    return createStage(loader, dialogFilename, stageStyle, modality, false);
+    return createStage(loader, dialogFilename, stageStyle, modality, null);
   }
 
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, boolean isToolWindow) throws java.io.IOException {
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner) throws java.io.IOException {
+    return createStage(loader, dialogFilename, stageStyle, modality, owner, false);
+  }
+
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner, boolean isToolWindow) throws IOException {
     loader.setResources(Localization.getStringsResourceBundle());
 
     if(isToolWindow == false)
       loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
-    else
+    else // TODO: what was this line good for? How should a control ever be loaded with FXMLLoader?
       loader.setLocation(Dialogs.class.getClassLoader().getResource(ControlsBaseFolder + dialogFilename));
 
     Parent parent = loader.load();
 
     // Create the dialog Stage.
     Stage dialogStage = new Stage();
-//      dialogStage.initModality(Modality.WINDOW_MODAL);
+    if(owner != null)
+      dialogStage.initOwner(owner);
     dialogStage.initModality(modality);
     dialogStage.initStyle(stageStyle);
-//      dialogStage.initOwner(windowStage);
 
     Scene scene = new Scene(parent);
     dialogStage.setScene(scene);

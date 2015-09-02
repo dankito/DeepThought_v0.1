@@ -28,6 +28,9 @@ public enum FieldWithUnsavedChanges {
   EntryEvaluation,
   EntryRating,
 
+  TagName,
+  TagDescription,
+
   PersonFirstName,
   PersonMiddleNames,
   PersonLastName,

@@ -298,10 +298,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
     fieldsWithUnsavedChanges.add(event.getFieldWithUnsavedChanges());
   }
 
-  protected Boolean doesSearchTermMatchReference(FXUtils.DoesItemMatchSearchTermParam<Reference> param) {
-    return param.getItem().getTitle().toLowerCase().contains(param.getSearchTerm().toLowerCase());
-  }
-
   protected void setEntryValues(final Entry entry) {
 //    txtfldTitle.setText(entry.getTitle());
 
@@ -350,6 +346,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
     Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
 
+    htmledAbstract.cleanUpControl();
+    htmledContent.cleanUpControl();
     entryTagsControl.cleanUpControl();
     entryCategoriesControl.cleanUpControl();
     entryReferenceControl.cleanUpControl();
@@ -471,8 +469,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
-          .title("Entry contains unsaved changes")
-          .message("Entry contains unsaved changes. Do you like to save changes now?")
+          .title(Localization.getLocalizedString("alert.title.entry.contains.unsaved.changes"))
+          .message(Localization.getLocalizedString("alert.message.entry.contains.unsaved.changes"))
           .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
           .showConfirm();
 

@@ -37,13 +37,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -59,6 +59,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -66,7 +67,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 
 /**
@@ -221,6 +221,10 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         filterEntries();
       }
     });
+    txtfldEntriesQuickFilter.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE)
+        txtfldEntriesQuickFilter.clear();
+    });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterAbstract);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "quickly.filter.entries.abstract.tool.tip");
@@ -228,16 +232,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
 
     tableViewEntriesItems = new LazyLoadingObservableList<>();
-//    filteredEntries = new FilteredList<>(tblvwEntries.getItems(), entry -> true);
-//    sortedFilteredEntries = new SortedList<Entry>(tblvwEntries.getItems(), entriesComparator);
     tblvwEntries.setItems(tableViewEntriesItems);
-
-//    tableViewEntriesItems = tblvwEntries.getItems();
-//    filteredEntries = new FilteredList<>(tableViewEntriesItems, entry -> true);
-//    sortedFilteredEntries = new SortedList<Entry>(filteredEntries, entriesComparator);
-//    tblvwEntries.setItems(sortedFilteredEntries);
-
-//    sortedFilteredEntries.comparatorProperty().bind(tblvwEntries.comparatorProperty());
 
     tblvwEntries.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     tblvwEntries.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Entry>() {
@@ -247,6 +242,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
           oldValue.removeEntityListener(currentlyEditedEntryListener);
 
         selectedEntryChanged(newValue);
+      }
+    });
+
+    tblvwEntries.setOnKeyReleased(event -> {
+      if(event.getCode() == KeyCode.DELETE /*&& FXUtils.isNoModifierPressed(event)*/) {
+        removeSelectedEntries();
       }
     });
 
@@ -473,13 +474,10 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void removeSelectedEntries() {
-    ObservableList<Entry> selectedItems = tblvwEntries.getSelectionModel().getSelectedItems();
+    List<Entry> selectedItems = new ArrayList<>(tblvwEntries.getSelectionModel().getSelectedItems()); // make a copy as when multiple Entries are selected after removing the first one SelectionModel gets cleared
     for(Entry selectedEntry : selectedItems) {
-      if(selectedEntry instanceof Entry)
-        deepThought.removeEntry((Entry)selectedEntry);
+      deepThought.removeEntry(selectedEntry);
     }
-
-    tableViewEntriesItems.removeAll(selectedItems);
   }
 
   @FXML

@@ -193,9 +193,11 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     btnCreateTag.setDisable(StringUtils.isNullOrEmpty(tagsFilter));
   }
 
-  protected void filterTags(String tagsFilter) {
+  protected void filterTags(final String tagsFilter) {
     if(filterTagsSearch != null)
       filterTagsSearch.interrupt();
+
+     btnCreateTag.setDisable(false);
 
     if(StringUtils.isNullOrEmpty(tagsFilter)) {
       lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
@@ -213,6 +215,9 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
             if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
               lstvwAllTags.scrollTo(results.getLastResult().getExactMatch());
+
+            if(tagsFilter.contains(",") == false && results.getResults().size() == 1 && results.getExactMatches().size() == 1)
+              btnCreateTag.setDisable(true);
 
             setControlsForEnteredTagsFilter(tagsFilter);
             callFilteredTagsChangedListeners(results);
@@ -337,8 +342,15 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       Tag tag = (Tag)entity;
 
       DeepThought deepThought = (DeepThought)collectionHolder;
-      resetListViewAllTagsItems(deepThought);
+      resetListViewAllTagsItemsThreadSafe(deepThought);
     }
+  }
+
+  protected void resetListViewAllTagsItemsThreadSafe(final DeepThought deepThought) {
+    if(Platform.isFxApplicationThread())
+      resetListViewAllTagsItems(deepThought);
+    else
+      Platform.runLater(() -> resetListViewAllTagsItems(deepThought));
   }
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {

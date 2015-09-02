@@ -2,6 +2,7 @@ package net.deepthought.controls.tabtags;
 
 import net.deepthought.Application;
 import net.deepthought.MainWindowController;
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.tag.IFilteredTagsChangedListener;
@@ -13,10 +14,10 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
@@ -43,6 +44,8 @@ import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -50,11 +53,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 import javafx.util.Callback;
 
 /**
@@ -92,6 +95,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected Button btnRemoveTagsFilter;
   @FXML
   protected Button btnRemoveSelectedTag;
+  @FXML
+  protected Button btnAddTag;
   @FXML
   protected TableView<Tag> tblvwTags;
   @FXML
@@ -146,7 +151,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     txtfldTagsQuickFilter.setPrefWidth(Region.USE_COMPUTED_SIZE);
     txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> quickFilterTags());
     txtfldTagsQuickFilter.setOnAction(event -> toggleTagsToFilterFor());
-    txtfldTagsQuickFilter.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+    txtfldTagsQuickFilter.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE)
         txtfldTagsQuickFilter.clear();
     });
@@ -164,10 +169,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     tableViewTagsItems = FXCollections.observableList(tblvwTags.getItems());
     filteredTags = new FilteredList<>(tableViewTagsItems, tag -> true);
-//    sortedFilteredTags = new SortedList<>(filteredTags, tagComparator);
-
-//    tblvwTags.setItems(sortedFilteredTags);
     tblvwTags.setItems(filteredTags);
+
+    tblvwTags.setOnKeyReleased(event -> {
+      if(event.getCode() == KeyCode.DELETE)
+        removeSelectedTags();
+    });
 
     clmnTagName.setCellFactory(new Callback<TableColumn<Tag, String>, TableCell<Tag, String>>() {
       @Override
@@ -410,13 +417,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected boolean isAddingTag = false;
 
   protected void tagHasBeenAdded(Tag tag) {
-//    if(tagsToFilterFor.size() == 0) {
-      isAddingTag = true;
-      tableViewTagsItems.add(tag);
-      isAddingTag = false;
-//    }
+    isAddingTag = true;
+//    tableViewTagsItems.add(tag);
+    showAllTagsInListViewTags(deepThought);
+    isAddingTag = false;
 
-//    sortTags();
+    quickFilterTags();
   }
 
   protected void tagHasBeenRemoved(Tag tag) {
@@ -482,47 +488,35 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   @FXML
   protected void handleButtonRemoveSelectedTagsAction(ActionEvent event) {
-    Tag selectedTag = tblvwTags.getSelectionModel().getSelectedItem();
-    if(selectedTag == null)
-      return;
+    removeSelectedTags();
+  }
 
-    Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(deepThought, selectedTag);
+  protected void removeSelectedTags() {
+    List<Tag> selectedTags = new ArrayList<>(tblvwTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing the first one SelectionModel gets cleared
+    for(Tag selectedTag : selectedTags) {
+      if(selectedTag instanceof SystemTag == false)
+        Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(deepThought, selectedTag);
+    }
   }
 
   @FXML
   protected void handleButtonAddTagAction(ActionEvent event) {
-    addNewTag("New tag");
+    addNewTag();
   }
 
-  protected Tag addNewTag(String name) {
-    Tag newTag = new Tag(name);
-    deepThought.addTag(newTag);
+  protected void addNewTag() {
+    // thanks for pointing me in the right direction how to calculate a Node's Screen position to: http://blog.crisp.se/2012/08/29/perlundholm/window-scene-and-node-coordinates-in-javafx
+    Window window = getScene().getWindow();
+    final Point2D windowCoord = new Point2D(window.getX(), window.getY());
+    final Point2D sceneCoord = new Point2D(getScene().getX(), getScene().getY());
+    final Point2D nodeCoord = btnAddTag.localToScene(btnAddTag.getWidth() / 2, btnAddTag.getHeight());
 
-    return newTag;
+    final double centerX = Math.round(windowCoord.getX() + sceneCoord.getX() + nodeCoord.getX());
+    final double y = Math.round(windowCoord.getY() + sceneCoord.getY() + nodeCoord.getY()) + 6;
+
+    Dialogs.showEditTagDialog(new Tag(), centerX, y, getScene().getWindow(), true);
   }
 
-
-  protected EntityListener entryListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-
-    }
-  };
 
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override

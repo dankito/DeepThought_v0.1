@@ -1,6 +1,7 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
+import net.deepthought.controls.ICleanableControl;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -21,15 +22,13 @@ import netscape.javascript.JSObject;
  *
  * Created by ganymed on 28/08/15.
  */
-public class HtmlEditor {
+public class HtmlEditor implements ICleanableControl {
 
   public final static String HtmlEditorFolderName = "htmleditor";
 
   public final static String HtmlEditorFileName = "CKEditor_start.html";
 
   public final static String HtmlEditorFolderAndFileName = new File(HtmlEditorFolderName, HtmlEditorFileName).getPath();
-
-  public final static int SizeAdjustment = 16;
 
 
   private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
@@ -84,7 +83,6 @@ public class HtmlEditor {
   public String getHtml() {
     try {
       if(isCKEditorLoaded()) {
-//        Object obj = scriptExecutor.executeScript("CKEDITOR.instances.editor.getData();");
         Object obj = ckEditor.call("getData");
         return obj.toString();
       }
@@ -114,6 +112,20 @@ public class HtmlEditor {
 
   public void setListener(HtmlEditorListener listener) {
     this.listener = listener;
+  }
+
+
+  @Override
+  public void cleanUpControl() {
+    setListener(null);
+
+    try {
+      JSObject win = (JSObject) scriptExecutor.executeScript("window");
+      win.setMember("app", null);
+    } catch(Exception ex) { }
+
+    this.scriptExecutor = null;
+    ckEditor = null;
   }
 
 

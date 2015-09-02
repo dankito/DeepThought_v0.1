@@ -866,8 +866,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
-          .title("Entry contains unsaved changes")
-          .message("Entry contains unsaved changes. Do you like to save changes now?")
+          .title(Localization.getLocalizedString("alert.title.reference.contains.unsaved.changes"))
+          .message(Localization.getLocalizedString("alert.message.reference.contains.unsaved.changes"))
           .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
           .showConfirm();
 

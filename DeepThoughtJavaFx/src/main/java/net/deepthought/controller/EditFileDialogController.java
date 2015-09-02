@@ -371,10 +371,10 @@ public class EditFileDialogController extends ChildWindowsController implements 
     if(hasUnsavedChanges()) {
       Action response = org.controlsfx.dialog.Dialogs.create()
           .owner(windowStage)
-          .title("File contains unsaved changes")
-          .message("File contains unsaved changes. Do you like to save changes now?")
-          .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
-          .showConfirm();
+          .title(Localization.getLocalizedString("alert.title.file.contains.unsaved.changes"))
+              .message(Localization.getLocalizedString("alert.message.file.contains.unsaved.changes"))
+              .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
+              .showConfirm();
 
       if(response.equals(Dialog.ACTION_CANCEL))
         return false;

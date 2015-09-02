@@ -34,7 +34,7 @@
                   <Font name="System Bold" size="13.0" />
                </font>
                 </Button>
-                <Button alignment="CENTER" contentDisplay="TEXT_ONLY" maxHeight="30.0" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="30.0" text="+" textAlignment="CENTER" textFill="#068606">
+                <Button fx:id="btnAddTag" alignment="CENTER" contentDisplay="TEXT_ONLY" maxHeight="30.0" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="30.0" text="+" textAlignment="CENTER" textFill="#068606">
                     <font>
                         <Font name="System Bold" size="13.0" />
                     </font>

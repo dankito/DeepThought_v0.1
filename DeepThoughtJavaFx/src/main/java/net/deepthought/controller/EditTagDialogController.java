@@ -1,11 +1,12 @@
 package net.deepthought.controller;
 
+import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
-import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Localization;
@@ -36,9 +37,9 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 31/12/14.
  */
-public class EditPersonDialogController extends ChildWindowsController implements Initializable {
+public class EditTagDialogController extends ChildWindowsController implements Initializable {
 
-  protected Person person = null;
+  protected Tag tag = null;
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
 
@@ -55,11 +56,9 @@ public class EditPersonDialogController extends ChildWindowsController implement
   protected ContextHelpControl contextHelpControl;
 
   @FXML
-  protected TextField txtfldFirstName;
+  protected TextField txtfldName;
   @FXML
-  protected TextField txtfldLastName;
-  @FXML
-  protected TextArea txtarNotes;
+  protected TextField txtfldDescription;
 
 
   @Override
@@ -77,16 +76,13 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   protected void setupFields() {
-    txtfldFirstName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonFirstName));
-    txtfldFirstName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("first.name"));
+    txtfldName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.TagName));
+    txtfldName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("name"));
 
-    txtfldLastName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonLastName));
-    txtfldLastName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("last.name"));
+    txtfldDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.TagDescription));
+    txtfldDescription.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("description"));
 
-    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.PersonNotes));
-    txtarNotes.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("notes"));
-
-    contextHelpControl = new ContextHelpControl("context.help.person.");
+    contextHelpControl = new ContextHelpControl("context.help.tag.");
     dialogPane.setRight(contextHelpControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
@@ -101,25 +97,23 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
 
-  public void setPersonAndStage(Stage dialogStage, Person personToEdit) {
+  public void setTagAndStage(Stage dialogStage, Tag tagToEdit) {
     setWindowStage(dialogStage);
-    this.person = personToEdit;
+    this.tag = tagToEdit;
 
     updateStageTitle();
-    btnApply.setVisible(personToEdit.isPersisted());
 
-    personToEditSet(personToEdit);
+    tagToEditSet(tagToEdit);
     fieldsWithUnsavedChanges.clear();
-    person.addEntityListener(personListener);
+    tag.addEntityListener(tagListener);
 
-    txtfldFirstName.selectAll();
-    txtfldFirstName.requestFocus();
+    txtfldName.selectAll();
+    txtfldName.requestFocus();
   }
 
-  protected void personToEditSet(Person person) {
-    txtfldFirstName.setText(person.getFirstName());
-    txtfldLastName.setText(person.getLastName());
-    txtarNotes.setText(person.getNotes());
+  protected void tagToEditSet(Tag tag) {
+    txtfldName.setText(tag.getName());
+    txtfldDescription.setText(tag.getDescription());
   }
 
   public boolean hasUnsavedChanges() {
@@ -127,10 +121,10 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
   protected void updateStageTitle() {
-    if(person.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedString("create.person", person.getNameRepresentation()));
+    if(tag.isPersisted() == false)
+      windowStage.setTitle(Localization.getLocalizedString("create.tag"));
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.person", person.getNameRepresentation()));
+      windowStage.setTitle(Localization.getLocalizedString("edit.tag", tag.getTextRepresentation()));
   }
 
 
@@ -152,26 +146,25 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
   @Override
   protected void closeDialog() {
-    if(person != null)
-      person.removeEntityListener(personListener);
+    if(tag != null)
+      tag.removeEntityListener(tagListener);
 
     super.closeDialog();
   }
 
   protected void saveEditedFields() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonFirstName)) {
-      person.setFirstName(txtfldFirstName.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonFirstName);
-    }
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonLastName)) {
-      person.setLastName(txtfldLastName.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonLastName);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.TagName)) {
+      tag.setName(txtfldName.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.TagName);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.PersonNotes)) {
-      person.setNotes(txtarNotes.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.PersonNotes);
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.TagDescription)) {
+      tag.setDescription(txtfldDescription.getText());
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.TagDescription);
     }
+
+    if(tag.isPersisted() == false)
+      Application.getDeepThought().addTag(tag);
   }
 
   @Override
@@ -179,8 +172,8 @@ public class EditPersonDialogController extends ChildWindowsController implement
     if(hasUnsavedChanges()) {
       Action response = Dialogs.create()
           .owner(windowStage)
-          .title(Localization.getLocalizedString("alert.title.person.contains.unsaved.changes"))
-          .message(Localization.getLocalizedString("alert.message.person.contains.unsaved.changes"))
+          .title(Localization.getLocalizedString("alert.title.tag.contains.unsaved.changes"))
+          .message(Localization.getLocalizedString("alert.message.tag.contains.unsaved.changes"))
           .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
           .showConfirm();
 
@@ -195,7 +188,7 @@ public class EditPersonDialogController extends ChildWindowsController implement
   }
 
 
-  protected EntityListener personListener = new EntityListener() {
+  protected EntityListener tagListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
 
