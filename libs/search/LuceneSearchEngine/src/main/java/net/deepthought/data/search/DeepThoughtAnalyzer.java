@@ -87,6 +87,12 @@ public class DeepThoughtAnalyzer extends AnalyzerWrapper {
   }
 
   protected Analyzer createAnalyzerForLanguage(Language language) {
+    // i only need removing stop words, not stemming (as i'm doing PrefixQuery anyway) and also not normalizing letters like ä -> ae, è -> e, ... (without indexing them the can't be found later on)
+    return new StandardAnalyzer(Version.LUCENE_47, getLanguageStopWords(language));
+  }
+
+  /*
+  protected Analyzer createAnalyzerForLanguage(Language language) {
     if(language == null || language == ILanguageDetector.CouldNotDetectLanguage)
       return defaultAnalyzer;
 
@@ -151,6 +157,7 @@ public class DeepThoughtAnalyzer extends AnalyzerWrapper {
 
     return defaultAnalyzer;
   }
+  */
 
 
   public Analyzer getDefaultAnalyzer() {

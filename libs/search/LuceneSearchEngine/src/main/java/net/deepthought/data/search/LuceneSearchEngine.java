@@ -211,7 +211,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       setDirectory(FSDirectory.open(deepThoughtIndexDirectory));
 
       if(indexDirExists == false)
-        rebuildIndex();
+        rebuildIndexAsync();
     } catch(Exception ex) {
       log.error("Could not open Lucene Index Directory for DeepThought " + deepThought, ex);
     }
@@ -297,6 +297,19 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return indexSearcher;
   }
 
+
+  /**
+   * Know what you do when you call this method!
+   * Deletes index and rebuilds it from scratch which can take a very long time if you have a big database
+   */
+  public void rebuildIndexAsync() {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        rebuildIndex();
+      }
+    });
+  }
 
   /**
    * Know what you do when you call this method!
