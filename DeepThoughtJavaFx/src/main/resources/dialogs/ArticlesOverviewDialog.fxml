@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="250.0" minWidth="350.0" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.ArticlesOverviewDialogController">
-   <center>
-      <ListView fx:id="lstvwArticleOverviewItems" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </center>
-   <bottom>
-      <AnchorPane prefHeight="40.0" BorderPane.alignment="CENTER">
+
+<GridPane prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.ArticlesOverviewDialogController">
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="NEVER" />
+      <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="400.0" vgrow="ALWAYS" />
+      <RowConstraints maxHeight="40.0" minHeight="40.0" prefHeight="40.0" vgrow="NEVER" />
+   </rowConstraints>
+   <children>
+      <AnchorPane prefHeight="40.0" GridPane.rowIndex="2">
          <children>
             <Button fx:id="btnAddSelected" disable="true" mnemonicParsing="false" onAction="#handleButtonAddSelectedItemsToDeepThoughtAction" prefWidth="200.0" text="%add.selected" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
             <Button fx:id="btnViewSelected" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#handleButtonViewSelectedAction" prefWidth="200.0" text="%view.selected" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="212.0" AnchorPane.topAnchor="0.0" />
@@ -17,12 +24,11 @@
             <Button cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefWidth="120.0" text="%cancel" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-   </bottom>
-   <top>
-      <AnchorPane fx:id="pnTopBar" prefHeight="40.0" BorderPane.alignment="CENTER_LEFT">
+      <ListView fx:id="lstvwArticleOverviewItems" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+      <AnchorPane fx:id="pnTopBar" prefHeight="40.0">
          <children>
             <Button fx:id="btnUpdateArticlesOverview" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" maxHeight="38.0" maxWidth="38.0" minHeight="38.0" minWidth="38.0" mnemonicParsing="false" onAction="#handleButtonUpdateArticlesOverviewAction" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="1.0" />
          </children>
       </AnchorPane>
-   </top>
-</BorderPane>
+   </children>
+</GridPane>

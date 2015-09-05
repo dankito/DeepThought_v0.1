@@ -109,7 +109,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
 
   protected void listViewChanged(ListView<ArticlesOverviewItem> listView) {
     if(listView != null && graphicPane != null)
-      graphicPane.prefWidthProperty().bind(listView.widthProperty().subtract(18));
+      graphicPane.prefWidthProperty().bind(listView.widthProperty().subtract(34));
   }
 
   protected void setupGraphic() {
@@ -142,7 +142,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
 
     graphicPane.add(itemTextLinesPane, 2, 0, 1, 2);
 
-    GridPane.setMargin(itemTextLinesPane, new Insets(0, 12, 0, 6));
+    GridPane.setMargin(itemTextLinesPane, new Insets(0, 0, 0, 6));
 
     itemTextLinesPane.setPrefHeight(VBox.USE_COMPUTED_SIZE);
     itemTextLinesPane.setMaxHeight(Double.MAX_VALUE);
