@@ -82,10 +82,6 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
   protected TreeView<Category> trvwCategories;
 
 
-  public EntryCategoriesControl() {
-    this(null);
-  }
-
   public EntryCategoriesControl(Entry entry) {
     deepThought = Application.getDeepThought();
 
@@ -282,9 +278,7 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
 
     this.entry = entry;
 
-    editedEntryCategories.clear();
-    addedCategories.clear();
-    removedCategories.clear();
+    clearEditedCategoriesSets();
 
     if(this.entry != null) {
       editedEntryCategories.addAll(entry.getCategories());
@@ -294,6 +288,27 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
     setDisable(entry == null);
     txtfldFilterCategories.clear();
     showEntryCategories();
+  }
+
+  public void setEntryCategories(Collection<Category> categories) {
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    this.entry = null;
+
+    clearEditedCategoriesSets();
+
+    editedEntryCategories.addAll(categories);
+
+    setDisable(false);
+    txtfldFilterCategories.clear();
+    showEntryCategories();
+  }
+
+  protected void clearEditedCategoriesSets() {
+    editedEntryCategories.clear();
+    addedCategories.clear();
+    removedCategories.clear();
   }
 
 

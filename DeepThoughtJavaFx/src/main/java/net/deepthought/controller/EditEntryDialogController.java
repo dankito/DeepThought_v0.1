@@ -294,8 +294,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && entryReferenceControl.isVisible() == false &&
-                          entryPersonsControl.isVisible() == false && ttldpnFiles.isVisible() == false);
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll || entryReferenceControl.isVisible() == false ||
+                          entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false);
   }
 
   protected void referenceControlFieldChanged(FieldChangedEvent event) {
@@ -579,6 +579,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     setWindowStageAndEntry(windowStage, creationResult.getCreatedEntry());
 
     entryTagsControl.setEntryTags(creationResult.getTags());
+    entryCategoriesControl.setEntryCategories(creationResult.getCategories());
 
     entryReferenceControl.setEntryCreationResult(creationResult);
 

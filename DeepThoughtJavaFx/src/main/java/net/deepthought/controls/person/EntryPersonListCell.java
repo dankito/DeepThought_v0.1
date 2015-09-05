@@ -1,5 +1,6 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
@@ -16,8 +17,8 @@ public class EntryPersonListCell extends PersonListCell {
   protected Entry entry = null;
 
 
-  public EntryPersonListCell(PersonsControl personsControl, Entry entry) {
-    super(personsControl);
+  public EntryPersonListCell(IEditedEntitiesHolder<Person> editedPersonsHolder, Entry entry) {
+    super(editedPersonsHolder);
 
     setEntry(entry);
   }
@@ -37,10 +38,6 @@ public class EntryPersonListCell extends PersonListCell {
     if(entry != null) {
       entry.addEntityListener(entryListener);
       entry.addEntryPersonListener(entryPersonListener);
-//      setDefaultPersonRole(entry.getTemplate().getDefaultPersonRole());
-    }
-    else {
-//      setDefaultPersonRole(null);
     }
   }
 
@@ -61,7 +58,7 @@ public class EntryPersonListCell extends PersonListCell {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
 
     @Override
@@ -72,7 +69,7 @@ public class EntryPersonListCell extends PersonListCell {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
   };
 

@@ -182,6 +182,10 @@ public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolde
     return editedTags;
   }
 
+  public boolean containsEditedEntity(Tag entity) {
+    return editedTags.contains(entity);
+  }
+
   public void addEntityToEntry(Tag entity) {
     if(removedTags.contains(entity)) {
       removedTags.remove(entity);
@@ -212,10 +216,6 @@ public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolde
 
     showEntryTags();
     fireTagRemovedEvent(entity);
-  }
-
-  public boolean containsEditedEntity(Tag entity) {
-    return editedTags.contains(entity);
   }
 
   public void setEntry(Entry entry) {

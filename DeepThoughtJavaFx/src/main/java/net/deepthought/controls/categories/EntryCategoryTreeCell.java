@@ -4,7 +4,6 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
@@ -77,16 +76,16 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
       @Override
       public void changed(ObservableValue<? extends TreeItem<Category>> observable, TreeItem<Category> oldValue, TreeItem<Category> newValue) {
         if(newValue != null)
-          itemChanged(newValue.getValue());
+          categoryChanged(newValue.getValue());
         else
-          itemChanged(null);
+          categoryChanged(null);
       }
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
   }
 
-  protected SetChangeListener<Category> editedCategoriesChangedListener = change -> categoryPropertiesHaveBeenUpdated();
+  protected SetChangeListener<Category> editedCategoriesChangedListener = change -> categoryUpdated();
 
   @Override
   public void cleanUpControl() {
@@ -190,7 +189,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   protected void updateItem(Category item, boolean empty) {
     TreeItem<Category> treeItem = getTreeItem();
     if(treeItem != null && treeItem.getValue() != category)
-      itemChanged(treeItem.getValue());
+      categoryChanged(treeItem.getValue());
 
     super.updateItem(item, empty);
 
@@ -223,7 +222,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     updateSelected(true);
   }
 
-  protected void itemChanged(Category newValue) {
+  protected void categoryChanged(Category newValue) {
     if(this.category != null && this.category.equals(newValue) == false)
       this.category.removeEntityListener(categoryListener);
 
@@ -232,6 +231,10 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     if(category != null)
       this.category.addEntityListener(categoryListener);
 
+    categoryUpdated();
+  }
+
+  protected void categoryUpdated() {
     updateItem(category, category == null);
   }
 

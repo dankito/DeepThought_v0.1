@@ -1,5 +1,7 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -14,8 +16,8 @@ public class SeriesTitlePersonListCell extends PersonListCell {
   protected SeriesTitle series = null;
 
 
-  public SeriesTitlePersonListCell(PersonsControl personsControl, SeriesTitle series) {
-    super(personsControl);
+  public SeriesTitlePersonListCell(IEditedEntitiesHolder<Person> editedPersonsHolder, SeriesTitle series) {
+    super(editedPersonsHolder);
 
     this.series = series;
     if(series != null) {
@@ -55,7 +57,7 @@ public class SeriesTitlePersonListCell extends PersonListCell {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
 
     @Override
@@ -66,7 +68,7 @@ public class SeriesTitlePersonListCell extends PersonListCell {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
   };
 

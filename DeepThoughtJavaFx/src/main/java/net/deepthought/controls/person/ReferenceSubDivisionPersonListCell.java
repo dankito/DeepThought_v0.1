@@ -1,5 +1,7 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -14,8 +16,8 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
   protected ReferenceSubDivision subDivision = null;
 
 
-  public ReferenceSubDivisionPersonListCell(PersonsControl personsControl, ReferenceSubDivision subDivision) {
-    super(personsControl);
+  public ReferenceSubDivisionPersonListCell(IEditedEntitiesHolder<Person> editedPersonsHolder, ReferenceSubDivision subDivision) {
+    super(editedPersonsHolder);
 
     setSubDivision(subDivision);
   }
@@ -53,7 +55,7 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
 
     @Override
@@ -64,7 +66,7 @@ public class ReferenceSubDivisionPersonListCell extends PersonListCell {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity.equals(getItem()))
-        itemChanged(getItem());
+        personChanged(getItem());
     }
   };
 

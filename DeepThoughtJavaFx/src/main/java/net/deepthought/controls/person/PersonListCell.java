@@ -2,6 +2,7 @@ package net.deepthought.controls.person;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -15,6 +16,7 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -40,7 +42,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
   protected Person person = null;
 
-  protected PersonsControl personsControl;
+  protected IEditedEntitiesHolder<Person> editedPersonsHolder;
 
   protected HBox graphicPane = new HBox();
 
@@ -51,8 +53,10 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   protected Button btnDeletePerson = new Button();
 
 
-  public PersonListCell(PersonsControl personsControl) {
-    this.personsControl = personsControl;
+  public PersonListCell(IEditedEntitiesHolder<Person> editedPersonsHolder) {
+    this.editedPersonsHolder = editedPersonsHolder;
+
+    editedPersonsHolder.getEditedEntities().addListener(editedPersonsChangedListener);
 
     setText(null);
     setupGraphic();
@@ -60,12 +64,14 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     itemProperty().addListener(new ChangeListener<Person>() {
       @Override
       public void changed(ObservableValue<? extends Person> observable, Person oldValue, Person newValue) {
-        itemChanged(newValue);
+        personChanged(newValue);
       }
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
   }
+
+  protected SetChangeListener<Person> editedPersonsChangedListener = change -> personUpdated();
 
   @Override
   public void cleanUpControl() {
@@ -77,7 +83,9 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       person.removeEntityListener(personListener);
     }
 
-    personsControl = null;
+    editedPersonsHolder.getEditedEntities().removeListener(editedPersonsChangedListener);
+
+    editedPersonsHolder = null;
   }
 
   protected void setupGraphic() {
@@ -151,7 +159,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
   protected boolean isPersonSetOnEntity(Person person) {
-    return personsControl.getEditedEntityPersons().contains(person);
+    return editedPersonsHolder.containsEditedEntity(person);
   }
 
 
@@ -173,7 +181,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     getListView().getSelectionModel().select(getIndex());
   }
 
-  protected void itemChanged(Person newValue) {
+  protected void personChanged(Person newValue) {
     if(person != null) {
       person.removeEntityListener(personListener);
     }
@@ -184,7 +192,11 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       newValue.addEntityListener(personListener);
     }
 
-    updateItem(newValue, newValue == null);
+    personUpdated();
+  }
+
+  protected void personUpdated() {
+    updateItem(person, person == null);
   }
 
 
@@ -196,14 +208,16 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
   protected void addPersonToEntity(Person person) {
-    personsControl.addPersonToEntity(person);
+    editedPersonsHolder.addEntityToEntry(person);
     setButtonAddOrRemovePersonState();
   }
 
   protected void removePersonFromEntity(Person person) {
-    personsControl.removePersonFromEntity(person);
+    editedPersonsHolder.removeEntityFromEntry(person);
     setButtonAddOrRemovePersonState();
   }
+
+
 
   protected void handleButtonEditPersonAction() {
     Dialogs.showEditPersonDialog(getItem());
@@ -220,7 +234,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
 //      personDisplayNameLabel.setText(((Person)entity).getNameRepresentation());
       if(entity == getItem())
-        itemChanged((Person)entity);
+        personChanged((Person) entity);
     }
 
     @Override

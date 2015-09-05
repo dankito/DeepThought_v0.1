@@ -5,6 +5,7 @@ import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -32,6 +33,8 @@ import java.util.TreeSet;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -48,7 +51,7 @@ import javafx.scene.layout.Priority;
 /**
  * Created by ganymed on 01/02/15.
  */
-public abstract class PersonsControl extends TitledPane implements ICleanableControl {
+public abstract class PersonsControl extends TitledPane implements IEditedEntitiesHolder<Person>, ICleanableControl {
 
   protected final static Logger log = LoggerFactory.getLogger(PersonsControl.class);
 
@@ -67,7 +70,7 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
   protected Set<Person> currentlySetPersonsOnEntity = new HashSet<>();
   protected Set<Person> addedPersons = new HashSet<>();
   protected Set<Person> removedPersons = new HashSet<>();
-  protected Set<Person> editedEntityPersons = new HashSet<>();
+  protected ObservableSet<Person> editedEntityPersons = FXCollections.observableSet();
 
   protected List<PersonListCell> personListCells = new ArrayList<>();
 
@@ -197,7 +200,11 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
 
   protected void setEntityPersons(Set<Person> persons) {
     currentlySetPersonsOnEntity = persons;
-    editedEntityPersons = persons;
+
+    if(persons instanceof ObservableSet)
+      editedEntityPersons = (ObservableSet<Person>)persons;
+    else
+      editedEntityPersons = FXCollections.observableSet(persons);
 
     addedPersons.clear();
     removedPersons.clear();
@@ -215,11 +222,19 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
 
   protected PersonLabel createPersonPreviewLabel(Person person) {
     PersonLabel label = new PersonLabel(person);
-    label.setOnButtonRemoveItemFromCollectionEventHandler((event) -> removePersonFromEntity(person));
+    label.setOnButtonRemoveItemFromCollectionEventHandler((event) -> removeEntityFromEntry(person));
     return label;
   }
 
-  protected void addPersonToEntity(Person person) {
+  public ObservableSet<Person> getEditedEntities() {
+    return editedEntityPersons;
+  }
+
+  public boolean containsEditedEntity(Person person) {
+    return editedEntityPersons.contains(person);
+  }
+
+  public void addEntityToEntry(Person person) {
     if(removedPersons.contains(person)) {
       removedPersons.remove(person);
     }
@@ -234,7 +249,7 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
 
   }
 
-  protected void removePersonFromEntity(Person person) {
+  public void removeEntityFromEntry(Person person) {
     if(addedPersons.contains(person)) {
       addedPersons.remove(person);
     }
@@ -266,7 +281,7 @@ public abstract class PersonsControl extends TitledPane implements ICleanableCon
     if(deepThought != null)
       deepThought.addPerson(newPerson);
 
-    addPersonToEntity(newPerson);
+    addEntityToEntry(newPerson);
   }
 
   @FXML
