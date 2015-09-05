@@ -49,7 +49,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected SearchAndSelectTagsControl searchAndSelectTagsControl = null;
 
-  protected IEditedTagsHolder editedTagsHolder = null;
+  protected IEditedEntitiesHolder editedTagsHolder = null;
 
   protected HBox graphicsPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
@@ -62,11 +62,11 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   protected FilterTagsSearchResults filterTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
 
 
-  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedTagsHolder editedTagsHolder) {
+  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedEntitiesHolder editedTagsHolder) {
     this.searchAndSelectTagsControl = searchAndSelectTagsControl;
     this.editedTagsHolder = editedTagsHolder;
 
-    editedTagsHolder.getEditedTags().addListener(editedTagsChangedListener);
+    editedTagsHolder.getEditedEntities().addListener(editedTagsChangedListener);
 
     filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
     searchAndSelectTagsControl.addFilteredTagsChangedListener(filteredTagsChangedListener);
@@ -92,7 +92,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   @Override
   public void cleanUpControl() {
-    editedTagsHolder.getEditedTags().removeListener(editedTagsChangedListener);
+    editedTagsHolder.getEditedEntities().removeListener(editedTagsChangedListener);
     editedTagsHolder = null;
 
     searchAndSelectTagsControl.removeFilteredTagsChangedListener(filteredTagsChangedListener);
@@ -168,7 +168,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
       chkbxIsTagSelected.selectedProperty().removeListener(checkBoxIsTagSelectedChangeListener);
 
-      chkbxIsTagSelected.setSelected(editedTagsHolder.containsEditedTag(item));
+      chkbxIsTagSelected.setSelected(editedTagsHolder.containsEditedEntity(item));
 
       chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
 
@@ -207,16 +207,15 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   }
 
   protected void tagUpdated() {
-//    setText(getTagStringRepresentation(tag));
     updateItem(tag, tag == null);
   }
 
 
   protected void handleCheckBoxSelectedChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
     if(newValue == true)
-      editedTagsHolder.addTagToEntry(getItem());
+      editedTagsHolder.addEntityToEntry(getItem());
     else
-      editedTagsHolder.removeTagFromEntry(getItem());
+      editedTagsHolder.removeEntityFromEntry(getItem());
   }
 
   protected void handleButtonEditTagAction(ActionEvent event) {
@@ -229,10 +228,10 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
         //Dialogs.showEditTagDialog(getItem());
 
         if (getItem() != null) {
-          if (editedTagsHolder.containsEditedTag(getItem()) == false)
-            editedTagsHolder.addTagToEntry(getItem());
+          if (editedTagsHolder.containsEditedEntity(getItem()) == false)
+            editedTagsHolder.addEntityToEntry(getItem());
           else
-            editedTagsHolder.removeTagFromEntry(getItem());
+            editedTagsHolder.removeEntityFromEntry(getItem());
         }
       }
 

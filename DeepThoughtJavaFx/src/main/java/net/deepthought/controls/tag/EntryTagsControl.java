@@ -34,13 +34,12 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, ICleanableControl {
+public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolder<Tag>, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
 
@@ -170,7 +169,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     clearEntryTagLabels();
 
     for(final Tag tag : new TreeSet<>(editedTags)) {
-      pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(tag, event -> removeTagFromEntry(tag)));
+      pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(tag, event -> removeEntityFromEntry(tag)));
     }
   }
 
@@ -178,18 +177,23 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     FXUtils.cleanUpChildrenAndClearPane(pnSelectedTagsPreview);
   }
 
-  public void addTagToEntry(Tag tag) {
-    if(removedTags.contains(tag)) {
-      removedTags.remove(tag);
+
+  public ObservableSet<Tag> getEditedEntities() {
+    return editedTags;
+  }
+
+  public void addEntityToEntry(Tag entity) {
+    if(removedTags.contains(entity)) {
+      removedTags.remove(entity);
     }
     else {
-      addedTags.add(tag);
+      addedTags.add(entity);
     }
 
-    addTagToEditedTags(tag);
+    addTagToEditedTags(entity);
 
     showEntryTags();
-    fireTagAddedEvent(tag);
+    fireTagAddedEvent(entity);
 
   }
 
@@ -197,21 +201,21 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     editedTags.add(tag);
   }
 
-  public void removeTagFromEntry(Tag tag) {
-    if(addedTags.contains(tag)) {
-      addedTags.remove(tag);
+  public void removeEntityFromEntry(Tag entity) {
+    if(addedTags.contains(entity)) {
+      addedTags.remove(entity);
     } else {
-      removedTags.add(tag);
+      removedTags.add(entity);
     }
 
-    editedTags.remove(tag);
+    editedTags.remove(entity);
 
     showEntryTags();
-    fireTagRemovedEvent(tag);
+    fireTagRemovedEvent(entity);
   }
 
-  public boolean containsEditedTag(Tag tag) {
-    return editedTags.contains(tag);
+  public boolean containsEditedEntity(Tag entity) {
+    return editedTags.contains(entity);
   }
 
   public void setEntry(Entry entry) {
@@ -335,7 +339,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
       DeepThought deepThought = (DeepThought)collectionHolder;
 
       if(editedTags.contains(tag)) // TODO: is this correct? as also entityAddedToCollection() calls this method
-        removeTagFromEntry(tag);
+        removeEntityFromEntry(tag);
     }
   }
 
@@ -373,9 +377,5 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
   public Set<Tag> getRemovedTags() {
     return removedTags;
-  }
-
-  public ObservableSet<Tag> getEditedTags() {
-    return editedTags;
   }
 }

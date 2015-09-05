@@ -3,7 +3,6 @@ package net.deepthought.controls.categories;
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 
@@ -20,16 +19,13 @@ import javafx.scene.control.TreeItem;
  */
 public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleanableControl {
 
-  protected Entry entry;
-
   protected Category category;
 
   protected Map<Category, EntryCategoryTreeItem> mapSubCategoryToTreeItem = new HashMap<>();
 
 
-  public EntryCategoryTreeItem(Entry entry, Category category) {
+  public EntryCategoryTreeItem(Category category) {
     super(category);
-    this.entry = entry;
     this.category = category;
     this.category.addEntityListener(categoryListener);
 
@@ -55,7 +51,7 @@ public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleana
   }
 
   protected void addSubCategoryItem(Category subCategory) {
-    EntryCategoryTreeItem subCategoryTreeItem = new EntryCategoryTreeItem(entry, subCategory);
+    EntryCategoryTreeItem subCategoryTreeItem = new EntryCategoryTreeItem(subCategory);
     if(subCategory.getCategoryOrder() < this.getChildren().size())
       this.getChildren().add(subCategory.getCategoryOrder(), subCategoryTreeItem);
     else

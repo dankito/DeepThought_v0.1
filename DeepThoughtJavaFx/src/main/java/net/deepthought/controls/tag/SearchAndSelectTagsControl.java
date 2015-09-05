@@ -52,7 +52,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectTagsControl.class);
 
 
-  protected IEditedTagsHolder editedTagsHolder = null;
+  protected IEditedEntitiesHolder editedTagsHolder = null;
 
   protected DeepThought deepThought = null;
 
@@ -79,7 +79,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   protected ListView<Tag> lstvwAllTags;
 
 
-  public SearchAndSelectTagsControl(IEditedTagsHolder editedTagsHolder) {
+  public SearchAndSelectTagsControl(IEditedEntitiesHolder editedTagsHolder) {
     this.editedTagsHolder = editedTagsHolder;
 
     deepThought = Application.getDeepThought();
@@ -248,10 +248,10 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     if(tag == null)
       return;
 
-    if(editedTagsHolder.containsEditedTag(tag) == false)
-      editedTagsHolder.addTagToEntry(tag);
+    if(editedTagsHolder.containsEditedEntity(tag) == false)
+      editedTagsHolder.addEntityToEntry(tag);
     else
-      editedTagsHolder.removeTagFromEntry(tag);
+      editedTagsHolder.removeEntityFromEntry(tag);
   }
 
   protected void addNewTagToEntry() {
@@ -262,7 +262,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     Tag newTag = new Tag(tagName);
     Application.getDeepThought().addTag(newTag);
 
-    editedTagsHolder.addTagToEntry(newTag);
+    editedTagsHolder.addEntityToEntry(newTag);
 
     btnCreateTag.setDisable(true);
   }

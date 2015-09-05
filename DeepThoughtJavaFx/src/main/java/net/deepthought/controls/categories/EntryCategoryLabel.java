@@ -3,7 +3,6 @@ package net.deepthought.controls.categories;
 import net.deepthought.controls.CollectionItemLabel;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.JavaFxLocalization;
@@ -17,21 +16,18 @@ import javafx.event.EventHandler;
  */
 public class EntryCategoryLabel extends CollectionItemLabel {
 
-  protected Entry entry;
-
   protected Category category;
 
 
-  public EntryCategoryLabel(Entry entry, Category category, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
+  public EntryCategoryLabel(Category category, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
     super(onButtonRemoveItemFromCollectionEventHandler);
 
-    this.entry = entry;
     this.category = category;
 
     category.addEntityListener(categoryListener);
 
     setUserData(category);
-    JavaFxLocalization.bindControlToolTip(btnRemoveItemFromCollection, "tool.tip.click.to.remove.category.from.entry", category.getName(), entry.getPreview());
+    JavaFxLocalization.bindControlToolTip(btnRemoveItemFromCollection, "tool.tip.click.to.remove.category.from.entry", category.getName());
     itemDisplayNameUpdated();
   }
 

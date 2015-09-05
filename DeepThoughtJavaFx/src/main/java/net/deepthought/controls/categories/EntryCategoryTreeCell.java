@@ -2,6 +2,7 @@ package net.deepthought.controls.categories;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
@@ -16,6 +17,7 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -45,9 +47,8 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
 
   protected Category category = null;
-  protected Entry entry = null;
 
-  protected EntryCategoriesControl entryCategoriesControl;
+  protected IEditedEntitiesHolder<Category> editedCategoriesHolder;
 
 
   protected HBox graphicPane = new HBox();
@@ -64,11 +65,10 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   protected Button addSubCategoryToCategoryButton = new Button();
 
 
-  public EntryCategoryTreeCell(Entry entry, EntryCategoriesControl entryCategoriesControl) {
-    this.entry = entry;
-    this.entryCategoriesControl = entryCategoriesControl;
+  public EntryCategoryTreeCell(IEditedEntitiesHolder<Category> editedCategoriesHolder) {
+    this.editedCategoriesHolder = editedCategoriesHolder;
 
-    isEntryInCategoryCheckBox.setDisable(entry == null);
+    editedCategoriesHolder.getEditedEntities().addListener(editedCategoriesChangedListener);
 
     setText(null);
     setupGraphic();
@@ -76,19 +76,24 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     treeItemProperty().addListener(new ChangeListener<TreeItem<Category>>() {
       @Override
       public void changed(ObservableValue<? extends TreeItem<Category>> observable, TreeItem<Category> oldValue, TreeItem<Category> newValue) {
-        if(newValue != null) {
+        if(newValue != null)
           itemChanged(newValue.getValue());
-        }
+        else
+          itemChanged(null);
       }
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
   }
 
+  protected SetChangeListener<Category> editedCategoriesChangedListener = change -> categoryPropertiesHaveBeenUpdated();
+
   @Override
   public void cleanUpControl() {
     if(this.category != null)
       this.category.removeEntityListener(categoryListener);
+
+    editedCategoriesHolder.getEditedEntities().removeListener(editedCategoriesChangedListener);
   }
 
   protected void setupGraphic() {
@@ -171,14 +176,12 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     }
   };
 
-  protected void isEntryInCategoryChanged(Boolean isOnCategory) {
-    if(entry != null && category != null) {
+  protected void isEntryInCategoryChanged(boolean isOnCategory) {
+    if(category != null) {
       if(isOnCategory)
-//        category.addEntry(entry);
-        entryCategoriesControl.addCategoryToEntry(entry, category);
+        editedCategoriesHolder.addEntityToEntry(category);
       else
-//        category.removeEntry(entry);
-        entryCategoriesControl.removeCategoryFromEntry(entry, category);
+        editedCategoriesHolder.removeEntityFromEntry(category);
     }
   }
 
@@ -195,9 +198,8 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
       setGraphic(null);
     }
     else {
-      if(category != null)
-        categoryNameLabel.setText(category.getName());
       setGraphic(graphicPane);
+      categoryPropertiesHaveBeenUpdated();
     }
   }
 
@@ -207,10 +209,10 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
       //Dialogs.showEditCategoryDialog(category);
 
 //      if(category != null) {
-//        if (entryCategoriesControl.getEditedEntryCategories().contains(category) == false)
-//          entryCategoriesControl.addCategoryToEntry(entry, category);
+//        if (editedCategoriesHolder.getEditedEntryCategories().contains(category) == false)
+//          editedCategoriesHolder.addEntityToEntry(entry, category);
 //        else
-//          entryCategoriesControl.removeCategoryFromEntry(entry, category);
+//          editedCategoriesHolder.removeCategoryFromEntry(entry, category);
 //      }
       isEntryInCategoryCheckBox.setSelected(!isEntryInCategoryCheckBox.isSelected()); // simply toggle selected state
     }
@@ -230,27 +232,17 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     if(category != null)
       this.category.addEntityListener(categoryListener);
 
-    if(newValue == null) {
-      setGraphic(null);
-    }
-    else {
-      setGraphic(graphicPane);
-      categoryPropertiesHaveBeenUpdated(newValue);
-    }
+    updateItem(category, category == null);
   }
 
-  private void categoryPropertiesHaveBeenUpdated(Category newValue) {
-    categoryNameLabel.setText(newValue.getName());
+  protected void categoryPropertiesHaveBeenUpdated() {
+    categoryNameLabel.setText(category.getName());
     if(category.getDescription() != null && category.getDescription().isEmpty() == false)
       setTooltip(new Tooltip(category.getDescription()));
 
     isEntryInCategoryCheckBox.selectedProperty().removeListener(checkBoxIsEntryInCategoryChangeListener);
 
-    if(entry == null)
-      isEntryInCategoryCheckBox.setSelected(false);
-    else
-//      isEntryInCategoryCheckBox.setSelected(category.containsEntry(entry));
-      isEntryInCategoryCheckBox.setSelected(entryCategoriesControl.getEditedEntryCategories().contains(category));
+    isEntryInCategoryCheckBox.setSelected(editedCategoriesHolder.containsEditedEntity(category));
 
     isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
   }
@@ -272,28 +264,15 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   }
 
 
-  public void setEntry(Entry entry) {
-    this.entry = entry;
-    isEntryInCategoryCheckBox.setDisable(entry == null);
-
-    categoryPropertiesHaveBeenUpdated(category);
-
-  }
-
-
   protected EntityListener categoryListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-//      if(entity.equals(category))
-        categoryPropertiesHaveBeenUpdated(category);
+        categoryPropertiesHaveBeenUpdated();
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(/*collectionHolder.equals(category) &&*/ collection == category.getEntries()) {
-        if(addedEntity.equals(entry))
-          setComboBoxToSelected();
-      }
+      categoryPropertiesHaveBeenUpdated();
     }
 
     @Override
@@ -303,23 +282,9 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(/*collectionHolder.equals(category) &&*/ collection == category.getEntries()) {
-        if(removedEntity.equals(entry))
-          setComboBoxToUnselected();
-      }
+      categoryPropertiesHaveBeenUpdated();
     }
   };
 
 
-  public void setComboBoxToSelected() {
-    isEntryInCategoryCheckBox.selectedProperty().removeListener(checkBoxIsEntryInCategoryChangeListener);
-    isEntryInCategoryCheckBox.setSelected(true);
-    isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
-  }
-
-  public void setComboBoxToUnselected() {
-    isEntryInCategoryCheckBox.selectedProperty().removeListener(checkBoxIsEntryInCategoryChangeListener);
-    isEntryInCategoryCheckBox.setSelected(false);
-    isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
-  }
 }

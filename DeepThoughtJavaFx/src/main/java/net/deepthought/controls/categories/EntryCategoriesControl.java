@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.event.EntryCategoriesEditedEvent;
+import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -24,7 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -41,7 +44,7 @@ import javafx.scene.layout.Pane;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryCategoriesControl extends TitledPane implements ICleanableControl {
+public class EntryCategoriesControl extends TitledPane implements IEditedEntitiesHolder<Category>, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoriesControl.class);
 
@@ -50,7 +53,7 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 
   protected DeepThought deepThought = null;
 
-  protected Set<Category> editedEntryCategories = new HashSet<>();
+  protected ObservableSet<Category> editedEntryCategories = FXCollections.observableSet();
   protected Set<Category> addedCategories = new HashSet<>();
   protected Set<Category> removedCategories = new HashSet<>();
 
@@ -64,8 +67,6 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
   protected EventHandler<EntryCategoriesEditedEvent> categoryRemovedEventHandler = null;
 
 
-  @FXML
-  protected Pane pnGraphicsPane;
   @FXML
   protected FlowPane pnSelectedCategoriesPreview;
 
@@ -160,56 +161,25 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 
     pnFilterCategories.setVisible(false);
     pnFilterCategories.setManaged(false);
-//    // replace normal TextField txtfldFilterCategories with a SearchTextField (with a cross to clear selection)
-//    pnFilterCategories.getChildren().remove(txtfldFilterCategories);
-//    txtfldFilterCategories = TextFields.createClearableTextField();
-//    pnFilterCategories.getChildren().add(0, txtfldFilterCategories);
-//    HBox.setHgrow(txtfldFilterCategories, Priority.ALWAYS);
-//    txtfldFilterCategories.setPromptText("Find tags to add");
-//
-//    txtfldFilterCategories.textProperty().addListener(new ChangeListener<String>() {
-//      @Override
-//      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//        setControlsForEnteredTagsFilter(newValue);
-//      }
-//    });
-//    txtfldFilterCategories.setOnAction(new EventHandler<ActionEvent>() {
-//      @Override
-//      public void handle(ActionEvent event) {
-//        if (checkIfCategoryOfThatNameExists(txtfldFilterCategories.getText()) == false)
-//          addNewCategoryToEntry();
-//      }
-//    });
 
-
-    trvwCategories.setRoot(new TopLevelCategoryTreeItem(entry));
+    trvwCategories.setRoot(new TopLevelCategoryTreeItem());
 
     trvwCategories.setCellFactory(treeView -> {
-      EntryCategoryTreeCell cell = new EntryCategoryTreeCell(entry, this);
+      EntryCategoryTreeCell cell = new EntryCategoryTreeCell(this);
       entryCategoryTreeCells.add(cell);
       return cell;
     });
 
-    showEntryCategories(entry);
+    showEntryCategories();
   }
 
-  protected void showEntryCategories(Entry entry) {
+  protected void showEntryCategories() {
     clearEntryCategoryLabels();
 
-    if(entry != null) {
-//      for(Category category : entry.getCategories()) {
-      for(final Category category : editedEntryCategories) {
-        pnSelectedCategoriesPreview.getChildren().add(new EntryCategoryLabel(entry, category, event -> {
-          removeCategoryFromEntry(entry, category);
-
-          for(EntryCategoryTreeCell cell : entryCategoryTreeCells) {
-            if(category.equals(cell.category)) {
-              cell.setComboBoxToUnselected();
-              break;
-            }
-          }
-        }));
-      }
+    for (final Category category : editedEntryCategories) {
+      pnSelectedCategoriesPreview.getChildren().add(new EntryCategoryLabel(category, event -> {
+        removeEntityFromEntry(category);
+      }));
     }
   }
 
@@ -259,18 +229,23 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
     });
   }
 
+  @Override
+  public ObservableSet<Category> getEditedEntities() {
+    return editedEntryCategories;
+  }
+
   protected void addNewCategoryToEntry() {
     String newCategoryName = txtfldFilterCategories.getText();
     Category newCategory = new Category(newCategoryName);
     Application.getDeepThought().addCategory(newCategory);
 
-//    newCategory.addEntry(entry);
-    addCategoryToEntry(entry, newCategory);
+    addEntityToEntry(newCategory);
 
     btnCreateCategory.setDisable(true);
   }
 
-  protected void addCategoryToEntry(Entry entry, Category category) {
+  @Override
+  public void addEntityToEntry(Category category) {
     if(removedCategories.contains(category))
       removedCategories.remove(category);
     else
@@ -278,11 +253,12 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 
     editedEntryCategories.add(category);
 
-    showEntryCategories(entry);
-    fireCategoryAddedEvent(entry, category);
+    showEntryCategories();
+    fireCategoryAddedEvent(category);
   }
 
-  protected void removeCategoryFromEntry(Entry entry, Category category) {
+  @Override
+  public void removeEntityFromEntry(Category category) {
     if(addedCategories.contains(category))
       addedCategories.remove(category);
     else
@@ -290,8 +266,13 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 
     editedEntryCategories.remove(category);
 
-    showEntryCategories(entry);
-    fireCategoryRemovedEvent(entry, category);
+    showEntryCategories();
+    fireCategoryRemovedEvent(category);
+  }
+
+  @Override
+  public boolean containsEditedEntity(Category entity) {
+    return editedEntryCategories.contains(entity);
   }
 
 
@@ -306,16 +287,13 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
     removedCategories.clear();
 
     if(this.entry != null) {
-      editedEntryCategories = new HashSet<>(entry.getCategories());
+      editedEntryCategories.addAll(entry.getCategories());
       this.entry.addEntityListener(entryListener);
     }
 
     setDisable(entry == null);
     txtfldFilterCategories.clear();
-    showEntryCategories(entry);
-
-    for(EntryCategoryTreeCell cell : entryCategoryTreeCells)
-      cell.setEntry(this.entry);
+    showEntryCategories();
   }
 
 
@@ -330,7 +308,7 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
     Application.getDeepThought().addCategory(newCategory);
 
 //    newCategory.addEntry(entry);
-    addCategoryToEntry(entry, newCategory);
+    addEntityToEntry(newCategory);
   }
 
 
@@ -344,7 +322,7 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Category)
         editedEntryCategories.add((Category)addedEntity);
-      showEntryCategories(entry);
+      showEntryCategories();
     }
 
     @Override
@@ -356,7 +334,7 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Category)
         editedEntryCategories.remove((Category)removedEntity);
-      showEntryCategories(entry);
+      showEntryCategories();
     }
   };
 
@@ -376,7 +354,7 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 //      checkIfCategoriesHaveBeenUpdated(collectionHolder, updatedEntity);
 
       if(updatedEntity instanceof Category && entry != null && ((Category)updatedEntity).getEntries().contains(entry))
-        showEntryCategories(entry);
+        showEntryCategories();
     }
 
     @Override
@@ -398,14 +376,14 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
 //  }
 
 
-  protected void fireCategoryAddedEvent(Entry entry, Category category) {
+  protected void fireCategoryAddedEvent(Category category) {
     if(categoryAddedEventHandler != null)
-      categoryAddedEventHandler.handle(new EntryCategoriesEditedEvent(this, entry, category));
+      categoryAddedEventHandler.handle(new EntryCategoriesEditedEvent(this, category));
   }
 
-  protected void fireCategoryRemovedEvent(Entry entry, Category category) {
+  protected void fireCategoryRemovedEvent(Category category) {
     if(categoryRemovedEventHandler != null)
-      categoryRemovedEventHandler.handle(new EntryCategoriesEditedEvent(this, entry, category));
+      categoryRemovedEventHandler.handle(new EntryCategoriesEditedEvent(this, category));
   }
 
   public EventHandler<EntryCategoriesEditedEvent> getCategoryAddedEventHandler() {
@@ -436,5 +414,4 @@ public class EntryCategoriesControl extends TitledPane implements ICleanableCont
   public Set<Category> getRemovedCategories() {
     return removedCategories;
   }
-
 }
