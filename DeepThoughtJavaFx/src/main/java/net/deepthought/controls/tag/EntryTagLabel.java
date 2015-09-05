@@ -2,7 +2,6 @@ package net.deepthought.controls.tag;
 
 import net.deepthought.controls.CollectionItemLabel;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -17,20 +16,17 @@ import javafx.event.EventHandler;
  */
 public class EntryTagLabel extends CollectionItemLabel {
 
-  protected Entry entry;
-
   protected Tag tag;
 
 
-  public EntryTagLabel(Entry entry, Tag tag, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
+  public EntryTagLabel(Tag tag, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
     super(onButtonRemoveItemFromCollectionEventHandler);
-    this.entry = entry;
     this.tag = tag;
 
     tag.addEntityListener(tagListener);
 
     setUserData(tag);
-    JavaFxLocalization.bindControlToolTip(btnRemoveItemFromCollection, "tool.tip.click.to.remove.tag.from.entry", tag.getName(), entry.getPreview());
+    JavaFxLocalization.bindControlToolTip(btnRemoveItemFromCollection, "tool.tip.click.to.remove.tag.from.entry", tag.getName());
     itemDisplayNameUpdated();
   }
 

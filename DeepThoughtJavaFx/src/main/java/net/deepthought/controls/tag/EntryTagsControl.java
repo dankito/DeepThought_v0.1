@@ -58,8 +58,6 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
 
   @FXML
-  protected Pane pnGraphicsPane;
-  @FXML
   protected ToggleButton btnShowHideSearchTagsToolWindow;
   @FXML
   protected Label lblTags;
@@ -147,11 +145,11 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     btnShowHideSearchTagsToolWindow.setGraphic(new ImageView(Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.selectedProperty().addListener(((observableValue, oldValue, newValue) -> btnShowHideSearchTagsToolWindowIsSelectedChanged(newValue)));
 
-    searchAndSelectTagsControl = new SearchAndSelectTagsControl(entry, this);
+    searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
 //    searchAndSelectTagsControl.setMaxHeight(200);
     this.setContent(searchAndSelectTagsControl);
 
-    showEntryTags(entry);
+    showEntryTags();
 
     // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
     this.widthProperty().addListener((observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength());
@@ -168,13 +166,11 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     }
   }
 
-  protected void showEntryTags(Entry entry) {
+  protected void showEntryTags() {
     clearEntryTagLabels();
 
-    if(entry != null) {
-      for(final Tag tag : new TreeSet<>(editedTags)) {
-        pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(entry, tag, event -> removeTagFromEntry(tag)));
-      }
+    for(final Tag tag : new TreeSet<>(editedTags)) {
+      pnSelectedTagsPreview.getChildren().add(new EntryTagLabel(tag, event -> removeTagFromEntry(tag)));
     }
   }
 
@@ -192,8 +188,8 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
     addTagToEditedTags(tag);
 
-    showEntryTags(entry);
-    fireTagAddedEvent(entry, tag);
+    showEntryTags();
+    fireTagAddedEvent(tag);
 
   }
 
@@ -210,8 +206,8 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
     editedTags.remove(tag);
 
-    showEntryTags(entry);
-    fireTagRemovedEvent(entry, tag);
+    showEntryTags();
+    fireTagRemovedEvent(tag);
   }
 
   public boolean containsEditedTag(Tag tag) {
@@ -224,9 +220,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
     this.entry = entry;
 
-    editedTags.clear();
-    addedTags.clear();
-    removedTags.clear();
+    clearEditedTagsSets();
 
     if(this.entry != null) {
       editedTags.addAll(entry.getTags());
@@ -234,7 +228,27 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     }
 
     setDisable(entry == null);
-    showEntryTags(entry);
+    showEntryTags();
+  }
+
+  public void setEntryTags(Collection<Tag> tags) {
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    this.entry = null;
+
+    clearEditedTagsSets();
+
+    editedTags.addAll(tags);
+
+    setDisable(false);
+    showEntryTags();
+  }
+
+  protected void clearEditedTagsSets() {
+    editedTags.clear();
+    addedTags.clear();
+    removedTags.clear();
   }
 
   public void setSearchAndSelectTagsControlHeight(double height) {
@@ -255,7 +269,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
   }
 
   protected Stage createToolWindowSearchTags() {
-    Stage stage = Dialogs.createToolWindowStage(new SearchAndSelectTagsControl(entry, this), getScene().getWindow(), "tags", deepThought.getSettings().getSearchAndSelectTagsToolWindowSettings());
+    Stage stage = Dialogs.createToolWindowStage(new SearchAndSelectTagsControl(this), getScene().getWindow(), "tags", deepThought.getSettings().getSearchAndSelectTagsToolWindowSettings());
     stage.setOnHidden(event -> btnShowHideSearchTagsToolWindow.setSelected(false));
 
     return stage;
@@ -272,7 +286,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Tag)
         addTagToEditedTags((Tag) addedEntity);
-      showEntryTags(entry);
+      showEntryTags();
     }
 
     @Override
@@ -284,7 +298,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Tag)
         editedTags.remove((Tag)removedEntity);
-      showEntryTags(entry);
+      showEntryTags();
     }
   };
 
@@ -305,7 +319,7 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
 
 //      if(updatedEntity instanceof Tag && entry != null && entry.getTags().contains((Tag)updatedEntity))
       if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity))
-        showEntryTags(entry);
+        showEntryTags();
     }
 
     @Override
@@ -326,14 +340,14 @@ public class EntryTagsControl extends TitledPane implements IEditedTagsHolder, I
   }
 
 
-  protected void fireTagAddedEvent(Entry entry, Tag tag) {
+  protected void fireTagAddedEvent(Tag tag) {
     if(tagAddedEventHandler != null)
-      tagAddedEventHandler.handle(new EntryTagsEditedEvent(this, entry, tag));
+      tagAddedEventHandler.handle(new EntryTagsEditedEvent(this, tag));
   }
 
-  protected void fireTagRemovedEvent(Entry entry, Tag tag) {
+  protected void fireTagRemovedEvent(Tag tag) {
     if(tagRemovedEventHandler != null)
-      tagRemovedEventHandler.handle(new EntryTagsEditedEvent(this, entry, tag));
+      tagRemovedEventHandler.handle(new EntryTagsEditedEvent(this, tag));
   }
 
   public EventHandler<EntryTagsEditedEvent> getTagAddedEventHandler() {

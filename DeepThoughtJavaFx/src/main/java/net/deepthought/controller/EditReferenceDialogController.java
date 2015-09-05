@@ -13,6 +13,7 @@ import net.deepthought.controls.person.ReferenceSubDivisionPersonsControl;
 import net.deepthought.controls.person.SeriesTitlePersonsControl;
 import net.deepthought.controls.reference.ISelectedReferenceHolder;
 import net.deepthought.controls.reference.SearchAndSelectReferenceControl;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -597,39 +598,41 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     // TODO: save async while closing the dialog? Would make Dialog closing faster
     if(hasSeriesTitleBeenEdited()) {
+      saveEditedFieldsOnSeriesTitle();
+
       if (seriesTitle.isPersisted() == false) { // a new SeriesTitle
         Application.getDeepThought().addSeriesTitle(seriesTitle);
       }
-
-      saveEditedFieldsOnSeriesTitle();
 
       if(editedReferenceBase == null)
         editedReferenceBase = seriesTitle;
     }
 
     if(hasReferenceBeenEdited()) {
+      saveEditedFieldsOnReference();
+
       if (reference.isPersisted() == false) { // a new Reference
         Application.getDeepThought().addReference(reference);
 //        if (persistedParentReferenceBase instanceof SeriesTitle) // is this really needed or are the two lines below sufficient
 //          ((SeriesTitle) persistedParentReferenceBase).addSerialPart(reference);
-        if(seriesTitle.isPersisted())
-          reference.setSeries(seriesTitle);
       }
 
-      saveEditedFieldsOnReference();
+      if(seriesTitle.isPersisted())
+        reference.setSeries(seriesTitle);
 
       if(editedReferenceBase == null)
         editedReferenceBase = reference;
     }
 
     if(hasReferenceSubDivisionBeenEdited()) {
+      saveEditedFieldsOnReferenceSubDivision();
+
       if (referenceSubDivision.isPersisted() == false) { // a new ReferenceSubDivision
         Application.getDeepThought().addReferenceSubDivision(referenceSubDivision);
-        if(reference.isPersisted())
-          reference.addSubDivision(referenceSubDivision);
       }
 
-      saveEditedFieldsOnReferenceSubDivision();
+      if(reference.isPersisted())
+        reference.addSubDivision(referenceSubDivision);
 
       if(editedReferenceBase == null)
         editedReferenceBase = referenceSubDivision;
@@ -651,17 +654,14 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   protected boolean hasSeriesTitleBeenEdited() {
-//    return StringUtils.isNotNullOrEmpty(txtfldSeriesTitleTitle.getText());
     return fieldsWithUnsavedSeriesTitleChanges.size() > 0;
   }
 
   protected boolean hasReferenceBeenEdited() {
-//    return StringUtils.isNotNullOrEmpty(txtfldTitle.getText()) || StringUtils.isNotNullOrEmpty(txtfldIssueOrPublishingDate.getText());
     return fieldsWithUnsavedReferenceChanges.size() > 0;
   }
 
   protected boolean hasReferenceSubDivisionBeenEdited() {
-//    return StringUtils.isNotNullOrEmpty(txtfldReferenceSubDivisionTitle.getText());
     return fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0;
   }
 
@@ -1144,6 +1144,68 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     editedReferenceBase = referenceBase;
     Node nodeToFocus = txtfldReferenceSubDivisionTitle;
 
+    nodeToFocus = setReferenceBases(referenceBase, persistedParentReferenceBase, nodeToFocus);
+
+    if(persistedParentReferenceBase != null) {
+      nodeToFocus = setPersistedParentReferenceBase(persistedParentReferenceBase, nodeToFocus);
+    }
+
+    setupDialog(windowStage, nodeToFocus);
+  }
+
+  public void setWindowStageAndReferenceBase(Stage windowStage, EntryCreationResult creationResult) {
+    Node nodeToFocus = txtfldTitle;
+
+    if(creationResult.getSeriesTitle() != null) {
+      seriesTitle = creationResult.getSeriesTitle();
+      editedReferenceBase = seriesTitle;
+      nodeToFocus = txtfldSeriesTitleTitle;
+    }
+    else
+      seriesTitle = new SeriesTitle();
+
+    if(creationResult.getReference() != null) {
+      reference = creationResult.getReference();
+      editedReferenceBase = reference;
+      nodeToFocus = txtfldTitle;
+    }
+    else
+      reference = new Reference();
+
+    if(creationResult.getReferenceSubDivision() != null) {
+      referenceSubDivision = creationResult.getReferenceSubDivision();
+      editedReferenceBase = referenceSubDivision;
+      nodeToFocus = txtfldReferenceSubDivisionTitle;
+    }
+    else
+      referenceSubDivision = new ReferenceSubDivision();
+
+    setupDialog(windowStage, nodeToFocus);
+
+    if(creationResult.getSeriesTitle() != null && seriesTitle.isPersisted() == false)
+      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
+    if(creationResult.getReference() != null && reference.isPersisted() == false)
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
+    if(creationResult.getReferenceSubDivision() != null && referenceSubDivision.isPersisted() == false)
+      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle);
+  }
+
+  protected void setupDialog(Stage windowStage, Node nodeToFocus) {
+    super.setWindowStage(windowStage);
+
+    updateWindowTitle(editedReferenceBase);
+
+    setupControls();
+
+    setSeriesTitleValues(seriesTitle);
+    setReferenceValues(reference);
+    setReferenceSubDivisionValues(referenceSubDivision);
+
+    btnApplyChanges.setVisible(seriesTitle.isPersisted() || reference.isPersisted() || referenceSubDivision.isPersisted());
+    FXUtils.focusNode(nodeToFocus);
+  }
+
+  protected Node setReferenceBases(ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, Node nodeToFocus) {
     if(referenceBase instanceof ReferenceSubDivision) {
       this.referenceSubDivision = (ReferenceSubDivision)referenceBase;
       this.reference = referenceSubDivision.getReference();
@@ -1182,33 +1244,22 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         nodeToFocus = txtfldSeriesTitleTitle;
       }
     }
+    return nodeToFocus;
+  }
 
-    if(persistedParentReferenceBase != null) {
-      this.persistedParentReferenceBase = persistedParentReferenceBase;
+  protected Node setPersistedParentReferenceBase(ReferenceBase persistedParentReferenceBase, Node nodeToFocus) {
+    this.persistedParentReferenceBase = persistedParentReferenceBase;
 
-      if(persistedParentReferenceBase instanceof SeriesTitle) {
-        this.seriesTitle = (SeriesTitle)persistedParentReferenceBase;
-        nodeToFocus = txtfldTitle;
-      }
-      else if(persistedParentReferenceBase instanceof Reference) {
-        this.reference = (Reference)persistedParentReferenceBase;
-        this.seriesTitle = reference.getSeries();
-        nodeToFocus = txtfldReferenceSubDivisionTitle;
-      }
+    if(persistedParentReferenceBase instanceof SeriesTitle) {
+      this.seriesTitle = (SeriesTitle)persistedParentReferenceBase;
+      nodeToFocus = txtfldTitle;
     }
-
-    super.setWindowStage(windowStage);
-
-    updateWindowTitle(editedReferenceBase);
-
-    setupControls();
-
-    setSeriesTitleValues(seriesTitle);
-    setReferenceValues(reference);
-    setReferenceSubDivisionValues(referenceSubDivision);
-
-    btnApplyChanges.setVisible(seriesTitle.isPersisted() || reference.isPersisted() || referenceSubDivision.isPersisted());
-    FXUtils.focusNode(nodeToFocus);
+    else if(persistedParentReferenceBase instanceof Reference) {
+      this.reference = (Reference)persistedParentReferenceBase;
+      this.seriesTitle = reference.getSeries();
+      nodeToFocus = txtfldReferenceSubDivisionTitle;
+    }
+    return nodeToFocus;
   }
 
   protected void setReferenceValues(final Reference reference) {
@@ -1236,8 +1287,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
   public boolean hasUnsavedChanges() {
-    return (seriesTitle.isPersisted() && fieldsWithUnsavedSeriesTitleChanges.size() > 0) || (reference.isPersisted() && fieldsWithUnsavedReferenceChanges.size() > 0) ||
-        (referenceSubDivision.isPersisted() && fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0);
+    return fieldsWithUnsavedSeriesTitleChanges.size() > 0 || fieldsWithUnsavedReferenceChanges.size() > 0 ||
+        fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0;
   }
 
   protected void updateWindowTitle(ReferenceBase referenceBase) {

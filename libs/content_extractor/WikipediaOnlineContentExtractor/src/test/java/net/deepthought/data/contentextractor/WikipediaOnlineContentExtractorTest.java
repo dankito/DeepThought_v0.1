@@ -72,17 +72,17 @@ public class WikipediaOnlineContentExtractorTest {
 
     Assert.assertEquals(articleTitle, article.getAbstract());
 
-    Assert.assertEquals(1, article.getTags().size());
-    Assert.assertEquals("Wikipedia", new ArrayList<Tag>(article.getTags()).get(0).getName());
+    Assert.assertEquals(1, creationResult.getTags().size());
+    Assert.assertEquals("Wikipedia", new ArrayList<Tag>(creationResult.getTags()).get(0).getName());
 
-    Assert.assertEquals(1, article.getCategories().size());
-    Assert.assertEquals("Wikipedia", new ArrayList<Category>(article.getCategories()).get(0).getName());
+    Assert.assertEquals(1, creationResult.getCategories().size());
+    Assert.assertEquals("Wikipedia", new ArrayList<Category>(creationResult.getCategories()).get(0).getName());
 
-    Assert.assertNotNull(article.getSeries());
-    Assert.assertEquals("Wikipedia", article.getSeries().getTitle());
+    Assert.assertNotNull(creationResult.getSeriesTitle());
+    Assert.assertEquals("Wikipedia", creationResult.getSeriesTitle().getTitle());
 
-    Assert.assertNotNull(article.getReference());
-    Assert.assertEquals(articleTitle, article.getReference().getTitle());
+    Assert.assertNotNull(creationResult.getReference());
+    Assert.assertEquals(articleTitle, creationResult.getReference().getTitle());
 
     Assert.assertFalse(article.getContent().contains("Vorlage_Weiterleitungshinweis"));
     Assert.assertFalse(article.getContent().contains("Vorlage_Belege_fehlen"));

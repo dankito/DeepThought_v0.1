@@ -59,18 +59,18 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
     try {
       Element contentElement = document.body().getElementById("content");
 
-      Reference reference = createReference(articleUrl, contentElement);
-
       Entry articleEntry = new Entry(extractContent(contentElement), extractTitle(contentElement));
-      articleEntry.setReference(reference);
+      EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      articleEntry.addTag(Application.getDeepThought().findOrCreateTagForName("Wikipedia"));
+      createReference(creationResult, articleUrl, contentElement);
+
+      creationResult.addTag(Application.getDeepThought().findOrCreateTagForName("Wikipedia"));
 
       Category encyclopaediaeCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName("Lexika");
       Category wikipediaCategory = Application.getDeepThought().findOrCreateSubCategoryForName(encyclopaediaeCategory, "Wikipedia");
-      wikipediaCategory.addEntry(articleEntry);
+      creationResult.addCategory(wikipediaCategory);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
       return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
@@ -113,7 +113,7 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
     return null;
   }
 
-  protected Reference createReference(String articleUrl, Element contentElement) {
+  protected Reference createReference(EntryCreationResult creationResult, String articleUrl, Element contentElement) {
     Reference articleReference = new Reference(extractTitle(contentElement));
     articleReference.setOnlineAddress(articleUrl);
 
@@ -122,9 +122,11 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 //    if(lastModifiedElement != null)
 //      articleReference.setIssueOrPublishingDate(lastModifiedElement.);
 
+    creationResult.setReference(articleReference);
+
     if(Application.getDeepThought() != null) {
       SeriesTitle wikipediaSeries = Application.getDeepThought().findOrCreateSeriesTitleForTitle("Wikipedia");
-      wikipediaSeries.addSerialPart(articleReference);
+      creationResult.setSeriesTitle(wikipediaSeries);
     }
 
     return articleReference;

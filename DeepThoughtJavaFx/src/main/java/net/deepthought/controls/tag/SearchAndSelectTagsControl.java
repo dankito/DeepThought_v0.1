@@ -52,7 +52,6 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectTagsControl.class);
 
 
-  protected Entry entry = null;
   protected IEditedTagsHolder editedTagsHolder = null;
 
   protected DeepThought deepThought = null;
@@ -80,8 +79,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   protected ListView<Tag> lstvwAllTags;
 
 
-  public SearchAndSelectTagsControl(Entry entry, IEditedTagsHolder editedTagsHolder) {
-    this.entry = entry;
+  public SearchAndSelectTagsControl(IEditedTagsHolder editedTagsHolder) {
     this.editedTagsHolder = editedTagsHolder;
 
     deepThought = Application.getDeepThought();

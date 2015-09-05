@@ -2,9 +2,7 @@ package net.deepthought.controls.entries;
 
 import net.deepthought.Application;
 import net.deepthought.MainWindowController;
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
-import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
@@ -67,7 +65,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -246,7 +243,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
     tblvwEntries.setOnKeyReleased(event -> {
-      if(event.getCode() == KeyCode.DELETE /*&& FXUtils.isNoModifierPressed(event)*/) {
+      if (event.getCode() == KeyCode.DELETE /*&& FXUtils.isNoModifierPressed(event)*/) {
         removeSelectedEntries();
       }
     });
@@ -299,8 +296,16 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     pnQuickEditEntry.getChildren().add(htmledEntryContent);
 
     currentEditedEntryTagsControl = new EntryTagsControl();
-    currentEditedEntryTagsControl.setTagAddedEventHandler(event -> event.getEntry().addTag(event.getTag()));
-    currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> event.getEntry().removeTag(event.getTag()));
+    currentEditedEntryTagsControl.setTagAddedEventHandler(event -> {
+      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
+      if (selectedEntry != null)
+        entry.addTag(event.getTag());
+    });
+    currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> {
+      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
+      if (selectedEntry != null)
+        entry.removeTag(event.getTag());
+    });
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
     currentEditedEntryTagsControl.setSearchAndSelectTagsControlHeight(190);
 
@@ -498,70 +503,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void showEditEntryDialog(final Entry entry) {
-    net.deepthought.controller.Dialogs.showEditEntryDialog(entry, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok) {
-//          if (tableViewEntriesItems.contains(entry) == false) { // a new Entry
-//            addEntryToSelectedCategory(entry);
-//            addAndSelectEntry(entry);
-//          } else {
-//            selectEntry(entry);
-//          }
-        }
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-
-      }
-    });
-
-//    try {
-//      FXMLLoader loader = new FXMLLoader();
-//      loader.setResources(Localization.getStringsResourceBundle());
-//      loader.setLocation(getClass().getClassLoader().getResource("dialogs/EditEntryDialog.fxml"));
-//      Parent parent = loader.load();
-//
-//      // Create the dialog Stage.
-//      Stage dialogStage = new Stage();
-////      dialogStage.setTitle(Localization.getLocalizedString("edit.entry"));
-//      dialogStage.initModality(Modality.NONE);
-////      windowStage.initOwner(stage);
-//      Scene scene = new Scene(parent);
-//      dialogStage.setScene(scene);
-//
-//      // Set the person into the controller.
-//      EditEntryDialogController controller = loader.getController();
-//      controller.setWindowStage(dialogStage);
-//      controller.setEntry(entry);
-//
-//      controller.setListener(new ChildWindowsControllerListener() {
-//        @Override
-//        public void windowClosing(Stage stage, ChildWindowsController controller) {
-//          if(controller.getDialogResult() == DialogResult.Ok) {
-//            if(entry.getId() == null) { // a new Entry
-//              deepThought.addEntry(entry);
-//              addEntryToSelectedCategory(entry);
-//              addAndSelectEntry(entry);
-//            }
-//            else {
-//              selectEntry(entry);
-//            }
-//          }
-//        }
-//
-//        @Override
-//        public void windowClosed(Stage stage, ChildWindowsController controller) {
-//          removeClosedChildWindow(stage);
-//        }
-//      });
-//
-//      addOpenedChildWindow(dialogStage);
-//      dialogStage.show();
-//    } catch(Exception ex) {
-//      log.error("Could not load / show dialog", ex);
-//    }
+    Dialogs.showEditEntryDialog(entry);
   }
 
 

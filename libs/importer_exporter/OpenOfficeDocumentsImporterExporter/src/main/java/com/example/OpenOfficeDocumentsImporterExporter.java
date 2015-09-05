@@ -357,11 +357,13 @@ public class OpenOfficeDocumentsImporterExporter {
       if(entryParagraphs.size() == 1) {
         if(sueddeutscheContentExtractor.canCreateEntryFromUrl(entryParagraphs.get(0).getOdfElement().getTextContent())) {
           EntryCreationResult result = sueddeutscheContentExtractor.createEntryFromArticle(entryParagraphs.get(0).getOdfElement().getTextContent());
+          // TODO: this doesn't work this way anymore, Entry's Tags, Categories, ... are now in EntryCreationResult
           if (result.successful())
             currentEntry = result.getCreatedEntry();
         }
         else if(spiegelContentExtractor.canCreateEntryFromUrl(entryParagraphs.get(0).getOdfElement().getTextContent())) {
           EntryCreationResult result = spiegelContentExtractor.createEntryFromArticle(entryParagraphs.get(0).getOdfElement().getTextContent());
+          // TODO: this doesn't work this way anymore, Entry's Tags, Categories, ... are now in EntryCreationResult
           if (result.successful())
             currentEntry = result.getCreatedEntry();
         }
@@ -729,6 +731,7 @@ public class OpenOfficeDocumentsImporterExporter {
     if(spiegelContentExtractor.canCreateEntryFromUrl(url) &&
         (StringUtils.isNullOrEmpty(title) || StringUtils.isNullOrEmpty(subTitle) || StringUtils.isNullOrEmpty(publishingDate))) {
       EntryCreationResult creationResult = spiegelContentExtractor.createEntryFromArticle(url);
+      // TODO: this doesn't work this way anymore, Entry's Tags, Categories, ... are now in EntryCreationResult
       if(creationResult.successful())
         return creationResult.getCreatedEntry().getReferenceSubDivision();
       else

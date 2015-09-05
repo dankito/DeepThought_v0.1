@@ -211,7 +211,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   public void createEntryFromOnlineArticleButViewFirst(ContentExtractOption contentExtractOption, IOnlineArticleContentExtractor contentExtractor) {
     contentExtractor.createEntryFromClipboardContentAsync(contentExtractOption, result -> {
       if (result.successful())
-        net.deepthought.controller.Dialogs.showEditEntryDialog(result.getCreatedEntry());
+        net.deepthought.controller.Dialogs.showEditEntryDialog(result);
       else
         showCouldNotCreateEntryError(result);
       hideThreadSafe();
@@ -221,9 +221,10 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   public void directlyAddEntryFromOnlineArticle(ContentExtractOption contentExtractOption, IOnlineArticleContentExtractor contentExtractor) {
     contentExtractor.createEntryFromClipboardContentAsync(contentExtractOption, result -> {
       if (result.successful())
-        Application.getDeepThought().addEntry(result.getCreatedEntry());
+        result.saveCreatedEntities();
       else
         showCouldNotCreateEntryError(result);
+
       hideThreadSafe();
     });
   }
@@ -323,7 +324,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
         if (controller.getDialogResult() == DialogResult.Ok) {
           Entry newEntry = new Entry();
           newEntry.addFile(newFile);
-          net.deepthought.controller.Dialogs.showEditEntryDialog(newEntry);
+          Dialogs.showEditEntryDialog(newEntry);
         }
       }
 
@@ -354,13 +355,13 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   protected void tryToExtractText(ContentExtractOption extractTextOption, IOcrContentExtractor textContentExtractor) {
     textContentExtractor.createEntryFromClipboardContentAsync(extractTextOption, result -> {
       if (result.successful())
-        Dialogs.showEditEntryDialog(result.getCreatedEntry());
+        Dialogs.showEditEntryDialog(result);
       else
         showCouldNotCreateEntryError(result);
     });
   }
 
-  public void attachFileToEntryAndTryToExtractText(ContentExtractOptions options) {
+  public void attachFileToEntryAndTryToExtractText(final ContentExtractOptions options) {
 //    ContentExtractOption attachFileOption = options.getAttachFileToEntryOption();
 //    final FileLink newFile = ((ILocalFileContentExtractor)attachFileOption.getContentExtractor()).createFileLink(attachFileOption);
     final FileLink newFile = new FileLink(options.getUrl());
@@ -374,7 +375,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
             if (result.successful()) {
               Entry newEntry = result.getCreatedEntry();
               newEntry.addFile(newFile);
-              net.deepthought.controller.Dialogs.showEditEntryDialog(newEntry);
+              net.deepthought.controller.Dialogs.showEditEntryDialog(result);
             } else
               showCouldNotCreateEntryError(result);
           });

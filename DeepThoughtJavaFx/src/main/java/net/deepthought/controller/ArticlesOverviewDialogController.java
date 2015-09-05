@@ -204,7 +204,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     item.getArticleContentExtractor().createEntryFromUrlAsync(item.getUrl(), creationResult -> {
       // TODO: this is the same code as in CreateEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst() -> unify
       if (creationResult.successful())
-        Dialogs.showEditEntryDialog(creationResult.getCreatedEntry());
+        Dialogs.showEditEntryDialog(creationResult);
       else
         showCouldNotCreateEntryError(creationResult);
     });

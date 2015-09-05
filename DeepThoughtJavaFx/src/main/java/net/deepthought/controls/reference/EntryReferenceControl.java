@@ -13,6 +13,7 @@ import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -27,6 +28,7 @@ import net.deepthought.data.search.Search;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +62,8 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
 
   protected Entry entry = null;
+
+  protected EntryCreationResult creationResult = null;
 
   protected ReferenceBase selectedReferenceBase = null;
 
@@ -171,6 +175,31 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     setDisable(entry == null);
   }
 
+  public void setEntryCreationResult(EntryCreationResult creationResult) {
+    if(this.entry != null)
+      this.entry.removeEntityListener(entryListener);
+
+    this.creationResult = creationResult;
+    this.entry = null;
+
+    if(creationResult != null) {
+      selectedReferenceBase = null;
+      if(creationResult.getReferenceSubDivision() != null)
+        selectedReferenceBase = creationResult.getReferenceSubDivision();
+      else if(creationResult.getReference() != null)
+        selectedReferenceBase = creationResult.getReference();
+      else if(creationResult.getSeriesTitle() != null)
+        selectedReferenceBase = creationResult.getSeriesTitle();
+
+      selectedReferenceBaseChanged(selectedReferenceBase);
+    }
+    else {
+      selectedReferenceBaseChanged(null);
+    }
+
+    setDisable(creationResult == null);
+  }
+
   public void cleanUpControl() {
     Application.removeApplicationListener(applicationListener);
 
@@ -222,7 +251,10 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     if(btnNewOrEditReference.getButtonFunction() == NewOrEditButton.ButtonFunction.New)
       createNewReferenceBase();
     else {
-      Dialogs.showEditReferenceDialog(selectedReferenceBase);
+      if(creationResult == null)
+        Dialogs.showEditReferenceDialog(selectedReferenceBase);
+      else
+        Dialogs.showEditReferenceDialog(creationResult);
     }
   }
 
@@ -231,13 +263,10 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
   }
 
   protected void createNewReferenceBase() {
-    //      Reference newReference = Reference.createReferenceFromStringRepresentation(cmbxSeriesTitleOrReference.getEditor().getText()); // TODO: use as soon as typing directly in ComboBox is
-    // possible again
     Dialogs.showEditReferenceDialog(null, new ChildWindowsControllerListener() {
       @Override
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok)
-//          entry.setReference(newReference);
           selectedReferenceBaseChanged(((EditReferenceDialogController) controller).getEditedReferenceBase());
       }
 
@@ -278,7 +307,7 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
   protected void createEntryReferenceBaseLabel(ReferenceBase newReferenceBase) {
     clearCurrentReferenceLabel();
 
-    currentReferenceLabel = new EntryReferenceBaseLabel(newReferenceBase, onButtonRemoveItemFromCollectionEventHandler);
+    currentReferenceLabel = new EntryReferenceBaseLabel(newReferenceBase, creationResult, onButtonRemoveItemFromCollectionEventHandler);
 
     // laborious but works: Before if EntryReferenceBaseLabel was to broad to be fully displayed it broadened the whole EntryReferenceControl and there moved the Splitter of SplitPane
     currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(currentReferenceLabel);
@@ -381,16 +410,18 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      // TODO: this is not working this way
-      if(updatedEntity.equals(entry.getSeries()) || updatedEntity.equals(entry.getReference()) || updatedEntity.equals(entry.getReferenceSubDivision())) {
-        if(entry.getReferenceSubDivision() != null)
-          selectedReferenceBaseChanged(entry.getReferenceSubDivision());
-        else if(entry.getReference() != null)
-          selectedReferenceBaseChanged(entry.getReference());
-        else if(entry.getSeries() != null)
-          selectedReferenceBaseChanged(entry.getSeries());
-        else
-          selectedReferenceBaseChanged(null);
+      if(entry != null) {
+        // TODO: this is not working this way
+        if (updatedEntity.equals(entry.getSeries()) || updatedEntity.equals(entry.getReference()) || updatedEntity.equals(entry.getReferenceSubDivision())) {
+          if (entry.getReferenceSubDivision() != null)
+            selectedReferenceBaseChanged(entry.getReferenceSubDivision());
+          else if (entry.getReference() != null)
+            selectedReferenceBaseChanged(entry.getReference());
+          else if (entry.getSeries() != null)
+            selectedReferenceBaseChanged(entry.getSeries());
+          else
+            selectedReferenceBaseChanged(null);
+        }
       }
     }
 

@@ -3,6 +3,7 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.FXUtils;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
@@ -94,17 +95,20 @@ public class Dialogs {
 
 
   public static void showEditEntryDialog(final Entry entry) {
-    showEditEntryDialog(entry, null);
-  }
-
-  public static void showEditEntryDialog(final Entry entry, final ChildWindowsControllerListener listener) {
     if(Platform.isFxApplicationThread())
-      showEditEntryDialogOnUiThread(entry, listener);
+      showEditEntryDialogOnUiThread(entry, null, null);
     else
-      Platform.runLater(() -> showEditEntryDialogOnUiThread(entry, listener));
+      Platform.runLater(() -> showEditEntryDialogOnUiThread(entry, null, null));
   }
 
-  protected static void showEditEntryDialogOnUiThread(final Entry entry, final ChildWindowsControllerListener listener) {
+  public static void showEditEntryDialog(final EntryCreationResult creationResult) {
+    if(Platform.isFxApplicationThread())
+      showEditEntryDialogOnUiThread(null, creationResult, null);
+    else
+      Platform.runLater(() -> showEditEntryDialogOnUiThread(null, creationResult, null));
+  }
+
+  protected static void showEditEntryDialogOnUiThread(final Entry entry, final EntryCreationResult creationResult, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditEntryDialog.fxml");
@@ -114,16 +118,11 @@ public class Dialogs {
 //      loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + "EditEntryDialog.fxml"));
 //      Parent parent = loader.load();
 //
-//      // Create the dialog Stage.
-//      Stage dialogStage = new Stage();
-//      dialogStage.initModality(Modality.NONE);
-////      windowStage.initOwner(stage);
-//      Scene scene = new Scene(parent);
-//      dialogStage.setScene(scene);
-
-      // Set the person into the controller.
       EditEntryDialogController controller = loader.getController();
-      controller.setWindowStageAndEntry(dialogStage, entry);
+      if(entry != null)
+        controller.setWindowStageAndEntry(dialogStage, entry);
+      else if(creationResult != null)
+        controller.setWindowStageAndEntryCreationResult(dialogStage, creationResult);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
@@ -291,6 +290,10 @@ public class Dialogs {
   }
 
 
+  public static void showEditReferenceDialog(EntryCreationResult creationResult) {
+    showEditReferenceDialog(null, null, creationResult, null);
+  }
+
   public static void showEditReferenceDialog(ReferenceBase referenceBase) {
     showEditReferenceDialog(referenceBase, null);
   }
@@ -300,15 +303,21 @@ public class Dialogs {
   }
 
   public static void showEditReferenceDialog(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, final ChildWindowsControllerListener listener) {
+    showEditReferenceDialog(referenceBase, persistedParentReferenceBase, null, listener);
+  }
+
+  protected static void showEditReferenceDialog(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, EntryCreationResult creationResult, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditReferenceDialog.fxml");
       dialogStage.setMinHeight(500);
       dialogStage.setMinWidth(500);
 
-      // Set the referenceBase into the controller.
       EditReferenceDialogController controller = loader.getController();
-      controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
+      if(referenceBase != null)
+        controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
+      else if(creationResult != null)
+        controller.setWindowStageAndReferenceBase(dialogStage, creationResult);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override

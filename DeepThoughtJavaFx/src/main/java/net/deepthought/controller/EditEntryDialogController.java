@@ -19,6 +19,7 @@ import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Device;
@@ -96,6 +97,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
   protected Entry entry = null;
+
+  protected EntryCreationResult creationResult = null;
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
 
@@ -286,12 +289,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
-
 //    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    entryReferenceControl.setVisible(entry.isAReferenceSet() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    entryPersonsControl.setVisible(entry.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && entryReferenceControl.isVisible() == false &&
+                          entryPersonsControl.isVisible() == false && ttldpnFiles.isVisible() == false);
   }
 
   protected void referenceControlFieldChanged(FieldChangedEvent event) {
@@ -365,6 +369,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void persistEntitiesIfNecessary() {
+    if(creationResult == null)
+      persistEntities();
+    else
+      creationResult.saveCreatedEntities();
+  }
+
+  protected void persistEntities() {
     boolean isSeriesUnPersisted = entry.getSeries() != null && entry.getSeries().isPersisted() == false;
     boolean isReferenceUnPersisted = entry.getReference() != null && entry.getReference().isPersisted() == false;
     boolean isReferenceSubDivisionUnPersisted = entry.getReferenceSubDivision() != null && entry.getReferenceSubDivision().isPersisted() == false;
@@ -518,8 +529,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     titleMenuItem.setOnAction(event -> {
       nodeToShowOnClick.setVisible(true);
 
-      if(nodeToShowOnClick instanceof TitledPane)
-        ((TitledPane)nodeToShowOnClick).setExpanded(true);
+      if (nodeToShowOnClick instanceof TitledPane)
+        ((TitledPane) nodeToShowOnClick).setExpanded(true);
     });
   }
 
@@ -560,7 +571,21 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entry.addEntityListener(entryListener);
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
-//    FXUtils.focusNode(htmledContent);
+    FXUtils.focusNode(htmledContent);
+  }
+
+  public void setWindowStageAndEntryCreationResult(final Stage windowStage, EntryCreationResult creationResult) {
+    this.creationResult = creationResult;
+    setWindowStageAndEntry(windowStage, creationResult.getCreatedEntry());
+
+    entryTagsControl.setEntryTags(creationResult.getTags());
+
+    entryReferenceControl.setEntryCreationResult(creationResult);
+
+    entryTagsControl.setExpanded(creationResult.getTags().size() == 0);
+    entryCategoriesControl.setExpanded(creationResult.getCategories().size() == 0);
+
+    entryReferenceControl.setExpanded(creationResult.isAReferenceSet() == false);
   }
 
   protected void showContextHelpForTarget(MouseEvent event) {

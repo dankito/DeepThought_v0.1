@@ -4,6 +4,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.CollectionItemLabel;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -30,6 +31,10 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
   protected ReferenceBase referenceBase;
 
+  protected EntryCreationResult creationResult = null;
+
+  protected String parentReferenceBaseInfo = null;
+
   protected ContextMenu contextMenu = null;
 
 
@@ -44,6 +49,40 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
     itemDisplayNameUpdated();
   }
 
+  public EntryReferenceBaseLabel(ReferenceBase referenceBase, EntryCreationResult creationResult, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
+    this(referenceBase, onButtonRemoveItemFromCollectionEventHandler);
+
+    this.creationResult = creationResult;
+
+    parentReferenceBaseInfo = createParentReferenceBaseInfo(creationResult, referenceBase);
+
+    itemDisplayNameUpdated();
+  }
+
+
+  protected String createParentReferenceBaseInfo(EntryCreationResult creationResult, ReferenceBase selectedReferenceBase) {
+    if(selectedReferenceBase.isPersisted() == false) {
+      if (selectedReferenceBase instanceof ReferenceSubDivision && ((ReferenceSubDivision)selectedReferenceBase).getReference() == null) {
+        if(creationResult.getReference() != null) {
+          Reference reference = creationResult.getReference();
+          String parentInfo = reference.getTextRepresentation();
+
+          if(reference.getSeries() == null && creationResult.getSeriesTitle() != null)
+            parentInfo = creationResult.getSeriesTitle().getTextRepresentation() + (StringUtils.isNullOrEmpty(parentInfo) ? "" : " " + parentInfo);
+
+          return parentInfo;
+        }
+      }
+      else if(selectedReferenceBase instanceof Reference && ((Reference)selectedReferenceBase).getSeries() == null) {
+        if(creationResult.getSeriesTitle() != null)
+          return creationResult.getSeriesTitle().getTextRepresentation();
+      }
+    }
+
+    return null;
+  }
+
+
 
   @Override
   public void cleanUpControl() {
@@ -55,9 +94,13 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
   @Override
   protected String getItemDisplayName() {
-    if(referenceBase != null)
+    if(referenceBase != null) {
+      if(referenceBase.isPersisted() == false && StringUtils.isNotNullOrEmpty(parentReferenceBaseInfo))
+        return parentReferenceBaseInfo + " " + referenceBase.getTextRepresentation();
+
       return referenceBase.getTextRepresentation();
-    return "";
+    }
+    return null;
   }
 
   @Override
@@ -81,7 +124,7 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
       if(event.getButton() == MouseButton.PRIMARY) {
         if(event.getClickCount() == 1) {
           event.consume();
-          Dialogs.showEditReferenceDialog(this.referenceBase);
+          showEditReferenceDialog();
         }
       }
       else if(event.isPopupTrigger()) {
@@ -89,6 +132,13 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
         showContextMenu();
       }
     }
+  }
+
+  protected void showEditReferenceDialog() {
+    if(creationResult == null)
+      Dialogs.showEditReferenceDialog(this.referenceBase);
+    else
+      Dialogs.showEditReferenceDialog(creationResult);
   }
 
   protected void showContextMenu() {
@@ -103,13 +153,13 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
     MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
     FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
-    editMenuItem.setOnAction(event -> Dialogs.showEditReferenceDialog(this.referenceBase));
+    editMenuItem.setOnAction(event -> showEditReferenceDialog());
     contextMenu.getItems().add(editMenuItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
     MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.text.to.clipboard"));
-    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(this.referenceBase.getTextRepresentation()));
+    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getItemDisplayName()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     final String referenceUrl = getReferenceUrl();

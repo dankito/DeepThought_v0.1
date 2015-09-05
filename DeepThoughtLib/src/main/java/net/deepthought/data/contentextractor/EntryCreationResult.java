@@ -1,7 +1,10 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -83,6 +86,10 @@ public class EntryCreationResult {
     return entryCategories;
   }
 
+  public boolean isAReferenceSet() {
+    return extractedSeriesTitle != null || extractedReference != null || extractedSubDivision != null;
+  }
+
   public SeriesTitle getSeriesTitle() {
     return extractedSeriesTitle;
   }
@@ -107,6 +114,10 @@ public class EntryCreationResult {
     this.extractedSubDivision = extractedSubDivision;
   }
 
+  public boolean hasPersons() {
+    return getPersons().size() > 0;
+  }
+
   public List<Person> getPersons() {
     return extractedPersons;
   }
@@ -125,6 +136,58 @@ public class EntryCreationResult {
       description += error;
 
     return description;
+  }
+
+  public void saveCreatedEntities() {
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(createdEntry);
+
+    for(Tag tag : entryTags) {
+      if(tag.isPersisted() == false)
+        deepThought.addTag(tag);
+      createdEntry.addTag(tag);
+    }
+
+    for(Category category : entryCategories) {
+      if(category.isPersisted() == false)
+        deepThought.addCategory(category);
+      category.addEntry(createdEntry);
+    }
+
+    for(Person person : extractedPersons) {
+      if(person.isPersisted() == false)
+        deepThought.addPerson(person);
+      createdEntry.addPerson(person);
+    }
+
+    for(FileLink file : createdEntry.getFiles()) {
+      if(file.isPersisted() == false)
+        deepThought.addFile(file);
+    }
+
+    saveReferenceBases(deepThought);
+  }
+
+  protected void saveReferenceBases(DeepThought deepThought) {
+    if(extractedSeriesTitle != null) {
+      if(extractedSeriesTitle.isPersisted() == false)
+        deepThought.addSeriesTitle(extractedSeriesTitle);
+      createdEntry.setSeries(extractedSeriesTitle);
+    }
+
+    if(extractedReference != null) {
+      if(extractedReference.isPersisted() == false)
+        deepThought.addReference(extractedReference);
+      extractedReference.setSeries(extractedSeriesTitle);
+      createdEntry.setReference(extractedReference);
+    }
+
+    if(extractedSubDivision != null) {
+      if(extractedSubDivision.isPersisted() == false)
+        deepThought.addReferenceSubDivision(extractedSubDivision);
+      extractedSubDivision.setReference(extractedReference);
+      createdEntry.setReferenceSubDivision(extractedSubDivision);
+    }
   }
 
 }
