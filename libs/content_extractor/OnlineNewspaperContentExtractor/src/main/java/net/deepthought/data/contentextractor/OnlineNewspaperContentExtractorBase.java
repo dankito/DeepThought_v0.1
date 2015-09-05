@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
@@ -64,14 +63,14 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
 
   protected void setArticleReference(EntryCreationResult creationResult, ReferenceSubDivision articleReference, String articleDate) {
-    creationResult.setExtractedSubDivision(articleReference);
+    creationResult.setReferenceSubDivision(articleReference);
 
     SeriesTitle newspaperSeries = findOrCreateNewspaperSeries();
-    creationResult.setExtractedSeriesTitle(newspaperSeries);
+    creationResult.setSeriesTitle(newspaperSeries);
 
     if(newspaperSeries != null && StringUtils.isNotNullOrEmpty(articleDate)) {
       Reference dateReference = findOrCreateReferenceForThatDate(newspaperSeries, articleDate);
-      creationResult.setExtractedReference(dateReference);
+      creationResult.setReference(dateReference);
     }
   }
 
@@ -99,28 +98,30 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return newspaperDateReference;
   }
 
-  protected void addNewspaperTag(Entry articleEntry) {
-    addNewspaperTag(articleEntry, getNewspaperName());
+  protected void addNewspaperTag(EntryCreationResult creationResult) {
+    addNewspaperTag(creationResult, getNewspaperName());
   }
 
-  protected void addNewspaperTag(Entry articleEntry, String newspaperName) {
+  protected void addNewspaperTag(EntryCreationResult creationResult, String newspaperName) {
     Tag newspaperTag = Application.getDeepThought().findOrCreateTagForName(newspaperName);
-    articleEntry.addTag(newspaperTag);
+    creationResult.addTag(newspaperTag);
   }
 
-  protected void addNewspaperCategory(Entry articleEntry, boolean isOnlineArticle) {
-    addNewspaperCategory(articleEntry, getNewspaperName(), isOnlineArticle);
+  protected void addNewspaperCategory(EntryCreationResult creationResult, boolean isOnlineArticle) {
+    addNewspaperCategory(creationResult, getNewspaperName(), isOnlineArticle);
   }
 
-  protected void addNewspaperCategory(Entry articleEntry, String newspaperName, boolean isOnlineArticle) {
+  protected void addNewspaperCategory(EntryCreationResult creationResult, String newspaperName, boolean isOnlineArticle) {
+    // TODO: here sub categories getting added directly to their (may already saved) parent categories and so also get stored in database whether user likes to save this Article
+    // or not, but i can live with that right now
     Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     Category newspaperCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
 
     if(isOnlineArticle == false)
-      newspaperCategory.addEntry(articleEntry);
+      creationResult.addCategory(newspaperCategory);
     else {
       Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedString("online"));
-      newspaperOnlineCategory.addEntry(articleEntry);
+      creationResult.addCategory(newspaperOnlineCategory);
     }
   }
 

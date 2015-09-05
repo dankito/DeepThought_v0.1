@@ -67,51 +67,51 @@ public class EntryCreationResult {
     return createdEntry;
   }
 
-  public List<Tag> getEntryTags() {
+  public boolean addTag(Tag tag) {
+    return entryTags.add(tag);
+  }
+
+  public List<Tag> getTags() {
     return entryTags;
   }
 
-  public void setEntryTags(List<Tag> entryTags) {
-    this.entryTags = entryTags;
+  public boolean addCategory(Category category) {
+    return entryCategories.add(category);
   }
 
-  public List<Category> getEntryCategories() {
+  public List<Category> getCategories() {
     return entryCategories;
   }
 
-  public void setEntryCategories(List<Category> entryCategories) {
-    this.entryCategories = entryCategories;
-  }
-
-  public SeriesTitle getExtractedSeriesTitle() {
+  public SeriesTitle getSeriesTitle() {
     return extractedSeriesTitle;
   }
 
-  public void setExtractedSeriesTitle(SeriesTitle extractedSeriesTitle) {
+  public void setSeriesTitle(SeriesTitle extractedSeriesTitle) {
     this.extractedSeriesTitle = extractedSeriesTitle;
   }
 
-  public Reference getExtractedReference() {
+  public Reference getReference() {
     return extractedReference;
   }
 
-  public void setExtractedReference(Reference extractedReference) {
+  public void setReference(Reference extractedReference) {
     this.extractedReference = extractedReference;
   }
 
-  public ReferenceSubDivision getExtractedSubDivision() {
+  public ReferenceSubDivision getReferenceSubDivision() {
     return extractedSubDivision;
   }
 
-  public void setExtractedSubDivision(ReferenceSubDivision extractedSubDivision) {
+  public void setReferenceSubDivision(ReferenceSubDivision extractedSubDivision) {
     this.extractedSubDivision = extractedSubDivision;
   }
 
-  public List<Person> getExtractedPersons() {
+  public List<Person> getPersons() {
     return extractedPersons;
   }
 
-  public void setExtractedPersons(List<Person> extractedPersons) {
+  public void setPersons(List<Person> extractedPersons) {
     this.extractedPersons = extractedPersons;
   }
 

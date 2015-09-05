@@ -48,10 +48,10 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
       Entry articleEntry = createEntry(articleSectionElements, articleIntroElements);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      ReferenceSubDivision reference = createReference(creationResult, articleUrl, contentElement);
+      createReference(creationResult, articleUrl, contentElement);
 
-      addNewspaperTag(articleEntry);
-      addNewspaperCategory(articleEntry, true);
+      addNewspaperTag(creationResult);
+      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {

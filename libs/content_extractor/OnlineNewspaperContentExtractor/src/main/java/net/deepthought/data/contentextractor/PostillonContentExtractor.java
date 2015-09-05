@@ -3,9 +3,7 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.DeepThoughtError;
 
 import org.jsoup.nodes.Document;
@@ -108,8 +106,8 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
     if(articleReference != null)
       entry.setAbstract(articleReference.getTitle());
 
-    addNewspaperTag(entry);
-    addNewspaperCategory(entry, false);
+    addNewspaperTag(creationResult);
+    addNewspaperCategory(creationResult, false);
 
     return creationResult;
   }

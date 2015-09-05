@@ -64,7 +64,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
       ReferenceSubDivision articleReference = createReference(creationResult, articleHeadElement, articleUrl);
 
-      addNewspaperTag(articleEntry);
+      addNewspaperTag(creationResult);
       addNewspaperCategory(articleEntry);
 
       return creationResult;
@@ -234,10 +234,10 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
   }
 
   @Override
-  protected void addNewspaperTag(Entry articleEntry) {
-    super.addNewspaperTag(articleEntry);
+  protected void addNewspaperTag(EntryCreationResult creationResult) {
+    super.addNewspaperTag(creationResult);
 
-    addNewspaperTag(articleEntry, "SZ");
+    addNewspaperTag(creationResult, "SZ");
   }
 
   protected void addNewspaperCategory(Entry articleEntry) {

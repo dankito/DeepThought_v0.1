@@ -4,9 +4,7 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -89,8 +87,8 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
       createReference(creationResult, articleUrl, articleElement);
 
-      addNewspaperTag(creationResult, articleEntry);
-      addNewspaperCategory(creationResult, articleEntry, true);
+      addNewspaperTag(creationResult);
+      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {

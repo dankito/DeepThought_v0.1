@@ -2,7 +2,6 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
-import net.deepthought.data.model.Entry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by ganymed on 13/06/15.
  */
-public class PostillonContentExtractorTest extends OnlineNewspaperContentExtractorTestBase {
+public class PostillonContentExtractorTest extends GermanOnlineNewspaperContentExtractorTestBase {
 
   protected PostillonContentExtractor postillonContentExtractor = null;
 
@@ -31,22 +30,22 @@ public class PostillonContentExtractorTest extends OnlineNewspaperContentExtract
 
   @Test
   public void importKolonieDeutschSuedostEuropaArtilce() {
-    Entry importedEntry = testImportArticle("http://www.der-postillon.com/2015/07/kolonie-deutsch-sudosteuropa.html");
-    testImportedArticleValues(importedEntry, 2532, "15.07.2015", "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze", "",
+    EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/kolonie-deutsch-sudosteuropa.html");
+    testImportedArticleValues(creationResult, 2532, "15.07.2015", "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze", "",
         "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze");
   }
 
   @Test
   public void importKleinerTimmyMussInsHeimWeilErAnKatzenhaarAllergieLeidetArtilce() {
-    Entry importedEntry = testImportArticle("http://www.der-postillon.com/2015/07/kleiner-timmy-9-muss-ins-heim-weil.html");
-    testImportedArticleValues(importedEntry, 1554, "15.07.2015", "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet", "",
+    EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/kleiner-timmy-9-muss-ins-heim-weil.html");
+    testImportedArticleValues(creationResult, 1554, "15.07.2015", "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet", "",
         "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet");
   }
 
   @Test
   public void importSchaeubleHatEigentlichKopfVonVaroufakisGefordertArtilce() {
-    Entry importedEntry = testImportArticle("http://www.der-postillon.com/2015/07/schauble-ich-habe-ursprunglich-den-kopf.html");
-    testImportedArticleValues(importedEntry, 6199, "14.07.2015", "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"", "",
+    EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/schauble-ich-habe-ursprunglich-den-kopf.html");
+    testImportedArticleValues(creationResult, 6199, "14.07.2015", "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"", "",
         "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"");
   }
 

@@ -53,10 +53,10 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
       Entry articleEntry = createEntry(articleBodyElement);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      ReferenceSubDivision reference = createReference(creationResult, articleUrl, articleBodyElement);
+      createReference(creationResult, articleUrl, articleBodyElement);
 
-      addTags(document.body(), articleEntry);
-      addNewspaperCategory(articleEntry, true);
+      addTags(document.body(), creationResult);
+      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {
@@ -140,22 +140,22 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     return null;
   }
 
-  protected void addTags(Element bodyElement, Entry articleEntry) {
-    addNewspaperTag(articleEntry);
+  protected void addTags(Element bodyElement, EntryCreationResult creationResult) {
+    addNewspaperTag(creationResult);
 
     Elements tagsElements = bodyElement.getElementsByClass("tags");
     for(Element tagsElement : tagsElements) {
       if("li".equals(tagsElement.nodeName())) {
-        addArticleTags(tagsElement, articleEntry);
+        addArticleTags(tagsElement, creationResult);
         break;
       }
     }
   }
 
-  protected void addArticleTags(Element tagsElement, Entry articleEntry) {
+  protected void addArticleTags(Element tagsElement, EntryCreationResult creationResult) {
     for(Element child : tagsElement.children()) {
       if("a".equals(child.nodeName())) {
-        articleEntry.addTag(Application.getDeepThought().findOrCreateTagForName(child.ownText()));
+        creationResult.addTag(Application.getDeepThought().findOrCreateTagForName(child.ownText()));
       }
     }
   }

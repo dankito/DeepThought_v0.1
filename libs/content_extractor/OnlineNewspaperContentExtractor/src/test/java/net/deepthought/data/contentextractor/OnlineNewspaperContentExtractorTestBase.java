@@ -34,7 +34,7 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
   }
 
 
-  protected Entry testImportArticle(String articleUrl) {
+  protected EntryCreationResult testImportArticle(String articleUrl) {
     EntryCreationResult result = contentExtractor.createEntryFromArticle(articleUrl);
     Assert.assertTrue(result.successful);
 
@@ -42,39 +42,39 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
     Assert.assertNotNull(importedEntry);
     Assert.assertTrue(StringUtils.isNotNullOrEmpty(importedEntry.getAbstract()));
 
-    Assert.assertTrue(importedEntry.getTags().size() > 0);
+    Assert.assertTrue(result.getTags().size() > 0);
     Tag periodicalTag = null;
-    for(Tag tag : importedEntry.getTags()) {
+    for(Tag tag : result.getTags()) {
       if(contentExtractor.getNewspaperName().equals(tag.getName()))
         periodicalTag = tag;
     }
     Assert.assertNotNull(periodicalTag);
 
-    Assert.assertNotNull(importedEntry.getSeries());
-    Assert.assertEquals(contentExtractor.getNewspaperName(), importedEntry.getSeries().getTitle());
+    Assert.assertNotNull(result.getSeriesTitle());
+    Assert.assertEquals(contentExtractor.getNewspaperName(), result.getSeriesTitle().getTitle());
 
-    Assert.assertNotNull(importedEntry.getReference());
-    Assert.assertNotNull(importedEntry.getReference().getIssueOrPublishingDate());
-    Assert.assertNotNull(importedEntry.getReference().getPublishingDate());
+    Assert.assertNotNull(result.getReference());
+    Assert.assertNotNull(result.getReference().getIssueOrPublishingDate());
+    Assert.assertNotNull(result.getReference().getPublishingDate());
 
-    Assert.assertNotNull(importedEntry.getReferenceSubDivision());
-    Assert.assertTrue(StringUtils.isNotNullOrEmpty(importedEntry.getReferenceSubDivision().getTitle()));
+    Assert.assertNotNull(result.getReferenceSubDivision());
+    Assert.assertTrue(StringUtils.isNotNullOrEmpty(result.getReferenceSubDivision().getTitle()));
 //    Assert.assertTrue(StringUtils.isNotNullOrEmpty(importedEntry.getReferenceSubDivision().getSubTitle())); // for Postillion articles sub title is null
-    Assert.assertTrue(articleUrl.startsWith(importedEntry.getReferenceSubDivision().getOnlineAddress()) || importedEntry.getReferenceSubDivision().getOnlineAddress().startsWith
+    Assert.assertTrue(articleUrl.startsWith(result.getReferenceSubDivision().getOnlineAddress()) || result.getReferenceSubDivision().getOnlineAddress().startsWith
         (articleUrl)); // for Zeit multi page articles '/komplettansicht' will be added to url
 
-    return importedEntry;
+    return result;
   }
 
-  protected void testImportedArticleValues(Entry importedEntry, int contentLength, String issueOrPublishingDate, String referenceTitle, String referenceSubTitle,
+  protected void testImportedArticleValues(EntryCreationResult creationResult, int contentLength, String issueOrPublishingDate, String referenceTitle, String referenceSubTitle,
                                            String abstractString) {
-    Assert.assertEquals(issueOrPublishingDate, importedEntry.getReference().getIssueOrPublishingDate());
+    Assert.assertEquals(issueOrPublishingDate, creationResult.getReference().getIssueOrPublishingDate());
 
-    Assert.assertEquals(referenceTitle, importedEntry.getReferenceSubDivision().getTitle());
-    Assert.assertEquals(referenceTitle, importedEntry.getReferenceSubDivision().getTitle());
+    Assert.assertEquals(referenceTitle, creationResult.getReferenceSubDivision().getTitle());
+    Assert.assertEquals(referenceTitle, creationResult.getReferenceSubDivision().getTitle());
 
-    Assert.assertEquals(abstractString, importedEntry.getAbstractAsPlainText());
+    Assert.assertEquals(abstractString, creationResult.getCreatedEntry().getAbstractAsPlainText());
 
-    Assert.assertEquals(contentLength, importedEntry.getContent().length());
+    Assert.assertEquals(contentLength, creationResult.getCreatedEntry().getContent().length());
   }
 }
