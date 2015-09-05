@@ -3,6 +3,7 @@ package net.deepthought.controls.tabtags;
 import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.tag.IFilteredTagsChangedListener;
@@ -156,7 +157,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
         txtfldTagsQuickFilter.clear();
     });
 
-    btnRemoveTagsFilter.setGraphic(new ImageView("icons/filter_delete_16x16.gif"));
+    btnRemoveTagsFilter.setGraphic(new ImageView(Constants.FilterDeleteIconPath));
     JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
 
     tblvwTags.selectionModelProperty().addListener(new ChangeListener<TableView.TableViewSelectionModel<Tag>>() {
@@ -183,7 +184,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       }
     });
 
-//    clmnTagFilter.setGraphic(new ImageView(ToDo));
+    clmnTagFilter.setText(null);
+    clmnTagFilter.setGraphic(new ImageView(Constants.FilterIconPath));
     clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
       @Override
       public TableCell<Tag, Boolean> call(TableColumn<Tag, Boolean> param) {

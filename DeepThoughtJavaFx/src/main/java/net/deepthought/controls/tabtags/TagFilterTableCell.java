@@ -25,25 +25,6 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
 
   protected FilterTagsSearchResults filterTagsSearchResults = null;
 
-
-//  private ReadOnlyObjectWrapper<Boolean> isChecked = new ReadOnlyObjectWrapper<Boolean>() {
-//    @Override protected void invalidated() {
-//      updateItem(isChecked(), tag != null);
-//    }
-//
-//    @Override public Object getBean() {
-//      return TagFilterTableCell.this;
-//    }
-//
-//    @Override public String getName() {
-//      return "isChecked";
-//    }
-//  };
-//
-//  public final ReadOnlyObjectProperty<Boolean> isCheckedProperty() { return isChecked.getReadOnlyProperty(); }
-//  private void setIsChecked(Boolean value) { isChecked.set(value); }
-//  public final Boolean isChecked() { return isChecked.get(); }
-
   public BooleanProperty isFilteredProperty() {
     return checkBox.selectedProperty();
   }
@@ -58,6 +39,11 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
     });
 
     setText(null);
+    setGraphicTextGap(0);
+
+    checkBox.setMinWidth(15);
+    checkBox.setMaxWidth(15);
+    checkBox.setAlignment(Pos.CENTER);
     setAlignment(Pos.CENTER);
   }
 
