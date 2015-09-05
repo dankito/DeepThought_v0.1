@@ -6,6 +6,7 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -84,22 +85,20 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       else
         articleElement = document.body().getElementById("sitecontent");
 
-      ReferenceSubDivision reference = createReference(articleUrl, articleElement);
+      EntryCreationResult creationResult = createEntry(articleUrl, articleElement);
 
-      Entry articleEntry = createEntry(articleElement);
-      if(reference != null)
-        articleEntry.setReferenceSubDivision(reference);
+      createReference(creationResult, articleUrl, articleElement);
 
-      addNewspaperTag(articleEntry);
-      addNewspaperCategory(articleEntry, true);
+      addNewspaperTag(creationResult, articleEntry);
+      addNewspaperCategory(creationResult, articleEntry, true);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 
-  protected Entry createEntry(Element articleElement) throws Exception {
+  protected EntryCreationResult createEntry(String articleUrl, Element articleElement) throws Exception {
     Elements bodyClassElements = articleElement.getElementsByClass("body");
     Element bodySection = null;
     for(Element element : bodyClassElements) {
@@ -108,7 +107,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         break;
       }
       else if("div".equals(element.tagName()) && articleElement.classNames().contains("gallery"))
-        return createEntryFromImageGalleryArticle(articleElement, element);
+        return createEntryFromImageGalleryArticle(articleUrl, articleElement, element);
     }
 
     if(bodySection == null) {
@@ -116,7 +115,8 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       throw new Exception(Localization.getLocalizedString("could.not.find.sueddeutsche.article.body.section", articleElement.baseUri()));
     }
 
-    return extractEntryFromBodySection(bodySection);
+    Entry articleEntry = extractEntryFromBodySection(bodySection);
+    return new EntryCreationResult(articleUrl, articleEntry);
   }
 
   protected Entry extractEntryFromBodySection(Element bodySection) throws Exception {
@@ -240,15 +240,17 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return imageHtml;
   }
 
-  protected Entry createEntryFromImageGalleryArticle(Element articleElement, Element articleBodyElement) {
+  protected EntryCreationResult createEntryFromImageGalleryArticle(String articleUrl, Element articleElement, Element articleBodyElement) {
     String abstractString = getElementOwnTextByClassAndNodeName(articleElement, "p", "entry-summary");
 
     String content = readHtmlOfAllImagesInGallery(articleBodyElement);
 
     Entry createdEntry = new Entry(content, abstractString);
-    createdEntry.setReferenceSubDivision(createReferenceForImageGallery(articleElement, articleBodyElement));
+    EntryCreationResult creationResult = new EntryCreationResult(articleUrl, createdEntry);
 
-    return createdEntry;
+    createReferenceForImageGallery(creationResult, articleElement, articleBodyElement);
+
+    return creationResult;
   }
 
   protected String readHtmlOfAllImagesInGallery(Element articleBodyElement) {
@@ -287,12 +289,12 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return null;
   }
 
-  protected ReferenceSubDivision createReferenceForImageGallery(Element articleElement, Element articleBodyElement) {
+  protected ReferenceSubDivision createReferenceForImageGallery(EntryCreationResult creationResult, Element articleElement, Element articleBodyElement) {
     Element sourceElement = getElementByClassAndNodeName(articleBodyElement, "span", "source");
     if(sourceElement != null) {
       String offscreenElementText = getElementOwnTextByClassAndNodeName(sourceElement, "span", "offscreen");
       if(StringUtils.isNotNullOrEmpty(offscreenElementText))
-        return createReferenceForImageGallery(articleElement, offscreenElementText);
+        return createReferenceForImageGallery(creationResult, articleElement, offscreenElementText);
     }
     else
       log.warn("Could not find Span with class 'source' to get publishing date of Image Gallery. Article Body Element was: " + articleBodyElement.outerHtml());
@@ -300,15 +302,14 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return null;
   }
 
-  protected ReferenceSubDivision createReferenceForImageGallery(Element articleElement, String rawPublishingDateString) {
+  protected ReferenceSubDivision createReferenceForImageGallery(EntryCreationResult creationResult, Element articleElement, String rawPublishingDateString) {
     String publishingDate = parseSueddeutscheHeaderDate(rawPublishingDateString);
     if(StringUtils.isNotNullOrEmpty(publishingDate)) {
       Element headerElement = getElementByClassAndNodeName(articleElement, "div", "header");
       if(headerElement != null) {
         ReferenceSubDivision articleReference = extractReferenceSubDivisionFromHeaderSection(articleElement.baseUri(), headerElement);
+        setArticleReference(creationResult, articleReference, publishingDate);
 
-        Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate(publishingDate);
-        sueddeutscheDateReference.addSubDivision(articleReference);
         return articleReference;
       }
     }
@@ -316,7 +317,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return null;
   }
 
-  protected ReferenceSubDivision createReference(String articleUrl, Element articleElement) {
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element articleElement) {
     Elements headerClassElements = articleElement.getElementsByClass("header");
     Element headerSection = null;
     for(Element element : headerClassElements) {
@@ -331,24 +332,17 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       return null;
     }
 
-    return extractReferenceFromHeaderSection(articleUrl, headerSection);
+    return extractReferenceFromHeaderSection(creationResult, articleUrl, headerSection);
   }
 
-  protected ReferenceSubDivision extractReferenceFromHeaderSection(String articleUrl, Element headerSection) {
-    ReferenceSubDivision articleReference = extractReferenceSubDivisionFromHeaderSection(articleUrl, headerSection);
+  protected ReferenceSubDivision extractReferenceFromHeaderSection(EntryCreationResult creationResult, String articleUrl, Element headerSection) {
     String articleDate = "";
-
-// Header section has two children: time containing publishing time and a h2 element contain article title and subtitle
-//    for(Element headerSectionChild : headerSection.children()) {
-//      if("time".equals(headerSectionChild.tagName()))
-//        articleDate = parseSueddeutscheHeaderDate(headerSectionChild.attributes().get("datetime"));
-//    }
     Elements timeElements = headerSection.getElementsByTag("time");
     if(timeElements.size() > 0)
       articleDate = parseSueddeutscheHeaderDate(timeElements.get(0).attributes().get("datetime"));
 
-    Reference sueddeutscheDateReference = findOrCreateReferenceForThatDate(articleDate);
-    sueddeutscheDateReference.addSubDivision(articleReference);
+    ReferenceSubDivision articleReference = extractReferenceSubDivisionFromHeaderSection(articleUrl, headerSection);
+    setArticleReference(creationResult, articleReference, articleDate);
 
     return articleReference;
   }

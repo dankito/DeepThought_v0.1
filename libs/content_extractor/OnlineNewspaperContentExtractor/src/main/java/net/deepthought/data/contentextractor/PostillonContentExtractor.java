@@ -5,6 +5,7 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.DeepThoughtError;
 
 import org.jsoup.nodes.Document;
@@ -101,28 +102,30 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
     }
 
     Entry entry = new Entry(content);
-    ReferenceSubDivision articleReference = extractReferenceSubDivisionFromPostElement(articleUrl, postDivElement);
-    entry.setReferenceSubDivision(articleReference);
+    EntryCreationResult creationResult = new EntryCreationResult(articleUrl, entry);
+
+    ReferenceSubDivision articleReference = extractReferenceSubDivisionFromPostElement(creationResult, articleUrl, postDivElement);
     if(articleReference != null)
       entry.setAbstract(articleReference.getTitle());
 
     addNewspaperTag(entry);
     addNewspaperCategory(entry, false);
 
-    return new EntryCreationResult(articleUrl, entry);
+    return creationResult;
   }
 
-  protected ReferenceSubDivision extractReferenceSubDivisionFromPostElement(String articleUrl, Element postDivElement) {
+  protected ReferenceSubDivision extractReferenceSubDivisionFromPostElement(EntryCreationResult creationResult, String articleUrl, Element postDivElement) {
     Element dateHeaderDiv = getElementByClassAndNodeName(postDivElement, "div", "date-header");
     if(dateHeaderDiv != null) {
       String articleDate = dateHeaderDiv.text();
-      Reference dateReference = findOrCreateReferenceForThatDate(parsePostillionDateFormat(articleDate));
 
       Element postTitleElement = getElementByClassAndNodeName(postDivElement, "h3", "post-title");
       if(postTitleElement != null) {
         ReferenceSubDivision articleReference = new ReferenceSubDivision(postTitleElement.text());
         articleReference.setOnlineAddress(articleUrl);
-        dateReference.addSubDivision(articleReference);
+
+        setArticleReference(creationResult, articleReference, parsePostillionDateFormat(articleDate));
+
         return articleReference;
       }
       else

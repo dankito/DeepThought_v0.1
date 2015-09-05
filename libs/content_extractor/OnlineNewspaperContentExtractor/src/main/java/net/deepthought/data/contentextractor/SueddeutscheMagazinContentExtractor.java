@@ -3,7 +3,6 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -18,7 +17,9 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtractorBase {
 
@@ -48,16 +49,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.id.to.extract.article", "articleHead")));
       }
 
-      ReferenceSubDivision articleReference = createReference(articleHeadElement, articleUrl);
-
-      String abstractString = null;
-      Element vorspannElement = getElementByClassAndNodeName(articleHeadElement, "div", "vorspann");
-      if(vorspannElement != null) {
-        for(Element child : vorspannElement.children()) {
-          if("p".equals(child.nodeName()))
-            abstractString = child.html();
-        }
-      }
+      String abstractString = extractAbstract(articleHeadElement);
 
       Element artikelElement = getElementByClassAndNodeName(document.body(), "div", "artikel");
       if(artikelElement == null) {
@@ -68,15 +60,29 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
       String content = parseContent(artikelElement);
 
       Entry articleEntry = new Entry(content, abstractString);
-      articleEntry.setReferenceSubDivision(articleReference);
+      EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
+
+      ReferenceSubDivision articleReference = createReference(creationResult, articleHeadElement, articleUrl);
 
       addNewspaperTag(articleEntry);
       addNewspaperCategory(articleEntry);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
+  }
+
+  protected String extractAbstract(Element articleHeadElement) {
+    String abstractString = null;
+    Element vorspannElement = getElementByClassAndNodeName(articleHeadElement, "div", "vorspann");
+    if(vorspannElement != null) {
+      for(Element child : vorspannElement.children()) {
+        if("p".equals(child.nodeName()))
+          abstractString = child.html();
+      }
+    }
+    return abstractString;
   }
 
   protected String parseContent(Element artikelElement) {
@@ -150,8 +156,27 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
     return "";
   }
 
-  protected ReferenceSubDivision createReference(Element articleHeadElement, String articleUrl) {
-    String publishingDate = null, label = null, title = null, subTitle = null;
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, Element articleHeadElement, String articleUrl) {
+    Map<String, String> infos = extractPublishingDateSubTitleAndLabel(articleHeadElement);
+    String publishingDate = infos.get("PublishingDate");
+    String subTitle = infos.get("SubTitle");
+    String label = infos.get("Label");
+
+    String title = extractTitle(articleHeadElement);
+
+    if(title != null && publishingDate != null) {
+      ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
+      setArticleReference(creationResult, articleReference, publishingDate);
+
+      return articleReference;
+    }
+
+    return null;
+  }
+
+  protected Map<String, String> extractPublishingDateSubTitleAndLabel(Element articleHeadElement) {
+    Map<String, String> infos = new HashMap<>();
+    String publishingDate = null, label = null, subTitle = null;
 
     for(Element headChild : articleHeadElement.children()) {
       if("p".equals(headChild.nodeName()) && headChild.hasClass("klassifizierung")) {
@@ -175,6 +200,16 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
       }
     }
 
+    infos.put("PublishingDate", publishingDate);
+    infos.put("SubTitle", subTitle);
+    infos.put("Label", label);
+
+    return infos;
+  }
+
+  protected String extractTitle(Element articleHeadElement) {
+    String title = null;
+
     for(Element headChild : articleHeadElement.ownerDocument().head().children()) {
       if("title".equals(headChild.nodeName())) {
         title = headChild.text();
@@ -185,17 +220,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
       }
     }
 
-    if(title != null && publishingDate != null) {
-      Reference dateReference = findOrCreateReferenceForThatDate(publishingDate);
-
-      ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
-      articleReference.setOnlineAddress(articleUrl);
-      dateReference.addSubDivision(articleReference);
-
-      return articleReference;
-    }
-
-    return null;
+    return title;
   }
 
   protected DateFormat sueddeutscheMagazinDateFormat = new SimpleDateFormat("dd. MMMMM yyyy", Locale.GERMAN);

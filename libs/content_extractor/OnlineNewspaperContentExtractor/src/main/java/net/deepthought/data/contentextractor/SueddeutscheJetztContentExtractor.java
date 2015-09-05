@@ -3,7 +3,6 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -48,15 +47,6 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "text")));
       }
 
-      ReferenceSubDivision articleReference = createReference(textElement, articleUrl);
-
-      String abstractString = null;
-      Element introElement = getElementByClassAndNodeName(textElement, "p", "intro");
-      if(introElement != null)
-        abstractString = introElement.html();
-      else
-        log.warn("Could not find intro Element");
-
       Element fliesstextElement = getElementByClassAndNodeName(textElement, "div", "fliesstext");
       if(fliesstextElement == null) {
         log.warn("Could not find fliesstext Element");
@@ -64,17 +54,30 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
       }
 
       String content = parseContent(fliesstextElement);
+      String abstractString = extractAbstract(textElement);
 
       Entry articleEntry = new Entry(content, abstractString);
-      articleEntry.setReferenceSubDivision(articleReference);
+      EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
+
+      createReference(creationResult, textElement, articleUrl);
 
       addNewspaperTag(articleEntry);
       addNewspaperCategory(articleEntry);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
+  }
+
+  protected String extractAbstract(Element textElement) {
+    String abstractString = null;
+    Element introElement = getElementByClassAndNodeName(textElement, "p", "intro");
+    if(introElement != null)
+      abstractString = introElement.html();
+    else
+      log.warn("Could not find intro Element");
+    return abstractString;
   }
 
   protected String parseContent(Element fliesstextElement) {
@@ -172,8 +175,22 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return "";
   }
 
-  protected ReferenceSubDivision createReference(Element textElement, String articleUrl) {
-    String publishingDate = null, title = null;
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, Element textElement, String articleUrl) {
+    String title = extractTitle(textElement);
+    String publishingDate = extractPublishingDate(textElement);
+
+    if(title != null && publishingDate != null) {
+      ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
+      setArticleReference(creationResult, articleReference, publishingDate);
+
+      return articleReference;
+    }
+
+    return null;
+  }
+
+  protected String extractTitle(Element textElement) {
+    String title = null;
 
     Elements header1Elements = textElement.getElementsByTag("h1");
     if(header1Elements.size() > 0)
@@ -181,6 +198,10 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     else
       log.warn("Could not find h1 child Element of text Element");
 
+    return title;
+  }
+
+  protected String extractPublishingDate(Element textElement) {
     Element textDetailsElement = textElement.getElementById("text_details");
     if(textDetailsElement == null) {
       log.warn("Could not find Element with id text_details");
@@ -189,18 +210,8 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
     for(Element detailsChild : textDetailsElement.children()) {
       if("p".equals(detailsChild.nodeName()) && detailsChild.hasClass("time")) {
-        publishingDate = tryToParseSueddeutscheJetztPublishingDate(detailsChild.text());
+        return tryToParseSueddeutscheJetztPublishingDate(detailsChild.text());
       }
-    }
-
-    if(title != null && publishingDate != null) {
-      Reference dateReference = findOrCreateReferenceForThatDate(publishingDate);
-
-      ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
-      articleReference.setOnlineAddress(articleUrl);
-      dateReference.addSubDivision(articleReference);
-
-      return articleReference;
     }
 
     return null;

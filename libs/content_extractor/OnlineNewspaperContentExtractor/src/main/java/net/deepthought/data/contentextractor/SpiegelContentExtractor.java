@@ -1,7 +1,6 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -43,20 +42,20 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
     try {
       Element contentElement = document.body().getElementById("content-main");
 
-      ReferenceSubDivision reference = createReference(articleUrl, contentElement);
-
       Elements articleSectionElements = document.body().getElementsByClass("article-section");
       Elements articleIntroElements = contentElement.getElementsByClass("article-intro");
 
       Entry articleEntry = createEntry(articleSectionElements, articleIntroElements);
-      articleEntry.setReferenceSubDivision(reference);
+      EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
+
+      ReferenceSubDivision reference = createReference(creationResult, articleUrl, contentElement);
 
       addNewspaperTag(articleEntry);
       addNewspaperCategory(articleEntry, true);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 
@@ -149,7 +148,21 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
     return abstractString;
   }
 
-  protected ReferenceSubDivision createReference(String articleUrl, Element contentElement) {
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element contentElement) {
+    String title = extractTitle(contentElement);
+    String subTitle = extractSubTitle(contentElement);
+
+    String publishingDateString = extractPublishingDate(contentElement);
+
+    ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
+    articleReference.setOnlineAddress(articleUrl);
+
+    setArticleReference(creationResult,articleReference, publishingDateString);
+
+    return articleReference;
+  }
+
+  protected String extractTitle(Element contentElement) {
     String title = "";
     Elements headerElements = contentElement.getElementsByClass("headline");
     for(Element headerElement : headerElements) {
@@ -158,7 +171,10 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
         break;
       }
     }
+    return title;
+  }
 
+  protected String extractSubTitle(Element contentElement) {
     String subTitle = "";
     Elements headerIntroElements = contentElement.getElementsByClass("headline-intro");
     for(Element headerIntroElement : headerIntroElements) {
@@ -169,7 +185,10 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
         break;
       }
     }
+    return subTitle;
+  }
 
+  protected String extractPublishingDate(Element contentElement) {
     Date publishingDate = null;
     Elements timeFormatElements = contentElement.getElementsByClass("timeformat");
     for(Element timeFormatElement : timeFormatElements) {
@@ -183,14 +202,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
     String publishingDateString = "";
     if(publishingDate != null)
       publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
-
-    Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);
-
-    ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
-    articleReference.setOnlineAddress(articleUrl);
-    spiegelDateReference.addSubDivision(articleReference);
-
-    return articleReference;
+    return publishingDateString;
   }
 
   protected DateFormat spiegelTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

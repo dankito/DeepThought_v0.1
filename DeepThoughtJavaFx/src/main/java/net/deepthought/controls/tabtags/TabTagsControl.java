@@ -172,7 +172,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     tblvwTags.setItems(filteredTags);
 
     tblvwTags.setOnKeyReleased(event -> {
-      if(event.getCode() == KeyCode.DELETE)
+      if (event.getCode() == KeyCode.DELETE)
         removeSelectedTags();
     });
 
@@ -183,6 +183,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       }
     });
 
+//    clmnTagFilter.setGraphic(new ImageView(ToDo));
     clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
       @Override
       public TableCell<Tag, Boolean> call(TableColumn<Tag, Boolean> param) {
@@ -418,7 +419,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected void tagHasBeenAdded(Tag tag) {
     isAddingTag = true;
-//    tableViewTagsItems.add(tag);
     showAllTagsInListViewTags(deepThought);
     isAddingTag = false;
 

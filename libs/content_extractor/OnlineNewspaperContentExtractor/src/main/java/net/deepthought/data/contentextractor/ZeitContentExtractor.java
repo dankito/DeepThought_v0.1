@@ -2,7 +2,6 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -51,17 +50,17 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
       if(articleBodyElement == null)
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html")));
 
-      ReferenceSubDivision reference = createReference(articleUrl, articleBodyElement);
-
       Entry articleEntry = createEntry(articleBodyElement);
-      articleEntry.setReferenceSubDivision(reference);
+      EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
+
+      ReferenceSubDivision reference = createReference(creationResult, articleUrl, articleBodyElement);
 
       addTags(document.body(), articleEntry);
       addNewspaperCategory(articleEntry, true);
 
-      return new EntryCreationResult(document.baseUri(), articleEntry);
+      return creationResult;
     } catch(Exception ex) {
-      return new EntryCreationResult(document.baseUri(), new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
     }
   }
 
@@ -106,7 +105,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     return content;
   }
 
-  protected ReferenceSubDivision createReference(String articleUrl, Element articleBodyElement) {
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element articleBodyElement) {
     String title = getElementOwnTextByClassAndNodeName(articleBodyElement, "span", "title");
 
     String subTitle = getElementOwnTextByClassAndNodeName(articleBodyElement, "span", "supertitle");
@@ -119,11 +118,10 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
         publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
     }
 
-    Reference spiegelDateReference = findOrCreateReferenceForThatDate(publishingDateString);
-
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
     articleReference.setOnlineAddress(articleUrl);
-    spiegelDateReference.addSubDivision(articleReference);
+
+    setArticleReference(creationResult, articleReference, publishingDateString);
 
     return articleReference;
   }

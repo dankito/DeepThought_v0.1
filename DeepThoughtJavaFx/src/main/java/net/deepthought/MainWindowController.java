@@ -18,6 +18,7 @@ import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
+import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
@@ -55,8 +56,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -333,6 +336,13 @@ public class MainWindowController implements Initializable {
 
 //    if(deepThought.getLastViewedCategory() != null)
 //      trvwCategories.getSelectionModel().(deepThought.getLastViewedCategory());
+
+//      List<Entry> allEntries = new ArrayList<>(deepThought.getEntries());
+//      for(int i = 0, length = deepThought.countEntries(); i < length; i++) {
+//        Entry entry = allEntries.get(0);
+//        entry.setEntryIndex(length - i);
+//        ((DefaultDataManager)Application.dataManager).entityUpdated(entry);
+//      }
     }
   }
 

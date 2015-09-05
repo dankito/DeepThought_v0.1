@@ -6,9 +6,11 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -60,15 +62,31 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return Localization.getLocalizedString("named.content.extractor", getNewspaperName());
   }
 
-  protected Reference findOrCreateReferenceForThatDate(String articleDate) {
-    return findOrCreateReferenceForThatDate(getNewspaperName(), articleDate);
+
+  protected void setArticleReference(EntryCreationResult creationResult, ReferenceSubDivision articleReference, String articleDate) {
+    creationResult.setExtractedSubDivision(articleReference);
+
+    SeriesTitle newspaperSeries = findOrCreateNewspaperSeries();
+    creationResult.setExtractedSeriesTitle(newspaperSeries);
+
+    if(newspaperSeries != null && StringUtils.isNotNullOrEmpty(articleDate)) {
+      Reference dateReference = findOrCreateReferenceForThatDate(newspaperSeries, articleDate);
+      creationResult.setExtractedReference(dateReference);
+    }
   }
 
-  protected Reference findOrCreateReferenceForThatDate(String newspaperTitle, String articleDate) {
+  public SeriesTitle findOrCreateNewspaperSeries() {
     SeriesTitle newspaperSeries = null;
 
     if(Application.getDeepThought() != null) {
-      newspaperSeries = Application.getDeepThought().findOrCreateSeriesTitleForTitle(newspaperTitle);
+      newspaperSeries = Application.getDeepThought().findOrCreateSeriesTitleForTitle(getNewspaperName());
+    }
+
+    return newspaperSeries;
+  }
+
+  protected Reference findOrCreateReferenceForThatDate(SeriesTitle newspaperSeries, String articleDate) {
+    if(newspaperSeries != null) {
       for (Reference reference : newspaperSeries.getSerialParts()) {
         if (articleDate.equals(reference.getIssueOrPublishingDate()))
           return reference;
@@ -77,10 +95,6 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
     Reference newspaperDateReference = new Reference();
     newspaperDateReference.setIssueOrPublishingDate(articleDate);
-//    Application.getDeepThought().addReference(newspaperDateReference);
-
-    if(newspaperDateReference != null)
-      newspaperSeries.addSerialPart(newspaperDateReference);
 
     return newspaperDateReference;
   }

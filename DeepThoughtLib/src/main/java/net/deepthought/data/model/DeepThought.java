@@ -937,7 +937,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
     SeriesTitle newSeriesTitle = new SeriesTitle(title);
     cachedSeriesTitles.put(title, newSeriesTitle);
-    addSeriesTitle(newSeriesTitle);
+//    addSeriesTitle(newSeriesTitle);
 
     return newSeriesTitle;
   }
@@ -966,7 +966,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
     Reference newReference = new Reference(title);
     cachedReferences.put(title, newReference);
-    addReference(newReference);
+//    addReference(newReference);
 
     return newReference;
   }
@@ -995,7 +995,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
     Tag newTag = new Tag(name);
     cachedTags.put(name, newTag);
-    addTag(newTag);
+//    addTag(newTag);
 
     return newTag;
   }
@@ -1017,7 +1017,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       return existingCategory;
 
     Category newCategory = new Category(name);
-    addCategory(newCategory);
+//    addCategory(newCategory);
 
     return newCategory;
   }
@@ -1038,8 +1038,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       return existingCategory;
 
     Category newCategory = new Category(subCategoryName);
-    addCategory(newCategory);
-    parentCategory.addSubCategory(newCategory);
+//    addCategory(newCategory);
+//    parentCategory.addSubCategory(newCategory);
 
     return newCategory;
   }
@@ -1068,7 +1068,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
     Person newPerson = new Person(firstName, lastName);
 //    cachedPersons.put(name, newPerson);
-    addPerson(newPerson);
+//    addPerson(newPerson);
 
     return newPerson;
   }
