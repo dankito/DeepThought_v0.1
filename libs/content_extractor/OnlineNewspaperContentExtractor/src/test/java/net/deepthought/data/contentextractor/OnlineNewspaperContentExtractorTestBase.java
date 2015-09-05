@@ -2,6 +2,7 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
 import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.util.StringUtils;
@@ -49,6 +50,14 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
         periodicalTag = tag;
     }
     Assert.assertNotNull(periodicalTag);
+
+    Assert.assertTrue(result.getCategories().size() > 0);
+    Category periodicalCategory = null;
+    for(Category category : result.getCategories()) {
+      if(contentExtractor.getNewspaperName().toLowerCase().contains(category.getName())) // 'jetzt' Category Name is only contained in Newspaper Name 'SZ Jetzt'
+        periodicalCategory = category;
+    }
+    Assert.assertNotNull(periodicalCategory);
 
     Assert.assertNotNull(result.getSeriesTitle());
     Assert.assertEquals(contentExtractor.getNewspaperName(), result.getSeriesTitle().getTitle());

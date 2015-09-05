@@ -34,7 +34,14 @@ public class SueddeutscheMagazinContentExtractorTest extends GermanOnlineNewspap
   @Test
   public void importDasZerquetschenVonEiernArticle() {
     EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/42288/Das-Zerquetschen-von-Eiern");
-    testImportedArticleValues(creationResult, 9043, "41/2014", "Straßenprostitution in Spanien - Fotostrecke von Txema Salvans", "Das Zerquetschen von Eiern",
+    testImportedArticleValues(creationResult, 9044, "41/2014", "Straßenprostitution in Spanien - Fotostrecke von Txema Salvans", "Das Zerquetschen von Eiern",
         "Als unser Autor diese Fotos von spanischen Prostituierten sah, wurde ihm klar, wo das Problem mit Männern wie ihm liegt.");
+  }
+
+  @Test
+  public void importArticleWithTwoArtikelElements() {
+    EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43533/Ein-Pausenknopf-fuer-das-Leben");
+    testImportedArticleValues(creationResult, 7815, "04.09.2015", "Der britische Komponist Max Richter steht vor einer besonderen Uraufführung", "»Ein Pausenknopf für das Leben«",
+        "Der britische Komponist Max Richter steht vor einer besonderen Uraufführung: Sein neuestes Werk »Sleep« dauert acht Stunden, im Zuschauerraum stehen 500 Feldbetten. Denn es ist zum Einschlafen.");
   }
 }

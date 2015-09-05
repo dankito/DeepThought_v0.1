@@ -11,6 +11,7 @@ import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,21 +52,23 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
       String abstractString = extractAbstract(articleHeadElement);
 
-      Element artikelElement = getElementByClassAndNodeName(document.body(), "div", "artikel");
-      if(artikelElement == null) {
+      Elements artikelElements = document.body().getElementsByClass("artikel");
+      if(artikelElements == null || artikelElements.size() == 0) {
         log.warn("Could not find artikelhead Element");
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "artikel")));
       }
 
-      String content = parseContent(artikelElement);
+      String content = parseContent(artikelElements);
+      if(content == null)
+        return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "artikel")));
 
       Entry articleEntry = new Entry(content, abstractString);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      ReferenceSubDivision articleReference = createReference(creationResult, articleHeadElement, articleUrl);
+      createReference(creationResult, articleHeadElement, articleUrl);
 
       addNewspaperTag(creationResult);
-      addNewspaperCategory(articleEntry);
+      addNewspaperCategory(creationResult);
 
       return creationResult;
     } catch(Exception ex) {
@@ -83,6 +86,19 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
       }
     }
     return abstractString;
+  }
+
+  protected String parseContent(Elements artikelElements) {
+    // unbelievable, there are sometimes two 'artikel' elements with the first being almost empty -> find the second one
+    for(Element artikelElement : artikelElements) {
+      if("div".equals(artikelElement.nodeName())) {
+        if(artikelElement.children().size() > 0)
+          return parseContent(artikelElement);
+      }
+    }
+
+    log.error("Could not find 'artikel' Element");
+    return null;
   }
 
   protected String parseContent(Element artikelElement) {
@@ -166,6 +182,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
     if(title != null && publishingDate != null) {
       ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
+      articleReference.setOnlineAddress(articleUrl);
       setArticleReference(creationResult, articleReference, publishingDate);
 
       return articleReference;
@@ -240,11 +257,11 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
     addNewspaperTag(creationResult, "SZ");
   }
 
-  protected void addNewspaperCategory(Entry articleEntry) {
+  protected void addNewspaperCategory(EntryCreationResult creationResult) {
     Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     Category sueddeutscheCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
     Category szMagazinCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, getNewspaperName());
 
-    szMagazinCategory.addEntry(articleEntry);
+    creationResult.addCategory(szMagazinCategory);
   }
 }

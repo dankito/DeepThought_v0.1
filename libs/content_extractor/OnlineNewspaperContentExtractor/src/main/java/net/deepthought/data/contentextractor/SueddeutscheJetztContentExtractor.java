@@ -62,7 +62,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
       createReference(creationResult, textElement, articleUrl);
 
       addNewspaperTag(creationResult);
-      addNewspaperCategory(articleEntry);
+      addNewspaperCategory(creationResult);
 
       return creationResult;
     } catch(Exception ex) {
@@ -181,6 +181,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
     if(title != null && publishingDate != null) {
       ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
+      articleReference.setOnlineAddress(articleUrl);
       setArticleReference(creationResult, articleReference, publishingDate);
 
       return articleReference;
@@ -237,11 +238,11 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     addNewspaperTag(creationResult, "SZ");
   }
 
-  protected void addNewspaperCategory(Entry articleEntry) {
+  protected void addNewspaperCategory(EntryCreationResult creationResult) {
     Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     Category sueddeutscheCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
-    Category szMagazinCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, "jetzt");
+    Category szJetztCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, "jetzt");
 
-    szMagazinCategory.addEntry(articleEntry);
+    creationResult.addCategory(szJetztCategory);
   }
 }

@@ -49,7 +49,8 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://www.sueddeutsche.de/") || url.startsWith("https://www.sueddeutsche.de/") /*|| url.startsWith("http://sz-magazin.sueddeutsche.de/")*/;
+    return url.startsWith("http://www.sueddeutsche.de/") || url.startsWith("https://www.sueddeutsche.de/") ||
+        szMagazinContentExtractor.canCreateEntryFromUrl(url) || jetztContentExtractor.canCreateEntryFromUrl(url);
   }
 
 
@@ -171,12 +172,23 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       else if(("div".equals(bodyChild.tagName()) && bodyChild.hasClass("basebox"))) {
         if(bodyChild.hasClass("embed"))
           content += bodyChild.outerHtml().replace(" src=\"//", " src=\"http://");
-        else if(bodyChild.hasClass("include"))
+        else if(bodyChild.hasClass("include")) {
+          makeLazyLoadingChildrenEagerLoading(bodyChild);
           content += bodyChild.outerHtml();
+        }
       }
     }
 
     return content;
+  }
+
+  protected void makeLazyLoadingChildrenEagerLoading(Element bodyChild) {
+    Elements lazyLoadChildren = bodyChild.getElementsByClass("lazyload");
+    if(lazyLoadChildren.size() > 0) {
+      for(Element lazyLoadChild : lazyLoadChildren) {
+        makeLazyLoadingElementEagerLoading(lazyLoadChild);
+      }
+    }
   }
 
   protected String extractUsefulTopEnrichmentElements(Element bodySection) {
@@ -187,8 +199,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         return parseInlineImageGallery(topEnrichmentElements.get(0));
 
       Element panoramaElement = getElementByClassAndNodeName(topEnrichmentElements.get(0), "div", "panorama");
-      if(panoramaElement != null && panoramaElement.hasClass("basebox") && panoramaElement.hasClass("include"))
+      if(panoramaElement != null && panoramaElement.hasClass("basebox") && panoramaElement.hasClass("include")) {
+        makeLazyLoadingChildrenEagerLoading(panoramaElement);
         return panoramaElement.outerHtml();
+      }
     }
 
     return "";
@@ -453,13 +467,20 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   }
 
   protected String extractImgElementHtml(Element imgElement) {
-    if(imgElement.hasClass("lazyload") && imgElement.hasAttr("data-src")) {
-      imgElement.attr("src", imgElement.attr("data-src"));
-      imgElement.removeClass("lazyload");
-      imgElement.removeAttr("data-src");
-    }
+    makeLazyLoadingElementEagerLoading(imgElement);
 
     return imgElement.outerHtml();
+  }
+
+  protected void makeLazyLoadingElementEagerLoading(Element lazyLoadElement) {
+    if(lazyLoadElement.hasClass("lazyload")) {
+      if(lazyLoadElement.hasAttr("data-src")) {
+        lazyLoadElement.attr("src", lazyLoadElement.attr("data-src"));
+        lazyLoadElement.removeAttr("data-src");
+      }
+
+//      lazyLoadElement.removeClass("lazyload");
+    }
   }
 
   protected List<ArticlesOverviewItem> extractOneLinerTeaserItemsFromTeaserElement(Element teaser) {

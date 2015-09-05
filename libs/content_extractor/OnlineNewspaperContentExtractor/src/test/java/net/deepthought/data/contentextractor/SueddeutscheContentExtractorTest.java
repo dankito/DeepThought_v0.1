@@ -140,10 +140,31 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void summeryIsNotMarkedWithClassArticleEntrySummary() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/selektorenliste-der-nsa-was-die-wikileaks-dokumente-zeigen-1.2547250");
-    testImportedArticleValues(creationResult, 3572, "02.07.2015", "Was die Wikileaks-Dokumente zeigen", "Selektorenliste der NSA",
+    testImportedArticleValues(creationResult, 3589, "02.07.2015", "Was die Wikileaks-Dokumente zeigen", "Selektorenliste der NSA",
         "Anhand der Telefonnummern in dieser Selektorenliste wird deutlich, dass die Ausspähung durch die NSA Bundesminister, Referenten und sogar Faxgeräte von Ministerien umfasste.");
 
     Assert.assertFalse(creationResult.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
+  }
+
+  @Test
+  public void importArticleWithLazyLoadingIFrames() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/reise/orte-und-ihre-antipoden-auf-der-anderen-seite-1.2606100");
+    testImportedArticleValues(creationResult, 3053, "02.09.2015", "Auf der anderen Seite", "Orte und ihre Antipoden",
+        "Wie es am Ende der Welt aussieht, ist eine Frage des Standpunkts. Wir haben Gegenüber-Orte zusammengestellt.");
+  }
+
+  @Test
+  public void importKarteDerSchandeArticle() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/gewalt-gegen-asylbewerber-karte-der-schande-1.2625987");
+    testImportedArticleValues(creationResult, 4038, "02.09.2015", "Karte der Schande", "Gewalt gegen Asylbewerber",
+        "In allen Teilen Deutschlands kommt es zu Anschlägen und Delikten gegen Asylbewerber und Flüchtlingsheime. Doch offenbar tauchen gar nicht alle Taten in der offiziellen Statistik auf.");
+  }
+
+  @Test
+  public void importArticleWithInteractiveGraphics() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/sport/grafik-zu-bundesliga-transfers-darmstadt-pluendert-die-liga-1.2628259");
+    testImportedArticleValues(creationResult, 10205, "02.09.2015", "Darmstadt plündert die Liga", "Grafik zu Bundesliga-Transfers",
+        "Der Audi-Klub Ingolstadt ist bescheidener als der Traditionsverein Darmstadt, das kleine Sinsheim wird multikulturell - und Bayern wildert in Italien. Unsere Transfergrafik zeigt, wie Zugänge die Bundesliga verändern.");
   }
 
   @Test
