@@ -3,8 +3,6 @@ package net.deepthought.data.search;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 
-import org.apache.lucene.store.Directory;
-
 import java.util.Collection;
 
 /**
@@ -19,10 +17,7 @@ public class LuceneAndDatabaseSearchEngine extends LuceneSearchEngine {
 
 
   public LuceneAndDatabaseSearchEngine() {
-  }
 
-  public LuceneAndDatabaseSearchEngine(Directory directory) {
-    super(directory);
   }
 
   @Override

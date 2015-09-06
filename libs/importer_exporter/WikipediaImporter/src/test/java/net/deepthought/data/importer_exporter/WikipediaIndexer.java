@@ -1,7 +1,7 @@
 package net.deepthought.data.importer_exporter;
 
 import net.deepthought.Application;
-import net.deepthought.DependencyResolverBase;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
@@ -23,7 +23,6 @@ public class WikipediaIndexer {
   protected WikipediaImporter importer = null;
 
   protected IEntityManager entityManager = null;
-  protected EntityManagerConfiguration configuration = null;
 
   protected DeepThought deepThought = null;
 
@@ -32,9 +31,7 @@ public class WikipediaIndexer {
   public void setup() throws SQLException {
     importer = new WikipediaImporter();
 
-    configuration = new EntityManagerConfiguration("data/tests/big_data/");
-
-    Application.instantiate(configuration, new DependencyResolverBase() {
+    Application.instantiate(new TestApplicationConfiguration("data/tests/big_data/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         entityManager = new OrmLiteJavaSeEntityManager(configuration);

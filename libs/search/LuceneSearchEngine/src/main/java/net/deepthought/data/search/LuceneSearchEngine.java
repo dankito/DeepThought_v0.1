@@ -5,6 +5,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.EntryPersonAssociation;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -12,7 +13,6 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.LazyLoadingList;
@@ -25,34 +25,18 @@ import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.deepthought.data.search.specific.IndexTerm;
 import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Tokenizer;
-import org.apache.lucene.analysis.core.LetterTokenizer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.util.FilteringTokenFilter;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.DocsEnum;
-import org.apache.lucene.index.Fields;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexableField;
-import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.index.Terms;
-import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.misc.HighFreqTerms;
-import org.apache.lucene.misc.TermStats;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -68,7 +52,6 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Bits;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.NumericUtils;
 import org.apache.lucene.util.Version;
@@ -76,19 +59,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -106,14 +88,20 @@ public class LuceneSearchEngine extends SearchEngineBase {
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
 
 
-  protected Directory directory;
+  // TODO: what about Category, Notes and Files?
+  protected final static List<Class> ClassesWithOwnIndexDirectories = Arrays.asList(new Class[] { Entry.class, Tag.class, ReferenceBase.class, Person.class });
+
+  protected final static Class DefaultIndexDirectoryClass = UserDataEntity.class;
+
+
+  protected Map<Class, Directory> directories = new HashMap<>();
 
   protected Analyzer defaultAnalyzer;
 
-  protected IndexWriter indexWriter;
+  protected Map<Class, IndexWriter> indexWriters = new HashMap<>();
 
-  protected DirectoryReader directoryReader;
-  protected IndexSearcher indexSearcher;
+  protected Map<Class, DirectoryReader> directoryReaders = new HashMap<>();
+  protected Map<Class, IndexSearcher> indexSearchers = new HashMap<>();
 
   protected boolean isIndexReady = false;
 
@@ -123,7 +111,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   public LuceneSearchEngine() {
-
+    if(deepThought != null)
+      deepThoughtChanged(null, deepThought);
   }
 
   public LuceneSearchEngine(Directory directory) {
@@ -138,7 +127,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
 
     if(previousDeepThought != null) {
-      closeIndexSearcherAndWriter();
+      closeIndexSearchersAndWriters();
     }
 
     createDirectoryAndIndexSearcherAndWriterForDeepThought(newDeepThought);
@@ -149,66 +138,108 @@ public class LuceneSearchEngine extends SearchEngineBase {
     timer.cancel();
     timer = null;
 
-    closeIndexSearcherAndWriter();
+    closeIndexSearchersAndWriters();
 
     super.close();
   }
 
-  protected void closeIndexSearcherAndWriter() {
-    closeIndexSearcher();
+  protected void closeIndexSearchersAndWriters() {
+    closeIndexSearchers();
 
-    closeIndexWriter();
+    closeIndexWriters();
 
-    closeDirectory();
+    closeDirectories();
   }
 
-  protected void closeDirectory() {
-    try {
-      if(directory != null) {
-        directory.close();
-        directory = null;
+  protected void closeDirectories() {
+    for(Directory directory : directories.values()) {
+      try {
+        if (directory != null) {
+          directory.close();
+          directory = null;
+        }
+      } catch (Exception ex) {
+        log.error("Could not close directory", ex);
       }
-    } catch(Exception ex) { log.error("Could not close directory", ex); }
-  }
-
-  protected void closeIndexSearcher() {
-    try {
-      if(directoryReader != null) {
-        directoryReader.close();
-        directoryReader = null;
-      }
-    } catch(Exception ex) {
-      log.error("Could not close DirectoryReader", ex);
     }
 
-    indexSearcher = null;
+    directories.clear();
   }
 
-  protected void closeIndexWriter() {
-    try {
-      if(indexWriter != null) {
-        indexWriter.close();
-        indexWriter = null;
+  protected void closeIndexSearchers() {
+    for(DirectoryReader directoryReader : new ArrayList<>(directoryReaders.values())) {
+      try {
+        if (directoryReader != null) {
+          directoryReader.close();
+          directoryReader = null;
+        }
+      } catch (Exception ex) {
+        log.error("Could not close DirectoryReader", ex);
       }
-    } catch(Exception ex) {
-      log.error("Could not close IndexWriter", ex);
     }
+    directoryReaders.clear();
+
+    indexSearchers.clear();
+  }
+
+  protected void markIndexHasBeenUpdated() {
+    for(Class entityClass : new ArrayList<>(indexSearchers.keySet()))
+      markIndexHasBeenUpdated(entityClass);
+  }
+
+  protected void markIndexHasBeenUpdated(Class<? extends UserDataEntity> entityClass) {
+    entityClass = findIndexEntityClass(entityClass);
+    indexSearchers.put(entityClass, null);
+  }
+
+  protected void closeIndexWriters() {
+    for(Class entityClass : new HashMap<>(indexWriters).keySet()) {
+      IndexWriter indexWriter = indexWriters.get(entityClass);
+      try {
+        if (indexWriter != null) {
+          indexWriter.close();
+          indexWriter = null;
+        }
+      } catch (Exception ex) {
+        log.error("Could not close IndexWriter", ex);
+      }
+    }
+
+    indexWriters.clear();
   }
 
   protected void setDirectory(Directory directory) {
-    this.directory = directory;
+    if(directory instanceof RAMDirectory) { // TODO: if not read path from FSDirectory and create Entity specific sub directories
+      for(Class classWithOwnIndexDirectory : ClassesWithOwnIndexDirectories)
+        directories.put(classWithOwnIndexDirectory, new RAMDirectory());
+    }
+    directories.put(DefaultIndexDirectoryClass, directory);
+
     isIndexReady = directory != null;
 
-    createIndexSearcherAndWriter(directory);
+    createIndexSearchersAndWriters();
   }
 
   protected void createDirectoryAndIndexSearcherAndWriterForDeepThought(DeepThought deepThought) {
+    if(directories.size() > 0) // on unit tests
+      return;
+
     try {
 //   directory = FSDirectory.open(Paths.get(Application.getDataFolderPath(), "index")); // Android doesn't support java.nio package (like therefor also not class Paths)
       File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), String.format("%02d", deepThought.getId()));
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
 
-      setDirectory(FSDirectory.open(deepThoughtIndexDirectory));
+      for(Class classWithOwnIndexDirectory : ClassesWithOwnIndexDirectories) {
+        File indexDirectory = new File(deepThoughtIndexDirectory, classWithOwnIndexDirectory.getName());
+        directories.put(classWithOwnIndexDirectory, FSDirectory.open(indexDirectory));
+      }
+
+      File defaultIndexDirectory = new File(deepThoughtIndexDirectory, "default");
+      directories.put(DefaultIndexDirectoryClass, FSDirectory.open(defaultIndexDirectory));
+
+      isIndexReady = true;
+
+      createIndexSearchersAndWriters();
 
       if(indexDirExists == false)
         rebuildIndexAsync();
@@ -217,35 +248,56 @@ public class LuceneSearchEngine extends SearchEngineBase {
     }
   }
 
-  protected void createIndexSearcherAndWriter(Directory directory) {
+  protected void createIndexSearchersAndWriters() {
     defaultAnalyzer = new DeepThoughtAnalyzer();
 //    defaultAnalyzer = new StandardAnalyzer(Version.LUCENE_47);
 
-    indexWriter = createIndexWriter();
-    indexSearcher = createIndexSearcherOnOpeningDirectory();
+    for(Class entityClass : directories.keySet())
+      createIndexSearcherAndWriter(entityClass);
+  }
+
+  protected void createIndexSearcherAndWriter(Class entityClass) {
+    IndexWriter indexWriter = createIndexWriter(entityClass);
+    indexWriters.put(entityClass, indexWriter);
+
+    createIndexSearcherOnOpeningDirectory(entityClass, indexWriter);
   }
 
   /**
    * <p>
-   *   Creates a new IndexWriter with defaultAnalyzer.
+   *   On opening an index directory there are no new changes yet
+   *   so on first call call this simple method to create an IndexSearcher.
    * </p>
    * @return
+   * @param entityClass
+   * @param indexWriter
    */
-  protected IndexWriter createIndexWriter() {
-    return createIndexWriter(defaultAnalyzer);
+  protected void createIndexSearcherOnOpeningDirectory(Class entityClass, IndexWriter indexWriter) {
+    try {
+      DirectoryReader directoryReader = DirectoryReader.open(indexWriter, true);
+      directoryReaders.put(entityClass, directoryReader);
+
+      IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
+      indexSearchers.put(entityClass, indexSearcher);
+    } catch(Exception ex) {
+      log.error("Could not create IndexSearcher for EntityClass " + entityClass, ex);
+    }
+  }
+
+  protected IndexWriter createIndexWriter(Class<? extends UserDataEntity> entryClass) {
+    return createIndexWriter(directories.get(entryClass));
   }
 
   /**
    * <p>
    *   Creates a new IndexWriter with specified Analyzer.
    * </p>
-   * @param analyzer
+   * @param directory
    * @return Created IndexWriter or null on failure!
    */
-  protected IndexWriter createIndexWriter(Analyzer analyzer) {
+  protected IndexWriter createIndexWriter(Directory directory) {
     try {
-//    IndexWriterConfig config = new IndexWriterConfig(analyzer);
-      IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, analyzer);
+      IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, defaultAnalyzer);
       config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
       return new IndexWriter(directory, config);
     } catch (Exception ex) {
@@ -256,23 +308,32 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return null;
   }
 
-  /**
-   * <p>
-   *   On opening an index directory there are no new changes yet
-   *   so on first call call this simple method to create an IndexSearcher.
-   * </p>
-   * @return
-   */
-  protected IndexSearcher createIndexSearcherOnOpeningDirectory() {
-    try {
-      directoryReader = DirectoryReader.open(indexWriter, true);
-      indexSearcher = new IndexSearcher(directoryReader);
-    } catch(Exception ex) {
-      log.error("Could not create IndexSearcher", ex);
-    }
-
-    return indexSearcher;
+  protected IndexWriter getIndexWriter() {
+    return getIndexWriter(DefaultIndexDirectoryClass);
   }
+
+  protected IndexWriter getIndexWriter(Class<? extends UserDataEntity> entityClass) {
+    entityClass = findIndexEntityClass(entityClass);
+    return indexWriters.get(entityClass);
+  }
+
+//  /**
+//   * <p>
+//   *   On opening an index directory there are no new changes yet
+//   *   so on first call call this simple method to create an IndexSearcher.
+//   * </p>
+//   * @return
+//   */
+//  protected IndexSearcher createIndexSearcherOnOpeningDirectory() {
+//    try {
+//      directoryReader = DirectoryReader.open(indexWriter, true);
+//      indexSearcher = new IndexSearcher(directoryReader);
+//    } catch(Exception ex) {
+//      log.error("Could not create IndexSearcher", ex);
+//    }
+//
+//    return indexSearcher;
+//  }
 
   /**
    * <p>
@@ -283,18 +344,39 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * @return
    */
   protected IndexSearcher getIndexSearcher() {
+      return getIndexSearcher(DefaultIndexDirectoryClass);
+  }
+
+  protected IndexSearcher getIndexSearcher(Class entityClass) {
+    entityClass = findIndexEntityClass(entityClass);
+    IndexSearcher indexSearcher = indexSearchers.get(entityClass);
+
     if(indexSearcher == null) {
       try {
-        DirectoryReader newDirectoryReader = DirectoryReader.openIfChanged(directoryReader, indexWriter, true);
-        if(newDirectoryReader != null)
+        DirectoryReader directoryReader = directoryReaders.get(entityClass);
+        DirectoryReader newDirectoryReader = DirectoryReader.openIfChanged(directoryReader, getIndexWriter(entityClass), true);
+        if(newDirectoryReader != null) {
+          directoryReaders.put(entityClass, newDirectoryReader);
           directoryReader = newDirectoryReader;
+        }
+
         indexSearcher = new IndexSearcher(directoryReader);
+        indexSearchers.put(entityClass, indexSearcher);
       } catch(Exception ex) {
         log.error("Could not create IndexSearcher", ex);
       }
     }
 
     return indexSearcher;
+  }
+
+  private Class findIndexEntityClass(Class entityClass) {
+    if(ClassesWithOwnIndexDirectories.contains(entityClass))
+      return entityClass;
+    if(SeriesTitle.class.equals(entityClass) || Reference.class.equals(entityClass) || ReferenceSubDivision.class.equals(entityClass))
+      return ReferenceBase.class;
+
+    return DefaultIndexDirectoryClass;
   }
 
 
@@ -343,15 +425,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
       for (ReferenceSubDivision subDivision : deepThought.getReferenceSubDivisions())
         indexReferenceSubDivision(subDivision);
 
-//      try {
-//        indexWriter.prepareCommit();
-//      } catch(Exception ex) {
-//        log.error("Could not prepare commit on Lucene Index", ex);
-//        indexWriter.rollback();
-//      }
-
-      indexWriter.commit();
-//      indexWriter.close();
+      for(IndexWriter indexWriter : indexWriters.values())
+        indexWriter.commit();
       log.debug("Done rebuilding Lucene Index.");
     } catch(Exception ex) {
       log.error("Could not rebuild Lucene Index", ex);
@@ -367,15 +442,17 @@ public class LuceneSearchEngine extends SearchEngineBase {
   public void deleteIndex() {
     log.debug("Going to delete Lucene Index ...");
     try {
-      indexWriter.deleteAll();
-      indexWriter.prepareCommit();
-      indexWriter.commit();
+      for(IndexWriter indexWriter : indexWriters.values()) {
+        indexWriter.deleteAll();
+        indexWriter.prepareCommit();
+        indexWriter.commit();
+      }
       log.debug("Lucene Index successfully deleted");
     } catch(Exception ex) {
       log.error("Could not delete Lucene index", ex);
     }
 
-    indexSearcher = null;
+    markIndexHasBeenUpdated();
   }
 
   protected Set<Entry> entriesToIndex = new CopyOnWriteArraySet<>();
@@ -402,6 +479,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
       indexReferenceSubDivision((ReferenceSubDivision)entity);
     else if(entity instanceof Note)
       indexNote((Note)entity);
+    else if(entity instanceof FileLink)
+      indexFile((FileLink) entity);
   }
 
   protected void indexEntry(Entry entry) {
@@ -413,7 +492,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
       Document doc = createDocumentFromEntry(entry);
 
-      indexDocument(doc);
+      indexDocument(doc, Entry.class);
     } catch(Exception ex) {
       log.error("Could not index Entry " + entry, ex);
     }
@@ -485,7 +564,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.TagId, tag.getId(), Field.Store.YES));
     doc.add(new Field(FieldName.TagName, tag.getName(), TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, Tag.class);
   }
 
   protected void indexCategory(Category category) {
@@ -497,17 +576,17 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
     doc.add(new Field(FieldName.CategoryName, category.getName(), TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, Category.class);
   }
 
   protected void indexPerson(Person person) {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.PersonId, person.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.PersonFirstName, person.getFirstName(), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.PersonLastName, person.getLastName(), TextField.TYPE_NOT_STORED));
+    doc.add(new Field(FieldName.PersonFirstName, person.getFirstName().toLowerCase(), TextField.TYPE_NOT_STORED));
+    doc.add(new Field(FieldName.PersonLastName, person.getLastName().toLowerCase(), TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, Person.class);
   }
 
   protected void indexSeriesTitle(SeriesTitle seriesTitle) {
@@ -520,7 +599,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //    doc.add(new Field(FieldName.ReferenceTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
 //    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, ReferenceBase.class);
   }
 
   protected String getSeriesTitleTitleValue(SeriesTitle seriesTitle) {
@@ -544,7 +623,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //
 //    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, ReferenceBase.class);
   }
 
   protected String getReferenceTitleValue(Reference reference) {
@@ -572,7 +651,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //    else
 //      doc.add(new Field(FieldName.ReferenceTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, ReferenceBase.class);
   }
 
   protected String getReferenceSubDivisionTitleValue(ReferenceSubDivision referenceSubDivision) {
@@ -585,7 +664,19 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.NoteId, note.getId(), Field.Store.YES));
     doc.add(new Field(FieldName.NoteNote, note.getNote(), TextField.TYPE_NOT_STORED));
 
-    indexDocument(doc);
+    indexDocument(doc, Note.class);
+  }
+
+  protected void indexFile(FileLink file) {
+    Document doc = new Document();
+
+    doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
+    doc.add(new Field(FieldName.FileName, file.getName(), TextField.TYPE_NOT_STORED));
+    doc.add(new Field(FieldName.FileUri, file.getUriString(), TextField.TYPE_NOT_STORED));
+    doc.add(new Field(FieldName.FileSourceUri, file.getSourceUriString(), TextField.TYPE_NOT_STORED));
+    doc.add(new Field(FieldName.FileDescription, file.getNotes(), TextField.TYPE_NOT_STORED));
+
+    indexDocument(doc, FileLink.class);
   }
 
   protected void addDateFieldToDocument(Document doc, String fieldName, Date date) {
@@ -609,15 +700,20 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void indexDocument(Document doc) {
+    indexDocument(doc, DefaultIndexDirectoryClass);
+  }
+
+  protected void indexDocument(Document doc, Class entityClass) {
     try {
       log.debug("Indexing document {}", doc);
+      IndexWriter indexWriter = getIndexWriter(entityClass);
       indexWriter.addDocument(doc);
       indexWriter.commit();
     } catch(Exception ex) {
       log.error("Could not index Document " + doc, ex);
     }
 
-    indexSearcher = null; // so that on next search updates are reflected
+    markIndexHasBeenUpdated(entityClass); // so that on next search updates are reflected
   }
 
 
@@ -625,45 +721,13 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   @Override
   public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
-//    TermQuery query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
-//    Search<Entry> dummy = new Search<>("", listener);
-//
-//    executeQuery(dummy, query, Entry.class, FieldName.EntryId);
-
-//    try {
-//      Date startTime = new Date();
-//      Set<Entry> entriesWithoutTags = new HashSet<>();
-//
-//      IndexSearcher searcher = getIndexSearcher();
-
-      // find docs without tags
-//    ScoreDoc[] hits = searcher.search(new TermQuery(new Term(FieldName.EntryNoTags.toString(), NoTagsFieldValue)), 100000).scoreDocs;
-//    QueryParser parser = new QueryParser(FieldName.EntryNoTags, defaultAnalyzer);
-//    Query query = parser.parse(NoTagsFieldValue);
       final Query query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
-
-//      ScoreDoc[] hits = searcher.search(query, 100000).scoreDocs;
-//      List<Long> ids = new ArrayList<>();
-//
-//      // Iterate through the results:
-//      for (int i = 0; i < hits.length; i++) {
-//        Document hitDoc = searcher.doc(hits[i].doc);
-////      entriesWithoutTags.add(hitDoc.getField(FieldName.EntryId).numericValue().longValue());
-////        entriesWithoutTags.add((Entry) getEntityFromDocument(hitDoc, Entry.class, FieldName.EntryId));
-//        ids.add(hitDoc.getField(FieldName.EntryId).numericValue().longValue());
-//      }
-//
-//      long millisecondsElapsed = (new Date().getTime() - startTime.getTime());
-//      entriesWithoutTags.addAll(getBaseEntitiesFromIds(Entry.class, ids));
-//
-////      return entriesWithoutTags;
-//      listener.completed(entriesWithoutTags);
 
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         try {
-          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending));
+          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending));
         } catch(Exception ex) {
           log.error("Could not search for Entries without Tags", ex);
         }
@@ -680,12 +744,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
         if(search.isInterrupted())
           return;
 
-        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(), query, Tag.class, FieldName.TagId, 1000)));
+        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class, FieldName.TagId, 1000)));
       } catch(Exception ex) {
         log.error("Could not parse query " + tagNamesToFilterFor, ex);
         // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
       }
     }
 
@@ -702,7 +764,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     }
 
     try {
-      IndexSearcher searcher = getIndexSearcher();
+      IndexSearcher searcher = getIndexSearcher(Entry.class);
 
       ScoreDoc[] hits = searcher.search(query, 10000).scoreDocs;
       Set<Long> ids = new HashSet<>();
@@ -808,7 +870,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   @Override
   protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
     CombinedLazyLoadingList<ReferenceBase> searchResults = new CombinedLazyLoadingList<>();
-    IndexSearcher searcher = getIndexSearcher();
+    IndexSearcher searcher = getIndexSearcher(ReferenceBase.class);
     referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
     referenceBaseFilter = "*" + referenceBaseFilter + "*";
 
@@ -967,7 +1029,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //    } catch(Exception ex) { }
 
 //    executeQuery(search, query, ReferenceBase.class, FieldName.ReferenceBaseId);
-    search.setResults(new LazyLoadingReferenceBasesSearchResultsList(getIndexSearcher(), query, 10000));
+    search.setResults(new LazyLoadingReferenceBasesSearchResultsList(getIndexSearcher(ReferenceBase.class), query, 10000));
     search.fireSearchCompleted();
   }
 
@@ -1043,26 +1105,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     log.debug("Executing Query " + query);
 
     try {
-//      IndexSearcher searcher = getIndexSearcher();
-
-//      ScoreDoc[] hits = searcher.search(query, 1000).scoreDocs;
-//      List<Long> ids = new ArrayList<>();
-//
-//      // Iterate through the results:
-//      for (int i = 0; i < hits.length; i++) {
-//        if(search.isInterrupted())
-//          return;
-//
-//        try {
-//          Document hitDoc = searcher.doc(hits[i].doc);
-//          ids.add(hitDoc.getField(idFieldName).numericValue().longValue());
-//          //search.addResult(getEntityFromDocument(hitDoc, resultEntityClass, idFieldName));
-//        } catch(Exception ex) { log.error("Could not extract result from hitDoc", ex); }
-//      }
-//
-//      search.addResults(Application.getEntityManager().getEntitiesById(resultEntityClass, ids));
-
-      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(), query, resultEntityClass, idFieldName, 1000, sortOrder));
+      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(resultEntityClass), query, resultEntityClass, idFieldName, 1000, sortOrder));
     } catch(Exception ex) {
       log.error("Could not execute Query " + query.toString(), ex);
       // TODO: set error flag in Search
@@ -1076,9 +1119,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * @param query
    * @return
    */
-  protected ScoreDoc[] search(Query query) {
+  protected ScoreDoc[] search(Query query, Class entityClass) {
     try {
-      IndexSearcher searcher = getIndexSearcher();
+      IndexSearcher searcher = getIndexSearcher(entityClass);
 
       return searcher.search(query, 1000).scoreDocs;
     } catch(Exception ex) {
@@ -1088,266 +1131,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return new ScoreDoc[0];
   }
 
-  protected BaseEntity getEntityFromDocument(Document hitDoc, Class<? extends BaseEntity> resultEntityClass, String idFieldName) {
-    Long entityId = hitDoc.getField(idFieldName).numericValue().longValue();
-    return Application.getEntityManager().getEntityById(resultEntityClass, entityId);
-//    if(resultEntityClass != ReferenceBase.class)
-//      return Application.getEntityManager().getEntityById(resultEntityClass, entityId);
-//    else { // TODO: this is quite a bad workaround, should actually be solved in OrmLite: if for a Inheritance Top Level entity is search, the concrete entity doesn't get created correctly
-//      if(hitDoc.getField(FieldName.SeriesTitleTitle) != null)
-//        return Application.getEntityManager().getEntityById(SeriesTitle.class, entityId);
-//      else if(hitDoc.getField(FieldName.ReferenceSubDivisionTitle) != null)
-//        return Application.getEntityManager().getEntityById(ReferenceSubDivision.class, entityId);
-//      else
-//        return Application.getEntityManager().getEntityById(Reference.class, entityId);
-//    }
-  }
-
-
-  private static int idMock = 1;
-
-  // TODO: remove
-//  public void index(String text) throws IOException {
-//    LanguageIdentifier languageIdentifier = new LanguageIdentifier(text);
-//    String language = languageIdentifier.getLanguage();
-//    boolean isCertain = languageIdentifier.isReasonablyCertain();
-//
-//    GermanStemFilter filter = new GermanStemFilter(new GermanNormalizationFilter(new StopFilter(new StandardTokenizer(), GermanAnalyzer.getDefaultStopSet())));
-//    filter.setStemmer(new GermanStemmer());
-//
-////    IndexWriterConfig config = new IndexWriterConfig(defaultAnalyzer);
-//    IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_10_4, defaultAnalyzer);
-//    config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-//    IndexWriter iwriter = new IndexWriter(directory, config);
-//
-//    Document doc = new Document();
-//    doc.add(new Field(FieldName.EntryContent, text, TextField.TYPE_STORED));
-//    doc.add(new IntField(FieldName.EntryId, idMock++, Field.Store.YES));
-//    iwriter.addDocument(doc);
-//    iwriter.close();
-//
-//    DirectoryReader reader = DirectoryReader.open(directory);
-//
-////    try {
-//////    Analyzer analyzer = new GermanAnalyzer();
-////      Analyzer analyzer = new StandardAnalyzer(GermanAnalyzer.getDefaultStopSet());
-////    TokenStream tokenStream = analyzer.tokenStream("", new StringReader(text));
-//////      TokenStream tokenStream = new StandardTokenizer(Version.LUCENE_47, new StringReader(text));
-//////      TokenStream tokenStream = new StandardTokenizer(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY);
-////      OffsetAttribute offsetAttribute = tokenStream.addAttribute(OffsetAttribute.class);
-////      CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
-////
-////      tokenStream.reset();
-////      while (tokenStream.incrementToken()) {
-//////        extractedKeywords.add(charTermAttribute.toString());
-////        System.out.println(charTermAttribute.toString());
-////      }
-////    } catch(Exception ex) {
-////      log.error("Could not extract keywords from text " + text, ex);
-////    }
-//
-//
-////    DocsEnum de = MultiFields.getTermDocsEnum(reader, MultiFields.getLiveDocs(reader), FieldName.EntryContent.toString(), new BytesRef("run"));
-////    if(de != null) {
-////      int docNum;
-////      while ((docNum = de.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
-////        System.out.println(de.freq());
-////      }
-////    }
-//
-//    int numDocs = reader.numDocs();
-//    int refCount = reader.getRefCount();
-////    Document lastInsertedDoc = reader.document(numDocs - 1);
-//    Fields fields = reader.getTermVectors(numDocs - 1);
-//    if(fields != null) {
-//      for (String field : fields) {
-//        Terms terms = fields.terms(field);
-//        long docFreq = terms.getSumDocFreq();
-//      }
-//    }
-//
-//    reader.close();
-//  }
-
-
-  public List<BaseEntity> search(String term, Class resultEntityType) throws IOException, ParseException {
-    Set<Long> searchResultIds = new HashSet<>();
-
-    IndexSearcher indexSearcher = getIndexSearcher();
-    // Parse a simple query that searches for "text":
-    // TODO: only EntryContent and EntryAbstract have language bases analyzers
-//    QueryParser parser = new QueryParser(FieldName.EntryContent, getAnalyzerForTextLanguage(term));
-    QueryParser parser = new QueryParser(Version.LUCENE_47, FieldName.EntryContent, defaultAnalyzer);
-    Query query = parser.parse(term);
-    ScoreDoc[] hits = indexSearcher.search(query, null, 1000).scoreDocs;
-
-    // Iterate through the results:
-    System.out.println("Searching for term " + term + " resulted " + hits.length + " results:");
-    for (int i = 0; i < hits.length; i++) {
-      Document hitDoc = indexSearcher.doc(hits[i].doc);
-      Long entityId = hitDoc.getField(FieldName.EntryId).numericValue().longValue();
-      searchResultIds.add(entityId);
-    }
-
-    return getBaseEntitiesFromIds(resultEntityType, searchResultIds);
-  }
-
   protected <T extends BaseEntity> List<T> getBaseEntitiesFromIds(Class<T> type, Collection<Long> searchResultIds) {
-//    List<T> resultEntities = new ArrayList<>();
-//
-//    for(Long entityId : searchResultIds)
-//      resultEntities.add(Application.getEntityManager().getEntityById(type, entityId));
-//
-//    return resultEntities;
-
     return Application.getEntityManager().getEntitiesById(type, searchResultIds);
   }
-
-//  public void test() throws IOException {
-//    Analyzer analyzer = new StandardAnalyzer();
-//
-//    // Store the index in memory:
-//    Directory directory = new RAMDirectory();
-//    // To store an index on disk, use this instead:
-//    //Directory directory = FSDirectory.open("/tmp/testindex");
-//    IndexWriterConfig config = new IndexWriterConfig(analyzer);
-//    IndexWriter iwriter = new IndexWriter(directory, config);
-//    Document doc = new Document();
-//    String text = "This is the text to be indexed.";
-//    doc.add(new Field(FieldName.EntryContent.toString(), text, TextField.TYPE_STORED));
-//    iwriter.addDocument(doc);
-//    iwriter.close();
-//
-//    // Now search the index:
-//    DirectoryReader ireader = DirectoryReader.open(directory);
-//    IndexSearcher isearcher = new IndexSearcher(ireader);
-//    // Parse a simple query that searches for "text":
-//    QueryParser parser = new QueryParser(FieldName.EntryContent.toString(), analyzer);
-//    Query query = parser.parse("text");
-//    ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
-//    assertEquals(1, hits.length);
-//    // Iterate through the results:
-//    for (int i = 0; i < hits.length; i++) {
-//      Document hitDoc = isearcher.doc(hits[i].doc);
-//      assertEquals("This is the text to be indexed.", hitDoc.get(FieldName.EntryContent.toString()));
-//    }
-//    ireader.close();
-//    directory.close();
-//  }
-
-  public List<net.deepthought.data.search.specific.IndexTerm> getAllTerms() throws IOException {
-    List<net.deepthought.data.search.specific.IndexTerm> allTerms = new ArrayList<>();
-    DirectoryReader reader = DirectoryReader.open(directory);
-    Fields fields = MultiFields.getFields(reader);
-
-    Bits liveDocs = MultiFields.getLiveDocs(reader);
-    DocsEnum docsEnum = null;
-
-    for (String field : fields) {
-      Terms terms = fields.terms(field);
-      TermsEnum termsEnum = terms.iterator(null);
-      int count = 0;
-      BytesRef text;
-      while((text = termsEnum.next()) != null) {
-        count++;
-        net.deepthought.data.search.specific.IndexTerm indexTerm = new IndexTerm(text.utf8ToString(), termsEnum.docFreq());
-        allTerms.add(indexTerm);
-
-        docsEnum = termsEnum.docs(liveDocs, docsEnum, DocsEnum.FLAG_FREQS);
-        if(docsEnum != null) {
-          int docId;
-          while ((docId = docsEnum.nextDoc()) != DocsEnum.NO_MORE_DOCS) {
-            Document doc = reader.document(docId);
-            IndexableField idField = doc.getField("id");
-            String[] values = doc.getValues("id");
-            indexTerm.addEntryContainingTerm(idField.numericValue().longValue());
-          }
-        }
-      }
-
-      System.out.println(count);
-    }
-
-    return allTerms;
-  }
-
-  protected IndexReader extractTermsFromEntryIndexReader = null;
-
-  public List<String> extractTermsFromEntry(Entry entry) {
-    Set<Term> extractedTerms = new HashSet<>();
-
-    extractedTerms.addAll(extractTermsFromText(entry.getAbstractAsPlainText()));
-    extractedTerms.addAll(extractTermsFromText(entry.getContentAsPlainText()));
-
-    TreeSet<Term> sortedTerms = new TreeSet<>(new Comparator<Term>() {
-      @Override
-      public int compare(Term term1, Term term2) {
-        Long term1Frequency = 0L, term2Frequency = 0L;
-        try {
-          term1Frequency = extractTermsFromEntryIndexReader.totalTermFreq(term1);
-          term2Frequency = extractTermsFromEntryIndexReader.totalTermFreq(term2);
-        } catch(Exception ex) { }
-
-        return term1Frequency.compareTo(term2Frequency);
-      }
-    });
-    sortedTerms.addAll(extractedTerms);
-
-    List<String> terms = new ArrayList<>();
-    for(Term term : sortedTerms)
-      terms.add(term.text());
-    return terms;
-  }
-
-    public Set<Term> extractTermsFromText(String text) {
-      text = QueryParser.escape(text);
-      Set<Term> extractedTerms = new HashSet<>();
-
-      if (extractTermsFromEntryIndexReader == null) {
-        try {
-          Language textLanguage = Application.getLanguageDetector().detectLanguageOfText(text);
-//          IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopAnalyzer(Version.LUCENE_47,
-//              DeepThoughtAnalyzer.getLanguageStopWords(textLanguage))));
-          IndexWriter extractTermsFromEntryIndexWriter = new IndexWriter(new RAMDirectory(), new IndexWriterConfig(Version.LUCENE_47, new StopwordAnalyzerBase(Version.LUCENE_47,
-              DeepThoughtAnalyzer.getLanguageStopWords(textLanguage)) {
-
-            @Override
-            protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-              final Tokenizer source = new LetterTokenizer(matchVersion, reader); // don't lowercase as original StopAnalyzer does
-              return new TokenStreamComponents(source, new FilteringTokenFilter(matchVersion,
-                  source) {
-                private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-                @Override
-                protected boolean accept() throws IOException {
-                  return !stopwords.contains(termAtt.buffer(), 0, termAtt.length());
-                }
-              });
-            }
-          }));
-//          extractTermsFromEntryIndexReader = DirectoryReader.open(extractTermsFromEntryIndexWriter, false);
-
-          Document doc = new Document();
-          doc.add(new Field("ExtractTermsFromText", text, TextField.TYPE_NOT_STORED));
-
-          extractTermsFromEntryIndexWriter.addDocument(doc);
-          extractTermsFromEntryIndexWriter.commit();
-
-          extractTermsFromEntryIndexReader = DirectoryReader.open(extractTermsFromEntryIndexWriter, true);
-          IndexSearcher searcher = new IndexSearcher(extractTermsFromEntryIndexReader);
-
-          TermStats[] termStatses = HighFreqTerms.getHighFreqTerms(extractTermsFromEntryIndexReader, 1000, "ExtractTermsFromText", new HighFreqTerms.TotalTermFreqComparator());
-          if(termStatses != null) {
-            for (TermStats stats : termStatses) {
-              if (stats.totalTermFreq > 0) {
-              }
-            }
-          }
-        } catch (Exception ex) { log.warn("Could not open IndexReader for extracting Entry's Terms", ex); }
-      }
-
-      extractTermsFromEntryIndexReader = null;
-      return extractedTerms;
-    }
 
 
 
@@ -1408,33 +1194,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
 
-//  protected EntityListener deepThoughtListener = new EntityListener() {
-//    @Override
-//    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-//
-//    }
-//
-//    @Override
-//    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-//      if(collectionHolder instanceof DeepThought && addedEntity instanceof UserDataEntity)
-//        indexEntity((UserDataEntity)addedEntity);
-//    }
-//
-//    @Override
-//    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-//      if(updatedEntity instanceof UserDataEntity) {
-//        updateIndexForEntity((UserDataEntity) updatedEntity);
-//        checkIfEntityIsOnEntry((UserDataEntity)updatedEntity);
-//      }
-//    }
-//
-//    @Override
-//    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-//      if(collectionHolder instanceof DeepThought && removedEntity instanceof UserDataEntity)
-//        removeEntityFromIndex((UserDataEntity) removedEntity);
-//    }
-//  };
-
   protected void updateIndexForEntity(UserDataEntity updatedEntity) {
     if(indexUpdatedEntitiesAfterMilliseconds == 0)
       doUpdateIndexForEntity(updatedEntity);
@@ -1477,6 +1236,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     updatedEntitiesToIndex.remove(removedEntity);
 
     String idFieldName = getIdFieldNameForEntity(removedEntity);
+    IndexWriter indexWriter = getIndexWriter(removedEntity.getClass());
     try {
       if(idFieldName != null)
         indexWriter.deleteDocuments(new Term(idFieldName, getByteRefFromLong(removedEntity.getId())));
@@ -1484,10 +1244,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
     }
 
-    indexSearcher = null; // so that on next search updates are reflected
+    markIndexHasBeenUpdated(removedEntity.getClass()); // so that on next search updates are reflected
   }
 
-  private String getIdFieldNameForEntity(UserDataEntity entity) {
+  protected String getIdFieldNameForEntity(UserDataEntity entity) {
     if(entity instanceof Entry)
       return FieldName.EntryId;
     else if(entity instanceof Tag)

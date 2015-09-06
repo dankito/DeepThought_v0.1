@@ -27,7 +27,7 @@ public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
 
     switch(databaseType) {
       case SQLite:
-        setDataCollectionFileName("DeepThoughtDb_Tests_SQLite.db");
+        setDataCollectionFileName("DeepThoughtDb_SQLite.db");
         break;
       case H2Embedded:
       case H2Mem:

@@ -23,7 +23,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.After;
 import org.junit.Assert;
@@ -61,15 +60,8 @@ public class LuceneSearchEngineTest {
       @Override
       public ISearchEngine createSearchEngine() {
         try {
-          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine() {
-            @Override
-            protected void setDirectory(Directory directory) {
-              if(directory instanceof RAMDirectory)
-                super.setDirectory(directory);
-              else
-                super.setDirectory(new RAMDirectory());
-            }
-          };
+          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine(new RAMDirectory());
+//          FileUtils.deleteFile(new File(Application.getDataFolderPath(), "index"));
 //          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine();
         } catch(Exception ex) {
           log.error("Could not create LuceneSearchEngine", ex);
@@ -261,7 +253,7 @@ public class LuceneSearchEngineTest {
     List<Category> categoryTwoCollection = new ArrayList<Category>() {{ add(category2); }};
     // TODO: no method to search for Entry Categories yet
 
-    ScoreDoc[] hits = searchEngine.search(new TermQuery(new Term(FieldName.EntryCategories, "periodicals")));
+    ScoreDoc[] hits = searchEngine.search(new TermQuery(new Term(FieldName.EntryCategories, "periodicals")), Entry.class);
     Assert.assertEquals(1, hits.length);
 //    List<Entry> entriesHavingTheseTags = new ArrayList<>();
 //    Set<Tag> notInterestedIn = new HashSet<>();
@@ -274,7 +266,7 @@ public class LuceneSearchEngineTest {
     // ensure category1 cannot be found anymore
     List<Category> categoryOneCollection = new ArrayList<Category>() {{ add(category1); }};
     // TODO as well
-    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryCategories, "quotations")));
+    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryCategories, "quotations")), Entry.class);
     Assert.assertEquals(0, hits2.length);
 //    entriesHavingTheseTags.clear();
 //
@@ -300,7 +292,7 @@ public class LuceneSearchEngineTest {
 
     List<Person> personTwoCollection = new ArrayList<Person>() {{ add(person2); }};
 
-    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryPersons, "gand*")));
+    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryPersons, "gand*")), Entry.class);
     Assert.assertEquals(1, hits.length);
     // TODO: no method to search for Entry Categories yet
 //    List<Entry> entriesHavingTheseTags = new ArrayList<>();
@@ -312,7 +304,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(newEntry, entriesHavingTheseTags.get(0));
 
     // ensure person1 cannot be found anymore
-    ScoreDoc[] hits2 = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryPersons, "mand*")));
+    ScoreDoc[] hits2 = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryPersons, "mand*")), Entry.class);
     Assert.assertEquals(0, hits2.length);
     List<Person> personOneCollection = new ArrayList<Person>() {{ add(person1); }};
     // TODO as well
@@ -338,7 +330,7 @@ public class LuceneSearchEngineTest {
 
     // TODO: now way to search for Entry's Series yet
 
-    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntrySeries, "wikipedia")));
+    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntrySeries, "wikipedia")), Entry.class);
     Assert.assertEquals(1, hits.length);
 //    final List<Entry> results = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -357,7 +349,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(newEntry, results.get(0));
 //
 //    // ensure previous entry content cannot be found anymore
-    ScoreDoc[] hits2 = searchEngine.search(new WildcardQuery(new Term(FieldName.EntrySeries, "Urban*")));
+    ScoreDoc[] hits2 = searchEngine.search(new WildcardQuery(new Term(FieldName.EntrySeries, "Urban*")), Entry.class);
     Assert.assertEquals(0, hits2.length);
 //    results.clear();
 //    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
@@ -390,7 +382,7 @@ public class LuceneSearchEngineTest {
 
     // TODO: now way to search for Entry's Reference yet
 
-    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryReference, "koran")));
+    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryReference, "koran")), Entry.class);
     Assert.assertEquals(1, hits.length);
 //    final List<Entry> results = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -409,7 +401,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(newEntry, results.get(0));
 //
 //    // ensure previous entry content cannot be found anymore
-    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryReference, "bible")));
+    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryReference, "bible")), Entry.class);
     Assert.assertEquals(0, hits2.length);
 //    results.clear();
 //    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
@@ -442,7 +434,7 @@ public class LuceneSearchEngineTest {
 
     // TODO: now way to search for Entry's Reference yet
 
-    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryReferenceSubDivision, "love")));
+    ScoreDoc[] hits = searchEngine.search(new WildcardQuery(new Term(FieldName.EntryReferenceSubDivision, "love")), Entry.class);
     Assert.assertEquals(1, hits.length);
 //    final List<Entry> results = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -461,7 +453,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(newEntry, results.get(0));
 //
 //    // ensure previous entry content cannot be found anymore
-    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryReferenceSubDivision, "hate")));
+    ScoreDoc[] hits2 = searchEngine.search(new TermQuery(new Term(FieldName.EntryReferenceSubDivision, "hate")), Entry.class);
     Assert.assertEquals(0, hits2.length);
 //    results.clear();
 //    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);

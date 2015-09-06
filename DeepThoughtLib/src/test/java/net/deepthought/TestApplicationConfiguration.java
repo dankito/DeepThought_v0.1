@@ -93,6 +93,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
   public IPreferencesStore getPreferencesStore() {
     return new PreferencesStoreBase() {
       @Override
+      public String getDataFolder() {
+        return "data/tests/";
+      }
+
+      @Override
       protected String readValueFromStore(String key, String defaultValue) {
         return "";
       }

@@ -76,23 +76,18 @@ public class FieldName {
 
   public final static String NoteNote = "note_note";
 
-//  Id("id"),
-//  EntryAbstract("abstract"),
-//  EntryContent("content"),
-//  EntryTags("tags"),
-//  EntryNoTags("no_tags"),
-//  ;
-//
-//  protected String name;
-//
-//  FieldName(String name) {
-//    this.name = name;
-//  }
-//
-//
-//  @Override
-//  public String toString() {
-//    return this.name;
-//  }
+
+  /*      Files      */
+
+  public final static String FileId = "file_id";
+
+  public final static String FileName = "file_name";
+
+  public final static String FileUri = "file_uri";
+
+  public final static String FileSourceUri = "file_source_uri";
+
+  public final static String FileDescription = "file_description";
+
 
 }
