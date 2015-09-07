@@ -230,7 +230,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
 
       for(Class classWithOwnIndexDirectory : ClassesWithOwnIndexDirectories) {
-        File indexDirectory = new File(deepThoughtIndexDirectory, classWithOwnIndexDirectory.getName());
+        File indexDirectory = new File(deepThoughtIndexDirectory, getDirectoryNameForClass(classWithOwnIndexDirectory));
         directories.put(classWithOwnIndexDirectory, FSDirectory.open(indexDirectory));
       }
 
@@ -242,10 +242,23 @@ public class LuceneSearchEngine extends SearchEngineBase {
       createIndexSearchersAndWriters();
 
       if(indexDirExists == false)
-        rebuildIndexAsync();
+        rebuildIndex(); // do not rebuild index asynchronously as Application depends on some functions of SearchEngine (like Entries without Tags)
     } catch(Exception ex) {
       log.error("Could not open Lucene Index Directory for DeepThought " + deepThought, ex);
     }
+  }
+
+  protected String getDirectoryNameForClass(Class classWithOwnIndexDirectory) {
+    if(Entry.class.equals(classWithOwnIndexDirectory))
+      return "entries";
+    if(ReferenceBase.class.equals(classWithOwnIndexDirectory))
+      return "references";
+    if(Category.class.equals(classWithOwnIndexDirectory))
+      return "categories";
+    if(FileLink.class.equals(classWithOwnIndexDirectory))
+      return "files";
+
+    return classWithOwnIndexDirectory.getSimpleName().toLowerCase() + "s"; // 's' for plural
   }
 
   protected void createIndexSearchersAndWriters() {
@@ -379,19 +392,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return DefaultIndexDirectoryClass;
   }
 
-
-  /**
-   * Know what you do when you call this method!
-   * Deletes index and rebuilds it from scratch which can take a very long time if you have a big database
-   */
-  public void rebuildIndexAsync() {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        rebuildIndex();
-      }
-    });
-  }
 
   /**
    * Know what you do when you call this method!

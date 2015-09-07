@@ -90,6 +90,9 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
   public void setSeries(SeriesTitle series) {
+    if(this.series == series)
+      return;
+
     Object previousValue = this.series;
     List<Entry> entriesBackup = new ArrayList<>(entries);
     if(this.series != null)

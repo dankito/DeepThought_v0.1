@@ -19,12 +19,15 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
 
   protected EntityManagerConfiguration entityManagerConfiguration;
 
+  protected String defaultDataFolder = "data/tests/";
+
 
   public TestApplicationConfiguration() {
 
   }
 
   public TestApplicationConfiguration(String dataFolder) {
+    this.defaultDataFolder = dataFolder;
     this.entityManagerConfiguration = new TestEntityManagerConfiguration(dataFolder);
   }
 
@@ -94,7 +97,7 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
     return new PreferencesStoreBase() {
       @Override
       public String getDataFolder() {
-        return "data/tests/";
+        return defaultDataFolder;
       }
 
       @Override

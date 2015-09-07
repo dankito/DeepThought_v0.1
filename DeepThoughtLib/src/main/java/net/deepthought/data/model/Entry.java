@@ -238,6 +238,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public void setSeries(SeriesTitle series) {
+    if(this.series == series)
+      return;
+
     Object previousValue = this.series;
 
     if(this.series != null) {
@@ -266,6 +269,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public void setReference(Reference reference) {
+    if(this.reference == reference)
+      return;
+
     Object previousValue = this.reference;
 
     if(this.reference != null) {
@@ -297,6 +303,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
   public void setReferenceSubDivision(ReferenceSubDivision referenceSubDivision) {
+    if(this.referenceSubDivision == referenceSubDivision)
+      return;
+
     Object previousValue = this.referenceSubDivision;
 
     if(this.referenceSubDivision != null)

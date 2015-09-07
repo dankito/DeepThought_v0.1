@@ -92,6 +92,9 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   }
 
   public void setReference(Reference reference) {
+    if(this.reference == reference)
+      return;
+
     Object previousValue = this.reference;
     List<Entry> entriesBackup = new ArrayList<>(entries); // after calling reference.removeSubDivision() entries will be empty
     if(this.reference != null && this.reference.equals(reference) == false)
