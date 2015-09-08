@@ -38,6 +38,7 @@ import net.deepthought.fragments.EntriesOverviewFragment;
 import net.deepthought.fragments.SearchFragment;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 
@@ -278,6 +279,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        menu.findItem(R.id.action_device_registration).setTitle(Localization.getLocalizedString("device.registration"));
 
         return true;
     }

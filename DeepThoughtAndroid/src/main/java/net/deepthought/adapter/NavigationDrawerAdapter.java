@@ -8,6 +8,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import net.deepthought.R;
+import net.deepthought.util.Localization;
 
 /**
  * Created by renard on 28/12/13.
@@ -43,10 +44,12 @@ public class NavigationDrawerAdapter extends BaseAdapter implements ListAdapter 
         }
         int textId = 0;
         int iconId = 0;
+        String text = null;
 
         switch (position) {
             case 0:
-                textId = R.string.device_registration;
+//                textId = R.string.device_registration;
+                text = Localization.getLocalizedString("device.registration");
 //                iconId = R.drawable.ic_whats_new;
                 break;
 //            case 1:

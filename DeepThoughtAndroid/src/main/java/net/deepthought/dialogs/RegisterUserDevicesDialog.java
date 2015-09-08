@@ -28,6 +28,7 @@ import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.helper.AlertHelper;
+import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
 public class RegisterUserDevicesDialog extends DialogFragment {
@@ -55,14 +56,15 @@ public class RegisterUserDevicesDialog extends DialogFragment {
     View view = inflater.inflate(R.layout.dialog_register_user_devices, container, false);
     setupControls(view);
 
-    getDialog().setTitle(R.string.device_registration);
+    getDialog().setTitle(Localization.getLocalizedString("device.registration"));
 
     return view;
   }
 
   protected void setupControls(View view) {
     spnDeviceRegistrationOptions = (Spinner)view.findViewById(R.id.spnDeviceRegistrationOptions);
-    String[] options = { getString(R.string.option_device_registration_open_server), getString(R.string.option_device_search_registration_servers) };
+    String[] options = { Localization.getLocalizedString("open.registration.server"), Localization.getLocalizedString("open.registration.server")
+                         /*, Localization.getLocalizedString("show.registered.devices")*/ };
     spnDeviceRegistrationOptions.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, options));
     spnDeviceRegistrationOptions.setOnItemSelectedListener(spnDeviceRegistrationOptionsItemSelectedListener);
 
@@ -147,8 +149,8 @@ public class RegisterUserDevicesDialog extends DialogFragment {
 
   protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    builder = builder.setTitle(R.string.alert_title_ask_for_device_registration);
-    String message = String.format(getActivity().getString(R.string.alert_message_ask_for_device_registration), extractUserInfoString(request.getUser()),
+    builder = builder.setTitle(Localization.getLocalizedString("alert.title.ask.for.device.registration"));
+    String message = Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()),
         extractDeviceInfoString(request.getDevice()), request.getAddress());
     builder = builder.setMessage(message);
 
