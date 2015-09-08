@@ -17,6 +17,7 @@ import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.util.Localization;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,6 +56,8 @@ public class LuceneSearchEngineTest {
 
   @Before
   public void setup() throws IOException {
+    Localization.setLanguageLocale(Locale.ENGLISH); // for date handling
+
     Application.instantiate(new TestApplicationConfiguration() {
 //    Application.instantiate(new TestApplicationConfiguration(new OrmLiteJavaSeEntityManager()) {
 
@@ -613,6 +617,71 @@ public class LuceneSearchEngineTest {
     Assert.assertTrue(results.contains(entry3));
   }
 
+  @Test
+  public void filterEntries_SearchResultIsInCorrectOrder() {
+    Entry entry1 = new Entry("", "Mandela");
+    Entry entry2 = new Entry("", "Mother");
+    Entry entry3 = new Entry("", "Mahatma");
+    deepThought.addEntry(entry1);
+    deepThought.addEntry(entry2);
+    deepThought.addEntry(entry3);
+
+    final List<Entry> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterEntries(new FilterEntriesSearch("m", true, true, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+    Assert.assertEquals(entry3, results.get(0)); // search results must be in reverse order than created order (newer ones being shown first)
+    Assert.assertEquals(entry2, results.get(1));
+    Assert.assertEquals(entry1, results.get(2));
+  }
+
+  @Test
+  public void filterEntriesWithGermanUmlaut() {
+    Entry entry = new Entry("", "Ägyptischer Journalist");
+    deepThought.addEntry(entry);
+
+    final List<Entry> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterEntries(new FilterEntriesSearch("äg", true, true, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size()); // ensure a search term with a German Umlaut gets found
+    Assert.assertTrue(results.contains(entry));
+
+    results.clear();
+    final CountDownLatch secondCountDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterEntries(new FilterEntriesSearch("aeg", true, true, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> result) {
+        results.addAll(result);
+        secondCountDownLatch.countDown();
+      }
+    }));
+
+    try { secondCountDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size()); // ensure a search term with its Umlaut equivalent doesn't get found
+  }
+
 
   @Test
   public void addTag_TagGetsIndexed() {
@@ -915,6 +984,106 @@ public class LuceneSearchEngineTest {
     try { countDownLatch.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
+  }
+
+  @Test
+  public void filterPersons_SearchResultsAreInCorrectAlphabeticalOrder() {
+    Person person1 = new Person("Mother", "Teresa");
+    Person person2 = new Person("Mahatma", "Gandhi");
+    Person person3 = new Person("Nelson", "Mandela");
+    deepThought.addPerson(person1);
+    deepThought.addPerson(person2);
+    deepThought.addPerson(person3);
+
+    final List<Person> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterPersons(new Search<Person>("m", new SearchCompletedListener<Collection<Person>>() {
+      @Override
+      public void completed(Collection<Person> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+    Assert.assertEquals(person2, results.get(0));
+    Assert.assertEquals(person3, results.get(1));
+    Assert.assertEquals(person1, results.get(2));
+  }
+
+  @Test
+  public void filterPersonsWithIdenticalLastNames_SearchResultsAreInCorrectAlphabeticalOrder() {
+    Person person1 = new Person("Mohandas Karamchand", "Gandhi");
+    Person person2 = new Person("Mahatma", "Gandhi");
+    deepThought.addPerson(person1);
+    deepThought.addPerson(person2);
+
+    final List<Person> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterPersons(new Search<Person>("gand", new SearchCompletedListener<Collection<Person>>() {
+      @Override
+      public void completed(Collection<Person> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(2, results.size());
+    Assert.assertEquals(person2, results.get(0));
+    Assert.assertEquals(person1, results.get(1));
+  }
+
+  @Test
+  public void filterPersonsForFirstAndLastName_SearchResultsAreInCorrectAlphabeticalOrder() {
+    Person person1 = new Person("Mohandas Karamchand", "Gandhi");
+    Person person2 = new Person("Mahatma", "Gandhi");
+    deepThought.addPerson(person1);
+    deepThought.addPerson(person2);
+
+    final List<Person> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterPersons(new Search<Person>("gand, m", new SearchCompletedListener<Collection<Person>>() {
+      @Override
+      public void completed(Collection<Person> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(2, results.size());
+    Assert.assertEquals(person2, results.get(0));
+    Assert.assertEquals(person1, results.get(1));
+  }
+
+  @Test
+  public void filterPersonWithTwoFirstNames_SearchingForSecondFirstName_PersonGetsFound() {
+    Person person = new Person("Mohandas Karamchand", "Gandhi");
+    deepThought.addPerson(person);
+
+    final List<Person> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterPersons(new Search<Person>("karam", new SearchCompletedListener<Collection<Person>>() {
+      @Override
+      public void completed(Collection<Person> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(person, results.get(0));
   }
 
 
@@ -1483,6 +1652,37 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
+  public void filterSeriesTitlesOnly_SearchResultIsInCorrectOrder() {
+    SeriesTitle seriesTitleGandhiMohandas = new SeriesTitle("Gandhi", "Mohandas");
+    SeriesTitle seriesTitleTeresa = new SeriesTitle("Teresa");
+    SeriesTitle seriesTitleGandhiMahatma = new SeriesTitle("Gandhi", "Mahatma");
+    SeriesTitle seriesTitleMandela = new SeriesTitle("Mandela");
+    deepThought.addSeriesTitle(seriesTitleGandhiMohandas);
+    deepThought.addSeriesTitle(seriesTitleTeresa);
+    deepThought.addSeriesTitle(seriesTitleGandhiMahatma);
+    deepThought.addSeriesTitle(seriesTitleMandela);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("a", ReferenceBaseType.SeriesTitle, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(4, results.size());
+    Assert.assertEquals(seriesTitleGandhiMahatma, results.get(0));
+    Assert.assertEquals(seriesTitleGandhiMohandas, results.get(1));
+    Assert.assertEquals(seriesTitleMandela, results.get(2));
+    Assert.assertEquals(seriesTitleTeresa, results.get(3));
+  }
+
+  @Test
   public void filterReferencesOnly_OtherReferenceBaseTypesDontGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
@@ -1495,6 +1695,60 @@ public class LuceneSearchEngineTest {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
     searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("test", ReferenceBaseType.Reference, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(reference, results.get(0));
+  }
+
+  @Test
+  public void filterReferencesOnly_SearchResultIsInCorrectOrder() {
+    Reference referenceGandhiMohandas = new Reference("Gandhi", "Mohandas");
+    Reference referenceTeresa = new Reference("Teresa");
+    Reference referenceGandhiMahatma = new Reference("Gandhi", "Mahatma");
+    Reference referenceMandela = new Reference("Mandela");
+    deepThought.addReference(referenceGandhiMohandas);
+    deepThought.addReference(referenceTeresa);
+    deepThought.addReference(referenceGandhiMahatma);
+    deepThought.addReference(referenceMandela);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("a", ReferenceBaseType.Reference, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(4, results.size());
+    Assert.assertEquals(referenceGandhiMahatma, results.get(0));
+    Assert.assertEquals(referenceGandhiMohandas, results.get(1));
+    Assert.assertEquals(referenceMandela, results.get(2));
+    Assert.assertEquals(referenceTeresa, results.get(3));
+  }
+
+  @Test
+  public void filterReferencesOnly_UnrecognizedDateFormatIsSetAsIssue_ReferenceGetsFoundAnyway() {
+    Reference reference = new Reference("Test");
+    reference.setIssueOrPublishingDate("04 / 2015");
+    deepThought.addReference(reference);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("04", ReferenceBaseType.Reference, new SearchCompletedListener<Collection<ReferenceBase>>() {
       @Override
       public void completed(Collection<ReferenceBase> result) {
         results.addAll(result);
@@ -1535,6 +1789,37 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
+  public void filterReferenceSubDivisionsOnly_SearchResultIsInCorrectOrder() {
+    ReferenceSubDivision subDivisionGandhiMohandas = new ReferenceSubDivision("Gandhi", "Mohandas");
+    ReferenceSubDivision subDivisionTeresa = new ReferenceSubDivision("Teresa");
+    ReferenceSubDivision subDivisionGandhiMahatma = new ReferenceSubDivision("Gandhi", "Mahatma");
+    ReferenceSubDivision subDivisionMandela = new ReferenceSubDivision("Mandela");
+    deepThought.addReferenceSubDivision(subDivisionGandhiMohandas);
+    deepThought.addReferenceSubDivision(subDivisionTeresa);
+    deepThought.addReferenceSubDivision(subDivisionGandhiMahatma);
+    deepThought.addReferenceSubDivision(subDivisionMandela);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("a", ReferenceBaseType.ReferenceSubDivision, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(4, results.size());
+    Assert.assertEquals(subDivisionGandhiMahatma, results.get(0));
+    Assert.assertEquals(subDivisionGandhiMohandas, results.get(1));
+    Assert.assertEquals(subDivisionMandela, results.get(2));
+    Assert.assertEquals(subDivisionTeresa, results.get(3));
+  }
+
+  @Test
   public void filterAllReferenceBaseTypes_AllGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
@@ -1560,6 +1845,171 @@ public class LuceneSearchEngineTest {
     Assert.assertTrue(results.contains(seriesTitle));
     Assert.assertTrue(results.contains(reference));
     Assert.assertTrue(results.contains(subDivision));
+  }
+
+  @Test
+  public void filterAllReferenceBaseTypes_SeriesTitlesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+    SeriesTitle seriesTitleSzJetzt = new SeriesTitle("SZ", "Jetzt");
+    SeriesTitle seriesTitleSzMagazin = new SeriesTitle("SZ", "Magazin");
+    SeriesTitle seriesTitleSz = new SeriesTitle("SZ", "");
+    deepThought.addSeriesTitle(seriesTitleSzJetzt);
+    deepThought.addSeriesTitle(seriesTitleSzMagazin);
+    deepThought.addSeriesTitle(seriesTitleSz);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("sz", ReferenceBaseType.All, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+
+    // the two SeriesTitle will be retrieved first, in correct alphabetical order
+    Assert.assertEquals(seriesTitleSz, results.get(0));
+    Assert.assertEquals(seriesTitleSzJetzt, results.get(1));
+    Assert.assertEquals(seriesTitleSzMagazin, results.get(2));
+  }
+
+  @Test
+  public void filterAllReferenceBaseTypes_ReferencesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+    Reference referenceSzJetzt = new Reference("SZ", "Jetzt");
+    Reference referenceSzMagazin = new Reference("SZ", "Magazin");
+    Reference referenceSz = new Reference("SZ", "");
+    deepThought.addReference(referenceSzJetzt);
+    deepThought.addReference(referenceSzMagazin);
+    deepThought.addReference(referenceSz);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("sz", ReferenceBaseType.All, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+
+    // the two SeriesTitle will be retrieved first, in correct alphabetical order
+    Assert.assertEquals(referenceSz, results.get(0));
+    Assert.assertEquals(referenceSzJetzt, results.get(1));
+    Assert.assertEquals(referenceSzMagazin, results.get(2));
+  }
+
+  @Test
+  public void filterAllReferenceBaseTypes_ReferenceSubDivisionsHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+    ReferenceSubDivision subDivisionSzJetzt = new ReferenceSubDivision("SZ", "Jetzt");
+    ReferenceSubDivision subDivisionSzMagazin = new ReferenceSubDivision("SZ", "Magazin");
+    ReferenceSubDivision subDivisionSz = new ReferenceSubDivision("SZ", "");
+    deepThought.addReferenceSubDivision(subDivisionSzJetzt);
+    deepThought.addReferenceSubDivision(subDivisionSzMagazin);
+    deepThought.addReferenceSubDivision(subDivisionSz);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("sz", ReferenceBaseType.All, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+
+    // the two SeriesTitle will be retrieved first, in correct alphabetical order
+    Assert.assertEquals(subDivisionSz, results.get(0));
+    Assert.assertEquals(subDivisionSzJetzt, results.get(1));
+    Assert.assertEquals(subDivisionSzMagazin, results.get(2));
+  }
+
+  @Test
+  public void filterAllReferenceBaseTypes_TheyAreSortedCorrectly() {
+    SeriesTitle seriesTitleSzMagazin = new SeriesTitle("SZ Magazin");
+    SeriesTitle seriesTitleSz = new SeriesTitle("SZ");
+    deepThought.addSeriesTitle(seriesTitleSzMagazin);
+    deepThought.addSeriesTitle(seriesTitleSz);
+
+    Reference reference_SZ_Magazin_1983_10_20 = new Reference();
+    reference_SZ_Magazin_1983_10_20.setIssueOrPublishingDate("10/20/1983");
+    Reference reference_SZ_1988_03_27 = new Reference();
+    reference_SZ_1988_03_27.setIssueOrPublishingDate("03/27/1988");
+    Reference reference_SZ_1983_10_20 = new Reference();
+    reference_SZ_1983_10_20.setIssueOrPublishingDate("10/20/1983");
+    Reference reference_SZ_Magazin_2222_12_31 = new Reference();
+    reference_SZ_Magazin_2222_12_31.setIssueOrPublishingDate("12/31/2222");
+    deepThought.addReference(reference_SZ_Magazin_1983_10_20);
+    deepThought.addReference(reference_SZ_1988_03_27);
+    deepThought.addReference(reference_SZ_1983_10_20);
+    deepThought.addReference(reference_SZ_Magazin_2222_12_31);
+
+    seriesTitleSz.addSerialPart(reference_SZ_1988_03_27);
+    seriesTitleSz.addSerialPart(reference_SZ_1983_10_20);
+    seriesTitleSzMagazin.addSerialPart(reference_SZ_Magazin_1983_10_20);
+    seriesTitleSzMagazin.addSerialPart(reference_SZ_Magazin_2222_12_31); // a Date starting with 01. may not be ordered before 20. when it's in a later year
+
+    ReferenceSubDivision subDivisionKarteDerSchande = new ReferenceSubDivision("Karte der Schande");
+    ReferenceSubDivision subDivisionSkandal = new ReferenceSubDivision("Dieser Skandal sollte vertuscht werden");
+    ReferenceSubDivision subDivisionPharmaindustrie = new ReferenceSubDivision("Die Pharmaindustrie ist schlimmer als die Mafia");
+    ReferenceSubDivision subDivisionEier = new ReferenceSubDivision("Das Zerquetschen von Eiern");
+    ReferenceSubDivision subDivisionFuture = new ReferenceSubDivision("The Future is now");
+    deepThought.addReferenceSubDivision(subDivisionEier);
+    deepThought.addReferenceSubDivision(subDivisionKarteDerSchande);
+    deepThought.addReferenceSubDivision(subDivisionSkandal);
+    deepThought.addReferenceSubDivision(subDivisionPharmaindustrie);
+    deepThought.addReferenceSubDivision(subDivisionFuture);
+
+    reference_SZ_1983_10_20.addSubDivision(subDivisionSkandal);
+    reference_SZ_1983_10_20.addSubDivision(subDivisionPharmaindustrie);
+    reference_SZ_1988_03_27.addSubDivision(subDivisionKarteDerSchande);
+    reference_SZ_Magazin_1983_10_20.addSubDivision(subDivisionEier);
+    reference_SZ_Magazin_2222_12_31.addSubDivision(subDivisionFuture);
+
+    final List<ReferenceBase> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.filterReferenceBases(new FilterReferenceBasesSearch("sz", ReferenceBaseType.All, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(11, results.size());
+
+    // the two SeriesTitle will be retrieved first, in correct alphabetical order
+    Assert.assertEquals(seriesTitleSz, results.get(0));
+    Assert.assertEquals(seriesTitleSzMagazin, results.get(1));
+
+    // then the References will be retrieved, in correct alphabetical and temporal order
+    Assert.assertEquals(reference_SZ_1988_03_27, results.get(2));
+    Assert.assertEquals(reference_SZ_1983_10_20, results.get(3));
+    Assert.assertEquals(reference_SZ_Magazin_2222_12_31, results.get(4));
+    Assert.assertEquals(reference_SZ_Magazin_1983_10_20, results.get(5));
+
+    // and at least the ReferenceSubDivisions, also in  correct alphabetical and temporal order
+    Assert.assertEquals(subDivisionKarteDerSchande, results.get(6));
+    Assert.assertEquals(subDivisionPharmaindustrie, results.get(7));
+    Assert.assertEquals(subDivisionSkandal, results.get(8));
+    Assert.assertEquals(subDivisionFuture, results.get(9));
+    Assert.assertEquals(subDivisionEier, results.get(10));
   }
 
 

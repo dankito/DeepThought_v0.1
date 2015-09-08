@@ -14,12 +14,10 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.AllEntitiesListener;
-import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
-import net.deepthought.data.search.results.LazyLoadingReferenceBasesSearchResultsList;
 import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
@@ -31,7 +29,9 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -45,8 +45,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
@@ -76,13 +74,21 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LuceneSearchEngine extends SearchEngineBase {
 
-  public static final String NoTagsFieldValue = "notags";
-  public static final String NoCategoriesFieldValue = "nocategories";
-  public static final String NoPersonsFieldValue = "nopersons";
-  public static final String NoNotesFieldValue = "nonotes";
-  public static final String NoSeriesFieldValue = "noseries";
-  public static final String NoReferenceFieldValue = "noreference";
-  public static final String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
+  public final static String NoTagsFieldValue = "notags";
+  public final static String NoCategoriesFieldValue = "nocategories";
+  public final static String NoPersonsFieldValue = "nopersons";
+  public final static String NoNotesFieldValue = "nonotes";
+  public final static String NoSeriesFieldValue = "noseries";
+  public final static String NoReferenceFieldValue = "noreference";
+  public final static String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
+
+  public final static int SeriesTitleReferenceBaseType = 1;
+  public final static int ReferenceReferenceBaseType = 2;
+  public final static int ReferenceSubDivisionReferenceBaseType = 3;
+
+  public static BytesRef SeriesTitleReferenceBaseTypeIntRef;
+  public static BytesRef ReferenceReferenceBaseTypeIntRef;
+  public static BytesRef ReferenceSubDivisionReferenceBaseTypeIntRef;
 
 
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
@@ -111,6 +117,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   public LuceneSearchEngine() {
+    SeriesTitleReferenceBaseTypeIntRef = getByteRefFromInteger(SeriesTitleReferenceBaseType);
+    ReferenceReferenceBaseTypeIntRef = getByteRefFromInteger(ReferenceReferenceBaseType);
+    ReferenceSubDivisionReferenceBaseTypeIntRef = getByteRefFromInteger(ReferenceSubDivisionReferenceBaseType);
+    
     if(deepThought != null)
       deepThoughtChanged(null, deepThought);
   }
@@ -538,17 +548,17 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     try {
       if (entry.getReferenceSubDivision() != null)
-        doc.add(new Field(FieldName.EntryReferenceSubDivision, getReferenceSubDivisionTitleValue(entry.getReferenceSubDivision()), TextField.TYPE_NOT_STORED));
+        doc.add(new Field(FieldName.EntryReferenceSubDivision, getReferenceSubDivisionIndexTerm(entry.getReferenceSubDivision()), TextField.TYPE_NOT_STORED));
       else
         doc.add(new Field(FieldName.EntryNoReferenceSubDivision, NoReferenceSubDivisionFieldValue, TextField.TYPE_NOT_STORED));
 
       if (entry.getReference() != null && StringUtils.isNotNullOrEmpty(entry.getReference().getTextRepresentation()))
-        doc.add(new Field(FieldName.EntryReference, getReferenceTitleValue(entry.getReference()), TextField.TYPE_NOT_STORED));
+        doc.add(new Field(FieldName.EntryReference, getReferenceIndexTerm(entry.getReference()), TextField.TYPE_NOT_STORED));
       else
         doc.add(new Field(FieldName.EntryNoReference, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
 
       if (entry.getSeries() != null)
-        doc.add(new Field(FieldName.EntrySeries, getSeriesTitleTitleValue(entry.getSeries()), TextField.TYPE_NOT_STORED));
+        doc.add(new Field(FieldName.EntrySeries, getReferenceBaseTitleIndexTerm(entry.getSeries()), TextField.TYPE_NOT_STORED));
       else
         doc.add(new Field(FieldName.EntryNoSeries, NoSeriesFieldValue, TextField.TYPE_NOT_STORED));
     } catch(Exception ex) {
@@ -583,8 +593,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.PersonId, person.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.PersonFirstName, person.getFirstName().toLowerCase(), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.PersonLastName, person.getLastName().toLowerCase(), TextField.TYPE_NOT_STORED));
+    doc.add(new StringField(FieldName.PersonFirstName, person.getFirstName().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.PersonLastName, person.getLastName().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, Person.class);
   }
@@ -593,69 +603,90 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.ReferenceBaseId, seriesTitle.getId(), Field.Store.YES));
-//    doc.add(new Field(FieldName.SeriesTitleTitle, getSeriesTitleTitleValue(seriesTitle), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.SeriesTitleTitle, getSeriesTitleTitleValue(seriesTitle), TextField.TYPE_STORED));
+    doc.add(new IntField(FieldName.ReferenceBaseType, SeriesTitleReferenceBaseType, Field.Store.NO));
 
-//    doc.add(new Field(FieldName.ReferenceTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
-//    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
+    addSeriesTitleFields(seriesTitle, doc);
 
     indexDocument(doc, ReferenceBase.class);
   }
 
-  protected String getSeriesTitleTitleValue(SeriesTitle seriesTitle) {
-    return seriesTitle.getTitle() + " " + seriesTitle.getSubTitle();
+  protected void addSeriesTitleFields(SeriesTitle seriesTitle, Document doc) {
+    doc.add(new StringField(FieldName.SeriesTitleTitle, getReferenceBaseTitleIndexTerm(seriesTitle), Field.Store.NO));
+  }
+
+  protected String getReferenceBaseTitleIndexTerm(ReferenceBase referenceBase) {
+    String indexTerm = referenceBase.getSubTitle() == null ? referenceBase.getTitle() : referenceBase.getTitle() + " " + referenceBase.getSubTitle();
+    return indexTerm.trim().toLowerCase();
   }
 
   protected void indexReference(Reference reference) {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.ReferenceBaseId, reference.getId(), Field.Store.YES));
-//    doc.add(new Field(FieldName.ReferenceTitle, getReferenceTitleValue(reference), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.ReferenceTitle, reference.getPreview() + " " + reference.getIssueOrPublishingDate() + " " + reference.getSubTitle(), TextField.TYPE_STORED));
-    if(reference.getPublishingDate() != null)
-      addDateFieldToDocument(doc, FieldName.ReferencePublishingDate, reference.getPublishingDate());
+    doc.add(new IntField(FieldName.ReferenceBaseType, ReferenceReferenceBaseType, Field.Store.NO));
 
-//    if(reference.getSeries() != null)
-////      doc.add(new Field(FieldName.ReferenceSeriesTitle, getSeriesTitleTitleValue(reference.getSeries()), TextField.TYPE_NOT_STORED));
-//      doc.add(new Field(FieldName.SeriesTitleTitle, getSeriesTitleTitleValue(reference.getSeries()), TextField.TYPE_NOT_STORED));
-//    else
-//      doc.add(new Field(FieldName.SeriesTitleTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
-//
-//    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
+    addReferenceFields(reference, doc);
 
     indexDocument(doc, ReferenceBase.class);
   }
 
-  protected String getReferenceTitleValue(Reference reference) {
-    return reference.getTitle() + " " + reference.getSubTitle() + " " + reference.getIssueOrPublishingDate();
+  protected void addReferenceFields(Reference reference, Document doc) {
+//    doc.add(new StringField(FieldName.ReferenceTitle, getReferenceIndexTerm(reference), Field.Store.NO));
+    doc.add(new StringField(FieldName.ReferenceTitle, getReferenceBaseTitleIndexTerm(reference), Field.Store.NO));
+
+    if(reference.getIssueOrPublishingDate() != null)
+      doc.add(new StringField(FieldName.ReferenceIssueOrPublishingDate, reference.getIssueOrPublishingDate(), Field.Store.NO));
+
+    if(reference.getPublishingDate() != null)
+      doc.add(new LongField(FieldName.ReferencePublishingDate, reference.getPublishingDate().getTime(), Field.Store.NO));
+
+    if(reference.getSeries() != null)
+      addSeriesTitleFields(reference.getSeries(), doc);
+  }
+
+  protected String getReferenceIndexTerm(Reference reference) {
+//    return (reference.getPreview() + " " + reference.getIssueOrPublishingDate() + " " + reference.getSubTitle()).toLowerCase();
+
+    String indexTerm = reference.getTitle();
+    if(reference.getSubTitle() != null)
+      indexTerm = indexTerm + " " + reference.getSubTitle();
+
+    if(reference.getSeries() != null)
+      indexTerm = getReferenceBaseTitleIndexTerm(reference.getSeries()) + " " + indexTerm;
+
+    return indexTerm.trim().toLowerCase();
   }
 
   protected void indexReferenceSubDivision(ReferenceSubDivision referenceSubDivision) {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.ReferenceBaseId, referenceSubDivision.getId(), Field.Store.YES));
-//    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, getReferenceSubDivisionTitleValue(referenceSubDivision), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.ReferenceSubDivisionTitle, referenceSubDivision.getTextRepresentation() + " " + referenceSubDivision.getSubTitle(), TextField.TYPE_STORED));
+    doc.add(new IntField(FieldName.ReferenceBaseType, ReferenceSubDivisionReferenceBaseType, Field.Store.NO));
 
-//    if(referenceSubDivision.getReference() != null) {
-//      Reference reference = referenceSubDivision.getReference();
-////      doc.add(new Field(FieldName.ReferenceSubDivisionReference, getReferenceTitleValue(reference), TextField.TYPE_NOT_STORED));
-//      doc.add(new Field(FieldName.ReferenceTitle, getReferenceTitleValue(reference), TextField.TYPE_NOT_STORED));
-//
-//      if (reference.getSeries() != null)
-////        doc.add(new Field(FieldName.ReferenceSubDivisionSeriesTitle, getSeriesTitleTitleValue(reference.getSeries()), TextField.TYPE_NOT_STORED));
-//        doc.add(new Field(FieldName.SeriesTitleTitle, getSeriesTitleTitleValue(reference.getSeries()), TextField.TYPE_NOT_STORED));
-//      else
-//        doc.add(new Field(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
-//    }
-//    else
-//      doc.add(new Field(FieldName.ReferenceTitle, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
+    addReferenceSubDivisionFields(referenceSubDivision, doc);
 
     indexDocument(doc, ReferenceBase.class);
   }
 
-  protected String getReferenceSubDivisionTitleValue(ReferenceSubDivision referenceSubDivision) {
-    return referenceSubDivision.getTitle() + " " + referenceSubDivision.getSubTitle();
+  protected void addReferenceSubDivisionFields(ReferenceSubDivision referenceSubDivision, Document doc) {
+    doc.add(new StringField(FieldName.ReferenceSubDivisionTitle, getReferenceBaseTitleIndexTerm(referenceSubDivision), Field.Store.NO));
+
+    if(referenceSubDivision.getReference() != null) {
+      addReferenceFields(referenceSubDivision.getReference(), doc);
+    }
+  }
+
+  protected String getReferenceSubDivisionIndexTerm(ReferenceSubDivision subDivision) {
+//    return (referenceSubDivision.getTextRepresentation() + " " + referenceSubDivision.getSubTitle()).toLowerCase();
+
+    String indexTerm = subDivision.getTitle();
+    if(subDivision.getSubTitle() != null)
+      indexTerm = indexTerm + " " + subDivision.getSubTitle();
+
+    if(subDivision.getReference() != null)
+      indexTerm = getReferenceIndexTerm(subDivision.getReference()) + " " + indexTerm;
+
+    return indexTerm.trim().toLowerCase();
   }
 
   protected void indexNote(Note note) {
@@ -686,7 +717,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void addDateFieldToDocument(Document doc, String fieldName, Date date, DateTools.Resolution resolution) {
     doc.add(new Field(fieldName,
         DateTools.timeToString(date.getTime(), resolution),
-        Field.Store.YES, Field.Index.NOT_ANALYZED));
+        Field.Store.NO, Field.Index.NOT_ANALYZED));
   }
 
   protected Query createQueryForDateField(String fieldName, Date date) {
@@ -727,8 +758,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
       @Override
       public void run() {
         try {
-          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending));
-        } catch(Exception ex) {
+          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryId));
+        } catch (Exception ex) {
           log.error("Could not search for Entries without Tags", ex);
         }
       }
@@ -740,11 +771,12 @@ public class LuceneSearchEngine extends SearchEngineBase {
       if(search.isInterrupted())
         return;
       try {
-        Query query = new WildcardQuery(new Term(FieldName.TagName, "*" + tagNameToFilterFor + "*"));
+        String searchTerm = "*" + QueryParser.escape(tagNameToFilterFor) + "*";
+        Query query = new WildcardQuery(new Term(FieldName.TagName, searchTerm));
         if(search.isInterrupted())
           return;
 
-        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class, FieldName.TagId, 1000)));
+        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class, FieldName.TagId, 10000)));
       } catch(Exception ex) {
         log.error("Could not parse query " + tagNamesToFilterFor, ex);
         // TODO: set error flag in search
@@ -817,7 +849,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       query.add(termQuery, BooleanClause.Occur.MUST);
     }
 
-    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending);
+    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending, FieldName.EntryId);
   }
 
   @Override
@@ -825,287 +857,127 @@ public class LuceneSearchEngine extends SearchEngineBase {
     BooleanQuery query = new BooleanQuery();
     personFilter = QueryParser.escape(personFilter);
 
-//    query.add(new PrefixQuery(new Term(FieldName.PersonFirstName, personFilter)), BooleanClause.Occur.SHOULD);
     query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + personFilter + "*")), BooleanClause.Occur.SHOULD);
-//    query.add(new PrefixQuery(new Term(FieldName.PersonLastName, personFilter)), BooleanClause.Occur.SHOULD);
     query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + personFilter + "*")), BooleanClause.Occur.SHOULD);
 
-    executeQuery(search, query, Person.class, FieldName.PersonId);
+    executeQuery(search, query, Person.class, FieldName.PersonId, SortOrder.Ascending, FieldName.PersonLastName, FieldName.PersonFirstName);
   }
 
   @Override
   protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
+    lastNameFilter = QueryParser.escape(lastNameFilter);
+    firstNameFilter = QueryParser.escape(firstNameFilter);
+
     BooleanQuery query = new BooleanQuery();
 
-    try {
-//        QueryParser parser = new QueryParser(FieldName.EntryContent, analyzer);
-//        query.add(parser.parse(firstNameFilter), BooleanClause.Occur.SHOULD);
-//      query.add(new PrefixQuery(new Term(FieldName.PersonFirstName, firstNameFilter)), BooleanClause.Occur.MUST);
-      firstNameFilter = QueryParser.escape(firstNameFilter);
-      query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + firstNameFilter + "*")), BooleanClause.Occur.MUST);
-//      query.add(new TermQuery(new Term(FieldName.PersonFirstName, firstNameFilter)), BooleanClause.Occur.MUST);
-    } catch(Exception ex) {
-      log.error("Could not parse query " + firstNameFilter, ex);
-      // TODO: set error flag in search
-      search.fireSearchCompleted();
-      return;
-    }
-    try {
-//        QueryParser parser = new QueryParser(FieldName.EntryContent, analyzer);
-//        query.add(parser.parse(lastNameFilter), BooleanClause.Occur.SHOULD);
-//      query.add(new PrefixQuery(new Term(FieldName.PersonLastName, lastNameFilter)), BooleanClause.Occur.MUST);
-      lastNameFilter = QueryParser.escape(lastNameFilter);
-      query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + lastNameFilter + "*")), BooleanClause.Occur.MUST);
-//      query.add(new TermQuery(new Term(FieldName.PersonLastName, lastNameFilter)), BooleanClause.Occur.MUST);
-    } catch(Exception ex) {
-      log.error("Could not parse query " + lastNameFilter, ex);
-      // TODO: set error flag in search
-      search.fireSearchCompleted();
-      return;
-    }
+    query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + lastNameFilter + "*")), BooleanClause.Occur.MUST);
+    query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + firstNameFilter + "*")), BooleanClause.Occur.MUST);
 
-    executeQuery(search, query, Person.class, FieldName.PersonId);
+    executeQuery(search, query, Person.class, FieldName.PersonId, SortOrder.Ascending, FieldName.PersonLastName, FieldName.PersonFirstName);
   }
 
   @Override
   protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
-    CombinedLazyLoadingList<ReferenceBase> searchResults = new CombinedLazyLoadingList<>();
-    IndexSearcher searcher = getIndexSearcher(ReferenceBase.class);
+    BooleanQuery query = new BooleanQuery();
+
     referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
     referenceBaseFilter = "*" + referenceBaseFilter + "*";
 
-//    query.add(new PrefixQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-    Query seriesTitleQuery = new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseFilter));
-    try {
-//      searchResults.addAll(new LazyLoadingLuceneSearchResultsList<ReferenceBase>(getIndexSearcher(), seriesTitleQuery, SeriesTitle.class,))
-      ScoreDoc[] hits = searcher.search(seriesTitleQuery, 1000, new Sort(new SortField(FieldName.SeriesTitleTitle, SortField.Type.STRING))).scoreDocs;
-      if(search.isInterrupted())
-        return;
-      Collection<Long> entityIds = getEntityIds(FieldName.ReferenceBaseId, hits, searcher);
-      searchResults.addAll(new LazyLoadingList<ReferenceBase>(ReferenceBase.class, entityIds));
-    } catch(Exception ex) {
-      log.error("Could not search SeriesTitles for " + search, ex);
-    }
+    query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
 
     if(search.isInterrupted())
       return;
 
-//    query.add(new PrefixQuery(new Term(FieldName.ReferenceTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-    Query referencesQuery = new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceBaseFilter));
-    try {
-      ScoreDoc[] hits = searcher.search(referencesQuery, 1000,
-          new Sort(new SortField(FieldName.ReferencePublishingDate, SortField.Type.STRING), new SortField(FieldName.ReferenceTitle, SortField.Type.STRING))).scoreDocs;
-      if(search.isInterrupted())
-        return;
-      Collection<Long> entityIds = getEntityIds(FieldName.ReferenceBaseId, hits, searcher);
-      searchResults.addAll(new LazyLoadingList<ReferenceBase>(ReferenceBase.class, entityIds));
-    } catch(Exception ex) {
-      log.error("Could not search SeriesTitles for " + search, ex);
-    }
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
 
     if(search.isInterrupted())
       return;
 
-//    query.add(new PrefixQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-    Query referenceSubDivisionsQuery = new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseFilter));
-    try {
-      ScoreDoc[] hits = searcher.search(referenceSubDivisionsQuery, 1000, new Sort(new SortField(FieldName.ReferenceSubDivisionTitle, SortField.Type.STRING))).scoreDocs;
-      if(search.isInterrupted())
-        return;
-      Collection<Long> entityIds = getEntityIds(FieldName.ReferenceBaseId, hits, searcher);
-      searchResults.addAll(new LazyLoadingList<ReferenceBase>(ReferenceBase.class, entityIds));
-    } catch(Exception ex) {
-      log.error("Could not search SeriesTitles for " + search, ex);
-    }
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
 
-    search.setResults(searchResults);
-    search.fireSearchCompleted();
+    executeReferenceBaseQuery(search, query);
   }
-
-  protected Collection<Long> getEntityIds(String idFieldName, ScoreDoc[] hits, IndexSearcher searcher) {
-    Set<Long> ids = new HashSet<>();
-
-    try {
-      for (int index = 0; index < hits.length; index++) {
-//        ids.add(getEntityIdForIndex(index));
-        Document hitDoc = searcher.doc(hits[index].doc);
-        ids.add(hitDoc.getField(idFieldName).numericValue().longValue());
-      }
-    } catch(Exception ex) {
-      log.error("Could not get all Entity IDs from Lucene Search Result", ex);
-    }
-
-    return ids;
-  }
-
-//  @Override
-//  protected void filterAllReferenceBaseTypesForSameFilter(Search search, String referenceBaseFilter) {
-//    BooleanQuery query = new BooleanQuery();
-//    referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
-//
-////    query.add(new PrefixQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-//    query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, "*" + referenceBaseFilter + "*")), BooleanClause.Occur.SHOULD);
-////    query.add(new PrefixQuery(new Term(FieldName.ReferenceTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-//    query.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, "*" + referenceBaseFilter + "*")), BooleanClause.Occur.SHOULD);
-////    query.add(new PrefixQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-//    query.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, "*" + referenceBaseFilter + "*")), BooleanClause.Occur.SHOULD);
-//
-////    executeQuery(search, query, ReferenceBase.class, FieldName.ReferenceBaseId);
-//    search.setResults(new LazyLoadingReferenceBasesSearchResultsList(getIndexSearcher(), query, 10000));
-//    search.fireSearchCompleted();
-//  }
 
   @Override
   protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     BooleanQuery query = new BooleanQuery();
 
     if(seriesTitleFilter != null) {
-      try {
-//        QueryParser parser = new QueryParser(FieldName.EntryContent, analyzer);
-//        query.add(parser.parse(contentFilter), BooleanClause.Occur.SHOULD);
-//        query.add(new PrefixQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleFilter)), BooleanClause.Occur.MUST);
-//        query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, "*" + seriesTitleFilter + "*")), BooleanClause.Occur.MUST);
+      seriesTitleFilter = "*" + QueryParser.escape(seriesTitleFilter) + "*";
+      BooleanQuery seriesTitleQuery = new BooleanQuery();
 
-        QueryParser parser = new QueryParser(Version.LUCENE_47, FieldName.SeriesTitleTitle, defaultAnalyzer);
-        parser.setAllowLeadingWildcard(true);
-        String escapedSearchText = QueryParser.escape(seriesTitleFilter);
-        query.add(parser.parse("*" + escapedSearchText + "*"), BooleanClause.Occur.MUST);
-      } catch(Exception ex) {
-        log.error("Could not parse query " + seriesTitleFilter, ex);
-        // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
-      }
+      seriesTitleQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, SeriesTitleReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
+      seriesTitleQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleFilter)), BooleanClause.Occur.MUST);
+
+      query.add(seriesTitleQuery, BooleanClause.Occur.MUST);
     }
-//    else
-//      query.add(new TermQuery(new Term(FieldName.SeriesTitleTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
+
+    if(search.isInterrupted())
+      return;
 
     if(referenceFilter != null) {
-      try {
-//        QueryParser parser = new QueryParser(FieldName.EntryAbstract, analyzer);
-//        query.add(parser.parse(abstractFilter), BooleanClause.Occur.SHOULD);
-//        query.add(new PrefixQuery(new Term(FieldName.ReferenceTitle, referenceFilter)), BooleanClause.Occur.MUST);
-//        query.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, "*" + referenceFilter + "*")), BooleanClause.Occur.MUST);
+      referenceFilter = "*" + QueryParser.escape(referenceFilter) + "*";
+      BooleanQuery referenceQuery = new BooleanQuery();
+      referenceQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, ReferenceReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
 
-        QueryParser parser = new QueryParser(Version.LUCENE_47, FieldName.ReferenceTitle, defaultAnalyzer);
-        parser.setAllowLeadingWildcard(true);
-        String escapedSearchText = QueryParser.escape(referenceFilter);
-        query.add(parser.parse("*" + escapedSearchText + "*"), BooleanClause.Occur.MUST);
-      } catch(Exception ex) {
-        log.error("Could not parse query " + referenceFilter, ex);
-        // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
-      }
+      BooleanQuery referenceValuesQuery = new BooleanQuery();
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceFilter)), BooleanClause.Occur.SHOULD);
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceFilter)), BooleanClause.Occur.SHOULD);
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceFilter)), BooleanClause.Occur.SHOULD);
+      referenceQuery.add(referenceValuesQuery, BooleanClause.Occur.MUST);
+
+      query.add(referenceQuery, BooleanClause.Occur.MUST);
     }
-//    else if(referenceSubDivisionFilter == null)
-//      query.add(new TermQuery(new Term(FieldName.ReferenceTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
-//      try {
-//        query.add((new QueryParser(Version.LUCENE_47, FieldName.ReferenceTitle, defaultAnalyzer)).parse(NoReferenceFieldValue), BooleanClause.Occur.MUST);
-//      } catch(Exception ex) { }
+
+    if(search.isInterrupted())
+      return;
 
     if(referenceSubDivisionFilter != null) {
-      try {
-//        QueryParser parser = new QueryParser(FieldName.EntryAbstract, analyzer);
-//        query.add(parser.parse(abstractFilter), BooleanClause.Occur.SHOULD);
-//        query.add(new PrefixQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceSubDivisionFilter)), BooleanClause.Occur.MUST);
-//        query.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, "*" + referenceSubDivisionFilter + "*")), BooleanClause.Occur.MUST);
+      referenceSubDivisionFilter = "*" + QueryParser.escape(referenceSubDivisionFilter) + "*";
+      BooleanQuery subDivisionQuery = new BooleanQuery();
+      subDivisionQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, ReferenceSubDivisionReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
 
-        QueryParser parser = new QueryParser(Version.LUCENE_47, FieldName.ReferenceSubDivisionTitle, defaultAnalyzer);
-        parser.setAllowLeadingWildcard(true);
-        String escapedSearchText = QueryParser.escape(referenceSubDivisionFilter);
-        query.add(parser.parse("*" + escapedSearchText + "*"), BooleanClause.Occur.MUST);
-      } catch(Exception ex) {
-        log.error("Could not parse query " + referenceSubDivisionFilter, ex);
-        // TODO: set error flag in search
-        search.fireSearchCompleted();
-        return;
-      }
+      BooleanQuery subDivisionValuesQuery = new BooleanQuery();
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
+      subDivisionQuery.add(subDivisionValuesQuery, BooleanClause.Occur.MUST);
+
+      query.add(subDivisionQuery, BooleanClause.Occur.MUST);
     }
-//    else
-//      query.add(new TermQuery(new Term(FieldName.ReferenceSubDivisionTitle, NoReferenceFieldValue)), BooleanClause.Occur.MUST);
-//    try {
-//      query.add((new QueryParser(Version.LUCENE_47, FieldName.ReferenceSubDivisionTitle, defaultAnalyzer)).parse(NoReferenceFieldValue), BooleanClause.Occur.MUST);
-//    } catch(Exception ex) { }
 
-//    executeQuery(search, query, ReferenceBase.class, FieldName.ReferenceBaseId);
-    search.setResults(new LazyLoadingReferenceBasesSearchResultsList(getIndexSearcher(ReferenceBase.class), query, 10000));
-    search.fireSearchCompleted();
+    executeReferenceBaseQuery(search, query);
   }
 
-  protected void filterSeriesTitles(Search search, String seriesTitleFilter) {
-//    Analyzer analyzer = getAnalyzerForTextLanguage(search.getSearchTerm());
-//        QueryParser parser = new QueryParser(FieldName.SeriesTitleTitle, analyzer);
-//    Query query = new PrefixQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleFilter));
-//    Query query = new WildcardQuery(new Term(FieldName.SeriesTitleTitle, "*" + seriesTitleFilter + "*"));
+  protected void executeReferenceBaseQuery(FilterReferenceBasesSearch search, Query query) {
+    if(search.isInterrupted())
+      return;
+    log.debug("Executing ReferenceBase Query " + query);
 
     try {
-      QueryParser parser = new QueryParser(Version.LUCENE_47, FieldName.SeriesTitleTitle, defaultAnalyzer);
-      parser.setAllowLeadingWildcard(true);
-      String escapedSearchText = QueryParser.escape(seriesTitleFilter);
-      Query query = parser.parse("*" + escapedSearchText + "*");
-
-      executeQuery(search, query, ReferenceBase.class, FieldName.ReferenceBaseId);
+      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(ReferenceBase.class), query, ReferenceBase.class, FieldName.ReferenceBaseId, 10000,
+          SortOrder.Ascending, FieldName.ReferenceBaseType, FieldName.SeriesTitleTitle, FieldName.ReferenceTitle, FieldName.ReferencePublishingDate, FieldName.ReferenceSubDivisionTitle));
     } catch(Exception ex) {
-      log.error("Could not parse query " + seriesTitleFilter, ex);
-      // TODO: set error flag in search
-      search.fireSearchCompleted();
+      log.error("Could not execute Query " + query.toString(), ex);
+      // TODO: set error flag in Search
     }
-  }
 
-//  @Override
-  protected void filterReferences(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-    // TODO:
-//    super.filterReferences(search, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
+    search.fireSearchCompleted();
   }
-
-//  @Override
-  protected void filterReferenceSubDivisions(Search search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-    // TODO:
-//    super.filterReferenceSubDivisions(search, reference, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
-  }
-
-//  protected void filterReferences(Search search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-//    for(Reference reference : Application.getDeepThought().getReferences()) {
-//      if(search.isInterrupted())
-//        return;
-//
-//      if(referenceSubDivisionFilter == null && reference.getTextRepresentation().toLowerCase().contains(referenceFilter) && // cannot fulfill all filters as ReferenceSubDivisionFilter is set and it isn't a ReferenceSubDivision
-//          ((seriesTitleFilter == null && reference.getSeries() == null) ||
-//              seriesTitleFilter != null && reference.getSeries() != null && reference.getSeries().getTextRepresentation().toLowerCase().contains(seriesTitleFilter)))
-//        search.addResult(reference);
-//
-//      if(referenceSubDivisionFilter != null)
-//        filterReferenceSubDivisions(search, reference, seriesTitleFilter, referenceFilter, referenceSubDivisionFilter);
-//    }
-//  }
-//
-//  protected void filterReferenceSubDivisions(Search search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
-//    for(ReferenceSubDivision subDivision : reference.getSubDivisions()) {
-//      if(search.isInterrupted())
-//        return;
-//
-//      if(subDivision.getTextRepresentation().toLowerCase().contains(referenceSubDivisionFilter) &&
-//          ((referenceFilter == null && subDivision.getReference() == null) ||
-//              (referenceFilter != null && subDivision.getReference() != null && subDivision.getReference().getTextRepresentation().toLowerCase().contains(referenceFilter))) &&
-//          ((seriesTitleFilter == null && (subDivision.getReference() == null || subDivision.getReference().getSeries() == null)) ||
-//              (seriesTitleFilter != null && subDivision.getReference() != null && subDivision.getReference().getSeries() != null &&
-//                  subDivision.getReference().getSeries().getTextRepresentation().toLowerCase().contains(seriesTitleFilter))))
-//        search.addResult(subDivision);
-//    }
-//  }
 
   protected void executeQuery(Search search, Query query, Class<? extends BaseEntity> resultEntityClass, String idFieldName) {
     executeQuery(search, query, resultEntityClass, idFieldName, SortOrder.Unsorted);
   }
 
-  protected void executeQuery(Search search, Query query, Class<? extends BaseEntity> resultEntityClass, String idFieldName, SortOrder sortOrder) {
+  protected void executeQuery(Search search, Query query, Class<? extends BaseEntity> resultEntityClass, String idFieldName, SortOrder sortOrder, String... sortFieldNames) {
     if(search.isInterrupted())
       return;
     log.debug("Executing Query " + query);
 
     try {
-      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(resultEntityClass), query, resultEntityClass, idFieldName, 1000, sortOrder));
+      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(resultEntityClass), query, resultEntityClass, idFieldName, 1000, sortOrder, sortFieldNames));
     } catch(Exception ex) {
       log.error("Could not execute Query " + query.toString(), ex);
       // TODO: set error flag in Search
@@ -1138,11 +1010,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
 
-  protected BytesRef getByteRefFromLong(Long longValue) {
-//    BytesRefBuilder byteRefBuilder = new BytesRefBuilder();
-//    NumericUtils.longToPrefixCoded(longValue, 0, byteRefBuilder);
-//    return byteRefBuilder.toBytesRef();
+  protected BytesRef getByteRefFromInteger(int intValue) {
+    BytesRef bytesRef = new BytesRef(NumericUtils.BUF_SIZE_INT);
+    NumericUtils.intToPrefixCoded(intValue, 0, bytesRef);
 
+    return bytesRef;
+  }
+
+  protected BytesRef getByteRefFromLong(Long longValue) {
     BytesRef bytesRef = new BytesRef(NumericUtils.BUF_SIZE_LONG);
     NumericUtils.longToPrefixCoded(longValue, 0, bytesRef);
 

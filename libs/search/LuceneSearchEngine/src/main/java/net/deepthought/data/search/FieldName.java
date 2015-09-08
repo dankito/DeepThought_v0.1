@@ -61,10 +61,12 @@ public class FieldName {
   /*      References      */
 
   public final static String ReferenceBaseId = "reference_base_id";
+  public final static String ReferenceBaseType = "reference_base_type";
 
   public final static String SeriesTitleTitle = "series_title_title";
 
   public final static String ReferenceTitle = "reference_title";
+  public final static String ReferenceIssueOrPublishingDate = "reference_issue_or_publishing_date";
   public final static String ReferencePublishingDate = "reference_publishing_date";
 
   public final static String ReferenceSubDivisionTitle = "reference_sub_division_title";
