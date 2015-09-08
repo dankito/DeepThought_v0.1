@@ -465,6 +465,6 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
     log.error("Could not create Entry from Source " + source, error.getException());
-    Alerts.showErrorMessage(stageToShowIn, error.getNotificationMessage(), Localization.getLocalizedString("can.not.create.entry.from", source));
+    Alerts.showErrorMessage(stageToShowIn, error.getNotificationMessage(), Localization.getLocalizedString("can.not.create.entry.from", source), error.getException());
   }
 }

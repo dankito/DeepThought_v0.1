@@ -23,7 +23,6 @@ import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
@@ -518,52 +517,52 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     if(entry.hasTags()) {
       for (Tag tag : entry.getTags()) {
-        doc.add(new Field(FieldName.EntryTags, tag.getName(), TextField.TYPE_NOT_STORED));
         doc.add(new LongField(FieldName.EntryTagsIds, tag.getId(), Field.Store.YES));
+//        doc.add(new StringField(FieldName.EntryTags, tag.getName().toLowerCase(), Field.Store.YES));
       }
     }
     else
-      doc.add(new Field(FieldName.EntryNoTags, NoTagsFieldValue, TextField.TYPE_NOT_STORED)); // TODO: isn't it better to just store it? As in this way value gets analyzed
+      doc.add(new StringField(FieldName.EntryNoTags, NoTagsFieldValue, Field.Store.NO));
 
-    if(entry.hasCategories()) {
-      for (Category category : entry.getCategories())
-        doc.add(new Field(FieldName.EntryCategories, category.getName(), TextField.TYPE_NOT_STORED));
-    }
-    else
-      doc.add(new Field(FieldName.EntryNoCategories, NoCategoriesFieldValue, TextField.TYPE_NOT_STORED));
-
-    if(entry.hasPersons()) {
-      for (Person person : entry.getPersons())
-        doc.add(new Field(FieldName.EntryPersons, person.getFirstName() + " " + person.getLastName(), TextField.TYPE_NOT_STORED));
-    }
-    else
-      doc.add(new Field(FieldName.EntryNoPersons, NoPersonsFieldValue, TextField.TYPE_NOT_STORED));
-
-    if(entry.hasNotes()) {
-      for (Note note : entry.getNotes())
-        doc.add(new Field(FieldName.EntryNotes, note.getNote(), TextField.TYPE_NOT_STORED));
-    }
-    else
-      doc.add(new Field(FieldName.EntryNoNotes, NoNotesFieldValue, TextField.TYPE_NOT_STORED));
-
-    try {
-      if (entry.getReferenceSubDivision() != null)
-        doc.add(new Field(FieldName.EntryReferenceSubDivision, getReferenceSubDivisionIndexTerm(entry.getReferenceSubDivision()), TextField.TYPE_NOT_STORED));
-      else
-        doc.add(new Field(FieldName.EntryNoReferenceSubDivision, NoReferenceSubDivisionFieldValue, TextField.TYPE_NOT_STORED));
-
-      if (entry.getReference() != null && StringUtils.isNotNullOrEmpty(entry.getReference().getTextRepresentation()))
-        doc.add(new Field(FieldName.EntryReference, getReferenceIndexTerm(entry.getReference()), TextField.TYPE_NOT_STORED));
-      else
-        doc.add(new Field(FieldName.EntryNoReference, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
-
-      if (entry.getSeries() != null)
-        doc.add(new Field(FieldName.EntrySeries, getReferenceBaseTitleIndexTerm(entry.getSeries()), TextField.TYPE_NOT_STORED));
-      else
-        doc.add(new Field(FieldName.EntryNoSeries, NoSeriesFieldValue, TextField.TYPE_NOT_STORED));
-    } catch(Exception ex) {
-      log.error("Could not index Reference of Entry " + entry, ex);
-    }
+//    if(entry.hasCategories()) {
+//      for (Category category : entry.getCategories())
+//        doc.add(new Field(FieldName.EntryCategories, category.getName(), TextField.TYPE_NOT_STORED));
+//    }
+//    else
+//      doc.add(new StringField(FieldName.EntryNoCategories, NoCategoriesFieldValue, Field.Store.NO));
+//
+//    if(entry.hasPersons()) {
+//      for (Person person : entry.getPersons())
+//        doc.add(new Field(FieldName.EntryPersons, person.getFirstName() + " " + person.getLastName(), TextField.TYPE_NOT_STORED));
+//    }
+//    else
+//      doc.add(new Field(FieldName.EntryNoPersons, NoPersonsFieldValue, TextField.TYPE_NOT_STORED));
+//
+//    if(entry.hasNotes()) {
+//      for (Note note : entry.getNotes())
+//        doc.add(new Field(FieldName.EntryNotes, note.getNote(), TextField.TYPE_NOT_STORED));
+//    }
+//    else
+//      doc.add(new Field(FieldName.EntryNoNotes, NoNotesFieldValue, TextField.TYPE_NOT_STORED));
+//
+//    try {
+//      if (entry.getReferenceSubDivision() != null)
+//        doc.add(new Field(FieldName.EntryReferenceSubDivision, getReferenceSubDivisionIndexTerm(entry.getReferenceSubDivision()), TextField.TYPE_NOT_STORED));
+//      else
+//        doc.add(new Field(FieldName.EntryNoReferenceSubDivision, NoReferenceSubDivisionFieldValue, TextField.TYPE_NOT_STORED));
+//
+//      if (entry.getReference() != null && StringUtils.isNotNullOrEmpty(entry.getReference().getTextRepresentation()))
+//        doc.add(new Field(FieldName.EntryReference, getReferenceIndexTerm(entry.getReference()), TextField.TYPE_NOT_STORED));
+//      else
+//        doc.add(new Field(FieldName.EntryNoReference, NoReferenceFieldValue, TextField.TYPE_NOT_STORED));
+//
+//      if (entry.getSeries() != null)
+//        doc.add(new Field(FieldName.EntrySeries, getReferenceBaseTitleIndexTerm(entry.getSeries()), TextField.TYPE_NOT_STORED));
+//      else
+//        doc.add(new Field(FieldName.EntryNoSeries, NoSeriesFieldValue, TextField.TYPE_NOT_STORED));
+//    } catch(Exception ex) {
+//      log.error("Could not index Reference of Entry " + entry, ex);
+//    }
 
     return doc;
   }
@@ -572,7 +571,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.TagId, tag.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.TagName, tag.getName(), TextField.TYPE_NOT_STORED));
+    doc.add(new StringField(FieldName.TagName, tag.getName().toLowerCase(), Field.Store.NO)); // for an not analyzed String it's important to index it lower case as only than lower case search finds ti
 
     indexDocument(doc, Tag.class);
   }
@@ -584,7 +583,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.CategoryName, category.getName(), TextField.TYPE_NOT_STORED));
+    doc.add(new StringField(FieldName.CategoryName, category.getName().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, Category.class);
   }
@@ -693,7 +692,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.NoteId, note.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.NoteNote, note.getNote(), TextField.TYPE_NOT_STORED));
+    doc.add(new StringField(FieldName.NoteNote, note.getNote().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, Note.class);
   }
@@ -702,10 +701,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
     Document doc = new Document();
 
     doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
-    doc.add(new Field(FieldName.FileName, file.getName(), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.FileUri, file.getUriString(), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.FileSourceUri, file.getSourceUriString(), TextField.TYPE_NOT_STORED));
-    doc.add(new Field(FieldName.FileDescription, file.getNotes(), TextField.TYPE_NOT_STORED));
+    doc.add(new StringField(FieldName.FileName, file.getName().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.FileDescription, file.getNotes().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, FileLink.class);
   }

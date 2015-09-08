@@ -12,10 +12,19 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -27,22 +36,15 @@ public class Alerts {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
       if(deleteCategory)
-//        category.getParentCategory().removeSubCategory(category);
       Application.getDeepThought().removeCategory(category);
     }
     else
-//      category.getParentCategory().removeSubCategory(category);
       Application.getDeepThought().removeCategory(category);
   }
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {
-    Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
-        .message(Localization.getLocalizedString("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()))
-        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-        .showConfirm();
-
-    return Dialog.ACTION_YES.equals(response);
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
   public static void deleteTagWithUserConfirmationIfIsSetOnEntries(Tag tag) {
@@ -60,13 +62,8 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteTagWithEntriesAlert(Tag tag) {
-    Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
-        .message(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()))
-        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-        .showConfirm();
-
-    return Dialog.ACTION_YES.equals(response);
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
   public static void deletePersonWithUserConfirmationIfIsSetOnEntries(Person person) {
@@ -84,13 +81,8 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeletePersonWithEntriesAlert(Person person) {
-    Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.confirm.delete"))
-        .message(Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()))
-        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-        .showConfirm();
-
-    return Dialog.ACTION_YES.equals(response);
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
@@ -103,13 +95,8 @@ public class Alerts {
   }
 
   protected static boolean askUserIfEditedReferenceBaseShouldBeSaved(String referenceBasePreview, String localizedReferenceBaseName) {
-    Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.should.edited.data.be.saved"))
-        .message(Localization.getLocalizedString("alert.message.ask.save.entity", localizedReferenceBaseName, referenceBasePreview))
-        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-        .showConfirm();
-
-    return Dialog.ACTION_YES.equals(response);
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.ask.save.entity", localizedReferenceBaseName, referenceBasePreview),
+        Localization.getLocalizedString("alert.title.should.edited.data.be.saved"));
   }
 
 
@@ -118,14 +105,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    Action response = org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.ask.for.device.registration"))
-        .message(Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())))
-        .actions(Dialog.ACTION_YES, Dialog.ACTION_NO)
-        .owner(windowStage)
-        .showConfirm();
-
-    return Dialog.ACTION_YES.equals(response);
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())),
+        Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
   }
 
   public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
@@ -133,12 +114,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    org.controlsfx.dialog.Dialogs.create()
-        .title(Localization.getLocalizedString("alert.title.device.registration.successful"))
-        .message(Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())))
-        .actions(Dialog.ACTION_OK)
-        .owner(windowStage)
-        .showInformation();
+    showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())),
+        Localization.getLocalizedString("alert.title.device.registration.successful"));
   }
 
   public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
@@ -165,6 +142,25 @@ public class Alerts {
   }
 
 
+  protected static boolean showConfirmationDialog(String message, String alertTitle) {
+    return showConfirmationDialog(message, alertTitle, null);
+  }
+
+  protected static boolean showConfirmationDialog(String message, String alertTitle, Stage owner) {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle(alertTitle);
+    setAlertContent(alert, message);
+    alert.setHeaderText(null);
+
+    alert.getButtonTypes().setAll(ButtonType.NO, ButtonType.YES);
+    if(owner != null)
+      alert.initOwner(owner);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.get() == ButtonType.YES;
+  }
+
+
   public static void showInfoMessage(final Stage owner, final String infoMessage, final String alertTitle) {
     if(Platform.isFxApplicationThread())
       showInfoMessageOnUiThread(owner, infoMessage, alertTitle);
@@ -173,27 +169,94 @@ public class Alerts {
   }
 
   protected static void showInfoMessageOnUiThread(Stage owner, String infoMessage, String alertTitle) {
-    org.controlsfx.dialog.Dialogs.create()
-        .title(alertTitle)
-        .message(infoMessage)
-        .actions(Dialog.ACTION_OK)
-        .owner(owner)
-        .showInformation();
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle(alertTitle);
+    setAlertContent(alert, infoMessage);
+    alert.setHeaderText(null);
+
+    alert.getButtonTypes().setAll(ButtonType.OK);
+    alert.initOwner(owner);
+    alert.showAndWait();
+  }
+
+
+  public static void showErrorMessage(final Stage owner, DeepThoughtError error) {
+    String title = error.getNotificationMessageTitle();
+    String message = error.getNotificationMessage();
+
+    if(error.isSevere()) {
+      title = Localization.getLocalizedString("alert.message.title.severe.error.occurred");
+      message = Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage());
+    }
+    else if(error.getNotificationMessageTitle() == null)
+      title = Localization.getLocalizedString("alert.message.title.error.occurred");
+
+    showErrorMessage(owner, message, title, error.getException());
   }
 
   public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle) {
-    if(Platform.isFxApplicationThread())
-      showErrorMessageOnUiThread(owner, errorMessage, alertTitle);
-    else
-      Platform.runLater(() -> showErrorMessageOnUiThread(owner, errorMessage, alertTitle));
+    showErrorMessage(owner, errorMessage, alertTitle, null);
   }
 
-  protected static void showErrorMessageOnUiThread(Stage owner, String errorMessage, String alertTitle) {
-    org.controlsfx.dialog.Dialogs.create()
-        .title(alertTitle)
-        .message(errorMessage)
-        .actions(Dialog.ACTION_OK)
-        .owner(owner)
-        .showError();
+  public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle, final Exception exception) {
+    if(Platform.isFxApplicationThread())
+      showErrorMessageOnUiThread(owner, errorMessage, alertTitle, exception);
+    else
+      Platform.runLater(() -> showErrorMessageOnUiThread(owner, errorMessage, alertTitle, exception));
+  }
+
+  protected static void showErrorMessageOnUiThread(Stage owner, String errorMessage, String alertTitle, Exception exception) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle(alertTitle);
+    setAlertContent(alert, errorMessage);
+    alert.setHeaderText(null);
+
+    if(exception != null)
+      createExpandableException(alert, exception);
+
+    alert.getButtonTypes().setAll(ButtonType.OK);
+    alert.initOwner(owner);
+    alert.showAndWait();
+  }
+
+
+  protected static void setAlertContent(Alert alert, String content) {
+    Label contentLabel = new Label(content);
+    contentLabel.setWrapText(true);
+    contentLabel.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    contentLabel.setMaxHeight(500);
+    contentLabel.setMaxWidth(500);
+
+    alert.getDialogPane().setPrefHeight(Region.USE_COMPUTED_SIZE);
+    alert.getDialogPane().setMaxHeight(500);
+    alert.getDialogPane().setMaxWidth(500);
+    alert.getDialogPane().setContent(new VBox(contentLabel));
+    VBox.setVgrow(contentLabel, Priority.ALWAYS);
+  }
+
+  protected static void createExpandableException(Alert alert, Exception exception) {
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    exception.printStackTrace(pw);
+    String exceptionText = sw.toString();
+
+    Label label = new Label("The exception stacktrace was:");
+
+    TextArea textArea = new TextArea(exceptionText);
+    textArea.setEditable(false);
+    textArea.setWrapText(true);
+
+    textArea.setMaxWidth(Double.MAX_VALUE);
+    textArea.setMaxHeight(Double.MAX_VALUE);
+    GridPane.setVgrow(textArea, Priority.ALWAYS);
+    GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+    GridPane expContent = new GridPane();
+    expContent.setMaxWidth(Double.MAX_VALUE);
+    expContent.add(label, 0, 0);
+    expContent.add(textArea, 0, 1);
+
+// Set expandable Exception into the dialog pane.
+    alert.getDialogPane().setExpandableContent(expContent);
   }
 }

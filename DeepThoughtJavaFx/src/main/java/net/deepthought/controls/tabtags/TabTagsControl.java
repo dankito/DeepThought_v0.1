@@ -316,8 +316,18 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     showTagsAdheringFilterAndQuickFilter();
     callFilteredTagsChangedListeners(results);
 
-    if (results.isMatch(selectedTag))
-      tblvwTags.getSelectionModel().select(selectedTag);
+    if(results == FilterTagsSearchResults.NoFilterSearchResults)
+      tblvwTags.getSelectionModel().select(deepThought.AllEntriesSystemTag());
+    else if(results.getLastResult().hasExactMatch())
+      tblvwTags.getSelectionModel().select(results.getLastResult().getExactMatch());
+    else {
+      if(results.getAllMatches().size() == 1)
+        tblvwTags.getSelectionModel().select(new ArrayList<Tag>(results.getAllMatches()).get(0));
+      else if(results.getLastResult().getAllMatches().size() == 1)
+        tblvwTags.getSelectionModel().select(new ArrayList<Tag>(results.getLastResult().getAllMatches()).get(0));
+      else if (results.isMatch(selectedTag))
+        tblvwTags.getSelectionModel().select(selectedTag);
+    }
 
     log.debug("Done quick filtering Tags");
   }

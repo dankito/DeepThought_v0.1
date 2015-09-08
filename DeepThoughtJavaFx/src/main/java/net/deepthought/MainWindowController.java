@@ -245,35 +245,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void showErrorOccurredMessage(DeepThoughtError error) {
-    if(error.getNotificationMessageTitle() != null) {
-      Action response = Dialogs.create()
-          .owner(stage)
-          .title(error.getNotificationMessageTitle())
-          .message(error.getNotificationMessage())
-          .actions(Dialog.ACTION_OK)
-          .showException(error.getException());
-    }
-    else if(error.isSevere() == true) {
-      Action response = Dialogs.create()
-          .owner(stage)
-          .title(Localization.getLocalizedString("alert.message.title.severe.error.occurred"))
-          .message(Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage()))
-          .actions(Dialog.ACTION_OK)
-          .showException(error.getException());
-    }
-    else {
-      Dialogs dialog = Dialogs.create()
-          .owner(stage)
-          .title(Localization.getLocalizedString("alert.message.title.error.occurred"))
-          .message(error.getNotificationMessage())
-          .actions(Dialog.ACTION_OK);
-
-      Action response = null;
-      if(error.getException() != null)
-        response = dialog.showException(error.getException());
-      else
-        response = dialog.showError();
-    }
+    Alerts.showErrorMessage(stage, error);
   }
 
   protected void pluginLoaded(IPlugin plugin) {
