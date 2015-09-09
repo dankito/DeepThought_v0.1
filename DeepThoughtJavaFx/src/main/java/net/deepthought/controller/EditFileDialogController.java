@@ -5,6 +5,7 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileNameSuggestion;
@@ -30,6 +31,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
@@ -321,10 +323,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
         Platform.runLater(new Runnable() {
           @Override
           public void run() {
-            org.controlsfx.dialog.Dialogs.create()
-                .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
-                .message(error.getNotificationMessage())
-                .showError();
+            Alerts.showErrorMessage(windowStage, Localization.getLocalizedString("error.could.not.copy.file.to.destination"), error.getNotificationMessage());
           }
         });
       }
@@ -350,10 +349,7 @@ public class EditFileDialogController extends ChildWindowsController implements 
         Platform.runLater(new Runnable() {
           @Override
           public void run() {
-            org.controlsfx.dialog.Dialogs.create()
-                .title(Localization.getLocalizedString("error.could.not.copy.file.to.destination"))
-                .message(error.getNotificationMessage())
-                .showError();
+            Alerts.showErrorMessage(windowStage, Localization.getLocalizedString("error.could.not.copy.file.to.destination"), error.getNotificationMessage());
           }
         });
       }
@@ -369,16 +365,11 @@ public class EditFileDialogController extends ChildWindowsController implements 
   @Override
   protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
-      Action response = org.controlsfx.dialog.Dialogs.create()
-          .owner(windowStage)
-          .title(Localization.getLocalizedString("alert.title.file.contains.unsaved.changes"))
-              .message(Localization.getLocalizedString("alert.message.file.contains.unsaved.changes"))
-              .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
-              .showConfirm();
+      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "file");
 
-      if(response.equals(Dialog.ACTION_CANCEL))
+      if(result.equals(ButtonType.CANCEL))
         return false;
-      else if(response.equals(Dialog.ACTION_YES)) {
+      else if(result.equals(ButtonType.YES)) {
         saveEditedFields();
       }
     }

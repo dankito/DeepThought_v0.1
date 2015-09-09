@@ -47,11 +47,8 @@ import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 
-import org.controlsfx.control.action.Action;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

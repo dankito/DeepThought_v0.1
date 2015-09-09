@@ -15,6 +15,7 @@ import net.deepthought.data.backup.listener.RestoreBackupListener;
 import net.deepthought.data.merger.enums.MergeEntities;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
 
@@ -263,10 +264,8 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
     else {
       BackupFileServiceType fileServiceType = getFileServiceTypeForBackupFile(txtfldChooseBackupFilePath.getText());
       if(fileServiceType == FileServiceTypeNotFoundForThisFile) {
-        org.controlsfx.dialog.Dialogs.create()
-            .title(Localization.getLocalizedString("error.can.not.restore.backup.file"))
-            .message(Localization.getLocalizedString("error.can.not.restore.backup.file.of.this.type", txtfldChooseBackupFilePath.getText()))
-            .showError();
+        Alerts.showErrorMessage(windowStage, Localization.getLocalizedString("error.can.not.restore.backup.file"),
+            Localization.getLocalizedString("error.can.not.restore.backup.file.of.this.type", txtfldChooseBackupFilePath.getText()));
         return;
       }
       else
@@ -337,15 +336,11 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
           @Override
           public void run() {
             if(successful)
-              org.controlsfx.dialog.Dialogs.create()
-                  .title(Localization.getLocalizedString("restoring.backup.was.successful"))
-                  .message(Localization.getLocalizedString("successfully.restored.backup.file", result.getBackup().getFilePath()))
-                  .showInformation();
+              Alerts.showInfoMessage(windowStage, Localization.getLocalizedString("restoring.backup.was.successful"),
+                  Localization.getLocalizedString("successfully.restored.backup.file", result.getBackup().getFilePath()));
             else
-              org.controlsfx.dialog.Dialogs.create()
-                  .title(Localization.getLocalizedString("error.could.not.restore.backup"))
-                  .message(Localization.getLocalizedString("error.could.not.restore.backup.file", result.getBackup().getFilePath(), result.getError()))
-                  .showError();
+              Alerts.showErrorMessage(windowStage, Localization.getLocalizedString("error.could.not.restore.backup"),
+                  Localization.getLocalizedString("error.could.not.restore.backup.file", result.getBackup().getFilePath(), result.getError()));
 
             closeDialog(DialogResult.Ok);
           }

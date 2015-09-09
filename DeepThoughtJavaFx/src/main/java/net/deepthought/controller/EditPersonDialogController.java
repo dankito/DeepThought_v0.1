@@ -8,11 +8,8 @@ import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.Localization;
-
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 
 import java.net.URL;
 import java.util.Collection;
@@ -25,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -177,16 +175,11 @@ public class EditPersonDialogController extends ChildWindowsController implement
   @Override
   protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
-      Action response = Dialogs.create()
-          .owner(windowStage)
-          .title(Localization.getLocalizedString("alert.title.person.contains.unsaved.changes"))
-          .message(Localization.getLocalizedString("alert.message.person.contains.unsaved.changes"))
-          .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
-          .showConfirm();
+      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "person");
 
-      if(response.equals(Dialog.ACTION_CANCEL))
+      if(result.equals(ButtonType.CANCEL))
         return false;
-      else if(response.equals(Dialog.ACTION_YES)) {
+      else if(result.equals(ButtonType.YES)) {
         saveEditedFields();
       }
     }

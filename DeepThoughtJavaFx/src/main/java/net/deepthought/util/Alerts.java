@@ -99,6 +99,28 @@ public class Alerts {
         Localization.getLocalizedString("alert.title.should.edited.data.be.saved"));
   }
 
+  // TODO: merge with that ones above
+  public static ButtonType askUserIfEditedEntityShouldBeSaved(Stage owner, String entityNameResourceKey) {
+    String translatedEntityName = Localization.getLocalizedString(entityNameResourceKey);
+
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle(Localization.getLocalizedString("alert.title.entity.contains.unsaved.changes", translatedEntityName));
+    setAlertContent(alert, Localization.getLocalizedString("alert.message.entity.contains.unsaved.changes", translatedEntityName));
+    alert.setHeaderText(null);
+
+    alert.getButtonTypes().clear();
+//    alert.getButtonTypes().setAll(ButtonType.CANCEL, ButtonType.NO, ButtonType.YES);
+    alert.getButtonTypes().add(0, ButtonType.CANCEL);
+//    alert.getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
+    alert.getButtonTypes().add(1, ButtonType.NO);
+    alert.getButtonTypes().add(2, ButtonType.YES);
+    if(owner != null)
+      alert.initOwner(owner);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.get();
+  }
+
 
   public static boolean showDeviceAsksForRegistrationAlert(AskForDeviceRegistrationRequest request, Stage windowStage) {
     windowStage.show();

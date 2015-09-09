@@ -34,9 +34,6 @@ import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-import org.controlsfx.dialog.Dialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +55,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
@@ -864,17 +862,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   @Override
   protected boolean askIfStageShouldBeClosed() {
     if(hasUnsavedChanges()) {
-      Action response = Dialogs.create()
-          .owner(windowStage)
-          .title(Localization.getLocalizedString("alert.title.reference.contains.unsaved.changes"))
-          .message(Localization.getLocalizedString("alert.message.reference.contains.unsaved.changes"))
-          .actions(Dialog.ACTION_CANCEL, Dialog.ACTION_NO, Dialog.ACTION_YES)
-          .showConfirm();
+      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "reference");
 
-      if(response.equals(Dialog.ACTION_CANCEL))
+      if(result.equals(ButtonType.CANCEL))
         return false;
-      else if(response.equals(Dialog.ACTION_YES)) {
-        saveEditedFieldsOnReference();
+      else if(result.equals(ButtonType.YES)) {
+//        saveEditedFieldsOnReference(); // TODO: is this correct? Why only saving edited fields on Reference (what about SeriesTitle and Ref.SubDivision?)
+        saveChanges();
       }
     }
 
