@@ -83,7 +83,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -124,15 +123,12 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected ToggleButton tglbtnShowHideContextHelp;
   protected ContextHelpControl contextHelpControl;
 
-  @FXML
-  protected TitledPane ttldpnAbstract;
-
   protected CollapsibleHtmlEditor htmledAbstract;
 
   @FXML
   protected TitledPane ttldpnContent;
 
-  protected DeepThoughtFxHtmlEditor htmledContent;
+  protected CollapsibleHtmlEditor htmledContent;
 
 //  @FXML
 //  protected BorderPane paneTagsAndCategories;
@@ -204,21 +200,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
     paneTitle.setVisible(false);
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
-//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-//    ttldpnAbstract.setExpanded(false);
-//
-//    htmledAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
-//    ttldpnAbstract.setContent(htmledAbstract);
-
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
-    contentPane.getChildren().remove(ttldpnAbstract); // TODO: remove
     contentPane.getChildren().add(1, htmledAbstract);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
-    htmledContent = new DeepThoughtFxHtmlEditor(contentListener);
-    ttldpnContent.setContent(htmledContent);
+    htmledContent = new CollapsibleHtmlEditor("content", abstractListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
+    contentPane.getChildren().add(2, htmledContent);
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -494,8 +483,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
     if(htmledAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledAbstract, "entry.abstract");
-    if(ttldpnContent.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnContent, "content");
+    if(htmledContent.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledContent, "content");
 
     if(entryReferenceControl.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, entryReferenceControl, "reference");

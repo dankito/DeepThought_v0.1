@@ -168,6 +168,8 @@ public class CollapsiblePane extends GridPane {
     expandButton.setOnAction(event -> toggleExpandedState());
     this.getChildren().add(expandButton);
     GridPane.setConstraints(expandButton, 0, 0);
+
+    setExpanded(true);
   }
 
   @Override

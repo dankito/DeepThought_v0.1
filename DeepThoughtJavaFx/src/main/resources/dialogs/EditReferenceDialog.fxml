@@ -110,14 +110,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
-                              <TitledPane fx:id="ttldpnTableOfContents" animated="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
-                                 <content>
-                                    <HTMLEditor fx:id="htmledTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <HBox fx:id="paneOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
@@ -348,14 +340,6 @@
                               <TitledPane fx:id="ttldpnSeriesTitleAbstract" animated="false" expanded="false" text="%abstract">
                                  <content>
                                     <TextArea fx:id="txtarSeriesTitleAbstract" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
-                              <TitledPane fx:id="ttldpnSeriesTitleTableOfContents" animated="false" expanded="false" text="%table.of.contents" VBox.vgrow="ALWAYS">
-                                 <content>
-                                    <HTMLEditor fx:id="htmledSeriesTitleTableOfContents" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" minHeight="175.0" />
                                  </content>
                                  <VBox.margin>
                                     <Insets top="6.0" />

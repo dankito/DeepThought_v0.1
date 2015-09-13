@@ -75,27 +75,6 @@
                         </HBox>
                      </children>
                   </AnchorPane>
-                  <TitledPane fx:id="ttldpnAbstract" animated="false" maxHeight="1.7976931348623157E308" text="%entry.abstract" VBox.vgrow="ALWAYS" />
-                  <TitledPane fx:id="ttldpnContent" animated="false" contentDisplay="RIGHT" maxHeight="1.7976931348623157E308" text="%content" VBox.vgrow="ALWAYS">
-                     <content>
-                        <HTMLEditor fx:id="htmledContent" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="250.0" minWidth="250.0" />
-                     </content>
-                     <graphic>
-                        <GridPane alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="24.0" prefWidth="350.0">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" />
-                            <ColumnConstraints hgrow="ALWAYS" />
-                              <ColumnConstraints fillWidth="false" hgrow="SOMETIMES" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <HBox fx:id="pnConnectedDevices" alignment="CENTER_RIGHT" GridPane.columnIndex="1" GridPane.valignment="CENTER" />
-                           </children>
-                        </GridPane>
-                     </graphic>
-                  </TitledPane>
                   <HBox fx:id="paneTagsAndCategories" maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES" />
                   <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false" maxHeight="1.7976931348623157E308" VBox.vgrow="SOMETIMES">
                      <graphic>
