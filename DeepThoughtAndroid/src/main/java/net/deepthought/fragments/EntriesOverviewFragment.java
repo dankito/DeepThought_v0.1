@@ -2,6 +2,8 @@ package net.deepthought.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,7 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import net.deepthought.Application;
 import net.deepthought.R;
@@ -25,7 +29,12 @@ import net.deepthought.data.model.Entry;
 public class EntriesOverviewFragment extends Fragment {
 
 
-  private EntriesOverviewAdapter entriesOverviewAdapter;
+  protected EntriesOverviewAdapter entriesOverviewAdapter;
+
+  protected RelativeLayout rlySearchEntries;
+
+  protected EditText edtxtSearchEntries;
+
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +51,11 @@ public class EntriesOverviewFragment extends Fragment {
     lstvwEntries.setAdapter(entriesOverviewAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
+
+    rlySearchEntries = (RelativeLayout)rootView.findViewById(R.id.rlySearchEntries);
+
+    edtxtSearchEntries = (EditText)rootView.findViewById(R.id.edtxtSearchEntries);
+    edtxtSearchEntries.addTextChangedListener(edtxtSearchEntriesTextWatcher);
 
     return rootView;
   }
@@ -72,6 +86,11 @@ public class EntriesOverviewFragment extends Fragment {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
+
+    if(id == R.id.mnitmActionSearchEntries) {
+      toggleSearchBarVisibility();
+      return true;
+    }
     if (id == R.id.mnitmActionAddEntry) {
       onActionAddEntrySelected();
       return true;
@@ -80,10 +99,22 @@ public class EntriesOverviewFragment extends Fragment {
     return super.onOptionsItemSelected(item);
   }
 
+  protected void toggleSearchBarVisibility() {
+    if(rlySearchEntries.getVisibility() == View.GONE) {
+      rlySearchEntries.setVisibility(View.VISIBLE);
+      edtxtSearchEntries.selectAll();
+    }
+    else {
+      entriesOverviewAdapter.showAllEntries();
+      rlySearchEntries.setVisibility(View.GONE);
+    }
+  }
+
   protected void onActionAddEntrySelected() {
     Entry entry = new Entry();
     ActivityManager.getInstance().showEditEntryActivity(entry);
   }
+
 
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -123,4 +154,22 @@ public class EntriesOverviewFragment extends Fragment {
       return false;
     }
   };
+
+  protected TextWatcher edtxtSearchEntriesTextWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+      entriesOverviewAdapter.searchEntries(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+  };
+
 }

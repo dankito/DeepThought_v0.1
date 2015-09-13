@@ -13,9 +13,13 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.util.Notification;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -24,6 +28,11 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
   protected DeepThought deepThought;
   protected Activity context;
+
+  protected FilterEntriesSearch filterEntriesSearch = null;
+
+  protected List<Entry> searchResults = null;
+
 
   public EntriesOverviewAdapter(Activity context) {
     this.context = context;
@@ -58,12 +67,19 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
   @Override
   public int getCount() {
+    if(searchResults != null)
+      return searchResults.size();
+
     if(deepThought != null)
       return deepThought.countEntries();
     return 0;
   }
 
   public Entry getEntryAt(int position) {
+    if(searchResults != null) {
+      searchResults.get(position);
+    }
+
     return deepThought.entryAt(position);
   }
 
@@ -84,9 +100,6 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
     Entry entry = getEntryAt(position);
 
-//    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTitle);
-//    txtvwTitle.setText(entry.getTitle());
-
     TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
     txtvwPreview.setText(entry.getPreview());
 
@@ -94,6 +107,32 @@ public class EntriesOverviewAdapter extends BaseAdapter {
     txtvwTags.setText(entry.getTagsPreview());
 
     return convertView;
+  }
+
+
+  public void searchEntries(String searchTerm) {
+    if(filterEntriesSearch != null && filterEntriesSearch.isCompleted() == false)
+      filterEntriesSearch.interrupt();
+
+    // TODO: enable filtering Abstract or Content only (currently both set to true)
+    filterEntriesSearch = new FilterEntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        if(results instanceof List)
+          searchResults = (List<Entry>)results;
+        else
+          searchResults = new ArrayList<>(results);
+
+        notifyDataSetChangedThreadSafe();
+      }
+    });
+
+    Application.getSearchEngine().filterEntries(filterEntriesSearch);
+  }
+
+  public void showAllEntries() {
+    searchResults = null;
+    notifyDataSetChangedThreadSafe();
   }
 
 

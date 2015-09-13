@@ -3,6 +3,13 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/mnitmActionSearchEntries"
+        android:title="@string/find"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always"
+        />
+
+    <item
         android:id="@+id/mnitmActionAddEntry"
         android:title="@string/add"
         android:icon="@android:drawable/ic_input_add"
