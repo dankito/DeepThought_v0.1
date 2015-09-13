@@ -679,6 +679,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     searchAndSelectSeriesTitleControl.cleanUpControl();
     paneSeriesTitle.getChildren().remove(searchAndSelectSeriesTitleControl);
     searchAndSelectSeriesTitleControl = null;
+    htmledSeriesTitleTableOfContents.cleanUpControl();
     seriesTitlePersonsControl.cleanUpControl();
     paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
     seriesTitlePersonsControl = null;
@@ -686,6 +687,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     searchAndSelectReferenceControl.cleanUpControl();
     paneReference.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
+    htmledTableOfContents.cleanUpControl();
     referencePersonsControl.cleanUpControl();
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;

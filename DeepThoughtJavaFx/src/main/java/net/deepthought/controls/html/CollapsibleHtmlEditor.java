@@ -62,6 +62,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
 
   protected void setupControl(String title, HtmlEditorListener listener) {
     htmlEditor = new DeepThoughtFxHtmlEditor(listener);
+    htmlEditor.setMaxHeight(Double.MAX_VALUE);
     setContent(htmlEditor);
 
     setupTitle(title);

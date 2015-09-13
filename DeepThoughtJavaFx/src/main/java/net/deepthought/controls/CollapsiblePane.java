@@ -150,11 +150,14 @@ public class CollapsiblePane extends GridPane {
   }
 
   protected void setupPane() {
+    setMaxHeight(Double.MAX_VALUE);
+    setMaxWidth(Double.MAX_VALUE);
+
     this.getColumnConstraints().add(new ColumnConstraints(28));
     clmcstrTitle = new ColumnConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true);
     this.getColumnConstraints().add(clmcstrTitle);
 
-    this.getRowConstraints().add(new RowConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.SOMETIMES, VPos.CENTER, false));
+    this.getRowConstraints().add(new RowConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, false));
     rwcstrContent = new RowConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.TOP, true);
     this.getRowConstraints().add(rwcstrContent);
 

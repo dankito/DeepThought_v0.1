@@ -57,6 +57,8 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     HBox.setHgrow(webView, Priority.ALWAYS);
     webView.prefHeightProperty().bind(this.heightProperty());
 
+    setFillHeight(true);
+
     loadCKEditor();
 
     testEvents();

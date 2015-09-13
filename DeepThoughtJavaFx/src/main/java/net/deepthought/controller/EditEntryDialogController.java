@@ -1,9 +1,6 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
-import net.deepthought.communication.listener.ConnectedDevicesListener;
-import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.Constants;
@@ -14,15 +11,12 @@ import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.file.FileRootTreeItem;
 import net.deepthought.controls.file.FileTreeTableCell;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
-import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.data.contentextractor.EntryCreationResult;
-import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
@@ -38,10 +32,8 @@ import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
-import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +42,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -67,7 +58,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -79,6 +69,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -110,7 +101,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected Button btnApplyChanges;
 
   @FXML
-  protected Pane contentPane;
+  protected GridPane contentPane;
 
   @FXML
   protected Pane paneTitle;
@@ -179,11 +170,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
       if (setting == Setting.UserDeviceShowCategories) {
         entryCategoriesControl.setVisible((boolean) newValue);
         if ((boolean) newValue) {
-          paneTagsAndCategories.getChildren().add(entryCategoriesControl);
-//            contentPane.getChildren().add(entryCategoriesControl);
+          contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
         } else
-          paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
-//            contentPane.getChildren().remove(entryCategoriesControl);
+          contentPane.getChildren().remove(entryCategoriesControl);
       } else if (setting == Setting.UserDeviceDialogFieldsDisplay)
         dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
     }
@@ -203,11 +192,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
-    contentPane.getChildren().add(1, htmledAbstract);
+    contentPane.add(htmledAbstract, 0, 1, 2, 1);
 
     htmledContent = new CollapsibleHtmlEditor("content", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
-    contentPane.getChildren().add(2, htmledContent);
+    contentPane.add(htmledContent, 0, 2, 2, 1);
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -218,7 +207,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryTagsControl.setExpanded(true);
 //    contentPane.getChildren().add(entryTagsControl);
     HBox.setHgrow(entryTagsControl, Priority.ALWAYS);
-    paneTagsAndCategories.getChildren().add(entryTagsControl);
+    contentPane.add(entryTagsControl, 0, 3, 1, 1);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
@@ -231,14 +220,14 @@ public class EditEntryDialogController extends ChildWindowsController implements
 //    contentPane.getChildren().addAll(entryCategoriesControl);
     HBox.setHgrow(entryCategoriesControl, Priority.ALWAYS);
     HBox.setMargin(entryCategoriesControl, new Insets(0, 0, 0, 12));
-    paneTagsAndCategories.getChildren().add(entryCategoriesControl);
+    contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
-    contentPane.getChildren().add(contentPane.getChildren().size() - 1, entryReferenceControl);
+    contentPane.add(entryReferenceControl, 0, 4, 2, 1);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setExpanded(false);
@@ -247,7 +236,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
-    contentPane.getChildren().add(contentPane.getChildren().size() - 1, entryPersonsControl);
+    contentPane.add(entryPersonsControl, 0, 5, 2, 1);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
