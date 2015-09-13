@@ -172,8 +172,6 @@ public class CollapsiblePane extends GridPane {
 
   @Override
   protected double computeMinHeight(double width) {
-//    return super.computeMinHeight(width);
-
     double height = getTitle() instanceof Region ? ((Region)getTitle()).getHeight() : 0; // TODO: make general, don't depend on Region
 
     if(isExpanded())

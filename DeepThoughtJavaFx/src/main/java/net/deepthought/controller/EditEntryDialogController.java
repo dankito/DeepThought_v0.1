@@ -13,8 +13,8 @@ import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.file.FileRootTreeItem;
 import net.deepthought.controls.file.FileTreeTableCell;
+import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
-import net.deepthought.controls.html.DeepThoughtHTMLEditor;
 import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
@@ -127,12 +127,10 @@ public class EditEntryDialogController extends ChildWindowsController implements
   @FXML
   protected TitledPane ttldpnAbstract;
 
-  protected DeepThoughtFxHtmlEditor htmledAbstract;
+  protected CollapsibleHtmlEditor htmledAbstract;
 
   @FXML
   protected TitledPane ttldpnContent;
-  @FXML
-  protected Pane pnConnectedDevices;
 
   protected DeepThoughtFxHtmlEditor htmledContent;
 
@@ -176,8 +174,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     Application.getSettings().addSettingsChangedListener(settingsChangedListener);
 
-    Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
-
     // TODO: what to do when DeepThought changes -> close dialog
   }
 
@@ -208,20 +204,21 @@ public class EditEntryDialogController extends ChildWindowsController implements
     paneTitle.setVisible(false);
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-    ttldpnAbstract.setExpanded(false);
+//    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
+//    ttldpnAbstract.setExpanded(false);
+//
+//    htmledAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
+//    ttldpnAbstract.setContent(htmledAbstract);
 
-    htmledAbstract = new DeepThoughtFxHtmlEditor(abstractListener);
-    ttldpnAbstract.setContent(htmledAbstract);
+    htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
+    htmledAbstract.setExpanded(false);
+    contentPane.getChildren().remove(ttldpnAbstract); // TODO: remove
+    contentPane.getChildren().add(1, htmledAbstract);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnContent);
     htmledContent = new DeepThoughtFxHtmlEditor(contentListener);
     ttldpnContent.setContent(htmledContent);
-
-    for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices()) {
-      if(connectedDevice.hasCaptureDevice() || connectedDevice.canDoOcr())
-        addConnectedDeviceIcon(connectedDevice);
-    }
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -307,7 +304,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     htmledAbstract.setHtml(entry.getAbstract());
 
-    ttldpnAbstract.setExpanded(entry.hasAbstract());
+    htmledAbstract.setExpanded(entry.hasAbstract());
 
     htmledContent.setHtml(entry.getContent());
 
@@ -347,7 +344,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected void closeDialog() {
     entry.removeEntityListener(entryListener);
     Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
-    Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
 
     htmledAbstract.cleanUpControl();
     htmledContent.cleanUpControl();
@@ -496,8 +492,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 //    if(paneTitle.isVisible() == false)
 //      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
-    if(ttldpnAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "entry.abstract");
+    if(htmledAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledAbstract, "entry.abstract");
     if(ttldpnContent.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnContent, "content");
 
@@ -661,87 +657,5 @@ public class EditEntryDialogController extends ChildWindowsController implements
     }
   };
 
-
-  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
-
-    @Override
-    public void registeredDeviceConnected(ConnectedDevice device) {
-      Platform.runLater(() -> addConnectedDeviceIcon(device));
-    }
-
-    @Override
-    public void registeredDeviceDisconnected(ConnectedDevice device) {
-      Platform.runLater(() -> removeConnectedDeviceIcon(device));
-    }
-  };
-
-  protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
-    Device device = connectedDevice.getDevice();
-
-    ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
-    icon.setPreserveRatio(true);
-    icon.setFitHeight(24);
-    icon.maxHeight(24);
-//    icon.setUserData(connectedDevice);
-
-//    pnConnectedDevices.getChildren().add(icon);
-//    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
-
-    Label label = new Label(null, icon);
-    label.setUserData(connectedDevice);
-    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
-        connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
-
-    pnConnectedDevices.getChildren().add(label);
-    HBox.setMargin(label, new Insets(0, 4, 0, 0));
-    label.setOnContextMenuRequested(event -> createConnectedDeviceContextMenu(connectedDevice, label));
-  }
-
-  protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, Node icon) {
-    ContextMenu contextMenu = new ContextMenu();
-
-    if(connectedDevice.hasCaptureDevice()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener));
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    if(connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
-      captureImageMenuItem.setOnAction(event -> {
-        // TODO: load image which text should be recognized
-//        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
-      });
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
-
-    contextMenu.show(icon, Side.BOTTOM, 0, 0);
-  }
-
-  protected void removeConnectedDeviceIcon(ConnectedDevice device) {
-    for(Node node : pnConnectedDevices.getChildren()) {
-      if(/*node instanceof ImageView &&*/ device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in  registeredDeviceConnected event
-        pnConnectedDevices.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
-        break;
-      }
-    }
-  }
-
-  protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
-    @Override
-    public void ocrResult(final TextRecognitionResult ocrResult) {
-      if(ocrResult.recognitionSuccessful())
-        Platform.runLater(() -> htmledContent.setHtml(htmledContent.getHtml() + ocrResult.getRecognizedText()));
-    }
-  };
 
 }

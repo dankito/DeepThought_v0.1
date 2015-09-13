@@ -198,7 +198,6 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     pnSelectedTagsPreview.setColumnHalignment(HPos.LEFT);
     pnSelectedTagsPreview.setRowValignment(VPos.CENTER);
     pnSelectedTagsPreview.setAlignment(Pos.CENTER_LEFT);
-    FXUtils.setBackgroundToColor(pnSelectedTagsPreview, Color.ORANGE); // TODO: remove again
     titlePane.add(pnSelectedTagsPreview, 2, 0);
 
     setTitle(titlePane);
