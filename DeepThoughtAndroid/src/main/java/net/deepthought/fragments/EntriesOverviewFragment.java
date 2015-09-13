@@ -102,7 +102,7 @@ public class EntriesOverviewFragment extends Fragment {
   protected void toggleSearchBarVisibility() {
     if(rlySearchEntries.getVisibility() == View.GONE) {
       rlySearchEntries.setVisibility(View.VISIBLE);
-      edtxtSearchEntries.selectAll();
+      edtxtSearchEntries.requestFocus();
     }
     else {
       entriesOverviewAdapter.showAllEntries();
