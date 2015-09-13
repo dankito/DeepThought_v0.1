@@ -80,11 +80,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
   protected Collection<Entry> unfilteredCurrentEntriesToShow = new ArrayList<>();
 
-//  protected ObservableList<Entry> tableViewEntriesItems = null;
   protected LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
-  protected FilteredList<Entry> filteredEntries = null;
-  protected SortedList<Entry> sortedFilteredEntries = null;
-//  protected Entry selectedEntryInTableViewEntries = null;
 
   protected FilterEntriesSearch filterEntriesSearch = null;
 

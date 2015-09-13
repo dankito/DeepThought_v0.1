@@ -2,6 +2,7 @@ package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
@@ -12,6 +13,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
@@ -29,17 +31,29 @@ import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolder<Tag>, ICleanableControl {
+public class EntryTagsControl extends CollapsiblePane implements IEditedEntitiesHolder<Tag>, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
 
@@ -82,20 +96,24 @@ public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolde
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryTagsControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryTagsControl.fxml"));
+//    fxmlLoader.setRoot(this);
+//    fxmlLoader.setController(this);
+//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+//
+//    try {
+//      fxmlLoader.load();
+//      setupControl();
+//
+//      if(deepThought != null)
+//        deepThought.addEntityListener(deepThoughtListener);
+//    } catch (IOException ex) {
+//      log.error("Could not load EntryTagsControl", ex);
+//    }
 
-    try {
-      fxmlLoader.load();
-      setupControl();
-
-      if(deepThought != null)
-        deepThought.addEntityListener(deepThoughtListener);
-    } catch (IOException ex) {
-      log.error("Could not load EntryTagsControl", ex);
-    }
+    setupControl();
+    if(deepThought != null)
+      deepThought.addEntityListener(deepThoughtListener);
   }
 
   protected ApplicationListener applicationListener = new ApplicationListener() {
@@ -139,20 +157,51 @@ public class EntryTagsControl extends TitledPane implements IEditedEntitiesHolde
   }
 
   protected void setupControl() {
-    this.setExpanded(false);
+    setMinHeight(22);
 
-    btnShowHideSearchTagsToolWindow.setGraphic(new ImageView(Constants.WindowIconPath));
-    btnShowHideSearchTagsToolWindow.selectedProperty().addListener(((observableValue, oldValue, newValue) -> btnShowHideSearchTagsToolWindowIsSelectedChanged(newValue)));
+    setTitle();
+    this.setExpanded(false);
 
     searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
 //    searchAndSelectTagsControl.setMaxHeight(200);
     this.setContent(searchAndSelectTagsControl);
 
     showEntryTags();
+  }
 
-    // before PrefWrapLength was set to 200, so it wrapped very early and used a lot of lines if an Entry had many Tags. This now fits the wrap length to EntryTagsControl's width
-    this.widthProperty().addListener((observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength());
-    lblTags.widthProperty().addListener((observable, oldValue, newValue) -> setPaneSelectedTagsPreviewWrapLength());
+  protected void setTitle() {
+    GridPane titlePane = new GridPane();
+    titlePane.setPrefWidth(Region.USE_COMPUTED_SIZE);
+    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.getColumnConstraints().add(new ColumnConstraints(24));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.NEVER, HPos.LEFT, false));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
+    titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, false));
+
+    btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(Constants.WindowIconPath));
+    btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    btnShowHideSearchTagsToolWindow.setMinHeight(24);
+    btnShowHideSearchTagsToolWindow.setMaxHeight(24);
+    btnShowHideSearchTagsToolWindow.setMinWidth(24);
+    btnShowHideSearchTagsToolWindow.setMaxWidth(24);
+    btnShowHideSearchTagsToolWindow.selectedProperty().addListener(((observableValue, oldValue, newValue) -> btnShowHideSearchTagsToolWindowIsSelectedChanged(newValue)));
+    titlePane.add(btnShowHideSearchTagsToolWindow, 0, 0);
+
+    lblTags = new Label();
+    JavaFxLocalization.bindLabeledText(lblTags, "tags");
+    lblTags.setMinHeight(22);
+    titlePane.add(lblTags, 1, 0);
+    GridPane.setMargin(lblTags, new Insets(0, 4, 0, 4));
+
+    pnSelectedTagsPreview = new FlowPane();
+    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
+    pnSelectedTagsPreview.setColumnHalignment(HPos.LEFT);
+    pnSelectedTagsPreview.setRowValignment(VPos.CENTER);
+    pnSelectedTagsPreview.setAlignment(Pos.CENTER_LEFT);
+    FXUtils.setBackgroundToColor(pnSelectedTagsPreview, Color.ORANGE); // TODO: remove again
+    titlePane.add(pnSelectedTagsPreview, 2, 0);
+
+    setTitle(titlePane);
   }
 
   protected void setPaneSelectedTagsPreviewWrapLength() {
