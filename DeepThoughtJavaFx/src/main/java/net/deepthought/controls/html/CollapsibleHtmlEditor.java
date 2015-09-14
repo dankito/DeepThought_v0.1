@@ -76,7 +76,6 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
     GridPane titlePane = new GridPane();
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
     titlePane.setMaxHeight(22);
-    rwcstrTitle.setMaxHeight(22);
     titlePane.setMaxWidth(Double.MAX_VALUE);
 
     titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, VPos.CENTER, true));

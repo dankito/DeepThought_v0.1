@@ -1,5 +1,6 @@
 package net.deepthought.controls;
 
+import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
@@ -8,15 +9,19 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -24,22 +29,16 @@ import javafx.scene.text.Font;
  * Created by ganymed on 13/09/15.
  */
 @DefaultProperty("content")
-public class CollapsiblePane extends GridPane {
+public class CollapsiblePane extends VBox {
 
   public final static String ExpandedText = "▼";
 
   public final static String CollapsedText = "▶";
 
 
-  protected GridPane layoutPane = new GridPane();
+  protected HBox titlePane = new HBox();
 
   protected Button expandButton = new Button();
-
-  protected ColumnConstraints clmcstrTitle;
-
-  protected RowConstraints rwcstrTitle;
-
-  protected RowConstraints rwcstrContent;
 
 
   protected BooleanProperty expanded;
@@ -155,14 +154,9 @@ public class CollapsiblePane extends GridPane {
     setMaxHeight(Double.MAX_VALUE);
     setMaxWidth(Double.MAX_VALUE);
 
-    this.getColumnConstraints().add(new ColumnConstraints(28));
-    clmcstrTitle = new ColumnConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true);
-    this.getColumnConstraints().add(clmcstrTitle);
-
-    rwcstrTitle = new RowConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.SOMETIMES, VPos.CENTER, false);
-    this.getRowConstraints().add(rwcstrTitle);
-    rwcstrContent = new RowConstraints(0, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.TOP, true);
-    this.getRowConstraints().add(rwcstrContent);
+    titlePane.setAlignment(Pos.CENTER_LEFT);
+    titlePane.setFillHeight(true);
+    this.getChildren().add(titlePane);
 
     expandButton.setContentDisplay(ContentDisplay.TEXT_ONLY);
     expandButton.setFont(new Font(expandButton.getFont().getName(), 9));
@@ -172,8 +166,8 @@ public class CollapsiblePane extends GridPane {
     expandButton.setMinWidth(24);
     expandButton.setMaxWidth(24);
     expandButton.setOnAction(event -> toggleExpandedState());
-    this.getChildren().add(expandButton);
-    GridPane.setConstraints(expandButton, 0, 0);
+    titlePane.getChildren().add(expandButton);
+    HBox.setMargin(expandButton, new Insets(0, 4, 0, 0));
 
     setExpanded(true);
   }
@@ -212,12 +206,6 @@ public class CollapsiblePane extends GridPane {
     return getTitle() instanceof Region ? ((Region)getTitle()).getHeight() : 22; // TODO: make general, don't depend on Region
   }
 
-  //  @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
-//    double headerHeight = snapSize(titleRegion.prefHeight(width));
-//    double contentHeight = contentContainer.minHeight(width) * getTransition();
-//    return headerHeight + snapSize(contentHeight) + topInset + bottomInset;
-//  }
-
   public void toggleExpandedState() {
     setExpanded(!isExpanded());
   }
@@ -228,12 +216,10 @@ public class CollapsiblePane extends GridPane {
 
     if(isExpanded()) {
       setMaxHeight(Double.MAX_VALUE);
-      getRowConstraints().add(rwcstrContent);
       expandButton.setText(ExpandedText);
     }
     else {
       setMaxHeight(computeMinHeight(getWidth()));
-      getRowConstraints().remove(rwcstrContent);
       expandButton.setText(CollapsedText);
     }
 
@@ -244,22 +230,21 @@ public class CollapsiblePane extends GridPane {
     setMinHeight(computeMinHeight(this.getWidth()));
     setPrefHeight(computePrefHeight(this.getWidth()));
 
-    layout();
-//    requestParentLayout();
-    if(getScene() != null && getScene().getRoot() != null)
-      getScene().getRoot().layout();
+    Platform.runLater(() -> {
+    requestParentLayout();
+    });
   }
 
   protected void titleChanged(Node oldTitle, Node newTitle) {
     if(oldTitle != null) {
-      this.getChildren().remove(oldTitle);
+      titlePane.getChildren().remove(oldTitle);
       if (oldTitle instanceof Region)
         ((Region) oldTitle).heightProperty().removeListener(titleHeightChangedListener);
     }
 
     if(newTitle != null) {
-      this.getChildren().add(newTitle);
-      GridPane.setConstraints(newTitle, 1, 0, 1, 1, HPos.LEFT, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+      titlePane.getChildren().add(newTitle);
+      HBox.setHgrow(newTitle, Priority.ALWAYS);
 
       if(newTitle instanceof Region)
         ((Region)newTitle).heightProperty().addListener(titleHeightChangedListener);
@@ -275,11 +260,10 @@ public class CollapsiblePane extends GridPane {
         ((Region)oldContent).heightProperty().removeListener(contentHeightChangedListener);
     }
 
-    GridPane.setConstraints(newContent, 0, 1, 2, 1);
-
     if(newContent != null) {
       FXUtils.ensureNodeOnlyUsesSpaceIfVisible(newContent);
       this.getChildren().add(newContent);
+      VBox.setVgrow(newContent, Priority.ALWAYS);
       newContent.setVisible(isExpanded());
 
       if(newContent instanceof Region)

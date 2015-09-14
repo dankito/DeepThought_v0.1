@@ -169,17 +169,13 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
   }
 
   protected void setupTitle() {
-    GridPane titlePane = new GridPane();
+    HBox titlePane = new HBox();
+    titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setPrefWidth(USE_COMPUTED_SIZE);
     titlePane.setMaxWidth(Double.MAX_VALUE);
-    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
-    titlePane.setMinHeight(USE_PREF_SIZE);
+//    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+//    titlePane.setMinHeight(USE_PREF_SIZE);
     titlePane.setMaxHeight(Double.MAX_VALUE);
-
-    titlePane.getColumnConstraints().add(new ColumnConstraints(24));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_PREF_SIZE, USE_COMPUTED_SIZE, USE_PREF_SIZE));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
-    titlePane.getRowConstraints().add(new RowConstraints(USE_PREF_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true));
 
     btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -188,7 +184,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     btnShowHideSearchTagsToolWindow.setMinWidth(24);
     btnShowHideSearchTagsToolWindow.setMaxWidth(24);
     btnShowHideSearchTagsToolWindow.selectedProperty().addListener(((observableValue, oldValue, newValue) -> btnShowHideSearchTagsToolWindowIsSelectedChanged(newValue)));
-    titlePane.add(btnShowHideSearchTagsToolWindow, 0, 0);
+    titlePane.getChildren().add(btnShowHideSearchTagsToolWindow);
 
     lblTags = new Label();
     JavaFxLocalization.bindLabeledText(lblTags, "tags");
@@ -196,15 +192,16 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     lblTags.setPrefWidth(USE_COMPUTED_SIZE);
     lblTags.setMinWidth(USE_PREF_SIZE);
     lblTags.setMaxWidth(USE_PREF_SIZE);
-    titlePane.add(lblTags, 1, 0);
-    GridPane.setMargin(lblTags, new Insets(0, 4, 0, 4));
+    titlePane.getChildren().add(lblTags);
+    HBox.setMargin(lblTags, new Insets(0, 4, 0, 4));
 
     pnSelectedTagsPreview = new FlowPane();
     pnSelectedTagsPreview.setColumnHalignment(HPos.LEFT);
     pnSelectedTagsPreview.setRowValignment(VPos.CENTER);
     pnSelectedTagsPreview.setAlignment(Pos.CENTER_LEFT);
-    titlePane.add(pnSelectedTagsPreview, 2, 0);
-    GridPane.setConstraints(pnSelectedTagsPreview, 2, 0, 1, 1, HPos.LEFT, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
+    pnSelectedTagsPreview.setVgap(2);
+    titlePane.getChildren().add(pnSelectedTagsPreview);
+    HBox.setHgrow(pnSelectedTagsPreview, Priority.ALWAYS);
 
     setTitle(titlePane);
   }
