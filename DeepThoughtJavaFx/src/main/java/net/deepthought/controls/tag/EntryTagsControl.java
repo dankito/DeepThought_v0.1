@@ -14,13 +14,11 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,24 +28,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -159,7 +154,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
   protected void setupControl() {
     setMinHeight(22);
 
-    setTitle();
+    setupTitle();
     this.setExpanded(false);
 
     searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
@@ -171,14 +166,20 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     showEntryTags();
   }
 
-  protected void setTitle() {
+  protected void setupTitle() {
     GridPane titlePane = new GridPane();
     titlePane.setPrefWidth(Region.USE_COMPUTED_SIZE);
     titlePane.setMaxWidth(Double.MAX_VALUE);
     titlePane.getColumnConstraints().add(new ColumnConstraints(24));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.NEVER, HPos.LEFT, false));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.SOMETIMES, HPos.LEFT, true));
     titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
     titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, false));
+
+//    HBox titlePane = new HBox();
+//    titlePane.setAlignment(Pos.CENTER_LEFT);
+//    titlePane.setMinHeight(22);
+//    titlePane.setMaxHeight(Double.MAX_VALUE);
+//    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
 
     btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -192,8 +193,13 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     lblTags = new Label();
     JavaFxLocalization.bindLabeledText(lblTags, "tags");
     lblTags.setMinHeight(22);
+    lblTags.setPrefWidth(USE_COMPUTED_SIZE);
+    lblTags.setMinWidth(USE_PREF_SIZE);
+    lblTags.setMaxWidth(USE_PREF_SIZE);
     titlePane.add(lblTags, 1, 0);
+//    GridPane.setConstraints(lblTags, 1, 0, 1, 1, HPos.LEFT, VPos.CENTER, Priority.ALWAYS, Priority.NEVER);
     GridPane.setMargin(lblTags, new Insets(0, 4, 0, 4));
+//    HBox.setHgrow(lblTags, Priority.ALWAYS);
 
     pnSelectedTagsPreview = new FlowPane();
     pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
@@ -201,6 +207,9 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     pnSelectedTagsPreview.setRowValignment(VPos.CENTER);
     pnSelectedTagsPreview.setAlignment(Pos.CENTER_LEFT);
     titlePane.add(pnSelectedTagsPreview, 2, 0);
+//    HBox.setHgrow(pnSelectedTagsPreview, Priority.ALWAYS);
+
+//    titlePane.getChildren().addAll(btnShowHideSearchTagsToolWindow, lblTags, pnSelectedTagsPreview);
 
     setTitle(titlePane);
   }
