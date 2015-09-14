@@ -1,6 +1,7 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Category;
@@ -25,10 +26,17 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -56,11 +64,11 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
   protected Label categoryNameLabel = new Label();
 
+  protected TextField txtfldEditCategoryName = null;
+
 
   protected HBox categoryOptionsButtonsPane = new HBox();
 
-  protected Button editCategoryButton = new Button();
-  protected Button deleteCategoryButton = new Button();
   protected Button addSubCategoryToCategoryButton = new Button();
 
 
@@ -83,6 +91,8 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
   protected SetChangeListener<Category> editedCategoriesChangedListener = change -> categoryUpdated();
@@ -99,12 +109,14 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
 
+    double height = 24;
+
     graphicPane.setAlignment(Pos.CENTER_LEFT);
-    graphicPane.setPrefHeight(20);
+    graphicPane.setMinHeight(height);
+    graphicPane.setMaxHeight(height);
 
     HBox.setHgrow(categoryNameLabel, Priority.ALWAYS);
     HBox.setMargin(categoryNameLabel, new Insets(0, 6, 0, 6));
-    HBox.setMargin(deleteCategoryButton, new Insets(0, 6, 0, 6));
 
     graphicPane.getChildren().add(isEntryInCategoryCheckBox);
     isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
@@ -116,38 +128,13 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     categoryOptionsButtonsPane.managedProperty().bind(categoryOptionsButtonsPane.visibleProperty());
     graphicPane.getChildren().add(categoryOptionsButtonsPane);
 
-    JavaFxLocalization.bindLabeledText(editCategoryButton, "edit");
-    JavaFxLocalization.bindControlToolTip(editCategoryButton, "edit.category.tool.tip");
-    editCategoryButton.setMinWidth(80);
-    categoryOptionsButtonsPane.getChildren().add(editCategoryButton);
-    editCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        selectCurrentCell();
-        handleEditFileButtonAction();
-      }
-    });
-
-    editCategoryButton.setDisable(true);
-
-    deleteCategoryButton.setText("-");
-    deleteCategoryButton.setTextFill(Color.RED);
-    deleteCategoryButton.setFont(new Font(15));
-    deleteCategoryButton.setPrefWidth(50);
-    JavaFxLocalization.bindControlToolTip(deleteCategoryButton, "delete.category.tool.tip");
-    categoryOptionsButtonsPane.getChildren().add(deleteCategoryButton);
-    deleteCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        selectCurrentCell();
-        handleDeleteCategoryButtonAction();
-      }
-    });
-
     addSubCategoryToCategoryButton.setText("+");
     addSubCategoryToCategoryButton.setTextFill(Color.GREEN);
-    addSubCategoryToCategoryButton.setFont(new Font(15));
-    addSubCategoryToCategoryButton.setPrefWidth(50);
+    addSubCategoryToCategoryButton.setFont(new Font(9.5));
+    addSubCategoryToCategoryButton.setMinWidth(height);
+    addSubCategoryToCategoryButton.setMaxWidth(height);
+    addSubCategoryToCategoryButton.setMinHeight(height);
+    addSubCategoryToCategoryButton.setMaxHeight(height);
     JavaFxLocalization.bindControlToolTip(addSubCategoryToCategoryButton, "add.sub.category.to.category.tool.tip");
     categoryOptionsButtonsPane.getChildren().add(addSubCategoryToCategoryButton);
     addSubCategoryToCategoryButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -205,20 +192,11 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-      //Dialogs.showEditCategoryDialog(category);
-
-//      if(category != null) {
-//        if (editedCategoriesHolder.getEditedEntryCategories().contains(category) == false)
-//          editedCategoriesHolder.addEntityToEntry(entry, category);
-//        else
-//          editedCategoriesHolder.removeCategoryFromEntry(entry, category);
-//      }
       isEntryInCategoryCheckBox.setSelected(!isEntryInCategoryCheckBox.isSelected()); // simply toggle selected state
     }
   }
 
   protected void selectCurrentCell() {
-//    getTreeView().getSelectionModel().select(getIndex());
     updateSelected(true);
   }
 
@@ -252,18 +230,129 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
 
   protected void handleAddSubCategoryToCategoryButtonAction() {
-    if(category != null)
-      category.addSubCategory(new Category());
-  }
-
-  protected void handleDeleteCategoryButtonAction() {
     if(category != null) {
-      Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(category);
+      if(getTreeItem() != null)
+        getTreeItem().setExpanded(true);
+      Category newCategory = new Category();
+      category.addSubCategory(newCategory);
+      editedCategoriesHolder.addEntityToEntry(newCategory);
+//      Dialogs.showEditCategoryDialog(new Category(), category, getScene().getWindow(), true);
     }
   }
 
-  protected void handleEditFileButtonAction() {
-    Dialogs.showEditCategoryDialog(category);
+
+  @Override
+  public void startEdit() {
+    super.startEdit();
+
+    if (txtfldEditCategoryName == null) {
+      createTextField();
+    }
+    txtfldEditCategoryName.setText(category.getName());
+
+    showCellInEditingState();
+
+    txtfldEditCategoryName.selectAll();
+    txtfldEditCategoryName.requestFocus();
+  }
+
+  protected void createTextField() {
+    txtfldEditCategoryName = new TextField();
+
+    HBox.setHgrow(txtfldEditCategoryName, Priority.ALWAYS);
+    HBox.setMargin(txtfldEditCategoryName, new Insets(0, 6, 0, 6));
+    txtfldEditCategoryName.setMaxWidth(Double.MAX_VALUE);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditCategoryName);
+    graphicPane.getChildren().add(1, txtfldEditCategoryName);
+
+    txtfldEditCategoryName.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
+      @Override
+      public void handle(KeyEvent t) {
+        if (t.getCode() == KeyCode.ESCAPE) {
+          cancelEdit();
+        }
+      }
+    });
+
+    txtfldEditCategoryName.setOnAction(event -> {
+      if (txtfldEditCategoryName.getText().equals(category.getName()) == false)
+        category.setName(txtfldEditCategoryName.getText());
+      try {
+//        commitEdit(getItem()); // throws an UnsupportedOperationException
+        cancelEdit();
+      } catch (Exception ex) {
+        log.error("Could not commit changes to Category " + category, ex);
+      }
+    });
+
+    txtfldEditCategoryName.focusedProperty().addListener(new ChangeListener<Boolean>() {
+      @Override
+      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+        if (newValue == false)
+          cancelEdit();
+      }
+    });
+  }
+
+  @Override
+  public void cancelEdit() {
+    super.cancelEdit();
+
+    showCellInNotEditingState();
+  }
+
+  @Override
+  public void commitEdit(Category newValue) {
+    showCellInNotEditingState();
+
+    super.commitEdit(newValue);
+  }
+
+  protected void showCellInEditingState() {
+    categoryNameLabel.setVisible(false);
+    txtfldEditCategoryName.setVisible(true);
+  }
+
+  protected void showCellInNotEditingState() {
+    if(txtfldEditCategoryName != null)
+      txtfldEditCategoryName.setVisible(false);
+
+    categoryNameLabel.setVisible(true);
+    categoryNameLabel.setText(category.getName());
+  }
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
+  }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    MenuItem editTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(editTagItem, "edit...");
+    editTagItem.setOnAction(actionEvent -> {
+      if(category != null)
+        Dialogs.showEditCategoryDialog(category, getScene().getWindow(), true);
+    });
+    contextMenu.getItems().add(editTagItem);
+
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem deleteTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
+    deleteTagItem.setOnAction(event -> {
+      if(category != null)
+        if(Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(category)) {
+          if(editedCategoriesHolder.containsEditedEntity(category))
+            editedCategoriesHolder.removeEntityFromEntry(category);
+        }
+    });
+    contextMenu.getItems().add(deleteTagItem);
+
+    return contextMenu;
   }
 
 

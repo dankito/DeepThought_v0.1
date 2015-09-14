@@ -175,11 +175,16 @@ public class Dialogs {
     showEditCategoryDialog(category, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal); // 146 = EditTagDialog's height
   }
 
-  public static void showEditCategoryDialog(Category category, double centerX, double y, Window window, boolean modal) {
-    showEditCategoryDialog(category, centerX, y, window, modal, null);
+  public static void showEditCategoryDialog(Category category, Category parentCategory,  Window window, boolean modal) {
+    showEditCategoryDialog(category, parentCategory, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal, null); // 146 =
+    // EditTagDialog's height
   }
 
-  public static void showEditCategoryDialog(final Category category, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
+  public static void showEditCategoryDialog(Category category, double centerX, double y, Window window, boolean modal) {
+    showEditCategoryDialog(category, null, centerX, y, window, modal, null);
+  }
+
+  public static void showEditCategoryDialog(final Category category, final Category parentCategory, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStage(loader, "EditCategoryDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
@@ -194,6 +199,8 @@ public class Dialogs {
           if (controller.getDialogResult() == DialogResult.Ok) {
             if (category.isPersisted() == false) { // a new Tag
               Application.getDeepThought().addCategory(category);
+              if(parentCategory != null)
+                parentCategory.addSubCategory(category);
             }
           }
 

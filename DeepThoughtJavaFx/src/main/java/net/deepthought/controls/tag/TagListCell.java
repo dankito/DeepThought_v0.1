@@ -301,7 +301,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
       txtfldEditTagName.setVisible(false);
     lblTagName.setVisible(true);
 
-    setText(getTagStringRepresentation(tag));
+    lblTagName.setText(getTagStringRepresentation(tag));
   }
 
 

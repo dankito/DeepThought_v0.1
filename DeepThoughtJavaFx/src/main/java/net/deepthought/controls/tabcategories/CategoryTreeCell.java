@@ -84,6 +84,7 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
 
         Category newCategory = new Category();
         getItem().addSubCategory(newCategory);
+//        Dialogs.showEditCategoryDialog(new Category(), getItem(), getScene().getWindow(), true);
       }
     });
   }

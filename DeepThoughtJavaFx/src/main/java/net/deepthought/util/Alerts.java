@@ -32,14 +32,17 @@ import javafx.stage.Stage;
  */
 public class Alerts {
 
-  public static void deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(Category category) {
+  public static boolean deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(Category category) {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
       if(deleteCategory)
-      Application.getDeepThought().removeCategory(category);
+        Application.getDeepThought().removeCategory(category);
+      return deleteCategory;
     }
     else
       Application.getDeepThought().removeCategory(category);
+
+    return true;
   }
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {
