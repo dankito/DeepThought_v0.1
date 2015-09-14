@@ -1,6 +1,7 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.Application;
+import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
@@ -39,19 +40,27 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public abstract class PersonsControl extends TitledPane implements IEditedEntitiesHolder<Person>, ICleanableControl {
+public abstract class PersonsControl extends CollapsiblePane implements IEditedEntitiesHolder<Person>, ICleanableControl {
 
   protected final static Logger log = LoggerFactory.getLogger(PersonsControl.class);
 
@@ -61,9 +70,6 @@ public abstract class PersonsControl extends TitledPane implements IEditedEntiti
   protected DeepThought deepThought = null;
 
   protected LazyLoadingObservableList<Person> listViewAllPersonsItems;
-//  protected ObservableList<Person> listViewAllPersonsItems;
-//  protected FilteredList<Person> filteredPersons;
-//  protected SortedList<Person> sortedFilteredPersons;
 
   protected Search<Person> filterPersonsSearch = null;
 
@@ -78,17 +84,16 @@ public abstract class PersonsControl extends TitledPane implements IEditedEntiti
   protected EventHandler<PersonsControlPersonsEditedEvent> personRemovedEventHandler = null;
 
 
-  @FXML
-  protected Pane pnPersonsGraphic;
-  @FXML
-  protected Pane pnSelectedPersonsPreview;
-  @FXML
+  protected FlowPane pnSelectedPersonsPreview;
+
+  protected VBox pnContent;
+
   protected HBox hboxSearchForPerson;
-  @FXML
+
   protected TextField txtfldSearchForPerson;
-  @FXML
+
   protected Button btnNewPerson;
-  @FXML
+
   protected ListView<Person> lstvwAllPersons;
 
 
@@ -97,20 +102,25 @@ public abstract class PersonsControl extends TitledPane implements IEditedEntiti
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/PersonsControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/PersonsControl.fxml"));
+//    fxmlLoader.setRoot(this);
+//    fxmlLoader.setController(this);
+//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+//
+//    try {
+//      fxmlLoader.load();
+//      setupControl();
+//
+//      if(deepThought != null)
+//        deepThought.addEntityListener(deepThoughtListener);
+//    } catch (IOException ex) {
+//      log.error("Could not load PersonsControl", ex);
+//    }
 
-    try {
-      fxmlLoader.load();
-      setupControl();
+    setupControl();
 
-      if(deepThought != null)
-        deepThought.addEntityListener(deepThoughtListener);
-    } catch (IOException ex) {
-      log.error("Could not load PersonsControl", ex);
-    }
+    if(deepThought != null)
+      deepThought.addEntityListener(deepThoughtListener);
   }
 
   protected ApplicationListener applicationListener = new ApplicationListener() {
@@ -160,15 +170,30 @@ public abstract class PersonsControl extends TitledPane implements IEditedEntiti
 
   protected void setupControl() {
     this.setExpanded(false);
-    this.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    setupTitle();
 
-    // replace normal TextField txtfldSearchForPerson with a SearchTextField (with a cross to clear selection)
-    hboxSearchForPerson.getChildren().remove(txtfldSearchForPerson);
+    pnContent = new VBox();
+    pnContent.setMinHeight(200);
+    pnContent.setMaxHeight(Double.MAX_VALUE);
+    pnContent.setMaxWidth(Double.MAX_VALUE);
+
+    hboxSearchForPerson = new HBox();
+    hboxSearchForPerson.setAlignment(Pos.CENTER_LEFT);
+    hboxSearchForPerson.setPrefHeight(32);
+    pnContent.getChildren().add(hboxSearchForPerson);
+    VBox.setMargin(hboxSearchForPerson, new Insets(6, 0, 6, 0));
+
+    Label lblSearch = new Label();
+    JavaFxLocalization.bindLabeledText(lblSearch, "search");
+    hboxSearchForPerson.getChildren().add(lblSearch);
+
     txtfldSearchForPerson = (CustomTextField) TextFields.createClearableTextField();
     txtfldSearchForPerson.setId("txtfldSearchForPerson");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForPerson, "search.for.person");
     hboxSearchForPerson.getChildren().add(1, txtfldSearchForPerson);
     HBox.setHgrow(txtfldSearchForPerson, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForPerson, "search.for.person");
+    HBox.setMargin(txtfldSearchForPerson, new Insets(0, 6, 0, 6));
+
     txtfldSearchForPerson.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -177,23 +202,52 @@ public abstract class PersonsControl extends TitledPane implements IEditedEntiti
     });
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchAuthorsAction());
 
-//    listViewAllPersonsItems = lstvwAllPersons.getItems();
-//    filteredPersons = new FilteredList<>(listViewAllPersonsItems, tag -> true);
-//    sortedFilteredPersons = new SortedList<>(filteredPersons, personComparator);
-//    lstvwAllPersons.setItems(sortedFilteredPersons);
-//    if(deepThought != null)
-//      listViewAllPersonsItems.addAll(deepThought.getPersonsSorted());
+    btnNewPerson = new Button();
+    JavaFxLocalization.bindLabeledText(btnNewPerson, "new...");
+    btnNewPerson.setMinWidth(80);
+    btnNewPerson.setOnAction(event -> handleButtonNewPersonAction(event));
+    hboxSearchForPerson.getChildren().add(btnNewPerson);
+
+    lstvwAllPersons = new ListView<Person>();
+    lstvwAllPersons.setMinHeight(150);
+    lstvwAllPersons.setMaxHeight(Double.MAX_VALUE);
+    lstvwAllPersons.setCellFactory((listView) -> {
+      final PersonListCell cell = createPersonListCell();
+      personListCells.add(cell);
+      return cell;
+    });
+
+    pnContent.getChildren().add(lstvwAllPersons);
+    VBox.setVgrow(lstvwAllPersons, Priority.ALWAYS);
 
     listViewAllPersonsItems = new LazyLoadingObservableList<>();
     if(deepThought != null)
       listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
     lstvwAllPersons.setItems(listViewAllPersonsItems);
 
-    lstvwAllPersons.setCellFactory((listView) -> {
-      final PersonListCell cell = createPersonListCell();
-      personListCells.add(cell);
-      return cell;
-    });
+    setContent(pnContent);
+  }
+
+  protected void setupTitle() {
+    HBox titlePane = new HBox();
+    titlePane.setAlignment(Pos.CENTER_LEFT);
+//    titlePane.setMinHeight(22);
+    titlePane.setMaxHeight(Double.MAX_VALUE);
+    titlePane.setMaxWidth(Double.MAX_VALUE);
+
+    Label lblPersons = new Label();
+    JavaFxLocalization.bindLabeledText(lblPersons, "persons");
+    titlePane.getChildren().add(lblPersons);
+    HBox.setMargin(lblPersons, new Insets(0, 6, 0, 0));
+
+    pnSelectedPersonsPreview = new FlowPane();
+    pnSelectedPersonsPreview.setMaxWidth(Double.MAX_VALUE);
+    pnSelectedPersonsPreview.setVgap(2);
+    pnSelectedPersonsPreview.setAlignment(Pos.CENTER_LEFT);
+    titlePane.getChildren().add(pnSelectedPersonsPreview);
+    HBox.setHgrow(pnSelectedPersonsPreview, Priority.ALWAYS);
+
+    setTitle(titlePane);
   }
 
   protected abstract PersonListCell createPersonListCell();

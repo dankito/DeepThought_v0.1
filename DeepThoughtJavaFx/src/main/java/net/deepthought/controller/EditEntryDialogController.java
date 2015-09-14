@@ -3,6 +3,7 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
@@ -538,8 +539,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     titleMenuItem.setOnAction(event -> {
       nodeToShowOnClick.setVisible(true);
 
-      if (nodeToShowOnClick instanceof TitledPane)
-        ((TitledPane) nodeToShowOnClick).setExpanded(true);
+      if (nodeToShowOnClick instanceof CollapsiblePane)
+        ((CollapsiblePane) nodeToShowOnClick).setExpanded(true);
     });
   }
 
