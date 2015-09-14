@@ -154,6 +154,10 @@ public class Dialogs {
     showEditTagDialog(tag, -1, -1, null, false);
   }
 
+  public static void showEditTagDialog(Tag tag,  Window window, boolean modal) {
+    showEditTagDialog(tag, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal); // 146 = EditTagDialog's height
+  }
+
   public static void showEditTagDialog(Tag tag, double centerX, double y, Window window, boolean modal) {
     showEditTagDialog(tag, centerX, y, window, modal, null);
   }
@@ -379,7 +383,7 @@ public class Dialogs {
       dialogStage.show();
       dialogStage.requestFocus();
     } catch(Exception ex) {
-      log.error("Could not load / show EditReferenceDialog", ex);
+      log.error("Could not load / show ArticlesOverviewDialog", ex);
     }
   }
 

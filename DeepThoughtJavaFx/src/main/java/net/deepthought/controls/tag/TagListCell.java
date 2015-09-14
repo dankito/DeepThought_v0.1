@@ -1,5 +1,6 @@
 package net.deepthought.controls.tag;
 
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
@@ -8,7 +9,9 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.ClipboardHelper;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +28,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -54,8 +61,6 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   protected HBox graphicsPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
   protected Label lblTagName = new Label();
-  protected Button btnEditTag = new Button();
-  protected Button btnDeleteTag = new Button();
 
   protected TextField txtfldEditTagName = null;
 
@@ -81,6 +86,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+
+    setOnContextMenuRequested(event -> showContextMenu(event));
 
     selectedProperty().addListener((observable, oldValue, newValue) -> {
       if(newValue == true)
@@ -114,12 +121,6 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     setText(null);
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
-//    setMaxHeight(16);
-//    graphicsPane.setMaxHeight(16);
-//
-//    String style = getStyle();
-//    style += ".table-row-cell { -fx-cell-size: 16px; }";
-//    setStyle(style);
 
     graphicsPane.setAlignment(Pos.CENTER_LEFT);
 
@@ -131,19 +132,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblTagName);
     graphicsPane.getChildren().add(lblTagName);
 
-    JavaFxLocalization.bindLabeledText(btnEditTag, "edit");
-    btnEditTag.setDisable(true);
-    graphicsPane.getChildren().add(btnEditTag);
-
-    btnDeleteTag.setText("-");
-    btnDeleteTag.setTextFill(Color.RED);
-    btnDeleteTag.setFont(new Font(15));
-    HBox.setMargin(btnDeleteTag, new Insets(0, 0, 0, 6));
-    graphicsPane.getChildren().add(btnDeleteTag);
-
     chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
-    btnEditTag.setOnAction((event) -> handleButtonEditTagAction(event));
-    btnDeleteTag.setOnAction((event) -> handleButtonDeleteTagAction(event));
   }
 
   @Override
@@ -218,15 +207,9 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
       editedTagsHolder.removeEntityFromEntry(getItem());
   }
 
-  protected void handleButtonEditTagAction(ActionEvent event) {
-    // TODO: show EditTag dialog
-  }
-
   protected void mouseClicked(MouseEvent event) {
     if(event.getButton() == MouseButton.PRIMARY) {
       if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-        //Dialogs.showEditTagDialog(getItem());
-
         if (getItem() != null) {
           if (editedTagsHolder.containsEditedEntity(getItem()) == false)
             editedTagsHolder.addEntityToEntry(getItem());
@@ -235,7 +218,6 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
         }
       }
 
-//      cancelEdit();
       showCellInNotEditingState();
         event.consume();
     }
@@ -322,9 +304,29 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     setText(getTagStringRepresentation(tag));
   }
 
-  protected void handleButtonDeleteTagAction(ActionEvent event) {
-    Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag);
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    MenuItem editTagItem = new MenuItem(Localization.getLocalizedString("edit..."));
+    editTagItem.setOnAction(actionEvent -> Dialogs.showEditTagDialog(tag, getScene().getWindow(), true));
+    contextMenu.getItems().add(editTagItem);
+
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem deleteTagItem = new MenuItem(Localization.getLocalizedString("delete"));
+    deleteTagItem.setOnAction(event -> Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag));
+    contextMenu.getItems().add(deleteTagItem);
+
+    return contextMenu;
+  }
+
 
 
   protected EntityListener tagListener = new EntityListener() {
