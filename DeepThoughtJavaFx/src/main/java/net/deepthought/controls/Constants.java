@@ -16,7 +16,7 @@ public class Constants {
 
   public final static String ContextHelpIconPath = "icons/context_help_icon_28x30.png";
 
-  public final static String FilterIconPath = "icons/filter_24x24.png";
+  public final static String FilterIconPath = "icons/filter_22x22.png";
   public final static String FilterDeleteIconPath = "icons/filter_delete_20x20.png";
 
   public final static String NewspaperIconPath = "icons/news_icon_26x26.png";
