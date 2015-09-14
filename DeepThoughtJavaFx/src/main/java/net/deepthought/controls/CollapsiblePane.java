@@ -12,9 +12,12 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -158,6 +161,9 @@ public class CollapsiblePane extends VBox {
     titlePane.setFillHeight(true);
     this.getChildren().add(titlePane);
 
+    titlePane.setCursor(Cursor.HAND);
+    titlePane.setOnMouseClicked(event -> clickedOnTitlePane(event));
+
     expandButton.setContentDisplay(ContentDisplay.TEXT_ONLY);
     expandButton.setFont(new Font(expandButton.getFont().getName(), 9));
     expandButton.setText(ExpandedText);
@@ -231,7 +237,7 @@ public class CollapsiblePane extends VBox {
     setPrefHeight(computePrefHeight(this.getWidth()));
 
     Platform.runLater(() -> {
-    requestParentLayout();
+      requestParentLayout();
     });
   }
 
@@ -271,6 +277,21 @@ public class CollapsiblePane extends VBox {
     }
 
     setHeight();
+  }
+
+  protected void clickedOnTitlePane(MouseEvent event) {
+    if(event.isConsumed() == false) {
+      if(event.getClickCount() == 1) {
+        if(event.getButton() == MouseButton.PRIMARY) {
+          toggleExpandedState();
+          event.consume();
+        }
+        else if(event.getButton() == MouseButton.MIDDLE) { // collapse on middle mouse button click
+          setExpanded(false);
+          event.consume();
+        }
+      }
+    }
   }
 
 
