@@ -2,6 +2,7 @@ package net.deepthought.data.model;
 
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.Localization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,11 +45,10 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
 
 
   public Tag() {
-
+    this(Localization.getLocalizedString("new.tag.default.name"));
   }
 
   public Tag(String name) {
-    this();
     this.name = name;
   }
 

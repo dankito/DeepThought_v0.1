@@ -1,8 +1,10 @@
 package net.deepthought.controls.tabcategories;
 
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.TextFieldTreeCell;
 import net.deepthought.data.model.Category;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.JavaFxLocalization;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -64,7 +66,7 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    addRenameMenuItem(contextMenu);
+    addEditMenuItem(contextMenu);
 
     addDeleteMenuItem(contextMenu);
 
@@ -72,7 +74,8 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
   }
 
   protected void addAddSubCategoryMenuItem(ContextMenu contextMenu) {
-    MenuItem addCategoryMenuItem = new MenuItem("Add SubCategory");
+    MenuItem addCategoryMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(addCategoryMenuItem, "add.sub.category");
     contextMenu.getItems().add(addCategoryMenuItem);
 
     addCategoryMenuItem.setOnAction(new EventHandler() {
@@ -85,20 +88,22 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
     });
   }
 
-  protected void addRenameMenuItem(ContextMenu contextMenu) {
-    MenuItem renameMenuItem = new MenuItem("Rename");
+  protected void addEditMenuItem(ContextMenu contextMenu) {
+    MenuItem renameMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(renameMenuItem, "edit...");
     contextMenu.getItems().add(renameMenuItem);
 
     renameMenuItem.setOnAction(new EventHandler<ActionEvent>() {
       @Override
       public void handle(ActionEvent event) {
-        startEdit();
+        Dialogs.showEditCategoryDialog(category, getScene().getWindow(), true);
       }
     });
   }
 
   protected void addDeleteMenuItem(ContextMenu contextMenu) {
-    MenuItem deleteMenuItem = new MenuItem("Delete");
+    MenuItem deleteMenuItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(deleteMenuItem, "delete");
     contextMenu.getItems().add(deleteMenuItem);
 
     deleteMenuItem.setOnAction(new EventHandler<ActionEvent>() {

@@ -16,7 +16,9 @@ import javafx.concurrent.Task;
 import javafx.css.Styleable;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Cell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
@@ -30,6 +32,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 /**
  * Created by ganymed on 04/02/15.
@@ -147,7 +150,20 @@ public class FXUtils {
 
   public static void showSplitPaneDividers(SplitPane splitPane, boolean show) {
     splitPane.lookupAll(".split-pane-divider").stream()
-        .forEach(div ->  div.setMouseTransparent(!show) );
+        .forEach(div -> div.setMouseTransparent(!show));
+  }
+
+  public static Point2D getNodeScreenCoordinates(Node node) {
+    // thanks for pointing me in the right direction how to calculate a Node's Screen position to: http://blog.crisp.se/2012/08/29/perlundholm/window-scene-and-node-coordinates-in-javafx
+    Scene scene = node.getScene();
+    Window window = scene.getWindow();
+
+    Point2D windowCoord = new Point2D(window.getX(), window.getY());
+    Point2D sceneCoord = new Point2D(scene.getX(), scene.getY());
+    Point2D nodeCoord = node.localToScene(0, 0);
+
+    return new Point2D(Math.round(windowCoord.getX() + sceneCoord.getX() + nodeCoord.getX()),
+                       Math.round(windowCoord.getY() + sceneCoord.getY() + nodeCoord.getY()));
   }
 
 

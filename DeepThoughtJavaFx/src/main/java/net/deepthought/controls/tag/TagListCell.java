@@ -314,13 +314,15 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   protected ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
-    MenuItem editTagItem = new MenuItem(Localization.getLocalizedString("edit..."));
+    MenuItem editTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(editTagItem, "edit...");
     editTagItem.setOnAction(actionEvent -> Dialogs.showEditTagDialog(tag, getScene().getWindow(), true));
     contextMenu.getItems().add(editTagItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem deleteTagItem = new MenuItem(Localization.getLocalizedString("delete"));
+    MenuItem deleteTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
     deleteTagItem.setOnAction(event -> Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag));
     contextMenu.getItems().add(deleteTagItem);
 

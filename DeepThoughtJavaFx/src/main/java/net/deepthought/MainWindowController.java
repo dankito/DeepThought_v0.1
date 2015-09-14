@@ -11,6 +11,7 @@ import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.FXUtils;
@@ -30,6 +31,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -71,6 +73,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -165,6 +168,8 @@ public class MainWindowController implements Initializable {
   protected HBox paneCategoriesQuickFilter;
   @FXML
   protected CustomTextField txtfldCategoriesQuickFilter;
+  @FXML
+  protected Button btnAddCategory;
   @FXML
   protected Button btnRemoveSelectedCategories;
   @FXML
@@ -585,10 +590,12 @@ public class MainWindowController implements Initializable {
 
   @FXML
   protected void handleButtonAddCategoryAction(ActionEvent event) {
-    Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
-    Category newCategory = new Category();
-//    deepThought.addCategory(newCategory);
-    selectedCategory.addSubCategory(newCategory);
+    Point2D buttonCoordinates = FXUtils.getNodeScreenCoordinates(btnAddCategory);
+
+    final double centerX = buttonCoordinates.getX() + btnAddCategory.getWidth() / 2;
+    final double y = buttonCoordinates.getY() + btnAddCategory.getHeight() + 6;
+
+    Dialogs.showEditCategoryDialog(new Category(), centerX, y, stage, true);
   }
 
   ListChangeListener<TreeItem<Category>> categoriesTreeItemsChanged = new ListChangeListener<TreeItem<Category>>() {

@@ -517,14 +517,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void addNewTag() {
-    // thanks for pointing me in the right direction how to calculate a Node's Screen position to: http://blog.crisp.se/2012/08/29/perlundholm/window-scene-and-node-coordinates-in-javafx
-    Window window = getScene().getWindow();
-    final Point2D windowCoord = new Point2D(window.getX(), window.getY());
-    final Point2D sceneCoord = new Point2D(getScene().getX(), getScene().getY());
-    final Point2D nodeCoord = btnAddTag.localToScene(btnAddTag.getWidth() / 2, btnAddTag.getHeight());
+    Point2D buttonCoordinates = FXUtils.getNodeScreenCoordinates(btnAddTag);
 
-    final double centerX = Math.round(windowCoord.getX() + sceneCoord.getX() + nodeCoord.getX());
-    final double y = Math.round(windowCoord.getY() + sceneCoord.getY() + nodeCoord.getY()) + 6;
+    final double centerX = buttonCoordinates.getX() + btnAddTag.getWidth() / 2;
+    final double y = buttonCoordinates.getY() + btnAddTag.getHeight() + 6;
 
     Dialogs.showEditTagDialog(new Tag(), centerX, y, getScene().getWindow(), true);
   }
