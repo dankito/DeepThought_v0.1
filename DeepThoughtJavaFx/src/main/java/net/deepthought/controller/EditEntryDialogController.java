@@ -255,7 +255,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
 
     contentPane.getChildren().add(3, paneTagsAndCategories);
-    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
+//    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
     VBox.setMargin(paneTagsAndCategories, new Insets(6, 0, 0, 0));
 
     entryTagsControl = new EntryTagsControl(entry);
@@ -272,10 +272,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setMinWidth(150);
+    entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setExpanded(true);
     paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
-    GridPane.setConstraints(entryCategoriesControl, 1, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
+    GridPane.setConstraints(entryCategoriesControl, 1, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS, new Insets(0, 0, 0, 12));
 
     setCategoriesPaneVisibility();
   }

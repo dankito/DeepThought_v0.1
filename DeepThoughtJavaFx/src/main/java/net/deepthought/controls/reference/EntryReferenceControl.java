@@ -7,6 +7,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.NewOrEditButton;
@@ -26,6 +27,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
@@ -46,17 +48,19 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends TitledPane implements ISelectedReferenceHolder, ICleanableControl {
+public class EntryReferenceControl extends CollapsiblePane implements ISelectedReferenceHolder, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
 
@@ -71,32 +75,16 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
 
-  protected LazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
-//  protected CombinedLazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
-//  protected ObservableList<ReferenceBase> listViewReferenceBasesItems = null;
-//  protected FilteredList<ReferenceBase> filteredReferenceBases = null;
-//  protected SortedList<ReferenceBase> sortedFilteredReferenceBases = null;
-
-  protected Search<ReferenceBase> filterReferenceBasesSearch = null;
-
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
 
   protected EntryReferenceBaseLabel currentReferenceLabel = null;
 
-  protected ChangeListener<? super Number> currentWidthListener = null;
-
 
   @FXML
-  protected Pane paneSeriesTitleOrReference;
-  @FXML
-  protected Label lblReference;
-  @FXML
-  protected Pane paneSelectedReferenceBase;
+  protected HBox paneSelectedReferenceBase;
   @FXML
   protected NewOrEditButton btnNewOrEditReference;
 
-  @FXML
-  protected Pane paneReferenceIndicationSettings;
   @FXML
   protected TextField txtfldReferenceIndication;
 
@@ -117,22 +105,12 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryReferenceControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+    setupControl();
 
-    try {
-      fxmlLoader.load();
-      setupControl();
+    if(deepThought != null)
+      deepThought.addEntityListener(deepThoughtListener);
 
-      if(deepThought != null)
-        deepThought.addEntityListener(deepThoughtListener);
-
-      setEntry(entry);
-    } catch (IOException ex) {
-      log.error("Could not load EntryReferenceControl", ex);
-    }
+    setEntry(entry);
   }
 
   protected ApplicationListener applicationListener = new ApplicationListener() {
@@ -221,29 +199,60 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
     this.deepThought = newDeepThought;
 
-    listViewReferenceBasesItems.clear();
-
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
     }
   }
 
   protected void setupControl() {
-    btnNewOrEditReference = new NewOrEditButton();// create btnNewOrEditReference before cmbxSeriesTitleOrReference's value gets set (otherwise cmbxSeriesTitleOrReferenceValueChangedListener causes a NullPointerException)
+    setupTitle();
+
+    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.All, this);
+    searchAndSelectReferenceControl.setMaxHeight(Double.MAX_VALUE);
+    setContent(searchAndSelectReferenceControl);
+  }
+
+  protected void setupTitle() {
+    HBox titlePane = new HBox();
+    titlePane.setAlignment(Pos.CENTER_LEFT);
+    titlePane.setMinHeight(32);
+    titlePane.setMaxHeight(32);
+    titlePane.setMaxWidth(Double.MAX_VALUE);
+
+    Label lblReference = new Label();
+    JavaFxLocalization.bindLabeledText(lblReference, "reference");
+    titlePane.getChildren().add(lblReference);
+    HBox.setMargin(lblReference, new Insets(0, 12, 0, 0));
+
+    paneSelectedReferenceBase = new HBox();
+    paneSelectedReferenceBase.setAlignment(Pos.CENTER_LEFT);
+    paneSelectedReferenceBase.setMinWidth(100);
+    paneSelectedReferenceBase.setMaxWidth(Double.MAX_VALUE);
+    titlePane.getChildren().add(paneSelectedReferenceBase);
+
+    btnNewOrEditReference = new NewOrEditButton();
     btnNewOrEditReference.setOnAction(event -> handleButtonEditOrNewReferenceAction(event));
     btnNewOrEditReference.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceAction(event));
-    paneSeriesTitleOrReference.getChildren().add(2, btnNewOrEditReference);
+    titlePane.getChildren().add(2, btnNewOrEditReference);
 
     btnNewOrEditReference.setMinWidth(100);
     btnNewOrEditReference.setPrefWidth(162);
     btnNewOrEditReference.setMaxHeight(28);
     HBox.setMargin(btnNewOrEditReference, new Insets(0, 0, 0, 6));
 
+    Label lblIndication = new Label();
+    JavaFxLocalization.bindLabeledText(lblIndication, "indication");
+    titlePane.getChildren().add(lblIndication);
+    HBox.setMargin(lblIndication, new Insets(0, 6, 0, 12));
+
+    txtfldReferenceIndication = new TextField();
+    txtfldReferenceIndication.setMinWidth(60);
+    txtfldReferenceIndication.setPrefWidth(90);
     txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) ->
         fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceIndication, txtfldReferenceIndication.getText()));
+    titlePane.getChildren().add(txtfldReferenceIndication);
 
-    searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.All, this);
-    setContent(searchAndSelectReferenceControl);
+    setTitle(titlePane);
   }
 
 
@@ -309,12 +318,6 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
 
     currentReferenceLabel = new EntryReferenceBaseLabel(newReferenceBase, creationResult, onButtonRemoveItemFromCollectionEventHandler);
 
-    // laborious but works: Before if EntryReferenceBaseLabel was to broad to be fully displayed it broadened the whole EntryReferenceControl and there moved the Splitter of SplitPane
-    currentWidthListener = (observable, oldValue, newValue) -> setEntryReferenceBaseLabelMaxWidth(currentReferenceLabel);
-    this.widthProperty().addListener(currentWidthListener);
-    paneReferenceIndicationSettings.widthProperty().addListener(currentWidthListener);
-    setEntryReferenceBaseLabelMaxWidth(currentReferenceLabel);
-
     paneSelectedReferenceBase.getChildren().add(currentReferenceLabel);
   }
 
@@ -325,19 +328,6 @@ public class EntryReferenceControl extends TitledPane implements ISelectedRefere
     }
 
     paneSelectedReferenceBase.getChildren().clear();
-
-    if(currentWidthListener != null) {
-      this.widthProperty().removeListener(currentWidthListener);
-      paneReferenceIndicationSettings.widthProperty().removeListener(currentWidthListener);
-      currentWidthListener = null;
-    }
-  }
-
-  protected void setEntryReferenceBaseLabelMaxWidth(EntryReferenceBaseLabel label) {
-    if(paneReferenceIndicationSettings.getWidth() > 0) // on the first call this.getWidth() == 0 -> maxWidth would be less than zero -> less than zero this means 'MAX_VALUE'
-      label.setMaxWidth(this.getWidth() - lblReference.getWidth() - btnNewOrEditReference.getWidth() - paneReferenceIndicationSettings.getWidth() - 60);
-    else
-      label.setMaxWidth(this.getMinWidth() - 60);
   }
 
   protected EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler = new EventHandler<CollectionItemLabelEvent>() {
