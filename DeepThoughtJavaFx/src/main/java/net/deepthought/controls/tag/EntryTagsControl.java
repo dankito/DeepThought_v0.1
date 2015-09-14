@@ -93,21 +93,6 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
     Application.addApplicationListener(applicationListener);
 
-//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryTagsControl.fxml"));
-//    fxmlLoader.setRoot(this);
-//    fxmlLoader.setController(this);
-//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-//
-//    try {
-//      fxmlLoader.load();
-//      setupControl();
-//
-//      if(deepThought != null)
-//        deepThought.addEntityListener(deepThoughtListener);
-//    } catch (IOException ex) {
-//      log.error("Could not load EntryTagsControl", ex);
-//    }
-
     setupControl();
     if(deepThought != null)
       deepThought.addEntityListener(deepThoughtListener);
