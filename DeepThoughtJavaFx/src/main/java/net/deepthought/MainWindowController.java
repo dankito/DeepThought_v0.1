@@ -585,16 +585,10 @@ public class MainWindowController implements Initializable {
 
   @FXML
   protected void handleButtonAddCategoryAction(ActionEvent event) {
-//    if(selectedCategoryTreeItem != null)
-//      selectedCategoryTreeItem.getChildren().addListener(categoriesTreeItemsChanged);
-
     Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
     Category newCategory = new Category();
 //    deepThought.addCategory(newCategory);
     selectedCategory.addSubCategory(newCategory);
-
-//    if(selectedCategoryTreeItem != null)
-//      selectedCategoryTreeItem.getChildren().removeListener(categoriesTreeItemsChanged);
   }
 
   ListChangeListener<TreeItem<Category>> categoriesTreeItemsChanged = new ListChangeListener<TreeItem<Category>>() {

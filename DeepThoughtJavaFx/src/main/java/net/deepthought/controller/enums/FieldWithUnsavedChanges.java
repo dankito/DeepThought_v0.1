@@ -31,6 +31,9 @@ public enum FieldWithUnsavedChanges {
   TagName,
   TagDescription,
 
+  CategoryName,
+  CategoryDescription,
+
   PersonFirstName,
   PersonMiddleNames,
   PersonLastName,

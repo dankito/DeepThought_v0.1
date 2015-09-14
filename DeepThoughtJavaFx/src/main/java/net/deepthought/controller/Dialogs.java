@@ -50,49 +50,6 @@ public class Dialogs {
     return openedChildWindows;
   }
 
-  public static void showEditCategoryDialog(final Category category) {
-    showEditCategoryDialog(category, null);
-  }
-
-  public static void showEditCategoryDialog(final Category category, final ChildWindowsControllerListener listener) {
-    try {
-//      FXMLLoader loader = new FXMLLoader();
-//      Stage dialogStage = createStage(loader, "EditCategoryDialog.fxml");
-//
-//      EditCategoryDialogController controller = loader.getController();
-//      controller.setCategoryAndStage(category, dialogStage);
-//
-//      controller.setListener(new ChildWindowsControllerListener() {
-//        @Override
-//        public void windowClosing(Stage stage, ChildWindowsController controller) {
-//          if(controller.getDialogResult() == DialogResult.Ok) {
-//            if(category.getId() == null) { // a new Category
-//              Application.getDeepThought().addCategory(category);
-//            }
-//          }
-//
-//          if(listener != null)
-//            listener.windowClosing(stage, controller);
-//        }
-//
-//        @Override
-//        public void windowClosed(Stage stage, ChildWindowsController controller) {
-//          removeClosedChildWindow(stage);
-//
-//          if(listener != null)
-//            listener.windowClosed(stage, controller);
-//        }
-//      });
-//
-//      addOpenedChildWindow(dialogStage);
-//
-//      dialogStage.show();
-//      dialogStage.requestFocus();
-    } catch(Exception ex) {
-      log.error("Could not load / show EditCategoryDialog", ex);
-    }
-  }
-
 
   public static void showEditEntryDialog(final Entry entry) {
     if(Platform.isFxApplicationThread())
@@ -206,6 +163,66 @@ public class Dialogs {
         dialogStage.setY(y);
     } catch(Exception ex) {
       log.error("Could not load / show EditTagDialog", ex);
+    }
+  }
+
+
+  public static void showEditCategoryDialog(Category category) {
+    showEditCategoryDialog(category, -1, -1, null, false);
+  }
+
+  public static void showEditCategoryDialog(Category category,  Window window, boolean modal) {
+    showEditCategoryDialog(category, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal); // 146 = EditTagDialog's height
+  }
+
+  public static void showEditCategoryDialog(Category category, double centerX, double y, Window window, boolean modal) {
+    showEditCategoryDialog(category, centerX, y, window, modal, null);
+  }
+
+  public static void showEditCategoryDialog(final Category category, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
+    try {
+      FXMLLoader loader = new FXMLLoader();
+      Stage dialogStage = createStage(loader, "EditCategoryDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
+
+      // Set the category into the controller.
+      EditCategoryDialogController controller = loader.getController();
+      controller.setCategoryAndStage(dialogStage, category);
+
+      controller.setListener(new ChildWindowsControllerListener() {
+        @Override
+        public void windowClosing(Stage stage, ChildWindowsController controller) {
+          if (controller.getDialogResult() == DialogResult.Ok) {
+            if (category.isPersisted() == false) { // a new Tag
+              Application.getDeepThought().addCategory(category);
+            }
+          }
+
+          if (listener != null)
+            listener.windowClosing(stage, controller);
+        }
+
+        @Override
+        public void windowClosed(Stage stage, ChildWindowsController controller) {
+          removeClosedChildWindow(stage);
+
+          if (listener != null)
+            listener.windowClosed(stage, controller);
+        }
+      });
+
+      addOpenedChildWindow(dialogStage);
+
+      dialogStage.show();
+      dialogStage.requestFocus();
+
+      if(centerX > 0) {
+        double x = centerX - dialogStage.getWidth() / 2;
+        dialogStage.setX(x);
+      }
+      if(y > 0)
+        dialogStage.setY(y);
+    } catch(Exception ex) {
+      log.error("Could not load / show EditCategoryDialog", ex);
     }
   }
 
