@@ -70,12 +70,15 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -106,7 +109,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected Button btnApplyChanges;
 
   @FXML
-  protected GridPane contentPane;
+  protected VBox contentPane;
 
   @FXML
   protected Pane paneTitle;
@@ -121,19 +124,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected CollapsibleHtmlEditor htmledAbstract;
 
-  @FXML
-  protected TitledPane ttldpnContent;
-
   protected CollapsibleHtmlEditor htmledContent;
 
-//  @FXML
-//  protected BorderPane paneTagsAndCategories;
-//  @FXML
-//  protected SplitPane paneTagsAndCategories;
-  @FXML
-  protected HBox paneTagsAndCategories;
-//  @FXML
-//  protected FlowPane paneTagsAndCategories;
+  protected GridPane paneTagsAndCategories;
+  protected ColumnConstraints tagsColumn;
+  protected ColumnConstraints categoriesColumn;
 
   protected EntryTagsControl entryTagsControl = null;
 
@@ -193,57 +188,33 @@ public class EditEntryDialogController extends ChildWindowsController implements
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
-    contentPane.add(htmledAbstract, 0, 1, 2, 1);
-    GridPane.setConstraints(htmledAbstract, 0, 1, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(htmledAbstract, true);
+    contentPane.getChildren().add(1, htmledAbstract);
+    VBox.setVgrow(htmledAbstract, Priority.SOMETIMES);
+    VBox.setMargin(htmledAbstract, new Insets(6, 0, 0, 0));
 
     htmledContent = new CollapsibleHtmlEditor("content", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
-    contentPane.add(htmledContent, 0, 2, 2, 1);
-    GridPane.setConstraints(htmledContent, 0, 2, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-    GridPane.setFillHeight(htmledContent, true);
+    contentPane.getChildren().add(2, htmledContent);
+    VBox.setVgrow(htmledContent, Priority.ALWAYS);
+    VBox.setMargin(htmledContent, new Insets(6, 0, 0, 0));
 
-    entryTagsControl = new EntryTagsControl(entry);
-    entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
-    entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
-    entryTagsControl.setMinWidth(150);
-    entryTagsControl.setPrefHeight(250);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
-    entryTagsControl.setExpanded(true);
-    contentPane.add(entryTagsControl, 0, 3, 1, 1);
-    GridPane.setConstraints(entryTagsControl, 0, 3, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(entryTagsControl, true);
-
-    entryCategoriesControl = new EntryCategoriesControl(entry);
-    entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
-    entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
-    entryCategoriesControl.setMinWidth(150);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
-    entryCategoriesControl.setExpanded(true);
-    contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
-    GridPane.setConstraints(entryCategoriesControl, 1, 3, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES, new Insets(0, 0, 0, 12));
-//    GridPane.setFillHeight(entryCategoriesControl, true);
-    setCategoriesPaneVisibility();
+    setupTagsAndCategoriesControl();
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    contentPane.getChildren().add(4, entryReferenceControl);
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
-    contentPane.add(entryReferenceControl, 0, 4, 2, 1);
-    GridPane.setConstraints(entryReferenceControl, 0, 4, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(entryReferenceControl, true);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setExpanded(false);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
+    contentPane.getChildren().add(5, entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
-    contentPane.add(entryPersonsControl, 0, 5, 2, 1);
-    GridPane.setConstraints(entryPersonsControl, 0, 5, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(entryPersonsControl, true);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
@@ -251,8 +222,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
     // implemented
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
-//    GridPane.setConstraints(ttldpnFiles, 0, 4, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(ttldpnFiles, true);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
       @Override
       public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
@@ -269,6 +238,46 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
+  }
+
+  protected void setupTagsAndCategoriesControl() {
+    tagsColumn = new ColumnConstraints();
+    categoriesColumn = new ColumnConstraints();
+    tagsColumn.setPercentWidth(50);
+    categoriesColumn.setPercentWidth(50);
+
+    paneTagsAndCategories = new GridPane();
+    paneTagsAndCategories.getColumnConstraints().add(tagsColumn);
+    paneTagsAndCategories.getColumnConstraints().add(categoriesColumn);
+
+    paneTagsAndCategories.setMinHeight(22);
+    paneTagsAndCategories.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
+
+    contentPane.getChildren().add(3, paneTagsAndCategories);
+    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
+    VBox.setMargin(paneTagsAndCategories, new Insets(6, 0, 0, 0));
+
+    entryTagsControl = new EntryTagsControl(entry);
+    entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
+    entryTagsControl.setMinWidth(150);
+    entryTagsControl.setPrefHeight(250);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
+    entryTagsControl.setExpanded(true);
+    paneTagsAndCategories.add(entryTagsControl, 0, 0);
+    GridPane.setConstraints(entryTagsControl, 0, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
+
+    entryCategoriesControl = new EntryCategoriesControl(entry);
+    entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
+    entryCategoriesControl.setMinWidth(150);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
+    entryCategoriesControl.setExpanded(true);
+    paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
+    GridPane.setConstraints(entryCategoriesControl, 1, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
+
+    setCategoriesPaneVisibility();
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
@@ -291,15 +300,15 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setVisible(showCategories);
 
     if(showCategories) {
-      if(contentPane.getChildren().contains(entryCategoriesControl) == false)
-        contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
-      contentPane.getColumnConstraints().get(0).setPercentWidth(50);
-      contentPane.getColumnConstraints().get(1).setPercentWidth(50);
+      if(paneTagsAndCategories.getChildren().contains(entryCategoriesControl) == false)
+        paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
+      tagsColumn.setPercentWidth(50);
+      categoriesColumn.setPercentWidth(50);
     }
     else {
-      contentPane.getChildren().remove(entryCategoriesControl);
-      contentPane.getColumnConstraints().get(0).setPercentWidth(100);
-      contentPane.getColumnConstraints().get(1).setPercentWidth(0);
+      paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
+      tagsColumn.setPercentWidth(100);
+      categoriesColumn.setPercentWidth(0);
     }
   }
 
