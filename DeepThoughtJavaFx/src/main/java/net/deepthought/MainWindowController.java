@@ -19,7 +19,6 @@ import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
-import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
@@ -31,7 +30,6 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -55,10 +53,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -465,7 +461,8 @@ public class MainWindowController implements Initializable {
     txtfldCategoriesQuickFilter.setPromptText("Quickly filter Categories");
     txtfldCategoriesQuickFilter.setPromptText("(disabled)");
 
-    btnAddCategory.setTextFill(Constants.PlusButtonTextColor);
+    btnRemoveSelectedCategories.setTextFill(Constants.RemoveEntityButtonTextColor);
+    btnAddCategory.setTextFill(Constants.AddEntityButtonTextColor);
 
     trvwCategories.setContextMenu(createTreeViewCategoriesContextMenu());
 

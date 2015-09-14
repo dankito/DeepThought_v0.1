@@ -43,8 +43,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -227,7 +225,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
 
-    btnAddEntry.setTextFill(Constants.PlusButtonTextColor);
+    btnRemoveSelectedEntries.setTextFill(Constants.RemoveEntityButtonTextColor);
+    btnAddEntry.setTextFill(Constants.AddEntityButtonTextColor);
 
     tableViewEntriesItems = new LazyLoadingObservableList<>();
     tblvwEntries.setItems(tableViewEntriesItems);

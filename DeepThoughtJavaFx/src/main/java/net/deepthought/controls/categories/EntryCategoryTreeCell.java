@@ -43,7 +43,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 /**
@@ -130,7 +129,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     graphicPane.getChildren().add(categoryOptionsButtonsPane);
 
     addSubCategoryToCategoryButton.setText("+");
-    addSubCategoryToCategoryButton.setTextFill(Constants.PlusButtonTextColor);
+    addSubCategoryToCategoryButton.setTextFill(Constants.AddEntityButtonTextColor);
     addSubCategoryToCategoryButton.setFont(new Font(9.5));
     addSubCategoryToCategoryButton.setMinWidth(height);
     addSubCategoryToCategoryButton.setMaxWidth(height);

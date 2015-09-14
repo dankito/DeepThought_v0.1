@@ -22,7 +22,6 @@ import net.deepthought.util.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +36,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -48,7 +46,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -241,7 +238,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     btnAddTopLevelCategory.setMaxWidth(24);
     btnAddTopLevelCategory.setFont(new Font(9.5));
     btnAddTopLevelCategory.setText("+");
-    btnAddTopLevelCategory.setTextFill(Constants.PlusButtonTextColor);
+    btnAddTopLevelCategory.setTextFill(Constants.AddEntityButtonTextColor);
     titlePane.getChildren().add(btnAddTopLevelCategory);
     HBox.setMargin(btnAddTopLevelCategory, new Insets(0, 0, 0, 4));
 

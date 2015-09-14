@@ -1,6 +1,7 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.model.Person;
@@ -125,7 +126,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     });
 
     btnDeletePerson.setText("-");
-    btnDeletePerson.setTextFill(Color.RED);
+    btnDeletePerson.setTextFill(Constants.RemoveEntityButtonTextColor);
     btnDeletePerson.setFont(new Font(15));
     HBox.setMargin(btnDeletePerson, new Insets(0, 0, 0, 6));
     graphicPane.getChildren().add(btnDeletePerson);

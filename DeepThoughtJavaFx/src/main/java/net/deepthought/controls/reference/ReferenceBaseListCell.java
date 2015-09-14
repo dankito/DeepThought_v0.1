@@ -4,6 +4,7 @@ import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
@@ -138,7 +139,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
     });
 
     btnDeleteReferenceBase.setText("-");
-    btnDeleteReferenceBase.setTextFill(Color.RED);
+    btnDeleteReferenceBase.setTextFill(Constants.RemoveEntityButtonTextColor);
     btnDeleteReferenceBase.setFont(new Font(15));
     HBox.setMargin(btnDeleteReferenceBase, new Insets(0, 0, 0, 6));
     graphicPane.getChildren().add(btnDeleteReferenceBase);

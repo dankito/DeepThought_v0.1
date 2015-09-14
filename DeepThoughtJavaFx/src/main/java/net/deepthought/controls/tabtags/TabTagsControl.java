@@ -45,7 +45,6 @@ import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
@@ -58,7 +57,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.stage.Window;
 import javafx.util.Callback;
 
 /**
@@ -160,7 +158,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     btnRemoveTagsFilter.setGraphic(new ImageView(Constants.FilterDeleteIconPath));
     JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
 
-    btnAddTag.setTextFill(Constants.PlusButtonTextColor);
+    btnRemoveSelectedTag.setTextFill(Constants.RemoveEntityButtonTextColor);
+    btnAddTag.setTextFill(Constants.AddEntityButtonTextColor);
 
     tblvwTags.selectionModelProperty().addListener(new ChangeListener<TableView.TableViewSelectionModel<Tag>>() {
       @Override
