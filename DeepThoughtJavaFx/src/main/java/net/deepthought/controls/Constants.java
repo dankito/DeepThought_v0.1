@@ -11,15 +11,12 @@ import javafx.scene.paint.Color;
  */
 public class Constants {
 
-//  public final static int ContextHelpBackgroundColor = -12424802;
   public final static int ContextHelpBackgroundColor = -7820592;
 
-//  public final static Color AddEntityButtonTextColor = Color.rgb(17, 114, 25);
   public final static Color AddEntityButtonTextColor = Color.rgb(6, 134, 6);
-//  public final static Color AddEntityButtonTextColor = Color.rgb(4, 117, 4);
 
-//  public final static Color RemoveEntityButtonTextColor = Color.rgb(185, 9, 9);
   public final static Color RemoveEntityButtonTextColor = Color.rgb(208, 16, 16);
+
 
   public final static String ContextHelpIconPath = "icons/context_help_icon_28x30.png";
 
