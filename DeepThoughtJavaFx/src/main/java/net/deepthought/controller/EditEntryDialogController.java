@@ -69,7 +69,6 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -77,7 +76,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -174,13 +172,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected SettingsChangedListener settingsChangedListener = new SettingsChangedListener() {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      if (setting == Setting.UserDeviceShowCategories) {
-        entryCategoriesControl.setVisible((boolean) newValue);
-        if ((boolean) newValue) {
-          contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
-        } else
-          contentPane.getChildren().remove(entryCategoriesControl);
-      } else if (setting == Setting.UserDeviceDialogFieldsDisplay)
+      if (setting == Setting.UserDeviceShowCategories)
+        setCategoriesPaneVisibility((boolean) newValue);
+      else if (setting == Setting.UserDeviceDialogFieldsDisplay)
         dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
     }
   };
@@ -207,7 +201,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
     contentPane.add(htmledContent, 0, 2, 2, 1);
     GridPane.setConstraints(htmledContent, 0, 2, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
-//    GridPane.setFillHeight(htmledContent, true);
+    GridPane.setFillHeight(htmledContent, true);
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -216,7 +210,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
-    HBox.setHgrow(entryTagsControl, Priority.ALWAYS);
     contentPane.add(entryTagsControl, 0, 3, 1, 1);
     GridPane.setConstraints(entryTagsControl, 0, 3, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
 //    GridPane.setFillHeight(entryTagsControl, true);
@@ -226,11 +219,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setMinWidth(150);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
-    entryCategoriesControl.setVisible(Application.getSettings().showCategories());
     entryCategoriesControl.setExpanded(true);
-    HBox.setHgrow(entryCategoriesControl, Priority.ALWAYS);
-    HBox.setMargin(entryCategoriesControl, new Insets(0, 0, 0, 12));
     contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
+    GridPane.setConstraints(entryCategoriesControl, 1, 3, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES, new Insets(0, 0, 0, 12));
+//    GridPane.setFillHeight(entryCategoriesControl, true);
+    setCategoriesPaneVisibility();
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setExpanded(false);
@@ -249,6 +242,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
     contentPane.add(entryPersonsControl, 0, 5, 2, 1);
+    GridPane.setConstraints(entryPersonsControl, 0, 5, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(entryPersonsControl, true);
 
 //    entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
@@ -256,6 +251,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     // implemented
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
+//    GridPane.setConstraints(ttldpnFiles, 0, 4, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(ttldpnFiles, true);
     clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
       @Override
       public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
@@ -282,6 +279,28 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll || entryReferenceControl.isVisible() == false ||
                           entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false);
+
+    setCategoriesPaneVisibility();
+  }
+
+  protected void setCategoriesPaneVisibility() {
+    setCategoriesPaneVisibility(Application.getSettings().showCategories());
+  }
+
+  protected void setCategoriesPaneVisibility(boolean showCategories) {
+    entryCategoriesControl.setVisible(showCategories);
+
+    if(showCategories) {
+      if(contentPane.getChildren().contains(entryCategoriesControl) == false)
+        contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
+      contentPane.getColumnConstraints().get(0).setPercentWidth(50);
+      contentPane.getColumnConstraints().get(1).setPercentWidth(50);
+    }
+    else {
+      contentPane.getChildren().remove(entryCategoriesControl);
+      contentPane.getColumnConstraints().get(0).setPercentWidth(100);
+      contentPane.getColumnConstraints().get(1).setPercentWidth(0);
+    }
   }
 
   protected void referenceControlFieldChanged(FieldChangedEvent event) {
