@@ -180,7 +180,7 @@ public class CollapsiblePane extends GridPane {
 
   @Override
   protected double computeMinHeight(double width) {
-    double height = getTitle() instanceof Region ? ((Region)getTitle()).getPrefHeight() : 22; // TODO: make general, don't depend on Region
+    double height = getTitleHeight();
 
     if(isExpanded())
       height += getContent() instanceof Region ? ((Region)getContent()).getMinHeight() : 0;
@@ -190,12 +190,26 @@ public class CollapsiblePane extends GridPane {
 
   @Override
   protected double computePrefHeight(double width) {
-    double height = getTitle() instanceof Region ? ((Region)getTitle()).getPrefHeight() : 22; // TODO: make general, don't depend on Region
+    double height = getTitleHeight();
 
     if(isExpanded())
       height += getContent() instanceof Region ? ((Region)getContent()).getPrefHeight() : 0;
 
     return height;
+  }
+
+  @Override
+  protected double computeMaxHeight(double width) {
+    double height = getTitleHeight();
+
+    if(isExpanded())
+      height += getContent() instanceof Region ? ((Region)getContent()).getMaxHeight() : 0;
+
+    return height;
+  }
+
+  protected double getTitleHeight() {
+    return getTitle() instanceof Region ? ((Region)getTitle()).getHeight() : 22; // TODO: make general, don't depend on Region
   }
 
   //  @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {

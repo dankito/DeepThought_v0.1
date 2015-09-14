@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
@@ -43,6 +44,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
@@ -168,18 +170,16 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
   protected void setupTitle() {
     GridPane titlePane = new GridPane();
-    titlePane.setPrefWidth(Region.USE_COMPUTED_SIZE);
+    titlePane.setPrefWidth(USE_COMPUTED_SIZE);
     titlePane.setMaxWidth(Double.MAX_VALUE);
-    titlePane.getColumnConstraints().add(new ColumnConstraints(24));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.SOMETIMES, HPos.LEFT, true));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
-    titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, false));
+    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+    titlePane.setMinHeight(USE_PREF_SIZE);
+    titlePane.setMaxHeight(Double.MAX_VALUE);
 
-//    HBox titlePane = new HBox();
-//    titlePane.setAlignment(Pos.CENTER_LEFT);
-//    titlePane.setMinHeight(22);
-//    titlePane.setMaxHeight(Double.MAX_VALUE);
-//    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+    titlePane.getColumnConstraints().add(new ColumnConstraints(24));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_PREF_SIZE, USE_COMPUTED_SIZE, USE_PREF_SIZE));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
+    titlePane.getRowConstraints().add(new RowConstraints(USE_PREF_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true));
 
     btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -197,19 +197,14 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     lblTags.setMinWidth(USE_PREF_SIZE);
     lblTags.setMaxWidth(USE_PREF_SIZE);
     titlePane.add(lblTags, 1, 0);
-//    GridPane.setConstraints(lblTags, 1, 0, 1, 1, HPos.LEFT, VPos.CENTER, Priority.ALWAYS, Priority.NEVER);
     GridPane.setMargin(lblTags, new Insets(0, 4, 0, 4));
-//    HBox.setHgrow(lblTags, Priority.ALWAYS);
 
     pnSelectedTagsPreview = new FlowPane();
-    pnSelectedTagsPreview.setMaxWidth(Double.MAX_VALUE);
     pnSelectedTagsPreview.setColumnHalignment(HPos.LEFT);
     pnSelectedTagsPreview.setRowValignment(VPos.CENTER);
     pnSelectedTagsPreview.setAlignment(Pos.CENTER_LEFT);
     titlePane.add(pnSelectedTagsPreview, 2, 0);
-//    HBox.setHgrow(pnSelectedTagsPreview, Priority.ALWAYS);
-
-//    titlePane.getChildren().addAll(btnShowHideSearchTagsToolWindow, lblTags, pnSelectedTagsPreview);
+    GridPane.setConstraints(pnSelectedTagsPreview, 2, 0, 1, 1, HPos.LEFT, VPos.CENTER, Priority.ALWAYS, Priority.ALWAYS);
 
     setTitle(titlePane);
   }
