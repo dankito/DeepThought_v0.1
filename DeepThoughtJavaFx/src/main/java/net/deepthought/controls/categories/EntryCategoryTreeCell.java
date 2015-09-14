@@ -1,6 +1,7 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
@@ -129,7 +130,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     graphicPane.getChildren().add(categoryOptionsButtonsPane);
 
     addSubCategoryToCategoryButton.setText("+");
-    addSubCategoryToCategoryButton.setTextFill(Color.GREEN);
+    addSubCategoryToCategoryButton.setTextFill(Constants.PlusButtonTextColor);
     addSubCategoryToCategoryButton.setFont(new Font(9.5));
     addSubCategoryToCategoryButton.setMinWidth(height);
     addSubCategoryToCategoryButton.setMaxWidth(height);

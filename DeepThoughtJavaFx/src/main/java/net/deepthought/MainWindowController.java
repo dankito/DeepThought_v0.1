@@ -465,6 +465,8 @@ public class MainWindowController implements Initializable {
     txtfldCategoriesQuickFilter.setPromptText("Quickly filter Categories");
     txtfldCategoriesQuickFilter.setPromptText("(disabled)");
 
+    btnAddCategory.setTextFill(Constants.PlusButtonTextColor);
+
     trvwCategories.setContextMenu(createTreeViewCategoriesContextMenu());
 
     trvwCategories.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Category>>() {

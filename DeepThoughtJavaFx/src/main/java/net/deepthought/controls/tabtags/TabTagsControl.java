@@ -160,6 +160,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     btnRemoveTagsFilter.setGraphic(new ImageView(Constants.FilterDeleteIconPath));
     JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
 
+    btnAddTag.setTextFill(Constants.PlusButtonTextColor);
+
     tblvwTags.selectionModelProperty().addListener(new ChangeListener<TableView.TableViewSelectionModel<Tag>>() {
       @Override
       public void changed(ObservableValue<? extends TableView.TableViewSelectionModel<Tag>> observable, TableView.TableViewSelectionModel<Tag> oldValue, TableView.TableViewSelectionModel<Tag> newValue) {

@@ -45,7 +45,7 @@
                                         <Insets bottom="2.0" left="6.0" top="2.0" />
                                     </HBox.margin>
                                 </Button>
-                                <Button fx:id="AddEntry" mnemonicParsing="false" onAction="#handleButtonAddEntryAction" prefHeight="30.0" prefWidth="50.0" text="+" textFill="#117219">
+                                <Button fx:id="btnAddEntry" mnemonicParsing="false" onAction="#handleButtonAddEntryAction" prefHeight="30.0" prefWidth="50.0" text="+" textFill="#117219">
                                     <font>
                                         <Font name="System Bold" size="18.0" />
                                     </font>

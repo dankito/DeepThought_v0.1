@@ -3,6 +3,7 @@ package net.deepthought.controls.entries;
 import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
@@ -101,6 +102,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   ToggleButton tglbtnEntriesQuickFilterContent;
   @FXML
   protected Button btnRemoveSelectedEntries;
+  @FXML
+  protected Button btnAddEntry;
 
   @FXML
   protected TableView<Entry> tblvwEntries;
@@ -223,6 +226,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "quickly.filter.entries.abstract.tool.tip");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
     JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
+
+    btnAddEntry.setTextFill(Constants.PlusButtonTextColor);
 
     tableViewEntriesItems = new LazyLoadingObservableList<>();
     tblvwEntries.setItems(tableViewEntriesItems);

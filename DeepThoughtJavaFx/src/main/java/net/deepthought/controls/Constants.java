@@ -14,6 +14,10 @@ public class Constants {
 //  public final static int ContextHelpBackgroundColor = -12424802;
   public final static int ContextHelpBackgroundColor = -7820592;
 
+//  public final static Color PlusButtonTextColor = Color.rgb(17, 114, 25);
+  public final static Color PlusButtonTextColor = Color.rgb(6, 134, 6);
+//  public final static Color PlusButtonTextColor = Color.rgb(4, 117, 4);
+
   public final static String ContextHelpIconPath = "icons/context_help_icon_28x30.png";
 
   public final static String FilterIconPath = "icons/filter_22x22.png";

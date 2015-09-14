@@ -1,6 +1,9 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.Application;
+import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.CollapsiblePane;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.event.EntryCategoriesEditedEvent;
@@ -12,6 +15,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
@@ -34,17 +38,25 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryCategoriesControl extends TitledPane implements IEditedEntitiesHolder<Category>, ICleanableControl {
+public class EntryCategoriesControl extends CollapsiblePane implements IEditedEntitiesHolder<Category>, ICleanableControl {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoriesControl.class);
 
@@ -67,13 +79,16 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
   protected EventHandler<EntryCategoriesEditedEvent> categoryRemovedEventHandler = null;
 
 
+  protected Label lblCategories;
   @FXML
   protected FlowPane pnSelectedCategoriesPreview;
 
+  protected Button btnAddTopLevelCategory;
+
   @FXML
-  protected Pane pnContent;
+  protected VBox pnContent;
   @FXML
-  protected Pane pnFilterCategories;
+  protected HBox pnFilterCategories;
   @FXML
   protected TextField txtfldFilterCategories;
   @FXML
@@ -87,22 +102,12 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntryCategoriesControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
+    setupControl();
 
-    try {
-      fxmlLoader.load();
-      setupControl();
+    if(deepThought != null)
+      deepThought.addEntityListener(deepThoughtListener);
 
-      if(deepThought != null)
-        deepThought.addEntityListener(deepThoughtListener);
-
-      setEntry(entry);
-    } catch (IOException ex) {
-      log.error("Could not load EntryCategoriesControl", ex);
-    }
+    setEntry(entry);
   }
 
   protected ApplicationListener applicationListener = new ApplicationListener() {
@@ -155,10 +160,18 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
   protected void setupControl() {
     this.setExpanded(false);
 
-    pnFilterCategories.setVisible(false);
-    pnFilterCategories.setManaged(false);
+    setupTitle();
 
-    trvwCategories.setRoot(new TopLevelCategoryTreeItem());
+    pnContent = new VBox();
+
+    setupPaneFilterCategories();
+
+    trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
+    trvwCategories.setMinHeight(230);
+    trvwCategories.setMaxHeight(Double.MAX_VALUE);
+    trvwCategories.setMaxWidth(Double.MAX_VALUE);
+    trvwCategories.setShowRoot(false);
+    trvwCategories.setEditable(true);
 
     trvwCategories.setCellFactory(treeView -> {
       EntryCategoryTreeCell cell = new EntryCategoryTreeCell(this);
@@ -166,7 +179,75 @@ public class EntryCategoriesControl extends TitledPane implements IEditedEntitie
       return cell;
     });
 
+    pnContent.getChildren().add(trvwCategories);
+    VBox.setVgrow(trvwCategories, Priority.ALWAYS);
+    VBox.setMargin(trvwCategories, new Insets(6, 0, 0, 0));
+
+    setContent(pnContent);
+
     showEntryCategories();
+  }
+
+  protected void setupPaneFilterCategories() {
+    pnFilterCategories = new HBox();
+    pnFilterCategories.setAlignment(Pos.CENTER_LEFT);
+    pnFilterCategories.setPrefHeight(40);
+    pnFilterCategories.setVisible(false);
+    pnFilterCategories.setManaged(false);
+
+    txtfldFilterCategories = new TextField();
+    pnFilterCategories.getChildren().add(txtfldFilterCategories);
+    HBox.setHgrow(txtfldFilterCategories, Priority.ALWAYS);
+
+    btnCreateCategory = new Button();
+    btnCreateCategory.setOnAction(event -> handleButtonCreateCategoryAction(event));
+    pnFilterCategories.getChildren().add(btnCreateCategory);
+    JavaFxLocalization.bindLabeledText(btnCreateCategory, "new...");
+
+    pnContent.getChildren().add(pnFilterCategories);
+    VBox.setMargin(pnFilterCategories, new Insets(6, 0, 0, 0));
+  }
+
+  protected void setupTitle() {
+    HBox titlePane = new HBox();
+    titlePane.setAlignment(Pos.CENTER_LEFT);
+    titlePane.setPrefWidth(USE_COMPUTED_SIZE);
+    titlePane.setMaxWidth(Double.MAX_VALUE);
+//    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+//    titlePane.setMinHeight(USE_PREF_SIZE);
+    titlePane.setMaxHeight(Double.MAX_VALUE);
+
+    lblCategories = new Label();
+    JavaFxLocalization.bindLabeledText(lblCategories, "categories");
+    lblCategories.setMinHeight(22);
+    lblCategories.setPrefWidth(USE_COMPUTED_SIZE);
+    lblCategories.setMinWidth(USE_PREF_SIZE);
+    lblCategories.setMaxWidth(USE_PREF_SIZE);
+    titlePane.getChildren().add(lblCategories);
+    HBox.setMargin(lblCategories, new Insets(0, 4, 0, 4));
+
+    pnSelectedCategoriesPreview = new FlowPane();
+    pnSelectedCategoriesPreview.setColumnHalignment(HPos.LEFT);
+    pnSelectedCategoriesPreview.setRowValignment(VPos.CENTER);
+    pnSelectedCategoriesPreview.setAlignment(Pos.CENTER_LEFT);
+    pnSelectedCategoriesPreview.setVgap(2);
+    titlePane.getChildren().add(pnSelectedCategoriesPreview);
+    HBox.setHgrow(pnSelectedCategoriesPreview, Priority.ALWAYS);
+
+    btnAddTopLevelCategory = new Button();
+    btnAddTopLevelCategory.setMinHeight(24);
+    btnAddTopLevelCategory.setMaxHeight(24);
+    btnAddTopLevelCategory.setMinWidth(24);
+    btnAddTopLevelCategory.setMaxWidth(24);
+    btnAddTopLevelCategory.setFont(new Font(9.5));
+    btnAddTopLevelCategory.setText("+");
+    btnAddTopLevelCategory.setTextFill(Constants.PlusButtonTextColor);
+    titlePane.getChildren().add(btnAddTopLevelCategory);
+    HBox.setMargin(btnAddTopLevelCategory, new Insets(0, 0, 0, 4));
+
+    btnAddTopLevelCategory.setOnAction(event -> Dialogs.showEditCategoryDialog(new Category(), getScene().getWindow(), true));
+
+    setTitle(titlePane);
   }
 
   protected void showEntryCategories() {
