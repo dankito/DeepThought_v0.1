@@ -5,6 +5,7 @@ import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListene
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.CollapsiblePane;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Device;
@@ -26,6 +27,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 13/09/15.
@@ -72,7 +74,9 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
 
   protected void setupTitle(String title) {
     GridPane titlePane = new GridPane();
-    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+//    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
+    titlePane.setMaxHeight(22);
+    rwcstrTitle.setMaxHeight(22);
     titlePane.setMaxWidth(Double.MAX_VALUE);
 
     titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, VPos.CENTER, true));
@@ -101,6 +105,15 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
   }
 
 
+//  @Override
+//  protected void setExpandedState() {
+//    if(isExpanded())
+//      setMaxHeight(Double.MAX_VALUE);
+//    else
+//      setMaxHeight(22);
+//
+//    super.setExpandedState();
+//  }
 
   protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
 

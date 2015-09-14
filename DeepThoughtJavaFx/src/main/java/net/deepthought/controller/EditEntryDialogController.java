@@ -50,8 +50,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -67,6 +69,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -74,6 +77,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -93,6 +97,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected ObservableList<FileLink> listViewFilesItems;
 
+
+  @FXML
+  protected Pane pnBottomBar;
 
   @FXML
   protected BorderPane dialogPane;
@@ -193,31 +200,34 @@ public class EditEntryDialogController extends ChildWindowsController implements
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
     contentPane.add(htmledAbstract, 0, 1, 2, 1);
+    GridPane.setConstraints(htmledAbstract, 0, 1, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(htmledAbstract, true);
 
     htmledContent = new CollapsibleHtmlEditor("content", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
     contentPane.add(htmledContent, 0, 2, 2, 1);
+    GridPane.setConstraints(htmledContent, 0, 2, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(htmledContent, true);
 
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setMinWidth(150);
-//    entryTagsControl.setPrefWidth(250);
+    entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
-//    contentPane.getChildren().add(entryTagsControl);
     HBox.setHgrow(entryTagsControl, Priority.ALWAYS);
     contentPane.add(entryTagsControl, 0, 3, 1, 1);
+    GridPane.setConstraints(entryTagsControl, 0, 3, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(entryTagsControl, true);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setMinWidth(150);
-//    entryCategoriesControl.setPrefWidth(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setVisible(Application.getSettings().showCategories());
     entryCategoriesControl.setExpanded(true);
-//    contentPane.getChildren().addAll(entryCategoriesControl);
     HBox.setHgrow(entryCategoriesControl, Priority.ALWAYS);
     HBox.setMargin(entryCategoriesControl, new Insets(0, 0, 0, 12));
     contentPane.add(entryCategoriesControl, 1, 3, 1, 1);
@@ -228,6 +238,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
     contentPane.add(entryReferenceControl, 0, 4, 2, 1);
+    GridPane.setConstraints(entryReferenceControl, 0, 4, 2, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.SOMETIMES);
+//    GridPane.setFillHeight(entryReferenceControl, true);
 
     entryPersonsControl = new EntryPersonsControl(entry);
     entryPersonsControl.setExpanded(false);
@@ -537,6 +549,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
+
+    contentPane.minHeightProperty().bind(windowStage.heightProperty().subtract(pnBottomBar.heightProperty()));
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
     FXUtils.focusNode(htmledContent);

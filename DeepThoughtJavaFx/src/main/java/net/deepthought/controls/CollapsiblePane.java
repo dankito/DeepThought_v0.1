@@ -37,6 +37,8 @@ public class CollapsiblePane extends GridPane {
 
   protected ColumnConstraints clmcstrTitle;
 
+  protected RowConstraints rwcstrTitle;
+
   protected RowConstraints rwcstrContent;
 
 
@@ -157,8 +159,9 @@ public class CollapsiblePane extends GridPane {
     clmcstrTitle = new ColumnConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true);
     this.getColumnConstraints().add(clmcstrTitle);
 
-    this.getRowConstraints().add(new RowConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, false));
-    rwcstrContent = new RowConstraints(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.TOP, true);
+    rwcstrTitle = new RowConstraints(24, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.SOMETIMES, VPos.CENTER, false);
+    this.getRowConstraints().add(rwcstrTitle);
+    rwcstrContent = new RowConstraints(0, Region.USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, VPos.TOP, true);
     this.getRowConstraints().add(rwcstrContent);
 
     expandButton.setContentDisplay(ContentDisplay.TEXT_ONLY);
@@ -177,13 +180,29 @@ public class CollapsiblePane extends GridPane {
 
   @Override
   protected double computeMinHeight(double width) {
-    double height = getTitle() instanceof Region ? ((Region)getTitle()).getHeight() : 0; // TODO: make general, don't depend on Region
+    double height = getTitle() instanceof Region ? ((Region)getTitle()).getPrefHeight() : 22; // TODO: make general, don't depend on Region
 
     if(isExpanded())
-      height += getContent() instanceof Region ? ((Region)getContent()).getHeight() : 0;
+      height += getContent() instanceof Region ? ((Region)getContent()).getMinHeight() : 0;
 
     return height;
   }
+
+  @Override
+  protected double computePrefHeight(double width) {
+    double height = getTitle() instanceof Region ? ((Region)getTitle()).getPrefHeight() : 22; // TODO: make general, don't depend on Region
+
+    if(isExpanded())
+      height += getContent() instanceof Region ? ((Region)getContent()).getPrefHeight() : 0;
+
+    return height;
+  }
+
+  //  @Override protected double computeMinHeight(double width, double topInset, double rightInset, double bottomInset, double leftInset) {
+//    double headerHeight = snapSize(titleRegion.prefHeight(width));
+//    double contentHeight = contentContainer.minHeight(width) * getTransition();
+//    return headerHeight + snapSize(contentHeight) + topInset + bottomInset;
+//  }
 
   public void toggleExpandedState() {
     setExpanded(!isExpanded());
@@ -193,17 +212,28 @@ public class CollapsiblePane extends GridPane {
     if(getContent() != null)
       getContent().setVisible(isExpanded());
 
-    if(isExpanded())
+    if(isExpanded()) {
+      setMaxHeight(Double.MAX_VALUE);
+      getRowConstraints().add(rwcstrContent);
       expandButton.setText(ExpandedText);
-    else
+    }
+    else {
+      setMaxHeight(computeMinHeight(getWidth()));
+      getRowConstraints().remove(rwcstrContent);
       expandButton.setText(CollapsedText);
+    }
 
     setHeight();
   }
 
   protected void setHeight() {
     setMinHeight(computeMinHeight(this.getWidth()));
+    setPrefHeight(computePrefHeight(this.getWidth()));
+
     layout();
+//    requestParentLayout();
+    if(getScene() != null && getScene().getRoot() != null)
+      getScene().getRoot().layout();
   }
 
   protected void titleChanged(Node oldTitle, Node newTitle) {

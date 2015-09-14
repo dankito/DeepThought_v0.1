@@ -163,7 +163,9 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     this.setExpanded(false);
 
     searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
+//    searchAndSelectTagsControl.setPrefHeight(250);
 //    searchAndSelectTagsControl.setMaxHeight(200);
+    searchAndSelectTagsControl.setMaxHeight(Double.MAX_VALUE);
     this.setContent(searchAndSelectTagsControl);
 
     showEntryTags();
@@ -201,16 +203,6 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     titlePane.add(pnSelectedTagsPreview, 2, 0);
 
     setTitle(titlePane);
-  }
-
-  protected void setPaneSelectedTagsPreviewWrapLength() {
-    if(lblTags.getWidth() > 0) {
-      if(getScene() != null && this.getWidth() > getScene().getWidth()) { // when Window was maximized, stage width is set yet but control width isn't yet
-        pnSelectedTagsPreview.setPrefWrapLength(getMinWidth()); // -> setting WrapLength to control width would result in a way to large wrap length and therefor control being larger than space is available
-      }
-      else
-        pnSelectedTagsPreview.setPrefWrapLength(this.getWidth() - lblTags.getWidth() - 86);
-    }
   }
 
   protected void showEntryTags() {

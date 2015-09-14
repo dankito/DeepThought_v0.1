@@ -247,24 +247,27 @@ public class MainWindowController implements Initializable {
 
   protected void pluginLoaded(IPlugin plugin) {
     if(plugin instanceof IOnlineArticleContentExtractor) {
-      final IOnlineArticleContentExtractor onlineArticleContentExtractor = (IOnlineArticleContentExtractor)plugin;
-      if(onlineArticleContentExtractor.hasArticlesOverview()) {
-        MenuItem articleContentExtractorMenuItem = new MenuItem(onlineArticleContentExtractor.getSiteBaseUrl());
-        articleContentExtractorMenuItem.setOnAction(event -> net.deepthought.controller.Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
+      onlineArticleContentExtractorPluginLoaded((IOnlineArticleContentExtractor)plugin);
+    }
+  }
 
-        if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
-          HBox graphicsPane = new HBox(new ImageView(onlineArticleContentExtractor.getIconUrl()));
-          graphicsPane.setPrefWidth(38);
-          graphicsPane.setMaxWidth(38);
-          graphicsPane.setAlignment(Pos.CENTER);
-          articleContentExtractorMenuItem.setGraphic(graphicsPane);
-        }
+  protected void onlineArticleContentExtractorPluginLoaded(IOnlineArticleContentExtractor onlineArticleContentExtractor) {
+    if(onlineArticleContentExtractor.hasArticlesOverview()) {
+      MenuItem articleContentExtractorMenuItem = new MenuItem(onlineArticleContentExtractor.getSiteBaseUrl());
+      articleContentExtractorMenuItem.setOnAction(event -> net.deepthought.controller.Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
 
-        btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
-//        btnOnlineArticleExtractors.setDisable(false);
-        btnOnlineArticleExtractors.setVisible(true);
-//        grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(btnOnlineArticleExtractors.getPrefWidth());
+      if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
+        HBox graphicsPane = new HBox(new ImageView(onlineArticleContentExtractor.getIconUrl()));
+        graphicsPane.setPrefWidth(38);
+        graphicsPane.setMaxWidth(38);
+        graphicsPane.setAlignment(Pos.CENTER);
+        articleContentExtractorMenuItem.setGraphic(graphicsPane);
       }
+
+      btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
+//        btnOnlineArticleExtractors.setDisable(false);
+      btnOnlineArticleExtractors.setVisible(true);
+//        grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(btnOnlineArticleExtractors.getPrefWidth());
     }
   }
 
