@@ -55,13 +55,17 @@ public class Alerts {
 
 
   public static boolean deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(Category category) {
+    return deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(Application.getDeepThought(), category);
+  }
+
+  public static boolean deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(DeepThought deepThought, Category category) {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
       if(deleteCategory)
-        return Application.getDeepThought().removeCategory(category);
+        return deepThought.removeCategory(category);
     }
     else
-      return Application.getDeepThought().removeCategory(category);
+      return deepThought.removeCategory(category);
 
     return false;
   }

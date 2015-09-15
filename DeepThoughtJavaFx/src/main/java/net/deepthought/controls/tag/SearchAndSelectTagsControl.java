@@ -164,9 +164,10 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       if (event.getCode() == KeyCode.ENTER) {
         toggleSelectedTagsAffiliation();
         event.consume();
-      }
-      else if (event.getCode() == KeyCode.DELETE)
+      } else if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedTags();
+        event.consume();
+      }
     });
 
     lstvwAllTags.setCellFactory(listView -> {

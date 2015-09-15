@@ -15,6 +15,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -32,7 +33,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -43,7 +43,9 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -68,7 +70,6 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
   protected ObservableList<Tag> listViewAllTagsItems = null;
   protected FilteredList<Tag> filteredTags = null;
-  protected SortedList<Tag> sortedFilteredTags = null;
 
   protected List<EntryCategoryTreeCell> entryCategoryTreeCells = new ArrayList<>();
 
@@ -169,6 +170,16 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     trvwCategories.setMaxWidth(Double.MAX_VALUE);
     trvwCategories.setShowRoot(false);
     trvwCategories.setEditable(true);
+
+    trvwCategories.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ENTER) {
+        toggleSelectedCategoriesAffiliation();
+        event.consume();
+      } else if (event.getCode() == KeyCode.DELETE) {
+        deleteSelectedCategories();
+        event.consume();
+      }
+    });
 
     trvwCategories.setCellFactory(treeView -> {
       EntryCategoryTreeCell cell = new EntryCategoryTreeCell(this);
@@ -347,6 +358,40 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   @Override
   public boolean containsEditedEntity(Category entity) {
     return editedEntryCategories.contains(entity);
+  }
+
+
+  protected void toggleCategoryAffiliation(Category category) {
+    if(category == null)
+      return;
+
+    if(containsEditedEntity(category) == false)
+      addEntityToEntry(category);
+    else
+      removeEntityFromEntry(category);
+  }
+
+  protected void toggleSelectedCategoriesAffiliation() {
+    for(Category selectedCategory : getSelectedCategories()) {
+      toggleCategoryAffiliation(selectedCategory);
+    }
+  }
+
+  protected void deleteSelectedCategories() {
+    for(Category selectedCategory : getSelectedCategories()) {
+      if(Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(deepThought, selectedCategory)) {
+        if(containsEditedEntity(selectedCategory))
+          removeEntityFromEntry(selectedCategory);
+      }
+    }
+  }
+
+  protected Collection<Category> getSelectedCategories() {
+    List<Category> selectedCategories = new ArrayList<>(); // make a copy as when multiple Categories are selected after removing first one SelectionModel gets cleared
+    for(TreeItem<Category> selectedItem : trvwCategories.getSelectionModel().getSelectedItems())
+      selectedCategories.add(selectedItem.getValue());
+
+    return selectedCategories;
   }
 
 
