@@ -12,7 +12,9 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,9 +29,13 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -73,6 +79,8 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
     });
 
     setOnMouseClicked(event -> mouseClicked(event));
+
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
   @Override
@@ -109,7 +117,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
       @Override
       public void handle(ActionEvent event) {
         selectCurrentCell();
-        handleButtonAddReferenceOrReferenceSubDivisionToReferenceBaseAction();
+        addReferenceOrReferenceSubDivisionToReferenceBase();
       }
     });
 
@@ -185,7 +193,51 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
   }
 
 
-  protected void handleButtonAddReferenceOrReferenceSubDivisionToReferenceBaseAction() {
+  protected void showContextMenu(ContextMenuEvent event) {
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
+  }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    MenuItem addReferenceOrSubDivisionItem = new MenuItem();
+    addReferenceOrSubDivisionItem.setOnAction(actionEvent -> addReferenceOrReferenceSubDivisionToReferenceBase());
+
+    if(getItem() instanceof SeriesTitle) {
+      JavaFxLocalization.bindMenuItemText(addReferenceOrSubDivisionItem, "series.title.add.reference...");
+      contextMenu.getItems().add(addReferenceOrSubDivisionItem);
+    }
+    else if(getItem() instanceof Reference) {
+      JavaFxLocalization.bindMenuItemText(addReferenceOrSubDivisionItem, "reference.add.reference.sub.division...");
+      contextMenu.getItems().add(addReferenceOrSubDivisionItem);
+    }
+
+    MenuItem editReferenceBaseItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(editReferenceBaseItem, "edit...");
+    editReferenceBaseItem.setOnAction(actionEvent -> Dialogs.showEditReferenceDialog(referenceBase));
+    contextMenu.getItems().add(editReferenceBaseItem);
+
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem deleteReferenceBaseItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(deleteReferenceBaseItem, "delete");
+    deleteReferenceBaseItem.setOnAction(event -> deleteReferenceBase());
+    contextMenu.getItems().add(deleteReferenceBaseItem);
+
+    return contextMenu;
+  }
+
+  protected void deleteReferenceBase() {
+    if(Alerts.deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(referenceBase)) {
+      if(selectedReferenceHolder != null && referenceBase.equals(selectedReferenceHolder.getSelectedReferenceBase()))
+        selectedReferenceHolder.selectedReferenceBaseChanged(null);
+    }
+  }
+
+
+  protected void addReferenceOrReferenceSubDivisionToReferenceBase() {
     if(getItem() instanceof SeriesTitle) {
       addNewReferenceToSeriesTitle((SeriesTitle)getItem());
     }
