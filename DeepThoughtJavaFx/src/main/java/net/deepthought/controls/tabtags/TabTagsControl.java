@@ -47,10 +47,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -186,7 +189,11 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     });
 
     clmnTagFilter.setText(null);
-    clmnTagFilter.setGraphic(new ImageView(Constants.FilterIconPath));
+    ImageView columnFilterGraphic = new ImageView(Constants.FilterIconPath);
+    Label columnFilterGraphicLabel = new Label(null, columnFilterGraphic); // wrap Image in a Label so that a Tooltip can be set
+    columnFilterGraphicLabel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    JavaFxLocalization.bindControlToolTip(columnFilterGraphicLabel, "filter.entries.tool.tip");
+    clmnTagFilter.setGraphic(columnFilterGraphicLabel);
     clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
       @Override
       public TableCell<Tag, Boolean> call(TableColumn<Tag, Boolean> param) {
