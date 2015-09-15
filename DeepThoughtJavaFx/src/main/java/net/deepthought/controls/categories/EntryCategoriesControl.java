@@ -1,7 +1,10 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.Application;
+import net.deepthought.controller.ChildWindowsController;
+import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
@@ -51,6 +54,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -253,7 +257,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     titlePane.getChildren().add(btnAddTopLevelCategory);
     HBox.setMargin(btnAddTopLevelCategory, new Insets(0, 0, 0, 4));
 
-    btnAddTopLevelCategory.setOnAction(event -> Dialogs.showEditCategoryDialog(new Category(), getScene().getWindow(), true));
+    btnAddTopLevelCategory.setOnAction(event -> handleButtonAddTopLevelCategoryAction(event));
 
     setTitle(titlePane);
   }
@@ -441,12 +445,29 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   }
 
   @FXML
-  public void handleButtonAddCategoryAction(ActionEvent event) {
-    Category newCategory = new Category();
-    Application.getDeepThought().addCategory(newCategory);
+  public void handleButtonAddTopLevelCategoryAction(ActionEvent event) {
+    final Category newCategory = new Category();
 
-//    newCategory.addEntry(entry);
-    addEntityToEntry(newCategory);
+    Dialogs.showEditCategoryDialog(newCategory, getScene().getWindow(), true, new ChildWindowsControllerListener() {
+      @Override
+      public void windowClosing(Stage stage, ChildWindowsController controller) {
+
+      }
+
+      @Override
+      public void windowClosed(Stage stage, ChildWindowsController controller) {
+        if (controller.getDialogResult() == DialogResult.Ok) {
+          addEntityToEntry(newCategory);
+          trvwCategories.getSelectionModel().clearSelection();
+          trvwCategories.getSelectionModel().selectLast();
+          scrollToSelectedItem();
+        }
+      }
+    });
+  }
+
+  protected void scrollToSelectedItem() {
+    trvwCategories.scrollTo(trvwCategories.getSelectionModel().getSelectedIndex());
   }
 
 

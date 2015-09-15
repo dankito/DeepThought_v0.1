@@ -172,7 +172,11 @@ public class Dialogs {
   }
 
   public static void showEditCategoryDialog(Category category,  Window window, boolean modal) {
-    showEditCategoryDialog(category, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal); // 146 = EditTagDialog's height
+    showEditCategoryDialog(category, window, modal, null);
+  }
+
+  public static void showEditCategoryDialog(Category category,  Window window, boolean modal, ChildWindowsControllerListener listener) {
+    showEditCategoryDialog(category, null, window.getX() + window.getWidth() / 2, window.getY() + (window.getHeight() - 146) / 2, window, modal, listener); // 146 = EditTagDialog's height
   }
 
   public static void showEditCategoryDialog(Category category, Category parentCategory,  Window window, boolean modal) {

@@ -35,6 +35,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -200,6 +201,8 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   }
 
   protected void selectCurrentCell() {
+    if(getTreeView() != null)
+      getTreeView().getSelectionModel().clearSelection();
     updateSelected(true);
   }
 
@@ -236,10 +239,30 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     if(category != null) {
       if(getTreeItem() != null)
         getTreeItem().setExpanded(true);
+
       Category newCategory = new Category();
       category.addSubCategory(newCategory);
       editedCategoriesHolder.addEntityToEntry(newCategory);
 //      Dialogs.showEditCategoryDialog(new Category(), category, getScene().getWindow(), true);
+
+      scrollToSubCategory(newCategory);
+    }
+  }
+
+  protected void scrollToSubCategory(Category subCategory) {
+    if(getTreeItem() != null) {
+      for(TreeItem<Category> child : getTreeItem().getChildren()) {
+        if(subCategory.equals(child.getValue())) {
+          if(getTreeView() != null) {
+            TreeView<Category> treeView = getTreeView();
+            treeView.getSelectionModel().clearSelection();
+            treeView.getSelectionModel().select(child);
+            treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+          }
+
+          break;
+        }
+      }
     }
   }
 
