@@ -121,6 +121,11 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     this.seriesOrder = seriesOrder;
   }
 
+
+  public boolean hasSubDivisions() {
+    return getSubDivisions().size() > 0;
+  }
+
   public Collection<ReferenceSubDivision> getSubDivisions() {
     return subDivisions;
   }
@@ -179,6 +184,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return subDivisionsSorted;
   }
 
+
+  public boolean hasEntries() {
+    return getEntries().size() > 0;
+  }
 
   public Collection<Entry> getEntries() {
     return entries;

@@ -58,6 +58,10 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   }
 
 
+  public boolean hasSerialParts() {
+    return getSerialParts().size() > 0;
+  }
+
   public Set<Reference> getSerialParts() {
     return serialParts;
   }
@@ -110,6 +114,11 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
       serialPartsSorted.addAll(getSerialParts());
     }
     return serialPartsSorted;
+  }
+
+
+  public boolean hasEntries() {
+    return getEntries().size() > 0;
   }
 
   public Set<Entry> getEntries() {

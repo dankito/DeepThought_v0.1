@@ -9,6 +9,8 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 
@@ -94,6 +96,73 @@ public class Alerts {
 
   public static boolean showConfirmDeletePersonWithEntriesAlert(Person person) {
     return showConfirmationDialog(Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
+  }
+
+
+  public static boolean deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(ReferenceBase referenceBase) {
+    return deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), referenceBase);
+  }
+
+  public static boolean deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, ReferenceBase referenceBase) {
+    if(referenceBase instanceof SeriesTitle)
+      return deleteSeriesTitleWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (SeriesTitle)referenceBase);
+    else if(referenceBase instanceof ReferenceSubDivision)
+      return deleteReferenceSubDivisionWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (ReferenceSubDivision)referenceBase);
+    else
+      return deleteReferenceWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (Reference) referenceBase);
+  }
+
+  public static boolean deleteSeriesTitleWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, SeriesTitle seriesTitle) {
+    if(seriesTitle.hasEntries() || seriesTitle.hasSerialParts()) {
+      boolean confirmDeleteTag = showConfirmDeleteSeriesTitleWithEntriesOrSerialPartsAlert(seriesTitle);
+      if(confirmDeleteTag)
+        return deepThought.removeSeriesTitle(seriesTitle);
+    } else
+      return deepThought.removeSeriesTitle(seriesTitle);
+
+    return false;
+  }
+
+  public static boolean showConfirmDeleteSeriesTitleWithEntriesOrSerialPartsAlert(SeriesTitle series) {
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.series.title.contains.entries.or.serial.parts", series.getTextRepresentation(),
+            series.getEntries().size(), series.getSerialParts().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
+  }
+
+  public static boolean deleteReferenceWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, Reference reference) {
+    if(reference.hasEntries() || reference.hasSubDivisions()) {
+      boolean confirmDeleteTag = showConfirmDeleteReferenceWithEntriesOrSubDivisionsAlert(reference);
+      if(confirmDeleteTag)
+        return deepThought.removeReference(reference);
+    }
+    else
+      return deepThought.removeReference(reference);
+
+    return false;
+  }
+
+  public static boolean showConfirmDeleteReferenceWithEntriesOrSubDivisionsAlert(Reference reference) {
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.reference.contains.entries.or.sub.divisions", reference.getTextRepresentation(),
+            reference.getEntries().size(), reference.getSubDivisions().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
+  }
+
+  public static boolean deleteReferenceSubDivisionWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, ReferenceSubDivision subDivision) {
+    if(subDivision.hasEntries() || subDivision.hasSubDivisions()) {
+      boolean confirmDeleteTag = showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(subDivision);
+      if(confirmDeleteTag)
+        return deepThought.removeReferenceSubDivision(subDivision);
+    }
+    else
+      return deepThought.removeReferenceSubDivision(subDivision);
+
+    return false;
+  }
+
+  public static boolean showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(ReferenceSubDivision subDivision) {
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.reference.sub.division.contains.entries.or.sub.divisions", subDivision.getTextRepresentation(),
+            subDivision.getEntries().size(), subDivision.getSubDivisions().size()),
         Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 

@@ -65,6 +65,10 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
 
 
 
+  public boolean hasEntries() {
+    return getEntries().size() > 0;
+  }
+
   public Collection<Entry> getEntries() {
     return entries;
   }

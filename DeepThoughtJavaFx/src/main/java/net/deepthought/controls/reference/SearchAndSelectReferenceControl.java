@@ -11,10 +11,12 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -36,6 +38,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -155,7 +158,16 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     });
     txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
 
-    // TODO: set cell
+    lstvwReferences.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ENTER) {
+        selectedReferenceHolder.selectedReferenceBaseChanged(lstvwReferences.getSelectionModel().getSelectedItem());
+        event.consume();
+      } else if (event.getCode() == KeyCode.DELETE) {
+        deleteSelectedReferenceBases();
+        event.consume();
+      }
+    });
+
     lstvwReferences.setCellFactory((listView) -> {
       ReferenceBaseListCell cell = new ReferenceBaseListCell(selectedReferenceHolder);
       referenceBaseListCells.add(cell);
@@ -170,6 +182,20 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     if(Application.getDeepThought() != null)
       resetListViewReferenceBasesItems(Application.getDeepThought());
   }
+
+  protected void deleteSelectedReferenceBases() {
+    for(ReferenceBase selectedReferenceBase : getSelectedReferenceBases()) {
+      if(Alerts.deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(deepThought, selectedReferenceBase)) {
+        if(selectedReferenceHolder != null && selectedReferenceBase.equals(selectedReferenceHolder.getSelectedReferenceBase()))
+          selectedReferenceHolder.selectedReferenceBaseChanged(null);
+      }
+    }
+  }
+
+  protected Collection<ReferenceBase> getSelectedReferenceBases() {
+    return new ArrayList<>(lstvwReferences.getSelectionModel().getSelectedItems()); // make a copy as when multiple ReferenceBases are selected after removing first one SelectionModel gets cleared
+  }
+
 
   protected void filterReferenceBases() {
     filterReferenceBases(txtfldSearchForReference.getText());
