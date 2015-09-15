@@ -21,10 +21,6 @@ public class EntryPersonsControl extends PersonsControl {
     setEntry(entry);
   }
 
-  protected PersonListCell createPersonListCell() {
-    return new EntryPersonListCell(this, entry);
-  }
-
   public void setEntry(Entry entry) {
     if(this.entry != null)
       this.entry.removeEntryPersonListener(entryPersonListener);

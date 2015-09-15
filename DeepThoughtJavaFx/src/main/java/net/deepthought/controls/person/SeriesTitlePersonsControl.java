@@ -43,11 +43,6 @@ public class SeriesTitlePersonsControl extends PersonsControl {
   }
 
   @Override
-  protected PersonListCell createPersonListCell() {
-    return new SeriesTitlePersonListCell(this, series);
-  }
-
-  @Override
   public void cleanUpControl() {
     super.cleanUpControl();
 

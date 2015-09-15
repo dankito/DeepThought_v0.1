@@ -138,8 +138,6 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     setTitle(titlePane);
   }
 
-  protected abstract PersonListCell createPersonListCell();
-
   protected void setEntityPersons(Set<Person> persons) {
     currentlySetPersonsOnEntity = persons;
 

@@ -43,11 +43,6 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
   }
 
   @Override
-  protected PersonListCell createPersonListCell() {
-    return new ReferenceSubDivisionPersonListCell(this, subDivision);
-  }
-
-  @Override
   public void cleanUpControl() {
     super.cleanUpControl();
 
