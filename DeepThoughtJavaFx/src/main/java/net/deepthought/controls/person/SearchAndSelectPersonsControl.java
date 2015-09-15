@@ -9,9 +9,12 @@ import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.Search;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -38,7 +41,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -160,6 +165,14 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
       listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
     lstvwAllPersons.setItems(listViewAllPersonsItems);
 
+    lstvwAllPersons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    lstvwAllPersons.setOnKeyReleased(event -> {
+      if(event.getCode() == KeyCode.ENTER)
+        toggleSelectedPersonsAffiliation();
+      else if(event.getCode() == KeyCode.DELETE)
+        deleteSelectedPersons();
+    });
+
     lstvwAllPersons.setCellFactory((listView) -> {
       final PersonListCell cell = createPersonListCell();
       personListCells.add(cell);
@@ -172,14 +185,28 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   }
 
   protected void togglePersonAffiliation(Person person) {
-    if(editedPersonsHolder.containsEditedEntity(person)) {
+    if(editedPersonsHolder.containsEditedEntity(person))
       editedPersonsHolder.removeEntityFromEntry(person);
-    }
-    else {
+    else
       editedPersonsHolder.addEntityToEntry(person);
-    }
-
   }
+
+  protected void toggleSelectedPersonsAffiliation() {
+    for(Person selectedPerson : getSelectedPersons()) {
+      togglePersonAffiliation(selectedPerson);
+    }
+  }
+
+  protected void deleteSelectedPersons() {
+    for(Person selectedPerson : getSelectedPersons()) {
+      Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(deepThought, selectedPerson);
+    }
+  }
+
+  protected Collection<Person> getSelectedPersons() {
+    return new ArrayList<>(lstvwAllPersons.getSelectionModel().getSelectedItems()); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
+  }
+
 
   protected void filterPersons() {
     if(filterPersonsSearch != null && filterPersonsSearch.isCompleted() == false)

@@ -52,7 +52,6 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   protected Label personDisplayNameLabel = new Label();
 
   protected Button btnEditPerson = new Button();
-  protected Button btnDeletePerson = new Button();
 
 
   public PersonListCell() {
@@ -131,13 +130,6 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
         handleButtonEditPersonAction();
       }
     });
-
-    btnDeletePerson.setText("-");
-    btnDeletePerson.setTextFill(Constants.RemoveEntityButtonTextColor);
-    btnDeletePerson.setFont(new Font(15));
-    HBox.setMargin(btnDeletePerson, new Insets(0, 0, 0, 6));
-    graphicPane.getChildren().add(btnDeletePerson);
-    btnDeletePerson.setOnAction((event) -> handleButtonDeletePersonAction(event));
   }
 
 
