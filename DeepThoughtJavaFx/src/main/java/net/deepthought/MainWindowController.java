@@ -468,6 +468,9 @@ public class MainWindowController implements Initializable {
     btnRemoveSelectedCategories.setTextFill(Constants.RemoveEntityButtonTextColor);
     btnAddCategory.setTextFill(Constants.AddEntityButtonTextColor);
 
+    JavaFxLocalization.bindControlToolTip(btnRemoveSelectedCategories, "remove.selected.categories.tool.tip");
+    JavaFxLocalization.bindControlToolTip(btnAddCategory, "create.new.top.level.category.tool.tip");
+
     trvwCategories.setOnContextMenuRequested(event -> showTreeViewCategoriesContextMenu(event));
 
     trvwCategories.setOnKeyPressed(event -> {

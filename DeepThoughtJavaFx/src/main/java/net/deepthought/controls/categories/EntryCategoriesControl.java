@@ -254,6 +254,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     btnAddTopLevelCategory.setFont(new Font(9.5));
     btnAddTopLevelCategory.setText("+");
     btnAddTopLevelCategory.setTextFill(Constants.AddEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnAddTopLevelCategory, "create.new.top.level.category.tool.tip");
     titlePane.getChildren().add(btnAddTopLevelCategory);
     HBox.setMargin(btnAddTopLevelCategory, new Insets(0, 0, 0, 4));
 
