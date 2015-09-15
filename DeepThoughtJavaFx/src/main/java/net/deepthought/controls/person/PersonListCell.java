@@ -25,8 +25,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -76,7 +80,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       setOnMouseClicked(event -> mouseClicked(event));
     }
 
-//    setOnContextMenuRequested(event -> showContextMenu(event));
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
   protected SetChangeListener<Person> editedPersonsChangedListener = change -> personUpdated();
@@ -213,6 +217,30 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
 
+  protected void showContextMenu(ContextMenuEvent event) {
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
+  }
+
+  protected ContextMenu createContextMenu() {
+    ContextMenu contextMenu = new ContextMenu();
+
+    MenuItem editTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(editTagItem, "edit...");
+    editTagItem.setOnAction(actionEvent -> Dialogs.showEditPersonDialog(getItem() == null ? person : getItem()));
+    contextMenu.getItems().add(editTagItem);
+
+    contextMenu.getItems().add(new SeparatorMenuItem());
+
+    MenuItem deleteTagItem = new MenuItem();
+    JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
+    deleteTagItem.setOnAction(event -> Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(getItem() == null ? person : getItem()));
+    contextMenu.getItems().add(deleteTagItem);
+
+    return contextMenu;
+  }
+
 
   protected ChangeListener<Boolean> checkBoxIsPersonSelectedChangeListener = new ChangeListener<Boolean>() {
     @Override
@@ -223,10 +251,6 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
   protected void handleButtonEditPersonAction() {
     Dialogs.showEditPersonDialog(getItem());
-  }
-
-  protected void handleButtonDeletePersonAction(ActionEvent event) {
-    Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(getItem());
   }
 
 
