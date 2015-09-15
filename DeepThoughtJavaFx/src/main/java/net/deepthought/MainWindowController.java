@@ -53,8 +53,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -87,6 +89,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -248,7 +251,7 @@ public class MainWindowController implements Initializable {
 
   protected void pluginLoaded(IPlugin plugin) {
     if(plugin instanceof IOnlineArticleContentExtractor) {
-      onlineArticleContentExtractorPluginLoaded((IOnlineArticleContentExtractor)plugin);
+      onlineArticleContentExtractorPluginLoaded((IOnlineArticleContentExtractor) plugin);
     }
   }
 
@@ -466,6 +469,13 @@ public class MainWindowController implements Initializable {
 
     trvwCategories.setContextMenu(createTreeViewCategoriesContextMenu());
 
+    trvwCategories.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.DELETE) {
+        deleteSelectedCategories();
+        event.consume();
+      }
+    });
+
     trvwCategories.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Category>>() {
       @Override
       public void changed(ObservableValue<? extends TreeItem<Category>> observable, TreeItem<Category> oldValue, TreeItem<Category> newValue) {
@@ -495,7 +505,7 @@ public class MainWindowController implements Initializable {
       tbpnOverview.getSelectionModel().select(tabTags);
   }
 
-  private ContextMenu createTreeViewCategoriesContextMenu() {
+  protected ContextMenu createTreeViewCategoriesContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
     MenuItem addCategoryMenuItem = new MenuItem("Add Category");
@@ -506,6 +516,20 @@ public class MainWindowController implements Initializable {
     });
 
     return contextMenu;
+  }
+
+  protected void deleteSelectedCategories() {
+    for(Category selectedCategory : getSelectedCategories()) {
+      Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(deepThought, selectedCategory);
+    }
+  }
+
+  protected Collection<Category> getSelectedCategories() {
+    List<Category> selectedCategories = new ArrayList<>(); // make a copy as when multiple Categories are selected after removing first one SelectionModel gets cleared
+    for(TreeItem<Category> selectedItem : trvwCategories.getSelectionModel().getSelectedItems())
+      selectedCategories.add(selectedItem.getValue());
+
+    return selectedCategories;
   }
 
   protected void setupEntriesOverviewSection() {
