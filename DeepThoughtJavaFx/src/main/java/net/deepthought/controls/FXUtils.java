@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 import javafx.concurrent.Task;
 import javafx.css.Styleable;
@@ -31,6 +32,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -165,6 +167,14 @@ public class FXUtils {
 
     return new Point2D(Math.round(windowCoord.getX() + sceneCoord.getX() + nodeCoord.getX()),
                        Math.round(windowCoord.getY() + sceneCoord.getY() + nodeCoord.getY()));
+  }
+
+  public static Screen getScreenWindowLeftUpperCornerIsIn(Window window) {
+    List<Screen> screens = Screen.getScreensForRectangle(window.getX(), window.getY(), 1, 1);
+    if(screens.size() > 0)
+      return screens.get(0);
+
+    return null;
   }
 
 

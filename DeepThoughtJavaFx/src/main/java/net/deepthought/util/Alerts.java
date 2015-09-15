@@ -5,6 +5,7 @@ import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
@@ -27,6 +28,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -106,7 +108,7 @@ public class Alerts {
 
   public static boolean deleteReferenceBaseWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, ReferenceBase referenceBase) {
     if(referenceBase instanceof SeriesTitle)
-      return deleteSeriesTitleWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (SeriesTitle)referenceBase);
+      return deleteSeriesTitleWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (SeriesTitle) referenceBase);
     else if(referenceBase instanceof ReferenceSubDivision)
       return deleteReferenceSubDivisionWithUserConfirmationIfHasEntriesOrSubDivisions(deepThought, (ReferenceSubDivision)referenceBase);
     else
@@ -185,6 +187,9 @@ public class Alerts {
     String translatedEntityName = Localization.getLocalizedString(entityNameResourceKey);
 
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    if(owner != null)
+      alert.initOwner(owner);
+
     alert.setTitle(Localization.getLocalizedString("alert.title.entity.contains.unsaved.changes", translatedEntityName));
     setAlertContent(alert, Localization.getLocalizedString("alert.message.entity.contains.unsaved.changes", translatedEntityName));
     alert.setHeaderText(null);
@@ -195,8 +200,6 @@ public class Alerts {
 //    alert.getButtonTypes().addAll(ButtonType.NO, ButtonType.YES);
     alert.getButtonTypes().add(1, ButtonType.NO);
     alert.getButtonTypes().add(2, ButtonType.YES);
-    if(owner != null)
-      alert.initOwner(owner);
 
     Optional<ButtonType> result = alert.showAndWait();
     return result.get();
@@ -251,13 +254,14 @@ public class Alerts {
 
   protected static boolean showConfirmationDialog(String message, String alertTitle, Stage owner) {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    if(owner != null)
+      alert.initOwner(owner);
+
     alert.setTitle(alertTitle);
     setAlertContent(alert, message);
     alert.setHeaderText(null);
 
     alert.getButtonTypes().setAll(ButtonType.NO, ButtonType.YES);
-    if(owner != null)
-      alert.initOwner(owner);
 
     Optional<ButtonType> result = alert.showAndWait();
     return result.get() == ButtonType.YES;
@@ -273,12 +277,14 @@ public class Alerts {
 
   protected static void showInfoMessageOnUiThread(Stage owner, String infoMessage, String alertTitle) {
     Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    if(owner != null)
+      alert.initOwner(owner);
+
     alert.setTitle(alertTitle);
     setAlertContent(alert, infoMessage);
     alert.setHeaderText(null);
 
     alert.getButtonTypes().setAll(ButtonType.OK);
-    alert.initOwner(owner);
     alert.showAndWait();
   }
 
@@ -310,6 +316,9 @@ public class Alerts {
 
   protected static void showErrorMessageOnUiThread(Stage owner, String errorMessage, String alertTitle, Exception exception) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
+    if(owner != null)
+      alert.initOwner(owner);
+
     alert.setTitle(alertTitle);
     setAlertContent(alert, errorMessage);
     alert.setHeaderText(null);
@@ -318,23 +327,33 @@ public class Alerts {
       createExpandableException(alert, exception);
 
     alert.getButtonTypes().setAll(ButtonType.OK);
-    alert.initOwner(owner);
     alert.showAndWait();
   }
 
-
   protected static void setAlertContent(Alert alert, String content) {
+    double maxWidth = Screen.getPrimary().getVisualBounds().getWidth();
+    if(alert.getOwner() != null) {
+      Screen ownersScreen = FXUtils.getScreenWindowLeftUpperCornerIsIn(alert.getOwner());
+      if(ownersScreen != null)
+        maxWidth = ownersScreen.getVisualBounds().getWidth();
+    }
+    maxWidth *= 0.6; // set max width to 60 % of Screen width
+
     Label contentLabel = new Label(content);
     contentLabel.setWrapText(true);
     contentLabel.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    contentLabel.setMaxHeight(500);
-    contentLabel.setMaxWidth(500);
+    contentLabel.setMaxHeight(Double.MAX_VALUE);
+    contentLabel.setMaxWidth(maxWidth);
+
+    VBox contentPane = new VBox(contentLabel);
+    contentPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    contentPane.setMaxHeight(Double.MAX_VALUE);
+    VBox.setVgrow(contentLabel, Priority.ALWAYS);
 
     alert.getDialogPane().setPrefHeight(Region.USE_COMPUTED_SIZE);
-    alert.getDialogPane().setMaxHeight(500);
-    alert.getDialogPane().setMaxWidth(500);
-    alert.getDialogPane().setContent(new VBox(contentLabel));
-    VBox.setVgrow(contentLabel, Priority.ALWAYS);
+    alert.getDialogPane().setMaxHeight(Double.MAX_VALUE);
+    alert.getDialogPane().setMaxWidth(maxWidth);
+    alert.getDialogPane().setContent(contentPane);
   }
 
   protected static void createExpandableException(Alert alert, Exception exception) {
