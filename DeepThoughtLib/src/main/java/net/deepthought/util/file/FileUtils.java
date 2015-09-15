@@ -374,15 +374,11 @@ public class FileUtils {
 
 
   public static String getUserDataFolderForFile(FileLink file) {
-    String fileDataFolder = CouldNotGetDataFolderForFile;
+    String fileDataFolder = getUserDataFolder();
 
-    String dataFolder = Application.getDataFolderPath();
-    if(dataFolder != Application.CouldNotGetDataFolderPath) {
+    if(fileDataFolder != Application.CouldNotGetDataFolderPath) {
       try {
-        File tmp = new File(dataFolder, UsersFolderName);
-        tmp = new File(tmp, Application.getLoggedOnUser().getUserName());
-        tmp = new File(tmp, FilesFolderName);
-        tmp = new File(tmp, getFileUserDataSubFolder(file));
+        File tmp = new File(fileDataFolder, getFileUserDataSubFolder(file));
 
         if (tmp.exists() == false)
           tmp.mkdirs();
@@ -394,6 +390,27 @@ public class FileUtils {
     }
 
     return fileDataFolder;
+  }
+
+  public static String getUserDataFolder() {
+    String userDataFolder = Application.getDataFolderPath();
+
+    if(userDataFolder != Application.CouldNotGetDataFolderPath) {
+      try {
+        File tmp = new File(userDataFolder, UsersFolderName);
+        tmp = new File(tmp, String.format("%02d", Application.getLoggedOnUser().getId()));
+        tmp = new File(tmp, FilesFolderName);
+
+        if (tmp.exists() == false)
+          tmp.mkdirs();
+
+        userDataFolder = tmp.getPath();
+      } catch(Exception ex) {
+        log.error("Could not get or create user's data folder", ex);
+      }
+    }
+
+    return userDataFolder;
   }
 
   public static String getFileUserDataSubFolder(FileLink file) {
