@@ -23,6 +23,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -45,6 +46,8 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   protected IEditedEntitiesHolder<Person> editedPersonsHolder;
 
   protected HBox graphicPane = new HBox();
+
+  protected CheckBox chkbxIsPersonSelected = new CheckBox();
 
   protected Label personDisplayNameLabel = new Label();
 
@@ -107,6 +110,11 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
+    if(editedPersonsHolder != null) {
+      graphicPane.getChildren().add(chkbxIsPersonSelected);
+      chkbxIsPersonSelected.selectedProperty().addListener(checkBoxIsPersonSelectedChangeListener);
+    }
+
     HBox.setHgrow(personDisplayNameLabel, Priority.ALWAYS);
     HBox.setMargin(personDisplayNameLabel, new Insets(0, 6, 0, 0));
 
@@ -141,8 +149,17 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       setGraphic(null);
     }
     else {
-      setGraphic(graphicPane);
       personDisplayNameLabel.setText(item.getNameRepresentation());
+
+      if(editedPersonsHolder != null) {
+        chkbxIsPersonSelected.selectedProperty().removeListener(checkBoxIsPersonSelectedChangeListener);
+
+        chkbxIsPersonSelected.setSelected(editedPersonsHolder.containsEditedEntity(item));
+
+        chkbxIsPersonSelected.selectedProperty().addListener(checkBoxIsPersonSelectedChangeListener);
+      }
+
+      setGraphic(graphicPane);
     }
   }
 
@@ -150,6 +167,13 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     return editedPersonsHolder.containsEditedEntity(person);
   }
 
+
+  protected void handleCheckBoxSelectedChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+    if(newValue == true)
+      editedPersonsHolder.addEntityToEntry(getItem());
+    else
+      editedPersonsHolder.removeEntityFromEntry(getItem());
+  }
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
@@ -197,6 +221,13 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
 
+
+  protected ChangeListener<Boolean> checkBoxIsPersonSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      handleCheckBoxSelectedChanged(observable, oldValue, newValue);
+    }
+  };
 
   protected void handleButtonEditPersonAction() {
     Dialogs.showEditPersonDialog(getItem());
