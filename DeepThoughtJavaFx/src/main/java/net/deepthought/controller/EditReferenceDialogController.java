@@ -1250,6 +1250,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     else if(persistedParentReferenceBase instanceof Reference) {
       this.reference = (Reference)persistedParentReferenceBase;
       this.seriesTitle = reference.getSeries();
+      if(seriesTitle == null)
+        this.seriesTitle = new SeriesTitle();
       nodeToFocus = txtfldReferenceSubDivisionTitle;
     }
     return nodeToFocus;

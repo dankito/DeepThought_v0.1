@@ -9,9 +9,7 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.ClipboardHelper;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +19,16 @@ import java.util.Collection;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.input.ContextMenuEvent;
@@ -41,8 +38,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 /**
  * Created by ganymed on 30/11/14.
@@ -58,7 +53,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected IEditedEntitiesHolder editedTagsHolder = null;
 
-  protected HBox graphicsPane = new HBox();
+  protected HBox graphicPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
   protected Label lblTagName = new Label();
 
@@ -84,6 +79,9 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
         tagChanged(newValue);
       }
     });
+
+    // bind ListView Item's width to ListView's width
+    listViewProperty().addListener((observable, oldValue, newValue) -> graphicPane.maxWidthProperty().bind(newValue.widthProperty().subtract(35)));
 
     setOnMouseClicked(event -> mouseClicked(event));
 
@@ -117,15 +115,16 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
 
-    graphicsPane.setAlignment(Pos.CENTER_LEFT);
+    graphicPane.setAlignment(Pos.CENTER_LEFT);
 
-    graphicsPane.getChildren().add(chkbxIsTagSelected);
+    graphicPane.getChildren().add(chkbxIsTagSelected);
 
-    HBox.setHgrow(lblTagName, Priority.ALWAYS);
-    HBox.setMargin(lblTagName, new Insets(0, 6, 0, 6));
+    lblTagName.setTextOverrun(OverrunStyle.ELLIPSIS);
     lblTagName.setMaxWidth(Double.MAX_VALUE);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblTagName);
-    graphicsPane.getChildren().add(lblTagName);
+    graphicPane.getChildren().add(lblTagName);
+    HBox.setHgrow(lblTagName, Priority.ALWAYS);
+    HBox.setMargin(lblTagName, new Insets(0, 6, 0, 6));
 
     chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
   }
@@ -155,7 +154,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
       chkbxIsTagSelected.selectedProperty().addListener(checkBoxIsTagSelectedChangeListener);
 
-      setGraphic(graphicsPane);
+      setGraphic(graphicPane);
     }
 
     setCellBackgroundColor();
@@ -249,7 +248,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     HBox.setMargin(txtfldEditTagName, new Insets(0, 6, 0, 6));
     txtfldEditTagName.setMaxWidth(Double.MAX_VALUE);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditTagName);
-    graphicsPane.getChildren().add(1, txtfldEditTagName);
+    graphicPane.getChildren().add(1, txtfldEditTagName);
 
     txtfldEditTagName.setOnKeyReleased(new EventHandler<KeyEvent>() {
 

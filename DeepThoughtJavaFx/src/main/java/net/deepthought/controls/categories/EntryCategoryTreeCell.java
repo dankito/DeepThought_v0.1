@@ -77,8 +77,10 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
 
     editedCategoriesHolder.getEditedEntities().addListener(editedCategoriesChangedListener);
 
-    setText(null);
     setupGraphic();
+
+    // bind TreeView Item's width to TreeView's width
+    treeViewProperty().addListener((observable, oldValue, newValue) -> graphicPane.maxWidthProperty().bind(newValue.widthProperty().subtract(47)));
 
     treeItemProperty().addListener(new ChangeListener<TreeItem<Category>>() {
       @Override
@@ -106,6 +108,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   }
 
   protected void setupGraphic() {
+    setText(null);
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
 
@@ -115,14 +118,14 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
     graphicPane.setMinHeight(height);
     graphicPane.setMaxHeight(height);
 
-    HBox.setHgrow(categoryNameLabel, Priority.ALWAYS);
-    HBox.setMargin(categoryNameLabel, new Insets(0, 6, 0, 6));
-
     graphicPane.getChildren().add(isEntryInCategoryCheckBox);
     isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
 
     categoryNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(categoryNameLabel);
+
+    HBox.setHgrow(categoryNameLabel, Priority.ALWAYS);
+    HBox.setMargin(categoryNameLabel, new Insets(0, 6, 0, 6));
 
     categoryOptionsButtonsPane.setAlignment(Pos.CENTER_LEFT);
     categoryOptionsButtonsPane.managedProperty().bind(categoryOptionsButtonsPane.visibleProperty());

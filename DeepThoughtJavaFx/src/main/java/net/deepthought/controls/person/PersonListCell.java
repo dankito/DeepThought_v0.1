@@ -29,6 +29,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
@@ -76,6 +77,9 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       }
     });
 
+    // bind ListView Item's width to ListView's width
+    listViewProperty().addListener((observable, oldValue, newValue) -> graphicPane.maxWidthProperty().bind(newValue.widthProperty().subtract(35)));
+
     if(editedPersonsHolder != null) {
       editedPersonsHolder.getEditedEntities().addListener(editedPersonsChangedListener);
 
@@ -120,11 +124,12 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       chkbxIsPersonSelected.selectedProperty().addListener(checkBoxIsPersonSelectedChangeListener);
     }
 
-    HBox.setHgrow(personDisplayNameLabel, Priority.ALWAYS);
-    HBox.setMargin(personDisplayNameLabel, new Insets(0, 6, 0, 0));
-
+    personDisplayNameLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
     personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(personDisplayNameLabel);
+
+    HBox.setHgrow(personDisplayNameLabel, Priority.ALWAYS);
+    HBox.setMargin(personDisplayNameLabel, new Insets(0, 6, 0, 0));
 
     JavaFxLocalization.bindLabeledText(btnEditPerson, "edit");
     btnEditPerson.setMinWidth(100);
