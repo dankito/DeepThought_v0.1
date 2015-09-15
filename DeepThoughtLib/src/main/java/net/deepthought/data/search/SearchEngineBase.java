@@ -36,24 +36,27 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   @Override
-  public void filterTags(final net.deepthought.data.search.specific.FilterTagsSearch search) {
-    if(StringUtils.isNullOrEmpty(search.getSearchTerm())) { // no filter term specified -> return all Tags
-      search.setResults(FilterTagsSearchResults.NoFilterSearchResults);
-      search.fireSearchCompleted();
-      return;
+  public void filterTags(final FilterTagsSearch search) {
+    if(StringUtils.isNullOrEmpty(search.getSearchTerm()))
+      filterTagsForEmptySearchTerm(search);
+    else {
+      String lowerCaseFilter = search.getSearchTerm().toLowerCase();
+      final String[] tagNamesToFilterFor = lowerCaseFilter.split(",");
+      for (int i = 0; i < tagNamesToFilterFor.length; i++)
+        tagNamesToFilterFor[i] = tagNamesToFilterFor[i].trim();
+
+      Application.getThreadPool().runTaskAsync(new Runnable() {
+        @Override
+        public void run() {
+          filterTags(search, tagNamesToFilterFor);
+        }
+      });
     }
+  }
 
-    String lowerCaseFilter = search.getSearchTerm().toLowerCase();
-    final String[] tagNamesToFilterFor = lowerCaseFilter.split(",");
-    for(int i = 0; i < tagNamesToFilterFor.length; i++)
-      tagNamesToFilterFor[i] = tagNamesToFilterFor[i].trim();
-
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        filterTags(search, tagNamesToFilterFor);
-      }
-    });
+  protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+    search.setResults(FilterTagsSearchResults.NoFilterSearchResults);
+    search.fireSearchCompleted();
   }
 
   protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);

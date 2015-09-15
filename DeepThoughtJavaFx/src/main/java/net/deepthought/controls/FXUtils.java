@@ -57,6 +57,7 @@ public class FXUtils {
 
   public static void setTagCellBackgroundColor(Tag tag, FilterTagsSearchResults filterTagsSearchResults, Cell cell) {
     if(tag != null && filterTagsSearchResults.getResults().size() > 0) {
+      // TODO: logic is wrong: if exact or relevant match of last search term is already included in result list (e.g. exact match of previous term) then it gets to wrong color
       if(filterTagsSearchResults.isExactMatchOfLastSearchTerm(tag))
         cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
       else if(filterTagsSearchResults.isRelevantMatchOfLastSearchTerm(tag))

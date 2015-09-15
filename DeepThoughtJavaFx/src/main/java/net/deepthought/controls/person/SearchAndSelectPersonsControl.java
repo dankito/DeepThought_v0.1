@@ -4,14 +4,11 @@ import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.Search;
 import net.deepthought.util.Alerts;
@@ -27,16 +24,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -60,7 +52,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
   protected DeepThought deepThought = null;
 
-  protected LazyLoadingObservableList<Person> listViewAllPersonsItems;
+  protected LazyLoadingObservableList<Person> listViewPersonsItems;
 
   protected Search<Person> filterPersonsSearch = null;
 
@@ -74,7 +66,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   @FXML
   protected Button btnNewPerson;
   @FXML
-  protected ListView<Person> lstvwAllPersons;
+  protected ListView<Person> lstvwPersons;
 
 
   public SearchAndSelectPersonsControl(IEditedEntitiesHolder<Person> editedPersonsHolder) {
@@ -120,7 +112,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
-    listViewAllPersonsItems.clear();
+    listViewPersonsItems.clear();
 
     for(PersonListCell cell : personListCells)
       cell.cleanUpControl();
@@ -135,7 +127,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
     this.deepThought = newDeepThought;
 
-    listViewAllPersonsItems.clear();
+    listViewPersonsItems.clear();
 
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
@@ -159,22 +151,21 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     });
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchPersonsAction());
 
-    listViewAllPersonsItems = new LazyLoadingObservableList<>();
-    lstvwAllPersons.setItems(listViewAllPersonsItems);
+    listViewPersonsItems = new LazyLoadingObservableList<>();
+    lstvwPersons.setItems(listViewPersonsItems);
 
-    lstvwAllPersons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    lstvwAllPersons.setOnKeyPressed(event -> {
-      if(event.getCode() == KeyCode.ENTER) {
+    lstvwPersons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    lstvwPersons.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ENTER) {
         toggleSelectedPersonsAffiliation();
         event.consume();
-      }
-      else if(event.getCode() == KeyCode.DELETE) {
+      } else if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedPersons();
         event.consume();
       }
     });
 
-    lstvwAllPersons.setCellFactory((listView) -> {
+    lstvwPersons.setCellFactory((listView) -> {
       final PersonListCell cell = createPersonListCell();
       personListCells.add(cell);
       return cell;
@@ -210,7 +201,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   }
 
   protected Collection<Person> getSelectedPersons() {
-    return new ArrayList<>(lstvwAllPersons.getSelectionModel().getSelectedItems()); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
+    return new ArrayList<>(lstvwPersons.getSelectionModel().getSelectedItems()); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
   }
 
 
@@ -219,7 +210,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
       filterPersonsSearch.interrupt();
 
     filterPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
-      listViewAllPersonsItems.setUnderlyingCollection(results);
+      listViewPersonsItems.setUnderlyingCollection(results);
     });
     Application.getSearchEngine().filterPersons(filterPersonsSearch);
   }

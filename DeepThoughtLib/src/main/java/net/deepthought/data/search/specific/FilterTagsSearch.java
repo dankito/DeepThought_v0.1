@@ -1,7 +1,10 @@
 package net.deepthought.data.search.specific;
 
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.SearchBase;
 import net.deepthought.data.search.SearchCompletedListener;
+
+import java.util.Collection;
 
 /**
  * Created by ganymed on 27/07/15.
@@ -43,8 +46,11 @@ public class FilterTagsSearch extends SearchBase {
     return this.results.addSearchResult(result);
   }
 
+  public void setAllMatchesSorted(Collection<Tag> allMatchesSorted) {
+    this.results.setAllMatchesSorted(allMatchesSorted);
+  }
+
   public FilterTagsSearchResults getResults() {
     return results;
   }
-
 }

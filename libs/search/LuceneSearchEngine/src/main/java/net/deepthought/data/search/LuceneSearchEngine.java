@@ -765,24 +765,70 @@ public class LuceneSearchEngine extends SearchEngineBase {
     });
   }
 
+  @Override
+  protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+    Query query = new WildcardQuery(new Term(FieldName.TagName, "*"));
+    if(search.isInterrupted())
+      return;
+
+    search.addResult(new FilterTagsSearchResult("", new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class,
+        FieldName.TagId, 100000, SortOrder.Ascending, FieldName.TagName), null));
+
+    search.fireSearchCompleted();
+  }
+
   protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+    IndexSearcher indexSearcher = getIndexSearcher(Tag.class);
+
     for(String tagNameToFilterFor : tagNamesToFilterFor) {
       if(search.isInterrupted())
         return;
       try {
-        String searchTerm = "*" + QueryParser.escape(tagNameToFilterFor) + "*";
-        Query query = new WildcardQuery(new Term(FieldName.TagName, searchTerm));
+        String searchTerm = QueryParser.escape(tagNameToFilterFor);
         if(search.isInterrupted())
           return;
 
-        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class, FieldName.TagId, 10000)));
+        Tag exactMatch = getExactMatchTag(indexSearcher, searchTerm);
+
+        Query query = new WildcardQuery(new Term(FieldName.TagName, "*" + searchTerm + "*"));
+        if(search.isInterrupted())
+          return;
+
+        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(indexSearcher, query, Tag.class,
+            FieldName.TagId, 100000), exactMatch));
       } catch(Exception ex) {
         log.error("Could not parse query " + tagNamesToFilterFor, ex);
         // TODO: set error flag in search
       }
     }
 
+    getAllRelevantTagsSorted(search, indexSearcher);
+
     search.fireSearchCompleted();
+  }
+
+  protected Tag getExactMatchTag(IndexSearcher indexSearcher, String searchTerm) {
+    Query exactMatchQuery = new TermQuery(new Term(FieldName.TagName, searchTerm));
+    List<Tag> exactMatchResults = new LazyLoadingLuceneSearchResultsList(indexSearcher, exactMatchQuery, Tag.class, FieldName.TagId, 2);
+    return exactMatchResults.size() == 1 ? exactMatchResults.get(0) : null;
+  }
+
+  protected void getAllRelevantTagsSorted(FilterTagsSearch search, IndexSearcher indexSearcher) {
+    BooleanQuery searchForAllQuery = new BooleanQuery();
+    for(FilterTagsSearchResult result : search.getResults().getResults()) {
+      if(search.isInterrupted())
+        return;
+
+      String searchTerm = QueryParser.escape(result.getSearchTerm());
+      if(result.hasExactMatch())
+        searchForAllQuery.add(new TermQuery(new Term(FieldName.TagName, searchTerm)), BooleanClause.Occur.SHOULD);
+      else
+        searchForAllQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + searchTerm + "*")), BooleanClause.Occur.SHOULD);
+    }
+
+    List<Tag> allMatchesSorted = new LazyLoadingLuceneSearchResultsList(indexSearcher, searchForAllQuery, Tag.class,
+        FieldName.TagId, 100000, SortOrder.Ascending, FieldName.TagName);
+    search.setAllMatchesSorted(allMatchesSorted);
   }
 
   protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {

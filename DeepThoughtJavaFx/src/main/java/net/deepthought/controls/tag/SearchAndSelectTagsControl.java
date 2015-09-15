@@ -2,17 +2,17 @@ package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
-import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
@@ -59,9 +59,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
   protected DeepThought deepThought = null;
 
-  protected ObservableList<Tag> listViewAllTagsItems = null;
-  protected FilteredList<Tag> filteredTags = null;
-  protected SortedList<Tag> sortedFilteredTags = null;
+  protected LazyLoadingObservableList<Tag> listViewTagsItems = null;
 
   protected FilterTagsSearch filterTagsSearch = null;
   protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
@@ -79,13 +77,11 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   @FXML
   protected Button btnCreateTag;
   @FXML
-  protected ListView<Tag> lstvwAllTags;
+  protected ListView<Tag> lstvwTags;
 
 
   public SearchAndSelectTagsControl(IEditedEntitiesHolder editedTagsHolder) {
     this.editedTagsHolder = editedTagsHolder;
-
-    deepThought = Application.getDeepThought();
 
     Application.addApplicationListener(applicationListener);
 
@@ -98,8 +94,9 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       fxmlLoader.load();
       setupControl();
 
-      if(deepThought != null)
-        deepThought.addEntityListener(deepThoughtListener);
+      if(Application.getDeepThought() != null && this.deepThought == null) {
+        deepThoughtChanged(Application.getDeepThought());
+      }
     } catch (IOException ex) {
       log.error("Could not load SearchAndSelectTagsControl", ex);
     }
@@ -132,6 +129,8 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     filterTagsSearch = null;
     lastFilterTagsResults = null;
 
+    listViewTagsItems.clear();
+
     for(TagListCell cell : tagListCells)
       cell.cleanUpControl();
     tagListCells.clear();
@@ -143,12 +142,13 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
     this.deepThought = newDeepThought;
 
-    listViewAllTagsItems.clear();
+    listViewTagsItems.clear();
 
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      listViewAllTagsItems.addAll(deepThought.getTags());
     }
+
+    filterTags();
   }
 
   protected void setupControl() {
@@ -159,8 +159,8 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "find.tags.to.add");
 
-    lstvwAllTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    lstvwAllTags.setOnKeyPressed(event -> {
+    lstvwTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    lstvwTags.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ENTER) {
         toggleSelectedTagsAffiliation();
         event.consume();
@@ -170,18 +170,14 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       }
     });
 
-    lstvwAllTags.setCellFactory(listView -> {
+    lstvwTags.setCellFactory(listView -> {
       TagListCell cell = new TagListCell(this, editedTagsHolder);
       tagListCells.add(cell);
       return cell;
     });
 
-    listViewAllTagsItems = lstvwAllTags.getItems();
-    if(deepThought != null)
-      listViewAllTagsItems.addAll(deepThought.getTags());
-    filteredTags = new FilteredList<>(listViewAllTagsItems, tag -> true);
-    sortedFilteredTags = new SortedList<>(filteredTags, tagComparator);
-    lstvwAllTags.setItems(sortedFilteredTags);
+    listViewTagsItems = new LazyLoadingObservableList<>();
+    lstvwTags.setItems(listViewTagsItems);
 
     txtfldFilterTags.textProperty().addListener((observable, oldValue, newValue) -> filterTags(newValue));
     txtfldFilterTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
@@ -205,40 +201,36 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     btnCreateTag.setDisable(StringUtils.isNullOrEmpty(tagsFilter));
   }
 
+  protected void filterTags() {
+    filterTags(txtfldFilterTags.getText());
+  }
+
   protected void filterTags(final String tagsFilter) {
     if(filterTagsSearch != null)
       filterTagsSearch.interrupt();
 
      btnCreateTag.setDisable(false);
 
-    if(StringUtils.isNullOrEmpty(tagsFilter)) {
-      lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
-      filteredTags.setPredicate((tag) -> true);
-      setControlsForEnteredTagsFilter(tagsFilter);
-      callFilteredTagsChangedListeners(lastFilterTagsResults);
-    }
-    else {
-      filterTagsSearch = new FilterTagsSearch(tagsFilter, new SearchCompletedListener<FilterTagsSearchResults>() {
-        @Override
-        public void completed(final FilterTagsSearchResults results) {
-          Platform.runLater(() -> {
-            lastFilterTagsResults = results;
-            filteredTags.setPredicate((tag) -> results.isRelevantMatch(tag));
+    filterTagsSearch = new FilterTagsSearch(tagsFilter, new SearchCompletedListener<FilterTagsSearchResults>() {
+      @Override
+      public void completed(final FilterTagsSearchResults results) {
+        Platform.runLater(() -> {
+          lastFilterTagsResults = results;
+          listViewTagsItems.setUnderlyingCollection(results.getRelevantMatches());
 
-            if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
-              lstvwAllTags.scrollTo(results.getLastResult().getExactMatch());
+          if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
+            lstvwTags.scrollTo(results.getLastResult().getExactMatch());
 
-            if(tagsFilter.contains(",") == false && results.getResults().size() == 1 && results.getExactMatches().size() == 1)
-              btnCreateTag.setDisable(true);
+          if(tagsFilter.contains(",") == false && results.getResults().size() == 1 && results.getExactMatches().size() == 1)
+            btnCreateTag.setDisable(true);
 
-            setControlsForEnteredTagsFilter(tagsFilter);
-            callFilteredTagsChangedListeners(results);
-          });
-        }
-      });
+          setControlsForEnteredTagsFilter(tagsFilter);
+          callFilteredTagsChangedListeners(results);
+        });
+      }
+    });
 
-      Application.getSearchEngine().filterTags(filterTagsSearch);
-    }
+    Application.getSearchEngine().filterTags(filterTagsSearch);
   }
 
   protected void createNewTagOrToggleTagsAffiliation() {
@@ -284,7 +276,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   }
 
   protected Collection<Tag> getSelectedTags() {
-    return new ArrayList<>(lstvwAllTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing first one SelectionModel gets cleared
+    return new ArrayList<>(lstvwTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing first one SelectionModel gets cleared
   }
 
 
@@ -320,11 +312,6 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       return tag1.compareTo(tag2);
     }
   };
-
-
-  public void setEntry(Entry entry) {
-//    txtfldFilterTags.clear();
-  }
 
 
   public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
@@ -386,9 +373,8 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   }
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {
-    listViewAllTagsItems.clear();
-    listViewAllTagsItems.addAll(deepThought.getTags());
-    filterTags(txtfldFilterTags.getText());
+    listViewTagsItems.clear();
+    filterTags();
   }
 
 }

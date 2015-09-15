@@ -18,6 +18,7 @@ public class FilterTagsSearchResults {
   protected List<FilterTagsSearchResult> results = new ArrayList<>();
 
   protected Collection<Tag> allMatches = null;
+  protected Collection<Tag> allMatchesSorted = null;
 
   protected Collection<Tag> relevantMatches = null;
 
@@ -40,8 +41,15 @@ public class FilterTagsSearchResults {
     return results.add(result);
   }
 
+  public void setAllMatchesSorted(Collection<Tag> allMatchesSorted) {
+    this.allMatchesSorted = allMatchesSorted;
+  }
+
 
   public Collection<Tag> getAllMatches() {
+    if(allMatchesSorted != null)
+      return allMatchesSorted;
+
     if(allMatches == null)
       determineMatchCategories();
 
@@ -54,6 +62,9 @@ public class FilterTagsSearchResults {
 
 
   public Collection<Tag> getRelevantMatches() {
+    if(allMatchesSorted != null)
+      return allMatchesSorted;
+
     if(relevantMatches == null)
       determineMatchCategories();
 
@@ -110,7 +121,7 @@ public class FilterTagsSearchResults {
 
   protected void determineMatchCategories() {
     allMatches = new CombinedLazyLoadingList<>();
-    relevantMatches = new ArrayList<>();
+    relevantMatches = new CombinedLazyLoadingList<>();
     exactMatches = new ArrayList<Tag>();
     singleMatchesOfASearchTerm = new ArrayList<>();
 
@@ -160,11 +171,19 @@ public class FilterTagsSearchResults {
   }
 
 
+  @Override
+  public String toString() {
+    return overAllSearchTerm + " has " + getAllMatches().size() + " results";
+  }
+
+
   public final static FilterTagsSearchResults NoFilterSearchResults = new FilterTagsSearchResults() {
 
     @Override
     public Collection<Tag> getAllMatches() {
-      return Application.getDeepThought().getSortedTags();
+      if(Application.getDeepThought() != null)
+        return Application.getDeepThought().getSortedTags();
+      return new ArrayList<>();
     }
 
     @Override

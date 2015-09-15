@@ -41,7 +41,7 @@ public class LazyLoadingLuceneSearchResultsList<T extends BaseEntity> extends La
   }
 
   public LazyLoadingLuceneSearchResultsList(IndexSearcher searcher, Query query, Class<T> resultType, String idFieldName, int countTopNHits) {
-    this(searcher, query, resultType, idFieldName, 1000, SortOrder.Unsorted, new String[0]);
+    this(searcher, query, resultType, idFieldName, countTopNHits, SortOrder.Unsorted, new String[0]);
   }
 
   public LazyLoadingLuceneSearchResultsList(IndexSearcher searcher, Query query, Class<T> resultType, String idFieldName, int countTopNHits, SortOrder sortOrder, String... sortFieldNames) {
