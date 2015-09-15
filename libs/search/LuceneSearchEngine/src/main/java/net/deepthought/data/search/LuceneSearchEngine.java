@@ -469,7 +469,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   public void indexEntity(UserDataEntity entity) {
-    if(entity.isPersisted() == false)
+    if(entity.isPersisted() == false || entity.isDeleted() == true)
       return;
 
     if(entity instanceof Entry)
@@ -1112,7 +1112,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     String idFieldName = getIdFieldNameForEntity(removedEntity);
     IndexWriter indexWriter = getIndexWriter(removedEntity.getClass());
     try {
-      if(idFieldName != null)
+      if(idFieldName != null && indexWriter != null)
         indexWriter.deleteDocuments(new Term(idFieldName, getByteRefFromLong(removedEntity.getId())));
     } catch(Exception ex) {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
