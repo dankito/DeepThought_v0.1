@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
-import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
@@ -13,49 +12,26 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.Search;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
-import org.controlsfx.control.textfield.CustomTextField;
-import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -69,16 +45,10 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
   protected DeepThought deepThought = null;
 
-  protected LazyLoadingObservableList<Person> listViewAllPersonsItems;
-
-  protected Search<Person> filterPersonsSearch = null;
-
   protected Set<Person> currentlySetPersonsOnEntity = new HashSet<>();
   protected Set<Person> addedPersons = new HashSet<>();
   protected Set<Person> removedPersons = new HashSet<>();
   protected ObservableSet<Person> editedEntityPersons = FXCollections.observableSet();
-
-  protected List<PersonListCell> personListCells = new ArrayList<>();
 
   protected EventHandler<PersonsControlPersonsEditedEvent> personAddedEventHandler = null;
   protected EventHandler<PersonsControlPersonsEditedEvent> personRemovedEventHandler = null;
@@ -86,36 +56,13 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
   protected FlowPane pnSelectedPersonsPreview;
 
-  protected VBox pnContent;
-
-  protected HBox hboxSearchForPerson;
-
-  protected TextField txtfldSearchForPerson;
-
-  protected Button btnNewPerson;
-
-  protected ListView<Person> lstvwAllPersons;
+  protected SearchAndSelectPersonsControl searchAndSelectPersonsControl = null;
 
 
   public PersonsControl() {
     deepThought = Application.getDeepThought();
 
     Application.addApplicationListener(applicationListener);
-
-//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/PersonsControl.fxml"));
-//    fxmlLoader.setRoot(this);
-//    fxmlLoader.setController(this);
-//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-//
-//    try {
-//      fxmlLoader.load();
-//      setupControl();
-//
-//      if(deepThought != null)
-//        deepThought.addEntityListener(deepThoughtListener);
-//    } catch (IOException ex) {
-//      log.error("Could not load PersonsControl", ex);
-//    }
 
     setupControl();
 
@@ -143,12 +90,6 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
-    listViewAllPersonsItems.clear();
-
-    for(PersonListCell cell : personListCells)
-      cell.cleanUpControl();
-    personListCells.clear();
-
     personAddedEventHandler = null;
     personRemovedEventHandler = null;
   }
@@ -159,12 +100,8 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
     this.deepThought = newDeepThought;
 
-    listViewAllPersonsItems.clear();
-
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
-      filterPersons();
     }
   }
 
@@ -172,60 +109,11 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     this.setExpanded(false);
     setupTitle();
 
-    pnContent = new VBox();
-    pnContent.setMinHeight(200);
-    pnContent.setMaxHeight(Double.MAX_VALUE);
-    pnContent.setMaxWidth(Double.MAX_VALUE);
-
-    hboxSearchForPerson = new HBox();
-    hboxSearchForPerson.setAlignment(Pos.CENTER_LEFT);
-    hboxSearchForPerson.setPrefHeight(32);
-    pnContent.getChildren().add(hboxSearchForPerson);
-    VBox.setMargin(hboxSearchForPerson, new Insets(6, 0, 6, 0));
-
-    Label lblSearch = new Label();
-    JavaFxLocalization.bindLabeledText(lblSearch, "search");
-    hboxSearchForPerson.getChildren().add(lblSearch);
-
-    txtfldSearchForPerson = (CustomTextField) TextFields.createClearableTextField();
-    txtfldSearchForPerson.setId("txtfldSearchForPerson");
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForPerson, "search.for.person");
-    hboxSearchForPerson.getChildren().add(1, txtfldSearchForPerson);
-    HBox.setHgrow(txtfldSearchForPerson, Priority.ALWAYS);
-    HBox.setMargin(txtfldSearchForPerson, new Insets(0, 6, 0, 6));
-
-    txtfldSearchForPerson.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        filterPersons();
-      }
-    });
-    txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchAuthorsAction());
-
-    btnNewPerson = new Button();
-    JavaFxLocalization.bindLabeledText(btnNewPerson, "new...");
-    btnNewPerson.setMinWidth(80);
-    btnNewPerson.setOnAction(event -> handleButtonNewPersonAction(event));
-    hboxSearchForPerson.getChildren().add(btnNewPerson);
-
-    lstvwAllPersons = new ListView<Person>();
-    lstvwAllPersons.setMinHeight(150);
-    lstvwAllPersons.setMaxHeight(Double.MAX_VALUE);
-    lstvwAllPersons.setCellFactory((listView) -> {
-      final PersonListCell cell = createPersonListCell();
-      personListCells.add(cell);
-      return cell;
-    });
-
-    pnContent.getChildren().add(lstvwAllPersons);
-    VBox.setVgrow(lstvwAllPersons, Priority.ALWAYS);
-
-    listViewAllPersonsItems = new LazyLoadingObservableList<>();
-    if(deepThought != null)
-      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
-    lstvwAllPersons.setItems(listViewAllPersonsItems);
-
-    setContent(pnContent);
+    searchAndSelectPersonsControl = new SearchAndSelectPersonsControl(this);
+//    searchAndSelectPersonsControl.setPrefHeight(250);
+//    searchAndSelectPersonsControl.setMaxHeight(200);
+    searchAndSelectPersonsControl.setMaxHeight(Double.MAX_VALUE);
+    this.setContent(searchAndSelectPersonsControl);
   }
 
   protected void setupTitle() {
@@ -317,41 +205,6 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     firePersonRemovedEvent(person);
   }
 
-  protected void filterPersons() {
-    if(filterPersonsSearch != null && filterPersonsSearch.isCompleted() == false)
-      filterPersonsSearch.interrupt();
-
-    filterPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
-//      filteredPersons.setPredicate((person) -> results.contains(person));
-        listViewAllPersonsItems.setUnderlyingCollection(results);
-    });
-    Application.getSearchEngine().filterPersons(filterPersonsSearch);
-  }
-
-
-  protected void handleTextFieldSearchAuthorsAction() {
-    final Person newPerson = Person.createPersonFromStringRepresentation(txtfldSearchForPerson.getText());
-
-    if(deepThought != null)
-      deepThought.addPerson(newPerson);
-
-    addEntityToEntry(newPerson);
-  }
-
-  @FXML
-  public void handleButtonNewPersonAction(ActionEvent event) {
-    final Person newPerson = Person.createPersonFromStringRepresentation(txtfldSearchForPerson.getText());
-
-    net.deepthought.controller.Dialogs.showEditPersonDialog(newPerson, null);
-  }
-
-
-  protected Comparator<Person> personComparator = new Comparator<Person>() {
-    @Override
-    public int compare(Person o1, Person o2) {
-      return o1.compareTo(o2);
-    }
-  };
 
 
   protected EntityListener deepThoughtListener = new EntityListener() {
@@ -362,31 +215,21 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
-      }
+
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
         updatePersonsSetOnEntityPreview();
       }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
-      }
+
     }
   };
-
-  protected void resetListViewAllPersonsItems() {
-    listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
-    filterPersons();
-  }
 
 
   protected void firePersonAddedEvent(Person person) {

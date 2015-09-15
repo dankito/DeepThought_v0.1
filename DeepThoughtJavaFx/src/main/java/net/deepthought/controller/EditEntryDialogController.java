@@ -549,7 +549,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
   public void handleButtonAddFileAction(ActionEvent event) {
     final FileLink newFile = new FileLink();
 
-    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
       @Override
       public void windowClosing(Stage stage, ChildWindowsController controller) {
 

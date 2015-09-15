@@ -30,7 +30,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 /**
@@ -49,17 +48,17 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
   protected Label personDisplayNameLabel = new Label();
 
-  protected Button btnAddOrRemovePerson = new Button();
   protected Button btnEditPerson = new Button();
   protected Button btnDeletePerson = new Button();
 
 
+  public PersonListCell() {
+    this(null);
+  }
+
   public PersonListCell(IEditedEntitiesHolder<Person> editedPersonsHolder) {
     this.editedPersonsHolder = editedPersonsHolder;
 
-    editedPersonsHolder.getEditedEntities().addListener(editedPersonsChangedListener);
-
-    setText(null);
     setupGraphic();
 
     itemProperty().addListener(new ChangeListener<Person>() {
@@ -69,13 +68,29 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
       }
     });
 
-    setOnMouseClicked(event -> mouseClicked(event));
+    if(editedPersonsHolder != null) {
+      editedPersonsHolder.getEditedEntities().addListener(editedPersonsChangedListener);
+
+      setOnMouseClicked(event -> mouseClicked(event));
+    }
+
+//    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
   protected SetChangeListener<Person> editedPersonsChangedListener = change -> personUpdated();
 
   @Override
   public void cleanUpControl() {
+    removeListener();
+
+    if(editedPersonsHolder != null) {
+      editedPersonsHolder.getEditedEntities().removeListener(editedPersonsChangedListener);
+
+      editedPersonsHolder = null;
+    }
+  }
+
+  protected void removeListener() {
     if(getItem() != null) {
       getItem().removeEntityListener(personListener);
     }
@@ -83,13 +98,10 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     if(person != null) { // don't know why but sometimes getItem() == null and person isn't
       person.removeEntityListener(personListener);
     }
-
-    editedPersonsHolder.getEditedEntities().removeListener(editedPersonsChangedListener);
-
-    editedPersonsHolder = null;
   }
 
   protected void setupGraphic() {
+    setText(null);
     setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     setAlignment(Pos.CENTER_LEFT);
 
@@ -100,19 +112,6 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
     personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(personDisplayNameLabel);
-
-    JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "add");
-    btnAddOrRemovePerson.setMinWidth(100);
-    HBox.setMargin(btnAddOrRemovePerson, new Insets(0, 6, 0, 0));
-    graphicPane.getChildren().add(btnAddOrRemovePerson);
-
-    btnAddOrRemovePerson.setOnAction(new EventHandler<ActionEvent>() {
-      @Override
-      public void handle(ActionEvent event) {
-        selectCurrentCell();
-        handleButtonAddOrRemovePersonAction();
-      }
-    });
 
     JavaFxLocalization.bindLabeledText(btnEditPerson, "edit");
     btnEditPerson.setMinWidth(100);
@@ -144,18 +143,6 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
     else {
       setGraphic(graphicPane);
       personDisplayNameLabel.setText(item.getNameRepresentation());
-      setButtonAddOrRemovePersonState();
-    }
-  }
-
-  protected void setButtonAddOrRemovePersonState() {
-    btnAddOrRemovePerson.setVisible(getItem() != null);
-
-    if(getItem() != null) {
-      if(isPersonSetOnEntity(getItem()) == false)
-        JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "add");
-      else
-        JavaFxLocalization.bindLabeledText(btnAddOrRemovePerson, "remove");
     }
   }
 
@@ -166,13 +153,8 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
   protected void mouseClicked(MouseEvent event) {
     if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
-      //Dialogs.showEditPersonDialog(getItem());
-
       if(getItem() != null) {
-        if (isPersonSetOnEntity(getItem()) == false)
-          addPersonToEntity(getItem());
-        else
-          removePersonFromEntity(getItem());
+        togglePersonAffiliation();
       }
     }
   }
@@ -183,9 +165,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
   protected void personChanged(Person newValue) {
-    if(person != null) {
-      person.removeEntityListener(personListener);
-    }
+    removeListener();
 
     person = newValue;
 
@@ -201,7 +181,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   }
 
 
-  protected void handleButtonAddOrRemovePersonAction() {
+  protected void togglePersonAffiliation() {
     if(isPersonSetOnEntity(getItem()) == false)
       addPersonToEntity(getItem());
     else
@@ -210,12 +190,10 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
   protected void addPersonToEntity(Person person) {
     editedPersonsHolder.addEntityToEntry(person);
-    setButtonAddOrRemovePersonState();
   }
 
   protected void removePersonFromEntity(Person person) {
     editedPersonsHolder.removeEntityFromEntry(person);
-    setButtonAddOrRemovePersonState();
   }
 
 

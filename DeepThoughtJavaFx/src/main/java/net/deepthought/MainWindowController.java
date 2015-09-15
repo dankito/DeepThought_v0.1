@@ -196,7 +196,7 @@ public class MainWindowController implements Initializable {
 
     setupControls();
 
-    net.deepthought.controller.Dialogs.getOpenedChildWindows().addListener(new SetChangeListener<Stage>() {
+    Dialogs.getOpenedChildWindows().addListener(new SetChangeListener<Stage>() {
       @Override
       public void onChanged(Change<? extends Stage> c) {
         if (c.wasAdded())
@@ -204,7 +204,7 @@ public class MainWindowController implements Initializable {
         if (c.wasRemoved())
           removeMenuItemFromWindowMenu(c.getElementRemoved());
 
-        mnitmMainMenuWindow.setDisable(net.deepthought.controller.Dialogs.getOpenedChildWindows().isEmpty());
+        mnitmMainMenuWindow.setDisable(Dialogs.getOpenedChildWindows().isEmpty());
       }
     });
   }
@@ -255,7 +255,7 @@ public class MainWindowController implements Initializable {
   protected void onlineArticleContentExtractorPluginLoaded(IOnlineArticleContentExtractor onlineArticleContentExtractor) {
     if(onlineArticleContentExtractor.hasArticlesOverview()) {
       MenuItem articleContentExtractorMenuItem = new MenuItem(onlineArticleContentExtractor.getSiteBaseUrl());
-      articleContentExtractorMenuItem.setOnAction(event -> net.deepthought.controller.Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
+      articleContentExtractorMenuItem.setOnAction(event -> Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
 
       if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
         HBox graphicsPane = new HBox(new ImageView(onlineArticleContentExtractor.getIconUrl()));
@@ -359,7 +359,7 @@ public class MainWindowController implements Initializable {
     setStatusLabelText(Localization.getLocalizedString("backing.up.data"));
     Application.shutdown();
 
-    for(Stage openedWindow : net.deepthought.controller.Dialogs.getOpenedChildWindows()) {
+    for(Stage openedWindow : Dialogs.getOpenedChildWindows()) {
       openedWindow.close();
     }
   }
@@ -698,12 +698,12 @@ public class MainWindowController implements Initializable {
 
   @FXML
   public void handleMenuItemToolsDeviceRegistrationAction(Event event) {
-    net.deepthought.controller.Dialogs.showRegisterUserDevicesDialog(stage);
+    Dialogs.showRegisterUserDevicesDialog(stage);
   }
 
   @FXML
   public void handleMenuItemToolsBackupsAction(Event event) {
-    net.deepthought.controller.Dialogs.showRestoreBackupDialog(stage);
+    Dialogs.showRestoreBackupDialog(stage);
   }
 
   @FXML

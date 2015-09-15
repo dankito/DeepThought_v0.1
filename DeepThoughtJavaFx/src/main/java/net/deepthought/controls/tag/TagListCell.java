@@ -211,16 +211,20 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     if(event.getButton() == MouseButton.PRIMARY) {
       if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
         if (getItem() != null) {
-          if (editedTagsHolder.containsEditedEntity(getItem()) == false)
-            editedTagsHolder.addEntityToEntry(getItem());
-          else
-            editedTagsHolder.removeEntityFromEntry(getItem());
+          toggleTagAffiliation();
         }
       }
 
       showCellInNotEditingState();
         event.consume();
     }
+  }
+
+  protected void toggleTagAffiliation() {
+    if (editedTagsHolder.containsEditedEntity(getItem()) == false)
+      editedTagsHolder.addEntityToEntry(getItem());
+    else
+      editedTagsHolder.removeEntityFromEntry(getItem());
   }
 
   @Override

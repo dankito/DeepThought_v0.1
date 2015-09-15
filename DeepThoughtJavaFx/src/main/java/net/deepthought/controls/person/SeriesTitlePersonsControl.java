@@ -40,9 +40,6 @@ public class SeriesTitlePersonsControl extends PersonsControl {
     }
     else
       setEntityPersons(new HashSet<Person>()); // TODO: or set to null to tell that editing is not enabled?
-
-    for(PersonListCell cell : personListCells)
-      ((SeriesTitlePersonListCell)cell).setSeries(series);
   }
 
   @Override

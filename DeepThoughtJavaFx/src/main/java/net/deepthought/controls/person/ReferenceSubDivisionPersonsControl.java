@@ -40,9 +40,6 @@ public class ReferenceSubDivisionPersonsControl extends PersonsControl {
     }
     else
       setEntityPersons(new HashSet<Person>()); // TODO: or set to null to tell that editing is not enabled?
-
-    for(PersonListCell cell : personListCells)
-      ((ReferenceSubDivisionPersonListCell)cell).setSubDivision(subDivision);
   }
 
   @Override

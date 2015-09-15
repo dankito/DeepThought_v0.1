@@ -211,7 +211,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   public void createEntryFromOnlineArticleButViewFirst(ContentExtractOption contentExtractOption, IOnlineArticleContentExtractor contentExtractor) {
     contentExtractor.createEntryFromClipboardContentAsync(contentExtractOption, result -> {
       if (result.successful())
-        net.deepthought.controller.Dialogs.showEditEntryDialog(result);
+        Dialogs.showEditEntryDialog(result);
       else
         showCouldNotCreateEntryError(result);
       hideThreadSafe();
@@ -267,7 +267,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     Entry newEntry = new Entry();
     newEntry.setContent("<html dir=\"ltr\"><head></head><body contenteditable=\"true\"><p><img src=\"file://" + newFile.getUriString() + "\" " +
         "/></p><p></p></body></html>");
-    net.deepthought.controller.Dialogs.showEditEntryDialog(newEntry);
+    Dialogs.showEditEntryDialog(newEntry);
   }
 
   public void copyFileToDataFolderAndSetAsEntryContent(final ContentExtractOptions options) {
@@ -318,7 +318,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 //    ContentExtractOption attachFileOption = options.getAttachFileToEntryOption();
 //    final FileLink newFile = ((ILocalFileContentExtractor)attachFileOption.getContentExtractor()).createFileLink(attachFileOption);
     final FileLink newFile = new FileLink(options.getUrl());
-    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
       @Override
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
@@ -365,7 +365,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 //    ContentExtractOption attachFileOption = options.getAttachFileToEntryOption();
 //    final FileLink newFile = ((ILocalFileContentExtractor)attachFileOption.getContentExtractor()).createFileLink(attachFileOption);
     final FileLink newFile = new FileLink(options.getUrl());
-    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
       @Override
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
@@ -375,7 +375,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
             if (result.successful()) {
               Entry newEntry = result.getCreatedEntry();
               newEntry.addFile(newFile);
-              net.deepthought.controller.Dialogs.showEditEntryDialog(result);
+              Dialogs.showEditEntryDialog(result);
             } else
               showCouldNotCreateEntryError(result);
           });

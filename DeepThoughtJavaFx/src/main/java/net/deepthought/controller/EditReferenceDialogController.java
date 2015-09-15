@@ -888,7 +888,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void handleButtonSeriesTitleAddFileAction(ActionEvent event) {
 //    final FileLink newFile = new FileLink();
 //
-//    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
 //      @Override
 //      public void windowClosing(Stage stage, ChildWindowsController controller) {
 //
@@ -968,7 +968,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   public void handleButtonNewOrEditSeriesTitleCategoryAction(ActionEvent event) {
 //    if(btnNewOrEditSeriesTitleCategory.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-//      net.deepthought.controller.Dialogs.showEditSeriesTitleCategoryDialog(cmbxSeriesTitleCategory.getValue());
+//      Dialogs.showEditSeriesTitleCategoryDialog(cmbxSeriesTitleCategory.getValue());
 //    else
 //      createNewSeriesTitleCategory();
   }
@@ -1060,7 +1060,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   public void handleButtonNewOrEditLanguageAction(ActionEvent event) {
 //    if(btnNewOrEditLanguage.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-//      net.deepthought.controller.Dialogs.showEditLanguageDialog(cmbxLanguage.getValue());
+//      Dialogs.showEditLanguageDialog(cmbxLanguage.getValue());
 //    else
 //      createNewLanguage();
   }
@@ -1072,7 +1072,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void createNewLanguage() {
     final Language newLanguage = new Language();
 
-//    net.deepthought.controller.Dialogs.showEditLanguageDialog(newLanguage, new ChildWindowsControllerListener() {
+//    Dialogs.showEditLanguageDialog(newLanguage, new ChildWindowsControllerListener() {
 //      @Override
 //      public void windowClosing(Stage stage, ChildWindowsController controller) {
 //
@@ -1090,7 +1090,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void handleButtonAddFileAction(ActionEvent event) {
 //    final FileLink newFile = new FileLink();
 //
-//    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
 //      @Override
 //      public void windowClosing(Stage stage, ChildWindowsController controller) {
 //
@@ -1109,7 +1109,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   public void handleButtonReferenceSubDivisionAddFileAction(ActionEvent event) {
 //    final FileLink newFile = new FileLink();
 //
-//    net.deepthought.controller.Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
+//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
 //      @Override
 //      public void windowClosing(Stage stage, ChildWindowsController controller) {
 //
