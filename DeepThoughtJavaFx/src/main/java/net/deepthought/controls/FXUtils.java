@@ -66,7 +66,8 @@ public class FXUtils {
         cell.setBackground(Constants.FilteredTagsRelevantMatchBackground);
       else
         cell.setBackground(Constants.FilteredTagsDefaultBackground);
-    } else
+    }
+    else
       cell.setBackground(Constants.FilteredTagsDefaultBackground);
   }
 

@@ -160,9 +160,11 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "find.tags.to.add");
 
     lstvwAllTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    lstvwAllTags.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.ENTER)
+    lstvwAllTags.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ENTER) {
         toggleSelectedTagsAffiliation();
+        event.consume();
+      }
       else if (event.getCode() == KeyCode.DELETE)
         deleteSelectedTags();
     });

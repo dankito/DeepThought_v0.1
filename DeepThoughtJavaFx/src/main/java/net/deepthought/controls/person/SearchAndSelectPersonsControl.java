@@ -163,7 +163,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     lstvwAllPersons.setItems(listViewAllPersonsItems);
 
     lstvwAllPersons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    lstvwAllPersons.setOnKeyReleased(event -> {
+    lstvwAllPersons.setOnKeyPressed(event -> {
       if(event.getCode() == KeyCode.ENTER)
         toggleSelectedPersonsAffiliation();
       else if(event.getCode() == KeyCode.DELETE)

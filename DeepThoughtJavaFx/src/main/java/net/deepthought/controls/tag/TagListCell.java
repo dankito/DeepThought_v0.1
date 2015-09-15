@@ -89,12 +89,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
     setOnContextMenuRequested(event -> showContextMenu(event));
 
-    selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue == true)
-        setBackground(Constants.FilteredTagsSelectedBackground);
-      else
-        FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, TagListCell.this);
-    });
+    selectedProperty().addListener((observable, oldValue, newValue) -> setCellBackgroundColor(newValue));
   }
 
   @Override
@@ -147,7 +142,6 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
         if (txtfldEditTagName == null)
           createTextField();
 
-        txtfldEditTagName.setText(item.getName());
         showCellInEditingState();
       }
       else {
@@ -168,7 +162,14 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   }
 
   protected void setCellBackgroundColor() {
-    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
+    setCellBackgroundColor(isSelected());
+  }
+
+  protected void setCellBackgroundColor(boolean isSelected) {
+    if(isSelected == true)
+      setBackground(Constants.FilteredTagsSelectedBackground);
+    else
+      FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, TagListCell.this);
   }
 
   protected ChangeListener<Boolean> checkBoxIsTagSelectedChangeListener = new ChangeListener<Boolean>() {
@@ -234,7 +235,6 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     if (txtfldEditTagName == null) {
       createTextField();
     }
-    txtfldEditTagName.setText(tag.getName());
 
     showCellInEditingState();
 
@@ -297,6 +297,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected void showCellInEditingState() {
     lblTagName.setVisible(false);
+
+    txtfldEditTagName.setText(tag.getName());
     txtfldEditTagName.setVisible(true);
   }
 
@@ -306,6 +308,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     lblTagName.setVisible(true);
 
     lblTagName.setText(getTagStringRepresentation(tag));
+
+    setCellBackgroundColor();
   }
 
 
