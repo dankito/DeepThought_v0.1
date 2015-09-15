@@ -5,6 +5,7 @@ import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -12,6 +13,7 @@ import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -36,6 +38,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -156,6 +159,14 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "find.tags.to.add");
 
+    lstvwAllTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    lstvwAllTags.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ENTER)
+        toggleSelectedTagsAffiliation();
+      else if (event.getCode() == KeyCode.DELETE)
+        deleteSelectedTags();
+    });
+
     lstvwAllTags.setCellFactory(listView -> {
       TagListCell cell = new TagListCell(this, editedTagsHolder);
       tagListCells.add(cell);
@@ -172,7 +183,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     txtfldFilterTags.textProperty().addListener((observable, oldValue, newValue) -> filterTags(newValue));
     txtfldFilterTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
     txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
-      if(event.getCode() == KeyCode.ESCAPE) {
+      if (event.getCode() == KeyCode.ESCAPE) {
         txtfldFilterTags.clear();
         event.consume();
       }
@@ -253,6 +264,26 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     else
       editedTagsHolder.removeEntityFromEntry(tag);
   }
+
+  protected void toggleSelectedTagsAffiliation() {
+    for(Tag selectedTag : getSelectedTags()) {
+      toggleTagAffiliation(selectedTag);
+    }
+  }
+
+  protected void deleteSelectedTags() {
+    for(Tag selectedTag : getSelectedTags()) {
+      if(Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(deepThought, selectedTag)) {
+        if(editedTagsHolder != null && editedTagsHolder.containsEditedEntity(selectedTag))
+          editedTagsHolder.removeEntityFromEntry(selectedTag);
+      }
+    }
+  }
+
+  protected Collection<Tag> getSelectedTags() {
+    return new ArrayList<>(lstvwAllTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing first one SelectionModel gets cleared
+  }
+
 
   protected void addNewTagToEntry() {
     addNewTagToEntry(txtfldFilterTags.getText());
