@@ -36,13 +36,12 @@ public class Alerts {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
       if(deleteCategory)
-        Application.getDeepThought().removeCategory(category);
-      return deleteCategory;
+        return Application.getDeepThought().removeCategory(category);
     }
     else
-      Application.getDeepThought().removeCategory(category);
+      return Application.getDeepThought().removeCategory(category);
 
-    return true;
+    return false;
   }
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {
@@ -69,18 +68,20 @@ public class Alerts {
         Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
-  public static void deletePersonWithUserConfirmationIfIsSetOnEntries(Person person) {
-    deletePersonWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), person);
+  public static boolean deletePersonWithUserConfirmationIfIsSetOnEntries(Person person) {
+    return deletePersonWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), person);
   }
 
-  public static void deletePersonWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, Person person) {
+  public static boolean deletePersonWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, Person person) {
     if(person.isSetOnEntries()) {
       boolean confirmDeleteTag = showConfirmDeletePersonWithEntriesAlert(person);
       if(confirmDeleteTag)
-        deepThought.removePerson(person);
+        return deepThought.removePerson(person);
     }
     else
-      deepThought.removePerson(person);
+      return deepThought.removePerson(person);
+
+    return false;
   }
 
   public static boolean showConfirmDeletePersonWithEntriesAlert(Person person) {

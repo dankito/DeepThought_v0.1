@@ -7,20 +7,44 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * Created by ganymed on 12/04/15.
  */
 public class InMemorySearchEngine extends SearchEngineBase {
+
+
+  @Override
+  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        List<Entry> entriesWithoutTags = new ArrayList<>();
+
+        for (Entry entry : Application.getDeepThought().getEntries()) {
+          if (entry.hasTags() == false)
+            entriesWithoutTags.add(entry);
+        }
+
+        listener.completed(entriesWithoutTags);
+      }
+    });
+  }
+
 
   protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
     // TODO: may implement one day (no need for it right now)
@@ -75,6 +99,11 @@ public class InMemorySearchEngine extends SearchEngineBase {
 
   @Override
   protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
+    if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
+      setReferenceBasesEmptyFilterSearchResult(search);
+      return;
+    }
+
     for(SeriesTitle seriesTitle : Application.getDeepThought().getSeriesTitles()) {
       if(search.isInterrupted())
         return;
@@ -104,6 +133,11 @@ public class InMemorySearchEngine extends SearchEngineBase {
 
   @Override
   protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+    if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
+      setReferenceBasesEmptyFilterSearchResult(search);
+      return;
+    }
+
     if(seriesTitleFilter != null &&
         referenceFilter == null && referenceSubDivisionFilter == null) // cannot fulfill all filters
       filterSeriesTitles(search, seriesTitleFilter);
@@ -159,6 +193,21 @@ public class InMemorySearchEngine extends SearchEngineBase {
 
     search.fireSearchCompleted();
   }
+
+  protected void setReferenceBasesEmptyFilterSearchResult(FilterReferenceBasesSearch search) {
+    if(search.getType() == ReferenceBaseType.SeriesTitle)
+      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles()));
+    else if(search.getType() == ReferenceBaseType.Reference)
+      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getReferences()));
+    else if(search.getType() == ReferenceBaseType.ReferenceSubDivision)
+      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getReferenceSubDivisions()));
+    else if(search.getType() == ReferenceBaseType.All)
+      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles(), Application.getDeepThought().getReferences(),
+          Application.getDeepThought().getReferenceSubDivisions()));
+
+    search.fireSearchCompleted();
+  }
+
 
   @Override
   protected void filterPersons(Search<Person> search, String personFilter) {

@@ -3,10 +3,8 @@ package net.deepthought.data.search;
 import net.deepthought.Application;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
@@ -16,9 +14,7 @@ import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Notification;
 import net.deepthought.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by ganymed on 12/04/15.
@@ -37,24 +33,6 @@ public abstract class SearchEngineBase implements ISearchEngine {
   public void close() {
     Application.removeApplicationListener(applicationListener);
     // nothing to do here, maybe in sub classes
-  }
-
-
-  @Override
-  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        List<Entry> entriesWithoutTags = new ArrayList<>();
-
-        for (Entry entry : Application.getDeepThought().getEntries()) {
-          if (entry.hasTags() == false)
-            entriesWithoutTags.add(entry);
-        }
-
-        listener.completed(entriesWithoutTags);
-      }
-    });
   }
 
   @Override
@@ -116,11 +94,11 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
   @Override
   public void filterReferenceBases(final FilterReferenceBasesSearch search) {
-    if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) { // no filter term specified -> return all ReferenceBases
-      setReferenceBasesEmptyFilterSearchResult(search);
-      return;
-    }
-
+    // no, don't do this, as they are might not sorted (e.g. when a ReferenceBase gets added during runtime)
+//    if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) { // no filter term specified -> return all ReferenceBases
+//      setReferenceBasesEmptyFilterSearchResult(search);
+//      return;
+//    }
 
     final String lowerCaseFilter = search.getSearchTerm().toLowerCase();
     final boolean filterForReferenceHierarchy = lowerCaseFilter.contains(",");
@@ -147,20 +125,6 @@ public abstract class SearchEngineBase implements ISearchEngine {
       filterEachReferenceBaseWithSeparateFilter(search, null, lowerCaseFilter, null);
     else if(search.getType() == ReferenceBaseType.ReferenceSubDivision)
       filterEachReferenceBaseWithSeparateFilter(search, null, null, lowerCaseFilter);
-  }
-
-  protected void setReferenceBasesEmptyFilterSearchResult(FilterReferenceBasesSearch search) {
-    if(search.getType() == ReferenceBaseType.SeriesTitle)
-      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles()));
-    else if(search.getType() == ReferenceBaseType.Reference)
-      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getReferences()));
-    else if(search.getType() == ReferenceBaseType.ReferenceSubDivision)
-      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getReferenceSubDivisions()));
-    else if(search.getType() == ReferenceBaseType.All)
-      search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles(), Application.getDeepThought().getReferences(),
-        Application.getDeepThought().getReferenceSubDivisions()));
-
-    search.fireSearchCompleted();
   }
 
   protected void filterEachReferenceBaseWithSeparateFilter(final FilterReferenceBasesSearch search, String lowerCaseFilter) {
@@ -198,11 +162,12 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
   @Override
   public void filterPersons(final Search<Person> search) {
-    if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
-      search.setResults(Application.getDeepThought().getPersons());
-      search.fireSearchCompleted();
-      return;
-    }
+    // Persons on DeepThought are might not sorted (e.g. if a new Person gets added during runtime)
+//    if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
+//      search.setResults(Application.getDeepThought().getPersons());
+//      search.fireSearchCompleted();
+//      return;
+//    }
 
     final String lowerCaseFilter = search.getSearchTerm().toLowerCase();
     final boolean filterForFirstAndLastName = lowerCaseFilter.contains(",");

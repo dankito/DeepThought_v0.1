@@ -139,8 +139,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
-      filterPersons();
+      resetListViewAllPersonsItems();
     }
   }
 
@@ -161,8 +160,6 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchPersonsAction());
 
     listViewAllPersonsItems = new LazyLoadingObservableList<>();
-    if(deepThought != null)
-      listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
     lstvwAllPersons.setItems(listViewAllPersonsItems);
 
     lstvwAllPersons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -178,6 +175,8 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
       personListCells.add(cell);
       return cell;
     });
+
+    resetListViewAllPersonsItems();
   }
 
   protected PersonListCell createPersonListCell() {
@@ -199,7 +198,10 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
   protected void deleteSelectedPersons() {
     for(Person selectedPerson : getSelectedPersons()) {
-      Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(deepThought, selectedPerson);
+      if(Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(deepThought, selectedPerson)) {
+        if(editedPersonsHolder != null && editedPersonsHolder.containsEditedEntity(selectedPerson))
+          editedPersonsHolder.removeEntityFromEntry(selectedPerson);
+      }
     }
   }
 
@@ -266,7 +268,6 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   };
 
   protected void resetListViewAllPersonsItems() {
-    listViewAllPersonsItems.setUnderlyingCollection(deepThought.getPersons());
     filterPersons();
   }
 

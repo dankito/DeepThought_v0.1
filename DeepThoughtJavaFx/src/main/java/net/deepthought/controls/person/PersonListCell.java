@@ -58,6 +58,8 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   protected Button btnEditPerson = new Button();
 
 
+  // making Cell editable on F2 press is not senseful for Persons as they have a First and a Last Name
+
   public PersonListCell() {
     this(null);
   }
@@ -235,10 +237,19 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
 
     MenuItem deleteTagItem = new MenuItem();
     JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
-    deleteTagItem.setOnAction(event -> Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(getItem() == null ? person : getItem()));
+    deleteTagItem.setOnAction(event -> deletePerson());
     contextMenu.getItems().add(deleteTagItem);
 
     return contextMenu;
+  }
+
+  protected void deletePerson() {
+    Person personToDelete = getItem() == null ? person : getItem();
+
+    if(Alerts.deletePersonWithUserConfirmationIfIsSetOnEntries(personToDelete)) {
+      if(editedPersonsHolder != null && editedPersonsHolder.containsEditedEntity(personToDelete))
+        editedPersonsHolder.removeEntityFromEntry(personToDelete);
+    }
   }
 
 
