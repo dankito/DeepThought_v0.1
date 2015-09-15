@@ -32,6 +32,28 @@ import javafx.stage.Stage;
  */
 public class Alerts {
 
+  public static boolean deleteTagWithUserConfirmationIfIsSetOnEntries(Tag tag) {
+    return deleteTagWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), tag);
+  }
+
+  public static boolean deleteTagWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, Tag tag) {
+    if(tag.hasEntries()) {
+      boolean confirmDeleteTag = showConfirmDeleteTagWithEntriesAlert(tag);
+      if(confirmDeleteTag)
+        return deepThought.removeTag(tag);
+    }
+    else
+      return deepThought.removeTag(tag);
+
+    return false;
+  }
+
+  public static boolean showConfirmDeleteTagWithEntriesAlert(Tag tag) {
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
+  }
+
+
   public static boolean deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(Category category) {
     if(category.hasSubCategories() || category.hasEntries()) {
       Boolean deleteCategory = Alerts.showConfirmDeleteCategoryWithSubCategoriesOrEntries(category);
@@ -49,24 +71,6 @@ public class Alerts {
         Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
-  public static void deleteTagWithUserConfirmationIfIsSetOnEntries(Tag tag) {
-    deleteTagWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), tag);
-  }
-
-  public static void deleteTagWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, Tag tag) {
-    if(tag.hasEntries()) {
-      boolean confirmDeleteTag = showConfirmDeleteTagWithEntriesAlert(tag);
-      if(confirmDeleteTag)
-        deepThought.removeTag(tag);
-    }
-    else
-      deepThought.removeTag(tag);
-  }
-
-  public static boolean showConfirmDeleteTagWithEntriesAlert(Tag tag) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
-  }
 
   public static boolean deletePersonWithUserConfirmationIfIsSetOnEntries(Person person) {
     return deletePersonWithUserConfirmationIfIsSetOnEntries(Application.getDeepThought(), person);

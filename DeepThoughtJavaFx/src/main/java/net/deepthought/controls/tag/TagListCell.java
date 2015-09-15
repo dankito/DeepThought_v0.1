@@ -327,12 +327,18 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
     MenuItem deleteTagItem = new MenuItem();
     JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
-    deleteTagItem.setOnAction(event -> Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag));
+    deleteTagItem.setOnAction(event -> deleteTag());
     contextMenu.getItems().add(deleteTagItem);
 
     return contextMenu;
   }
 
+  protected void deleteTag() {
+    if(Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(tag)) {
+      if(editedTagsHolder != null && editedTagsHolder.containsEditedEntity(tag))
+        editedTagsHolder.removeEntityFromEntry(tag);
+    }
+  }
 
 
   protected EntityListener tagListener = new EntityListener() {
