@@ -85,20 +85,6 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
       setGraphic(null);
     }
     else {
-//      if (isEditing()) {
-//        if (textField != null) {
-//          textField.setText(getItemTextRepresentation());
-//        }
-//        setText(null);
-//        setGraphic(textField);
-//      } else {
-//        setText(getItemTextRepresentation());
-//        setGraphic(getTreeItem().getGraphic());
-//
-//        if(hasAContextMenu)
-//          setContextMenu(contextMenu);
-//      }
-
       setGraphic(null);
       setText(getItemTextRepresentation());
     }

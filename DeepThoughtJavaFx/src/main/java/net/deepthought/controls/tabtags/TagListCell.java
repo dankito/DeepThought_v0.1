@@ -13,6 +13,7 @@ import java.util.Collection;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ContextMenuEvent;
 
 /**
  * Created by ganymed on 29/11/14.
@@ -20,6 +21,11 @@ import javafx.scene.control.SeparatorMenuItem;
 public class TagListCell extends TextFieldListCell<Tag> {
 
   protected Tag tag = null;
+
+
+  public TagListCell() {
+    setOnContextMenuRequested(event -> showContextMenu(event));
+  }
 
 
   @Override
@@ -46,15 +52,12 @@ public class TagListCell extends TextFieldListCell<Tag> {
   protected void tagChanged(Tag tag) {
     if(this.tag != null) {
       this.tag.removeEntityListener(tagListener);
-      setContextMenu(null);
     }
 
     this.tag = tag;
 
     if(tag != null) {
       tag.addEntityListener(tagListener);
-      if(tag instanceof SystemTag == false)
-        setContextMenu(createContextMenu());
     }
 
     setItem(tag);
@@ -63,6 +66,16 @@ public class TagListCell extends TextFieldListCell<Tag> {
 
   protected void tagUpdated() {
     updateItem(tag, getItemTextRepresentation().isEmpty());
+  }
+
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    if(tag instanceof SystemTag)
+      return;
+
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }
 
   protected ContextMenu createContextMenu() {

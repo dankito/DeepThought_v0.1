@@ -12,6 +12,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ContextMenuEvent;
 
 /**
  * Created by ganymed on 27/11/14.
@@ -22,7 +23,7 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
 
 
   public CategoryTreeCell() {
-
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
 
@@ -33,15 +34,7 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
   }
 
   protected void categoryChanged(Category category) {
-    if(this.category != null) {
-      setContextMenu(null);
-    }
-
     this.category = category;
-
-    if(category != null) {
-      setContextMenu(createContextMenu());
-    }
 
     categoryUpdated();
   }
@@ -57,6 +50,13 @@ public class CategoryTreeCell extends TextFieldTreeCell<Category> {
   @Override
   protected void itemValueUpdated(String newValue, String oldValue) {
     getItem().setName(newValue);
+  }
+
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }
 
   protected ContextMenu createContextMenu() {

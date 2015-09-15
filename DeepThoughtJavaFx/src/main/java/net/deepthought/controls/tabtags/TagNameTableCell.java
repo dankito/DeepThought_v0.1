@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.ContextMenuEvent;
 
 /**
  * Created by ganymed on 27/12/14.
@@ -34,6 +35,8 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
       filterTagsSearchResults = results;
       setCellBackgroundColor();
     });
+
+    setOnContextMenuRequested(event -> showContextMenu(event));
   }
 
 
@@ -65,15 +68,12 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   protected void tagChanged(Tag tag) {
     if(this.tag != null) {
       this.tag.removeEntityListener(tagListener);
-      setContextMenu(null);
     }
 
     this.tag = tag;
 
     if(tag != null) {
       tag.addEntityListener(tagListener);
-      if(tag instanceof SystemTag == false)
-        setContextMenu(createContextMenu());
     }
 
     setItem(getItemTextRepresentation());
@@ -96,6 +96,16 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
   protected void tagUpdated() {
     updateItem(getItemTextRepresentation(), getItemTextRepresentation().isEmpty());
+  }
+
+
+  protected void showContextMenu(ContextMenuEvent event) {
+    if(tag instanceof SystemTag)
+      return;
+
+    ContextMenu contextMenu = createContextMenu();
+
+    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }
 
   protected ContextMenu createContextMenu() {
