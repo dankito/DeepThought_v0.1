@@ -76,6 +76,9 @@ public class TagsFragment extends Fragment {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Tag tag = (Tag)parent.getItemAtPosition(position);
+      if(tag.hasEntries() == false) // no Entries to show -> don't navigate
+        return;
+
       ActivityManager.getInstance().navigateToEntriesFragment(tag.getEntries(), R.id.rlyFragmentTags);
 
       hasNavigatedToOtherFragment = true;

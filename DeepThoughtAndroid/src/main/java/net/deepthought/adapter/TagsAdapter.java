@@ -98,12 +98,12 @@ public class TagsAdapter extends BaseAdapter {
 
     TextView txtvwListItemTagName = (TextView)convertView.findViewById(R.id.txtvwTagName);
     txtvwListItemTagName.setText(tag.getTextRepresentation());
+    if(tag.hasEntries())
+      txtvwListItemTagName.setText(txtvwListItemTagName.getText() + "  ≻");
 
     ImageView imgvwFilter = (ImageView)convertView.findViewById(R.id.imgvwFilter);
     imgvwFilter.setTag(tag);
     imgvwFilter.setOnClickListener(imgvwFilterOnClickListener);
-
-    convertView.setEnabled(tag.hasEntries());
 
     return convertView;
   }
