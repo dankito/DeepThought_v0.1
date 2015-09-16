@@ -46,7 +46,7 @@ public class EntriesFragment extends Fragment {
   }
 
   public EntriesFragment(Collection<Entry> entriesToShow) {
-    this.entriesToShow = (List<Entry>)entriesToShow;
+    this.entriesToShow = entriesToShow;
   }
 
 

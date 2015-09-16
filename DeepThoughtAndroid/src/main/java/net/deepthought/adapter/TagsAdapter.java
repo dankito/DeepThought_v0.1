@@ -42,6 +42,8 @@ public class TagsAdapter extends BaseAdapter {
 
     Application.addApplicationListener(applicationListener);
 
+    if(Application.getDataManager() != null)
+      Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
     if(Application.getDeepThought() != null)
       deepThoughtChanged(Application.getDeepThought());
   }

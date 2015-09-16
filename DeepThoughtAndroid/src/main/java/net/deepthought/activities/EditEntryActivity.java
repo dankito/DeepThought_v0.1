@@ -236,6 +236,8 @@ public class EditEntryActivity extends AppCompatActivity {
 
     if(id == android.R.id.home) {
       saveEntryIfNeeded();
+      finish();
+      return true;
     }
     else if (id == R.id.mnitmActionCancel) {
       finish();

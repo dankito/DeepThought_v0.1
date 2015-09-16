@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 
 import net.deepthought.MainActivity;
-import net.deepthought.R;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.fragments.EntriesFragment;
@@ -66,11 +65,11 @@ public class ActivityManager {
     FragmentTransaction transaction = mainActivity.getSupportFragmentManager().beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
-    transaction.replace(R.id.rlyFragmentTags, entriesFragment);
+    transaction.replace(fragmentToReplace, entriesFragment);
 
     transaction.addToBackStack("Tags");
 
-    transaction.commit();
+    transaction.commitAllowingStateLoss();
   }
 
   public void showEditTagActivity(Tag tag) {

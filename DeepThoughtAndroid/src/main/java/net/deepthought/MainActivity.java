@@ -427,8 +427,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           else if(position == 1) {
             if(tagsFragment == null)
               tagsFragment = new TagsFragment();
-            if(tagsFragment.hasNavigatedToOtherFragment())
-              return new EntriesFragment();
             return tagsFragment;
           }
           else if(position == 2) {
