@@ -23,6 +23,7 @@ import net.deepthought.adapter.EntriesAdapter;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ import java.util.List;
 public class EntriesFragment extends Fragment {
 
 
-  protected List<Entry> entriesToShow = null;
+  protected Collection<Entry> entriesToShow = null;
 
   protected EntriesAdapter entriesAdapter;
 
@@ -41,15 +42,12 @@ public class EntriesFragment extends Fragment {
 
 
   public EntriesFragment() {
-//    this(new ArrayList<Entry>());
+
   }
 
-//  public EntriesFragment(Collection<Entry> entriesToShow) {
-//    if(entriesToShow instanceof List)
-//      this.entriesToShow = (List<Entry>)entriesToShow;
-//    else
-//      this.entriesToShow = new ArrayList<>(entriesToShow);
-//  }
+  public EntriesFragment(Collection<Entry> entriesToShow) {
+    this.entriesToShow = (List<Entry>)entriesToShow;
+  }
 
 
   @Override
@@ -63,7 +61,7 @@ public class EntriesFragment extends Fragment {
     View rootView = inflater.inflate(R.layout.fragment_entries, container, false);
 
     ListView lstvwEntries = (ListView)rootView.findViewById(R.id.lstvwEntries);
-    entriesAdapter = new EntriesAdapter(getActivity());
+    entriesAdapter = new EntriesAdapter(getActivity(), entriesToShow);
     lstvwEntries.setAdapter(entriesAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
@@ -158,18 +156,6 @@ public class EntriesFragment extends Fragment {
     }
   }
 
-  protected AdapterView.OnItemLongClickListener lstvwEntriesOnItemLongClickListener = new AdapterView.OnItemLongClickListener() {
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-      Entry entry = (Entry)parent.getItemAtPosition(position);
-      if(entry != null) {
-
-        return true;
-      }
-
-      return false;
-    }
-  };
 
   protected TextWatcher edtxtSearchEntriesTextWatcher = new TextWatcher() {
     @Override

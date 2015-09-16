@@ -11,11 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
@@ -77,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+
+    protected TabLayout tabLayout;
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       mViewPager = (ViewPager) findViewById(R.id.pager);
       mViewPager.setAdapter(mSectionsPagerAdapter);
 
-      TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
+      tabLayout = (TabLayout) findViewById(R.id.tabLayout);
       tabLayout.setupWithViewPager(mViewPager);
 
       // When swiping between different sections, select the corresponding
@@ -385,36 +384,58 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   }
 
+  @Override
+  public void onBackPressed() {
+    // a bit hacky but i don't know how to solve it otherwise to reliably get informed of Back Button pressed in TagsFragment
+    // (tip in https://stackoverflow.com/a/7992472 doesn't work as fragment's view needs to stay focused which is not always provided e.g. when displaying Search Bar)
+    int selectedTabPosition = tabLayout.getSelectedTabPosition();
+    Fragment selectedFragment = mSectionsPagerAdapter.getItem(selectedTabPosition);
+    if(selectedFragment instanceof TagsFragment)
+      ((TagsFragment)selectedFragment).backButtonPressed();
+
+    super.onBackPressed();
+  }
+
   /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+        protected android.support.v4.app.FragmentManager fragmentManager = null;
+
+        protected EntriesFragment entriesFragment = null;
+        protected TagsFragment tagsFragment = null;
+
         public SectionsPagerAdapter(android.support.v4.app.FragmentManager fm) {
             super(fm);
+            this.fragmentManager = fm;
+        }
+
+        @Override
+        public int getCount() {
+          return 2; // don't show SearchFragment right now
         }
 
         @Override
         public Fragment getItem(int position) {
           if(position == 0) {
-            return new EntriesFragment();
+            if(entriesFragment == null)
+              entriesFragment = new EntriesFragment();
+            return entriesFragment;
           }
           else if(position == 1) {
-            return new TagsFragment();
+            if(tagsFragment == null)
+              tagsFragment = new TagsFragment();
+            if(tagsFragment.hasNavigatedToOtherFragment())
+              return new EntriesFragment();
+            return tagsFragment;
           }
           else if(position == 2) {
             return new SearchFragment();
           }
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
 
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 2;
+          return null;
         }
 
         @Override
@@ -422,47 +443,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section_entries).toUpperCase(l);
+                    return getString(R.string.title_section_entries);
                 case 1:
-                    return getString(R.string.title_section_tags).toUpperCase(l);
+                    return getString(R.string.title_section_tags);
                 case 2:
-                  return getString(R.string.title_section_search).toUpperCase(l);
+                  return getString(R.string.title_section_search);
             }
             return null;
         }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            return rootView;
-        }
-    }
+  }
 
 }

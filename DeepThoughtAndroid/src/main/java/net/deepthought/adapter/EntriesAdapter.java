@@ -27,6 +27,8 @@ import java.util.List;
  */
 public class EntriesAdapter extends BaseAdapter {
 
+  protected List<Entry> entriesToShow = null;
+
   protected DeepThought deepThought;
   protected Activity context;
 
@@ -35,8 +37,13 @@ public class EntriesAdapter extends BaseAdapter {
   protected List<Entry> searchResults = null;
 
 
-  public EntriesAdapter(Activity context) {
+  public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     this.context = context;
+
+    if(entriesToShow instanceof List)
+      this.entriesToShow = (List<Entry>)entriesToShow;
+    else if(entriesToShow != null)
+      this.entriesToShow = new ArrayList<>(entriesToShow); // TODO: use a lazy loading list
 
     Application.addApplicationListener(applicationListener);
 
@@ -59,7 +66,19 @@ public class EntriesAdapter extends BaseAdapter {
   protected void deepThoughtChanged(DeepThought deepThought) {
     Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
 
+    if(this.deepThought != null) {
+      if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries())
+        entriesToShow = null;
+    }
+
     this.deepThought = deepThought;
+
+    if(deepThought != null && entriesToShow == null) {
+      if(deepThought.AllEntriesSystemTag().getEntries() instanceof List)
+        entriesToShow = (List<Entry>)deepThought.AllEntriesSystemTag().getEntries();
+      else
+        entriesToShow = new ArrayList<>(deepThought.AllEntriesSystemTag().getEntries()); // TODO: use a lazy loading list
+    }
 
     Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
 
@@ -72,8 +91,8 @@ public class EntriesAdapter extends BaseAdapter {
     if(searchResults != null)
       return searchResults.size();
 
-    if(deepThought != null)
-      return deepThought.countEntries();
+    if(entriesToShow != null)
+      return entriesToShow.size();
     return 0;
   }
 
@@ -82,7 +101,7 @@ public class EntriesAdapter extends BaseAdapter {
       return searchResults.get(position);
     }
 
-    return deepThought.entryAt(position);
+    return entriesToShow.get(position);
   }
 
   @Override

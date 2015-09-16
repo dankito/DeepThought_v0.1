@@ -35,6 +35,10 @@ public class TagsFragment extends Fragment {
 
   protected EditText edtxtSearchTags;
 
+  protected MenuItem mnitmSearchTags = null;
+
+  protected boolean hasNavigatedToOtherFragment = false;
+
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -72,13 +76,27 @@ public class TagsFragment extends Fragment {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Tag tag = (Tag)parent.getItemAtPosition(position);
-      ActivityManager.getInstance().showEditTagActivity(tag);
+      ActivityManager.getInstance().navigateToEntriesFragment(tag.getEntries(), R.id.rlyFragmentTags);
+
+      hasNavigatedToOtherFragment = true;
+      getActivity().invalidateOptionsMenu();
     }
   };
+
+  public void backButtonPressed() {
+    if(hasNavigatedToOtherFragment) {
+      hasNavigatedToOtherFragment = false;
+      getActivity().invalidateOptionsMenu();
+    }
+  }
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     inflater.inflate(R.menu.fragment_tags_options_menu, menu);
+
+    mnitmSearchTags = menu.findItem(R.id.mnitmActionSearchTags);
+
+    mnitmSearchTags.setVisible(!hasNavigatedToOtherFragment);
 
     super.onCreateOptionsMenu(menu, inflater);
   }
@@ -142,18 +160,6 @@ public class TagsFragment extends Fragment {
     }
   }
 
-  protected AdapterView.OnItemLongClickListener lstvwTagsOnItemLongClickListener = new AdapterView.OnItemLongClickListener() {
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-      Tag tag = (Tag)parent.getItemAtPosition(position);
-      if(tag != null) {
-
-        return true;
-      }
-
-      return false;
-    }
-  };
 
   protected TextWatcher edtxtSearchTagsTextWatcher = new TextWatcher() {
     @Override
@@ -172,4 +178,7 @@ public class TagsFragment extends Fragment {
     }
   };
 
+  public boolean hasNavigatedToOtherFragment() {
+    return hasNavigatedToOtherFragment;
+  }
 }

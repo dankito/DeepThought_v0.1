@@ -1,13 +1,19 @@
 package net.deepthought.activities;
 
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 
 import net.deepthought.MainActivity;
+import net.deepthought.R;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.fragments.EntriesFragment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
 
 /**
  * Created by ganymed on 12/10/14.
@@ -49,14 +55,30 @@ public class ActivityManager {
       entryToBeEdited = entry;
 
       Intent startEditEntryActivityIntent = new Intent(mainActivity, EditEntryActivity.class);
-      //startEditEntryActivityIntent.putExtra(EditEntryActivity.EntryArgumentKey, entry); // after serializing / deserializing it's not the same object anymore!
       mainActivity.startActivityForResult(startEditEntryActivityIntent, EditEntryActivity.RequestCode);
     } catch(Exception ex) {
       log.error("Could not start EditEntryActivity", ex);
     }
   }
 
+  public void navigateToEntriesFragment(Collection<Entry> entries, int fragmentToReplace) {
+    Fragment entriesFragment = new EntriesFragment(entries);
+    FragmentTransaction transaction = mainActivity.getSupportFragmentManager().beginTransaction();
+    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+    transaction.replace(R.id.rlyFragmentTags, entriesFragment);
+
+    transaction.addToBackStack("Tags");
+
+    transaction.commit();
+  }
+
   public void showEditTagActivity(Tag tag) {
     // TODO
+  }
+
+
+  public MainActivity getMainActivity() {
+    return mainActivity;
   }
 }

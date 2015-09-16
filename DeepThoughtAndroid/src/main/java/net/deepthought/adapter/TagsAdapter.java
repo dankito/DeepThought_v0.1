@@ -103,6 +103,8 @@ public class TagsAdapter extends BaseAdapter {
     imgvwFilter.setTag(tag);
     imgvwFilter.setOnClickListener(imgvwFilterOnClickListener);
 
+    convertView.setEnabled(tag.hasEntries());
+
     return convertView;
   }
 
