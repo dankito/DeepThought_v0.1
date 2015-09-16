@@ -12,11 +12,11 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.AllEntitiesListener;
-import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,13 +59,12 @@ public class EntriesAdapter extends BaseAdapter {
 
     @Override
     public void notification(Notification notification) {
-
+      if(notification.getType() == NotificationType.ApplicationInstantiated)
+        Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
     }
   };
 
   protected void deepThoughtChanged(DeepThought deepThought) {
-    Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
-
     if(this.deepThought != null) {
       if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries())
         entriesToShow = null;
@@ -79,8 +78,6 @@ public class EntriesAdapter extends BaseAdapter {
       else
         entriesToShow = new ArrayList<>(deepThought.AllEntriesSystemTag().getEntries()); // TODO: use a lazy loading list
     }
-
-    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
 
     notifyDataSetChangedThreadSafe();
   }
@@ -198,31 +195,6 @@ public class EntriesAdapter extends BaseAdapter {
     if(entity instanceof Entry /*|| entity instanceof Tag*/)
       notifyDataSetChangedThreadSafe();
   }
-
-  protected EntityListener deepThoughtListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      // TODO: how to get when an Entry has been updated?
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getEntries())
-        notifyDataSetChangedThreadSafe();
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == deepThought.getEntries())
-        notifyDataSetChangedThreadSafe();
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getEntries() || collection == deepThought.getTags())
-        notifyDataSetChangedThreadSafe();
-    }
-  };
 
   public void cleanUp() {
     Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);

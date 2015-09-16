@@ -12,12 +12,13 @@ import net.deepthought.R;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,18 +54,13 @@ public class TagsAdapter extends BaseAdapter {
 
     @Override
     public void notification(Notification notification) {
-
+      if(notification.getType() == NotificationType.ApplicationInstantiated)
+        Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
     }
   };
 
   protected void deepThoughtChanged(DeepThought deepThought) {
-    if (this.deepThought != null)
-      this.deepThought.removeEntityListener(deepThoughtListener);
-
     this.deepThought = deepThought;
-
-    if (this.deepThought != null)
-      this.deepThought.addEntityListener(deepThoughtListener);
 
     searchTags();
   }
@@ -160,34 +156,40 @@ public class TagsAdapter extends BaseAdapter {
   };
 
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      // TODO: how to get when a Tag has been updated?
+    public void entityCreated(BaseEntity entity) {
+      checkIfATagHasChanged(entity);
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      checkIfATagHasChanged(entity);
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+      checkIfATagHasChanged(entity);
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getTags())
-        searchTags();
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == deepThought.getTags())
-        searchTags();
+      checkIfATagHasChanged(collectionHolder);
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getTags())
-        searchTags();
+      checkIfATagHasChanged(collectionHolder);
     }
   };
 
+  protected void checkIfATagHasChanged(BaseEntity entity) {
+    if(entity instanceof Tag)
+      notifyDataSetChangedThreadSafe();
+  }
+
   public void cleanUp() {
-    if(deepThought != null)
-      deepThought.removeEntityListener(deepThoughtListener);
+    Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
 
     Application.removeApplicationListener(applicationListener);
   }

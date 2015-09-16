@@ -25,6 +25,7 @@ import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -142,8 +143,7 @@ public class Application {
       Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
       deepThoughtsConnector.runAsync();
 
-      long duration = new Date().getTime() - startTime.getTime();
-      if(duration > 1000) { }
+      callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated, ""));
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,

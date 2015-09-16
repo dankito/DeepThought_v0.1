@@ -443,11 +443,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section_entries);
+                    return getString(R.string.title_section_entries).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section_tags);
+                    return getString(R.string.title_section_tags).toUpperCase(l);
                 case 2:
-                  return getString(R.string.title_section_search);
+                  return getString(R.string.title_section_search).toUpperCase(l);
             }
             return null;
         }
