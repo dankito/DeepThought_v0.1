@@ -5,6 +5,7 @@
                 android:layout_height="match_parent"
                 android:background="#FFFFFF"
     >
+    <!-- without setting background color it would be transparent and when navigating from TagsFragment underlying TagsFragment would still be visible -->
 
     <RelativeLayout
         android:id="@+id/rlySearchEntries"

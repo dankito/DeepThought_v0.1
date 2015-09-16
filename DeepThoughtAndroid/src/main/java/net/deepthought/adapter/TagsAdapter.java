@@ -113,9 +113,17 @@ public class TagsAdapter extends BaseAdapter {
 
     ImageView imgvwFilter = (ImageView)convertView.findViewById(R.id.imgvwFilter);
     imgvwFilter.setTag(tag);
+    setFilterIconDependingOnTagState(tag, imgvwFilter);
     imgvwFilter.setOnClickListener(imgvwFilterOnClickListener);
 
     return convertView;
+  }
+
+  private void setFilterIconDependingOnTagState(Tag tag, ImageView imgvwFilter) {
+    if(tagsFilter.contains(tag))
+      imgvwFilter.setImageResource(R.drawable.filter);
+    else
+      imgvwFilter.setImageResource(R.drawable.filter_disabled);
   }
 
 

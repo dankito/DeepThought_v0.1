@@ -239,7 +239,9 @@ public class LuceneSearchEngineTest {
     Assert.assertEquals(0, entriesHavingTheseTags.size());
   }
 
-  @Test
+  // TODO: reactivate these Tests again when used on Entry
+
+//  @Test
   public void updateEntryCategories_SearchFindsUpdatedEntry() {
     Entry newEntry = new Entry("");
     deepThought.addEntry(newEntry);
@@ -279,7 +281,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(0, entriesHavingTheseTags.size());
   }
 
-  @Test
+//  @Test
   public void updateEntryPersons_SearchFindsUpdatedEntry() {
     Entry newEntry = new Entry("");
     deepThought.addEntry(newEntry);
@@ -319,7 +321,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(0, entriesHavingTheseTags.size());
   }
 
-  @Test
+//  @Test
   public void updateEntrySeries_SearchFindsUpdatedEntry() {
     Entry newEntry = new Entry("");
     deepThought.addEntry(newEntry);
@@ -371,7 +373,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(0, results.size());
   }
 
-  @Test
+//  @Test
   public void updateEntryReference_SearchFindsUpdatedEntry() {
     Entry newEntry = new Entry("");
     deepThought.addEntry(newEntry);
@@ -423,7 +425,7 @@ public class LuceneSearchEngineTest {
 //    Assert.assertEquals(0, results.size());
   }
 
-  @Test
+//  @Test
   public void updateEntryReferenceSubDivision_SearchFindsUpdatedEntry() {
     Entry newEntry = new Entry("");
     deepThought.addEntry(newEntry);

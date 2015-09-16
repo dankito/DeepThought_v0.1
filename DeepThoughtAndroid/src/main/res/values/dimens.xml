@@ -27,7 +27,8 @@
 
     <dimen name="list_item_tag_height">30dp</dimen>
     <dimen name="list_item_tag_name_text_size">18sp</dimen>
-    <dimen name="list_item_tag_filter_icon_width">30dp</dimen>
+    <dimen name="list_item_tag_filter_icon_width">26dp</dimen>
+    <dimen name="list_item_tag_filter_icon_height">26dp</dimen>
 
     <dimen name="alert_edit_tag_name_height">40dp</dimen>
     <dimen name="alert_edit_tag_description_height">80dp</dimen>
