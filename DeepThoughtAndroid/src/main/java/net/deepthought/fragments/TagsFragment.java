@@ -1,0 +1,175 @@
+package net.deepthought.fragments;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+
+import net.deepthought.Application;
+import net.deepthought.R;
+import net.deepthought.activities.ActivityManager;
+import net.deepthought.adapter.TagsAdapter;
+import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Tag;
+
+/**
+ * Created by ganymed on 01/10/14.
+ */
+public class TagsFragment extends Fragment {
+
+
+  protected TagsAdapter tagsAdapter;
+
+  protected RelativeLayout rlySearchTags;
+
+  protected EditText edtxtSearchTags;
+
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
+  }
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View rootView = inflater.inflate(R.layout.fragment_tags, container, false);
+
+    ListView lstvwTags = (ListView)rootView.findViewById(R.id.lstvwTags);
+    tagsAdapter = new TagsAdapter(getActivity());
+    lstvwTags.setAdapter(tagsAdapter);
+    registerForContextMenu(lstvwTags);
+    lstvwTags.setOnItemClickListener(lstvwTagsOnItemClickListener);
+
+    rlySearchTags = (RelativeLayout)rootView.findViewById(R.id.rlySearchTags);
+
+    edtxtSearchTags = (EditText)rootView.findViewById(R.id.edtxtSearchTags);
+    edtxtSearchTags.addTextChangedListener(edtxtSearchTagsTextWatcher);
+
+    return rootView;
+  }
+
+  @Override
+  public void onDestroyView() {
+    if(tagsAdapter != null)
+      tagsAdapter.cleanUp();
+
+    super.onDestroyView();
+  }
+
+  protected AdapterView.OnItemClickListener lstvwTagsOnItemClickListener = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      Tag tag = (Tag)parent.getItemAtPosition(position);
+      ActivityManager.getInstance().showEditTagActivity(tag);
+    }
+  };
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    inflater.inflate(R.menu.fragment_tags_options_menu, menu);
+
+    super.onCreateOptionsMenu(menu, inflater);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    if(id == R.id.mnitmActionSearchTags) {
+      toggleSearchBarVisibility();
+      return true;
+    }
+    if (id == R.id.mnitmActionAddTag) {
+      onActionAddTagSelected();
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  protected void toggleSearchBarVisibility() {
+    if(rlySearchTags.getVisibility() == View.GONE) {
+      rlySearchTags.setVisibility(View.VISIBLE);
+      edtxtSearchTags.requestFocus();
+    }
+    else {
+      tagsAdapter.showAllTags();
+      rlySearchTags.setVisibility(View.GONE);
+    }
+  }
+
+  protected void onActionAddTagSelected() {
+    Tag tag = new Tag();
+    ActivityManager.getInstance().showEditTagActivity(tag);
+  }
+
+
+  @Override
+  public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    super.onCreateContextMenu(menu, v, menuInfo);
+    MenuInflater inflater = getActivity().getMenuInflater();
+    inflater.inflate(R.menu.list_item_tag_context_menu, menu);
+  }
+
+  @Override
+  public boolean onContextItemSelected(MenuItem item) {
+    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    DeepThought deepThought = Application.getDeepThought();
+
+    switch(item.getItemId()) {
+      case R.id.list_item_tag_context_menu_edit:
+        Tag tagToEdit = tagsAdapter.getTagAt(info.position);
+        ActivityManager.getInstance().showEditTagActivity(tagToEdit);
+        return true;
+      case R.id.list_item_tag_context_menu_delete:
+        Tag tagToDelete = tagsAdapter.getTagAt(info.position);
+        deepThought.removeTag(tagToDelete);
+        return true;
+      default:
+        return super.onContextItemSelected(item);
+    }
+  }
+
+  protected AdapterView.OnItemLongClickListener lstvwTagsOnItemLongClickListener = new AdapterView.OnItemLongClickListener() {
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+      Tag tag = (Tag)parent.getItemAtPosition(position);
+      if(tag != null) {
+
+        return true;
+      }
+
+      return false;
+    }
+  };
+
+  protected TextWatcher edtxtSearchTagsTextWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+      tagsAdapter.searchTags(s.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+  };
+
+}

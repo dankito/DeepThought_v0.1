@@ -11,6 +11,7 @@ import net.deepthought.R;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
@@ -24,7 +25,7 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntriesOverviewAdapter extends BaseAdapter {
+public class EntriesAdapter extends BaseAdapter {
 
   protected DeepThought deepThought;
   protected Activity context;
@@ -34,28 +35,19 @@ public class EntriesOverviewAdapter extends BaseAdapter {
   protected List<Entry> searchResults = null;
 
 
-  public EntriesOverviewAdapter(Activity context) {
+  public EntriesAdapter(Activity context) {
     this.context = context;
 
     Application.addApplicationListener(applicationListener);
 
-    deepThought = Application.getDeepThought();
-    if(deepThought != null)
-      deepThought.addEntityListener(deepThoughtListener);
+    if(Application.getDeepThought() != null)
+      deepThoughtChanged(Application.getDeepThought());
   }
 
   protected ApplicationListener applicationListener = new ApplicationListener() {
     @Override
     public void deepThoughtChanged(DeepThought deepThought) {
-      if (EntriesOverviewAdapter.this.deepThought != null)
-        EntriesOverviewAdapter.this.deepThought.removeEntityListener(deepThoughtListener);
-
-      EntriesOverviewAdapter.this.deepThought = deepThought;
-
-      if (EntriesOverviewAdapter.this.deepThought != null)
-        EntriesOverviewAdapter.this.deepThought.addEntityListener(deepThoughtListener);
-
-      notifyDataSetChangedThreadSafe();
+      EntriesAdapter.this.deepThoughtChanged(deepThought);
     }
 
     @Override
@@ -63,6 +55,16 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
     }
   };
+
+  protected void deepThoughtChanged(DeepThought deepThought) {
+    Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
+
+    this.deepThought = deepThought;
+
+    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+
+    notifyDataSetChangedThreadSafe();
+  }
 
 
   @Override
@@ -77,7 +79,7 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
   public Entry getEntryAt(int position) {
     if(searchResults != null) {
-      searchResults.get(position);
+      return searchResults.get(position);
     }
 
     return deepThought.entryAt(position);
@@ -146,6 +148,38 @@ public class EntriesOverviewAdapter extends BaseAdapter {
   }
 
 
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
+    @Override
+    public void entityCreated(BaseEntity entity) {
+      checkIfRelevantEntityHasChanged(entity);
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      checkIfRelevantEntityHasChanged(entity);
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+      checkIfRelevantEntityHasChanged(entity);
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      checkIfRelevantEntityHasChanged(collectionHolder);
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      checkIfRelevantEntityHasChanged(collectionHolder);
+    }
+  };
+
+  protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
+    if(entity instanceof Entry /*|| entity instanceof Tag*/)
+      notifyDataSetChangedThreadSafe();
+  }
+
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
@@ -166,14 +200,13 @@ public class EntriesOverviewAdapter extends BaseAdapter {
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getEntries())
+      if(collection == deepThought.getEntries() || collection == deepThought.getTags())
         notifyDataSetChangedThreadSafe();
     }
   };
 
   public void cleanUp() {
-    if(deepThought != null)
-      deepThought.removeEntityListener(deepThoughtListener);
+    Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
 
     Application.removeApplicationListener(applicationListener);
   }

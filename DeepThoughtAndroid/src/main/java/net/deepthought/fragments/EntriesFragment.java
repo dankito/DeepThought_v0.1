@@ -19,21 +19,37 @@ import android.widget.RelativeLayout;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.activities.ActivityManager;
-import net.deepthought.adapter.EntriesOverviewAdapter;
+import net.deepthought.adapter.EntriesAdapter;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+
+import java.util.List;
 
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntriesOverviewFragment extends Fragment {
+public class EntriesFragment extends Fragment {
 
 
-  protected EntriesOverviewAdapter entriesOverviewAdapter;
+  protected List<Entry> entriesToShow = null;
+
+  protected EntriesAdapter entriesAdapter;
 
   protected RelativeLayout rlySearchEntries;
 
   protected EditText edtxtSearchEntries;
+
+
+  public EntriesFragment() {
+//    this(new ArrayList<Entry>());
+  }
+
+//  public EntriesFragment(Collection<Entry> entriesToShow) {
+//    if(entriesToShow instanceof List)
+//      this.entriesToShow = (List<Entry>)entriesToShow;
+//    else
+//      this.entriesToShow = new ArrayList<>(entriesToShow);
+//  }
 
 
   @Override
@@ -44,11 +60,11 @@ public class EntriesOverviewFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View rootView = inflater.inflate(R.layout.fragment_overview, container, false);
+    View rootView = inflater.inflate(R.layout.fragment_entries, container, false);
 
     ListView lstvwEntries = (ListView)rootView.findViewById(R.id.lstvwEntries);
-    entriesOverviewAdapter = new EntriesOverviewAdapter(getActivity());
-    lstvwEntries.setAdapter(entriesOverviewAdapter);
+    entriesAdapter = new EntriesAdapter(getActivity());
+    lstvwEntries.setAdapter(entriesAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
 
@@ -62,8 +78,8 @@ public class EntriesOverviewFragment extends Fragment {
 
   @Override
   public void onDestroyView() {
-    if(entriesOverviewAdapter != null)
-      entriesOverviewAdapter.cleanUp();
+    if(entriesAdapter != null)
+      entriesAdapter.cleanUp();
 
     super.onDestroyView();
   }
@@ -78,7 +94,7 @@ public class EntriesOverviewFragment extends Fragment {
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    inflater.inflate(R.menu.fragment_overview_options_menu, menu);
+    inflater.inflate(R.menu.fragment_entries_options_menu, menu);
 
     super.onCreateOptionsMenu(menu, inflater);
   }
@@ -105,7 +121,7 @@ public class EntriesOverviewFragment extends Fragment {
       edtxtSearchEntries.requestFocus();
     }
     else {
-      entriesOverviewAdapter.showAllEntries();
+      entriesAdapter.showAllEntries();
       rlySearchEntries.setVisibility(View.GONE);
     }
   }
@@ -130,11 +146,11 @@ public class EntriesOverviewFragment extends Fragment {
 
     switch(item.getItemId()) {
       case R.id.list_item_entry_context_menu_edit:
-        Entry entryToEdit = deepThought.entryAt(info.position);
+        Entry entryToEdit = entriesAdapter.getEntryAt(info.position);
         ActivityManager.getInstance().showEditEntryActivity(entryToEdit);
         return true;
       case R.id.list_item_entry_context_menu_delete:
-        Entry entryToDelete = deepThought.entryAt(info.position);
+        Entry entryToDelete = entriesAdapter.getEntryAt(info.position);
         deepThought.removeEntry(entryToDelete);
         return true;
       default:
@@ -163,7 +179,7 @@ public class EntriesOverviewFragment extends Fragment {
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-      entriesOverviewAdapter.searchEntries(s.toString());
+      entriesAdapter.searchEntries(s.toString());
     }
 
     @Override

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/list_item_tag_height"
+              android:minHeight="@dimen/list_item_tag_min_height"
+    >
+
+    <CheckedTextView
+        android:id="@+id/txtvwTagName"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/imgvwFilter"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textSize="@dimen/list_item_tag_name_text_size"/>
+
+    <ImageView
+        android:id="@+id/imgvwFilter"
+        android:layout_width="@dimen/list_item_tag_filter_icon_width"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:focusable="false"
+        android:background="@drawable/filter"
+        />
+
+</RelativeLayout>

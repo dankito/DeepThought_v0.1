@@ -34,8 +34,9 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
-import net.deepthought.fragments.EntriesOverviewFragment;
+import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.SearchFragment;
+import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -397,9 +398,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         @Override
         public Fragment getItem(int position) {
           if(position == 0) {
-            return new EntriesOverviewFragment();
+            return new EntriesFragment();
           }
           else if(position == 1) {
+            return new TagsFragment();
+          }
+          else if(position == 2) {
             return new SearchFragment();
           }
             // getItem is called to instantiate the fragment for the given page.
@@ -418,9 +422,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section_entries_overview).toUpperCase(l);
+                    return getString(R.string.title_section_entries).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section_search).toUpperCase(l);
+                    return getString(R.string.title_section_tags).toUpperCase(l);
+                case 2:
+                  return getString(R.string.title_section_search).toUpperCase(l);
             }
             return null;
         }

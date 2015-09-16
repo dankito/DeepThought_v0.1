@@ -12,6 +12,8 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ganymed on 12/10/14.
@@ -130,8 +132,9 @@ public class OrmLiteDeepThoughtPersistenceManagerTests extends AndroidTestCase {
     deepThought.addEntry(entry4);
 
     Tag commonTag = new Tag("common");
-    for(int i = 0; i < deepThought.getEntries().size(); i++) {
-      Entry entry = deepThought.entryAt(i);
+    List<Entry> allEntries = new ArrayList<>(deepThought.getEntries());
+    for(int i = 0; i < allEntries.size(); i++) {
+      Entry entry = allEntries.get(i);
       entry.addTag(commonTag);
       entry.addTag(new Tag("Entry Specific " + (i + 1)));
     }

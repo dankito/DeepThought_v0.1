@@ -236,6 +236,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     try {
 //   directory = FSDirectory.open(Paths.get(Application.getDataFolderPath(), "index")); // Android doesn't support java.nio package (like therefor also not class Paths)
       File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), String.format("%02d", deepThought.getId()));
+//      FileUtils.deleteFile(deepThoughtIndexDirectory);
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
 
       for(Class classWithOwnIndexDirectory : ClassesWithOwnIndexDirectories) {
@@ -767,6 +768,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   @Override
   protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+    if(isIndexReady == false) {
+      if(Application.getDeepThought() != null)
+        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
+
+      search.fireSearchCompleted();
+      return;
+    }
+
     Query query = new WildcardQuery(new Term(FieldName.TagName, "*"));
     if(search.isInterrupted())
       return;

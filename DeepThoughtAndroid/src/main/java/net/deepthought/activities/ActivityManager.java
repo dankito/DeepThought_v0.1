@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import net.deepthought.MainActivity;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,5 +54,9 @@ public class ActivityManager {
     } catch(Exception ex) {
       log.error("Could not start EditEntryActivity", ex);
     }
+  }
+
+  public void showEditTagActivity(Tag tag) {
+    // TODO
   }
 }

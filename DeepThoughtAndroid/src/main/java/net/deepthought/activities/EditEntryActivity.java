@@ -71,8 +71,6 @@ public class EditEntryActivity extends AppCompatActivity {
   protected EditText edtxtEditEntrySearchTag;
   protected ListView lstvwEditEntryTags;
 
-  protected MenuItem mnitmActionSaveEntry;
-
   protected boolean hasEntryBeenEdited = false;
 
 
@@ -432,6 +430,7 @@ public class EditEntryActivity extends AppCompatActivity {
       Tag newTag = new Tag(tagName);
       Application.getDeepThought().addTag(newTag);
       entryTags.add(newTag);
+      setEntryHasBeenEdited();
       Collections.sort(entryTags);
       setTextViewEditEntryTags();
     }
