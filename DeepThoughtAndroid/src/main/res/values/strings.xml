@@ -21,6 +21,9 @@
     <string name="save">Save</string>
     <string name="ocr">OCR</string>
 
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+
     <string name="loading_data_wait_message">Loading data ...</string>
 
     <string name="error_message_could_not_show_activity">Could not show dialog: %s</string>

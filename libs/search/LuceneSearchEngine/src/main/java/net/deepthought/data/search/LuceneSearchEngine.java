@@ -1124,7 +1124,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   protected void updateIndexForEntity(UserDataEntity updatedEntity) {
-    if(indexUpdatedEntitiesAfterMilliseconds == 0)
+    if(indexUpdatedEntitiesAfterMilliseconds == 0 || updatedEntity instanceof Tag)
       doUpdateIndexForEntity(updatedEntity);
     else {
       if(updatedEntitiesToIndex.contains(updatedEntity) == false)

@@ -20,6 +20,9 @@
     <string name="cancel">Abbrechen</string>
     <string name="ocr">OCR</string>
 
+    <string name="name">Name</string>
+    <string name="description">Beschreibung</string>
+
     <string name="loading_data_wait_message">Lade daten ...</string>
 
     <string name="error_message_tag_with_that_name_already_exists">Ein Schlagwort mit diesem Namen existiert bereits</string>

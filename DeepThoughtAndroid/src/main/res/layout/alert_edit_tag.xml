@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+    >
+
+    <TextView
+        android:id="@+id/txtvwTagNameLabel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/alert_edit_tag_label_height"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:textSize="@dimen/alert_edit_tag_text_size"
+        android:text="@string/name"
+        />
+
+    <EditText
+        android:id="@+id/edtxtTagName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtvwTagNameLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:lines="1"
+        android:textSize="@dimen/alert_edit_tag_text_size"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/alert_edit_tag_label_height"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/edtxtTagName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/edtxtTagDescription"
+        android:textSize="@dimen/alert_edit_tag_text_size"
+        android:text="@string/description"
+        />
+
+    <EditText
+        android:id="@+id/edtxtTagDescription"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/alert_edit_tag_description_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:lines="2"
+        android:textSize="@dimen/alert_edit_tag_text_size"
+        />
+
+</RelativeLayout>

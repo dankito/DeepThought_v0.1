@@ -79,7 +79,7 @@ public class TagsFragment extends Fragment {
       if(tag.hasEntries() == false) // no Entries to show -> don't navigate
         return;
 
-      ActivityManager.getInstance().navigateToEntriesFragment(tag.getEntries(), R.id.rlyFragmentTags);
+      ActivityManager.getInstance().navigateToEntriesFragment(getActivity().getSupportFragmentManager(), tag.getEntries(), R.id.rlyFragmentTags);
 
       hasNavigatedToOtherFragment = true;
       getActivity().invalidateOptionsMenu();
@@ -133,7 +133,7 @@ public class TagsFragment extends Fragment {
 
   protected void onActionAddTagSelected() {
     Tag tag = new Tag();
-    ActivityManager.getInstance().showEditTagActivity(tag);
+    editTag(tag);
   }
 
 
@@ -152,7 +152,7 @@ public class TagsFragment extends Fragment {
     switch(item.getItemId()) {
       case R.id.list_item_tag_context_menu_edit:
         Tag tagToEdit = tagsAdapter.getTagAt(info.position);
-        ActivityManager.getInstance().showEditTagActivity(tagToEdit);
+        editTag(tagToEdit);
         return true;
       case R.id.list_item_tag_context_menu_delete:
         Tag tagToDelete = tagsAdapter.getTagAt(info.position);
@@ -161,6 +161,10 @@ public class TagsFragment extends Fragment {
       default:
         return super.onContextItemSelected(item);
     }
+  }
+
+  protected void editTag(Tag tagToEdit) {
+    ActivityManager.getInstance().showEditTagAlert(getActivity(), tagToEdit);
   }
 
 

@@ -161,17 +161,17 @@ public class TagsAdapter extends BaseAdapter {
   protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
     public void entityCreated(BaseEntity entity) {
-      checkIfATagHasChanged(entity);
+      checkIfATagHasChanged(entity, true);
     }
 
     @Override
     public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      checkIfATagHasChanged(entity);
+      checkIfATagHasChanged(entity, true);
     }
 
     @Override
     public void entityDeleted(BaseEntity entity) {
-      checkIfATagHasChanged(entity);
+      checkIfATagHasChanged(entity, true);
     }
 
     @Override
@@ -186,8 +186,16 @@ public class TagsAdapter extends BaseAdapter {
   };
 
   protected void checkIfATagHasChanged(BaseEntity entity) {
-    if(entity instanceof Tag)
-      notifyDataSetChangedThreadSafe();
+    checkIfATagHasChanged(entity, false);
+  }
+
+  protected void checkIfATagHasChanged(BaseEntity entity, boolean redoSearch) {
+    if(entity instanceof Tag) {
+      if(redoSearch)
+        searchTags();
+      else
+        notifyDataSetChangedThreadSafe();
+    }
   }
 
   public void cleanUp() {
