@@ -19,6 +19,7 @@ public interface ISearchEngine {
   public void filterTags(FilterTagsSearch search);
 
   public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
+  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, String searchTerm, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   public void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search);
 

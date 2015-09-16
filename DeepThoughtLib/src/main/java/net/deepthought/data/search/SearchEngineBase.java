@@ -40,10 +40,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm()))
       filterTagsForEmptySearchTerm(search);
     else {
-      String lowerCaseFilter = search.getSearchTerm().toLowerCase();
-      final String[] tagNamesToFilterFor = lowerCaseFilter.split(",");
-      for (int i = 0; i < tagNamesToFilterFor.length; i++)
-        tagNamesToFilterFor[i] = tagNamesToFilterFor[i].trim();
+      final String[] tagNamesToFilterFor = getTagNamesToSearchFromSearchTerm(search.getSearchTerm());
 
       Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
@@ -54,6 +51,16 @@ public abstract class SearchEngineBase implements ISearchEngine {
     }
   }
 
+  protected String[] getTagNamesToSearchFromSearchTerm(String searchTerm) {
+    String lowerCaseFilter = searchTerm.toLowerCase();
+    final String[] tagNamesToFilterFor = lowerCaseFilter.split(",");
+
+    for (int i = 0; i < tagNamesToFilterFor.length; i++)
+      tagNamesToFilterFor[i] = tagNamesToFilterFor[i].trim();
+
+    return tagNamesToFilterFor;
+  }
+
   protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
     search.setResults(FilterTagsSearchResults.NoFilterSearchResults);
     search.fireSearchCompleted();
@@ -62,16 +69,22 @@ public abstract class SearchEngineBase implements ISearchEngine {
   protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);
 
   @Override
-  public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
+  public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+    findAllEntriesHavingTheseTags(tagsToFilterFor, "", listener);
+  }
+
+  @Override
+  public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final String searchTerm, final SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, listener);
+        final String[] tagNamesToFilterFor = getTagNamesToSearchFromSearchTerm(searchTerm);
+        findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, tagNamesToFilterFor, listener);
       }
     });
   }
 
-  protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
+  protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, String[] tagNamesToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   @Override
   public void filterEntries(final FilterEntriesSearch search) {

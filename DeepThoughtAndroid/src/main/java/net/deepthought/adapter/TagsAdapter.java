@@ -17,6 +17,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 
@@ -29,12 +30,19 @@ import java.util.List;
  */
 public class TagsAdapter extends BaseAdapter {
 
+  protected final static String EmptySearchTerm = "";
+
+
   protected DeepThought deepThought;
   protected Activity context;
 
   protected FilterTagsSearch filterTagsSearch = null;
+  protected String lastSearchTerm = EmptySearchTerm;
 
   protected List<Tag> searchResults = new ArrayList<>();
+
+  protected List<Tag> tagsFilter = new ArrayList<>();
+  protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
 
 
   public TagsAdapter(Activity context) {
@@ -70,10 +78,14 @@ public class TagsAdapter extends BaseAdapter {
 
   @Override
   public int getCount() {
+    if(lastFilterTagsResult != null)
+      return lastFilterTagsResult.getTagsOnEntriesContainingFilteredTagsCount();
     return searchResults.size();
   }
 
   public Tag getTagAt(int position) {
+    if(lastFilterTagsResult != null)
+      return lastFilterTagsResult.getTagsOnEntriesContainingFilteredTagsAt(position);
     return searchResults.get(position);
   }
 
@@ -108,34 +120,68 @@ public class TagsAdapter extends BaseAdapter {
 
 
   public void searchTags() {
-    searchTags("");
+    searchTags(EmptySearchTerm);
+  }
+
+  public void researchTagsWithLastSearchTerm() {
+    searchTags(lastSearchTerm);
   }
 
   public void searchTags(String searchTerm) {
-    if(filterTagsSearch != null && filterTagsSearch.isCompleted() == false)
-      filterTagsSearch.interrupt();
+    this.lastSearchTerm = searchTerm;
 
-    filterTagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
-      @Override
-      public void completed(FilterTagsSearchResults results) {
-        if(results.getRelevantMatches() instanceof List)
-          searchResults = (List<Tag>)results.getRelevantMatches();
-        else
-          searchResults = new ArrayList<>(results.getRelevantMatches());
+    if(isTagsFilterApplied())
+      filterTags();
+    else {
+      if (filterTagsSearch != null && filterTagsSearch.isCompleted() == false)
+        filterTagsSearch.interrupt();
+      lastFilterTagsResult = null;
 
-        notifyDataSetChangedThreadSafe();
-      }
-    });
+      filterTagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
+        @Override
+        public void completed(FilterTagsSearchResults results) {
+          if (results.getRelevantMatches() instanceof List)
+            searchResults = (List<Tag>) results.getRelevantMatches();
+          else
+            searchResults = new ArrayList<>(results.getRelevantMatches()); // TODO: use lazy loading list
 
-    Application.getSearchEngine().filterTags(filterTagsSearch);
+          notifyDataSetChangedThreadSafe();
+        }
+      });
+
+      Application.getSearchEngine().filterTags(filterTagsSearch);
+    }
   }
 
-  public void showAllTags() {
+  protected boolean isTagsFilterApplied() {
+    return tagsFilter.size() > 0;
+  }
+
+  protected void filterTags() {
+    if(isTagsFilterApplied() == false)
+      researchTagsWithLastSearchTerm();
+    else {
+      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+        @Override
+        public void completed(FindAllEntriesHavingTheseTagsResult results) {
+          lastFilterTagsResult = results;
+          notifyDataSetChangedThreadSafe();
+        }
+      });
+    }
+  }
+
+  public void removeSearchTerm() {
     searchTags();
   }
 
   protected void toggleFilterTag(Tag tag) {
+    if(tagsFilter.contains(tag))
+      tagsFilter.remove(tag);
+    else
+      tagsFilter.add(tag);
 
+    filterTags();
   }
 
 
@@ -153,7 +199,8 @@ public class TagsAdapter extends BaseAdapter {
     @Override
     public void onClick(View view) {
       Tag tag = (Tag)view.getTag();
-      toggleFilterTag(tag);
+//      if(tag.hasEntries())
+        toggleFilterTag(tag);
     }
   };
 

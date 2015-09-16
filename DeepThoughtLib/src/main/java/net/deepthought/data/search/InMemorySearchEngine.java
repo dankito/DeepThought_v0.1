@@ -65,7 +65,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, String[] tagNamesToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
     Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
     Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 

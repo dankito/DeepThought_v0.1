@@ -1,8 +1,6 @@
 package net.deepthought.data.search;
 
 import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.Tag;
-import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 
 import java.util.Collection;
 
@@ -26,10 +24,10 @@ public class LuceneAndDatabaseSearchEngine extends LuceneSearchEngine {
     databaseSearchEngine.getEntriesWithoutTags(listener);
   }
 
-  @Override
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
-    databaseSearchEngine.findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, listener);
-  }
+//  @Override
+//  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
+//    databaseSearchEngine.findAllEntriesHavingTheseTagsAsync(tagsToFilterFor, listener);
+//  }
 
   // no, don't filter Tags and Persons with db, even though it's faster, as SQLite does not support case insensitive Unicode sorting
   // (see for example https://stackoverflow.com/questions/3317672/how-to-order-sqlite-results-containing-umlauts-and-other-special-characters // }

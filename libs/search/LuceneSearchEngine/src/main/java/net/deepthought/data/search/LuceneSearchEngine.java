@@ -44,6 +44,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
@@ -840,41 +842,99 @@ public class LuceneSearchEngine extends SearchEngineBase {
     search.setAllMatchesSorted(allMatchesSorted);
   }
 
-  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult> listener) {
+  protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, String[] tagNamesToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
     Collection<Entry> entriesHavingFilteredTags = new LazyLoadingList<Entry>(Entry.class);
-    Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
-
+    Collection<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     BooleanQuery query = new BooleanQuery();
+
     for(Tag tag : tagsToFilterFor) {
       query.add(new BooleanClause(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.MUST));
     }
 
     try {
-      IndexSearcher searcher = getIndexSearcher(Entry.class);
-
-      ScoreDoc[] hits = searcher.search(query, 10000).scoreDocs;
-      Set<Long> ids = new HashSet<>();
-
-      // Iterate through the results:
-      for (int i = 0; i < hits.length; i++) {
-        try {
-          Document hitDoc = searcher.doc(hits[i].doc);
-//          Entry resultEntry = (Entry)getEntityFromDocument(hitDoc, Entry.class, FieldName.EntryId);
-//          entriesHavingFilteredTags.add(resultEntry);
-//          tagsOnEntriesContainingFilteredTags.addAll(resultEntry.getTags());
-          ids.add(hitDoc.getField(FieldName.EntryId).numericValue().longValue());
-        } catch(Exception ex) { log.error("Could not extract result from hitDoc", ex); }
-      }
-
-      entriesHavingFilteredTags.addAll(getBaseEntitiesFromIds(Entry.class, ids));
+      entriesHavingFilteredTags.addAll(getBaseEntitiesFromQuery(Entry.class, query, FieldName.EntryId));
       for(Entry resultEntry : entriesHavingFilteredTags)
         tagsOnEntriesContainingFilteredTags.addAll(resultEntry.getTags());
+
+      if(tagNamesToFilterFor != null && tagNamesToFilterFor.length > 0)
+        tagsOnEntriesContainingFilteredTags = filterTagsOnEntriesContainingFilteredTagsWithSearchTerm(tagsOnEntriesContainingFilteredTags, tagNamesToFilterFor);
     } catch(Exception ex) {
       log.error("Could not execute Query " + query.toString(), ex);
     }
 
     listener.completed(new FindAllEntriesHavingTheseTagsResult(entriesHavingFilteredTags, tagsOnEntriesContainingFilteredTags));
   }
+
+  protected Collection<Tag> filterTagsOnEntriesContainingFilteredTagsWithSearchTerm(Collection<Tag> tagsOnEntriesContainingFilteredTags, String[] tagNamesToFilterFor) {
+    BooleanQuery searchTermQuery = new BooleanQuery();
+    for(String tagName : tagNamesToFilterFor) {
+      searchTermQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + tagName + "*")), BooleanClause.Occur.SHOULD);
+    }
+
+    Collection<Long> tagsWithSearchTermIds = getEntityIdsFromQuery(Tag.class, searchTermQuery, FieldName.TagId, SortOrder.Ascending, FieldName.TagName);
+
+    Map<Long, Tag> tagsOnEntriesIds = new HashMap<>();
+    for(Tag tagOnEntries : tagsOnEntriesContainingFilteredTags)
+      tagsOnEntriesIds.put(tagOnEntries.getId(), tagOnEntries);
+
+    tagsWithSearchTermIds.retainAll(tagsOnEntriesIds.keySet());
+
+    Collection<Tag> sortedResultTags = new ArrayList<>();
+    for(Long tagId : tagsWithSearchTermIds) {
+      sortedResultTags.add(tagsOnEntriesIds.get(tagId));
+    }
+
+    return sortedResultTags;
+  }
+
+  protected <T extends BaseEntity> List<T> getBaseEntitiesFromQuery(Class<T> type, Query query, String idFieldName) {
+    Collection<Long> ids = getEntityIdsFromQuery(type, query, idFieldName);
+
+    return getBaseEntitiesFromIds(type, ids);
+  }
+
+  protected <T extends BaseEntity> Collection<Long> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName) {
+    return getEntityIdsFromQuery(type, query, idFieldName, SortOrder.Unsorted);
+  }
+
+  protected <T extends BaseEntity> Collection<Long> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName, SortOrder sortOrder, String... sortFieldNames) {
+    List<Long> ids = new ArrayList<>();
+
+    try {
+      IndexSearcher searcher = getIndexSearcher(type);
+
+      ScoreDoc[] hits = searcher.search(query, 10000, getSorting(sortOrder, sortFieldNames)).scoreDocs;
+
+      for (int i = 0; i < hits.length; i++) {
+        try {
+          Document hitDoc = searcher.doc(hits[i].doc);
+          ids.add(hitDoc.getField(idFieldName).numericValue().longValue());
+        } catch(Exception ex) { log.error("Could not extract result from hitDoc of Query " + query, ex); }
+      }
+    } catch(Exception ex) {
+      log.error("Could not execute Query " + query.toString(), ex);
+    }
+
+    return ids;
+  }
+
+  protected Sort getSorting(SortOrder sortOrder, String[] sortFieldNames) {
+    Sort sort = new Sort();
+
+    if(sortOrder != SortOrder.Unsorted) {
+      boolean reverse = sortOrder == SortOrder.Descending;
+
+      SortField[] sortFields = new SortField[sortFieldNames.length];
+      for (int i = 0; i < sortFieldNames.length; i++) {
+        sortFields[i] = new SortField(sortFieldNames[i], SortField.Type.STRING, reverse);
+      }
+
+      sort.setSort(sortFields);
+    }
+
+    return sort;
+  }
+
 
   @Override
   protected void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor) {

@@ -126,7 +126,7 @@ public class TagsFragment extends Fragment {
       edtxtSearchTags.requestFocus();
     }
     else {
-      tagsAdapter.showAllTags();
+      tagsAdapter.removeSearchTerm();
       rlySearchTags.setVisibility(View.GONE);
     }
   }

@@ -208,9 +208,9 @@ public class LuceneSearchEngineTest {
     final List<Entry> entriesHavingTheseTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagTwoCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
         countDownLatch.countDown();
       }
@@ -226,9 +226,9 @@ public class LuceneSearchEngineTest {
     entriesHavingTheseTags.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagOneCollection, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingTheseTags.addAll(results.getEntriesHavingFilteredTags());
         countDownLatch2.countDown();
       }
@@ -2074,9 +2074,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch.countDown();
@@ -2096,9 +2096,9 @@ public class LuceneSearchEngineTest {
     tagsOnEntriesContainingFilteredTags.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesHavingFilteredTags.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesContainingFilteredTags.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch2.countDown();
@@ -2205,9 +2205,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag1 = new HashSet<>();
     final CountDownLatch countDownLatch1 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag1.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag1.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch1.countDown();
@@ -2228,9 +2228,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag2 = new HashSet<>();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag2.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag2.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch2.countDown();
@@ -2251,9 +2251,9 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag3 = new HashSet<>();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
-      public void completed(net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult results) {
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTag3.addAll(results.getEntriesHavingFilteredTags());
         tagsOnEntriesWithTag3.addAll(results.getTagsOnEntriesContainingFilteredTags());
         countDownLatch3.countDown();
@@ -2274,7 +2274,7 @@ public class LuceneSearchEngineTest {
     final Set<Tag> tagsOnEntriesWithTag2And3 = new HashSet<>();
     final CountDownLatch countDownLatch4 = new CountDownLatch(1);
 
-    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), new SearchCompletedListener<net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult>() {
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
       @Override
       public void completed(FindAllEntriesHavingTheseTagsResult results) {
         entriesWithTags2And3.addAll(results.getEntriesHavingFilteredTags());
@@ -2292,6 +2292,174 @@ public class LuceneSearchEngineTest {
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags1));
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags2));
     Assert.assertFalse(entriesWithTags2And3.contains(entryWithoutTags3));
+  }
+
+  @Test
+  public void findEntriesWithTags_SearchTermIsSet() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag1");
+    Tag tag2 = new Tag("tag2");
+    Tag tag3 = new Tag("tag3");
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+    deepThought.addTag(tag3);
+
+    Entry entry1 = new Entry("one");
+    deepThought.addEntry(entry1);
+    entry1.addTag(tag1);
+    entry1.addTag(tag2);
+    entry1.addTag(tag3);
+
+    final Collection<Entry> entriesWithSearchTermTag = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithSearchTermTag = new HashSet<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    // must find all Tags as all contain search term 'tag'
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), "tag", new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithSearchTermTag.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithSearchTermTag.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, tagsOnEntriesWithSearchTermTag.size());
+    Assert.assertEquals(1, entriesWithSearchTermTag.size());
+
+
+    final Collection<Entry> entriesWithSearchTermSwag = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithSearchTermSwag = new HashSet<>();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    // no entries and tags may be found as no tag contains search term 'swag'
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag2, tag3), "swag", new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithSearchTermSwag.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithSearchTermSwag.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch2.countDown();
+      }
+    });
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, tagsOnEntriesWithSearchTermSwag.size());
+    Assert.assertEquals(1, entriesWithSearchTermSwag.size());
+  }
+
+  @Test
+  public void findEntriesWithTags_TagIsOnEntryButDoesNotMatchSearchTerm() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag");
+    Tag tag2 = new Tag("swag");
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+
+    Entry entry1 = new Entry("one");
+    deepThought.addEntry(entry1);
+    entry1.addTag(tag1);
+    entry1.addTag(tag2);
+
+    final Collection<Entry> entriesWithSearchTermTag = new ArrayList<>();
+    final Set<Tag> tagsOnEntriesWithSearchTermTag = new HashSet<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1, tag2), "tag", new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithSearchTermTag.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithSearchTermTag.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, tagsOnEntriesWithSearchTermTag.size()); // only tag1 must be found (tag2's name doesn't match search term 'tag')
+    Assert.assertEquals(tag1, new ArrayList<Tag>(tagsOnEntriesWithSearchTermTag).get(0));
+    Assert.assertEquals(1, entriesWithSearchTermTag.size());
+  }
+
+  @Test
+  public void findEntriesWithTags_SearchTermIsSet_ButNotAllTagsMatchingSearchTermAreOnResultEntries() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag1");
+    Tag tag2 = new Tag("tag2");
+    Tag tag3 = new Tag("tag3");
+    Tag tag4 = new Tag("tag4");
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+    deepThought.addTag(tag3);
+    deepThought.addTag(tag4);
+
+    Entry entry1 = new Entry("one");
+    deepThought.addEntry(entry1);
+    entry1.addTag(tag1);
+    entry1.addTag(tag4); // only tag1 and tag4 are on result Entry
+
+    final Collection<Entry> entriesWithSearchTermTag = new ArrayList<>();
+    final List<Tag> tagsOnEntriesWithSearchTermTag = new ArrayList<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1), "tag", new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithSearchTermTag.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithSearchTermTag.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(2, tagsOnEntriesWithSearchTermTag.size());
+    Assert.assertEquals(1, entriesWithSearchTermTag.size());
+
+    List<Tag> tagsResultList = new ArrayList<Tag>(tagsOnEntriesWithSearchTermTag);
+    Assert.assertEquals(tag1, tagsResultList.get(0));
+    Assert.assertEquals(tag4, tagsResultList.get(1));
+  }
+
+  @Test
+  public void findEntriesWithTags_SearchTermIsSet_SearchResultsAreInCorrectAlphabeticalOrder() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag");
+    Tag tag2 = new Tag("swag");
+    Tag tag3 = new Tag("Ztag");
+    Tag tag4 = new Tag("Atag");
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+    deepThought.addTag(tag3);
+    deepThought.addTag(tag4);
+
+    Entry entry1 = new Entry("one");
+    deepThought.addEntry(entry1);
+    entry1.addTag(tag1);
+    entry1.addTag(tag2);
+    entry1.addTag(tag3);
+    entry1.addTag(tag4);
+
+    final Collection<Entry> entriesWithSearchTermTag = new ArrayList<>();
+    final List<Tag> tagsOnEntriesWithSearchTermTag = new ArrayList<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    searchEngine.findAllEntriesHavingTheseTags(Arrays.asList(tag1, tag2), "tag", new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
+      @Override
+      public void completed(FindAllEntriesHavingTheseTagsResult results) {
+        entriesWithSearchTermTag.addAll(results.getEntriesHavingFilteredTags());
+        tagsOnEntriesWithSearchTermTag.addAll(results.getTagsOnEntriesContainingFilteredTags());
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, tagsOnEntriesWithSearchTermTag.size());
+    Assert.assertEquals(1, entriesWithSearchTermTag.size());
+
+    List<Tag> tagsResultList = new ArrayList<Tag>(tagsOnEntriesWithSearchTermTag);
+    Assert.assertEquals(tag4, tagsResultList.get(0)); // Atag must be first result
+    Assert.assertEquals(tag1, tagsResultList.get(1)); // tag second
+    Assert.assertEquals(tag3, tagsResultList.get(2)); // and Ztag last
   }
 
 }

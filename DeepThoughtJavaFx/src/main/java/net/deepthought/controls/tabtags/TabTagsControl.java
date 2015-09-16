@@ -53,7 +53,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -78,13 +77,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected FilteredList<Tag> filteredTags = null;
   protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
 
-  protected FilterTagsSearch filterTagsSearch = null;
-  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected FilterTagsSearch tagsSearch = null;
+  protected FilterTagsSearchResults lastTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected ObservableSet<Tag> tagsToFilterFor = FXCollections.observableSet();
   protected Collection<Entry> entriesHavingFilteredTags = new HashSet<>();
-  protected Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
+  protected Collection<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
 
 
   protected MainWindowController mainWindowController;
@@ -300,27 +300,27 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
   protected void quickFilterTags() {
     log.debug("Starting to quick filter Tags ... ");
-    if(filterTagsSearch != null)
-      filterTagsSearch.interrupt();
+    if(tagsSearch != null)
+      tagsSearch.interrupt();
 
     if(StringUtils.isNullOrEmpty(txtfldTagsQuickFilter.getText())) {
       quickFilteringTagsDone(FilterTagsSearchResults.NoFilterSearchResults);
     }
     else {
-      filterTagsSearch = new FilterTagsSearch(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
+      tagsSearch = new FilterTagsSearch(txtfldTagsQuickFilter.getText(), new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
         public void completed(final FilterTagsSearchResults results) {
           Platform.runLater(() -> quickFilteringTagsDone(results));
         }
       });
-      Application.getSearchEngine().filterTags(filterTagsSearch);
+      Application.getSearchEngine().filterTags(tagsSearch);
     }
   }
 
   protected void quickFilteringTagsDone(FilterTagsSearchResults results) {
     final Tag selectedTag = deepThought.getSettings().getLastViewedTag();
 
-    lastFilterTagsResults = results;
+    lastTagsSearchResults = results;
     showTagsAdheringFilterAndQuickFilter();
     callFilteredTagsChangedListeners(results);
 
@@ -341,25 +341,25 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void showTagsAdheringFilterAndQuickFilter() {
-    if(tagsToFilterFor.size() == 0 && lastFilterTagsResults.getResults().size() == 0)
+    if(tagsToFilterFor.size() == 0 && lastTagsSearchResults.getResults().size() == 0)
       filteredTags.setPredicate((tag) -> true);
     else if(tagsToFilterFor.size() > 0) {
       if(tagsOnEntriesContainingFilteredTags.size() == 0)
         filteredTags.setPredicate((tag) -> tagsToFilterFor.contains(tag));
-      else if(lastFilterTagsResults.getResults().size() == 0)
+      else if(lastTagsSearchResults.getResults().size() == 0)
         filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag));
       else
-        filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag) && lastFilterTagsResults.isRelevantMatch(tag));
+        filteredTags.setPredicate((tag) -> tagsOnEntriesContainingFilteredTags.contains(tag) && lastTagsSearchResults.isRelevantMatch(tag));
     }
     else
-      filteredTags.setPredicate((tag) -> lastFilterTagsResults.isRelevantMatch(tag));
+      filteredTags.setPredicate((tag) -> lastTagsSearchResults.isRelevantMatch(tag));
   }
 
   protected void toggleTagsToFilterFor() {
-    if(lastFilterTagsResults.getResults().size() == 0)
+    if(lastTagsSearchResults.getResults().size() == 0)
       return;
 
-    for(Tag tag : lastFilterTagsResults.getRelevantMatches()) {
+    for(Tag tag : lastTagsSearchResults.getRelevantMatches()) {
       if(tagsToFilterFor.contains(tag))
         tagsToFilterFor.remove(tag);
       else
@@ -416,6 +416,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsToFilterFor, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
         @Override
         public void completed(FindAllEntriesHavingTheseTagsResult results) {
+          lastFilterTagsResult = results;
           entriesHavingFilteredTags = results.getEntriesHavingFilteredTags();
           tagsOnEntriesContainingFilteredTags = results.getTagsOnEntriesContainingFilteredTags();
 

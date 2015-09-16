@@ -2,9 +2,10 @@ package net.deepthought.data.search.specific;
 
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.CombinedLazyLoadingList;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by ganymed on 27/07/15.
@@ -13,9 +14,11 @@ public class FindAllEntriesHavingTheseTagsResult {
 
   protected Collection<Entry> entriesHavingFilteredTags;
 
-  protected Set<Tag> tagsOnEntriesContainingFilteredTags;
+  protected Collection<Tag> tagsOnEntriesContainingFilteredTags;
+  protected List<Tag> tagsOnEntriesContainingFilteredTagsList = null;
 
-  public FindAllEntriesHavingTheseTagsResult(Collection<Entry> entriesHavingFilteredTags, Set<Tag> tagsOnEntriesContainingFilteredTags) {
+
+  public FindAllEntriesHavingTheseTagsResult(Collection<Entry> entriesHavingFilteredTags, Collection<Tag> tagsOnEntriesContainingFilteredTags) {
     this.entriesHavingFilteredTags = entriesHavingFilteredTags;
     this.tagsOnEntriesContainingFilteredTags = tagsOnEntriesContainingFilteredTags;
   }
@@ -24,7 +27,25 @@ public class FindAllEntriesHavingTheseTagsResult {
     return entriesHavingFilteredTags;
   }
 
-  public Set<Tag> getTagsOnEntriesContainingFilteredTags() {
+  public int getTagsOnEntriesContainingFilteredTagsCount() {
+    return tagsOnEntriesContainingFilteredTags.size();
+  }
+
+  public Collection<Tag> getTagsOnEntriesContainingFilteredTags() {
     return tagsOnEntriesContainingFilteredTags;
+  }
+
+  public Tag getTagsOnEntriesContainingFilteredTagsAt(int index) {
+    if(index < 0 || index >= getTagsOnEntriesContainingFilteredTagsCount())
+      return null;
+
+    if(tagsOnEntriesContainingFilteredTagsList == null) {
+      if(tagsOnEntriesContainingFilteredTags instanceof List)
+        tagsOnEntriesContainingFilteredTagsList = (List<Tag>)tagsOnEntriesContainingFilteredTags;
+      else
+        tagsOnEntriesContainingFilteredTagsList = new CombinedLazyLoadingList<Tag>(tagsOnEntriesContainingFilteredTags);
+    }
+
+    return tagsOnEntriesContainingFilteredTagsList.get(index);
   }
 }

@@ -30,7 +30,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
 
   public TagNameTableCell(TabTagsControl tabTagsControl) {
-    this.filterTagsSearchResults = tabTagsControl.lastFilterTagsResults;
+    this.filterTagsSearchResults = tabTagsControl.lastTagsSearchResults;
     tabTagsControl.addFilteredTagsChangedListener(results -> {
       filterTagsSearchResults = results;
       setCellBackgroundColor();

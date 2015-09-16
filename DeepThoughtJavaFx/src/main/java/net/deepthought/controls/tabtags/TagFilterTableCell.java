@@ -32,7 +32,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
 
   public TagFilterTableCell(TabTagsControl tabTagsControl) {
     this.tagsToFilterFor = tabTagsControl.tagsToFilterFor;
-    this.filterTagsSearchResults = tabTagsControl.lastFilterTagsResults;
+    this.filterTagsSearchResults = tabTagsControl.lastTagsSearchResults;
     tabTagsControl.addFilteredTagsChangedListener(results -> {
       filterTagsSearchResults = results;
       setCellBackgroundColor();
