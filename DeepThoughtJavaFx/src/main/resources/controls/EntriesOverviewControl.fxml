@@ -25,13 +25,13 @@
                                         <Insets right="6.0" />
                                     </HBox.margin>
                                 </Label>
-                                <CustomTextField fx:id="txtfldEntriesQuickFilter" promptText="%search.entries.prompt.text" HBox.hgrow="ALWAYS" />
-                                <ToggleButton fx:id="tglbtnEntriesQuickFilterAbstract" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%entry.abstract" visible="false">
+                                <CustomTextField fx:id="txtfldSearchEntries" promptText="%search.entries.prompt.text" HBox.hgrow="ALWAYS" />
+                                <ToggleButton fx:id="tglbtnSearchEntriesAbstract" mnemonicParsing="false" onAction="#handleToggleButtonSearchEntriesOptionsAction" prefWidth="100.0" selected="true" text="%entry.abstract" visible="false">
                                     <HBox.margin>
                                         <Insets left="6.0" right="6.0" />
                                     </HBox.margin>
                                 </ToggleButton>
-                                <ToggleButton fx:id="tglbtnEntriesQuickFilterContent" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%content" visible="false" />
+                                <ToggleButton fx:id="tglbtnSearchEntriesContent" mnemonicParsing="false" onAction="#handleToggleButtonSearchEntriesOptionsAction" prefWidth="100.0" selected="true" text="%content" visible="false" />
                             </children></HBox>
                     </center>
                     <right>

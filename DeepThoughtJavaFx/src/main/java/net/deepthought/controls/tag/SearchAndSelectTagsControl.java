@@ -60,7 +60,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
   protected FilterTagsSearch filterTagsSearch = null;
   protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.EmptySearchResults;
-  protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
+  protected List<IDisplayedTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected List<TagListCell> tagListCells = new ArrayList<>();
 
@@ -312,16 +312,16 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   };
 
 
-  public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+  public boolean addFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
     return filteredTagsChangedListeners.add(listener);
   }
 
-  public boolean removeFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
+  public boolean removeFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
     return filteredTagsChangedListeners.remove(listener);
   }
 
   protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
-    for(IFilteredTagsChangedListener listener : filteredTagsChangedListeners)
+    for(IDisplayedTagsChangedListener listener : filteredTagsChangedListeners)
       listener.filteredTagsChanged(results);
   }
 

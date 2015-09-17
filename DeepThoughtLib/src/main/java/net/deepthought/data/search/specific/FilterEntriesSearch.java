@@ -83,7 +83,7 @@ public class FilterEntriesSearch extends Search<Entry> {
     return filterOnlyEntriesWithoutTags;
   }
 
-  public void setFilterOnlyEntriesWithoutTags(boolean filterOnlyEntriesWithoutTags) {
+  public void setSearchOnlyEntriesWithoutTags(boolean filterOnlyEntriesWithoutTags) {
     this.filterOnlyEntriesWithoutTags = filterOnlyEntriesWithoutTags;
   }
 }

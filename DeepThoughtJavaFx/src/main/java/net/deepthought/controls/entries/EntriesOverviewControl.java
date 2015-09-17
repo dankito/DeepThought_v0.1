@@ -80,7 +80,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
   protected LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
 
-  protected FilterEntriesSearch filterEntriesSearch = null;
+  protected FilterEntriesSearch lastEntriesSearch = null;
 
 
   protected MainWindowController mainWindowController;
@@ -92,11 +92,11 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   @FXML
   protected HBox hboxEntriesBar;
   @FXML
-  protected CustomTextField txtfldEntriesQuickFilter;
+  protected CustomTextField txtfldSearchEntries;
   @FXML
-  ToggleButton tglbtnEntriesQuickFilterAbstract;
+  ToggleButton tglbtnSearchEntriesAbstract;
   @FXML
-  ToggleButton tglbtnEntriesQuickFilterContent;
+  ToggleButton tglbtnSearchEntriesContent;
   @FXML
   protected Button btnRemoveSelectedEntries;
   @FXML
@@ -202,27 +202,27 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void setupControl() {
-    // replace normal TextField txtfldEntriesQuickFilter with a SearchTextField (with a cross to clear selection)
-    hboxEntriesBar.getChildren().remove(txtfldEntriesQuickFilter);
-    txtfldEntriesQuickFilter = (CustomTextField) TextFields.createClearableTextField();
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldEntriesQuickFilter, "search.entries.prompt.text");
-    hboxEntriesBar.getChildren().add(1, txtfldEntriesQuickFilter);
-    HBox.setHgrow(txtfldEntriesQuickFilter, Priority.ALWAYS);
-    txtfldEntriesQuickFilter.textProperty().addListener(new ChangeListener<String>() {
+    // replace normal TextField txtfldSearchEntries with a SearchTextField (with a cross to clear selection)
+    hboxEntriesBar.getChildren().remove(txtfldSearchEntries);
+    txtfldSearchEntries = (CustomTextField) TextFields.createClearableTextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchEntries, "search.entries.prompt.text");
+    hboxEntriesBar.getChildren().add(1, txtfldSearchEntries);
+    HBox.setHgrow(txtfldSearchEntries, Priority.ALWAYS);
+    txtfldSearchEntries.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        filterEntries();
+        searchEntries();
       }
     });
-    txtfldEntriesQuickFilter.setOnKeyReleased(event -> {
+    txtfldSearchEntries.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE)
-        txtfldEntriesQuickFilter.clear();
+        txtfldSearchEntries.clear();
     });
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterAbstract);
-    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "search.entries.abstract.tool.tip");
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
-    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "search.entries.content.tool.tip");
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesAbstract);
+    JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesAbstract, "search.entries.abstract.tool.tip");
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesContent);
+    JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesContent, "search.entries.content.tool.tip");
 
     btnRemoveSelectedEntries.setTextFill(Constants.RemoveEntityButtonTextColor);
     JavaFxLocalization.bindControlToolTip(btnRemoveSelectedEntries, "delete.selected.entries.tool.tip");
@@ -443,8 +443,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   @FXML
-  public void handleToggleButtonEntriesQuickFilterOptionsAction(ActionEvent actionEvent) {
-    filterEntries();
+  public void handleToggleButtonSearchEntriesOptionsAction(ActionEvent actionEvent) {
+    searchEntries();
   }
 
   protected void addEntryToSelectedCategory(Entry newEntry) {
@@ -548,18 +548,17 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   };
 
 
-  protected void filterEntries() {
-    if(filterEntriesSearch != null && filterEntriesSearch.isCompleted() == false)
-      filterEntriesSearch.interrupt();
+  protected void searchEntries() {
+    if(lastEntriesSearch != null && lastEntriesSearch.isCompleted() == false)
+      lastEntriesSearch.interrupt();
 
-    String filterTerm = txtfldEntriesQuickFilter.getText();
+    String searchTerm = txtfldSearchEntries.getText();
     Tag selectedTag = deepThought.getSettings().getLastViewedTag();
 
-    if(StringUtils.isNullOrEmpty(filterTerm)) // no filter applied -> show all entries
+    if(StringUtils.isNullOrEmpty(searchTerm)) // TODO: remove this, get all (and sorted) Entries by SearchEngine
       tableViewEntriesItems.setUnderlyingCollection(unfilteredCurrentEntriesToShow);
     else {
-      filterEntriesSearch = new FilterEntriesSearch(txtfldEntriesQuickFilter.getText(), tglbtnEntriesQuickFilterContent.isSelected(), tglbtnEntriesQuickFilterAbstract.isSelected(),
-          /*unfilteredCurrentEntriesToShow,*/ (results) -> {
+      lastEntriesSearch = new FilterEntriesSearch(txtfldSearchEntries.getText(), tglbtnSearchEntriesContent.isSelected(), tglbtnSearchEntriesAbstract.isSelected(), (results) -> {
         Platform.runLater(() -> {
           tblvwEntries.getSelectionModel().clearSelection();
           tableViewEntriesItems.setUnderlyingCollection(results);
@@ -567,12 +566,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       });
 
       if(selectedTag instanceof EntriesWithoutTagsSystemTag)
-        filterEntriesSearch.setFilterOnlyEntriesWithoutTags(true);
+        lastEntriesSearch.setSearchOnlyEntriesWithoutTags(true);
       else if(selectedTag instanceof SystemTag == false) {
-        filterEntriesSearch.addTagEntriesMustHave(deepThought.getSettings().getLastViewedTag());
+        lastEntriesSearch.addTagEntriesMustHave(deepThought.getSettings().getLastViewedTag());
       }
 
-      Application.getSearchEngine().filterEntries(filterEntriesSearch);
+      Application.getSearchEngine().filterEntries(lastEntriesSearch);
     }
   }
 

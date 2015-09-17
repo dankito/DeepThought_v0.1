@@ -7,7 +7,7 @@ import net.deepthought.controls.Constants;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.tag.IFilteredTagsChangedListener;
+import net.deepthought.controls.tag.IDisplayedTagsChangedListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -16,7 +16,6 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FilterTagsSearch;
 import net.deepthought.data.search.specific.FilterTagsSearchResults;
@@ -85,7 +84,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected FilterTagsSearchResults lastTagsSearchResults = FilterTagsSearchResults.EmptySearchResults;
   protected Collection<Tag> allTagsSearchResult = null;
   protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
-  protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
+  protected List<IDisplayedTagsChangedListener> displayedTagsChangedListeners = new ArrayList<>();
 
   protected ObservableSet<Tag> tagsFilter = FXCollections.observableSet();
 
@@ -95,7 +94,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   @FXML
   protected HBox hboxTagsBar;
   @FXML
-  protected TextField txtfldTagsQuickFilter;
+  protected TextField txtfldSearchTags;
   @FXML
   protected Button btnRemoveTagsFilter;
   @FXML
@@ -156,19 +155,19 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void setupControl() {
-    // replace normal TextField txtfldTagsQuickFilter with a SearchTextField (with a cross to clear selection)
-    hboxTagsBar.getChildren().remove(txtfldTagsQuickFilter);
-    txtfldTagsQuickFilter = (CustomTextField) TextFields.createClearableTextField();
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldTagsQuickFilter, "search.tags.prompt.text");
-    hboxTagsBar.getChildren().add(1, txtfldTagsQuickFilter);
-    HBox.setHgrow(txtfldTagsQuickFilter, Priority.ALWAYS);
-    txtfldTagsQuickFilter.setMinWidth(60);
-    txtfldTagsQuickFilter.setPrefWidth(Region.USE_COMPUTED_SIZE);
-    txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> searchTags());
-    txtfldTagsQuickFilter.setOnAction(event -> toggleCurrentTagsTagsFilter());
-    txtfldTagsQuickFilter.setOnKeyReleased(event -> {
+    // replace normal TextField txtfldSearchTags with a SearchTextField (with a cross to clear selection)
+    hboxTagsBar.getChildren().remove(txtfldSearchTags);
+    txtfldSearchTags = (CustomTextField) TextFields.createClearableTextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchTags, "search.tags.prompt.text");
+    hboxTagsBar.getChildren().add(1, txtfldSearchTags);
+    HBox.setHgrow(txtfldSearchTags, Priority.ALWAYS);
+    txtfldSearchTags.setMinWidth(60);
+    txtfldSearchTags.setPrefWidth(Region.USE_COMPUTED_SIZE);
+    txtfldSearchTags.textProperty().addListener((observable, oldValue, newValue) -> searchTags());
+    txtfldSearchTags.setOnAction(event -> toggleCurrentTagsTagsFilter());
+    txtfldSearchTags.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE)
-        txtfldTagsQuickFilter.clear();
+        txtfldSearchTags.clear();
     });
 
     btnRemoveTagsFilter.setGraphic(new ImageView(Constants.FilterDeleteIconPath));
@@ -266,7 +265,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     if(tag != null) {
       if (isTagsFilterApplied() && lastFilterTagsResult != null) {
-        log.debug("Determining Entries in entriesHavingFilteredTags with Tag " + tag + " ...");
 
         Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
         for (Entry tagEntry : tag.getEntries()) {
@@ -274,8 +272,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
             filteredEntriesWithThisTag.add(tagEntry);
         }
 
-        log.debug("done");
-        mainWindowController.showEntries(filteredEntriesWithThisTag);
+        mainWindowController.showEntries(filteredEntriesWithThisTag); // TODO: here can may be a problem when Entries are search. How to know about this filter?
       }
       else
         mainWindowController.showEntries(tag.getEntries());
@@ -294,7 +291,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   public void searchTags() {
-    searchTags(txtfldTagsQuickFilter.getText());
+    searchTags(txtfldSearchTags.getText());
   }
 
   public void searchTags(String searchTerm) {
@@ -309,7 +306,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       lastSearchTerm = searchTerm;
       lastFilterTagsResult = null;
 
-      if(StringUtils.isNullOrEmpty(txtfldTagsQuickFilter.getText()) && allTagsSearchResult != null) {
+      if(StringUtils.isNullOrEmpty(txtfldSearchTags.getText()) && allTagsSearchResult != null) {
         setTableViewTagsItems(allTagsSearchResult);
       }
       else {
@@ -489,16 +486,16 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     }
   }
 
-  public boolean addFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
-    return filteredTagsChangedListeners.add(listener);
+  public boolean addFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
+    return displayedTagsChangedListeners.add(listener);
   }
 
-  public boolean removeFilteredTagsChangedListener(IFilteredTagsChangedListener listener) {
-    return filteredTagsChangedListeners.remove(listener);
+  public boolean removeFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
+    return displayedTagsChangedListeners.remove(listener);
   }
 
   protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
-    for(IFilteredTagsChangedListener listener : filteredTagsChangedListeners)
+    for(IDisplayedTagsChangedListener listener : displayedTagsChangedListeners)
       listener.filteredTagsChanged(results);
   }
 
@@ -603,8 +600,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected EntityListener selectedTagListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(TableConfig.TagNameColumnName.equals(propertyName))
-        sortTags();
+      researchTagsWithLastSearchTerm();
     }
 
     @Override
@@ -617,8 +613,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 //      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
 //          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
       if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == ((Tag)collectionHolder).getEntries()) {
-//        if(filteredTags.size() > 0)
-//          reapplyTagsFilter();
         if(tableViewTagsItems.size() > 0)
           filterTags();
         showEntriesForSelectedTag((Tag)collectionHolder);
@@ -635,8 +629,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 //      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
 //          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
       if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == ((Tag)collectionHolder).getEntries()) {
-//        if(isTagsFilterApplied())
-//          reapplyTagsFilter();
         if(tableViewTagsItems.size() > 0)
           filterTags();
         showEntriesForSelectedTag((Tag)collectionHolder);

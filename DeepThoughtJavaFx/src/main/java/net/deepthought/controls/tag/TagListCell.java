@@ -105,7 +105,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected SetChangeListener<Tag> editedTagsChangedListener = change -> tagUpdated();
 
-  protected IFilteredTagsChangedListener filteredTagsChangedListener = results -> {
+  protected IDisplayedTagsChangedListener filteredTagsChangedListener = results -> {
     filterTagsSearchResults = results;
     setCellBackgroundColor();
   };
