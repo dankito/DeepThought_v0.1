@@ -58,12 +58,12 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
   @Override
   public void cleanUpControl() {
     Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
-    htmlEditor.cleanUpControl();
+    DeepThoughtFxHtmlEditorPool.getInstance().htmlEditorReleased(htmlEditor);
   }
 
 
   protected void setupControl(String title, HtmlEditorListener listener) {
-    htmlEditor = new DeepThoughtFxHtmlEditor(listener);
+    htmlEditor = DeepThoughtFxHtmlEditorPool.getInstance().getHtmlEditor(listener);
     htmlEditor.setMaxHeight(Double.MAX_VALUE);
     setContent(htmlEditor);
 

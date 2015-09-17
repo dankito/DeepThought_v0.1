@@ -280,14 +280,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
 
-    htmledEntryContent = new DeepThoughtFxHtmlEditor(new HtmlEditorListener() {
-      @Override
-      public void htmlCodeUpdated(String newHtmlCode) {
-        Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
-        if (selectedEntry != null) // TODO: avoid setting Content just because viewed Entry has changed
-          selectedEntry.setContent(htmledEntryContent.getHtml());
-      }
-    });
+    htmledEntryContent = new DeepThoughtFxHtmlEditor(newHtmlCode -> contentUpdated(newHtmlCode));
     htmledEntryContent.setMinHeight(250);
     htmledEntryContent.setMaxHeight(Double.MAX_VALUE);
     VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
@@ -333,6 +326,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     lblReference.widthProperty().addListener(fixControlsWidthListener);
     txtfldReferenceIndication.widthProperty().addListener(fixControlsWidthListener);
     lblPersons.widthProperty().addListener(fixControlsWidthListener);
+  }
+
+  protected void contentUpdated(String newContent) {
+    Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
+    if (selectedEntry != null) // TODO: avoid setting Content just because viewed Entry has changed
+      selectedEntry.setContent(newContent);
   }
 
   public void showPaneQuickEditEntryChanged(boolean showPaneQuickEditEntry) {

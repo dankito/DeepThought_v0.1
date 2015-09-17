@@ -92,6 +92,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     htmlEditor.setHtml(html);
   }
 
+  public void setListener(HtmlEditorListener listener) {
+    htmlEditor.setListener(listener);
+  }
+
 
   protected void testEvents() {
     engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
