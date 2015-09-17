@@ -43,19 +43,19 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected double entriesOverviewDividerPosition = 0.5;
 
-  protected WindowSettings mainWindowSettings = new WindowSettings(-1, -1, 1157, 621);
+  protected WindowSettings mainWindowSettings = new WindowSettings(-1, -1, 1150, 620);
 
   protected ColumnSettings entriesOverviewIdColumnSettings = new ColumnSettings(false, 46);
 
-  protected ColumnSettings entriesOverviewReferenceColumnSettings = new ColumnSettings(true, 140);
+  protected ColumnSettings entriesOverviewReferenceColumnSettings = new ColumnSettings(true, 340);
 
-  protected ColumnSettings entriesOverviewEntryPreviewColumnSettings = new ColumnSettings(true, 265);
+  protected ColumnSettings entriesOverviewEntryPreviewColumnSettings = new ColumnSettings(true, 360);
 
-  protected ColumnSettings entriesOverviewTagsColumnSettings = new ColumnSettings(true, 150);
+  protected ColumnSettings entriesOverviewTagsColumnSettings = new ColumnSettings(true, 225);
 
-  protected ColumnSettings entriesOverviewCreatedColumnSettings = new ColumnSettings(false, 176);
+  protected ColumnSettings entriesOverviewCreatedColumnSettings = new ColumnSettings(false, 148);
 
-  protected ColumnSettings entriesOverviewModifiedColumnSettings = new ColumnSettings(true, 176);
+  protected ColumnSettings entriesOverviewModifiedColumnSettings = new ColumnSettings(true, 148);
 
   protected WindowSettings searchAndSelectTagsToolWindowSettings = new WindowSettings(-1, -1, 400, 375);
 

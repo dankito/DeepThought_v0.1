@@ -59,12 +59,12 @@
                 </BorderPane>
                 <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="clmnId" prefWidth="46.0" text="%id" visible="false" />
-                  <TableColumn fx:id="clmnReferencePreview" prefWidth="140.0" text="%reference" />
-                        <TableColumn fx:id="clmnEntryPreview" prefWidth="265.0" text="%preview" />
-                        <TableColumn fx:id="clmnTags" prefWidth="150.0" text="%tags" />
-                        <TableColumn fx:id="clmnCreated" minWidth="0.0" prefWidth="176.0" text="%created" visible="false" />
-                        <TableColumn fx:id="clmnModified" minWidth="0.0" prefWidth="176.0" text="%modified" />
+                        <TableColumn fx:id="clmnId" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="46.0" text="%id" visible="false" />
+                  <TableColumn fx:id="clmnReferencePreview" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="340.0" text="%reference" />
+                        <TableColumn fx:id="clmnEntryPreview" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="360.0" text="%preview" />
+                        <TableColumn fx:id="clmnTags" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="225.0" text="%tags" />
+                        <TableColumn fx:id="clmnCreated" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="148.0" text="%created" visible="false" />
+                        <TableColumn fx:id="clmnModified" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="148.0" text="%modified" />
                     </columns>
                 </TableView>
             </children>
