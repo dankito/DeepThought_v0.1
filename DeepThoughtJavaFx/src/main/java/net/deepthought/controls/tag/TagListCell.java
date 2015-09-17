@@ -59,17 +59,17 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected TextField txtfldEditTagName = null;
 
-  protected FilterTagsSearchResults filterTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected FilterTagsSearchResults filterTagsSearchResults = null;
 
 
   public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedEntitiesHolder editedTagsHolder) {
     this.searchAndSelectTagsControl = searchAndSelectTagsControl;
     this.editedTagsHolder = editedTagsHolder;
 
-    editedTagsHolder.getEditedEntities().addListener(editedTagsChangedListener);
-
     filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
     searchAndSelectTagsControl.addFilteredTagsChangedListener(filteredTagsChangedListener);
+
+    editedTagsHolder.getEditedEntities().addListener(editedTagsChangedListener);
 
     setupGraphics();
 

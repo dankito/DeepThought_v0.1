@@ -13,7 +13,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
-import net.deepthought.data.model.ui.AllEntriesSystemTag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -46,7 +45,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -84,7 +82,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected String lastSearchTerm = FilterTagsSearch.EmptySearchTerm;
 
   protected FilterTagsSearch tagsSearch = null;
-  protected FilterTagsSearchResults lastTagsSearchResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected FilterTagsSearchResults lastTagsSearchResults = FilterTagsSearchResults.EmptySearchResults;
   protected Collection<Tag> allTagsSearchResult = null;
   protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();

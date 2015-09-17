@@ -5,7 +5,6 @@ import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -30,9 +29,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -62,7 +58,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   protected LazyLoadingObservableList<Tag> listViewTagsItems = null;
 
   protected FilterTagsSearch filterTagsSearch = null;
-  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.NoFilterSearchResults;
+  protected FilterTagsSearchResults lastFilterTagsResults = FilterTagsSearchResults.EmptySearchResults;
   protected List<IFilteredTagsChangedListener> filteredTagsChangedListeners = new ArrayList<>();
 
   protected List<TagListCell> tagListCells = new ArrayList<>();

@@ -1,6 +1,5 @@
 package net.deepthought.data.search.specific;
 
-import net.deepthought.Application;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 
@@ -12,6 +11,9 @@ import java.util.List;
  * Created by ganymed on 27/07/15.
  */
 public class FilterTagsSearchResults {
+
+  public final static FilterTagsSearchResults EmptySearchResults = new FilterTagsSearchResults(FilterTagsSearch.EmptySearchTerm, new ArrayList<Tag>());
+
 
   protected String overAllSearchTerm;
 
@@ -39,6 +41,11 @@ public class FilterTagsSearchResults {
   public FilterTagsSearchResults(String overAllSearchTerm) {
     this();
     this.overAllSearchTerm = overAllSearchTerm;
+  }
+
+  public FilterTagsSearchResults(String overAllSearchTerm, Collection<Tag> allMatchesSorted) {
+    this(overAllSearchTerm);
+    setAllMatchesSorted(allMatchesSorted);
   }
 
 
@@ -263,26 +270,4 @@ public class FilterTagsSearchResults {
     return overAllSearchTerm + " has " + getAllMatches().size() + " results";
   }
 
-
-  // TODO: remove NoFilterSearchResults
-
-  public final static FilterTagsSearchResults NoFilterSearchResults = new FilterTagsSearchResults() {
-
-    @Override
-    public Collection<Tag> getAllMatches() {
-      if(Application.getDeepThought() != null)
-        return Application.getDeepThought().getSortedTags();
-      return new ArrayList<>();
-    }
-
-    @Override
-    public boolean isMatch(Tag tag) {
-      return true;
-    }
-
-    @Override
-    public boolean isRelevantMatch(Tag tag) {
-      return true;
-    }
-  };
 }

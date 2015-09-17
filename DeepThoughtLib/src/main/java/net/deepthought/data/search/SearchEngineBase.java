@@ -5,10 +5,11 @@ import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.search.specific.FilterEntriesSearch;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
 import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.FilterTagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Notification;
@@ -62,7 +63,9 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
-    search.setResults(FilterTagsSearchResults.NoFilterSearchResults);
+    search.addResult(new FilterTagsSearchResult(FilterTagsSearch.EmptySearchTerm, new CombinedLazyLoadingList<Tag>(Application.getDeepThought().getSortedTags()), null));
+    search.setHasEmptySearchTerm(true);
+
     search.fireSearchCompleted();
   }
 
