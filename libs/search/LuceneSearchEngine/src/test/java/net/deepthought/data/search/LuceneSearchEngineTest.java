@@ -696,7 +696,7 @@ public class LuceneSearchEngineTest {
     searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("Tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
       public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
-        results.addAll(result.getAllMatches());
+        results.addAll(result.getRelevantMatchesSorted());
         countDownLatch.countDown();
       }
     }));
@@ -720,7 +720,7 @@ public class LuceneSearchEngineTest {
     searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("swag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
       public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
-        results.addAll(result.getAllMatches());
+        results.addAll(result.getRelevantMatchesSorted());
         countDownLatch.countDown();
       }
     }));
@@ -737,7 +737,7 @@ public class LuceneSearchEngineTest {
     searchEngine.filterTags(new net.deepthought.data.search.specific.FilterTagsSearch("tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
       public void completed(net.deepthought.data.search.specific.FilterTagsSearchResults result) {
-        results.addAll(result.getAllMatches());
+        results.addAll(result.getRelevantMatchesSorted());
         nextCountDownLatch.countDown();
       }
     }));
@@ -760,7 +760,7 @@ public class LuceneSearchEngineTest {
     searchEngine.filterTags(new FilterTagsSearch("Tag", new SearchCompletedListener<net.deepthought.data.search.specific.FilterTagsSearchResults>() {
       @Override
       public void completed(FilterTagsSearchResults result) {
-        results.addAll(result.getAllMatches());
+        results.addAll(result.getRelevantMatchesSorted());
         countDownLatch.countDown();
       }
     }));

@@ -149,7 +149,7 @@ public abstract class SearchComparisonTestBase {
     searchEngine.filterTags(new FilterTagsSearch("Zeit", new SearchCompletedListener<FilterTagsSearchResults>() {
       @Override
       public void completed(FilterTagsSearchResults results) {
-        searchResults.addAll(results.getAllMatches());
+        searchResults.addAll(results.getRelevantMatchesSorted());
         logOperationProcessTime("filterTags");
         countDownLatch.countDown();
       }
@@ -195,9 +195,9 @@ public abstract class SearchComparisonTestBase {
     Assert.assertEquals("hom", thirdResult.getSearchTerm());
 
     Assert.assertEquals(1130, searchResults.getAllMatches().size());
-    Assert.assertEquals(274, searchResults.getRelevantMatches().size());
+    Assert.assertEquals(274, searchResults.getRelevantMatchesSorted().size());
     Assert.assertEquals(firstResult.getAllMatchesCount() + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getAllMatches().size());
-    Assert.assertEquals(1 + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getRelevantMatches().size());
+    Assert.assertEquals(1 + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getRelevantMatchesSorted().size());
   }
 
 

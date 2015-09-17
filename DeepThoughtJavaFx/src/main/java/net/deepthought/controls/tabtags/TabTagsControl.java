@@ -327,7 +327,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     lastTagsSearchResults = results;
 
     if(results.hasEmptySearchTerm()) {
-      allTagsSearchResult = new CombinedLazyLoadingList<Tag>(systemTags, results.getAllMatches());
+      allTagsSearchResult = new CombinedLazyLoadingList<Tag>(systemTags, results.getRelevantMatchesSorted());
       setTableViewTagsItems(allTagsSearchResult);
       setSelectedTagToAllEntriesSystemTag();
     }
@@ -422,7 +422,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void setTableViewTagsItems(FilterTagsSearchResults results) {
-    setTableViewTagsItems(results.getAllMatchesSorted());
+    setTableViewTagsItems(results.getRelevantMatchesSorted());
     selectTagAccordingToSearchResult(results);
   }
 
@@ -444,8 +444,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     else if(results.getLastResult().hasSingleMatch())
       setSelectedTag(results.getLastResult().getSingleMatch());
     else {
-      if (results.getAllMatches().size() == 1)
-        setSelectedTag(new ArrayList<Tag>(results.getAllMatches()).get(0));
+      if (results.getRelevantMatchesSorted().size() == 1)
+        setSelectedTag(new ArrayList<Tag>(results.getRelevantMatchesSorted()).get(0));
       else if (results.getLastResult().getAllMatches().size() == 1)
         setSelectedTag(new ArrayList<Tag>(results.getLastResult().getAllMatches()).get(0));
       // don't do this, isMatch() starts loading all search results

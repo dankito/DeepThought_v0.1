@@ -827,21 +827,24 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void getAllRelevantTagsSorted(FilterTagsSearch search, IndexSearcher indexSearcher) {
-    BooleanQuery searchForAllQuery = new BooleanQuery();
+    BooleanQuery sortRelevantTagsQuery = new BooleanQuery();
     for(FilterTagsSearchResult result : search.getResults().getResults()) {
       if(search.isInterrupted())
         return;
 
       String searchTerm = QueryParser.escape(result.getSearchTerm());
       if(result.hasExactMatch() && result != search.getResults().getLastResult())
-        searchForAllQuery.add(new TermQuery(new Term(FieldName.TagName, searchTerm)), BooleanClause.Occur.SHOULD);
+        sortRelevantTagsQuery.add(new TermQuery(new Term(FieldName.TagName, searchTerm)), BooleanClause.Occur.SHOULD);
       else
-        searchForAllQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + searchTerm + "*")), BooleanClause.Occur.SHOULD);
+        sortRelevantTagsQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + searchTerm + "*")), BooleanClause.Occur.SHOULD);
     }
 
-    List<Tag> allMatchesSorted = new LazyLoadingLuceneSearchResultsList(indexSearcher, searchForAllQuery, Tag.class,
+    if(search.isInterrupted())
+      return;
+
+    List<Tag> relevantMatchesSorted = new LazyLoadingLuceneSearchResultsList(indexSearcher, sortRelevantTagsQuery, Tag.class,
         FieldName.TagId, 100000, SortOrder.Ascending, FieldName.TagName);
-    search.setAllMatchesSorted(allMatchesSorted);
+    search.setRelevantMatchesSorted(relevantMatchesSorted);
   }
 
   protected void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, String[] tagNamesToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {

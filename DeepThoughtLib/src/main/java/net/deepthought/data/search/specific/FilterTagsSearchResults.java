@@ -22,12 +22,10 @@ public class FilterTagsSearchResults {
   protected List<FilterTagsSearchResult> results = new ArrayList<>();
 
   protected Collection<Tag> allMatches = null;
-  protected Collection<Tag> allMatchesSorted = null;
 
-  protected Collection<Tag> relevantMatches = null;
+  protected Collection<Tag> relevantMatchesSorted = null;
 
   protected Collection<Tag> exactMatches = null;
-  protected Collection<Tag> singleMatchesOfASearchTerm = null;
 
   protected Collection<Tag> exactOrSingleMatchesNotOfLastResult = null;
 
@@ -43,53 +41,31 @@ public class FilterTagsSearchResults {
     this.overAllSearchTerm = overAllSearchTerm;
   }
 
-  public FilterTagsSearchResults(String overAllSearchTerm, Collection<Tag> allMatchesSorted) {
+  public FilterTagsSearchResults(String overAllSearchTerm, Collection<Tag> relevantMatchesSorted) {
     this(overAllSearchTerm);
-    setAllMatchesSorted(allMatchesSorted);
+    setRelevantMatchesSorted(relevantMatchesSorted);
   }
 
 
   public boolean addSearchResult(FilterTagsSearchResult result) {
-    allMatches = relevantMatches = exactMatches = singleMatchesOfASearchTerm = null;
+    allMatches = null;
     return results.add(result);
   }
 
-  public Collection<Tag> getAllMatchesSorted() {
-    return allMatchesSorted;
+  public Collection<Tag> getRelevantMatchesSorted() {
+    return relevantMatchesSorted;
   }
 
-  public void setAllMatchesSorted(Collection<Tag> allMatchesSorted) {
-    this.allMatchesSorted = allMatchesSorted;
+  public void setRelevantMatchesSorted(Collection<Tag> relevantMatchesSorted) {
+    this.relevantMatchesSorted = relevantMatchesSorted;
   }
 
 
   public Collection<Tag> getAllMatches() {
-    if(allMatchesSorted != null)
-      return allMatchesSorted;
-
     if(allMatches == null)
-      determineMatchCategories();
+      allMatches = determineAllMatches();
 
     return allMatches;
-  }
-
-  public boolean isMatch(Tag tag) {
-    return getAllMatches().contains(tag);
-  }
-
-
-  public Collection<Tag> getRelevantMatches() {
-    if(allMatchesSorted != null)
-      return allMatchesSorted;
-
-    if(relevantMatches == null)
-      determineMatchCategories();
-
-    return relevantMatches;
-  }
-
-  public boolean isRelevantMatch(Tag tag) {
-    return getRelevantMatches().contains(tag);
   }
 
 
@@ -200,42 +176,14 @@ public class FilterTagsSearchResults {
   }
 
 
-  protected void determineMatchCategories() {
-    allMatches = new CombinedLazyLoadingList<>();
-    relevantMatches = new CombinedLazyLoadingList<>();
-    exactMatches = new ArrayList<Tag>();
-    singleMatchesOfASearchTerm = new ArrayList<>();
+  protected Collection<Tag> determineAllMatches() {
+    CombinedLazyLoadingList<Tag> allMatches = new CombinedLazyLoadingList<>();
 
-    for(int i = 0; i < results.size() - 1; i++) {
-      FilterTagsSearchResult result = results.get(i);
+    for(FilterTagsSearchResult result : getResults()) {
       allMatches.addAll(result.getAllMatches());
-
-      if(result.hasExactMatch()) {
-        relevantMatches.add(result.getExactMatch());
-        exactMatches.add(result.getExactMatch());
-      }
-      else
-        relevantMatches.addAll(result.getAllMatches());
-
-      if(result.hasExactMatch() == false && result.getAllMatchesCount() == 1) // FilterTagsSearchResult has only a single match
-        singleMatchesOfASearchTerm.addAll(result.getAllMatches());
     }
 
-    if(results.size() > 0) {
-      FilterTagsSearchResult lastResult = getLastResult();
-      allMatches.addAll(lastResult.getAllMatches());
-
-      if(lastResult.hasExactMatch())
-        exactMatches.add(lastResult.getExactMatch());
-
-      if(overAllSearchTerm.endsWith(",") && lastResult.hasExactMatch())
-        relevantMatches.add(lastResult.getExactMatch());
-      else
-        relevantMatches.addAll(lastResult.getAllMatches());
-
-      if(lastResult.hasExactMatch() == false && lastResult.getAllMatchesCount() == 1) // FilterTagsSearchResult has only a single match
-        singleMatchesOfASearchTerm.addAll(lastResult.getAllMatches());
-    }
+    return allMatches;
   }
 
 
@@ -267,7 +215,7 @@ public class FilterTagsSearchResults {
 
   @Override
   public String toString() {
-    return overAllSearchTerm + " has " + getAllMatches().size() + " results";
+    return overAllSearchTerm + " has " + getRelevantMatchesSorted().size() + " results";
   }
 
 }

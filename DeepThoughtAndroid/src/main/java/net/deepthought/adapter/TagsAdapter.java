@@ -146,10 +146,10 @@ public class TagsAdapter extends BaseAdapter {
       tagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
         public void completed(FilterTagsSearchResults results) {
-          if (results.getAllMatchesSorted() instanceof List)
-            searchResults = (List<Tag>) results.getAllMatchesSorted();
+          if (results.getRelevantMatchesSorted() instanceof List)
+            searchResults = (List<Tag>) results.getRelevantMatchesSorted();
           else
-            searchResults = new ArrayList<>(results.getAllMatchesSorted()); // TODO: use lazy loading list
+            searchResults = new ArrayList<>(results.getRelevantMatchesSorted()); // TODO: use lazy loading list
 
           notifyDataSetChangedThreadSafe();
         }

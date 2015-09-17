@@ -41,7 +41,7 @@ public class FilterTagsSearch extends SearchBase {
 
   @Override
   protected int getResultsCount() {
-    return results.getAllMatches().size();
+    return results.getRelevantMatchesSorted().size();
   }
 
 
@@ -53,8 +53,8 @@ public class FilterTagsSearch extends SearchBase {
     this.results.setHasEmptySearchTerm(hasEmptySearchTerm);
   }
 
-  public void setAllMatchesSorted(Collection<Tag> allMatchesSorted) {
-    this.results.setAllMatchesSorted(allMatchesSorted);
+  public void setRelevantMatchesSorted(Collection<Tag> allMatchesSorted) {
+    this.results.setRelevantMatchesSorted(allMatchesSorted);
   }
 
   public FilterTagsSearchResults getResults() {
