@@ -69,7 +69,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "entries") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Category?
   protected Set<Category> categories = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.EntryTagJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.EntryTagJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },

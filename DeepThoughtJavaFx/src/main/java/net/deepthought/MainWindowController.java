@@ -192,6 +192,8 @@ public class MainWindowController implements Initializable {
 
       @Override
       public void notification(Notification notification) {
+        if(notification.getType() == NotificationType.ApplicationInstantiated)
+          tabTagsControl.applicationInstantiated();
         notifyUserThreadSafe(notification);
       }
     });

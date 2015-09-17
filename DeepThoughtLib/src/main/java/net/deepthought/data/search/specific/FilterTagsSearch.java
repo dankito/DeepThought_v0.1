@@ -11,6 +11,9 @@ import java.util.Collection;
  */
 public class FilterTagsSearch extends SearchBase {
 
+  public final static String EmptySearchTerm = "";
+
+
   protected FilterTagsSearchResults results = null;
 
   protected SearchCompletedListener<FilterTagsSearchResults> completedListener = null;
@@ -44,6 +47,10 @@ public class FilterTagsSearch extends SearchBase {
 
   public boolean addResult(FilterTagsSearchResult result) {
     return this.results.addSearchResult(result);
+  }
+
+  public void setHasEmptySearchTerm(boolean hasEmptySearchTerm) {
+    this.results.setHasEmptySearchTerm(hasEmptySearchTerm);
   }
 
   public void setAllMatchesSorted(Collection<Tag> allMatchesSorted) {

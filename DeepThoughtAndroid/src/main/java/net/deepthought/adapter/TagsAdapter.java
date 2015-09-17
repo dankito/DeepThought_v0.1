@@ -30,14 +30,12 @@ import java.util.List;
  */
 public class TagsAdapter extends BaseAdapter {
 
-  protected final static String EmptySearchTerm = "";
-
 
   protected DeepThought deepThought;
   protected Activity context;
 
-  protected FilterTagsSearch filterTagsSearch = null;
-  protected String lastSearchTerm = EmptySearchTerm;
+  protected FilterTagsSearch tagsSearch = null;
+  protected String lastSearchTerm = FilterTagsSearch.EmptySearchTerm;
 
   protected List<Tag> searchResults = new ArrayList<>();
 
@@ -72,7 +70,7 @@ public class TagsAdapter extends BaseAdapter {
   protected void deepThoughtChanged(DeepThought deepThought) {
     this.deepThought = deepThought;
 
-    searchTags();
+    searchForAllTags();
   }
 
 
@@ -127,8 +125,8 @@ public class TagsAdapter extends BaseAdapter {
   }
 
 
-  public void searchTags() {
-    searchTags(EmptySearchTerm);
+  public void searchForAllTags() {
+    searchTags(FilterTagsSearch.EmptySearchTerm);
   }
 
   public void researchTagsWithLastSearchTerm() {
@@ -141,23 +139,23 @@ public class TagsAdapter extends BaseAdapter {
     if(isTagsFilterApplied())
       filterTags();
     else {
-      if (filterTagsSearch != null && filterTagsSearch.isCompleted() == false)
-        filterTagsSearch.interrupt();
+      if (tagsSearch != null && tagsSearch.isCompleted() == false)
+        tagsSearch.interrupt();
       lastFilterTagsResult = null;
 
-      filterTagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
+      tagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
         @Override
         public void completed(FilterTagsSearchResults results) {
-          if (results.getRelevantMatches() instanceof List)
-            searchResults = (List<Tag>) results.getRelevantMatches();
+          if (results.getAllMatchesSorted() instanceof List)
+            searchResults = (List<Tag>) results.getAllMatchesSorted();
           else
-            searchResults = new ArrayList<>(results.getRelevantMatches()); // TODO: use lazy loading list
+            searchResults = new ArrayList<>(results.getAllMatchesSorted()); // TODO: use lazy loading list
 
           notifyDataSetChangedThreadSafe();
         }
       });
 
-      Application.getSearchEngine().filterTags(filterTagsSearch);
+      Application.getSearchEngine().filterTags(tagsSearch);
     }
   }
 
@@ -180,7 +178,7 @@ public class TagsAdapter extends BaseAdapter {
   }
 
   public void removeSearchTerm() {
-    searchTags();
+    searchForAllTags();
   }
 
   protected void toggleFilterTag(Tag tag) {
@@ -247,7 +245,7 @@ public class TagsAdapter extends BaseAdapter {
   protected void checkIfATagHasChanged(BaseEntity entity, boolean redoSearch) {
     if(entity instanceof Tag) {
       if(redoSearch)
-        searchTags();
+        searchForAllTags();
       else
         notifyDataSetChangedThreadSafe();
     }

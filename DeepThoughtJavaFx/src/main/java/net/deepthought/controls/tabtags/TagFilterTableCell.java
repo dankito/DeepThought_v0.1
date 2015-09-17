@@ -8,6 +8,8 @@ import net.deepthought.data.search.specific.FilterTagsSearchResults;
 import java.util.Collection;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
@@ -19,22 +21,25 @@ import javafx.scene.control.TableRow;
 public class TagFilterTableCell extends TableCell<Tag, Boolean> {
 
   protected Tag tag = null;
-  protected Collection<Tag> tagsToFilterFor = null;
+  protected ObservableSet<Tag> tagsFilter = null;
 
   protected CheckBox checkBox = new CheckBox();
 
-  protected FilterTagsSearchResults filterTagsSearchResults = null;
+  protected FilterTagsSearchResults lastTagsSearchResults = null;
 
+  // TODO: this is not that clever. Better create SelectionChanged listener and react on CheckBox SelectionChanged events. Remove CheckBox SelectionChanged before setting checkBox.setSelected()
   public BooleanProperty isFilteredProperty() {
     return checkBox.selectedProperty();
   }
 
 
   public TagFilterTableCell(TabTagsControl tabTagsControl) {
-    this.tagsToFilterFor = tabTagsControl.tagsToFilterFor;
-    this.filterTagsSearchResults = tabTagsControl.lastTagsSearchResults;
+    this.tagsFilter = tabTagsControl.tagsFilter;
+    tagsFilter.addListener((SetChangeListener<Tag>) (change) -> tagsFilterChanged(change)); // TODO: remove listeners in ICleanableControl implementation
+
+    this.lastTagsSearchResults = tabTagsControl.lastTagsSearchResults;
     tabTagsControl.addFilteredTagsChangedListener(results -> {
-      filterTagsSearchResults = results;
+      lastTagsSearchResults = results;
       setCellBackgroundColor();
     });
 
@@ -47,12 +52,17 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
     setAlignment(Pos.CENTER);
   }
 
+  protected void tagsFilterChanged(SetChangeListener.Change<? extends Tag> change) {
+    Tag tag = getTableRowTag();
+    updateItem(tagsFilter.contains(tag), tag == null);
+  }
+
 
   @Override
   protected void updateItem(Boolean item, boolean empty) {
-    Object tagCheck = ((TableRow<Tag>)getTableRow()).getItem();
+    Tag tagCheck = getTableRowTag();
     if(tagCheck != tag && (tagCheck instanceof Tag || tagCheck == null))
-      tagChanged((Tag) tagCheck);
+      tagChanged(tagCheck);
 
     super.updateItem(item, empty);
 
@@ -60,11 +70,15 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
       setGraphic(null);
     }
     else {
-      checkBox.setSelected(tagsToFilterFor.contains(tag));
+      checkBox.setSelected(tagsFilter.contains(tag));
       setGraphic(checkBox);
     }
 
     setCellBackgroundColor();
+  }
+
+  protected Tag getTableRowTag() {
+    return ((TableRow<Tag>)getTableRow()).getItem();
   }
 
   protected void tagChanged(Tag tag) {
@@ -73,7 +87,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   }
 
   protected void setCellBackgroundColor() {
-    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
+    FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
   }
 
 

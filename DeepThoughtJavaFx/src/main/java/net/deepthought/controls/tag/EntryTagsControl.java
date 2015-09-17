@@ -59,7 +59,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
   protected DeepThought deepThought = null;
 
-  protected ObservableSet<Tag> editedTags = FXCollections.observableSet();
+  protected ObservableSet<Tag> editedTags = FXCollections.observableSet(); // TODO: this has to be made lazy loading as it otherwise loads all Tags
   protected Set<Tag> addedTags = new HashSet<>();
   protected Set<Tag> removedTags = new HashSet<>();
 

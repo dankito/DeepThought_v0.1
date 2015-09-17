@@ -57,16 +57,14 @@ public class FXUtils {
 
   public static void setTagCellBackgroundColor(Tag tag, FilterTagsSearchResults filterTagsSearchResults, Cell cell) {
     if(tag != null && filterTagsSearchResults.getResults().size() > 0) {
-      // TODO: logic is wrong: if exact or relevant match of last search term is already included in result list (e.g. exact match of previous term) then it gets to wrong color
-      if(filterTagsSearchResults.isExactMatchOfLastSearchTerm(tag))
-        cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
-      else if(filterTagsSearchResults.isRelevantMatchOfLastSearchTerm(tag))
-//        cell.setBackground(Constants.FilteredTagsLastSearchTermRelevantMatchBackground);
-        cell.setBackground(Constants.FilteredTagsDefaultBackground);
-      else if(filterTagsSearchResults.isExactMatch(tag) || filterTagsSearchResults.isSingleMatchOfASearchTerm(tag))
+      if(filterTagsSearchResults.isExactOrSingleMatchButNotOfLastResult(tag))
         cell.setBackground(Constants.FilteredTagsExactMatchBackground);
-      else if(filterTagsSearchResults.isRelevantMatch(tag))
+      else if(filterTagsSearchResults.isMatchButNotOfLastResult(tag))
         cell.setBackground(Constants.FilteredTagsRelevantMatchBackground);
+      else if(filterTagsSearchResults.isExactMatchOfLastResult(tag))
+        cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
+      else if(filterTagsSearchResults.isSingleMatchOfLastResult(tag))
+        cell.setBackground(Constants.FilteredTagsLastSearchTermSingleMatchBackground);
       else
         cell.setBackground(Constants.FilteredTagsDefaultBackground);
     }

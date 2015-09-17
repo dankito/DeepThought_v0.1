@@ -2,7 +2,9 @@ package net.deepthought.data.search.specific;
 
 import net.deepthought.data.model.Tag;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ganymed on 27/07/15.
@@ -14,6 +16,8 @@ public class FilterTagsSearchResult {
   protected boolean hasExactMatch;
 
   protected Tag exactMatch;
+
+  protected Tag singleMatch = null;
 
   protected Collection<Tag> allMatches;
 
@@ -54,6 +58,25 @@ public class FilterTagsSearchResult {
 
   public Tag getExactMatch() {
     return exactMatch;
+  }
+
+  public boolean hasSingleMatch() {
+    return getAllMatchesCount() == 1;
+  }
+
+  public Tag getSingleMatch() {
+    if(hasSingleMatch()) {
+      if(singleMatch == null) {
+        if(allMatches instanceof List)
+          singleMatch = ((List<Tag>)allMatches).get(0);
+        else
+          singleMatch = new ArrayList<Tag>(allMatches).get(0);
+      }
+
+      return singleMatch;
+    }
+
+    return null;
   }
 
   public int getAllMatchesCount() {

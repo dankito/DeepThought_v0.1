@@ -216,7 +216,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       public void completed(final FilterTagsSearchResults results) {
         Platform.runLater(() -> {
           lastFilterTagsResults = results;
-          listViewTagsItems.setUnderlyingCollection(results.getRelevantMatches());
+          listViewTagsItems.setUnderlyingCollection(results.getAllMatchesSorted());
 
           if(results.getResults().size() > 0 && results.getLastResult().hasExactMatch())
             lstvwTags.scrollTo(results.getLastResult().getExactMatch());

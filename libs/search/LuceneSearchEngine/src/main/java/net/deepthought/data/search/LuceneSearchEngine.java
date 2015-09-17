@@ -770,9 +770,11 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   @Override
   protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+    search.setHasEmptySearchTerm(true);
+
     if(isIndexReady == false) {
-      if(Application.getDeepThought() != null)
-        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
+//      if(Application.getDeepThought() != null)
+//        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
 
       search.fireSearchCompleted();
       return;
@@ -831,7 +833,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
         return;
 
       String searchTerm = QueryParser.escape(result.getSearchTerm());
-      if(result.hasExactMatch())
+      if(result.hasExactMatch() && result != search.getResults().getLastResult())
         searchForAllQuery.add(new TermQuery(new Term(FieldName.TagName, searchTerm)), BooleanClause.Occur.SHOULD);
       else
         searchForAllQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + searchTerm + "*")), BooleanClause.Occur.SHOULD);

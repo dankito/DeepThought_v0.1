@@ -1,5 +1,8 @@
 package net.deepthought.controls;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,11 +19,18 @@ import javafx.collections.ObservableListBase;
  */
 public class LazyLoadingObservableList<T> extends ObservableListBase<T> implements ObservableList<T> {
 
+  private final static Logger log = LoggerFactory.getLogger(LazyLoadingObservableList.class);
+
+
   protected Collection<T> underlyingCollection = null;
 
 
   public LazyLoadingObservableList() {
     setUnderlyingCollection(new ArrayList<T>());
+  }
+
+  public LazyLoadingObservableList(Collection<T> collection) {
+    setUnderlyingCollection(collection);
   }
 
 
@@ -88,8 +98,12 @@ public class LazyLoadingObservableList<T> extends ObservableListBase<T> implemen
 
     this.underlyingCollection = underlyingCollection;
 
-    nextAdd(0, size());
-    endChange();
+    try {
+      nextAdd(0, size());
+      endChange();
+    } catch(Exception ex) {
+      log.error("Could not set underlying collection", ex);
+    }
   }
 
   @Override
