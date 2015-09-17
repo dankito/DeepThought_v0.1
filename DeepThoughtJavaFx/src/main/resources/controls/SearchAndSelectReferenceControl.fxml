@@ -15,7 +15,7 @@
                   <Insets right="6.0" />
                </HBox.margin>
             </Label>
-            <CustomTextField fx:id="txtfldSearchForReference" HBox.hgrow="ALWAYS" />
+            <CustomTextField fx:id="txtfldSearchForReference" promptText="%search.reference.prompt.text" HBox.hgrow="ALWAYS" />
          </children>
          <VBox.margin>
             <Insets top="6.0" />

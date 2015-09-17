@@ -159,9 +159,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     // replace normal TextField txtfldTagsQuickFilter with a SearchTextField (with a cross to clear selection)
     hboxTagsBar.getChildren().remove(txtfldTagsQuickFilter);
     txtfldTagsQuickFilter = (CustomTextField) TextFields.createClearableTextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldTagsQuickFilter, "search.tags.prompt.text");
     hboxTagsBar.getChildren().add(1, txtfldTagsQuickFilter);
     HBox.setHgrow(txtfldTagsQuickFilter, Priority.ALWAYS);
-    txtfldTagsQuickFilter.setPromptText("Quickly filter Tags");
     txtfldTagsQuickFilter.setMinWidth(60);
     txtfldTagsQuickFilter.setPrefWidth(Region.USE_COMPUTED_SIZE);
     txtfldTagsQuickFilter.textProperty().addListener((observable, oldValue, newValue) -> searchTags());
@@ -175,7 +175,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
 
     btnRemoveSelectedTag.setTextFill(Constants.RemoveEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnRemoveSelectedTag, "delete.selected.tags.tool.tip");
     btnAddTag.setTextFill(Constants.AddEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnAddTag, "add.new.tag.tool.tip");
 
     // TODO: isn't this setting listener twice?
     tblvwTags.selectionModelProperty().addListener(new ChangeListener<TableView.TableViewSelectionModel<Tag>>() {
@@ -205,7 +207,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     ImageView columnFilterGraphic = new ImageView(Constants.FilterIconPath);
     Label columnFilterGraphicLabel = new Label(null, columnFilterGraphic); // wrap Image in a Label so that a Tooltip can be set
     columnFilterGraphicLabel.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    JavaFxLocalization.bindControlToolTip(columnFilterGraphicLabel, "filter.entries.tool.tip");
+    JavaFxLocalization.bindControlToolTip(columnFilterGraphicLabel, "filter.tags.tool.tip");
     clmnTagFilter.setGraphic(columnFilterGraphicLabel);
     clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
       @Override

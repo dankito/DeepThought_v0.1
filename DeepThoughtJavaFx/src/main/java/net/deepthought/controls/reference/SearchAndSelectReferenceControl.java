@@ -11,7 +11,6 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
@@ -146,10 +145,9 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     // replace normal TextField txtfldSearchForPerson with a SearchTextField (with a cross to clear selection)
     paneSearchForReference.getChildren().remove(txtfldSearchForReference);
     txtfldSearchForReference = (CustomTextField) TextFields.createClearableTextField();
-    txtfldSearchForReference.setId("txtfldSearchForReference");
     paneSearchForReference.getChildren().add(1, txtfldSearchForReference);
     HBox.setHgrow(txtfldSearchForReference, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForReference, "search.for.reference");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForReference, "search.reference.prompt.text");
     txtfldSearchForReference.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {

@@ -155,7 +155,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     txtfldFilterTags = TextFields.createClearableTextField();
     pnFilterTags.getChildren().add(0, txtfldFilterTags);
     HBox.setHgrow(txtfldFilterTags, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "find.tags.to.add");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldFilterTags, "search.tags.prompt.text");
 
     lstvwTags.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     lstvwTags.setOnKeyPressed(event -> {

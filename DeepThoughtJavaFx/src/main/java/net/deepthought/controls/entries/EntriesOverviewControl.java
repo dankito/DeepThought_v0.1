@@ -8,7 +8,6 @@ import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
-import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.PersonLabel;
 import net.deepthought.controls.reference.EntryReferenceBaseLabel;
 import net.deepthought.controls.tag.EntryTagsControl;
@@ -206,9 +205,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     // replace normal TextField txtfldEntriesQuickFilter with a SearchTextField (with a cross to clear selection)
     hboxEntriesBar.getChildren().remove(txtfldEntriesQuickFilter);
     txtfldEntriesQuickFilter = (CustomTextField) TextFields.createClearableTextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldEntriesQuickFilter, "search.entries.prompt.text");
     hboxEntriesBar.getChildren().add(1, txtfldEntriesQuickFilter);
     HBox.setHgrow(txtfldEntriesQuickFilter, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldEntriesQuickFilter, "quickly.filter.entries");
     txtfldEntriesQuickFilter.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -221,12 +220,14 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterAbstract);
-    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "quickly.filter.entries.abstract.tool.tip");
+    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterAbstract, "search.entries.abstract.tool.tip");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnEntriesQuickFilterContent);
-    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "quickly.filter.entries.content.tool.tip");
+    JavaFxLocalization.bindControlToolTip(tglbtnEntriesQuickFilterContent, "search.entries.content.tool.tip");
 
     btnRemoveSelectedEntries.setTextFill(Constants.RemoveEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnRemoveSelectedEntries, "delete.selected.entries.tool.tip");
     btnAddEntry.setTextFill(Constants.AddEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnAddEntry, "add.new.entry.tool.tip");
 
     tableViewEntriesItems = new LazyLoadingObservableList<>();
     tblvwEntries.setItems(tableViewEntriesItems);

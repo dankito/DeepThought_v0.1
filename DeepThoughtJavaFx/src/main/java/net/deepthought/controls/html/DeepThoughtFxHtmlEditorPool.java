@@ -17,8 +17,6 @@ public class DeepThoughtFxHtmlEditorPool {
   }
 
 
-  protected static int HtmlEditorsCreated = 0;
-
   protected Queue<DeepThoughtFxHtmlEditor> availableHtmlEditors = new ConcurrentLinkedQueue<>();
 
 
@@ -34,7 +32,6 @@ public class DeepThoughtFxHtmlEditorPool {
       return editor;
     }
 
-    HtmlEditorsCreated++;
     return new DeepThoughtFxHtmlEditor(listener);
   }
 

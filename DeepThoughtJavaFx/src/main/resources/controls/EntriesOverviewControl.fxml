@@ -20,12 +20,12 @@
                     <center>
                         <HBox fx:id="hboxEntriesBar" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                             <children>
-                                <Label text="%quick.filter">
+                                <Label text="%search">
                                     <HBox.margin>
                                         <Insets right="6.0" />
                                     </HBox.margin>
                                 </Label>
-                                <CustomTextField fx:id="txtfldEntriesQuickFilter" promptText="Quickly filter Entries" HBox.hgrow="ALWAYS" />
+                                <CustomTextField fx:id="txtfldEntriesQuickFilter" promptText="%search.entries.prompt.text" HBox.hgrow="ALWAYS" />
                                 <ToggleButton fx:id="tglbtnEntriesQuickFilterAbstract" mnemonicParsing="false" onAction="#handleToggleButtonEntriesQuickFilterOptionsAction" prefWidth="100.0" selected="true" text="%entry.abstract" visible="false">
                                     <HBox.margin>
                                         <Insets left="6.0" right="6.0" />

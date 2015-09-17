@@ -142,7 +142,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     txtfldSearchForPerson.setId("txtfldSearchForPerson");
     hboxSearchForPerson.getChildren().add(1, txtfldSearchForPerson);
     HBox.setHgrow(txtfldSearchForPerson, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForPerson, "search.for.person");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForPerson, "search.person.prompt.text");
     txtfldSearchForPerson.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
