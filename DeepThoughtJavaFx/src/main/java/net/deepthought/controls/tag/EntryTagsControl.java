@@ -340,34 +340,25 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      checkIfTagsHaveBeenUpdated(collectionHolder, addedEntity);
+
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      checkIfTagsHaveBeenUpdated(collectionHolder, updatedEntity);
-
-//      if(updatedEntity instanceof Tag && entry != null && entry.getTags().contains((Tag)updatedEntity))
       if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity))
         showEntryTags();
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      checkIfTagsHaveBeenUpdated(collectionHolder, removedEntity);
+      if(collectionHolder instanceof DeepThought && removedEntity instanceof Tag) {
+        Tag tag = (Tag)removedEntity;
+
+        if(editedTags.contains(tag))
+          removeEntityFromEntry(tag);
+      }
     }
   };
-
-  protected void checkIfTagsHaveBeenUpdated(BaseEntity collectionHolder, BaseEntity entity) {
-    if(collectionHolder instanceof DeepThought && entity instanceof Tag) {
-      Tag tag = (Tag)entity;
-
-      DeepThought deepThought = (DeepThought)collectionHolder;
-
-      if(editedTags.contains(tag)) // TODO: is this correct? as also entityAddedToCollection() calls this method
-        removeEntityFromEntry(tag);
-    }
-  }
 
 
   protected void fireTagAddedEvent(Tag tag) {
