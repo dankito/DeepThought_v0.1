@@ -8,9 +8,10 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
-import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResult;
+import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 
 import org.slf4j.Logger;
@@ -62,9 +63,9 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+  protected void filterTags(TagsSearch search, String[] tagNamesToFilterFor) {
     IEntityManager entityManager = Application.getEntityManager();
-    List<net.deepthought.data.search.specific.FilterTagsSearchResult> results = new ArrayList<>();
+    List<TagsSearchResult> results = new ArrayList<>();
 
     String queryPrefix = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.TagTableName + " WHERE " +
         TableConfig.TagDeepThoughtJoinColumnName + " = " + deepThought.getId() + " AND (" + TableConfig.TagNameColumnName + " LIKE '%";
@@ -80,7 +81,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
         if(search.isInterrupted())
           return;
 
-        log.debug("Filtering Tags for " + search.getSearchTerm() + " with query: " + query);
+        log.debug("Searching Tags for " + search.getSearchTerm() + " with query: " + query);
         List<String[]> queryResults = entityManager.doNativeQuery(query);
         List<Long> ids = new ArrayList<>(queryResults.size());
         for(String[] result : queryResults) {
@@ -90,7 +91,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
         if(search.isInterrupted())
           return;
 
-        search.addResult(new FilterTagsSearchResult(tagNamesToFilterFor[i], new LazyLoadingList<Tag>(Tag.class, ids)));
+        search.addResult(new TagsSearchResult(tagNamesToFilterFor[i], new LazyLoadingList<Tag>(Tag.class, ids)));
       } catch(Exception ex) {
         log.error("Could not query for Entries without Tags", ex);
       }
@@ -100,12 +101,12 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search, String[] termsToFilterFor) {
+  protected void filterEntries(EntriesSearch search, String[] termsToFilterFor) {
     search.fireSearchCompleted(); // TODO
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
     IEntityManager entityManager = Application.getEntityManager();
 
     String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (" +
@@ -127,7 +128,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
   // there's no way to complete this search with SQL -> do it in memory (very slow for a large amount of ReferenceBases) or with Lucene
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
 //    IEntityManager entityManager = Application.getEntityManager();
 //
 //    String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (";

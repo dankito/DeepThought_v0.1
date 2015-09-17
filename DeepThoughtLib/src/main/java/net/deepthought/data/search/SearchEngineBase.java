@@ -6,9 +6,9 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
-import net.deepthought.data.search.specific.FilterEntriesSearch;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
-import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
+import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Notification;
@@ -36,7 +36,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   @Override
-  public void filterTags(final FilterTagsSearch search) {
+  public void searchTags(final TagsSearch search) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm()))
       filterTagsForEmptySearchTerm(search);
     else {
@@ -61,14 +61,14 @@ public abstract class SearchEngineBase implements ISearchEngine {
     return tagNamesToFilterFor;
   }
 
-  protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+  protected void filterTagsForEmptySearchTerm(TagsSearch search) {
     search.setRelevantMatchesSorted(new CombinedLazyLoadingList<Tag>(Application.getDeepThought().getSortedTags()));
     search.setHasEmptySearchTerm(true);
 
     search.fireSearchCompleted();
   }
 
-  protected abstract void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor);
+  protected abstract void filterTags(TagsSearch search, String[] tagNamesToFilterFor);
 
   @Override
   public void findAllEntriesHavingTheseTags(final Collection<Tag> tagsToFilterFor, final SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener) {
@@ -89,7 +89,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
   protected abstract void findAllEntriesHavingTheseTagsAsync(Collection<Tag> tagsToFilterFor, String[] tagNamesToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
   @Override
-  public void filterEntries(final FilterEntriesSearch search) {
+  public void searchEntries(final EntriesSearch search) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
       search.setResults(Application.getDeepThought().getEntries());
       search.fireSearchCompleted();
@@ -107,11 +107,11 @@ public abstract class SearchEngineBase implements ISearchEngine {
     });
   }
 
-  protected abstract void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor);
+  protected abstract void filterEntries(EntriesSearch search, String[] termsToFilterFor);
 
 
   @Override
-  public void filterReferenceBases(final FilterReferenceBasesSearch search) {
+  public void searchReferenceBases(final ReferenceBasesSearch search) {
     // no, don't do this, as they are might not sorted (e.g. when a ReferenceBase gets added during runtime)
 //    if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) { // no filter term specified -> return all ReferenceBases
 //      setReferenceBasesEmptyFilterSearchResult(search);
@@ -136,7 +136,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
     }
   }
 
-  protected void filterOnlyOneTypeOfReferenceBase(FilterReferenceBasesSearch search, String lowerCaseFilter) {
+  protected void filterOnlyOneTypeOfReferenceBase(ReferenceBasesSearch search, String lowerCaseFilter) {
     if(search.getType() == ReferenceBaseType.SeriesTitle)
       filterEachReferenceBaseWithSeparateFilter(search, lowerCaseFilter, null, null);
     else if(search.getType() == ReferenceBaseType.Reference)
@@ -145,7 +145,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
       filterEachReferenceBaseWithSeparateFilter(search, null, null, lowerCaseFilter);
   }
 
-  protected void filterEachReferenceBaseWithSeparateFilter(final FilterReferenceBasesSearch search, String lowerCaseFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(final ReferenceBasesSearch search, String lowerCaseFilter) {
     String seriesTitleFilter = null, referenceFilter = null, referenceSubDivisionFilter = null;
     String[] parts = lowerCaseFilter.split(",");
 
@@ -174,12 +174,12 @@ public abstract class SearchEngineBase implements ISearchEngine {
     });
   }
 
-  protected abstract void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter);
+  protected abstract void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter);
 
-  protected abstract void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String FilterReferenceBasesreferenceSubDivisionFilter);
+  protected abstract void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String FilterReferenceBasesreferenceSubDivisionFilter);
 
   @Override
-  public void filterPersons(final Search<Person> search) {
+  public void searchPersons(final Search<Person> search) {
     // Persons on DeepThought are might not sorted (e.g. if a new Person gets added during runtime)
 //    if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
 //      search.setResults(Application.getDeepThought().getPersons());

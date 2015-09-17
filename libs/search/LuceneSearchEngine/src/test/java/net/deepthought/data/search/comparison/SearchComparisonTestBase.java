@@ -13,9 +13,9 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResult;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResult;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
@@ -146,11 +146,11 @@ public abstract class SearchComparisonTestBase {
     final List<Tag> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch("Zeit", new SearchCompletedListener<FilterTagsSearchResults>() {
+    searchEngine.searchTags(new TagsSearch("Zeit", new SearchCompletedListener<TagsSearchResults>() {
       @Override
-      public void completed(FilterTagsSearchResults results) {
+      public void completed(TagsSearchResults results) {
         searchResults.addAll(results.getRelevantMatchesSorted());
-        logOperationProcessTime("filterTags");
+        logOperationProcessTime("searchTags");
         countDownLatch.countDown();
       }
     }));
@@ -162,13 +162,13 @@ public abstract class SearchComparisonTestBase {
   @Test
   public void filterForMultipleTags() {
     String filter = "zeit,Geschich,hom";
-    final FilterTagsSearchResults searchResults = new FilterTagsSearchResults(filter);
+    final TagsSearchResults searchResults = new TagsSearchResults(filter);
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.filterTags(new FilterTagsSearch(filter, new SearchCompletedListener<FilterTagsSearchResults>() { // TODO: use tags available in test database
+    searchEngine.searchTags(new TagsSearch(filter, new SearchCompletedListener<TagsSearchResults>() { // TODO: use tags available in test database
       @Override
-      public void completed(FilterTagsSearchResults results) {
-        for (FilterTagsSearchResult result : results.getResults())
+      public void completed(TagsSearchResults results) {
+        for (TagsSearchResult result : results.getResults())
           searchResults.addSearchResult(result);
         logOperationProcessTime("filterForMultipleTags");
         countDownLatch.countDown();
@@ -179,17 +179,17 @@ public abstract class SearchComparisonTestBase {
 
     Assert.assertEquals(3, searchResults.getResults().size());
 
-    FilterTagsSearchResult firstResult = searchResults.getResults().get(0);
+    TagsSearchResult firstResult = searchResults.getResults().get(0);
     Assert.assertTrue(firstResult.hasExactMatch());
     Assert.assertEquals(857, firstResult.getAllMatchesCount());
     Assert.assertEquals("zeit", firstResult.getSearchTerm());
 
-    FilterTagsSearchResult secondResult = searchResults.getResults().get(1);
+    TagsSearchResult secondResult = searchResults.getResults().get(1);
     Assert.assertFalse(secondResult.hasExactMatch());
     Assert.assertEquals(140, secondResult.getAllMatchesCount());
     Assert.assertEquals("geschich", secondResult.getSearchTerm());
 
-    FilterTagsSearchResult thirdResult = searchResults.getResults().get(2);
+    TagsSearchResult thirdResult = searchResults.getResults().get(2);
     Assert.assertFalse(thirdResult.hasExactMatch());
     Assert.assertEquals(133, thirdResult.getAllMatchesCount());
     Assert.assertEquals("hom", thirdResult.getSearchTerm());
@@ -258,10 +258,10 @@ public abstract class SearchComparisonTestBase {
     final CountDownLatch countDownLatch = new CountDownLatch(1);
     final List<Person> searchResults = new ArrayList<>();
 
-    searchEngine.filterPersons(new Search<Person>("Dürer", new SearchCompletedListener<Collection<Person>>() {
+    searchEngine.searchPersons(new Search<Person>("Dürer", new SearchCompletedListener<Collection<Person>>() {
       @Override
       public void completed(Collection<Person> results) {
-        logOperationProcessTime("filterPersons");
+        logOperationProcessTime("searchPersons");
         searchResults.addAll(results);
         countDownLatch.countDown();
       }
@@ -277,7 +277,7 @@ public abstract class SearchComparisonTestBase {
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("sz", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>("sz", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterEachReferenceBaseWithSeparateFilter for sz");
@@ -305,7 +305,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("wiki,", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>("wiki,", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterSeriesTitlesOnly_StartsWithTerm for wiki");
@@ -324,7 +324,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("iki,", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>("iki,", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterSeriesTitlesOnly_ContainsTerm for iki");
@@ -343,7 +343,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>(",zeit,", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>(",zeit,", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterReferencesOnly for zeit");
@@ -362,7 +362,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>(",,nsa", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>(",,nsa", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterReferenceSubDivisionsOnly for nsa");
@@ -381,7 +381,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("wiki,stein,", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>("wiki,stein,", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterReferenceBasesForSeriesTitleAndReference for wiki,zeit,");
@@ -400,7 +400,7 @@ public abstract class SearchComparisonTestBase {
 //    final List<ReferenceBase> searchResults = new ArrayList<>();
 //    final CountDownLatch countDownLatch = new CountDownLatch(1);
 //
-//    searchEngine.filterReferenceBases(new Search<ReferenceBase>("sz,06,pharma", new SearchCompletedListener<ReferenceBase>() {
+//    searchEngine.searchReferenceBases(new Search<ReferenceBase>("sz,06,pharma", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
 //        logOperationProcessTime("filterReferenceBasesForSeriesTitleReferenceAndReferenceSubDivision for wiki,zeit,sz,06,pharma");

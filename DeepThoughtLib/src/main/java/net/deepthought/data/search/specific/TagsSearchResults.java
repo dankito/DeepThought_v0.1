@@ -10,16 +10,16 @@ import java.util.List;
 /**
  * Created by ganymed on 27/07/15.
  */
-public class FilterTagsSearchResults {
+public class TagsSearchResults {
 
-  public final static FilterTagsSearchResults EmptySearchResults = new FilterTagsSearchResults(FilterTagsSearch.EmptySearchTerm, new ArrayList<Tag>());
+  public final static TagsSearchResults EmptySearchResults = new TagsSearchResults(TagsSearch.EmptySearchTerm, new ArrayList<Tag>());
 
 
   protected String overAllSearchTerm;
 
   protected boolean hasEmptySearchTerm = false;
 
-  protected List<FilterTagsSearchResult> results = new ArrayList<>();
+  protected List<TagsSearchResult> results = new ArrayList<>();
 
   protected Collection<Tag> allMatches = null;
 
@@ -32,22 +32,22 @@ public class FilterTagsSearchResults {
   protected Collection<Tag> matchesButOfLastResult = null;
 
 
-  public FilterTagsSearchResults() {
+  public TagsSearchResults() {
 
   }
 
-  public FilterTagsSearchResults(String overAllSearchTerm) {
+  public TagsSearchResults(String overAllSearchTerm) {
     this();
     this.overAllSearchTerm = overAllSearchTerm;
   }
 
-  public FilterTagsSearchResults(String overAllSearchTerm, Collection<Tag> relevantMatchesSorted) {
+  public TagsSearchResults(String overAllSearchTerm, Collection<Tag> relevantMatchesSorted) {
     this(overAllSearchTerm);
     setRelevantMatchesSorted(relevantMatchesSorted);
   }
 
 
-  public boolean addSearchResult(FilterTagsSearchResult result) {
+  public boolean addSearchResult(TagsSearchResult result) {
     allMatches = null;
     return results.add(result);
   }
@@ -68,7 +68,7 @@ public class FilterTagsSearchResults {
     this.relevantMatchesSorted = relevantMatchesSorted;
 
     if(results.size() == 0)
-      addSearchResult(new FilterTagsSearchResult(getOverAllSearchTerm(), relevantMatchesSorted, null));
+      addSearchResult(new TagsSearchResult(getOverAllSearchTerm(), relevantMatchesSorted, null));
   }
 
 
@@ -91,7 +91,7 @@ public class FilterTagsSearchResults {
   protected Collection<Tag> determineExactMatches() {
     Collection<Tag> exactMatches = new ArrayList<>();
 
-    for(FilterTagsSearchResult result : getResults()) {
+    for(TagsSearchResult result : getResults()) {
       if(result.hasExactMatch())
         exactMatches.add(result.getExactMatch());
     }
@@ -124,7 +124,7 @@ public class FilterTagsSearchResults {
     if(hasLastResult() == false)
       return false;
 
-    FilterTagsSearchResult lastResult = getLastResult();
+    TagsSearchResult lastResult = getLastResult();
     return lastResult.hasExactMatch() && lastResult.getExactMatch().equals(tag);
   }
 
@@ -134,7 +134,7 @@ public class FilterTagsSearchResults {
     if(hasLastResult() == false)
       return false;
 
-    FilterTagsSearchResult lastResult = getLastResult();
+    TagsSearchResult lastResult = getLastResult();
     return lastResult.hasSingleMatch() && lastResult.getSingleMatch().equals(tag);
   }
 
@@ -158,7 +158,7 @@ public class FilterTagsSearchResults {
     List<Tag> nonLastResultExactOrSingleMatches = new ArrayList<>();
 
     for(int i = 0; i < results.size() - 1; i++) {
-      FilterTagsSearchResult result = results.get(i);
+      TagsSearchResult result = results.get(i);
       if(result.hasExactMatch())
         nonLastResultExactOrSingleMatches.add(result.getExactMatch());
       else if(result.hasSingleMatch())
@@ -178,7 +178,7 @@ public class FilterTagsSearchResults {
     List<Tag> nonLastResultNotExactOrSingleMatches = new ArrayList<>();
 
     for(int i = 0; i < results.size() - 1; i++) {
-      FilterTagsSearchResult result = results.get(i);
+      TagsSearchResult result = results.get(i);
       if(result.hasExactMatch() == false && result.hasSingleMatch() == false)
         nonLastResultNotExactOrSingleMatches.addAll(result.getAllMatches());
     }
@@ -190,7 +190,7 @@ public class FilterTagsSearchResults {
   protected Collection<Tag> determineAllMatches() {
     CombinedLazyLoadingList<Tag> allMatches = new CombinedLazyLoadingList<>();
 
-    for(FilterTagsSearchResult result : getResults()) {
+    for(TagsSearchResult result : getResults()) {
       allMatches.addAll(result.getAllMatches());
     }
 
@@ -202,12 +202,12 @@ public class FilterTagsSearchResults {
     return results.size() > 0; // no result (and therefore not last result) at all
   }
 
-  public FilterTagsSearchResult getLastResult() {
+  public TagsSearchResult getLastResult() {
     return results.get(results.size() - 1);
   }
 
 
-  public List<FilterTagsSearchResult> getResults() {
+  public List<TagsSearchResult> getResults() {
     return results;
   }
 

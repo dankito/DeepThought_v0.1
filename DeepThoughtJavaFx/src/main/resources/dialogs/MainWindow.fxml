@@ -44,14 +44,14 @@
                            <children>
                               <AnchorPane maxHeight="40.0" prefHeight="40.0">
                                  <children>
-                                    <HBox fx:id="paneCategoriesQuickFilter" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="98.0" AnchorPane.topAnchor="0.0">
+                                    <HBox fx:id="paneSearchCategories" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="98.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <Label text="%quick.filter">
+                                          <Label text="%search">
                                              <HBox.margin>
                                                 <Insets right="6.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <CustomTextField fx:id="txtfldCategoriesQuickFilter" disable="true" promptText="Quickly filter Categories" HBox.hgrow="ALWAYS">
+                                          <CustomTextField fx:id="txtfldSearchCategories" disable="true" promptText="%search.categories.prompt.text" HBox.hgrow="ALWAYS">
                                     </CustomTextField>
                                        </children>
                                     </HBox>

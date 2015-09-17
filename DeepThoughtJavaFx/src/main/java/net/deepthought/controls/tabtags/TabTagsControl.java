@@ -17,8 +17,8 @@ import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
@@ -78,10 +78,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   protected LazyLoadingObservableList<Tag> tableViewTagsItems = null;
   protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
 
-  protected String lastSearchTerm = FilterTagsSearch.EmptySearchTerm;
+  protected String lastSearchTerm = TagsSearch.EmptySearchTerm;
 
-  protected FilterTagsSearch tagsSearch = null;
-  protected FilterTagsSearchResults lastTagsSearchResults = FilterTagsSearchResults.EmptySearchResults;
+  protected TagsSearch tagsSearch = null;
+  protected TagsSearchResults lastTagsSearchResults = TagsSearchResults.EmptySearchResults;
   protected Collection<Tag> allTagsSearchResult = null;
   protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
   protected List<IDisplayedTagsChangedListener> displayedTagsChangedListeners = new ArrayList<>();
@@ -283,7 +283,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
 
   public void searchForAllTags() {
-    searchTags(FilterTagsSearch.EmptySearchTerm);
+    searchTags(TagsSearch.EmptySearchTerm);
   }
 
   public void researchTagsWithLastSearchTerm() {
@@ -310,19 +310,19 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
         setTableViewTagsItems(allTagsSearchResult);
       }
       else {
-        tagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
+        tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
           @Override
-          public void completed(FilterTagsSearchResults results) {
+          public void completed(TagsSearchResults results) {
             Platform.runLater(() -> searchTagsCompleted(results));
           }
         });
 
-        Application.getSearchEngine().filterTags(tagsSearch);
+        Application.getSearchEngine().searchTags(tagsSearch);
       }
     }
   }
 
-  protected void searchTagsCompleted(FilterTagsSearchResults results) {
+  protected void searchTagsCompleted(TagsSearchResults results) {
     lastTagsSearchResults = results;
 
     if(results.hasEmptySearchTerm()) {
@@ -333,7 +333,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     else
       setTableViewTagsItems(results);
 
-    callFilteredTagsChangedListeners(results);
+    callDisplayedTagsChangedListeners(results);
   }
 
   protected boolean isTagsFilterApplied() {
@@ -420,7 +420,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       setTableViewTagsItems(lastTagsSearchResults);
   }
 
-  protected void setTableViewTagsItems(FilterTagsSearchResults results) {
+  protected void setTableViewTagsItems(TagsSearchResults results) {
     setTableViewTagsItems(results.getRelevantMatchesSorted());
     selectTagAccordingToSearchResult(results);
   }
@@ -431,11 +431,11 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     tblvwTags.setItems(tableViewTagsItems);
   }
 
-  protected void selectTagAccordingToSearchResult(FilterTagsSearchResults results) {
+  protected void selectTagAccordingToSearchResult(TagsSearchResults results) {
     selectTagAccordingToSearchResult(results, deepThought.getSettings().getLastViewedTag());
   }
 
-  protected void selectTagAccordingToSearchResult(FilterTagsSearchResults results, Tag selectedTag) {
+  protected void selectTagAccordingToSearchResult(TagsSearchResults results, Tag selectedTag) {
     if(results.hasEmptySearchTerm())
       setSelectedTagToAllEntriesSystemTag();
     else if(results.getLastResult().hasExactMatch())
@@ -476,27 +476,17 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     tableViewTagsItems.remove(tag);
   }
 
-  protected void sortTags() {
-    log.debug("Going to sort sortedFilteredTags containing {} items", tableViewTagsItems.size());
-
-    try {
-      FXCollections.sort(tableViewTagsItems, tagComparator);
-    } catch(Exception ex) {
-      log.error("Could not sort Tags", ex);
-    }
-  }
-
-  public boolean addFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
+  public boolean addDisplayedTagsChangedListener(IDisplayedTagsChangedListener listener) {
     return displayedTagsChangedListeners.add(listener);
   }
 
-  public boolean removeFilteredTagsChangedListener(IDisplayedTagsChangedListener listener) {
+  public boolean removeDisplayedTagsChangedListener(IDisplayedTagsChangedListener listener) {
     return displayedTagsChangedListeners.remove(listener);
   }
 
-  protected void callFilteredTagsChangedListeners(FilterTagsSearchResults results) {
+  protected void callDisplayedTagsChangedListeners(TagsSearchResults results) {
     for(IDisplayedTagsChangedListener listener : displayedTagsChangedListeners)
-      listener.filteredTagsChanged(results);
+      listener.displayedTagsChanged(results);
   }
 
 

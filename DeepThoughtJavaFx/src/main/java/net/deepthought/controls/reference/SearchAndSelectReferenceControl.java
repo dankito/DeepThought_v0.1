@@ -13,7 +13,7 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
@@ -59,7 +59,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
 
   protected LazyLoadingObservableList<ReferenceBase> listViewReferenceBasesItems = null;
 
-  protected FilterReferenceBasesSearch filterReferenceBasesSearch = null;
+  protected ReferenceBasesSearch lastReferenceBasesSearch = null;
 
   protected Collection<EventHandler<FieldChangedEvent>> fieldChangedEvents = new HashSet<>();
 
@@ -120,7 +120,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
 
     selectedReferenceHolder = null;
 
-    filterReferenceBasesSearch = null;
+    lastReferenceBasesSearch = null;
 
     for(ReferenceBaseListCell cell : referenceBaseListCells)
       cell.cleanUpControl();
@@ -151,7 +151,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     txtfldSearchForReference.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        filterReferenceBases();
+        searchReferenceBases();
       }
     });
     txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
@@ -195,18 +195,18 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
   }
 
 
-  protected void filterReferenceBases() {
-    filterReferenceBases(txtfldSearchForReference.getText());
+  protected void searchReferenceBases() {
+    searchReferenceBases(txtfldSearchForReference.getText());
   }
 
-  protected void filterReferenceBases(String filter) {
-    if(filterReferenceBasesSearch != null)
-      filterReferenceBasesSearch.interrupt();
+  protected void searchReferenceBases(String searchTerm) {
+    if(lastReferenceBasesSearch != null)
+      lastReferenceBasesSearch.interrupt();
 
-    filterReferenceBasesSearch = new FilterReferenceBasesSearch(filter, type, (results) -> {
+    lastReferenceBasesSearch = new ReferenceBasesSearch(searchTerm, type, (results) -> {
       listViewReferenceBasesItems.setUnderlyingCollection(results);
     });
-    Application.getSearchEngine().filterReferenceBases(filterReferenceBasesSearch);
+    Application.getSearchEngine().searchReferenceBases(lastReferenceBasesSearch);
   }
 
   protected void handleTextFieldSearchForReferenceAction() {
@@ -246,7 +246,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
   }
 
   protected void resetListViewReferenceBasesItems(DeepThought deepThought) {
-    filterReferenceBases("");
+    searchReferenceBases("");
   }
 
 

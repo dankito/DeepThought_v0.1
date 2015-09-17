@@ -3,9 +3,10 @@ package net.deepthought.data.search;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
-import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.data.search.specific.TagsSearch;
 
 import java.util.Collection;
 
@@ -16,16 +17,16 @@ public interface ISearchEngine {
 
   public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener);
 
-  public void filterTags(FilterTagsSearch search);
+  public void searchTags(TagsSearch search);
 
   public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
   public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, String searchTerm, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
-  public void filterEntries(net.deepthought.data.search.specific.FilterEntriesSearch search);
+  public void searchEntries(EntriesSearch search);
 
-  public void filterReferenceBases(FilterReferenceBasesSearch search);
+  public void searchReferenceBases(ReferenceBasesSearch search);
 
-  public void filterPersons(Search<Person> search);
+  public void searchPersons(Search<Person> search);
 
 
   public void close();

@@ -3,9 +3,7 @@ package net.deepthought.controls.tabtags;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.ui.SystemTag;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
-
-import java.util.Collection;
+import net.deepthought.data.search.specific.TagsSearchResults;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableSet;
@@ -25,7 +23,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
 
   protected CheckBox checkBox = new CheckBox();
 
-  protected FilterTagsSearchResults lastTagsSearchResults = null;
+  protected TagsSearchResults lastTagsSearchResults = null;
 
   // TODO: this is not that clever. Better create SelectionChanged listener and react on CheckBox SelectionChanged events. Remove CheckBox SelectionChanged before setting checkBox.setSelected()
   public BooleanProperty isFilteredProperty() {
@@ -38,7 +36,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
     tagsFilter.addListener((SetChangeListener<Tag>) (change) -> tagsFilterChanged(change)); // TODO: remove listeners in ICleanableControl implementation
 
     this.lastTagsSearchResults = tabTagsControl.lastTagsSearchResults;
-    tabTagsControl.addFilteredTagsChangedListener(results -> {
+    tabTagsControl.addDisplayedTagsChangedListener(results -> {
       lastTagsSearchResults = results;
       setCellBackgroundColor();
     });

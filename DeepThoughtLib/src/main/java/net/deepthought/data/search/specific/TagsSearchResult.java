@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by ganymed on 27/07/15.
  */
-public class FilterTagsSearchResult {
+public class TagsSearchResult {
 
   protected String searchTerm;
 
@@ -22,14 +22,14 @@ public class FilterTagsSearchResult {
   protected Collection<Tag> allMatches;
 
 
-  public FilterTagsSearchResult(String searchTerm, Collection<Tag> allMatches) {
+  public TagsSearchResult(String searchTerm, Collection<Tag> allMatches) {
     this.searchTerm = searchTerm;
     this.allMatches = allMatches;
 
     findExactMatch(searchTerm, allMatches);
   }
 
-  public FilterTagsSearchResult(String searchTerm, Collection<Tag> allMatches, Tag exactMatch) {
+  public TagsSearchResult(String searchTerm, Collection<Tag> allMatches, Tag exactMatch) {
     this.searchTerm = searchTerm;
     this.allMatches = allMatches;
     this.hasExactMatch = exactMatch != null;

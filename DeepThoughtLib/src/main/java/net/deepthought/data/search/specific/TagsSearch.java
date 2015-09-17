@@ -9,22 +9,22 @@ import java.util.Collection;
 /**
  * Created by ganymed on 27/07/15.
  */
-public class FilterTagsSearch extends SearchBase {
+public class TagsSearch extends SearchBase {
 
   public final static String EmptySearchTerm = "";
 
 
-  protected FilterTagsSearchResults results = null;
+  protected TagsSearchResults results = null;
 
-  protected SearchCompletedListener<FilterTagsSearchResults> completedListener = null;
+  protected SearchCompletedListener<TagsSearchResults> completedListener = null;
 
 
-  public FilterTagsSearch(String searchTerm) {
+  public TagsSearch(String searchTerm) {
     super(searchTerm);
-    results = new FilterTagsSearchResults(searchTerm);
+    results = new TagsSearchResults(searchTerm);
   }
 
-  public FilterTagsSearch(String searchTerm, SearchCompletedListener<FilterTagsSearchResults> completedListener) {
+  public TagsSearch(String searchTerm, SearchCompletedListener<TagsSearchResults> completedListener) {
     this(searchTerm);
     this.completedListener = completedListener;
   }
@@ -41,7 +41,7 @@ public class FilterTagsSearch extends SearchBase {
   }
 
 
-  public boolean addResult(FilterTagsSearchResult result) {
+  public boolean addResult(TagsSearchResult result) {
     return this.results.addSearchResult(result);
   }
 
@@ -53,7 +53,7 @@ public class FilterTagsSearch extends SearchBase {
     this.results.setRelevantMatchesSorted(allMatchesSorted);
   }
 
-  public FilterTagsSearchResults getResults() {
+  public TagsSearchResults getResults() {
     return results;
   }
 }

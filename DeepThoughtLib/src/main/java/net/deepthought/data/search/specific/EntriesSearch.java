@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * Created by ganymed on 12/04/15.
  */
-public class FilterEntriesSearch extends Search<Entry> {
+public class EntriesSearch extends Search<Entry> {
 
   protected boolean filterAbstract;
 
@@ -24,27 +24,27 @@ public class FilterEntriesSearch extends Search<Entry> {
   protected boolean filterOnlyEntriesWithoutTags = false;
 
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract) {
+  public EntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract) {
     super(searchTerm);
 
     this.filterContent = filterContent;
     this.filterAbstract = filterAbstract;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, SearchCompletedListener<Collection<Entry>> completedListener) {
+  public EntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, SearchCompletedListener<Collection<Entry>> completedListener) {
     super(searchTerm, completedListener);
 
     this.filterContent = filterContent;
     this.filterAbstract = filterAbstract;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, boolean filterOnlyEntriesWithoutTags, SearchCompletedListener<Collection<Entry>> completedListener) {
+  public EntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, boolean filterOnlyEntriesWithoutTags, SearchCompletedListener<Collection<Entry>> completedListener) {
     this(searchTerm, filterContent, filterAbstract, completedListener);
 
     this.filterOnlyEntriesWithoutTags = filterOnlyEntriesWithoutTags;
   }
 
-  public FilterEntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Tag> entriesMustHaveTheseTags, SearchCompletedListener<Collection<Entry>> completedListener) {
+  public EntriesSearch(String searchTerm, boolean filterContent, boolean filterAbstract, Collection<Tag> entriesMustHaveTheseTags, SearchCompletedListener<Collection<Entry>> completedListener) {
     this(searchTerm, filterContent, filterAbstract, completedListener);
 
     this.entriesMustHaveTheseTags = entriesMustHaveTheseTags;

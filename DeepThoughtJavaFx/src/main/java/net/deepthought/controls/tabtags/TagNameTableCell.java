@@ -7,7 +7,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.Alerts;
 
 import java.util.Collection;
@@ -26,13 +26,13 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
   protected Tag tag = null;
 
-  protected FilterTagsSearchResults filterTagsSearchResults = null;
+  protected TagsSearchResults lastTagsSearchResults = null;
 
 
   public TagNameTableCell(TabTagsControl tabTagsControl) {
-    this.filterTagsSearchResults = tabTagsControl.lastTagsSearchResults;
-    tabTagsControl.addFilteredTagsChangedListener(results -> {
-      filterTagsSearchResults = results;
+    this.lastTagsSearchResults = tabTagsControl.lastTagsSearchResults;
+    tabTagsControl.addDisplayedTagsChangedListener(results -> {
+      lastTagsSearchResults = results;
       setCellBackgroundColor();
     });
 
@@ -131,7 +131,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   }
 
   protected void setCellBackgroundColor() {
-    FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, this);
+    FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
   }
 
   protected void deleteTag(Tag tag) {

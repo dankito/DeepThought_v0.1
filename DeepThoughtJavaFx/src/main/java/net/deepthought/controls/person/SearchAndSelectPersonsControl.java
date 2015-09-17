@@ -54,7 +54,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
   protected LazyLoadingObservableList<Person> listViewPersonsItems;
 
-  protected Search<Person> filterPersonsSearch = null;
+  protected Search<Person> lastPersonsSearch = null;
 
   protected List<PersonListCell> personListCells = new ArrayList<>();
 
@@ -146,7 +146,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     txtfldSearchForPerson.textProperty().addListener(new ChangeListener<String>() {
       @Override
       public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        filterPersons();
+        searchPersons();
       }
     });
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchPersonsAction());
@@ -205,14 +205,14 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   }
 
 
-  protected void filterPersons() {
-    if(filterPersonsSearch != null && filterPersonsSearch.isCompleted() == false)
-      filterPersonsSearch.interrupt();
+  protected void searchPersons() {
+    if(lastPersonsSearch != null && lastPersonsSearch.isCompleted() == false)
+      lastPersonsSearch.interrupt();
 
-    filterPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
+    lastPersonsSearch = new Search<>(txtfldSearchForPerson.getText(), (results) -> {
       listViewPersonsItems.setUnderlyingCollection(results);
     });
-    Application.getSearchEngine().filterPersons(filterPersonsSearch);
+    Application.getSearchEngine().searchPersons(lastPersonsSearch);
   }
 
 
@@ -263,7 +263,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
   };
 
   protected void resetListViewAllPersonsItems() {
-    filterPersons();
+    searchPersons();
   }
 
 

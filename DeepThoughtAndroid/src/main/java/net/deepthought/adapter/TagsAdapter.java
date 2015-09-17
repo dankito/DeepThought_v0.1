@@ -15,8 +15,8 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
@@ -34,8 +34,8 @@ public class TagsAdapter extends BaseAdapter {
   protected DeepThought deepThought;
   protected Activity context;
 
-  protected FilterTagsSearch tagsSearch = null;
-  protected String lastSearchTerm = FilterTagsSearch.EmptySearchTerm;
+  protected TagsSearch tagsSearch = null;
+  protected String lastSearchTerm = TagsSearch.EmptySearchTerm;
 
   protected List<Tag> searchResults = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public class TagsAdapter extends BaseAdapter {
 
 
   public void searchForAllTags() {
-    searchTags(FilterTagsSearch.EmptySearchTerm);
+    searchTags(TagsSearch.EmptySearchTerm);
   }
 
   public void researchTagsWithLastSearchTerm() {
@@ -143,9 +143,9 @@ public class TagsAdapter extends BaseAdapter {
         tagsSearch.interrupt();
       lastFilterTagsResult = null;
 
-      tagsSearch = new FilterTagsSearch(searchTerm, new SearchCompletedListener<FilterTagsSearchResults>() {
+      tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
         @Override
-        public void completed(FilterTagsSearchResults results) {
+        public void completed(TagsSearchResults results) {
           if (results.getRelevantMatchesSorted() instanceof List)
             searchResults = (List<Tag>) results.getRelevantMatchesSorted();
           else
@@ -155,7 +155,7 @@ public class TagsAdapter extends BaseAdapter {
         }
       });
 
-      Application.getSearchEngine().filterTags(tagsSearch);
+      Application.getSearchEngine().searchTags(tagsSearch);
     }
   }
 

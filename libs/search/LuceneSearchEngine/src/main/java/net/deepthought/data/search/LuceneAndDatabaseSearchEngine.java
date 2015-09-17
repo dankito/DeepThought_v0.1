@@ -33,17 +33,17 @@ public class LuceneAndDatabaseSearchEngine extends LuceneSearchEngine {
   // (see for example https://stackoverflow.com/questions/3317672/how-to-order-sqlite-results-containing-umlauts-and-other-special-characters // }
 
 //  @Override
-//  protected void filterTags(net.deepthought.data.search.specific.FilterTagsSearch search, String[] tagNamesToFilterFor) {
-//    databaseSearchEngine.filterTags(search, tagNamesToFilterFor);
+//  protected void searchTags(net.deepthought.data.search.specific.FilterTagsSearch search, String[] tagNamesToFilterFor) {
+//    databaseSearchEngine.searchTags(search, tagNamesToFilterFor);
 //  }
 //
 //  @Override
-//  protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
-//    databaseSearchEngine.filterPersons((Search<Person>) search, (String) lastNameFilter, (String) firstNameFilter);
+//  protected void searchPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
+//    databaseSearchEngine.searchPersons((Search<Person>) search, (String) lastNameFilter, (String) firstNameFilter);
 //  }
 //
 //  @Override
-//  protected void filterPersons(Search<Person> search, String personFilter) {
-//    databaseSearchEngine.filterPersons(search, personFilter);
+//  protected void searchPersons(Search<Person> search, String personFilter) {
+//    databaseSearchEngine.searchPersons(search, personFilter);
 //  }
 }

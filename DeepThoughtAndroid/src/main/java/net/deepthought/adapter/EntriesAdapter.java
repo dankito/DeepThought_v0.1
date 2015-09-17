@@ -14,7 +14,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.data.search.specific.FilterEntriesSearch;
+import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 
@@ -32,7 +32,7 @@ public class EntriesAdapter extends BaseAdapter {
   protected DeepThought deepThought;
   protected Activity context;
 
-  protected FilterEntriesSearch filterEntriesSearch = null;
+  protected EntriesSearch entriesSearch = null;
 
   protected List<Entry> searchResults = null;
 
@@ -131,11 +131,11 @@ public class EntriesAdapter extends BaseAdapter {
 
 
   public void searchEntries(String searchTerm) {
-    if(filterEntriesSearch != null && filterEntriesSearch.isCompleted() == false)
-      filterEntriesSearch.interrupt();
+    if(entriesSearch != null && entriesSearch.isCompleted() == false)
+      entriesSearch.interrupt();
 
     // TODO: enable filtering Abstract or Content only (currently both set to true)
-    filterEntriesSearch = new FilterEntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
+    entriesSearch = new EntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         if(results instanceof List)
@@ -147,7 +147,7 @@ public class EntriesAdapter extends BaseAdapter {
       }
     });
 
-    Application.getSearchEngine().filterEntries(filterEntriesSearch);
+    Application.getSearchEngine().searchEntries(entriesSearch);
   }
 
   public void showAllEntries() {

@@ -7,7 +7,7 @@ import net.deepthought.controls.ICleanableControl;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 
@@ -59,15 +59,15 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected TextField txtfldEditTagName = null;
 
-  protected FilterTagsSearchResults filterTagsSearchResults = null;
+  protected TagsSearchResults lastSearchResults = null;
 
 
   public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedEntitiesHolder editedTagsHolder) {
     this.searchAndSelectTagsControl = searchAndSelectTagsControl;
     this.editedTagsHolder = editedTagsHolder;
 
-    filterTagsSearchResults = searchAndSelectTagsControl.lastFilterTagsResults;
-    searchAndSelectTagsControl.addFilteredTagsChangedListener(filteredTagsChangedListener);
+    lastSearchResults = searchAndSelectTagsControl.lastSearchResults;
+    searchAndSelectTagsControl.addDisplayedTagsChangedListener(displayedTagsChangedListener);
 
     editedTagsHolder.getEditedEntities().addListener(editedTagsChangedListener);
 
@@ -95,9 +95,9 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
     editedTagsHolder.getEditedEntities().removeListener(editedTagsChangedListener);
     editedTagsHolder = null;
 
-    searchAndSelectTagsControl.removeFilteredTagsChangedListener(filteredTagsChangedListener);
+    searchAndSelectTagsControl.removeDisplayedTagsChangedListener(displayedTagsChangedListener);
     searchAndSelectTagsControl = null;
-    filterTagsSearchResults = null;
+    lastSearchResults = null;
 
     if(this.tag != null)
       this.tag.removeEntityListener(tagListener);
@@ -105,8 +105,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected SetChangeListener<Tag> editedTagsChangedListener = change -> tagUpdated();
 
-  protected IDisplayedTagsChangedListener filteredTagsChangedListener = results -> {
-    filterTagsSearchResults = results;
+  protected IDisplayedTagsChangedListener displayedTagsChangedListener = results -> {
+    lastSearchResults = results;
     setCellBackgroundColor();
   };
 
@@ -166,9 +166,9 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected void setCellBackgroundColor(boolean isSelected) {
     if(isSelected == true)
-      setBackground(Constants.FilteredTagsSelectedBackground);
+      setBackground(Constants.TagCellSelectedBackground);
     else
-      FXUtils.setTagCellBackgroundColor(tag, filterTagsSearchResults, TagListCell.this);
+      FXUtils.setTagCellBackgroundColor(tag, lastSearchResults, TagListCell.this);
   }
 
   protected ChangeListener<Boolean> checkBoxIsTagSelectedChangeListener = new ChangeListener<Boolean>() {

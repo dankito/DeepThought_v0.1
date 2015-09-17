@@ -46,17 +46,17 @@ public class Constants {
   public final static String SolarisLogoPath = "icons/os/sun-solaris_logo.png";
 
 
-  public final static Background FilteredTagsExactMatchBackground = new Background(new BackgroundFill(Color.GREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellExactMatchBackground = new Background(new BackgroundFill(Color.GREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsRelevantMatchBackground = new Background(new BackgroundFill(Color.LIGHTGREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellRelevantMatchBackground = new Background(new BackgroundFill(Color.LIGHTGREEN.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsLastSearchTermExactMatchBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellLastSearchTermExactMatchBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsLastSearchTermSingleMatchBackground = new Background(new BackgroundFill(Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellLastSearchTermSingleMatchBackground = new Background(new BackgroundFill(Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.5), new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsSelectedBackground = new Background(new BackgroundFill(Color.SKYBLUE, new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellSelectedBackground = new Background(new BackgroundFill(Color.SKYBLUE, new CornerRadii(0), new Insets(0)));
 
-  public final static Background FilteredTagsDefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
+  public final static Background TagCellDefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
 
 
   public final static Color ClipboardContentPopupBackgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);

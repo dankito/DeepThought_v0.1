@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Created by ganymed on 27/07/15.
  */
-public class FilterReferenceBasesSearch extends SearchBase {
+public class ReferenceBasesSearch extends SearchBase {
 
   protected Collection<ReferenceBase> results = new ArrayList<>();
 
@@ -19,11 +19,11 @@ public class FilterReferenceBasesSearch extends SearchBase {
   protected SearchCompletedListener<Collection<ReferenceBase>> completedListener = null;
 
 
-  public FilterReferenceBasesSearch(String searchTerm, SearchCompletedListener<Collection<ReferenceBase>> completedListener) {
+  public ReferenceBasesSearch(String searchTerm, SearchCompletedListener<Collection<ReferenceBase>> completedListener) {
     this(searchTerm, ReferenceBaseType.All, completedListener);
   }
 
-  public FilterReferenceBasesSearch(String searchTerm, ReferenceBaseType type, SearchCompletedListener<Collection<ReferenceBase>> completedListener) {
+  public ReferenceBasesSearch(String searchTerm, ReferenceBaseType type, SearchCompletedListener<Collection<ReferenceBase>> completedListener) {
     super(searchTerm);
     this.type = type;
     this.completedListener = completedListener;

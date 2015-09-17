@@ -18,10 +18,10 @@ import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
-import net.deepthought.data.search.specific.FilterEntriesSearch;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
-import net.deepthought.data.search.specific.FilterTagsSearch;
-import net.deepthought.data.search.specific.FilterTagsSearchResult;
+import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -769,7 +769,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterTagsForEmptySearchTerm(FilterTagsSearch search) {
+  protected void filterTagsForEmptySearchTerm(TagsSearch search) {
     search.setHasEmptySearchTerm(true);
 
     if(isIndexReady == false) {
@@ -791,7 +791,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+  protected void filterTags(TagsSearch search, String[] tagNamesToFilterFor) {
     IndexSearcher indexSearcher = getIndexSearcher(Tag.class);
 
     for(String tagNameToFilterFor : tagNamesToFilterFor) {
@@ -808,7 +808,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
         if(search.isInterrupted())
           return;
 
-        search.addResult(new FilterTagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(indexSearcher, query, Tag.class,
+        search.addResult(new TagsSearchResult(tagNameToFilterFor, new LazyLoadingLuceneSearchResultsList(indexSearcher, query, Tag.class,
             FieldName.TagId, 100000), exactMatch));
       } catch(Exception ex) {
         log.error("Could not parse query " + tagNamesToFilterFor, ex);
@@ -827,9 +827,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return exactMatchResults.size() == 1 ? exactMatchResults.get(0) : null;
   }
 
-  protected void getAllRelevantTagsSorted(FilterTagsSearch search, IndexSearcher indexSearcher) {
+  protected void getAllRelevantTagsSorted(TagsSearch search, IndexSearcher indexSearcher) {
     BooleanQuery sortRelevantTagsQuery = new BooleanQuery();
-    for(FilterTagsSearchResult result : search.getResults().getResults()) {
+    for(TagsSearchResult result : search.getResults().getResults()) {
       if(search.isInterrupted())
         return;
 
@@ -943,7 +943,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   @Override
-  protected void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor) {
+  protected void filterEntries(EntriesSearch search, String[] termsToFilterFor) {
     // TODO: i think it's better to analyze content- and abstractFilter as they are being used on analyzed fields
 //    Analyzer analyzer = getAnalyzerForTextLanguage(search.getSearchTerm());
     BooleanQuery query = new BooleanQuery();
@@ -997,7 +997,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
     BooleanQuery query = new BooleanQuery();
 
     referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
@@ -1020,7 +1020,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     BooleanQuery query = new BooleanQuery();
 
     if(seriesTitleFilter != null) {
@@ -1071,7 +1071,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     executeReferenceBaseQuery(search, query);
   }
 
-  protected void executeReferenceBaseQuery(FilterReferenceBasesSearch search, Query query) {
+  protected void executeReferenceBaseQuery(ReferenceBasesSearch search, Query query) {
     if(search.isInterrupted())
       return;
     log.debug("Executing ReferenceBase Query " + query);

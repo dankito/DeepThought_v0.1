@@ -9,9 +9,9 @@ import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.LazyLoadingList;
-import net.deepthought.data.search.specific.FilterEntriesSearch;
-import net.deepthought.data.search.specific.FilterReferenceBasesSearch;
-import net.deepthought.data.search.specific.FilterTagsSearch;
+import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
+import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.StringUtils;
@@ -46,7 +46,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
 
-  protected void filterTags(FilterTagsSearch search, String[] tagNamesToFilterFor) {
+  protected void filterTags(TagsSearch search, String[] tagNamesToFilterFor) {
     // TODO: may implement one day (no need for it right now)
 //    for(Tag tag : Application.getDeepThought().getTags()) {
 //      if(search.isInterrupted())
@@ -82,7 +82,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEntries(FilterEntriesSearch search, String[] termsToFilterFor) {
+  protected void filterEntries(EntriesSearch search, String[] termsToFilterFor) {
     for(Entry entry : Application.getDeepThought().getEntries()) {
       if(search.isInterrupted())
         return;
@@ -98,7 +98,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(FilterReferenceBasesSearch search, String referenceBaseFilter) {
+  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
       setReferenceBasesEmptyFilterSearchResult(search);
       return;
@@ -132,7 +132,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
       setReferenceBasesEmptyFilterSearchResult(search);
       return;
@@ -148,7 +148,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterSeriesTitles(FilterReferenceBasesSearch search, String seriesTitleFilter) {
+  protected void filterSeriesTitles(ReferenceBasesSearch search, String seriesTitleFilter) {
     for(SeriesTitle seriesTitle : Application.getDeepThought().getSeriesTitles()) {
       if(search.isInterrupted())
         return;
@@ -160,7 +160,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterReferences(FilterReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterReferences(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     for(Reference reference : Application.getDeepThought().getReferences()) {
       if(search.isInterrupted())
         return;
@@ -177,7 +177,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void filterReferenceSubDivisions(FilterReferenceBasesSearch search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void filterReferenceSubDivisions(ReferenceBasesSearch search, Reference reference, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     for(ReferenceSubDivision subDivision : reference.getSubDivisions()) {
       if(search.isInterrupted())
         return;
@@ -194,7 +194,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
-  protected void setReferenceBasesEmptyFilterSearchResult(FilterReferenceBasesSearch search) {
+  protected void setReferenceBasesEmptyFilterSearchResult(ReferenceBasesSearch search) {
     if(search.getType() == ReferenceBaseType.SeriesTitle)
       search.setResults(new CombinedLazyLoadingList(Application.getDeepThought().getSeriesTitles()));
     else if(search.getType() == ReferenceBaseType.Reference)

@@ -105,7 +105,7 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     btnSearchTags = (Button)rootView.findViewById(R.id.btnSearchTags);
     btnSearchTags.setOnClickListener(btnSearchTagsOnClickListener);
 
-    EditText edtxtSearchTagsFilter = (EditText)rootView.findViewById(R.id.edtxtSearchTagsFilter);
+    EditText edtxtSearchTagsFilter = (EditText)rootView.findViewById(R.id.edtxtTagsSearchTerm);
     edtxtSearchTagsFilter.addTextChangedListener(edtxtSearchTagsFilterTextChangedListener);
 
     lstvwSearchTags = (ListView)rootView.findViewById(R.id.lstvwSearchTags);

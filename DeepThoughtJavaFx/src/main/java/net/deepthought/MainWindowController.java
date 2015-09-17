@@ -165,9 +165,9 @@ public class MainWindowController implements Initializable {
 
 
   @FXML
-  protected HBox paneCategoriesQuickFilter;
+  protected HBox paneSearchCategories;
   @FXML
-  protected CustomTextField txtfldCategoriesQuickFilter;
+  protected CustomTextField txtfldSearchCategories;
   @FXML
   protected Button btnAddCategory;
   @FXML
@@ -456,16 +456,15 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupCategoriesTab() {
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneCategoriesQuickFilter);
-    paneCategoriesQuickFilter.setVisible(false); // TODO: display again when you know how to filter Categories
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSearchCategories);
+    paneSearchCategories.setVisible(false); // TODO: display again when you know how to search Categories
 
-    // replace normal TextField txtfldCategoriesQuickFilter with a SearchTextField (with a cross to clear selection)
-    paneCategoriesQuickFilter.getChildren().remove(txtfldCategoriesQuickFilter);
-    txtfldCategoriesQuickFilter = (CustomTextField) TextFields.createClearableTextField();
-    paneCategoriesQuickFilter.getChildren().add(1, txtfldCategoriesQuickFilter);
-    HBox.setHgrow(txtfldCategoriesQuickFilter, Priority.ALWAYS);
-    txtfldCategoriesQuickFilter.setPromptText("Quickly filter Categories");
-    txtfldCategoriesQuickFilter.setPromptText("(disabled)");
+    // replace normal TextField txtfldSearchCategories with a SearchTextField (with a cross to clear selection)
+    paneSearchCategories.getChildren().remove(txtfldSearchCategories);
+    txtfldSearchCategories = (CustomTextField) TextFields.createClearableTextField();
+    paneSearchCategories.getChildren().add(1, txtfldSearchCategories);
+    HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
 
     btnRemoveSelectedCategories.setTextFill(Constants.RemoveEntityButtonTextColor);
     btnAddCategory.setTextFill(Constants.AddEntityButtonTextColor);

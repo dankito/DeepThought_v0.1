@@ -4,7 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.model.settings.WindowSettings;
-import net.deepthought.data.search.specific.FilterTagsSearchResults;
+import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -55,21 +55,21 @@ public class FXUtils {
     region.setBackground(new Background(new BackgroundFill(color, new CornerRadii(0), new Insets(0))));
   }
 
-  public static void setTagCellBackgroundColor(Tag tag, FilterTagsSearchResults filterTagsSearchResults, Cell cell) {
-    if(tag != null && filterTagsSearchResults.getResults().size() > 0) {
-      if(filterTagsSearchResults.isExactOrSingleMatchButNotOfLastResult(tag))
-        cell.setBackground(Constants.FilteredTagsExactMatchBackground);
-      else if(filterTagsSearchResults.isMatchButNotOfLastResult(tag))
-        cell.setBackground(Constants.FilteredTagsRelevantMatchBackground);
-      else if(filterTagsSearchResults.isExactMatchOfLastResult(tag))
-        cell.setBackground(Constants.FilteredTagsLastSearchTermExactMatchBackground);
-      else if(filterTagsSearchResults.isSingleMatchOfLastResult(tag))
-        cell.setBackground(Constants.FilteredTagsLastSearchTermSingleMatchBackground);
+  public static void setTagCellBackgroundColor(Tag tag, TagsSearchResults tagsSearchResults, Cell cell) {
+    if(tag != null && tagsSearchResults.getResults().size() > 0) {
+      if(tagsSearchResults.isExactOrSingleMatchButNotOfLastResult(tag))
+        cell.setBackground(Constants.TagCellExactMatchBackground);
+      else if(tagsSearchResults.isMatchButNotOfLastResult(tag))
+        cell.setBackground(Constants.TagCellRelevantMatchBackground);
+      else if(tagsSearchResults.isExactMatchOfLastResult(tag))
+        cell.setBackground(Constants.TagCellLastSearchTermExactMatchBackground);
+      else if(tagsSearchResults.isSingleMatchOfLastResult(tag))
+        cell.setBackground(Constants.TagCellLastSearchTermSingleMatchBackground);
       else
-        cell.setBackground(Constants.FilteredTagsDefaultBackground);
+        cell.setBackground(Constants.TagCellDefaultBackground);
     }
     else
-      cell.setBackground(Constants.FilteredTagsDefaultBackground);
+      cell.setBackground(Constants.TagCellDefaultBackground);
   }
 
   public static void applyWindowSettingsAndListenToChanges(Stage stage, WindowSettings settings) {

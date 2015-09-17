@@ -90,9 +90,9 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   @FXML
   protected VBox pnContent;
   @FXML
-  protected HBox pnFilterCategories;
+  protected HBox pnSearchCategories;
   @FXML
-  protected TextField txtfldFilterCategories;
+  protected TextField txtfldSearchCategories;
   @FXML
   protected Button btnCreateCategory;
   @FXML
@@ -166,7 +166,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
     pnContent = new VBox();
 
-    setupPaneFilterCategories();
+    setupPaneSearchCategories();
 
     trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
     trvwCategories.setMinHeight(230);
@@ -200,24 +200,25 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     showEntryCategories();
   }
 
-  protected void setupPaneFilterCategories() {
-    pnFilterCategories = new HBox();
-    pnFilterCategories.setAlignment(Pos.CENTER_LEFT);
-    pnFilterCategories.setPrefHeight(40);
-    pnFilterCategories.setVisible(false);
-    pnFilterCategories.setManaged(false);
+  protected void setupPaneSearchCategories() {
+    pnSearchCategories = new HBox();
+    pnSearchCategories.setAlignment(Pos.CENTER_LEFT);
+    pnSearchCategories.setPrefHeight(40);
+    pnSearchCategories.setVisible(false);
+    pnSearchCategories.setManaged(false);
 
-    txtfldFilterCategories = new TextField();
-    pnFilterCategories.getChildren().add(txtfldFilterCategories);
-    HBox.setHgrow(txtfldFilterCategories, Priority.ALWAYS);
+    txtfldSearchCategories = new TextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
+    pnSearchCategories.getChildren().add(txtfldSearchCategories);
+    HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
 
     btnCreateCategory = new Button();
     btnCreateCategory.setOnAction(event -> handleButtonCreateCategoryAction(event));
-    pnFilterCategories.getChildren().add(btnCreateCategory);
+    pnSearchCategories.getChildren().add(btnCreateCategory);
     JavaFxLocalization.bindLabeledText(btnCreateCategory, "new...");
 
-    pnContent.getChildren().add(pnFilterCategories);
-    VBox.setMargin(pnFilterCategories, new Insets(6, 0, 0, 0));
+    pnContent.getChildren().add(pnSearchCategories);
+    VBox.setMargin(pnSearchCategories, new Insets(6, 0, 0, 0));
   }
 
   protected void setupTitle() {
@@ -278,8 +279,8 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   }
 
 
-  protected void setControlsForEnteredTagsFilter(String newValue) {
-    filterCategories(newValue);
+  protected void setControlsForEnteredTagsSearch(String newValue) {
+    searchCategories(newValue);
     btnCreateCategory.setDisable(checkIfCategoryOfThatNameExists(newValue));
   }
 
@@ -303,17 +304,17 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
         Localization.getLocalizedString("system.tag.entries.with.no.tags").equals(tagName);
   }
 
-  protected void filterCategories(String filterConstraint) {
+  protected void searchCategories(String searchTerm) {
     filteredTags.setPredicate((category) -> {
       // If filter text is empty, display all Tags.
-      if (filterConstraint == null || filterConstraint.isEmpty()) {
+      if (searchTerm == null || searchTerm.isEmpty()) {
         return true;
       }
 
-      String lowerCaseFilterConstraint = filterConstraint.toLowerCase();
+      String lowerCaseSearchTerm = searchTerm.toLowerCase();
 
-      if (category.getName().toLowerCase().contains(lowerCaseFilterConstraint)) {
-        return true; // Filter matches Tag's name
+      if (category.getName().toLowerCase().contains(lowerCaseSearchTerm)) {
+        return true; // Search Term matches Tag's name
       }
       return false; // Does not match.
     });
@@ -325,7 +326,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   }
 
   protected void addNewCategoryToEntry() {
-    String newCategoryName = txtfldFilterCategories.getText();
+    String newCategoryName = txtfldSearchCategories.getText();
     Category newCategory = new Category(newCategoryName);
     Application.getDeepThought().addCategory(newCategory);
 
@@ -414,7 +415,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     }
 
     setDisable(entry == null);
-    txtfldFilterCategories.clear();
+    txtfldSearchCategories.clear();
     showEntryCategories();
   }
 
@@ -429,7 +430,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     editedEntryCategories.addAll(categories);
 
     setDisable(false);
-    txtfldFilterCategories.clear();
+    txtfldSearchCategories.clear();
     showEntryCategories();
   }
 

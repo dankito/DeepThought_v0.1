@@ -24,7 +24,7 @@ import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.data.search.specific.FilterEntriesSearch;
+import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
 
@@ -80,7 +80,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
   protected LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
 
-  protected FilterEntriesSearch lastEntriesSearch = null;
+  protected EntriesSearch lastEntriesSearch = null;
 
 
   protected MainWindowController mainWindowController;
@@ -558,7 +558,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(StringUtils.isNullOrEmpty(searchTerm)) // TODO: remove this, get all (and sorted) Entries by SearchEngine
       tableViewEntriesItems.setUnderlyingCollection(unfilteredCurrentEntriesToShow);
     else {
-      lastEntriesSearch = new FilterEntriesSearch(txtfldSearchEntries.getText(), tglbtnSearchEntriesContent.isSelected(), tglbtnSearchEntriesAbstract.isSelected(), (results) -> {
+      lastEntriesSearch = new EntriesSearch(txtfldSearchEntries.getText(), tglbtnSearchEntriesContent.isSelected(), tglbtnSearchEntriesAbstract.isSelected(), (results) -> {
         Platform.runLater(() -> {
           tblvwEntries.getSelectionModel().clearSelection();
           tableViewEntriesItems.setUnderlyingCollection(results);
@@ -571,7 +571,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         lastEntriesSearch.addTagEntriesMustHave(deepThought.getSettings().getLastViewedTag());
       }
 
-      Application.getSearchEngine().filterEntries(lastEntriesSearch);
+      Application.getSearchEngine().searchEntries(lastEntriesSearch);
     }
   }
 
