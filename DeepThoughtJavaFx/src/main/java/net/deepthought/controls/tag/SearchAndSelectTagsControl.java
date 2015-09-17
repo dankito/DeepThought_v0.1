@@ -179,7 +179,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
     txtfldSearchTags.textProperty().addListener((observable, oldValue, newValue) -> searchTags(newValue));
     txtfldSearchTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
-    txtfldSearchTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
+    txtfldSearchTags.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE) {
         txtfldSearchTags.clear();
         event.consume();

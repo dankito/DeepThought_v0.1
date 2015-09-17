@@ -150,6 +150,12 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
       }
     });
     txtfldSearchForPerson.setOnAction((event) -> handleTextFieldSearchPersonsAction());
+    txtfldSearchForPerson.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchForPerson.clear();
+        event.consume();
+      }
+    });
 
     listViewPersonsItems = new LazyLoadingObservableList<>();
     lstvwPersons.setItems(listViewPersonsItems);

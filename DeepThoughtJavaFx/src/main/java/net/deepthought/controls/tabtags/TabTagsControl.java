@@ -382,6 +382,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   protected void toggleCurrentTagsTagsFilter() {
+    if(StringUtils.isNullOrEmpty(txtfldSearchTags.getText())) // toggling all Tags is really not that senseful
+      return;
+
     if(tableViewTagsItems.size() == 0)
       clearTagFilter();
     else {

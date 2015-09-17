@@ -465,6 +465,12 @@ public class MainWindowController implements Initializable {
     paneSearchCategories.getChildren().add(1, txtfldSearchCategories);
     HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
+    txtfldSearchCategories.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchCategories.clear();
+        event.consume();
+      }
+    });
 
     btnRemoveSelectedCategories.setTextFill(Constants.RemoveEntityButtonTextColor);
     btnAddCategory.setTextFill(Constants.AddEntityButtonTextColor);

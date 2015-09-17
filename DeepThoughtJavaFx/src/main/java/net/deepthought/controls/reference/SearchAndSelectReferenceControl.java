@@ -155,6 +155,12 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
       }
     });
     txtfldSearchForReference.setOnAction((event) -> handleTextFieldSearchForReferenceAction());
+    txtfldSearchForReference.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchForReference.clear();
+        event.consume();
+      }
+    });
 
     lstvwReferences.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ENTER) {

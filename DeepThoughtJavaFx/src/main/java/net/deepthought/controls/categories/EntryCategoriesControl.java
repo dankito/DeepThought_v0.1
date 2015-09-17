@@ -23,6 +23,7 @@ import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
+import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,9 +208,15 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     pnSearchCategories.setVisible(false);
     pnSearchCategories.setManaged(false);
 
-    txtfldSearchCategories = new TextField();
+    txtfldSearchCategories = TextFields.createClearableTextField();
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
     pnSearchCategories.getChildren().add(txtfldSearchCategories);
+    txtfldSearchCategories.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchCategories.clear();
+        event.consume();
+      }
+    });
     HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
 
     btnCreateCategory = new Button();
