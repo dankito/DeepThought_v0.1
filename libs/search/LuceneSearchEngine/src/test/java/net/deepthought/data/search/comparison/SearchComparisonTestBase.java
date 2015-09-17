@@ -197,7 +197,7 @@ public abstract class SearchComparisonTestBase {
     Assert.assertEquals(1130, searchResults.getAllMatches().size());
     Assert.assertEquals(274, searchResults.getRelevantMatchesSorted().size());
     Assert.assertEquals(firstResult.getAllMatchesCount() + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getAllMatches().size());
-    Assert.assertEquals(1 + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getRelevantMatchesSorted().size());
+    Assert.assertEquals(1 + secondResult.getAllMatchesCount() + thirdResult.getAllMatchesCount(), searchResults.getRelevantMatchesCount());
   }
 
 

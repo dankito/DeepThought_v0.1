@@ -23,7 +23,7 @@ public class FilterTagsSearchResults {
 
   protected Collection<Tag> allMatches = null;
 
-  protected Collection<Tag> relevantMatchesSorted = null;
+  protected Collection<Tag> relevantMatchesSorted = new ArrayList<>();
 
   protected Collection<Tag> exactMatches = null;
 
@@ -52,12 +52,23 @@ public class FilterTagsSearchResults {
     return results.add(result);
   }
 
+  public int getRelevantMatchesCount() {
+    if(getRelevantMatchesSorted() != null)
+      return getRelevantMatchesSorted().size();
+    return 0;
+  }
+
   public Collection<Tag> getRelevantMatchesSorted() {
+    if(relevantMatchesSorted == null)
+      return getAllMatches();
     return relevantMatchesSorted;
   }
 
   public void setRelevantMatchesSorted(Collection<Tag> relevantMatchesSorted) {
     this.relevantMatchesSorted = relevantMatchesSorted;
+
+    if(results.size() == 0)
+      addSearchResult(new FilterTagsSearchResult(getOverAllSearchTerm(), relevantMatchesSorted, null));
   }
 
 
@@ -215,7 +226,7 @@ public class FilterTagsSearchResults {
 
   @Override
   public String toString() {
-    return overAllSearchTerm + " has " + getRelevantMatchesSorted().size() + " results";
+    return overAllSearchTerm + " has " + getRelevantMatchesCount() + " results";
   }
 
 }

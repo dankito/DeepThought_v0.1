@@ -16,6 +16,7 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.TextFields;
@@ -106,7 +107,8 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
     @Override
     public void notification(Notification notification) {
-
+      if(notification.getType() == NotificationType.ApplicationInstantiated)
+        searchTags();
     }
   };
 
@@ -144,7 +146,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
       newDeepThought.addEntityListener(deepThoughtListener);
     }
 
-    filterTags();
+    searchTags();
   }
 
   protected void setupControl() {
@@ -175,7 +177,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     listViewTagsItems = new LazyLoadingObservableList<>();
     lstvwTags.setItems(listViewTagsItems);
 
-    txtfldFilterTags.textProperty().addListener((observable, oldValue, newValue) -> filterTags(newValue));
+    txtfldFilterTags.textProperty().addListener((observable, oldValue, newValue) -> searchTags(newValue));
     txtfldFilterTags.setOnAction(event -> createNewTagOrToggleTagsAffiliation());
     txtfldFilterTags.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
       if (event.getCode() == KeyCode.ESCAPE) {
@@ -197,11 +199,11 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     btnCreateTag.setDisable(StringUtils.isNullOrEmpty(tagsFilter));
   }
 
-  protected void filterTags() {
-    filterTags(txtfldFilterTags.getText());
+  protected void searchTags() {
+    searchTags(txtfldFilterTags.getText());
   }
 
-  protected void filterTags(final String tagsFilter) {
+  protected void searchTags(final String tagsFilter) {
     if(filterTagsSearch != null)
       filterTagsSearch.interrupt();
 
@@ -370,7 +372,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {
     listViewTagsItems.clear();
-    filterTags();
+    searchTags();
   }
 
 }

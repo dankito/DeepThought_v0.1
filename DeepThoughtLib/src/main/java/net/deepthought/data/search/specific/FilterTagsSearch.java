@@ -30,10 +30,6 @@ public class FilterTagsSearch extends SearchBase {
   }
 
 
-  public void setResults(FilterTagsSearchResults results) {
-    this.results = results;
-  }
-
   protected void callCompletedListener() {
     if(completedListener != null)
       completedListener.completed(results);
@@ -41,7 +37,7 @@ public class FilterTagsSearch extends SearchBase {
 
   @Override
   protected int getResultsCount() {
-    return results.getRelevantMatchesSorted().size();
+    return results.getRelevantMatchesCount();
   }
 
 

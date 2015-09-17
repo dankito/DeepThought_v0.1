@@ -775,6 +775,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(isIndexReady == false) {
 //      if(Application.getDeepThought() != null)
 //        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
+      search.setRelevantMatchesSorted(new ArrayList<Tag>());
 
       search.fireSearchCompleted();
       return;
@@ -784,8 +785,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(search.isInterrupted())
       return;
 
-    search.addResult(new FilterTagsSearchResult("", new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class,
-        FieldName.TagId, 100000, SortOrder.Ascending, FieldName.TagName), null));
+    search.setRelevantMatchesSorted(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Tag.class), query, Tag.class,
+        FieldName.TagId, 100000, SortOrder.Ascending, FieldName.TagName));
 
     search.fireSearchCompleted();
   }
