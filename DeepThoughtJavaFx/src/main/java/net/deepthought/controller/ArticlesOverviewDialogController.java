@@ -172,7 +172,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
   }
 
   @FXML
-  public void handleButtonCancelAction(ActionEvent actionEvent) {
+  public void handleButtonCloseAction(ActionEvent actionEvent) {
     closeDialog(DialogResult.Cancel);
   }
 
@@ -194,7 +194,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     item.getArticleContentExtractor().createEntryFromUrlAsync(item.getUrl(), creationResult -> {
       // TODO: this is the same code as in CreateEntryFromClipboardContentPopup.directlyAddEntryFromOnlineArticle() -> unify
       if (creationResult.successful())
-        Application.getDeepThought().addEntry(creationResult.getCreatedEntry());
+        creationResult.saveCreatedEntities();
       else
         showCouldNotCreateEntryError(creationResult);
     });
