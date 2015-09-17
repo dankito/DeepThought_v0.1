@@ -299,12 +299,12 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> {
       Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
       if (selectedEntry != null)
-        entry.addTag(event.getTag());
+        selectedEntry.addTag(event.getTag());
     });
     currentEditedEntryTagsControl.setTagRemovedEventHandler(event -> {
       Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
       if (selectedEntry != null)
-        entry.removeTag(event.getTag());
+        selectedEntry.removeTag(event.getTag());
     });
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
     currentEditedEntryTagsControl.setSearchAndSelectTagsControlHeight(190);

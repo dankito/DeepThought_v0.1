@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
@@ -57,7 +58,14 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
     entryUpdated(entry);
   }
 
-  protected void entryUpdated(Entry entry) {
+  protected void entryUpdated(final Entry entry) {
+    if(Platform.isFxApplicationThread())
+      entryUpdatedOnUiThread(entry);
+    else
+      Platform.runLater(() -> entryUpdatedOnUiThread(entry));
+  }
+
+  protected void entryUpdatedOnUiThread(Entry entry) {
     this.textRepresentation = getTextRepresentationForCell(entry);
 
     setItem(textRepresentation);
