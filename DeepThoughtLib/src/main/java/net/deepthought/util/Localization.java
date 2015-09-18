@@ -1,5 +1,7 @@
 package net.deepthought.util;
 
+import net.deepthought.data.model.enums.ApplicationLanguage;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,14 @@ public class Localization {
   public static void setLanguageLocale(Locale languageLocale) {
     LanguageLocale = languageLocale;
     StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
+  }
+
+  public static void setLanguageLocale(ApplicationLanguage language) {
+    try {
+      setLanguageLocale(Locale.forLanguageTag(language.getLanguageKey()));
+    } catch(Exception ex) {
+      log.error("Could not find Locale for ApplicationLanguage's LanguageKey " + language.getLanguageKey() + " of ApplicationLanguage " + language.getName(), ex);
+    }
   }
 
   public static ResourceBundle getStringsResourceBundle() {

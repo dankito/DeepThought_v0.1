@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
+import net.deepthought.util.Localization;
 
 import java.io.Serializable;
 
@@ -48,6 +49,8 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
     this.language = language;
 
     this.languageId = language == null ? null : language.getId();
+
+    applyLanguageSettings();
 
     callSettingsChangedListeners(Setting.UserDeviceLanguage, previousValue, language);
   }
@@ -110,6 +113,15 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
     Object previousValue = this.showQuickEditEntryPane;
     this.showQuickEditEntryPane = showEntryQuickEditPane;
     callSettingsChangedListeners(Setting.UserDeviceShowQuickEditEntryPane, previousValue, showEntryQuickEditPane);
+  }
+
+
+  public void applySettings() {
+    applyLanguageSettings();
+  }
+
+  protected void applyLanguageSettings() {
+    Localization.setLanguageLocale(getLanguage());
   }
 
 }

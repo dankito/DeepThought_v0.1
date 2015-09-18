@@ -71,9 +71,6 @@ public class Dialogs {
       Stage dialogStage = createStage(loader, "EditEntryDialog.fxml");
       dialogStage.setMinHeight(500);
       dialogStage.setMinWidth(500);
-//      loader.setResources(Localization.getStringsResourceBundle());
-//      loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + "EditEntryDialog.fxml"));
-//      Parent parent = loader.load();
 //
       EditEntryDialogController controller = loader.getController();
       if(entry != null)
@@ -506,7 +503,7 @@ public class Dialogs {
   }
 
   protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner, boolean isToolWindow) throws IOException {
-    loader.setResources(Localization.getStringsResourceBundle());
+    loader.setResources(JavaFxLocalization.Resources);
 
     if(isToolWindow == false)
       loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
@@ -514,6 +511,7 @@ public class Dialogs {
       loader.setLocation(Dialogs.class.getClassLoader().getResource(ControlsBaseFolder + dialogFilename));
 
     Parent parent = loader.load();
+    JavaFxLocalization.resolveResourceKeys(parent);
 
     // Create the dialog Stage.
     Stage dialogStage = new Stage();

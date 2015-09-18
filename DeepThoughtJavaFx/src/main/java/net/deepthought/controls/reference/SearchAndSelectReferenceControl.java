@@ -2,6 +2,7 @@ package net.deepthought.controls.reference;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -81,19 +82,11 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchAndSelectReferenceControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-
-    try {
-      fxmlLoader.load();
+    if(FXUtils.loadControl(this, "SearchAndSelectReferenceControl")) {
       setupControl();
 
       if(deepThought != null)
         deepThought.addEntityListener(deepThoughtListener);
-    } catch (IOException ex) {
-      log.error("Could not load SearchAndSelectReferenceControl", ex);
     }
   }
 

@@ -30,6 +30,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -131,6 +132,19 @@ public class MainWindowController implements Initializable {
   protected Menu mnitmMainMenuWindow;
 
   @FXML
+  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowImportantOnes;
+  @FXML
+  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowAll;
+  @FXML
+  protected CheckMenuItem chkmnitmViewShowCategories;
+  @FXML
+  protected CheckMenuItem chkmnitmViewShowQuickEditEntryPane;
+
+  @FXML
+  protected Menu mnitmToolsLanguage;
+
+
+  @FXML
   protected MenuButton btnOnlineArticleExtractors;
 
   @FXML
@@ -141,16 +155,6 @@ public class MainWindowController implements Initializable {
   protected Label statusLabelCountEntries;
   @FXML
   protected Pane pnConnectedDevices;
-
-
-  @FXML
-  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowImportantOnes;
-  @FXML
-  protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowAll;
-  @FXML
-  protected CheckMenuItem chkmnitmViewShowCategories;
-  @FXML
-  protected CheckMenuItem chkmnitmViewShowQuickEditEntryPane;
 
 
   @FXML
@@ -403,6 +407,8 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setupMainMenu() {
+    mnitmToolsLanguage.setOnShowing(event -> handleMenuToolsLanguageShowing(event));
+
     ImageView newspaperIcon = new ImageView(Constants.NewspaperIconPath);
     newspaperIcon.setPreserveRatio(true);
     newspaperIcon.setFitHeight(20); // TODO: make icon fill button
@@ -735,6 +741,26 @@ public class MainWindowController implements Initializable {
       if (listener != null)
         listener.optionInvoked(contentExtractOptions);
     });
+  }
+
+
+  protected void handleMenuToolsLanguageShowing(Event event) {
+    mnitmToolsLanguage.getItems().clear();
+    ApplicationLanguage currentLanguage = Application.getLoggedOnUser().getSettings().getLanguage();
+
+    for(final ApplicationLanguage language : Application.getApplication().getApplicationLanguages()) {
+      CheckMenuItem languageItem = new CheckMenuItem();
+      JavaFxLocalization.bindMenuItemText(languageItem, language.getName());
+      languageItem.setSelected(language.equals(currentLanguage));
+      languageItem.setOnAction(menuEvent -> applicationLanguageChanged(language));
+
+      mnitmToolsLanguage.getItems().add(languageItem);
+    }
+  }
+
+  protected void applicationLanguageChanged(ApplicationLanguage language) {
+    Application.getLoggedOnUser().getSettings().setLanguage(language);
+    JavaFxLocalization.setLocaleForLanguage(language);
   }
 
   @FXML

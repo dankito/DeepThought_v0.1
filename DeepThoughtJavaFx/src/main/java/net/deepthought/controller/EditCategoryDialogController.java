@@ -10,6 +10,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
 import java.net.URL;
@@ -119,9 +120,9 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
 
   protected void updateStageTitle() {
     if(category.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedString("create.category"));
+      JavaFxLocalization.bindStageTitle(windowStage, "create.category");
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.category", category.getTextRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.category", category.getTextRepresentation());
   }
 
 

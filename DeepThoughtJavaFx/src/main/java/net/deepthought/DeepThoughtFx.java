@@ -2,7 +2,6 @@ package net.deepthought;
 
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +37,10 @@ public class DeepThoughtFx extends Application {
     try {
 //      Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("MainDocument.fxml"));
       FXMLLoader loader = new FXMLLoader();
-      loader.setResources(Localization.getStringsResourceBundle());
+      loader.setResources(JavaFxLocalization.Resources);
       loader.setLocation(getClass().getClassLoader().getResource("dialogs/MainWindow.fxml"));
       Parent root = (Parent)loader.load();
+      JavaFxLocalization.resolveResourceKeys(root);
 
       Scene scene = new Scene(root);
 //    String mainDocumentCss = getClass().getResource("/MainDocument.css").toExternalForm();

@@ -1288,9 +1288,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void updateWindowTitle(ReferenceBase referenceBase) {
     if(editedReferenceBase == null)
-      windowStage.setTitle(Localization.getLocalizedString("create.reference"));
+      JavaFxLocalization.bindStageTitle(windowStage, "create.reference");
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.reference", referenceBase.getTextRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.reference", referenceBase.getTextRepresentation());
   }
 
 

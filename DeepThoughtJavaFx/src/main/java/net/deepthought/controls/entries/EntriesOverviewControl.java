@@ -158,21 +158,6 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     if(FXUtils.loadControl(this, "EntriesOverviewControl"))
       setupControl();
-
-//    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/EntriesOverviewControl.fxml"));
-//    fxmlLoader.setRoot(this);
-//    fxmlLoader.setController(this);
-//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-//
-//    try {
-//      fxmlLoader.load();
-//      setupControl();
-//
-//      if(deepThought != null)
-//        deepThought.addEntityListener(deepThoughtListener);
-//    } catch (IOException ex) {
-//      log.error("Could not load EntriesOverviewControl", ex);
-//    }
   }
 
   public void deepThoughtChanged(DeepThought newDeepThought) {

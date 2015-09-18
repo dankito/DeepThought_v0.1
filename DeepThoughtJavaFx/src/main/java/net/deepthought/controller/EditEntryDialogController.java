@@ -630,9 +630,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected void updateWindowTitle(String entryTitle) {
     if(this.entry.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedString("create.entry", entryTitle));
+      JavaFxLocalization.bindStageTitle(windowStage, "create.entry", entryTitle);
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.entry", entryTitle));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.entry", entryTitle);
   }
 
 

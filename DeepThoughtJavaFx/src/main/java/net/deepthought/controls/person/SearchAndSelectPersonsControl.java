@@ -2,6 +2,7 @@ package net.deepthought.controls.person;
 
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.tag.IEditedEntitiesHolder;
@@ -76,19 +77,11 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchAndSelectPersonsControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-
-    try {
-      fxmlLoader.load();
+    if(FXUtils.loadControl(this, "SearchAndSelectPersonsControl")) {
       setupControl();
 
       if(deepThought != null)
         deepThought.addEntityListener(deepThoughtListener);
-    } catch (IOException ex) {
-      log.error("Could not load SearchAndSelectPersonsControl", ex);
     }
   }
 

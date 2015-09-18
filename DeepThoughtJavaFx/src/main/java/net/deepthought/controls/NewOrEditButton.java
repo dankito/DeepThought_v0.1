@@ -61,16 +61,8 @@ public class NewOrEditButton extends SplitMenuButton {
 
 
   public NewOrEditButton() {
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/NewOrEditButton.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-//    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-
-    try {
-      fxmlLoader.load();
+    if(FXUtils.loadControl(this, "NewOrEditButton")) {
       setupControl();
-    } catch (IOException ex) {
-      log.error("Could not load NewOrEditButton", ex);
     }
   }
 

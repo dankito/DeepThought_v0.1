@@ -9,6 +9,7 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
 import java.net.URL;
@@ -126,9 +127,9 @@ public class EditPersonDialogController extends ChildWindowsController implement
 
   protected void updateStageTitle() {
     if(person.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedString("create.person", person.getNameRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "create.person", person.getNameRepresentation());
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.person", person.getNameRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.person", person.getNameRepresentation());
   }
 
 

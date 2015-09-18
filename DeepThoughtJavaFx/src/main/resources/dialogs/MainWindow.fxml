@@ -28,7 +28,7 @@
          </rowConstraints>
          <children>
             <Label fx:id="statusLabelCountEntries" prefWidth="100.0" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.valignment="CENTER" />
-            <Label fx:id="statusLabel" text="Ready" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" />
+            <Label fx:id="statusLabel" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" />
             <HBox fx:id="pnConnectedDevices" alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES" />
          </children>
       </GridPane>
@@ -125,6 +125,12 @@
                         </Menu>
                         <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
                            <items>
+                              <Menu fx:id="mnitmToolsLanguage" mnemonicParsing="false" text="%language">
+                                <items>
+                                    <CheckMenuItem mnemonicParsing="false" text="%application.language.english" />
+                                    <CheckMenuItem mnemonicParsing="false" text="%application.language.german" />
+                                </items>
+                              </Menu>
                               <MenuItem mnemonicParsing="false" onAction="#handleMenuItemToolsDeviceRegistrationAction" text="%device.registration..." />
                               <SeparatorMenuItem mnemonicParsing="false" />
                             <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
@@ -137,7 +143,7 @@
                         <Menu fx:id="mnitmMainMenuWindow" disable="true" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%window" />
                       <Menu mnemonicParsing="false" text="%help">
                         <items>
-                          <MenuItem disable="true" mnemonicParsing="false" text="About" />
+                          <MenuItem disable="true" mnemonicParsing="false" text="\%about" />
                         </items>
                       </Menu>
                     </menus>

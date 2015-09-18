@@ -9,7 +9,7 @@ import net.deepthought.data.compare.DataCompareResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.Localization;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.ReflectionHelper;
 
@@ -247,7 +247,7 @@ public class SelectEntitiesToImportDialogController extends ChildWindowsControll
     setWindowStage(dialogStage);
     this.parentDataEntityToImport = parentDataEntityToImport;
 
-    dialogStage.setTitle(Localization.getLocalizedString("select.entities.to.import.dialog.title", parentDataEntityToImport));
+    JavaFxLocalization.bindStageTitle(dialogStage, "select.entities.to.import.dialog.title", parentDataEntityToImport);
 
     trtblvwDataToImportEntities.setRoot(new ImportDataTreeItem(parentDataEntityToImport));
     trtblvwDataToImportEntities.getRoot().setExpanded(true);

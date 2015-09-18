@@ -7,6 +7,7 @@ import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
@@ -193,9 +194,9 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
   protected void updateWindowTitle() {
     if(file.getId() == null)
-      windowStage.setTitle(Localization.getLocalizedString("add.file", file.getTextRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "add.file", file.getTextRepresentation());
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.file", file.getTextRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.file", file.getTextRepresentation());
   }
 
 

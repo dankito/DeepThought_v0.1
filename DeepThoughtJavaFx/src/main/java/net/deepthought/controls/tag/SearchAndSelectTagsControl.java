@@ -1,6 +1,7 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
+import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.ICleanableControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.data.listener.ApplicationListener;
@@ -82,20 +83,12 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
     Application.addApplicationListener(applicationListener);
 
-    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("controls/SearchAndSelectTagsControl.fxml"));
-    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(Localization.getStringsResourceBundle());
-
-    try {
-      fxmlLoader.load();
+    if(FXUtils.loadControl(this, "SearchAndSelectTagsControl")) {
       setupControl();
 
       if(Application.getDeepThought() != null && this.deepThought == null) {
         deepThoughtChanged(Application.getDeepThought());
       }
-    } catch (IOException ex) {
-      log.error("Could not load SearchAndSelectTagsControl", ex);
     }
   }
 

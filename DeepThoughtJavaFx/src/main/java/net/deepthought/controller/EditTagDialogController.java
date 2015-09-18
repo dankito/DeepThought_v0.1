@@ -10,6 +10,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
 import java.net.URL;
@@ -120,9 +121,9 @@ public class EditTagDialogController extends ChildWindowsController implements I
 
   protected void updateStageTitle() {
     if(tag.isPersisted() == false)
-      windowStage.setTitle(Localization.getLocalizedString("create.tag"));
+      JavaFxLocalization.bindStageTitle(windowStage, "create.tag");
     else
-      windowStage.setTitle(Localization.getLocalizedString("edit.tag", tag.getTextRepresentation()));
+      JavaFxLocalization.bindStageTitle(windowStage, "edit.tag", tag.getTextRepresentation());
   }
 
 

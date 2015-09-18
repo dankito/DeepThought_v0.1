@@ -16,6 +16,7 @@ import net.deepthought.data.merger.enums.MergeEntities;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.Localization;
 
@@ -384,7 +385,7 @@ public class RestoreBackupDialogController extends ChildWindowsController implem
   public void setWindowStage(Stage windowStage) {
     super.setWindowStage(windowStage);
 
-    windowStage.setTitle(Localization.getLocalizedString("restore.backup.dialog.title"));
+    JavaFxLocalization.bindStageTitle(windowStage, "restore.backup.dialog.title");
   }
 
   public static class RestoreProgressItem {
