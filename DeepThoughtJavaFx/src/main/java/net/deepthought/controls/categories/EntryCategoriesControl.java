@@ -165,67 +165,9 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
     setupTitle();
 
-    pnContent = new VBox();
-
-    setupPaneSearchCategories();
-
-    trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
-    trvwCategories.setMinHeight(230);
-    trvwCategories.setMaxHeight(Double.MAX_VALUE);
-    trvwCategories.setMaxWidth(Double.MAX_VALUE);
-    trvwCategories.setShowRoot(false);
-    trvwCategories.setEditable(true);
-
-    trvwCategories.setOnKeyPressed(event -> {
-      if (event.getCode() == KeyCode.ENTER) {
-        toggleSelectedCategoriesAffiliation();
-        event.consume();
-      } else if (event.getCode() == KeyCode.DELETE) {
-        deleteSelectedCategories();
-        event.consume();
-      }
-    });
-
-    trvwCategories.setCellFactory(treeView -> {
-      EntryCategoryTreeCell cell = new EntryCategoryTreeCell(this);
-      entryCategoryTreeCells.add(cell);
-      return cell;
-    });
-
-    pnContent.getChildren().add(trvwCategories);
-    VBox.setVgrow(trvwCategories, Priority.ALWAYS);
-    VBox.setMargin(trvwCategories, new Insets(6, 0, 0, 0));
-
-    setContent(pnContent);
+    setupContent();
 
     showEntryCategories();
-  }
-
-  protected void setupPaneSearchCategories() {
-    pnSearchCategories = new HBox();
-    pnSearchCategories.setAlignment(Pos.CENTER_LEFT);
-    pnSearchCategories.setPrefHeight(40);
-    pnSearchCategories.setVisible(false);
-    pnSearchCategories.setManaged(false);
-
-    txtfldSearchCategories = TextFields.createClearableTextField();
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
-    pnSearchCategories.getChildren().add(txtfldSearchCategories);
-    txtfldSearchCategories.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.ESCAPE) {
-        txtfldSearchCategories.clear();
-        event.consume();
-      }
-    });
-    HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
-
-    btnCreateCategory = new Button();
-    btnCreateCategory.setOnAction(event -> handleButtonCreateCategoryAction(event));
-    pnSearchCategories.getChildren().add(btnCreateCategory);
-    JavaFxLocalization.bindLabeledText(btnCreateCategory, "new...");
-
-    pnContent.getChildren().add(pnSearchCategories);
-    VBox.setMargin(pnSearchCategories, new Insets(6, 0, 0, 0));
   }
 
   protected void setupTitle() {
@@ -269,6 +211,71 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     btnAddTopLevelCategory.setOnAction(event -> handleButtonAddTopLevelCategoryAction(event));
 
     setTitle(titlePane);
+  }
+
+  protected void setupContent() {
+    pnContent = new VBox();
+    pnContent.setMinHeight(230);
+//    pnContent.setMinHeight(268); // as long as there's not search bar, reise TreeView's min height to fit with EntryTag's Control height
+
+    setupPaneSearchCategories();
+
+    trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
+    trvwCategories.setMinHeight(230);
+//    trvwCategories.setMinHeight(268); // as long as there's not search bar, reise TreeView's min height to fit with EntryTag's Control height
+    trvwCategories.setMaxHeight(Double.MAX_VALUE);
+    trvwCategories.setMaxWidth(Double.MAX_VALUE);
+    trvwCategories.setShowRoot(false);
+    trvwCategories.setEditable(true);
+
+    trvwCategories.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.ENTER) {
+        toggleSelectedCategoriesAffiliation();
+        event.consume();
+      } else if (event.getCode() == KeyCode.DELETE) {
+        deleteSelectedCategories();
+        event.consume();
+      }
+    });
+
+    trvwCategories.setCellFactory(treeView -> {
+      EntryCategoryTreeCell cell = new EntryCategoryTreeCell(this);
+      entryCategoryTreeCells.add(cell);
+      return cell;
+    });
+
+    pnContent.getChildren().add(trvwCategories);
+    VBox.setVgrow(trvwCategories, Priority.ALWAYS);
+    VBox.setMargin(trvwCategories, new Insets(6, 0, 0, 0));
+
+    setContent(pnContent);
+  }
+
+  protected void setupPaneSearchCategories() {
+    pnSearchCategories = new HBox();
+    pnSearchCategories.setAlignment(Pos.CENTER_LEFT);
+    pnSearchCategories.setPrefHeight(40);
+    pnSearchCategories.setVisible(false);
+    pnSearchCategories.setManaged(false);
+
+    txtfldSearchCategories = TextFields.createClearableTextField();
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
+    pnSearchCategories.getChildren().add(txtfldSearchCategories);
+    txtfldSearchCategories.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchCategories.clear();
+        event.consume();
+      }
+    });
+    HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
+
+    btnCreateCategory = new Button();
+    btnCreateCategory.setOnAction(event -> handleButtonCreateCategoryAction(event));
+    pnSearchCategories.getChildren().add(btnCreateCategory);
+    JavaFxLocalization.bindLabeledText(btnCreateCategory, "new...");
+
+    pnContent.getChildren().add(pnSearchCategories);
+    VBox.setMargin(pnSearchCategories, new Insets(6, 0, 0, 0));
   }
 
   protected void showEntryCategories() {

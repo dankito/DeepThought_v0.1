@@ -106,8 +106,10 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
   }
 
   protected void setupControl() {
-    this.setExpanded(false);
+    setMinHeight(22);
+
     setupTitle();
+    this.setExpanded(false);
 
     searchAndSelectPersonsControl = new SearchAndSelectPersonsControl(this);
 //    searchAndSelectPersonsControl.setPrefHeight(250);

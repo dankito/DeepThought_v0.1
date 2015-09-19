@@ -42,7 +42,10 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -51,6 +54,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -62,6 +67,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
@@ -110,6 +117,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected Button btnApplyChanges;
 
   @FXML
+  protected ScrollPane scrpnContent;
+  @FXML
   protected VBox contentPane;
 
   @FXML
@@ -127,9 +136,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected CollapsibleHtmlEditor htmledContent;
 
-  protected GridPane paneTagsAndCategories;
-  protected ColumnConstraints tagsColumn;
-  protected ColumnConstraints categoriesColumn;
+  protected SplitPane paneTagsAndCategories;
 
   protected EntryTagsControl entryTagsControl = null;
 
@@ -242,21 +249,20 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   protected void setupTagsAndCategoriesControl() {
-    tagsColumn = new ColumnConstraints();
-    categoriesColumn = new ColumnConstraints();
-    tagsColumn.setPercentWidth(50);
-    categoriesColumn.setPercentWidth(50);
+    paneTagsAndCategories = new SplitPane();
 
-    paneTagsAndCategories = new GridPane();
-    paneTagsAndCategories.getColumnConstraints().add(tagsColumn);
-    paneTagsAndCategories.getColumnConstraints().add(categoriesColumn);
-
-    paneTagsAndCategories.setMinHeight(22);
+    paneTagsAndCategories.setMinHeight(26);
+    paneTagsAndCategories.setMinHeight(Region.USE_PREF_SIZE);
     paneTagsAndCategories.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
+    paneTagsAndCategories.setMaxHeight(Region.USE_PREF_SIZE);
+//    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
 
-    contentPane.getChildren().add(3, paneTagsAndCategories);
-//    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
+    // as ScrollPane is too stupid to resize correctly when entryTagsControl or entryCategoriesControl is expanded, i wrapped paneTagsAndCategories in another ScrollPane
+    ScrollPane tagsAndCategoriesScrollPane = new ScrollPane(paneTagsAndCategories);
+    tagsAndCategoriesScrollPane.setFitToWidth(true);
+
+    contentPane.getChildren().add(3, tagsAndCategoriesScrollPane);
+    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
     VBox.setMargin(paneTagsAndCategories, new Insets(6, 0, 0, 0));
 
     // TODO: replace entry by IEditedEntitiesHolder<Tags> so that Dialog controls edited tags -> if a Tag is removed which is in creationResult, it can be removed from creationResult as well (also Categories, ...)
@@ -267,8 +273,7 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
-    paneTagsAndCategories.add(entryTagsControl, 0, 0);
-    GridPane.setConstraints(entryTagsControl, 0, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
+    paneTagsAndCategories.getItems().add(entryTagsControl);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
@@ -277,10 +282,30 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setExpanded(true);
-    paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
-    GridPane.setConstraints(entryCategoriesControl, 1, 0, 1, 1, HPos.LEFT, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS, new Insets(0, 0, 0, 12));
+    paneTagsAndCategories.getItems().add(entryCategoriesControl);
+
+    entryTagsControl.heightProperty().addListener((observable, oldValue, newValue) -> setPaneTagsAndCategoriesHeight());
+    entryCategoriesControl.heightProperty().addListener((observable, oldValue, newValue) -> setPaneTagsAndCategoriesHeight());
 
     setCategoriesPaneVisibility();
+  }
+
+  protected void setPaneTagsAndCategoriesHeight() {
+    // TODO: i just don't know how to do it but paneTagsAndCategories never resized correctly
+    // right now if entryTagsControl or entryCategoriesControl is expanded it uses rest of dialog an other controls are now shown
+    double height = entryTagsControl.getHeight() > entryCategoriesControl.getHeight() ? entryTagsControl.getHeight() : entryCategoriesControl.getHeight();
+//    paneTagsAndCategories.setMinHeight(height);
+//    paneTagsAndCategories.setPrefHeight(height);
+//    paneTagsAndCategories.setMaxHeight(height);
+//    paneTagsAndCategories.layout();
+    entryTagsControl.setVisible(false);
+
+    Platform.runLater(() -> {
+      entryTagsControl.setVisible(true);
+      Platform.runLater(() -> {
+        scrpnContent.layout();
+      });
+    });
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
@@ -303,15 +328,18 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setVisible(showCategories);
 
     if(showCategories) {
-      if(paneTagsAndCategories.getChildren().contains(entryCategoriesControl) == false)
-        paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
-      tagsColumn.setPercentWidth(50);
-      categoriesColumn.setPercentWidth(50);
+//      if(paneTagsAndCategories.getChildren().contains(entryCategoriesControl) == false)
+//        paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
+//      tagsColumn.setPercentWidth(50);
+//      categoriesColumn.setPercentWidth(50);
+//      if(paneTagsAndCategories.getItems().contains(entryCategoriesControl) == false)
+//        paneTagsAndCategories.getItems().add(entryCategoriesControl);
     }
     else {
-      paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
-      tagsColumn.setPercentWidth(100);
-      categoriesColumn.setPercentWidth(0);
+//      paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
+//      tagsColumn.setPercentWidth(100);
+//      categoriesColumn.setPercentWidth(0);
+//      paneTagsAndCategories.getItems().remove(entryCategoriesControl);
     }
   }
 

@@ -2,6 +2,7 @@ package net.deepthought.controls.html;
 
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanableControl;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +148,7 @@ public class HtmlEditor implements ICleanableControl {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();

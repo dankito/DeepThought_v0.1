@@ -56,6 +56,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     this.getChildren().add(webView);
     HBox.setHgrow(webView, Priority.ALWAYS);
     webView.prefHeightProperty().bind(this.heightProperty());
+    webView.prefWidthProperty().bind(this.widthProperty());
 
     setFillHeight(true);
 
@@ -167,5 +168,6 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   public void cleanUpControl() {
     htmlEditor.setListener(null);
   }
+
 
 }
