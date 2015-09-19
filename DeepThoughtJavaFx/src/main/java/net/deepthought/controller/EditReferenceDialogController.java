@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.text.DateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -1172,8 +1173,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     referencePersonsControl.setReference(reference);
 
-    dtpckReferencePublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
     txtfldReferenceIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
+    dtpckReferencePublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
 
     txtfldReferenceOnlineAddress.setText(reference.getOnlineAddress());
 
