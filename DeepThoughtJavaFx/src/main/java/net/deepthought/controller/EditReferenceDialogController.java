@@ -1188,6 +1188,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       editedReferenceBase = seriesTitle;
       nodeToFocus = txtfldSeriesTitleTitle;
       btnShowHideSeriesTitlePane.setSelected(true);
+      btnShowHideSeriesTitlePane.setSelected(true);
     }
     else
       setToNewSeries();
@@ -1196,6 +1197,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       reference = creationResult.getReference();
       editedReferenceBase = reference;
       nodeToFocus = txtfldTitle;
+      btnShowHideReferencePane.setSelected(true);
     }
     else
       reference = new Reference();
@@ -1204,6 +1206,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       referenceSubDivision = creationResult.getReferenceSubDivision();
       editedReferenceBase = referenceSubDivision;
       nodeToFocus = txtfldReferenceSubDivisionTitle;
+      btnShowHideReferenceSubDivisionPane.setSelected(true);
     }
     else
       setToNewReferenceSubDivision();
@@ -1279,15 +1282,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       }
       else {
         this.reference = new Reference();
+        nodeToFocus = txtfldTitle;
 
         if(referenceBase instanceof SeriesTitle) {
           this.seriesTitle = (SeriesTitle) referenceBase;
           paneReferenceSubDivision.setVisible(false);
           paneReference.setVisible(false);
+          nodeToFocus = txtfldSeriesTitleTitle;
         }
         else // a new Reference should be created
           setToNewSeries();
-        nodeToFocus = txtfldSeriesTitleTitle;
       }
     }
     return nodeToFocus;

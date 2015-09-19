@@ -343,10 +343,10 @@ public class Dialogs {
       dialogStage.setMinWidth(500);
 
       EditReferenceDialogController controller = loader.getController();
-      if(referenceBase != null)
-        controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
-      else if(creationResult != null)
+      if(creationResult != null)
         controller.setWindowStageAndReferenceBase(dialogStage, creationResult);
+      else
+        controller.setWindowStageAndReferenceBase(dialogStage, referenceBase, persistedParentReferenceBase);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override
