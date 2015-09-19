@@ -1,14 +1,11 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
-import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.event.FieldChangedEvent;
-import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.ReferencePersonsControl;
@@ -23,17 +20,13 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
-import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
@@ -42,9 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.text.DateFormat;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -58,11 +49,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -70,12 +58,10 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 
 /**
  * Created by ganymed on 21/12/14.
@@ -172,51 +158,51 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
   @FXML
-  protected Pane paneTitle;
+  protected Pane paneReferenceTitle;
   @FXML
-  protected TextField txtfldTitle;
+  protected TextField txtfldReferenceTitle;
 
   @FXML
-  protected Pane paneSubTitle;
+  protected Pane paneReferenceSubTitle;
   @FXML
-  protected TextField txtfldSubTitle;
+  protected TextField txtfldReferenceSubTitle;
 
   @FXML
-  protected TitledPane ttldpnAbstract;
+  protected TitledPane ttldpnReferenceAbstract;
   @FXML
-  protected TextArea txtarAbstract;
+  protected TextArea txtarReferenceAbstract;
 
-  protected CollapsibleHtmlEditor htmledTableOfContents;
+  protected CollapsibleHtmlEditor htmledReferenceTableOfContents;
 
 
   protected ReferencePersonsControl referencePersonsControl;
 
   @FXML
-  protected Pane panePublishingDate;
+  protected Pane paneReferencePublishingDate;
   @FXML
-  protected TextField txtfldIssueOrPublishingDate;
+  protected TextField txtfldReferenceIssueOrPublishingDate;
   @FXML
-  protected DatePicker dtpckPublishingDate;
+  protected DatePicker dtpckReferencePublishingDate;
 
   @FXML
-  protected Pane paneOnlineAddress;
+  protected Pane paneReferenceOnlineAddress;
   @FXML
-  protected TextField txtfldOnlineAddress;
+  protected TextField txtfldReferenceOnlineAddress;
 
   @FXML
-  protected TitledPane ttldpnNotes;
+  protected TitledPane ttldpnReferenceNotes;
   @FXML
-  protected TextArea txtarNotes;
+  protected TextArea txtarReferenceNotes;
 
 
   @FXML
-  protected TitledPane ttldpnFiles;
+  protected TitledPane ttldpnReferenceFiles;
   @FXML
-  protected FlowPane flpnFilesPreview;
+  protected FlowPane flpnReferenceFilesPreview;
   @FXML
-  protected TreeTableView<FileLink> trtblvwFiles;
+  protected TreeTableView<FileLink> trtblvwReferenceFiles;
   @FXML
-  protected TreeTableColumn<FileLink, String> clmnFile;
+  protected TreeTableColumn<FileLink, String> clmnReferenceFile;
 
 
   @FXML
@@ -435,21 +421,21 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     searchAndSelectReferenceControl.setMaxHeight(190);
     pnContent.getChildren().add(5, searchAndSelectReferenceControl);
 
-    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
+    txtfldReferenceTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
       if (editedReferenceBase instanceof Reference)
         updateWindowTitle();
     });
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
-    txtfldSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubTitle);
+    txtfldReferenceSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnAbstract);
-    txtarAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceAbstract);
+    txtarReferenceAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract));
 
-    htmledTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledTableOfContents);
-    paneReference.getChildren().add(5, htmledTableOfContents);
+    htmledReferenceTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
+    paneReference.getChildren().add(5, htmledReferenceTableOfContents);
 
     referencePersonsControl = new ReferencePersonsControl();
     referencePersonsControl.setExpanded(false);
@@ -458,23 +444,23 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
     paneReference.getChildren().add(6, referencePersonsControl);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(panePublishingDate);
-    txtfldIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferencePublishingDate);
+    txtfldReferenceIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     });
 
-//    dtpckPublishingDate.setConverter(localeDateStringConverter);
-    dtpckPublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> {
-      txtfldIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(newValue)));
+//    dtpckReferencePublishingDate.setConverter(localeDateStringConverter);
+    dtpckReferencePublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> {
+      txtfldReferenceIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(newValue)));
         });
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneOnlineAddress);
-    txtfldOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceOnlineAddress);
+    txtfldReferenceOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnNotes);
-    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceNotes);
+    txtarReferenceNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceFiles);
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
 //      @Override
 //      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
@@ -562,15 +548,15 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     btnChooseReferenceFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
-    paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneReferenceSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    htmledTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnReferenceAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledReferenceTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    paneOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    paneReferenceOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnReferenceNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnReferenceFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
     btnChooseReferenceSubDivisionFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
@@ -695,7 +681,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     searchAndSelectReferenceControl.cleanUpControl();
     paneReference.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
-    htmledTableOfContents.cleanUpControl();
+    htmledReferenceTableOfContents.cleanUpControl();
     referencePersonsControl.cleanUpControl();
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
@@ -767,25 +753,25 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTitle)) {
-      reference.setTitle(txtfldTitle.getText());
+      reference.setTitle(txtfldReferenceTitle.getText());
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
     }
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceSubTitle)) {
-      reference.setSubTitle(txtfldSubTitle.getText());
+      reference.setSubTitle(txtfldReferenceSubTitle.getText());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
     }
 
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceAbstract)) {
-      reference.setAbstract(txtarAbstract.getText());
+      reference.setAbstract(txtarReferenceAbstract.getText());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
     }
-    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledTableOfContents.getHtml().equals(reference.getTableOfContents()) == false) {
-      if(FXUtils.HtmlEditorDefaultText.equals(htmledTableOfContents.getHtml())) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledReferenceTableOfContents.getHtml().equals(reference.getTableOfContents()) == false) {
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledReferenceTableOfContents.getHtml())) {
         if(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()))
           reference.setTableOfContents("");
       }
       else
-        reference.setTableOfContents(htmledTableOfContents.getHtml());
+        reference.setTableOfContents(htmledReferenceTableOfContents.getHtml());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
     }
 
@@ -800,12 +786,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
-      reference.setIssueOrPublishingDate(txtfldIssueOrPublishingDate.getText());
+      reference.setIssueOrPublishingDate(txtfldReferenceIssueOrPublishingDate.getText());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     }
 
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
-      reference.setOnlineAddress(txtfldOnlineAddress.getText());
+      reference.setOnlineAddress(txtfldReferenceOnlineAddress.getText());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
     }
 
@@ -815,7 +801,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 //    }
 
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceNotes)) {
-      reference.setNotes(txtarNotes.getText());
+      reference.setNotes(txtarReferenceNotes.getText());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
     }
 
@@ -971,22 +957,22 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   public void handleButtonChooseReferenceFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
-    if(paneSubTitle.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneSubTitle, "subtitle");
+    if(paneReferenceSubTitle.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubTitle, "subtitle");
 
-    if(ttldpnAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnAbstract, "abstract");
-    if(htmledTableOfContents.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledTableOfContents, "table.of.contents");
+    if(ttldpnReferenceAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceAbstract, "abstract");
+    if(htmledReferenceTableOfContents.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceTableOfContents, "table.of.contents");
 
-    if(paneOnlineAddress.isVisible() == false) {
-      createHiddenFieldMenuItem(hiddenFieldsMenu, paneOnlineAddress, "online.address");
+    if(paneReferenceOnlineAddress.isVisible() == false) {
+      createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceOnlineAddress, "online.address");
     }
 
-    if(ttldpnNotes.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnNotes, "notes");
-    if(ttldpnFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+    if(ttldpnReferenceNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceNotes, "notes");
+    if(ttldpnReferenceFiles.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceFiles, "files");
 
     hiddenFieldsMenu.show(btnChooseReferenceFieldsToShow, Side.BOTTOM, 0, 0);
   }
@@ -1054,7 +1040,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected Node setReferenceBaseInstances(EntryCreationResult creationResult) {
-    Node nodeToFocus = txtfldTitle;
+    Node nodeToFocus = txtfldReferenceTitle;
 
     if(creationResult.getSeriesTitle() != null) {
       seriesTitle = creationResult.getSeriesTitle();
@@ -1068,7 +1054,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     if(creationResult.getReference() != null) {
       reference = creationResult.getReference();
       editedReferenceBase = reference;
-      nodeToFocus = txtfldTitle;
+      nodeToFocus = txtfldReferenceTitle;
       btnShowHideReferencePane.setSelected(true);
     }
     else
@@ -1140,12 +1126,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         this.seriesTitle = reference.getSeries();
         if(this.seriesTitle == null)
           setToNewSeries();
-        nodeToFocus = txtfldTitle;
+        nodeToFocus = txtfldReferenceTitle;
         paneReferenceSubDivision.setVisible(false);
       }
       else {
         setToNewReference();
-        nodeToFocus = txtfldTitle;
+        nodeToFocus = txtfldReferenceTitle;
 
         if(referenceBase instanceof SeriesTitle) {
           this.seriesTitle = (SeriesTitle) referenceBase;
@@ -1165,7 +1151,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     if(persistedParentReferenceBase instanceof SeriesTitle) {
       this.seriesTitle = (SeriesTitle)persistedParentReferenceBase;
-      nodeToFocus = txtfldTitle;
+      nodeToFocus = txtfldReferenceTitle;
     }
     else if(persistedParentReferenceBase instanceof Reference) {
       this.reference = (Reference)persistedParentReferenceBase;
@@ -1178,20 +1164,20 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setReferenceValues(final Reference reference) {
-    txtfldTitle.setText(reference.getTitle());
-    txtfldSubTitle.setText(reference.getSubTitle());
+    txtfldReferenceTitle.setText(reference.getTitle());
+    txtfldReferenceSubTitle.setText(reference.getSubTitle());
 
-    txtarAbstract.setText(reference.getAbstract());
-    htmledTableOfContents.setHtml(reference.getTableOfContents());
+    txtarReferenceAbstract.setText(reference.getAbstract());
+    htmledReferenceTableOfContents.setHtml(reference.getTableOfContents());
 
     referencePersonsControl.setReference(reference);
 
-    dtpckPublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
-    txtfldIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
+    dtpckReferencePublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
+    txtfldReferenceIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
 
-    txtfldOnlineAddress.setText(reference.getOnlineAddress());
+    txtfldReferenceOnlineAddress.setText(reference.getOnlineAddress());
 
-    txtarNotes.setText(reference.getNotes());
+    txtarReferenceNotes.setText(reference.getNotes());
 
 //    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
 
@@ -1277,17 +1263,17 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.ReferenceBaseTitleColumnName))
-        titleChanged((String) previousValue, (String) newValue);
+        referenceTitleChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseSubTitleColumnName))
-        subTitleChanged((String) previousValue, (String) newValue);
+        referenceSubTitleChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseAbstractColumnName))
-        abstractChanged((String) previousValue, (String) newValue);
+        referenceAbstractChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceTableOfContentsColumnName))
-        tableOfContentsChanged((String) previousValue, (String) newValue);
+        referenceTableOfContentsChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
-        onlineAddressChanged((String) previousValue, (String) newValue);
+        referenceOnlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
-        notesChanged((String) previousValue, (String) newValue);
+        referenceNotesChanged((String) previousValue, (String) newValue);
     }
 
     @Override
@@ -1306,39 +1292,39 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
   };
 
-  protected void titleChanged(String previousValue, String newValue) {
+  protected void referenceTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldTitle.setText(newValue);
+    txtfldReferenceTitle.setText(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTitle);
   }
 
-  protected void subTitleChanged(String previousValue, String newValue) {
+  protected void referenceSubTitleChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldSubTitle.setText(newValue);
+    txtfldReferenceSubTitle.setText(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
   }
 
-  protected void abstractChanged(String previousValue, String newValue) {
+  protected void referenceAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarAbstract.setText(newValue);
+    txtarReferenceAbstract.setText(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
   }
 
-  protected void tableOfContentsChanged(String previousValue, String newValue) {
+  protected void referenceTableOfContentsChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    htmledTableOfContents.setHtml(newValue);
+    htmledReferenceTableOfContents.setHtml(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
   }
 
-  protected void onlineAddressChanged(String previousValue, String newValue) {
+  protected void referenceOnlineAddressChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtfldOnlineAddress.setText(newValue);
+    txtfldReferenceOnlineAddress.setText(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
   }
 
-  protected void notesChanged(String previousValue, String newValue) {
+  protected void referenceNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarNotes.setText(newValue);
+    txtarReferenceNotes.setText(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
   }
 

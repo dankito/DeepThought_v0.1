@@ -167,68 +167,68 @@
                         </AnchorPane>
                         <VBox fx:id="paneReference">
                            <children>
-                              <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                              <HBox fx:id="paneReferenceTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefHeight="40.0" prefWidth="135.0" text="%reference.title" />
-                                    <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="txtfldReferenceTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <HBox fx:id="paneSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                              <HBox fx:id="paneReferenceSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
-                                    <TextField fx:id="txtfldSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="txtfldReferenceSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <HBox fx:id="panePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
+                              <HBox fx:id="paneReferencePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="200.0" text="%issue.or.publishing.date">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="txtfldIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                    <DatePicker fx:id="dtpckPublishingDate" editable="false" maxWidth="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="0.0" showWeekNumbers="true" />
+                                    <TextField fx:id="txtfldReferenceIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <DatePicker fx:id="dtpckReferencePublishingDate" editable="false" maxWidth="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="0.0" showWeekNumbers="true" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnAbstract" animated="false" text="%abstract">
+                              <TitledPane fx:id="ttldpnReferenceAbstract" animated="false" text="%abstract">
                                  <content>
-                                    <TextArea fx:id="txtarAbstract" minHeight="120.0" wrapText="true" />
+                                    <TextArea fx:id="txtarReferenceAbstract" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
-                              <HBox fx:id="paneOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                              <HBox fx:id="paneReferenceOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
                                        <HBox.margin>
                                           <Insets />
                                        </HBox.margin>
                                     </Label>
-                                    <TextField fx:id="txtfldOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                    <TextField fx:id="txtfldReferenceOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                  </children>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnNotes" animated="false" expanded="false" text="%notes">
+                              <TitledPane fx:id="ttldpnReferenceNotes" animated="false" expanded="false" text="%notes">
                                  <content>
-                                    <TextArea fx:id="txtarNotes" minHeight="120.0" wrapText="true" />
+                                    <TextArea fx:id="txtarReferenceNotes" minHeight="120.0" wrapText="true" />
                                  </content>
                                  <VBox.margin>
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </TitledPane>
-                              <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
+                              <TitledPane fx:id="ttldpnReferenceFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
                                  <graphic>
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
@@ -238,16 +238,16 @@
                                                 <Insets left="6.0" right="6.0" />
                                              </HBox.margin>
                                           </Button>
-                                          <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+                                          <FlowPane fx:id="flpnReferenceFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>
                                  </graphic>
                                  <content>
                                     <VBox>
                                        <children>
-                                          <TreeTableView fx:id="trtblvwFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
+                                          <TreeTableView fx:id="trtblvwReferenceFiles" prefHeight="200.0" prefWidth="200.0" showRoot="false">
                                             <columns>
-                                              <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
+                                              <TreeTableColumn fx:id="clmnReferenceFile" editable="false" minWidth="80.0" prefWidth="757.0" text="%file" />
                                             </columns>
                                              <columnResizePolicy>
                                                 <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
