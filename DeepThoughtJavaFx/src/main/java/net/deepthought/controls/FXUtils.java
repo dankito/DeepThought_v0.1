@@ -1,6 +1,7 @@
 package net.deepthought.controls;
 
 import net.deepthought.Application;
+import net.deepthought.controller.Dialogs;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.model.settings.WindowSettings;
@@ -110,7 +111,7 @@ public class FXUtils {
 
 
   public static boolean loadControl(Object controller, String controlName) {
-    FXMLLoader fxmlLoader = new FXMLLoader(controller.getClass().getClassLoader().getResource("controls/" + controlName + ".fxml"));
+    FXMLLoader fxmlLoader = new FXMLLoader(controller.getClass().getClassLoader().getResource(Dialogs.ControlsBaseFolder + controlName + ".fxml"));
     fxmlLoader.setRoot(controller);
     fxmlLoader.setController(controller);
     fxmlLoader.setResources(JavaFxLocalization.Resources);

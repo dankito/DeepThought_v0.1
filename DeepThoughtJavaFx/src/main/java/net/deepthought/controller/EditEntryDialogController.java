@@ -93,7 +93,7 @@ import javafx.util.Callback;
 /**
  * Created by ganymed on 21/12/14.
  */
-public class EditEntryDialogController extends ChildWindowsController implements Initializable {
+public class EditEntryDialogController extends EntityDialogFrameController implements Initializable {
 
   private final static Logger log = LoggerFactory.getLogger(EditEntryDialogController.class);
 
@@ -102,19 +102,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
   protected EntryCreationResult creationResult = null;
 
-  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
-
   protected ObservableList<FileLink> listViewFilesItems;
 
 
-  @FXML
-  protected Pane pnBottomBar;
-
-  @FXML
-  protected BorderPane dialogPane;
-
-  @FXML
-  protected Button btnApplyChanges;
 
   @FXML
   protected ScrollPane scrpnContent;
@@ -125,12 +115,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
   protected Pane paneTitle;
   @FXML
   protected TextField txtfldTitle;
-
-  @FXML
-  protected Button btnChooseFieldsToShow;
-  @FXML
-  protected ToggleButton tglbtnShowHideContextHelp;
-  protected ContextHelpControl contextHelpControl;
 
   protected CollapsibleHtmlEditor htmledAbstract;
 
@@ -159,36 +143,34 @@ public class EditEntryDialogController extends ChildWindowsController implements
 
 
   @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
-      @Override
-      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
-        btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
-      }
-    });
-
-    Application.getSettings().addSettingsChangedListener(settingsChangedListener);
-
-    // TODO: what to do when DeepThought changes -> close dialog
+  protected String getHelpTextResourceKeyPrefix() {
+    return "context.help.entry.";
   }
 
-  protected SettingsChangedListener settingsChangedListener = new SettingsChangedListener() {
-    @Override
-    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      if (setting == Setting.UserDeviceShowCategories)
-        setCategoriesPaneVisibility((boolean) newValue);
-      else if (setting == Setting.UserDeviceDialogFieldsDisplay)
-        dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
-    }
-  };
+  @Override
+  protected String getEntityType() {
+    return "entry";
+  }
+
+  @Override
+  protected Node getContent() {
+    return scrpnContent;
+  }
+
+  @Override
+  protected void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+    super.settingsChanged(setting, previousValue, newValue);
+
+    if (setting == Setting.UserDeviceShowCategories)
+      setCategoriesPaneVisibility((boolean) newValue);
+  }
 
   protected void setupControls() {
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
+    super.setupControls();
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
-      updateWindowTitle(newValue);
     });
     paneTitle.setVisible(false);
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
@@ -236,16 +218,6 @@ public class EditEntryDialogController extends ChildWindowsController implements
         return new FileTreeTableCell(entry);
       }
     });
-
-
-    contextHelpControl = new ContextHelpControl("context.help.entry.");
-    dialogPane.setRight(contextHelpControl);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
-    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-
-    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void setupTagsAndCategoriesControl() {
@@ -314,8 +286,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll || entryReferenceControl.isVisible() == false ||
-                          entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false);
+    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
+                          entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false));
 
     setCategoriesPaneVisibility();
   }
@@ -328,18 +300,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryCategoriesControl.setVisible(showCategories);
 
     if(showCategories) {
-//      if(paneTagsAndCategories.getChildren().contains(entryCategoriesControl) == false)
-//        paneTagsAndCategories.add(entryCategoriesControl, 1, 0);
-//      tagsColumn.setPercentWidth(50);
-//      categoriesColumn.setPercentWidth(50);
-//      if(paneTagsAndCategories.getItems().contains(entryCategoriesControl) == false)
-//        paneTagsAndCategories.getItems().add(entryCategoriesControl);
+      if(paneTagsAndCategories.getItems().contains(entryCategoriesControl) == false)
+        paneTagsAndCategories.getItems().add(entryCategoriesControl);
     }
     else {
-//      paneTagsAndCategories.getChildren().remove(entryCategoriesControl);
-//      tagsColumn.setPercentWidth(100);
-//      categoriesColumn.setPercentWidth(0);
-//      paneTagsAndCategories.getItems().remove(entryCategoriesControl);
+      paneTagsAndCategories.getItems().remove(entryCategoriesControl);
     }
   }
 
@@ -373,26 +338,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
 
-  @FXML
-  public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEntry();
-  }
-
-  @FXML
-  public void handleButtonCancelAction(ActionEvent actionEvent) {
-    closeDialog(DialogResult.Cancel);
-  }
-
-  @FXML
-  public void handleButtonOkAction(ActionEvent actionEvent) {
-    saveEntry();
-    closeDialog(DialogResult.Ok);
-  }
-
   @Override
   protected void closeDialog() {
     entry.removeEntityListener(entryListener);
-    Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
 
     htmledAbstract.cleanUpControl();
     htmledContent.cleanUpControl();
@@ -406,7 +354,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
     super.closeDialog();
   }
 
-  protected void saveEntry() {
+  @Override
+  protected void saveEntity() {
     persistEntitiesIfNecessary();
 
     saveEditedFieldsOnEntry();
@@ -519,24 +468,9 @@ public class EditEntryDialogController extends ChildWindowsController implements
     btnApplyChanges.setDisable(true);
   }
 
+
   @Override
-  protected boolean askIfStageShouldBeClosed() {
-    if(hasUnsavedChanges()) {
-      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "entry");
-
-      if(result.equals(ButtonType.CANCEL))
-        return false;
-      else if(result.equals(ButtonType.YES)) {
-        saveEntry();
-      }
-    }
-
-    return true;
-  }
-
-
-  @FXML
-  public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
+  public ContextMenu createHiddenFieldsContextMenu() {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
 //    if(paneTitle.isVisible() == false)
@@ -559,18 +493,8 @@ public class EditEntryDialogController extends ChildWindowsController implements
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
 
     hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
-  }
 
-  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, final Node nodeToShowOnClick, String menuItemText) {
-    MenuItem titleMenuItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
-    hiddenFieldsMenu.getItems().add(titleMenuItem);
-    titleMenuItem.setOnAction(event -> {
-      nodeToShowOnClick.setVisible(true);
-
-      if (nodeToShowOnClick instanceof CollapsiblePane)
-        ((CollapsiblePane) nodeToShowOnClick).setExpanded(true);
-    });
+    return hiddenFieldsMenu;
   }
 
 
@@ -599,17 +523,13 @@ public class EditEntryDialogController extends ChildWindowsController implements
   }
 
   public void setWindowStageAndEntry(final Stage windowStage, Entry entry) {
-    super.setWindowStage(windowStage);
     this.entry = entry;
-
-    updateWindowTitle(entry.getPreview());
-
-    setupControls();
+    super.setWindowStage(windowStage, entry);
 
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
 
-    contentPane.minHeightProperty().bind(windowStage.heightProperty().subtract(pnBottomBar.heightProperty()));
+    contentPane.minHeightProperty().bind(windowStage.heightProperty().subtract(pnBottomBar.heightProperty())); // TODO: remove again?
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
     FXUtils.focusNode(htmledContent);
@@ -630,39 +550,11 @@ public class EditEntryDialogController extends ChildWindowsController implements
     entryReferenceControl.setExpanded(creationResult.isAReferenceSet() == false);
   }
 
-  protected void showContextHelpForTarget(MouseEvent event) {
-    EventTarget target = event.getTarget();
-    log.debug("Target has been {}, source {}", target, event.getSource());
-    if(target instanceof Node && ("txtfldSearchForPerson".equals(((Node)target).getId()) || isNodeChildOf((Node)target, entryPersonsControl)))
-      contextHelpControl.showContextHelpForResourceKey("search.person");
-    else  // TODO: add Context Help for other fields
-      contextHelpControl.showContextHelpForResourceKey("default");
+
+  @Override
+  protected String getEntityPreview() {
+    return entry.getPreview();
   }
-
-  protected boolean isNodeChildOf(Node node, Node parentToSearchFor) {
-    Parent parent = node.getParent();
-
-    while(parent != null) {
-      if(parent.equals(parentToSearchFor))
-        return true;
-
-      parent = parent.getParent();
-    }
-
-    return false;
-  }
-
-  public boolean hasUnsavedChanges() {
-    return fieldsWithUnsavedChanges.size() > 0;
-  }
-
-  protected void updateWindowTitle(String entryTitle) {
-    if(this.entry.isPersisted() == false)
-      JavaFxLocalization.bindStageTitle(windowStage, "create.entry", entryTitle);
-    else
-      JavaFxLocalization.bindStageTitle(windowStage, "edit.entry", entryTitle);
-  }
-
 
   protected EntityListener entryListener = new EntityListener() {
     @Override

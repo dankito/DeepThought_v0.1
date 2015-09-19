@@ -25,8 +25,10 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -513,16 +515,28 @@ public class Dialogs {
     Parent parent = loader.load();
     JavaFxLocalization.resolveResourceKeys(parent);
 
-    // Create the dialog Stage.
+    BorderPane dialogFrame = loadDialogFrame(loader, parent);
+
     Stage dialogStage = new Stage();
     if(owner != null)
       dialogStage.initOwner(owner);
     dialogStage.initModality(modality);
     dialogStage.initStyle(stageStyle);
 
-    Scene scene = new Scene(parent);
+    Scene scene = new Scene(dialogFrame);
     dialogStage.setScene(scene);
     return dialogStage;
+  }
+
+  protected static BorderPane loadDialogFrame(FXMLLoader loader, Parent parent) throws IOException {
+    FXMLLoader fxmlLoader = new FXMLLoader(Dialogs.class.getClassLoader().getResource(Dialogs.DialogsBaseFolder + "EntityDialogFrame.fxml"));
+    fxmlLoader.setController(loader.getController());
+    fxmlLoader.setResources(JavaFxLocalization.Resources);
+
+    BorderPane dialogFrame = fxmlLoader.load();
+    JavaFxLocalization.resolveResourceKeys(dialogFrame);
+    dialogFrame.setCenter(parent);
+    return dialogFrame;
   }
 
 
