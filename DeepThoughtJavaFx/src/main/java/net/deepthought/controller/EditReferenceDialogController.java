@@ -318,6 +318,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
     paneSeriesTitle.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
 
+    btnShowHideSeriesTitlePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideSeriesTitlePaneText());
+    setButtonShowHideSeriesTitlePaneText();
+
     btnShowHideSearchSeriesTitle.setGraphic(new ImageView(Constants.SearchIconPath));
 
     searchAndSelectSeriesTitleControl = new SearchAndSelectReferenceControl(ReferenceBaseType.SeriesTitle, new ISelectedReferenceHolder() {
@@ -407,6 +410,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void setupReferenceControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
     paneReference.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
+
+    btnShowHideReferencePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferencePaneText());
+    setButtonShowHideReferencePaneText();
 
     btnShowHideSearchReference.setGraphic(new ImageView(Constants.SearchIconPath));
 
@@ -501,6 +507,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected void setupReferenceSubDivisionControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
     paneReferenceSubDivision.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
+
+    btnShowHideReferenceSubDivisionPane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferenceSubDivisionPaneText());
+    setButtonShowHideReferenceSubDivisionPaneText();
 
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
@@ -986,7 +995,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   @FXML
-  public void handleButtonShowHideSeriesTitlePaneAction(ActionEvent actionEvent) {
+  public void setButtonShowHideSeriesTitlePaneText() {
     if(btnShowHideSeriesTitlePane.isSelected())
       btnShowHideSeriesTitlePane.setText(CollapsiblePane.ExpandedText);
     else
@@ -1021,7 +1030,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   @FXML
-  public void handleButtonShowHideReferencePaneAction(ActionEvent actionEvent) {
+  public void setButtonShowHideReferencePaneText() {
     if(btnShowHideReferencePane.isSelected())
       btnShowHideReferencePane.setText(CollapsiblePane.ExpandedText);
     else
@@ -1053,7 +1062,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   @FXML
-  public void handleButtonShowHideReferenceSubDivisionPaneAction(ActionEvent actionEvent) {
+  public void setButtonShowHideReferenceSubDivisionPaneText() {
     if(btnShowHideReferenceSubDivisionPane.isSelected())
       btnShowHideReferenceSubDivisionPane.setText(CollapsiblePane.ExpandedText);
     else

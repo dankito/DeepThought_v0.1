@@ -41,7 +41,7 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ToggleButton fx:id="btnShowHideSeriesTitlePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleButtonShowHideSeriesTitlePaneAction" prefHeight="28.0" prefWidth="28.0" text="▼">
+                                    <ToggleButton fx:id="btnShowHideSeriesTitlePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" text="▼">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>
@@ -162,7 +162,7 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ToggleButton fx:id="btnShowHideReferencePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" onAction="#handleButtonShowHideReferencePaneAction" prefHeight="28.0" prefWidth="28.0" text="▼">
+                                    <ToggleButton fx:id="btnShowHideReferencePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" selected="true" text="▼">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>
@@ -191,7 +191,7 @@
                               </Button>
                            </children>
                            <VBox.margin>
-                              <Insets />
+                              <Insets top="12.0" />
                            </VBox.margin>
                         </AnchorPane>
                         <VBox fx:id="paneReference">
@@ -295,7 +295,7 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <ToggleButton fx:id="btnShowHideReferenceSubDivisionPane" contentDisplay="TEXT_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" onAction="#handleButtonShowHideReferenceSubDivisionPaneAction" text="▼">
+                                    <ToggleButton fx:id="btnShowHideReferenceSubDivisionPane" contentDisplay="TEXT_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" text="▼">
                                        <HBox.margin>
                                           <Insets right="6.0" />
                                        </HBox.margin>
@@ -319,7 +319,7 @@
                               </Button>
                            </children>
                            <VBox.margin>
-                              <Insets />
+                              <Insets top="12.0" />
                            </VBox.margin>
                         </AnchorPane>
                         <VBox fx:id="paneReferenceSubDivision">
