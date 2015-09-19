@@ -128,6 +128,7 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 //    loadFrame();
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
+    setButtonChooseFieldsToShowVisiblity(false);
 
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
@@ -203,7 +204,8 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = createHiddenFieldsContextMenu();
 
-    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
+    if(hiddenFieldsMenu != null)
+      hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
   }
 
   protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, final Node nodeToShowOnClick, String menuItemText) {

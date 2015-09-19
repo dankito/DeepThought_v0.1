@@ -3,9 +3,6 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.CollapsiblePane;
-import net.deepthought.controls.Constants;
-import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -27,66 +24,37 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.BoundingBox;
-import javafx.geometry.Bounds;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
-import javafx.geometry.VPos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -162,6 +130,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   protected void setupControls() {
     super.setupControls();
+
+    setButtonChooseFieldsToShowVisiblity(true);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -281,7 +251,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
+    setButtonChooseFieldsToShowVisiblity(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
                           entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false));
 
     setCategoriesPaneVisibility();
