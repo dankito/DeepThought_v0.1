@@ -105,6 +105,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Button btnApplyChanges;
 
   @FXML
+  protected ToggleButton tglbtnShowHideContextHelp;
+
+  protected ContextHelpControl contextHelpControl;
+
+
+  @FXML
   protected VBox pnContent;
 
   @FXML
@@ -127,11 +133,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected TextField txtfldSeriesTitleTitle;
   @FXML
   protected Button btnChooseSeriesTitleFieldsToShow;
-
-  @FXML
-  protected ToggleButton tglbtnShowHideContextHelp;
-
-  protected ContextHelpControl contextHelpControl;
 
   @FXML
   protected Pane paneSeriesTitleSubTitle;
@@ -311,6 +312,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     setupSeriesTitleControls();
     setupReferenceControls();
     setupReferenceSubDivisionControls();
+
+    setupContextHelpControl();
   }
 
 
@@ -380,15 +383,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleFiles);
-
-    contextHelpControl = new ContextHelpControl("context.help.series.title.");
-    dialogPane.setRight(contextHelpControl);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
-    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-
-    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void setSeriesTitle(SeriesTitle newSeriesTitle) {
@@ -546,6 +540,17 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //        return new FileTreeTableCell(referenceSubDivision);
 //      }
 //    });
+  }
+
+  protected void setupContextHelpControl() {
+    contextHelpControl = new ContextHelpControl("context.help.series.title.");
+    dialogPane.setRight(contextHelpControl);
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
+    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
+
+    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
 
