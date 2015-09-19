@@ -3,6 +3,7 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
@@ -104,6 +105,9 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Button btnApplyChanges;
 
   @FXML
+  protected VBox pnContent;
+
+  @FXML
   protected Pane paneSeriesTitle;
 
   @FXML
@@ -111,6 +115,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   protected Pane paneSeriesTitleHeader;
+  @FXML
+  protected ToggleButton btnShowHideSeriesTitlePane;
   @FXML
   protected ToggleButton btnShowHideSearchSeriesTitle;
   protected SearchAndSelectReferenceControl searchAndSelectSeriesTitleControl = null;
@@ -167,6 +173,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected Button btnChooseFieldsToShow;
 
   @FXML
+  protected ToggleButton btnShowHideReferencePane;
+  @FXML
   protected ToggleButton btnShowHideSearchReference;
   protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
@@ -220,6 +228,8 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @FXML
   protected Pane paneReferenceSubDivision;
+  @FXML
+  protected ToggleButton btnShowHideReferenceSubDivisionPane;
   @FXML
   protected Button btnChooseReferenceSubDivisionFieldsToShow;
 
@@ -305,6 +315,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   protected void setupSeriesTitleControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
+    paneSeriesTitle.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
+
+    btnShowHideSearchSeriesTitle.setGraphic(new ImageView(Constants.SearchIconPath));
+
     searchAndSelectSeriesTitleControl = new SearchAndSelectReferenceControl(ReferenceBaseType.SeriesTitle, new ISelectedReferenceHolder() {
       @Override
       public ReferenceBase getSelectedReferenceBase() {
@@ -327,7 +342,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     searchAndSelectSeriesTitleControl.visibleProperty().bind(btnShowHideSearchSeriesTitle.selectedProperty());
     searchAndSelectSeriesTitleControl.setMinHeight(190);
     searchAndSelectSeriesTitleControl.setMaxHeight(190);
-    paneSeriesTitle.getChildren().add(1, searchAndSelectSeriesTitleControl);
+    pnContent.getChildren().add(1, searchAndSelectSeriesTitleControl);
 
     txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
@@ -384,13 +399,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
     seriesTitle = newSeriesTitle;
     if(seriesTitle == null)
-      this.seriesTitle = new SeriesTitle();
+      setToNewSeries();
 
     setSeriesTitleValues(seriesTitle);
   }
 
   protected void setupReferenceControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
+    paneReference.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
+
+    btnShowHideSearchReference.setGraphic(new ImageView(Constants.SearchIconPath));
 
     searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.Reference, new ISelectedReferenceHolder() {
       @Override
@@ -414,7 +432,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     searchAndSelectReferenceControl.visibleProperty().bind(btnShowHideSearchReference.selectedProperty());
     searchAndSelectReferenceControl.setMinHeight(190);
     searchAndSelectReferenceControl.setMaxHeight(190);
-    paneReference.getChildren().add(1, searchAndSelectReferenceControl);
+    pnContent.getChildren().add(5, searchAndSelectReferenceControl);
 
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
@@ -482,6 +500,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   protected void setupReferenceSubDivisionControls() {
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+    paneReferenceSubDivision.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
 
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
@@ -966,11 +985,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
 
-  public void handleButtonNewOrEditSeriesTitleCategoryAction(ActionEvent event) {
-//    if(btnNewOrEditSeriesTitleCategory.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-//      Dialogs.showEditSeriesTitleCategoryDialog(cmbxSeriesTitleCategory.getValue());
-//    else
-//      createNewSeriesTitleCategory();
+  @FXML
+  public void handleButtonShowHideSeriesTitlePaneAction(ActionEvent actionEvent) {
+    if(btnShowHideSeriesTitlePane.isSelected())
+      btnShowHideSeriesTitlePane.setText(CollapsiblePane.ExpandedText);
+    else
+      btnShowHideSeriesTitlePane.setText(CollapsiblePane.CollapsedText);
   }
 
   public void handleButtonChooseSeriesTitleFieldsToShowAction(ActionEvent event) {
@@ -999,8 +1019,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     hiddenFieldsMenu.show(btnChooseSeriesTitleFieldsToShow, Side.BOTTOM, 0, 0);
   }
 
-  public void handleButtonNewOrEditSeriesTitleAction(ActionEvent event) {
 
+  @FXML
+  public void handleButtonShowHideReferencePaneAction(ActionEvent actionEvent) {
+    if(btnShowHideReferencePane.isSelected())
+      btnShowHideReferencePane.setText(CollapsiblePane.ExpandedText);
+    else
+      btnShowHideReferencePane.setText(CollapsiblePane.CollapsedText);
   }
 
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
@@ -1024,6 +1049,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
 
     hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+  }
+
+
+  @FXML
+  public void handleButtonShowHideReferenceSubDivisionPaneAction(ActionEvent actionEvent) {
+    if(btnShowHideReferenceSubDivisionPane.isSelected())
+      btnShowHideReferenceSubDivisionPane.setText(CollapsiblePane.ExpandedText);
+    else
+      btnShowHideReferenceSubDivisionPane.setText(CollapsiblePane.CollapsedText);
   }
 
   public void handleButtonChooseReferenceSubDivisionFieldsToShowAction(ActionEvent event) {
@@ -1153,9 +1187,10 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       seriesTitle = creationResult.getSeriesTitle();
       editedReferenceBase = seriesTitle;
       nodeToFocus = txtfldSeriesTitleTitle;
+      btnShowHideSeriesTitlePane.setSelected(true);
     }
     else
-      seriesTitle = new SeriesTitle();
+      setToNewSeries();
 
     if(creationResult.getReference() != null) {
       reference = creationResult.getReference();
@@ -1171,7 +1206,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       nodeToFocus = txtfldReferenceSubDivisionTitle;
     }
     else
-      referenceSubDivision = new ReferenceSubDivision();
+      setToNewReferenceSubDivision();
 
     setupDialog(windowStage, nodeToFocus);
 
@@ -1181,6 +1216,17 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
     if(creationResult.getReferenceSubDivision() != null && referenceSubDivision.isPersisted() == false)
       fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle);
+
+  }
+
+  protected void setToNewReferenceSubDivision() {
+    referenceSubDivision = new ReferenceSubDivision();
+    btnShowHideReferenceSubDivisionPane.setSelected(false);
+  }
+
+  protected void setToNewSeries() {
+    seriesTitle = new SeriesTitle();
+    btnShowHideSeriesTitlePane.setSelected(false);
   }
 
   protected void setupDialog(Stage windowStage, Node nodeToFocus) {
@@ -1193,6 +1239,13 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     setSeriesTitleValues(seriesTitle);
     setReferenceValues(reference);
     setReferenceSubDivisionValues(referenceSubDivision);
+
+    if(seriesTitle.isPersisted())
+      btnShowHideSeriesTitlePane.setSelected(true);
+    if(reference.isPersisted())
+      btnShowHideReferencePane.setSelected(true);
+    if(referenceSubDivision.isPersisted())
+      btnShowHideReferenceSubDivisionPane.setSelected(true);
 
     btnApplyChanges.setVisible(seriesTitle.isPersisted() || reference.isPersisted() || referenceSubDivision.isPersisted());
     FXUtils.focusNode(nodeToFocus);
@@ -1211,16 +1264,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       else
         this.seriesTitle = reference.getSeries();
       if(this.seriesTitle == null)
-        this.seriesTitle = new SeriesTitle();
+        setToNewSeries();
     }
     else {
-      this.referenceSubDivision = new ReferenceSubDivision();
+      setToNewReferenceSubDivision();
 
       if(referenceBase instanceof Reference) {
         this.reference = (Reference) referenceBase;
         this.seriesTitle = reference.getSeries();
         if(this.seriesTitle == null)
-          this.seriesTitle = new SeriesTitle();
+          setToNewSeries();
         nodeToFocus = txtfldTitle;
         paneReferenceSubDivision.setVisible(false);
       }
@@ -1233,7 +1286,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
           paneReference.setVisible(false);
         }
         else // a new Reference should be created
-          this.seriesTitle = new SeriesTitle();
+          setToNewSeries();
         nodeToFocus = txtfldSeriesTitleTitle;
       }
     }
@@ -1251,7 +1304,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       this.reference = (Reference)persistedParentReferenceBase;
       this.seriesTitle = reference.getSeries();
       if(seriesTitle == null)
-        this.seriesTitle = new SeriesTitle();
+        setToNewSeries();
       nodeToFocus = txtfldReferenceSubDivisionTitle;
     }
     return nodeToFocus;
