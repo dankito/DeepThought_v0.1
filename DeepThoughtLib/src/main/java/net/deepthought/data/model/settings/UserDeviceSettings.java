@@ -50,7 +50,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
     this.languageId = language == null ? null : language.getId();
 
-    applyLanguageSettings();
+    Localization.setLanguageLocale(getLanguage());
 
     callSettingsChangedListeners(Setting.UserDeviceLanguage, previousValue, language);
   }
@@ -113,15 +113,6 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
     Object previousValue = this.showQuickEditEntryPane;
     this.showQuickEditEntryPane = showEntryQuickEditPane;
     callSettingsChangedListeners(Setting.UserDeviceShowQuickEditEntryPane, previousValue, showEntryQuickEditPane);
-  }
-
-
-  public void applySettings() {
-    applyLanguageSettings();
-  }
-
-  protected void applyLanguageSettings() {
-    Localization.setLanguageLocale(getLanguage());
   }
 
 }

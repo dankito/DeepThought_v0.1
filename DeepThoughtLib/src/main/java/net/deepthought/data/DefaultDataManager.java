@@ -97,7 +97,6 @@ public class DefaultDataManager implements IDataManager {
         application = applicationsQueryResult.get(0);
 //        setCurrentDeepThoughtApplication(application);
         loggedOnUser = application.getLastLoggedOnUser();
-        loggedOnUser.getSettings().applySettings();
 
         // TODO: what to return if user was already logged on but autoLogOn is set to false?
         if (application.autoLogOnLastLoggedOnUser()) {

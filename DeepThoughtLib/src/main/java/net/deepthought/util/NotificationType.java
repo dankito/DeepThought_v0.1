@@ -10,5 +10,6 @@ public enum NotificationType {
   ApplicationInstantiated,
   DeepThoughtsConnectorStarted,
   PluginLoaded,
+  LanguageChanged
 
 }

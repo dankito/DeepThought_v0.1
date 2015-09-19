@@ -760,7 +760,6 @@ public class MainWindowController implements Initializable {
 
   protected void applicationLanguageChanged(ApplicationLanguage language) {
     Application.getLoggedOnUser().getSettings().setLanguage(language);
-    JavaFxLocalization.setLocaleForLanguage(language);
   }
 
   @FXML

@@ -16,7 +16,7 @@
     <children>
         <HBox fx:id="hboxTagsBar" alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0">
             <children>
-                <Label text="%search">
+                <Label maxWidth="-Infinity" minWidth="-Infinity" text="%search">
                     <HBox.margin>
                         <Insets right="6.0" />
                     </HBox.margin></Label>

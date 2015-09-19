@@ -1,5 +1,8 @@
 package net.deepthought.util;
 
+import net.deepthought.Application;
+import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 
 import org.slf4j.Logger;
@@ -8,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -53,7 +57,8 @@ public class JavaFxLocalization {
 
   public static void setLocale(Locale locale) {
     Localization.setLanguageLocale(locale);
-    localeProperty().set(locale);
+
+    Platform.runLater(() -> localeProperty().set(locale));
   }
 
   public static void setLocaleForLanguage(ApplicationLanguage language) {
@@ -62,6 +67,26 @@ public class JavaFxLocalization {
     } catch(Exception ex) {
       log.error("Could not find Locale for ApplicationLanguage's LanguageKey " + language.getLanguageKey() + " of ApplicationLanguage " + language.getName(), ex);
     }
+  }
+
+
+  static {
+    Application.addApplicationListener(new ApplicationListener() {
+      @Override
+      public void deepThoughtChanged(DeepThought deepThought) {
+
+      }
+
+      @Override
+      public void notification(Notification notification) {
+        if(notification.getType() == NotificationType.LanguageChanged) {
+          if(notification.getParameter() instanceof ApplicationLanguage)
+            setLocaleForLanguage((ApplicationLanguage)notification.getParameter());
+          else
+            setLocale(Localization.getLanguageLocale());
+        }
+      }
+    });
   }
 
 

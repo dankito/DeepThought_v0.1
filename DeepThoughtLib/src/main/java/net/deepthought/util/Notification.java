@@ -7,15 +7,19 @@ public class Notification {
 
   protected NotificationType type;
 
-  protected String notificationMessage;
+  protected String notificationMessage = "";
 
   protected String notificationMessageTitle = null;
 
   protected Object parameter = null;
 
 
-  public Notification(NotificationType type, String notificationMessage) {
+  public Notification(NotificationType type) {
     this.type = type;
+  }
+
+  public Notification(NotificationType type, String notificationMessage) {
+    this(type);
     this.notificationMessage = notificationMessage;
   }
 
@@ -31,6 +35,11 @@ public class Notification {
 
   public Notification(NotificationType type, String notificationMessage, String notificationMessageTitle, Object parameter) {
     this(type, notificationMessage, notificationMessageTitle);
+    this.parameter = parameter;
+  }
+
+  public Notification(NotificationType type, Object parameter) {
+    this(type);
     this.parameter = parameter;
   }
 
