@@ -28,6 +28,8 @@ import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
 import net.deepthought.util.Localization;
+import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.text.DateFormat;
+import java.time.chrono.Chronology;
 import java.util.Collection;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -252,11 +255,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   @Override
-  protected Node getContent() {
-    return pnContent;
-  }
-
-  @Override
   protected String getHelpTextResourceKeyPrefix() {
     return "context.help.series.title.";
   }
@@ -269,6 +267,16 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   @Override
   protected ContextMenu createHiddenFieldsContextMenu() {
     return null;
+  }
+
+  @Override
+  protected void notificationReceived(Notification notification) {
+    super.notificationReceived(notification);
+
+    if(notification.getType() == NotificationType.LanguageChanged) {
+      dtpckReferencePublishingDate.setChronology(Chronology.ofLocale(Localization.getLanguageLocale()));
+      setReferenceIssueTextFieldToDateSelectedInDatePicker();
+    }
   }
 
   @Override
@@ -450,10 +458,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     });
 
-//    dtpckReferencePublishingDate.setConverter(localeDateStringConverter);
-    dtpckReferencePublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> {
-      txtfldReferenceIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(newValue)));
-        });
+    dtpckReferencePublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> setReferenceIssueTextFieldToDateSelectedInDatePicker());
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceOnlineAddress);
     txtfldReferenceOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
@@ -468,6 +473,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 //        return new FileTreeTableCell(reference);
 //      }
 //    });
+  }
+
+  protected void setReferenceIssueTextFieldToDateSelectedInDatePicker() {
+    if(dtpckReferencePublishingDate.getValue() != null) {
+      Date date = DateConvertUtils.asUtilDate(dtpckReferencePublishingDate.getValue());
+      txtfldReferenceIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(date));
+    }
   }
 
   protected void setReference(Reference newReference) {

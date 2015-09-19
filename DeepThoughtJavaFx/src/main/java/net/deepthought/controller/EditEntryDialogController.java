@@ -153,11 +153,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   @Override
-  protected Node getContent() {
-    return scrpnContent;
-  }
-
-  @Override
   protected void settingsChanged(Setting setting, Object previousValue, Object newValue) {
     super.settingsChanged(setting, previousValue, newValue);
 

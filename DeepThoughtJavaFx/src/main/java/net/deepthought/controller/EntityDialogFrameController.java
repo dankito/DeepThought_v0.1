@@ -7,33 +7,20 @@ import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.html.HtmlEditorListener;
-import net.deepthought.data.contentextractor.EntryCreationResult;
-import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.FileLink;
-import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Reference;
-import net.deepthought.data.model.ReferenceBase;
-import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.listener.ApplicationListener;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
-import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -42,7 +29,6 @@ import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Side;
 import javafx.scene.Node;
@@ -101,26 +87,8 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
     });
 
     Application.getSettings().addSettingsChangedListener(settingsChangedListener);
+    Application.addApplicationListener(applicationListener);
   }
-
-  protected void loadFrame() {
-    FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getClassLoader().getResource(Dialogs.DialogsBaseFolder + "EntityDialogFrame.fxml"));
-//    fxmlLoader.setRoot(this);
-    fxmlLoader.setController(this);
-    fxmlLoader.setResources(JavaFxLocalization.Resources);
-
-    try {
-      Object loadedObject = fxmlLoader.load();
-      if(loadedObject instanceof Node)
-        JavaFxLocalization.resolveResourceKeys((Node)loadedObject);
-
-      dialogPane.setCenter(getContent());
-    } catch (IOException ex) {
-      log.error("Could not load EntityDialogFrame", ex);
-    }
-  }
-
-  protected abstract Node getContent();
 
   protected void fieldsWithUnsavedChangesChanged() {
     btnApplyChanges.setDisable(fieldsWithUnsavedChanges.size() == 0);
@@ -136,8 +104,25 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   };
 
   protected void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-
+    // maybe overwritten in sub class
   }
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+
+    }
+
+    @Override
+    public void notification(Notification notification) {
+      notificationReceived(notification);
+    }
+  };
+
+  protected void notificationReceived(Notification notification) {
+    // maybe overwritten in sub class
+  }
+
 
   protected void setupControls() {
 //    loadFrame();
@@ -182,6 +167,7 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   @Override
   protected void closeDialog() {
     Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
+    Application.removeApplicationListener(applicationListener);
 
     super.closeDialog();
   }
