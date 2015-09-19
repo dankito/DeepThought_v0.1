@@ -9,37 +9,7 @@
 <?import javafx.scene.layout.*?>
 <?import net.deepthought.controls.*?>
 
-<BorderPane fx:id="dialogPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
-   <center>
-      <BorderPane BorderPane.alignment="CENTER">
-         <bottom>
-            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" BorderPane.alignment="CENTER">
-               <children>
-                  <ToggleButton fx:id="tglbtnShowHideContextHelp" focusTraversable="false" mnemonicParsing="false" prefHeight="40.0" prefWidth="60.0" text="?">
-                     <font>
-                        <Font name="System Bold" size="15.0" />
-                     </font>
-                  </ToggleButton>
-                  <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="120.0" text="%cancel">
-                     <HBox.margin>
-                        <Insets right="12.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button fx:id="btnApplyChanges" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="120.0" text="%apply">
-                     <HBox.margin>
-                        <Insets right="12.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="120.0" text="%ok" />
-               </children>
-               <BorderPane.margin>
-                  <Insets bottom="6.0" top="6.0" />
-               </BorderPane.margin>
-            </HBox>
-         </bottom>
-         <center>
-            <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefViewportHeight="650.0" prefViewportWidth="650.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefViewportHeight="650.0" prefViewportWidth="650.0" prefWidth="830.0" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditReferenceDialogController">
                <content>
                   <VBox fx:id="pnContent">
                      <children>
@@ -69,7 +39,7 @@
                                     </Label>
                                  </children>
                               </HBox>
-                              <Button fx:id="btnChooseSeriesTitleFieldsToShow" focusTraversable="false" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" prefHeight="40.0" prefWidth="60.0" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <Button fx:id="btnChooseSeriesTitleFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>
@@ -144,7 +114,7 @@
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label text="%files" />
-                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonSeriesTitleAddFileAction" text="%add...">
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" text="%add...">
                                              <HBox.margin>
                                                 <Insets left="6.0" right="6.0" />
                                              </HBox.margin>
@@ -185,7 +155,7 @@
                                     </Label>
                                  </children>
                               </HBox>
-                              <Button fx:id="btnChooseFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <Button fx:id="btnChooseReferenceFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <font>
                                     <Font name="System Bold" size="15.0" />
                                  </font>
@@ -263,7 +233,7 @@
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label text="%files" />
-                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" text="%add...">
                                              <HBox.margin>
                                                 <Insets left="6.0" right="6.0" />
                                              </HBox.margin>
@@ -391,7 +361,7 @@
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
                                           <Label text="%files" />
-                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonReferenceSubDivisionAddFileAction" text="%add...">
+                                          <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" text="%add...">
                                              <HBox.margin>
                                                 <Insets left="6.0" right="6.0" />
                                              </HBox.margin>
@@ -410,7 +380,3 @@
                   </VBox>
                </content>
             </ScrollPane>
-         </center>
-      </BorderPane>
-   </center>
-</BorderPane>

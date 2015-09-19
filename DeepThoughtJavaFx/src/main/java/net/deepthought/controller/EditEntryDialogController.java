@@ -234,8 +234,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     tagsAndCategoriesScrollPane.setFitToWidth(true);
 
     contentPane.getChildren().add(3, tagsAndCategoriesScrollPane);
-    VBox.setVgrow(paneTagsAndCategories, Priority.SOMETIMES);
-    VBox.setMargin(paneTagsAndCategories, new Insets(6, 0, 0, 0));
+    VBox.setVgrow(tagsAndCategoriesScrollPane, Priority.SOMETIMES);
+    VBox.setMargin(tagsAndCategoriesScrollPane, new Insets(6, 0, 0, 0));
 
     // TODO: replace entry by IEditedEntitiesHolder<Tags> so that Dialog controls edited tags -> if a Tag is removed which is in creationResult, it can be removed from creationResult as well (also Categories, ...)
     entryTagsControl = new EntryTagsControl(entry);

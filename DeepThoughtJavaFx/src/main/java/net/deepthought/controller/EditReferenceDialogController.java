@@ -80,10 +80,14 @@ import javafx.util.StringConverter;
 /**
  * Created by ganymed on 21/12/14.
  */
-public class EditReferenceDialogController extends ChildWindowsController implements Initializable {
+public class EditReferenceDialogController extends EntityDialogFrameController implements Initializable {
 
   private final static Logger log = LoggerFactory.getLogger(EditReferenceDialogController.class);
 
+
+  protected ReferenceBase editedReferenceBase = null;
+
+  protected ReferenceBase persistedParentReferenceBase;
 
   protected SeriesTitle seriesTitle = null;
 
@@ -96,18 +100,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceSubDivisionChanges = FXCollections.observableSet();
 
   protected int publishingDateFormat = DateFormat.MEDIUM;
-
-
-  @FXML
-  protected BorderPane dialogPane;
-
-  @FXML
-  protected Button btnApplyChanges;
-
-  @FXML
-  protected ToggleButton tglbtnShowHideContextHelp;
-
-  protected ContextHelpControl contextHelpControl;
 
 
   @FXML
@@ -171,7 +163,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   @FXML
-  protected Button btnChooseFieldsToShow;
+  protected Button btnChooseReferenceFieldsToShow;
 
   @FXML
   protected ToggleButton btnShowHideReferencePane;
@@ -273,8 +265,28 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
 
   @Override
+  protected Node getContent() {
+    return pnContent;
+  }
+
+  @Override
+  protected String getHelpTextResourceKeyPrefix() {
+    return "context.help.series.title.";
+  }
+
+  @Override
+  protected String getEntityType() {
+    return "reference";
+  }
+
+  @Override
+  protected ContextMenu createHiddenFieldsContextMenu() {
+    return null;
+  }
+
+  @Override
   public void initialize(URL location, ResourceBundle resources) {
-    btnApplyChanges.managedProperty().bind(btnApplyChanges.visibleProperty());
+    super.initialize(location, resources);
 
     fieldsWithUnsavedSeriesTitleChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
       @Override
@@ -294,26 +306,15 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         btnApplyChanges.setDisable(hasUnsavedChanges() == false);
       }
     });
-
-    Application.getSettings().addSettingsChangedListener(settingsChangedListener);
-
-    // TODO: what to do when DeepThought changes -> close dialog
   }
 
-  protected SettingsChangedListener settingsChangedListener = new SettingsChangedListener() {
-    @Override
-    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      if (setting == Setting.UserDeviceDialogFieldsDisplay)
-        dialogFieldsDisplayChanged((DialogsFieldsDisplay) newValue);
-    }
-  };
-
   protected void setupControls() {
+    super.setupControls();
+    setButtonChooseFieldsToShowVisiblity(false);
+
     setupSeriesTitleControls();
     setupReferenceControls();
     setupReferenceSubDivisionControls();
-
-    setupContextHelpControl();
   }
 
 
@@ -353,7 +354,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtfldSeriesTitleTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
       if (editedReferenceBase instanceof SeriesTitle)
-        updateWindowTitle(editedReferenceBase);
+        updateWindowTitle();
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
@@ -437,7 +438,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
       if (editedReferenceBase instanceof Reference)
-        updateWindowTitle(editedReferenceBase);
+        updateWindowTitle();
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSubTitle);
@@ -508,7 +509,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     txtfldReferenceSubDivisionTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionTitle);
       if (editedReferenceBase instanceof ReferenceSubDivision)
-        updateWindowTitle(editedReferenceBase);
+        updateWindowTitle();
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
@@ -542,17 +543,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 //    });
   }
 
-  protected void setupContextHelpControl() {
-    contextHelpControl = new ContextHelpControl("context.help.series.title.");
-    dialogPane.setRight(contextHelpControl);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
-    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-
-    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
-  }
-
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
     btnChooseSeriesTitleFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
@@ -570,7 +560,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
-    btnChooseFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
+    btnChooseReferenceFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
     paneSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
@@ -598,30 +588,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
   }
 
 
-  @FXML
-  public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveChanges();
-  }
-
-  @FXML
-  public void handleButtonCancelAction(ActionEvent actionEvent) {
-    closeDialog(DialogResult.Cancel);
-  }
-
-  protected ReferenceBase editedReferenceBase = null;
-
   public ReferenceBase getEditedReferenceBase() {
     return editedReferenceBase;
   }
 
-  @FXML
-  public void handleButtonOkAction(ActionEvent actionEvent) {
-    saveChanges();
-
-    closeDialog(DialogResult.Ok);
-  }
-
-  protected void saveChanges() {
+  @Override
+  protected void saveEntity() {
     // TODO: also check if a previously set Entity now has been unset
 
     // TODO: save async while closing the dialog? Would make Dialog closing faster
@@ -681,6 +653,11 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
   }
 
+  @Override
+  protected boolean hasUnsavedChanges() {
+    return hasSeriesTitleBeenEdited() || hasReferenceBeenEdited() || hasReferenceSubDivisionBeenEdited();
+  }
+
   protected boolean hasSeriesTitleBeenEdited() {
     return fieldsWithUnsavedSeriesTitleChanges.size() > 0;
   }
@@ -695,8 +672,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
 
   @Override
   protected void closeDialog() {
-    Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
-
     seriesTitle.removeEntityListener(seriesTitleListener);
     reference.removeEntityListener(referenceListener);
     referenceSubDivision.removeEntityListener(referenceSubDivisionListener);
@@ -891,55 +866,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     }
   }
 
-  @Override
-  protected boolean askIfStageShouldBeClosed() {
-    if(hasUnsavedChanges()) {
-      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "reference");
-
-      if(result.equals(ButtonType.CANCEL))
-        return false;
-      else if(result.equals(ButtonType.YES)) {
-//        saveEditedFieldsOnReference(); // TODO: is this correct? Why only saving edited fields on Reference (what about SeriesTitle and Ref.SubDivision?)
-        saveChanges();
-      }
-    }
-
-    return true;
-  }
-
-
-  @FXML
-  public void handleButtonSeriesTitleNewOrEditPublisherAction(ActionEvent event) {
-
-  }
-
-  protected void handleMenuItemSeriesTitleNewPublisherAction(NewOrEditButtonMenuActionEvent event) {
-
-  }
-
-  @FXML
-  public void handleButtonSeriesTitleAddFileAction(ActionEvent event) {
-//    final FileLink newFile = new FileLink();
-//
-//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//        if (controller.getDialogResult() == DialogResult.Ok) {
-//          seriesTitle.addFile(newFile);
-//        }
-//      }
-//    });
-  }
-
-
-  public SeriesTitle getSeriesTitle() {
-    return seriesTitle;
-  }
 
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
     if(seriesTitle != null) {
@@ -1042,7 +968,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       btnShowHideReferencePane.setText(CollapsiblePane.CollapsedText);
   }
 
-  public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
+  public void handleButtonChooseReferenceFieldsToShowAction(ActionEvent event) {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
     if(paneSubTitle.isVisible() == false)
@@ -1062,7 +988,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(ttldpnFiles.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
 
-    hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.BOTTOM, 0, 0);
+    hiddenFieldsMenu.show(btnChooseReferenceFieldsToShow, Side.BOTTOM, 0, 0);
   }
 
 
@@ -1098,110 +1024,42 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     hiddenFieldsMenu.show(btnChooseReferenceSubDivisionFieldsToShow, Side.BOTTOM, 0, 0);
   }
 
-  protected void createHiddenFieldMenuItem(ContextMenu hiddenFieldsMenu, Node nodeToShowOnClick, String menuItemText) {
-    MenuItem titleMenuItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(titleMenuItem, menuItemText);
-    hiddenFieldsMenu.getItems().add(titleMenuItem);
-    titleMenuItem.setOnAction(event -> nodeToShowOnClick.setVisible(true));
-  }
-
-
-  public void handleButtonNewOrEditLanguageAction(ActionEvent event) {
-//    if(btnNewOrEditLanguage.getButtonFunction() == NewOrEditButton.ButtonFunction.Edit)
-//      Dialogs.showEditLanguageDialog(cmbxLanguage.getValue());
-//    else
-//      createNewLanguage();
-  }
-
-  protected void handleMenuItemNewLanguageAction(NewOrEditButtonMenuActionEvent event) {
-    createNewLanguage();
-  }
-
-  protected void createNewLanguage() {
-    final Language newLanguage = new Language();
-
-//    Dialogs.showEditLanguageDialog(newLanguage, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//        if(controller.getDialogResult() == DialogResult.Ok)
-//          reference.setLanguage(newLanguage);
-//      }
-//    });
-  }
-
-  @FXML
-  public void handleButtonAddFileAction(ActionEvent event) {
-//    final FileLink newFile = new FileLink();
-//
-//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//        if (controller.getDialogResult() == DialogResult.Ok) {
-//          reference.addFile(newFile);
-//        }
-//      }
-//    });
-  }
-
-  @FXML
-  public void handleButtonReferenceSubDivisionAddFileAction(ActionEvent event) {
-//    final FileLink newFile = new FileLink();
-//
-//    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
-//      @Override
-//      public void windowClosing(Stage stage, ChildWindowsController controller) {
-//
-//      }
-//
-//      @Override
-//      public void windowClosed(Stage stage, ChildWindowsController controller) {
-//        if (controller.getDialogResult() == DialogResult.Ok) {
-//          reference.addFile(newFile);
-//        }
-//      }
-//    });
-  }
-
-
-  public Reference getReference() {
-    return reference;
-  }
-
-  protected ReferenceBase persistedParentReferenceBase;
-
 
   public void setWindowStageAndReferenceBase(Stage windowStage, ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase) {
     // TODO: if referenceBase != null disallow editing of Entities below referenceBase's Hierarchy (e.g. referenceBase instanceof Reference -> don't allow ReferenceSubDivision editing
     editedReferenceBase = referenceBase;
-    Node nodeToFocus = txtfldReferenceSubDivisionTitle;
+    super.setWindowStage(windowStage, referenceBase);
 
-    nodeToFocus = setReferenceBases(referenceBase, persistedParentReferenceBase, nodeToFocus);
+    Node nodeToFocus = setReferenceBases(referenceBase, persistedParentReferenceBase);
 
     if(persistedParentReferenceBase != null) {
       nodeToFocus = setPersistedParentReferenceBase(persistedParentReferenceBase, nodeToFocus);
     }
 
-    setupDialog(windowStage, nodeToFocus);
+    setupDialog(nodeToFocus);
   }
 
   public void setWindowStageAndReferenceBase(Stage windowStage, EntryCreationResult creationResult) {
+    Node nodeToFocus = setReferenceBaseInstances(creationResult);
+    super.setWindowStage(windowStage, editedReferenceBase);
+
+    setupDialog(nodeToFocus);
+
+    if(creationResult.getSeriesTitle() != null && seriesTitle.isPersisted() == false)
+      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
+    if(creationResult.getReference() != null && reference.isPersisted() == false)
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
+    if(creationResult.getReferenceSubDivision() != null && referenceSubDivision.isPersisted() == false)
+      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle);
+  }
+
+  protected Node setReferenceBaseInstances(EntryCreationResult creationResult) {
     Node nodeToFocus = txtfldTitle;
 
     if(creationResult.getSeriesTitle() != null) {
       seriesTitle = creationResult.getSeriesTitle();
       editedReferenceBase = seriesTitle;
       nodeToFocus = txtfldSeriesTitleTitle;
-      btnShowHideSeriesTitlePane.setSelected(true);
       btnShowHideSeriesTitlePane.setSelected(true);
     }
     else
@@ -1214,7 +1072,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
       btnShowHideReferencePane.setSelected(true);
     }
     else
-      reference = new Reference();
+      setToNewReference();
 
     if(creationResult.getReferenceSubDivision() != null) {
       referenceSubDivision = creationResult.getReferenceSubDivision();
@@ -1225,20 +1083,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     else
       setToNewReferenceSubDivision();
 
-    setupDialog(windowStage, nodeToFocus);
-
-    if(creationResult.getSeriesTitle() != null && seriesTitle.isPersisted() == false)
-      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTitle);
-    if(creationResult.getReference() != null && reference.isPersisted() == false)
-      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
-    if(creationResult.getReferenceSubDivision() != null && referenceSubDivision.isPersisted() == false)
-      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle);
-
-  }
-
-  protected void setToNewReferenceSubDivision() {
-    referenceSubDivision = new ReferenceSubDivision();
-    btnShowHideReferenceSubDivisionPane.setSelected(false);
+    return nodeToFocus;
   }
 
   protected void setToNewSeries() {
@@ -1246,13 +1091,16 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     btnShowHideSeriesTitlePane.setSelected(false);
   }
 
-  protected void setupDialog(Stage windowStage, Node nodeToFocus) {
-    super.setWindowStage(windowStage);
+  protected void setToNewReference() {
+    reference = new Reference();
+  }
 
-    updateWindowTitle(editedReferenceBase);
+  protected void setToNewReferenceSubDivision() {
+    referenceSubDivision = new ReferenceSubDivision();
+    btnShowHideReferenceSubDivisionPane.setSelected(false);
+  }
 
-    setupControls();
-
+  protected void setupDialog(Node nodeToFocus) {
     setSeriesTitleValues(seriesTitle);
     setReferenceValues(reference);
     setReferenceSubDivisionValues(referenceSubDivision);
@@ -1264,11 +1112,12 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     if(referenceSubDivision.isPersisted())
       btnShowHideReferenceSubDivisionPane.setSelected(true);
 
-    btnApplyChanges.setVisible(seriesTitle.isPersisted() || reference.isPersisted() || referenceSubDivision.isPersisted());
     FXUtils.focusNode(nodeToFocus);
   }
 
-  protected Node setReferenceBases(ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, Node nodeToFocus) {
+  protected Node setReferenceBases(ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase) {
+    Node nodeToFocus = txtfldReferenceSubDivisionTitle;
+
     if(referenceBase instanceof ReferenceSubDivision) {
       this.referenceSubDivision = (ReferenceSubDivision)referenceBase;
       this.reference = referenceSubDivision.getReference();
@@ -1277,7 +1126,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         this.reference = (Reference)persistedParentReferenceBase;
 
       if(reference == null)
-        reference = new Reference();
+        setToNewReference();
       else
         this.seriesTitle = reference.getSeries();
       if(this.seriesTitle == null)
@@ -1295,7 +1144,7 @@ public class EditReferenceDialogController extends ChildWindowsController implem
         paneReferenceSubDivision.setVisible(false);
       }
       else {
-        this.reference = new Reference();
+        setToNewReference();
         nodeToFocus = txtfldTitle;
 
         if(referenceBase instanceof SeriesTitle) {
@@ -1351,69 +1200,6 @@ public class EditReferenceDialogController extends ChildWindowsController implem
     reference.addEntityListener(referenceListener);
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
-
-  public boolean hasUnsavedChanges() {
-    return fieldsWithUnsavedSeriesTitleChanges.size() > 0 || fieldsWithUnsavedReferenceChanges.size() > 0 ||
-        fieldsWithUnsavedReferenceSubDivisionChanges.size() > 0;
-  }
-
-  protected void updateWindowTitle(ReferenceBase referenceBase) {
-    if(editedReferenceBase == null)
-      JavaFxLocalization.bindStageTitle(windowStage, "create.reference");
-    else
-      JavaFxLocalization.bindStageTitle(windowStage, "edit.reference", referenceBase.getTextRepresentation());
-  }
-
-
-  protected StringConverter<LocalDate> localeDateStringConverter = new StringConverter<LocalDate>() {
-    @Override
-    public String toString(LocalDate date) {
-//      log.debug("publishingDateFormat: " + publishingDateFormat);
-      return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(DateConvertUtils.asUtilDate(date));
-    }
-
-    @Override
-    public LocalDate fromString(String string) {
-      try {
-        Date parsedDate = null;
-        try {
-          parsedDate = DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).parse(string);
-          publishingDateFormat = DateFormat.MEDIUM;
-        } catch(Exception ex) {
-          if(string.length() == 4) {
-            try {
-              int year = Integer.parseInt(string) - 1900;
-              parsedDate = new Date(year, 0, 1);
-              publishingDateFormat = DateFormat.YEAR_FIELD;
-            } catch(Exception ex2) { }
-          }
-          else if(string.length() == 7) {
-            try {
-              int month = Integer.parseInt(string.substring(0, 2)) - 1;
-              int year = Integer.parseInt(string.substring(3, 7)) - 1900;
-              parsedDate = new Date(year, month, 1);
-              publishingDateFormat = DateFormat.SHORT;
-            } catch(Exception ex2) { }
-          }
-          else { // if String has been set by DatePicker control
-            try {
-              parsedDate = DateFormat.getDateInstance(DateFormat.LONG, Localization.getLanguageLocale()).parse(string);
-              publishingDateFormat = DateFormat.LONG;
-            } catch(Exception ex2) { }
-          }
-        }
-
-        if(parsedDate == null)
-          log.warn("Could not parse string {} to java.util.date for Locale {}", string, Localization.getLanguageLocale());
-        else {
-          log.debug("Parsed date: " + parsedDate);
-          return DateConvertUtils.asLocalDate(parsedDate);
-        }
-      } catch(Exception ex) { log.warn("Could not parse string {} to java.util.date for Locale {}", string, Localization.getLanguageLocale()); }
-
-      return LocalDate.now();
-    }
-  };
 
 
   protected EntityListener seriesTitleListener = new EntityListener() {

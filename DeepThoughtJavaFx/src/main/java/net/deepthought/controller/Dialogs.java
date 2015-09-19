@@ -70,7 +70,7 @@ public class Dialogs {
   protected static void showEditEntryDialogOnUiThread(final Entry entry, final EntryCreationResult creationResult, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditEntryDialog.fxml");
+      Stage dialogStage = createStageForEntityDialog(loader, "EditEntryDialog.fxml");
       dialogStage.setMinHeight(500);
       dialogStage.setMinWidth(500);
 //
@@ -121,7 +121,7 @@ public class Dialogs {
   public static void showEditTagDialog(final Tag tag, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditTagDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
+      Stage dialogStage = createStageForEntityDialog(loader, "EditTagDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
 
       // Set the tag into the controller.
       EditTagDialogController controller = loader.getController();
@@ -190,7 +190,7 @@ public class Dialogs {
   public static void showEditCategoryDialog(final Category category, final Category parentCategory, double centerX, double y, Window window, boolean modal, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditCategoryDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
+      Stage dialogStage = createStageForEntityDialog(loader, "EditCategoryDialog.fxml", StageStyle.UTILITY, modal ? Modality.WINDOW_MODAL : Modality.NONE, window);
 
       // Set the category into the controller.
       EditCategoryDialogController controller = loader.getController();
@@ -244,7 +244,7 @@ public class Dialogs {
   public static void showEditPersonDialog(final Person person, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditPersonDialog.fxml", StageStyle.UTILITY);
+      Stage dialogStage = createStageForEntityDialog(loader, "EditPersonDialog.fxml", StageStyle.UTILITY);
 
       // Set the person into the controller.
       EditPersonDialogController controller = loader.getController();
@@ -289,7 +289,7 @@ public class Dialogs {
   public static void showEditFileDialog(final FileLink file, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditFileDialog.fxml", StageStyle.UTILITY);
+      Stage dialogStage = createStageForEntityDialog(loader, "EditFileDialog.fxml", StageStyle.UTILITY);
 
       // Set the file into the controller.
       EditFileDialogController controller = loader.getController();
@@ -340,7 +340,7 @@ public class Dialogs {
   protected static void showEditReferenceDialog(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, EntryCreationResult creationResult, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
-      Stage dialogStage = createStage(loader, "EditReferenceDialog.fxml");
+      Stage dialogStage = createStageForEntityDialog(loader, "EditReferenceDialog.fxml");
       dialogStage.setMinHeight(500);
       dialogStage.setMinWidth(500);
 
@@ -488,34 +488,36 @@ public class Dialogs {
   }
 
 
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename) throws java.io.IOException {
+  protected static Stage createStageForEntityDialog(FXMLLoader loader, String dialogFilename) throws IOException {
+    return createStageForEntityDialog(loader, dialogFilename, StageStyle.DECORATED);
+  }
+
+  protected static Stage createStageForEntityDialog(FXMLLoader loader, String dialogFilename, StageStyle stageStyle) throws IOException {
+    return createStageForEntityDialog(loader, dialogFilename, stageStyle, Modality.NONE, null);
+  }
+
+  protected static Stage createStageForEntityDialog(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner) throws IOException {
+    return createStage(loader, dialogFilename, stageStyle, modality, owner, true);
+  }
+
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename) throws IOException {
     return createStage(loader, dialogFilename, StageStyle.DECORATED);
   }
 
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle) throws java.io.IOException {
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle) throws IOException {
     return createStage(loader, dialogFilename, stageStyle, Modality.NONE);
   }
 
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality) throws java.io.IOException {
-    return createStage(loader, dialogFilename, stageStyle, modality, null);
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality) throws IOException {
+    return createStage(loader, dialogFilename, stageStyle, modality, null, false);
   }
 
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner) throws java.io.IOException {
-    return createStage(loader, dialogFilename, stageStyle, modality, owner, false);
-  }
-
-  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner, boolean isToolWindow) throws IOException {
+  protected static Stage createStage(FXMLLoader loader, String dialogFilename, StageStyle stageStyle, Modality modality, Window owner, boolean createInEntityDialogFrame) throws IOException {
     loader.setResources(JavaFxLocalization.Resources);
-
-    if(isToolWindow == false)
-      loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
-    else // TODO: what was this line good for? How should a control ever be loaded with FXMLLoader?
-      loader.setLocation(Dialogs.class.getClassLoader().getResource(ControlsBaseFolder + dialogFilename));
+    loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
 
     Parent parent = loader.load();
     JavaFxLocalization.resolveResourceKeys(parent);
-
-    BorderPane dialogFrame = loadDialogFrame(loader, parent);
 
     Stage dialogStage = new Stage();
     if(owner != null)
@@ -523,7 +525,14 @@ public class Dialogs {
     dialogStage.initModality(modality);
     dialogStage.initStyle(stageStyle);
 
-    Scene scene = new Scene(dialogFrame);
+    Scene scene = null;
+    if(createInEntityDialogFrame) {
+      BorderPane dialogFrame = loadDialogFrame(loader, parent);
+      scene = new Scene(dialogFrame);
+    }
+    else
+      scene = new Scene(parent);
+
     dialogStage.setScene(scene);
     return dialogStage;
   }
