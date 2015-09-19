@@ -221,6 +221,9 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
 
     Label lblReference = new Label();
     JavaFxLocalization.bindLabeledText(lblReference, "reference");
+    lblReference.setPrefWidth(USE_COMPUTED_SIZE);
+    lblReference.setMinWidth(USE_PREF_SIZE);
+    lblReference.setMaxWidth(USE_PREF_SIZE);
     titlePane.getChildren().add(lblReference);
     HBox.setMargin(lblReference, new Insets(0, 12, 0, 0));
 
@@ -242,6 +245,9 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
 
     Label lblIndication = new Label();
     JavaFxLocalization.bindLabeledText(lblIndication, "indication");
+    lblIndication.setPrefWidth(USE_COMPUTED_SIZE);
+    lblIndication.setMinWidth(USE_PREF_SIZE);
+    lblIndication.setMaxWidth(USE_PREF_SIZE);
     titlePane.getChildren().add(lblIndication);
     HBox.setMargin(lblIndication, new Insets(0, 6, 0, 12));
 

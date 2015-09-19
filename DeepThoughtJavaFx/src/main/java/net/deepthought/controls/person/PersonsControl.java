@@ -127,6 +127,9 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
     Label lblPersons = new Label();
     JavaFxLocalization.bindLabeledText(lblPersons, "persons");
+    lblPersons.setPrefWidth(USE_COMPUTED_SIZE);
+    lblPersons.setMinWidth(USE_PREF_SIZE);
+    lblPersons.setMaxWidth(USE_PREF_SIZE);
     titlePane.getChildren().add(lblPersons);
     HBox.setMargin(lblPersons, new Insets(0, 6, 0, 0));
 
