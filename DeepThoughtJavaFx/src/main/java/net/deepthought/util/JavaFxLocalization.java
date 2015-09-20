@@ -34,6 +34,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
@@ -147,6 +150,10 @@ public class JavaFxLocalization {
       for(TableColumn column : (ObservableList<TableColumn>)((TableView) node).getColumns())
         resolveTableColumnBaseResourceKeys(column);
     }
+    else if(node instanceof TreeTableView) {
+      for(TreeTableColumn column : (ObservableList<TreeTableColumn>)((TreeTableView)node).getColumns())
+        resolveTableColumnBaseResourceKeys(column);
+    }
     else if(node instanceof ScrollPane) {
       if(((ScrollPane)node).getContent() != null)
         resolveNodeResourceKeys(((ScrollPane)node).getContent());
@@ -162,6 +169,9 @@ public class JavaFxLocalization {
     else if(node instanceof MenuBar) {
       for(Menu menu : ((MenuBar)node).getMenus())
         resolveMenuItemResourceKeys(menu);
+    }
+    else if(node instanceof BorderPane) {
+      resolveBorderPaneResourceKeys((BorderPane) node);
     }
     else if(node instanceof Parent)
       resolveChildrenResourceKeys((Parent) node);
@@ -181,7 +191,7 @@ public class JavaFxLocalization {
       resolveNodeResourceKeys(labeled.getGraphic());
 
     if(labeled instanceof TitledPane)
-      resolveNodeResourceKeys(((TitledPane)labeled).getContent());
+      resolveNodeResourceKeys(((TitledPane) labeled).getContent());
   }
 
   protected static void resolveTextInputControlResourceKeys(TextInputControl textInputControl) {
@@ -215,6 +225,21 @@ public class JavaFxLocalization {
     if (tab.getGraphic() != null)
       resolveNodeResourceKeys(tab.getGraphic());
     resolveNodeResourceKeys(tab.getContent());
+  }
+
+  protected static void resolveBorderPaneResourceKeys(BorderPane node) {
+    BorderPane borderPane = node;
+
+    if(borderPane.getTop() != null)
+      resolveNodeResourceKeys(borderPane.getTop());
+    if(borderPane.getLeft() != null)
+      resolveNodeResourceKeys(borderPane.getLeft());
+    if(borderPane.getBottom() != null)
+      resolveNodeResourceKeys(borderPane.getBottom());
+    if(borderPane.getRight() != null)
+      resolveNodeResourceKeys(borderPane.getRight());
+    if(borderPane.getCenter() != null)
+      resolveNodeResourceKeys(borderPane.getCenter());
   }
 
 
