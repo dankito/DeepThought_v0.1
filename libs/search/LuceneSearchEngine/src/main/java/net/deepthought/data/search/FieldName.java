@@ -89,7 +89,9 @@ public class FieldName {
 
   public final static String FileSourceUri = "file_source_uri";
 
-  public final static String FileDescription = "file_description";
+  public final static String FileFileType = "file_type";
+
+  public final static String FileNotes = "file_notes";
 
 
 }

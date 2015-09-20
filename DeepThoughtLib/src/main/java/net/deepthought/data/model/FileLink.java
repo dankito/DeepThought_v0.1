@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
@@ -37,6 +38,10 @@ public class FileLink extends UserDataEntity implements Serializable {
   @Column(name = TableConfig.FileLinkIsFolderColumnName)
   protected boolean isFolder = false;
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = TableConfig.FileLinkFileTypeColumnName)
+  protected FileType fileType = FileType.getDefaultFileType();
+
   @Column(name = TableConfig.FileLinkNotesColumnName)
   protected String notes = "";
 
@@ -63,6 +68,7 @@ public class FileLink extends UserDataEntity implements Serializable {
   }
 
   public FileLink(String uri) {
+    this();
     setUriString(uri);
   }
 
@@ -108,6 +114,14 @@ public class FileLink extends UserDataEntity implements Serializable {
     Object previousValue = this.isFolder;
     this.isFolder = isFolder;
     callPropertyChangedListeners(TableConfig.FileLinkIsFolderColumnName, previousValue, isFolder);
+  }
+
+  public FileType getFileType() {
+    return fileType;
+  }
+
+  public void setFileType(FileType fileType) {
+    this.fileType = fileType;
   }
 
   public String getNotes() {

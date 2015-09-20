@@ -5,6 +5,7 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
@@ -27,6 +28,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -47,6 +49,8 @@ public class EditFileDialogController extends EntityDialogFrameController implem
 
   protected String previousUriString = null;
 
+  protected FileType detectedFileType = null;
+
 
   @FXML
   protected RadioButton rdbtnFileOrUrl;
@@ -54,6 +58,8 @@ public class EditFileDialogController extends EntityDialogFrameController implem
   protected Pane pnFileSettings;
   @FXML
   protected TextField txtfldFileLocation;
+  @FXML
+  protected Label lblFileType;
   @FXML
   protected ComboBox<FileLinkOptions> cmbxLocalFileLinkOptions;
 
@@ -133,14 +139,17 @@ public class EditFileDialogController extends EntityDialogFrameController implem
 
     try {
         if(previousUriString == null || previousUriString.endsWith(txtfldFileName.getText())) {
-          java.io.File file = new java.io.File(uriString);
+          File file = new File(uriString);
           txtfldFileName.setText(file.getName());
         }
         else if(previousUriString != null && previousUriString.endsWith("/") &&
             (txtfldFileName.getText() == null || txtfldFileName.getText().isEmpty() || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
-          java.io.File file = new java.io.File(uriString);
+          File file = new File(uriString);
           txtfldFileName.setText(file.getName());
         }
+
+      detectedFileType = FileUtils.getFileType(uriString);
+      lblFileType.setText(detectedFileType.getName());
     } catch(Exception ex) {
       log.debug("Could not extract file's name from uriString " + uriString, ex);
     }
@@ -162,6 +171,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
       txtfldFileLocation.setText(file.getUriString());
       txtfldFileLocation.selectAll();
       txtfldFileLocation.requestFocus();
+      lblFileType.setText(file.getFileType().getName());
     }
     else {
       rdbtnFolder.setSelected(true);

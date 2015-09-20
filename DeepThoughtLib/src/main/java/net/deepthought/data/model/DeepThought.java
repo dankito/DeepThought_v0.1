@@ -945,11 +945,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   protected static void createFileTypeDefaultValues(DeepThought deepThought) {
+    deepThought.addFileType(new FileType("file.type.other.files", FileUtils.OtherFilesFolderName, true, false, Integer.MAX_VALUE));
     deepThought.addFileType(new FileType("file.type.document", FileUtils.DocumentsFilesFolderName, true, true, 1));
     deepThought.addFileType(new FileType("file.type.image", FileUtils.ImagesFilesFolderName, true, true, 2));
     deepThought.addFileType(new FileType("file.type.audio", FileUtils.AudioFilesFolderName, true, true, 3));
     deepThought.addFileType(new FileType("file.type.video", FileUtils.VideoFilesFolderName, true, true, 4));
-    deepThought.addFileType(new FileType("file.type.other.files", FileUtils.OtherFilesFolderName, true, false, Integer.MAX_VALUE));
   }
 
   protected static void createBackupFileServiceTypeDefaultValues(DeepThought deepThought) {

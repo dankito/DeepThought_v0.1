@@ -19,10 +19,10 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
 import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResult;
-import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -96,8 +96,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
 
 
-  // TODO: what about Category, Notes and Files?
-  protected final static List<Class> ClassesWithOwnIndexDirectories = Arrays.asList(new Class[] { Entry.class, Tag.class, ReferenceBase.class, Person.class });
+  protected final static List<Class> ClassesWithOwnIndexDirectories = Arrays.asList(new Class[] { Entry.class, Tag.class, ReferenceBase.class, Person.class,
+                                                                                                  Category.class, Note.class, FileLink.class });
 
   protected final static Class DefaultIndexDirectoryClass = UserDataEntity.class;
 
@@ -707,9 +707,11 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.FileName, file.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
+    if(file.getFileType() != null)
+      doc.add(new LongField(FieldName.FileFileType, file.getFileType().getId(), Field.Store.NO));
+    doc.add(new StringField(FieldName.FileNotes, file.getNotes().toLowerCase(), Field.Store.NO));
     if(StringUtils.isNotNullOrEmpty(file.getSourceUriString()))
       doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
-    doc.add(new StringField(FieldName.FileDescription, file.getNotes().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, FileLink.class);
   }

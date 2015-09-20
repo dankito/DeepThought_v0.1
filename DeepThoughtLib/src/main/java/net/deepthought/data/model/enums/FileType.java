@@ -1,6 +1,10 @@
 package net.deepthought.data.model.enums;
 
+import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -60,4 +64,36 @@ public class FileType extends ExtensibleEnumeration {
     return "FileType " + getTextRepresentation();
   }
 
+
+  protected static FileType defaultFileType = null;
+
+  public static FileType getDefaultFileType() {
+    if(defaultFileType == null && Application.getDeepThought() != null) { // TODO: bad solution as then FileLink's FileType stays null
+      for(FileType fileType : Application.getDeepThought().getFileTypes()) {
+        if("file.type.other.files".equals(fileType.nameResourceKey)) {
+          defaultFileType = fileType;
+          break;
+        }
+      }
+    }
+
+    return defaultFileType;
+  }
+
+  protected static Map<String, FileType> detectedFileTypesForResourceKeys = new HashMap<>();
+
+  public static FileType getForResourceKey(String resourceKey) {
+    if(detectedFileTypesForResourceKeys.containsKey(resourceKey))
+      return detectedFileTypesForResourceKeys.get(resourceKey);
+
+    if(Application.getDeepThought() != null) {
+      for(FileType fileType : Application.getDeepThought().getFileTypes()) {
+        if(resourceKey.equals(fileType.nameResourceKey)) {
+          detectedFileTypesForResourceKeys.put(resourceKey, fileType);
+          return fileType;
+        }
+      }
+    }
+    return getDefaultFileType();
+  }
 }

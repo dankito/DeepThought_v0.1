@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="328.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditFileDialogController">
+<VBox prefHeight="365.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditFileDialogController">
          <children>
             <VBox prefHeight="140.0">
                <children>
@@ -30,11 +30,19 @@
                         <Insets left="24.0" />
                      </VBox.margin>
                   </HBox>
-                  <ComboBox fx:id="cmbxLocalFileLinkOptions" prefWidth="250.0">
-                     <VBox.margin>
-                        <Insets left="130.0" top="6.0" />
-                     </VBox.margin>
-                  </ComboBox>
+            <AnchorPane maxHeight="40.0" minHeight="40.0">
+               <children>
+                        <ComboBox fx:id="cmbxLocalFileLinkOptions" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="370.0" AnchorPane.topAnchor="0.0">
+                           <VBox.margin>
+                              <Insets left="130.0" top="6.0" />
+                           </VBox.margin>
+                        </ComboBox>
+                  <Label fx:id="lblFileType" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               </children>
+               <VBox.margin>
+                  <Insets left="130.0" top="6.0" />
+               </VBox.margin>
+            </AnchorPane>
                </children>
             </VBox>
             <VBox prefHeight="100.0">

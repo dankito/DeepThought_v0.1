@@ -2,6 +2,7 @@ package net.deepthought.util.file;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
@@ -105,7 +106,7 @@ public class FileUtils {
     copyFileToDataFolder(file, new FileOperationListener() {
       @Override
       public ExistingFileHandling destinationFileAlreadyExists(File existingFile, File newFile, FileNameSuggestion suggestion) {
-        if(listener != null)
+        if (listener != null)
           return listener.destinationFileAlreadyExists(existingFile, newFile, suggestion);
         else
           return ExistingFileHandling.KeepExistingFile;
@@ -113,18 +114,18 @@ public class FileUtils {
 
       @Override
       public void errorOccurred(DeepThoughtError error) {
-        if(listener != null)
+        if (listener != null)
           listener.errorOccurred(error);
       }
 
       @Override
       public void fileOperationDone(boolean successful, File destinationFile) {
         boolean overallSuccessful = successful;
-        if(successful) {
+        if (successful) {
           overallSuccessful &= sourceFile.delete();
         }
 
-        if(listener != null)
+        if (listener != null)
           listener.fileOperationDone(overallSuccessful, destinationFile);
       }
     });
@@ -415,7 +416,7 @@ public class FileUtils {
 
   public static String getFileUserDataSubFolder(FileLink file) {
     String mimeType = getMimeType(file);
-    
+
     if(isDocumentFile(mimeType))
       return DocumentsFilesFolderName;
     else if(isImageFile(mimeType))
@@ -520,6 +521,27 @@ public class FileUtils {
     }
 
     return CouldNotDetectMimeType;
+  }
+
+  public static FileType getFileType(FileLink file) {
+    return getFileType(file.getUriString());
+  }
+
+  public static FileType getFileType(String file) {
+    String mimeType = getMimeType(file);
+    if(mimeType != CouldNotDetectMimeType) {
+      if(isDocumentFile(mimeType))
+        return FileType.getForResourceKey("file.type.document");
+      else if(isImageFile(mimeType))
+        return FileType.getForResourceKey("file.type.image");
+      else if(isAudioFile(mimeType))
+        return FileType.getForResourceKey("file.type.audio");
+      else if(isVideoFile(mimeType))
+        return FileType.getForResourceKey("file.type.video");
+      // TODO: what about if plugins add new file types?
+    }
+
+    return FileType.getDefaultFileType();
   }
 
   public static void writeToFile(String fileContent, File destinationFile) throws Exception {
