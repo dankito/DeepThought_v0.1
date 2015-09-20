@@ -395,15 +395,6 @@ public class MainWindowController implements Initializable {
     setupTabPaneOverview();
 
     setupEntriesOverviewSection();
-
-    if(contentPane.getDividers().size() > 0) {
-      contentPane.getDividers().get(0).positionProperty().addListener(((observableValue, oldValue, newValue) -> {
-        if (deepThought != null) {
-          double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
-          deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
-        }
-      }));
-    }
   }
 
   protected void setupMainMenu() {
@@ -538,11 +529,14 @@ public class MainWindowController implements Initializable {
     entriesOverviewControl = new EntriesOverviewControl(this);
     contentPane.getItems().add(entriesOverviewControl);
 
-    contentPane.setDividerPositions(0.3);
-    contentPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
-      if(deepThought != null)
-        deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newValue.doubleValue());
-    });
+//    contentPane.setDividerPositions(0.26);
+
+    contentPane.getDividers().get(0).positionProperty().addListener(((observableValue, oldValue, newValue) -> {
+      if (deepThought != null) {
+        double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
+        deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
+      }
+    }));
   }
 
   @FXML
