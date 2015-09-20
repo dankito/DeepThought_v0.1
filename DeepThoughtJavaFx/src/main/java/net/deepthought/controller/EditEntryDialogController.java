@@ -126,7 +126,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setupControls() {
     super.setupControls();
 
-    setButtonChooseFieldsToShowVisiblity(true);
+    setButtonChooseFieldsToShowVisibility(true);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
     txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -246,8 +246,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    setButtonChooseFieldsToShowVisiblity(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
-                          entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false));
+    setButtonChooseFieldsToShowVisibility(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
+        entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false));
 
     setCategoriesPaneVisibility();
   }

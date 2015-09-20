@@ -3,55 +3,28 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.Constants;
-import net.deepthought.controls.ContextHelpControl;
-import net.deepthought.controls.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.ResourceBundle;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 31/12/14.
  */
-public class EditCategoryDialogController extends ChildWindowsController implements Initializable {
+public class EditCategoryDialogController extends EntityDialogFrameController implements Initializable {
+
 
   protected Category category = null;
 
-  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
-
-
-  @FXML
-  protected BorderPane dialogPane;
-
-  @FXML
-  protected Button btnApply;
-
-  @FXML
-  protected ToggleButton tglbtnShowHideContextHelp;
-
-  protected ContextHelpControl contextHelpControl;
 
   @FXML
   protected TextField txtfldName;
@@ -60,34 +33,20 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
 
 
   @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    btnApply.managedProperty().bind(btnApply.visibleProperty());
-
-    setupFields();
-
-    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
-      @Override
-      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
-        btnApply.setDisable(fieldsWithUnsavedChanges.size() == 0);
-      }
-    });
+  protected String getEntityType() {
+    return "category";
   }
 
-  protected void setupFields() {
+
+  @Override
+  protected void setupControls() {
+    super.setupControls();
+
     txtfldName.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.CategoryName));
     txtfldName.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("name"));
 
     txtfldDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.CategoryDescription));
     txtfldDescription.focusedProperty().addListener((observable, oldValue, newValue) -> fieldFocused("description"));
-
-    contextHelpControl = new ContextHelpControl("context.help.category.");
-    dialogPane.setRight(contextHelpControl);
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
-    contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
-
-    tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-    tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
   }
 
   protected void fieldFocused(String fieldName) {
@@ -96,10 +55,8 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
 
 
   public void setCategoryAndStage(Stage dialogStage, Category categoryToEdit) {
-    setWindowStage(dialogStage);
     this.category = categoryToEdit;
-
-    updateStageTitle();
+    setWindowStage(dialogStage, categoryToEdit);
 
     categoryToEditSet(categoryToEdit);
     fieldsWithUnsavedChanges.clear();
@@ -114,34 +71,6 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
     txtfldDescription.setText(category.getDescription());
   }
 
-  public boolean hasUnsavedChanges() {
-    return fieldsWithUnsavedChanges.size() > 0;
-  }
-
-  protected void updateStageTitle() {
-    if(category.isPersisted() == false)
-      JavaFxLocalization.bindStageTitle(windowStage, "create.category");
-    else
-      JavaFxLocalization.bindStageTitle(windowStage, "edit.category", category.getTextRepresentation());
-  }
-
-
-  @FXML
-  public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEditedFields();
-  }
-
-  @FXML
-  public void handleButtonCancelAction(ActionEvent actionEvent) {
-    closeDialog(DialogResult.Cancel);
-  }
-
-  @FXML
-  public void handleButtonOkAction(ActionEvent actionEvent) {
-    saveEditedFields();
-    closeDialog(DialogResult.Ok);
-  }
-
   @Override
   protected void closeDialog() {
     if(category != null)
@@ -150,7 +79,8 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
     super.closeDialog();
   }
 
-  protected void saveEditedFields() {
+  @Override
+  protected void saveEntity() {
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.CategoryName)) {
       category.setName(txtfldName.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.CategoryName);
@@ -163,21 +93,6 @@ public class EditCategoryDialogController extends ChildWindowsController impleme
 
     if(category.isPersisted() == false)
       Application.getDeepThought().addCategory(category);
-  }
-
-  @Override
-  protected boolean askIfStageShouldBeClosed() {
-    if(hasUnsavedChanges()) {
-      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "category");
-
-      if(result.equals(ButtonType.CANCEL))
-        return false;
-      else if(result.equals(ButtonType.YES)) {
-        saveEditedFields();
-      }
-    }
-
-    return true;
   }
 
 

@@ -295,7 +295,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected void setupControls() {
     super.setupControls();
-    setButtonChooseFieldsToShowVisiblity(false);
+    setButtonChooseFieldsToShowVisibility(false);
 
     setupSeriesTitleControls();
     setupReferenceControls();

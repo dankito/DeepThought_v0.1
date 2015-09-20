@@ -127,10 +127,8 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 
 
   protected void setupControls() {
-//    loadFrame();
-
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
-    setButtonChooseFieldsToShowVisiblity(false);
+    setButtonChooseFieldsToShowVisibility(false);
 
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     tglbtnShowHideContextHelp.setGraphic(new ImageView(Constants.ContextHelpIconPath));
@@ -142,7 +140,7 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
     contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
   }
 
-  protected void setButtonChooseFieldsToShowVisiblity(boolean isVisible) {
+  protected void setButtonChooseFieldsToShowVisibility(boolean isVisible) {
     btnChooseFieldsToShow.setVisible(isVisible);
   }
 
