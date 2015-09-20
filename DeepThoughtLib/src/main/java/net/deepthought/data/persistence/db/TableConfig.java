@@ -142,28 +142,6 @@ public class TableConfig {
   public final static String DeepThoughtFavoriteEntryTemplateJoinTableDeepThoughtJoinColumnName = "deep_thought_id";
 
 
-  /*          Category Table Config        */
-
-  public final static String CategoryTableName = "category";
-
-  public final static String CategoryNameColumnName = "name";
-  public final static String CategoryDescriptionColumnName = "description";
-  public final static String CategoryIsExpandedColumnName = "is_expanded";
-  public final static String CategoryCategoryOrderColumnName = "category_order";
-  public final static String CategoryDefaultEntryTemplateJoinColumnName = "default_entry_template_id";
-//  public final static String CategoryDefaultEntryTemplateKeyColumnName = "default_entry_template_key";
-  public final static String CategoryParentCategoryJoinColumnName = "parent_category_id";
-  public final static String CategoryDeepThoughtJoinColumnName = "deep_thought_id";
-
-
-  /*          Category Entry Join Table Config        */
-
-  public final static String CategoryEntryJoinTableName = "category_entry_join_table";
-
-  public final static String CategoryEntryJoinTableCategoryIdColumnName = "category_id";
-  public final static String CategoryEntryJoinTableEntryIdColumnName = "entry_id";
-
-
   /*          Entry Table Config        */
 
   public final static String EntryTableName = "entry";
@@ -194,6 +172,14 @@ public class TableConfig {
 
   public final static String EntryTagJoinTableEntryIdColumnName = "entry_id";
   public final static String EntryTagJoinTableTagIdColumnName = "tag_id";
+
+
+  /*          Entry Category Join Table Config        */
+
+  public final static String EntryCategoryJoinTableName = "entry_category_join_table";
+
+  public final static String EntryCategoryJoinTableEntryIdColumnName = "entry_id";
+  public final static String EntryCategoryJoinTableCategoryIdColumnName = "category_id";
 
 
   /*          Entry FileLink Join Table Config        */
@@ -229,13 +215,16 @@ public class TableConfig {
   public final static String TagDeepThoughtJoinColumnName = "deep_thought_id";
 
 
-  /*          IndexTerm Table Config        */
+  /*          Category Table Config        */
 
-  public final static String IndexTermTableName = "index_term";
+  public final static String CategoryTableName = "category";
 
-  public final static String IndexTermNameColumnName = "name";
-  public final static String IndexTermDescriptionColumnName = "description";
-  public final static String IndexTermDeepThoughtJoinColumnName = "deep_thought_id";
+  public final static String CategoryNameColumnName = "name";
+  public final static String CategoryDescriptionColumnName = "description";
+  public final static String CategoryIsExpandedColumnName = "is_expanded";
+  public final static String CategoryCategoryOrderColumnName = "category_order";
+  public final static String CategoryParentCategoryJoinColumnName = "parent_category_id";
+  public final static String CategoryDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          Person Table Config        */

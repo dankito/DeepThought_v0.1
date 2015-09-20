@@ -16,7 +16,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -53,12 +52,7 @@ public class Category extends UserDataEntity {
   @OrderBy("categoryOrder ASC") // TODO: EclipseLink Error: The order by value [category_index], specified on the element [subCategories] from entity [class Category], is invalid. No property or field with that name exists on the target entity [class Category].
   protected Collection<Category> subCategories = new ArrayList<>();
 
-  @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
-  @JoinTable(
-      name = TableConfig.CategoryEntryJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableCategoryIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.CategoryEntryJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) }
-  )
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
   @OrderBy("entryIndex DESC")
   protected Collection<Entry> entries = new ArrayList<>();
 
@@ -177,36 +171,18 @@ public class Category extends UserDataEntity {
     return entries;
   }
 
-  public boolean addEntry(Entry entry) {
-    if(entries.contains(entry) == false) {
-      if (entries.add(entry)) {
-        entry.addCategory(this);
-//        Collections.sort((List) entries, entriesByIndexComparator); // throws an UnsupportedException // TODO: sort Category's Entries
-
-//        if (entry.deepThought == null)
-//          deepThought.addEntry(entry);
-
-        callEntityAddedListeners(entries, entry);
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public boolean removeEntry(Entry entry) {
-    boolean result = entries.remove(entry);
-    if(result) {
-      entry.removeCategory(this);
-      callEntityRemovedListeners(entries, entry);
-    }
-
+  protected boolean addEntry(Entry entry) {
+    boolean result = entries.add(entry);
+    callEntityAddedListeners(entries, entry);
     return result;
   }
 
-  public boolean containsEntry(Entry entry) {
-    return entries.contains(entry);
+  protected boolean removeEntry(Entry entry) {
+    boolean result = entries.remove(entry);
+    callEntityRemovedListeners(entries, entry);
+    return result;
   }
+
 
   public DeepThought getDeepThought() {
     return deepThought;

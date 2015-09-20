@@ -181,7 +181,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
       for(Entry entry : new ArrayList<>(category.getEntries())) {
         if(entry.getCategories().contains(category)) // TODO: what is this line good for?
-          category.removeEntry(entry);
+          entry.removeCategory(category);
       }
       category.entries.clear();
 
@@ -240,7 +240,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
         entry.getParentEntry().removeSubEntry(entry);
 
       for(Category category : new ArrayList<>(entry.getCategories()))
-        category.removeEntry(entry);
+        entry.removeCategory(category);
 
       for(Tag tag : new ArrayList<>(entry.getTags()))
         entry.removeTag(tag);

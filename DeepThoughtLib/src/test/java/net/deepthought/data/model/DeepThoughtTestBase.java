@@ -254,7 +254,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Assert.assertEquals(1, deepThought.getCategories().size());
     Assert.assertEquals(1, deepThought.getEntries().size());

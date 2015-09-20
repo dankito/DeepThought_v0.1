@@ -19,8 +19,8 @@ import java.util.List;
 public abstract class EntryTestBase extends DataModelTestBase {
 
   protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
-    return doesJoinTableEntryExist(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableCategoryIdColumnName, categoryId,
-        TableConfig.CategoryEntryJoinTableEntryIdColumnName, entryId);
+    return doesJoinTableEntryExist(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableCategoryIdColumnName, categoryId,
+        TableConfig.EntryCategoryJoinTableEntryIdColumnName, entryId);
   }
 
   protected boolean doesEntryTagJoinTableEntryExist(Long entryId, Long tagId) throws SQLException {
@@ -306,7 +306,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     // assert Category - Entry JoinTable entry really got written to database
     Assert.assertTrue(doesCategoryEntryJoinTableEntryExist(category.getId(), entry.getId()));
@@ -321,7 +321,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Assert.assertTrue(category.getEntries().contains(entry));
     Assert.assertTrue(entry.getCategories().contains(category));
@@ -336,8 +336,8 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
-    category.removeEntry(entry);
+    entry.addCategory(category);
+    entry.removeCategory(category);
 
     // assert entry really got deleted from database
     Assert.assertFalse(doesCategoryEntryJoinTableEntryExist(category.getId(), entry.getId()));
@@ -354,9 +354,9 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
-    category.addEntry(entry);
+    entry.addCategory(category);
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     Assert.assertFalse(category.getEntries().contains(entry));
     Assert.assertFalse(entry.getCategories().contains(category));
@@ -374,12 +374,12 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category2);
     deepThought.addEntry(entry);
 
-    category1.addEntry(entry);
-    category2.addEntry(entry);
+    entry.addCategory(category1);
+    entry.addCategory(category1);
 
     // assert entry really got written to database
-    List<Object> joinTableEntries = getJoinTableEntries(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableEntryIdColumnName, entry.getId(),
-        TableConfig.CategoryEntryJoinTableCategoryIdColumnName);
+    List<Object> joinTableEntries = getJoinTableEntries(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableEntryIdColumnName, entry.getId(),
+        TableConfig.EntryCategoryJoinTableCategoryIdColumnName);
     Assert.assertEquals(2, joinTableEntries.size());
     Assert.assertTrue(joinTableEntriesContainEntityId(category1.getId(), joinTableEntries));
     Assert.assertTrue(joinTableEntriesContainEntityId(category2.getId(), joinTableEntries));
@@ -396,8 +396,8 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category2);
     deepThought.addEntry(entry);
 
-    category1.addEntry(entry);
-    category2.addEntry(entry);
+    entry.addCategory(category1);
+    entry.addCategory(category2);
 
     Assert.assertTrue(category1.getEntries().contains(entry));
     Assert.assertTrue(category2.getEntries().contains(entry));
@@ -417,14 +417,14 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category2);
     deepThought.addEntry(entry);
 
-    category1.addEntry(entry);
-    category2.addEntry(entry);
+    entry.addCategory(category1);
+    entry.addCategory(category2);
 
-    category2.removeEntry(entry);
+    entry.removeCategory(category2);
 
     // assert entry really got written to database
-    List<Object> joinTableEntries = getJoinTableEntries(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableEntryIdColumnName, entry.getId(),
-        TableConfig.CategoryEntryJoinTableCategoryIdColumnName);
+    List<Object> joinTableEntries = getJoinTableEntries(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableEntryIdColumnName, entry.getId(),
+        TableConfig.EntryCategoryJoinTableCategoryIdColumnName);
     Assert.assertEquals(1, joinTableEntries.size());
     Assert.assertTrue(joinTableEntriesContainEntityId(category1.getId(), joinTableEntries));
     Assert.assertFalse(joinTableEntriesContainEntityId(category2.getId(), joinTableEntries));
@@ -441,10 +441,10 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addCategory(category2);
     deepThought.addEntry(entry);
 
-    category1.addEntry(entry);
-    category2.addEntry(entry);
+    entry.addCategory(category1);
+    entry.addCategory(category2);
 
-    category2.removeEntry(entry);
+    entry.removeCategory(category2);
 
     Assert.assertFalse(category2.getEntries().contains(entry));
     Assert.assertFalse(entry.getCategories().contains(category2));

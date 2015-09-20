@@ -445,7 +445,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories) {
       Category selectedCategory = deepThought.getSettings().getLastViewedCategory();
       if(selectedCategory != null && selectedCategory != deepThought.getTopLevelCategory()) {
-        selectedCategory.addEntry(newEntry);
+        newEntry.addCategory(selectedCategory);
       }
     }
   }

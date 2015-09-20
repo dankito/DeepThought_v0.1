@@ -134,7 +134,8 @@ public class OpenOfficeDocumentsImporterExporter {
   }
 
   protected void addCategoryAndTagsToQuotationEntry(Entry extractedEntry) {
-    Application.getDeepThought().findOrCreateTopLevelCategoryForName("Zitate").addEntry(extractedEntry);
+    Category quotationCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName("Zitate");
+    extractedEntry.addCategory(quotationCategory);
 
     Tag quotationTag = Application.getDeepThought().findOrCreateTagForName("Zitat");
     extractedEntry.addTag(quotationTag);
@@ -925,7 +926,7 @@ public class OpenOfficeDocumentsImporterExporter {
       String seriesTitleTitle = entry.getSeries().getTitle();
       Category category = findOrCreateCategoryForSeriesTitle(seriesTitleTitle);
       if(category != null)
-        category.addEntry(entry);
+        entry.addCategory(category);
     }
   }
 

@@ -214,7 +214,8 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
       }
     });
 
-    category.addEntry(new Entry("entry", "contentless"));
+    Entry newEntry = new Entry("entry", "contentless");
+    newEntry.addCategory(category);
 
     Assert.assertTrue(listenerCalled.hasListenerBeenCalled());
   }
@@ -226,7 +227,7 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
     final DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
     Entry entry = new Entry("entry", "contentless");
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     deepThought.addEntityListener(new EntityListener() {
       @Override
@@ -251,7 +252,7 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
       }
     });
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     Assert.assertTrue(listenerCalled.hasListenerBeenCalled());
   }
@@ -430,7 +431,7 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Assert.assertTrue(listenerCalled.hasListenerBeenCalled());
   }
@@ -447,7 +448,7 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
     deepThought.addCategory(category);
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     deepThought.addEntityListener(new EntityListener() {
       @Override
@@ -472,7 +473,7 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
       }
     });
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     Assert.assertTrue(listenerCalled.hasListenerBeenCalled());
   }

@@ -14,8 +14,8 @@ import java.sql.SQLException;
 public abstract class CategoryTestBase extends DataModelTestBase {
 
   protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
-    return doesJoinTableEntryExist(TableConfig.CategoryEntryJoinTableName, TableConfig.CategoryEntryJoinTableCategoryIdColumnName, categoryId,
-        TableConfig.CategoryEntryJoinTableEntryIdColumnName, entryId);
+    return doesJoinTableEntryExist(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableCategoryIdColumnName, categoryId,
+        TableConfig.EntryCategoryJoinTableEntryIdColumnName, entryId);
   }
 
 
@@ -191,7 +191,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
 
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     // assert entry really got written to database
     Object[] queryResult = getRowFromTable(TableConfig.EntryTableName, entry.getId());
@@ -207,7 +207,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
 
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Assert.assertNotNull(entry.getId());
     Assert.assertTrue(entry.getCategories().contains(category));
@@ -222,10 +222,10 @@ public abstract class CategoryTestBase extends DataModelTestBase {
 
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Long entryId = entry.getId();
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     // assert entry really didn't get deleted from database
     Object[] queryResult = getRowFromTable(TableConfig.EntryTableName, entry.getId());
@@ -241,9 +241,9 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     Assert.assertFalse(entry.getCategories().contains(category));
     Assert.assertFalse(category.getEntries().contains(entry));

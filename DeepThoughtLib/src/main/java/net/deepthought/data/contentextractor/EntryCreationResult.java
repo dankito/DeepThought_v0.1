@@ -151,7 +151,7 @@ public class EntryCreationResult {
     for(Category category : entryCategories) {
       if(category.isPersisted() == false)
         deepThought.addCategory(category);
-      category.addEntry(createdEntry);
+      createdEntry.addCategory(category);
     }
 
     for(Person person : extractedPersons) {

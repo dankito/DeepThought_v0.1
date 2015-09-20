@@ -32,6 +32,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 
@@ -178,6 +179,9 @@ public class JavaFxLocalization {
 
     if(labeled.getGraphic() != null)
       resolveNodeResourceKeys(labeled.getGraphic());
+
+    if(labeled instanceof TitledPane)
+      resolveNodeResourceKeys(((TitledPane)labeled).getContent());
   }
 
   protected static void resolveTextInputControlResourceKeys(TextInputControl textInputControl) {

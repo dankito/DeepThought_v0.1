@@ -66,7 +66,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Column(name = TableConfig.EntryEntryIndexColumnName)
   protected int entryIndex;
 
-  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "entries") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Category?
+  @ManyToMany(fetch = FetchType.LAZY )
+  @JoinTable(
+      name = TableConfig.EntryCategoryJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.EntryCategoryJoinTableEntryIdColumnName) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryCategoryJoinTableCategoryIdColumnName) }
+  )
   protected Set<Category> categories = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
@@ -406,15 +411,26 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return categories;
   }
 
-  protected boolean addCategory(Category category) {
-    boolean result = categories.add(category);
-    callEntityAddedListeners(categories, category);
-    return result;
+  public boolean addCategory(Category category) {
+    if(categories.contains(category) == false) {
+      if (categories.add(category)) {
+        category.addEntry(this);
+
+        callEntityAddedListeners(categories, category);
+        return true;
+      }
+    }
+
+    return false;
   }
 
-  protected boolean removeCategory(Category category) {
+  public boolean removeCategory(Category category) {
     boolean result = categories.remove(category);
-    callEntityRemovedListeners(categories, category);
+    if(result) {
+      category.removeEntry(this);
+      callEntityRemovedListeners(categories, category);
+    }
+
     return result;
   }
 

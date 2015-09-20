@@ -251,10 +251,10 @@ public class LuceneSearchEngineTest {
     final Category category2 = new Category("Periodicals");
     deepThought.addCategory(category2);
 
-    category1.addEntry(newEntry);
-    category2.addEntry(newEntry);
+    newEntry.addCategory(category1);
+    newEntry.addCategory(category2);
 
-    category1.removeEntry(newEntry);
+    newEntry.removeCategory(category1);
 
     List<Category> categoryTwoCollection = new ArrayList<Category>() {{ add(category2); }};
     // TODO: no method to search for Entry Categories yet

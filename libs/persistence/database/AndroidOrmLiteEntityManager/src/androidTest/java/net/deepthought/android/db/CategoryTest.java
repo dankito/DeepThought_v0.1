@@ -98,7 +98,7 @@ public class CategoryTest extends EntitiesTestBase {
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     // assert entry really got written to database
     List queryResult = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.EntryTableName + " WHERE id=" + entry.getId());
@@ -113,7 +113,7 @@ public class CategoryTest extends EntitiesTestBase {
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     assertNotNull(entry.getId());
     assertTrue(entry.getCategories().contains(category));
@@ -128,10 +128,10 @@ public class CategoryTest extends EntitiesTestBase {
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
     Long entryId = entry.getId();
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     // assert entry really didn't get deleted from database
     List queryResult = entityManager.doNativeQuery("SELECT * FROM entry WHERE id=" + entryId);
@@ -146,9 +146,9 @@ public class CategoryTest extends EntitiesTestBase {
     Entry entry = new Entry("test", "no content");
     deepThought.addEntry(entry);
 
-    category.addEntry(entry);
+    entry.addCategory(category);
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     assertFalse(entry.getCategories().contains(category));
     assertFalse(category.getEntries().contains(entry));

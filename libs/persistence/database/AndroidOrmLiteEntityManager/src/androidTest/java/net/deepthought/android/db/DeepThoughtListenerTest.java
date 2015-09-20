@@ -181,7 +181,8 @@ public class DeepThoughtListenerTest extends EntitiesTestBase {
 //      }
 //    });
 
-    category.addEntry(new Entry("entry", "contentless"));
+    Entry newEntry = new Entry("entry", "contentless");
+    newEntry.addCategory(category);
 
     assertTrue(listenerCalled.hasListenerBeenCalled());
   }
@@ -192,7 +193,7 @@ public class DeepThoughtListenerTest extends EntitiesTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
     Entry entry = new Entry("entry", "contentless");
-    category.addEntry(entry);
+    entry.addCategory(category);
 
 //    deepThought.addCategoriesChangedListener(new CategoriesChangedListener() {
 //      @Override
@@ -211,7 +212,7 @@ public class DeepThoughtListenerTest extends EntitiesTestBase {
 //      }
 //    });
 
-    category.removeEntry(entry);
+    entry.removeCategory(category);
 
     assertTrue(listenerCalled.hasListenerBeenCalled());
   }

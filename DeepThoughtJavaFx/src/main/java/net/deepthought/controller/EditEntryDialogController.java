@@ -409,11 +409,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryCategories)) {
       for(Category removedCategory : entryCategoriesControl.getRemovedCategories())
-        removedCategory.removeEntry(entry);
+        entry.removeCategory(removedCategory);
       entryCategoriesControl.getRemovedCategories().clear();
 
       for(Category addedCategory : entryCategoriesControl.getAddedCategories())
-        addedCategory.addEntry(entry);
+        entry.addCategory(addedCategory);
       entryCategoriesControl.getAddedCategories().clear();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryCategories);

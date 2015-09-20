@@ -65,10 +65,10 @@ public class DataHelper {
     entry1.addSubEntry(entry2);
     entry1.addSubEntry(entry3);
 
-    bookDigestsCategory.addEntry(entry1);
-    periodicalsPrintCategory.addEntry(entry2);
-    periodicalsPrintCategory.addEntry(entry3);
-    periodicalsOnlineCategory.addEntry(entry3);
+    entry1.addCategory(bookDigestsCategory);
+    entry2.addCategory(periodicalsPrintCategory);
+    entry3.addCategory(periodicalsPrintCategory);
+    entry3.addCategory(periodicalsOnlineCategory);
 
     Tag tag1 = new Tag("Peace");
     Tag tag2 = new Tag("Gandhi");

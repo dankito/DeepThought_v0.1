@@ -435,13 +435,13 @@ public class WikipediaImporter {
       List<String> categories = articleCategories.remove(articleName);
       for(String categoryName : categories) {
         if(createdCategories.containsKey(categoryName))
-          createdCategories.get(categoryName).addEntry(entry);
+          entry.addCategory(createdCategories.get(categoryName));
         else {
           Category newCategory = new Category(categoryName);
           synchronized(deepThought) {
             deepThought.addCategory(newCategory);
             if(newCategory.isPersisted())
-              newCategory.addEntry(entry);
+              entry.addCategory(newCategory);
           }
 
           if(newCategory.isPersisted())
