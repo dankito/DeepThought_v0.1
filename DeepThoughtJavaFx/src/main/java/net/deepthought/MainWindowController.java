@@ -484,8 +484,6 @@ public class MainWindowController implements Initializable {
     JavaFxLocalization.bindControlToolTip(btnRemoveSelectedCategories, "delete.selected.categories.tool.tip");
     JavaFxLocalization.bindControlToolTip(btnAddCategory, "create.new.top.level.category.tool.tip");
 
-    trvwCategories.setOnContextMenuRequested(event -> showTreeViewCategoriesContextMenu(event));
-
     trvwCategories.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedCategories();
@@ -520,25 +518,6 @@ public class MainWindowController implements Initializable {
 
     if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories)
       tbpnOverview.getSelectionModel().select(tabTags);
-  }
-
-  protected void showTreeViewCategoriesContextMenu(ContextMenuEvent event) {
-    ContextMenu contextMenu = createTreeViewCategoriesContextMenu();
-
-    contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
-  }
-
-  protected ContextMenu createTreeViewCategoriesContextMenu() {
-    ContextMenu contextMenu = new ContextMenu();
-
-    MenuItem addCategoryMenuItem = new MenuItem("Add Category");
-    contextMenu.getItems().add(addCategoryMenuItem);
-
-    addCategoryMenuItem.setOnAction(event -> {
-      deepThought.addCategory(new Category());
-    });
-
-    return contextMenu;
   }
 
   protected void deleteSelectedCategories() {
