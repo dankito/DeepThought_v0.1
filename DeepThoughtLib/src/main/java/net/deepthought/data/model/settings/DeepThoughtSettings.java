@@ -170,10 +170,13 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
     return entriesOverviewDividerPosition;
   }
 
-  public void setEntriesOverviewDividerPosition(double entriesOverviewDividerPosition) {
+  public void setEntriesOverviewDividerPosition(double dividerPosition) {
+    if(((Double)dividerPosition).equals(this.entriesOverviewDividerPosition))
+      return;
+
     Object previousValue = this.entriesOverviewDividerPosition;
-    this.entriesOverviewDividerPosition = entriesOverviewDividerPosition;
-    callSettingsChangedListeners(Setting.DeepThoughtEntriesOverviewDividerPosition, previousValue, entriesOverviewDividerPosition);
+    this.entriesOverviewDividerPosition = dividerPosition;
+    callSettingsChangedListeners(Setting.DeepThoughtEntriesOverviewDividerPosition, previousValue, dividerPosition);
   }
 
   public WindowSettings getMainWindowSettings() {

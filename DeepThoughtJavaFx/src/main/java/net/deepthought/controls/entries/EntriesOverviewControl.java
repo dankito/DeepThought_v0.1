@@ -326,7 +326,16 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     if(showPaneQuickEditEntry) {
       if(splpnEntries.getItems().contains(pnQuickEditEntryScrollPane) == false) {
         splpnEntries.getItems().add(pnQuickEditEntryScrollPane);
-        splpnEntries.setDividerPositions(0.5);
+      }
+
+      splpnEntries.setDividerPosition(0, deepThought.getSettings().getEntriesOverviewDividerPosition());
+
+      if(splpnEntries.getDividers().size() > 0) {
+        splpnEntries.getDividers().get(0).positionProperty().addListener(((observableValue, oldValue, newValue) -> {
+          if (deepThought != null) {
+            deepThought.getSettings().setEntriesOverviewDividerPosition((double)newValue);
+          }
+        }));
       }
     }
     else {
