@@ -29,19 +29,19 @@ public class FileLink extends UserDataEntity implements Serializable {
 
 
   @Column(name = TableConfig.FileLinkUriColumnName)
-  protected String uriString;
+  protected String uriString = "";
 
   @Column(name = TableConfig.FileLinkNameColumnName)
   protected String name = "";
 
   @Column(name = TableConfig.FileLinkIsFolderColumnName)
-  protected boolean isFolder;
+  protected boolean isFolder = false;
 
   @Column(name = TableConfig.FileLinkNotesColumnName)
-  protected String notes;
+  protected String notes = "";
 
   @Column(name = TableConfig.FileLinkSourceUriColumnName)
-  protected String sourceUriString;
+  protected String sourceUriString = "";
 
 //  @ManyToOne(fetch = FetchType.LAZY)
 //  @JoinColumn(name = TableConfig.FileLinkEntryJoinColumnName)

@@ -92,13 +92,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
     });
 
     txtfldFileLocation.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileFileLocation);
-      updateWindowTitle();
-      updateFileName(txtfldFileLocation.getText());
-      try {
-        String scheme = new URI(txtfldFileLocation.getText()).getScheme();
-        cmbxLocalFileLinkOptions.setDisable(scheme != null && "file".equals(scheme) == false);
-      } catch(Exception ex) { }
+      fileLocationChanged();
     });
 
     rdbtnFolder.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -120,6 +114,17 @@ public class EditFileDialogController extends EntityDialogFrameController implem
     });
 
     txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
+  }
+
+  protected void fileLocationChanged() {
+    fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileFileLocation);
+    updateWindowTitle();
+    updateFileName(txtfldFileLocation.getText());
+
+    try {
+      String scheme = new URI(txtfldFileLocation.getText()).getScheme();
+      cmbxLocalFileLinkOptions.setDisable(scheme != null && "file".equals(scheme) == false);
+    } catch(Exception ex) { }
   }
 
   protected void updateFileName(String uriString) {
@@ -225,10 +230,10 @@ public class EditFileDialogController extends EntityDialogFrameController implem
 
   @Override
   protected void saveEntity() {
+    saveEditedFields();
+
     if(file.isPersisted() == false)
       Application.getDeepThought().addFile(file);
-
-    saveEditedFields();
   }
 
   protected void saveEditedFields() {
@@ -248,9 +253,9 @@ public class EditFileDialogController extends EntityDialogFrameController implem
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileFolderLocation);
     }
 
-//    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileName)) {
-    if(txtfldFileName.getText().equals(file.getName()) == false) {
-      file.setName(txtfldFileName.getText());
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileName)) {
+      if(txtfldFileName.getText().equals(file.getName()) == false)
+        file.setName(txtfldFileName.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileName);
     }
 

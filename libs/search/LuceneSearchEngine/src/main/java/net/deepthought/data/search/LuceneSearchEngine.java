@@ -23,6 +23,7 @@ import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResult;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.util.StringUtils;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
@@ -706,7 +707,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.FileName, file.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
-    doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
+    if(StringUtils.isNotNullOrEmpty(file.getSourceUriString()))
+      doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileDescription, file.getNotes().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, FileLink.class);

@@ -366,6 +366,14 @@ public class TableConfig {
   public final static String NoteTypeTableName = "note_type";
 
 
+  /*          FileType Table Config        */
+
+  public final static String FileTypeTableName = "file_type";
+
+  public final static String FileTypeFolderNameColumnName = "folder";
+  public final static String FileTypeIconColumnName = "icon";
+
+
   /*          BackupFileServiceType Table Config        */
 
   public final static String BackupFileServiceTypeTableName = "backup_file_service_type";

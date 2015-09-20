@@ -1,6 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.listener.EntityListener;
@@ -13,6 +14,7 @@ import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,6 +131,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<NoteType> noteTypes = new TreeSet<>();
+
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OrderBy(value = "sortOrder")
+  protected Set<FileType> fileTypes = new TreeSet<>();
 
   @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
@@ -397,6 +403,36 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(result) {
       noteType.setDeepThought(null);
       callEntityRemovedListeners(noteTypes, noteType);
+    }
+
+    return result;
+  }
+
+
+  public Collection<FileType> getFileTypes() {
+    return fileTypes;
+  }
+
+  public boolean addFileType(FileType fileType) {
+    boolean result = fileTypes.add(fileType);
+
+    if(result) {
+      fileType.setDeepThought(this);
+      callEntityAddedListeners(fileTypes, fileType);
+    }
+
+    return result;
+  }
+
+  public boolean removeFileType(FileType fileType) {
+    if(fileType.isDeletable() == false)
+      return false;
+
+    boolean result = fileTypes.remove(fileType);
+
+    if(result) {
+      fileType.setDeepThought(null);
+      callEntityRemovedListeners(fileTypes, fileType);
     }
 
     return result;
@@ -843,6 +879,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected static void createEnumerationsDefaultValues(DeepThought deepThought) {
     createLanguageDefaultValues(deepThought);
     createNoteTypeDefaultValues(deepThought);
+    createFileTypeDefaultValues(deepThought);
     createBackupFileServiceTypeDefaultValues(deepThought);
   }
 
@@ -905,6 +942,14 @@ public class DeepThought extends UserDataEntity implements Serializable {
     deepThought.addNoteType(new NoteType("note.type.info", true, false, 3));
     deepThought.addNoteType(new NoteType("note.type.to.do", true, false, 4));
     deepThought.addNoteType(new NoteType("note.type.thought", true, false, 5));
+  }
+
+  protected static void createFileTypeDefaultValues(DeepThought deepThought) {
+    deepThought.addFileType(new FileType("file.type.document", FileUtils.DocumentsFilesFolderName, true, true, 1));
+    deepThought.addFileType(new FileType("file.type.image", FileUtils.ImagesFilesFolderName, true, true, 2));
+    deepThought.addFileType(new FileType("file.type.audio", FileUtils.AudioFilesFolderName, true, true, 3));
+    deepThought.addFileType(new FileType("file.type.video", FileUtils.VideoFilesFolderName, true, true, 4));
+    deepThought.addFileType(new FileType("file.type.other.files", FileUtils.OtherFilesFolderName, true, false, Integer.MAX_VALUE));
   }
 
   protected static void createBackupFileServiceTypeDefaultValues(DeepThought deepThought) {

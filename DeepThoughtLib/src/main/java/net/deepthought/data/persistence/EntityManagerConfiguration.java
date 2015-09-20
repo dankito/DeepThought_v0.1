@@ -21,6 +21,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 
@@ -324,6 +325,7 @@ public class EntityManagerConfiguration {
         Note.class,
         NoteType.class,
         FileLink.class,
+        FileType.class,
         EntriesLinkGroup.class,
     
         ReferenceBase.class,
