@@ -89,8 +89,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceChanges = FXCollections.observableSet();
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceSubDivisionChanges = FXCollections.observableSet();
 
-  protected int publishingDateFormat = DateFormat.MEDIUM;
-
 
   @FXML
   protected VBox pnContent;
@@ -121,10 +119,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   @FXML
   protected TextField txtfldSeriesTitleSubTitle;
 
-  @FXML
-  protected TitledPane ttldpnSeriesTitleAbstract;
-  @FXML
-  protected TextArea txtarSeriesTitleAbstract;
+  protected CollapsibleHtmlEditor htmledSeriesTitleAbstract;
 
   protected CollapsibleHtmlEditor htmledSeriesTitleTableOfContents;
 
@@ -136,10 +131,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   @FXML
   protected TextField txtfldSeriesTitleOnlineAddress;
 
-  @FXML
-  protected TitledPane ttldpnSeriesTitleNotes;
-  @FXML
-  protected TextArea txtarSeriesTitleNotes;
+  protected CollapsibleHtmlEditor htmledSeriesTitleNotes;
 
 
   @FXML
@@ -172,16 +164,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected TextField txtfldReferenceSubTitle;
 
   @FXML
-  protected TitledPane ttldpnReferenceAbstract;
-  @FXML
-  protected TextArea txtarReferenceAbstract;
-
-  protected CollapsibleHtmlEditor htmledReferenceTableOfContents;
-
-
-  protected ReferencePersonsControl referencePersonsControl;
-
-  @FXML
   protected Pane paneReferencePublishingDate;
   @FXML
   protected TextField txtfldReferenceIssueOrPublishingDate;
@@ -193,10 +175,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   @FXML
   protected TextField txtfldReferenceOnlineAddress;
 
-  @FXML
-  protected TitledPane ttldpnReferenceNotes;
-  @FXML
-  protected TextArea txtarReferenceNotes;
+  protected CollapsibleHtmlEditor htmledReferenceAbstract;
+
+  protected CollapsibleHtmlEditor htmledReferenceTableOfContents;
+
+
+  protected ReferencePersonsControl referencePersonsControl;
+
+  protected CollapsibleHtmlEditor htmledReferenceNotes;
 
 
   @FXML
@@ -227,22 +213,16 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected TextField txtfldReferenceSubDivisionSubTitle;
 
   @FXML
-  protected TitledPane ttldpnReferenceSubDivisionAbstract;
-  @FXML
-  protected TextArea txtarReferenceSubDivisionAbstract;
-
-
-  protected ReferenceSubDivisionPersonsControl referenceSubDivisionPersonsControl;
-
-  @FXML
   protected Pane paneReferenceSubDivisionOnlineAddress;
   @FXML
   protected TextField txtfldReferenceSubDivisionOnlineAddress;
 
-  @FXML
-  protected TitledPane ttldpnReferenceSubDivisionNotes;
-  @FXML
-  protected TextArea txtarReferenceSubDivisionNotes;
+  protected CollapsibleHtmlEditor htmledReferenceSubDivisionAbstract;
+
+
+  protected ReferenceSubDivisionPersonsControl referenceSubDivisionPersonsControl;
+
+  protected CollapsibleHtmlEditor htmledReferenceSubDivisionNotes;
 
   @FXML
   protected TitledPane ttldpnReferenceSubDivisionFiles;
@@ -345,28 +325,33 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
     txtfldSeriesTitleSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleSubTitle));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleAbstract);
-    txtarSeriesTitleAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
+    txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
+
+    htmledSeriesTitleAbstract = new CollapsibleHtmlEditor("abstract", seriesTitleAbstractListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleAbstract);
+    paneSeriesTitle.getChildren().add(3, htmledSeriesTitleAbstract);
+    VBox.setMargin(htmledSeriesTitleAbstract, new Insets(6, 0, 0, 0));
 
     htmledSeriesTitleTableOfContents = new CollapsibleHtmlEditor("table.of.contents", seriesTitleTableOfContentsListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleTableOfContents);
     paneSeriesTitle.getChildren().add(4, htmledSeriesTitleTableOfContents);
+    VBox.setMargin(htmledSeriesTitleTableOfContents, new Insets(6, 0, 0, 0));
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
     seriesTitlePersonsControl.setExpanded(true);
     seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     VBox.setMargin(seriesTitlePersonsControl, new Insets(6, 0, 0, 0));
-    paneSeriesTitle.getChildren().add(6, seriesTitlePersonsControl);
+    paneSeriesTitle.getChildren().add(5, seriesTitlePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
     seriesTitlePersonsControl.setVisible(false);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
-    txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleNotes);
-    txtarSeriesTitleNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes));
+    htmledSeriesTitleNotes = new CollapsibleHtmlEditor("notes", seriesTitleNotesListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleNotes);
+    paneSeriesTitle.getChildren().add(6, htmledSeriesTitleNotes);
+    VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleFiles);
   }
@@ -418,7 +403,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     searchAndSelectReferenceControl.visibleProperty().bind(btnShowHideSearchReference.selectedProperty());
     searchAndSelectReferenceControl.setMinHeight(190);
     searchAndSelectReferenceControl.setMaxHeight(190);
-    pnContent.getChildren().add(5, searchAndSelectReferenceControl);
+    pnContent.getChildren().add(4, searchAndSelectReferenceControl);
 
     txtfldReferenceTitle.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTitle);
@@ -428,20 +413,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubTitle);
     txtfldReferenceSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceAbstract);
-    txtarReferenceAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract));
-
-    htmledReferenceTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
-    paneReference.getChildren().add(5, htmledReferenceTableOfContents);
-
-    referencePersonsControl = new ReferencePersonsControl();
-    referencePersonsControl.setExpanded(false);
-    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
-    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
-    VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
-    paneReference.getChildren().add(6, referencePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferencePublishingDate);
     txtfldReferenceIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -453,8 +424,27 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceOnlineAddress);
     txtfldReferenceOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceNotes);
-    txtarReferenceNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes));
+    htmledReferenceAbstract = new CollapsibleHtmlEditor("abstract", referenceAbstractListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceAbstract);
+    paneReference.getChildren().add(4, htmledReferenceAbstract);
+    VBox.setMargin(htmledReferenceAbstract, new Insets(6, 0, 0, 0));
+
+    htmledReferenceTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
+    paneReference.getChildren().add(5, htmledReferenceTableOfContents);
+    VBox.setMargin(htmledReferenceTableOfContents, new Insets(6, 0, 0, 0));
+
+    referencePersonsControl = new ReferencePersonsControl();
+    referencePersonsControl.setExpanded(false);
+    referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
+    referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
+    VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
+    paneReference.getChildren().add(6, referencePersonsControl);
+
+    htmledReferenceNotes = new CollapsibleHtmlEditor("notes", referenceNotesListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceNotes);
+    paneReference.getChildren().add(7, htmledReferenceNotes);
+    VBox.setMargin(htmledReferenceNotes, new Insets(6, 0, 0, 0));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceFiles);
 //    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -504,8 +494,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
     txtfldReferenceSubDivisionSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionAbstract);
-    txtarReferenceSubDivisionAbstract.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
+    txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
+
+    htmledReferenceSubDivisionAbstract = new CollapsibleHtmlEditor("abstract", referenceSubDivisionAbstractListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionAbstract);
+    paneReferenceSubDivision.getChildren().add(3, htmledReferenceSubDivisionAbstract);
+    VBox.setMargin(htmledReferenceSubDivisionAbstract, new Insets(6, 0, 0, 0));
 
     referenceSubDivisionPersonsControl = new ReferenceSubDivisionPersonsControl();
     referenceSubDivisionPersonsControl.setExpanded(true);
@@ -516,11 +511,10 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
-    txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
-
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionNotes);
-    txtarReferenceSubDivisionNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes));
+    htmledReferenceSubDivisionNotes = new CollapsibleHtmlEditor("notes", referenceSubDivisionNotesListener);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionNotes);
+    paneReferenceSubDivision.getChildren().add(5, htmledReferenceSubDivisionNotes);
+    VBox.setMargin(htmledReferenceSubDivisionNotes, new Insets(6, 0, 0, 0));
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionFiles);
 
@@ -538,14 +532,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     paneSeriesTitleSubTitle.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnSeriesTitleAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledSeriesTitleAbstract.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     htmledSeriesTitleTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     seriesTitlePersonsControl.setVisible(seriesTitle.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
@@ -553,12 +547,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     paneReferenceSubTitle.setVisible(StringUtils.isNotNullOrEmpty(reference.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnReferenceAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledReferenceAbstract.setVisible(StringUtils.isNotNullOrEmpty(reference.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     htmledReferenceTableOfContents.setVisible(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     paneReferenceOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnReferenceNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledReferenceNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnReferenceFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
@@ -566,13 +560,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     paneReferenceSubDivisionSubTitle.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getSubTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnReferenceSubDivisionAbstract.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledReferenceSubDivisionAbstract.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getAbstract()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     referenceSubDivisionPersonsControl.setVisible(referenceSubDivision.hasPersons() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     paneReferenceSubDivisionOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
-    ttldpnReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    htmledReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
@@ -677,21 +671,28 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneSeriesTitle.getChildren().remove(searchAndSelectSeriesTitleControl);
     searchAndSelectSeriesTitleControl = null;
     htmledSeriesTitleTableOfContents.cleanUpControl();
+    htmledSeriesTitleAbstract.cleanUpControl();
     seriesTitlePersonsControl.cleanUpControl();
     paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
     seriesTitlePersonsControl = null;
+    htmledSeriesTitleNotes.cleanUpControl();
 
     searchAndSelectReferenceControl.cleanUpControl();
+    htmledReferenceAbstract.cleanUpControl();
+    htmledReferenceTableOfContents.cleanUpControl();
     paneReference.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
     htmledReferenceTableOfContents.cleanUpControl();
     referencePersonsControl.cleanUpControl();
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
+    htmledReferenceNotes.cleanUpControl();
 
+    htmledReferenceSubDivisionAbstract.cleanUpControl();
     referenceSubDivisionPersonsControl.cleanUpControl();
     paneReferenceSubDivision.getChildren().remove(referenceSubDivisionPersonsControl);
     referenceSubDivisionPersonsControl = null;
+    htmledReferenceSubDivisionNotes.cleanUpControl();
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {
@@ -705,16 +706,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleAbstract)) {
-      seriesTitle.setAbstract(txtarSeriesTitleAbstract.getText());
+      seriesTitle.setAbstract(htmledSeriesTitleAbstract.getHtml());
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
     }
     if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleTableOfContents) || htmledSeriesTitleTableOfContents.getHtml().equals(seriesTitle.getTableOfContents()) == false) {
-      if(FXUtils.HtmlEditorDefaultText.equals(htmledSeriesTitleTableOfContents.getHtml())) {
-        if(StringUtils.isNotNullOrEmpty(seriesTitle.getTableOfContents()))
-          seriesTitle.setTableOfContents("");
-      }
-      else
-        seriesTitle.setTableOfContents(htmledSeriesTitleTableOfContents.getHtml());
+      seriesTitle.setTableOfContents(htmledSeriesTitleTableOfContents.getHtml());
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     }
 
@@ -739,7 +735,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleNotes)) {
-      seriesTitle.setNotes(txtarSeriesTitleNotes.getText());
+      seriesTitle.setNotes(htmledSeriesTitleNotes.getHtml());
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
     }
 
@@ -764,8 +760,18 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
     }
 
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
+      reference.setIssueOrPublishingDate(txtfldReferenceIssueOrPublishingDate.getText());
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
+    }
+
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
+      reference.setOnlineAddress(txtfldReferenceOnlineAddress.getText());
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
+    }
+
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceAbstract)) {
-      reference.setAbstract(txtarReferenceAbstract.getText());
+      reference.setAbstract(htmledReferenceAbstract.getHtml());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
     }
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledReferenceTableOfContents.getHtml().equals(reference.getTableOfContents()) == false) {
@@ -788,23 +794,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferencePersons);
     }
 
-    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate)) {
-      reference.setIssueOrPublishingDate(txtfldReferenceIssueOrPublishingDate.getText());
-      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
-    }
-
-    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceOnlineAddress)) {
-      reference.setOnlineAddress(txtfldReferenceOnlineAddress.getText());
-      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
-    }
-
-//    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanged.ReferenceSubDivisions)) {
-//
-//      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanged.ReferenceSubDivisions);
-//    }
-
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceNotes)) {
-      reference.setNotes(txtarReferenceNotes.getText());
+      reference.setNotes(htmledReferenceNotes.getHtml());
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
     }
 
@@ -825,7 +816,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract)) {
-      referenceSubDivision.setAbstract(txtarReferenceSubDivisionAbstract.getText());
+      referenceSubDivision.setAbstract(htmledReferenceSubDivisionAbstract.getHtml());
       fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     }
 
@@ -845,7 +836,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
 
     if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionNotes)) {
-      referenceSubDivision.setNotes(txtarReferenceSubDivisionNotes.getText());
+      referenceSubDivision.setNotes(htmledReferenceSubDivisionNotes.getHtml());
       fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
     }
 
@@ -861,12 +852,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
       txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
 
-      txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
+      htmledSeriesTitleAbstract.setHtml(seriesTitle.getAbstract());
       htmledSeriesTitleTableOfContents.setHtml(seriesTitle.getTableOfContents());
 
       txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
 
-      txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
+      htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
 
       seriesTitlePersonsControl.setSeries(seriesTitle);
     }
@@ -874,12 +865,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       txtfldSeriesTitleTitle.setText("");
       txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
 
-      txtarSeriesTitleAbstract.setText(seriesTitle.getAbstract());
+      htmledSeriesTitleAbstract.setHtml(seriesTitle.getAbstract());
       htmledSeriesTitleTableOfContents.setHtml(seriesTitle.getTableOfContents());
 
       txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
 
-      txtarSeriesTitleNotes.setText(seriesTitle.getNotes());
+      htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
 
       seriesTitlePersonsControl.setSeries(seriesTitle);
     }
@@ -896,13 +887,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     txtfldReferenceSubDivisionTitle.setText(subDivision.getTitle());
     txtfldReferenceSubDivisionSubTitle.setText(subDivision.getSubTitle());
 
-    txtarReferenceSubDivisionAbstract.setText(subDivision.getAbstract());
+    htmledReferenceSubDivisionAbstract.setHtml(subDivision.getAbstract());
 
     referenceSubDivisionPersonsControl.setSubDivision(subDivision);
 
     txtfldReferenceSubDivisionOnlineAddress.setText(subDivision.getOnlineAddress());
 
-    txtarReferenceSubDivisionNotes.setText(subDivision.getNotes());
+    htmledReferenceSubDivisionNotes.setHtml(subDivision.getNotes());
 
 //    trtblvwReferenceSubDivisionFiles.setRoot(new FileRootTreeItem(subDivision));
 
@@ -928,8 +919,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     if(paneSeriesTitleSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleSubTitle, "subtitle");
 
-    if(ttldpnSeriesTitleAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleAbstract, "abstract");
+    if(htmledSeriesTitleAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledSeriesTitleAbstract, "abstract");
     if(htmledSeriesTitleTableOfContents.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledSeriesTitleTableOfContents, "table.of.contents");
 
@@ -940,8 +931,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneSeriesTitleOnlineAddress, "online.address");
     }
 
-    if(ttldpnSeriesTitleNotes.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleNotes, "notes");
+    if(htmledSeriesTitleNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledSeriesTitleNotes, "notes");
     if(ttldpnSeriesTitleFiles.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleFiles, "files");
 
@@ -963,17 +954,17 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     if(paneReferenceSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubTitle, "subtitle");
 
-    if(ttldpnReferenceAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceAbstract, "abstract");
-    if(htmledReferenceTableOfContents.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceTableOfContents, "table.of.contents");
-
     if(paneReferenceOnlineAddress.isVisible() == false) {
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceOnlineAddress, "online.address");
+
+    if(htmledReferenceAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceAbstract, "abstract");
+    if(htmledReferenceTableOfContents.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceTableOfContents, "table.of.contents");
     }
 
-    if(ttldpnReferenceNotes.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceNotes, "notes");
+    if(htmledReferenceNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceNotes, "notes");
     if(ttldpnReferenceFiles.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceFiles, "files");
 
@@ -995,8 +986,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     if(paneReferenceSubDivisionSubTitle.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubDivisionSubTitle, "subtitle");
 
-    if(ttldpnReferenceSubDivisionAbstract.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceSubDivisionAbstract, "abstract");
+    if(htmledReferenceSubDivisionAbstract.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceSubDivisionAbstract, "abstract");
 
     if(referenceSubDivisionPersonsControl.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, referenceSubDivisionPersonsControl, "persons");
@@ -1005,8 +996,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       createHiddenFieldMenuItem(hiddenFieldsMenu, paneReferenceSubDivisionOnlineAddress, "online.address");
     }
 
-    if(ttldpnReferenceSubDivisionNotes.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceSubDivisionNotes, "notes");
+    if(htmledReferenceSubDivisionNotes.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceSubDivisionNotes, "notes");
     if(ttldpnReferenceSubDivisionFiles.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceSubDivisionFiles, "files");
 
@@ -1170,7 +1161,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     txtfldReferenceTitle.setText(reference.getTitle());
     txtfldReferenceSubTitle.setText(reference.getSubTitle());
 
-    txtarReferenceAbstract.setText(reference.getAbstract());
+    htmledReferenceAbstract.setHtml(reference.getAbstract());
     htmledReferenceTableOfContents.setHtml(reference.getTableOfContents());
 
     referencePersonsControl.setReference(reference);
@@ -1180,7 +1171,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     txtfldReferenceOnlineAddress.setText(reference.getOnlineAddress());
 
-    txtarReferenceNotes.setText(reference.getNotes());
+    htmledReferenceNotes.setHtml(reference.getNotes());
 
 //    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
 
@@ -1239,7 +1230,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected void seriesTitleAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarSeriesTitleAbstract.setText(newValue);
+    htmledSeriesTitleAbstract.setHtml(newValue);
     fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleAbstract);
   }
 
@@ -1257,7 +1248,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected void seriesTitleNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarSeriesTitleNotes.setText(newValue);
+    htmledSeriesTitleNotes.setHtml(newValue);
     fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
   }
 
@@ -1269,12 +1260,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         referenceTitleChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseSubTitleColumnName))
         referenceSubTitleChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceIssueOrPublishingDateColumnName))
+        referenceIssueOrPublishingDateChanged((String) previousValue, (String) newValue);
+      else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
+        referenceOnlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseAbstractColumnName))
         referenceAbstractChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceTableOfContentsColumnName))
         referenceTableOfContentsChanged((String) previousValue, (String) newValue);
-      else if(propertyName.equals(TableConfig.ReferenceBaseOnlineAddressColumnName))
-        referenceOnlineAddressChanged((String) previousValue, (String) newValue);
       else if(propertyName.equals(TableConfig.ReferenceBaseNotesColumnName))
         referenceNotesChanged((String) previousValue, (String) newValue);
     }
@@ -1307,9 +1300,21 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceSubTitle);
   }
 
+  protected void referenceIssueOrPublishingDateChanged(String previousValue, String newValue) {
+    // TODO: if current value != previousValue, ask User what to do?
+    txtfldReferenceIssueOrPublishingDate.setText(newValue);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
+  }
+
+  protected void referenceOnlineAddressChanged(String previousValue, String newValue) {
+    // TODO: if current value != previousValue, ask User what to do?
+    txtfldReferenceOnlineAddress.setText(newValue);
+    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
+  }
+
   protected void referenceAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarReferenceAbstract.setText(newValue);
+    htmledReferenceAbstract.setHtml(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
   }
 
@@ -1319,15 +1324,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceTableOfContents);
   }
 
-  protected void referenceOnlineAddressChanged(String previousValue, String newValue) {
-    // TODO: if current value != previousValue, ask User what to do?
-    txtfldReferenceOnlineAddress.setText(newValue);
-    fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceOnlineAddress);
-  }
-
   protected void referenceNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarReferenceNotes.setText(newValue);
+    htmledReferenceNotes.setHtml(newValue);
     fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
   }
 
@@ -1379,7 +1378,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected void referenceSubDivisionAbstractChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarReferenceSubDivisionAbstract.setText(newValue);
+    htmledReferenceSubDivisionAbstract.setHtml(newValue);
     fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
   }
 
@@ -1391,7 +1390,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected void referenceSubDivisionNotesChanged(String previousValue, String newValue) {
     // TODO: if current value != previousValue, ask User what to do?
-    txtarReferenceSubDivisionNotes.setText(newValue);
+    htmledReferenceSubDivisionNotes.setHtml(newValue);
     fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
   }
 
@@ -1403,10 +1402,54 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     }
   };
 
+  protected HtmlEditorListener seriesTitleAbstractListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract);
+    }
+  };
+
+  protected HtmlEditorListener seriesTitleNotesListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes);
+    }
+  };
+
+
+  protected HtmlEditorListener referenceAbstractListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract);
+    }
+  };
+
   protected HtmlEditorListener referenceTableOfContentsListener = new HtmlEditorListener() {
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents);
+    }
+  };
+
+  protected HtmlEditorListener referenceNotesListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes);
+    }
+  };
+
+
+  protected HtmlEditorListener referenceSubDivisionAbstractListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
+    }
+  };
+
+  protected HtmlEditorListener referenceSubDivisionNotesListener = new HtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
     }
   };
 

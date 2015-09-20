@@ -66,14 +66,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnSeriesTitleAbstract" animated="false" expanded="false" text="%abstract">
-                                 <content>
-                                    <TextArea fx:id="txtarSeriesTitleAbstract" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <HBox fx:id="paneSeriesTitleOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
@@ -87,14 +79,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnSeriesTitleNotes" animated="false" expanded="false" text="%notes">
-                                 <content>
-                                    <TextArea fx:id="txtarSeriesTitleNotes" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <TitledPane fx:id="ttldpnSeriesTitleFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
                                  <content>
                                     <VBox>
@@ -199,14 +183,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnReferenceAbstract" animated="false" text="%abstract">
-                                 <content>
-                                    <TextArea fx:id="txtarReferenceAbstract" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <HBox fx:id="paneReferenceOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
@@ -220,14 +196,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnReferenceNotes" animated="false" expanded="false" text="%notes">
-                                 <content>
-                                    <TextArea fx:id="txtarReferenceNotes" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <TitledPane fx:id="ttldpnReferenceFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
                                  <graphic>
                                     <HBox alignment="CENTER_LEFT">
@@ -313,14 +281,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnReferenceSubDivisionAbstract" animated="false" text="%abstract">
-                                 <content>
-                                    <TextArea fx:id="txtarReferenceSubDivisionAbstract" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <HBox fx:id="paneReferenceSubDivisionOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
                                  <children>
                                     <Label prefWidth="135.0" text="%online.address">
@@ -334,14 +294,6 @@
                                     <Insets top="6.0" />
                                  </VBox.margin>
                               </HBox>
-                              <TitledPane fx:id="ttldpnReferenceSubDivisionNotes" animated="false" expanded="false" text="%notes">
-                                 <content>
-                                    <TextArea fx:id="txtarReferenceSubDivisionNotes" minHeight="120.0" wrapText="true" />
-                                 </content>
-                                 <VBox.margin>
-                                    <Insets top="6.0" />
-                                 </VBox.margin>
-                              </TitledPane>
                               <TitledPane fx:id="ttldpnReferenceSubDivisionFiles" animated="false" contentDisplay="GRAPHIC_ONLY" disable="true" expanded="false">
                                  <content>
                                     <VBox>
