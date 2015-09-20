@@ -7,33 +7,26 @@ import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -45,20 +38,15 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 31/12/14.
  */
-public class EditFileDialogController extends ChildWindowsController implements Initializable {
+public class EditFileDialogController extends EntityDialogFrameController implements Initializable {
 
   private final static Logger log = LoggerFactory.getLogger(EditFileDialogController.class);
 
 
   protected FileLink file;
 
-  protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
-
   protected String previousUriString = null;
 
-
-  @FXML
-  protected Button btnApply;
 
   @FXML
   protected RadioButton rdbtnFileOrUrl;
@@ -84,23 +72,18 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
 
   @Override
-  public void initialize(URL location, ResourceBundle resources) {
-    btnApply.managedProperty().bind(btnApply.visibleProperty());
+  protected String getEntityType() {
+    return "file";
+  }
 
-    setupFields();
+
+  @Override
+  protected void setupControls() {
+    super.setupControls();
 
     cmbxLocalFileLinkOptions.setItems(FXCollections.observableArrayList(FileLinkOptions.values()));
     cmbxLocalFileLinkOptions.getSelectionModel().select(FileLinkOptions.Link);
 
-    fieldsWithUnsavedChanges.addListener(new SetChangeListener<FieldWithUnsavedChanges>() {
-      @Override
-      public void onChanged(Change<? extends FieldWithUnsavedChanges> c) {
-        btnApply.setDisable(fieldsWithUnsavedChanges.size() == 0);
-      }
-    });
-  }
-
-  protected void setupFields() {
     rdbtnFileOrUrl.selectedProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileIsFolder);
       pnFileSettings.setDisable(false);
@@ -161,11 +144,8 @@ public class EditFileDialogController extends ChildWindowsController implements 
   }
 
   public void setEditFile(Stage dialogStage, FileLink file) {
-    setWindowStage(dialogStage);
     this.file = file;
-
-    updateWindowTitle();
-    btnApply.setVisible(file.isPersisted());
+    setWindowStage(dialogStage, file);
 
     fileToEditSet(file);
     fieldsWithUnsavedChanges.clear();
@@ -188,17 +168,6 @@ public class EditFileDialogController extends ChildWindowsController implements 
     txtarNotes.setText(file.getNotes());
   }
 
-  public boolean hasUnsavedChanges() {
-    return fieldsWithUnsavedChanges.size() > 0;
-  }
-
-  protected void updateWindowTitle() {
-    if(file.getId() == null)
-      JavaFxLocalization.bindStageTitle(windowStage, "add.file", file.getTextRepresentation());
-    else
-      JavaFxLocalization.bindStageTitle(windowStage, "edit.file", file.getTextRepresentation());
-  }
-
 
   @FXML
   public void handleButtonSelectFileAction(ActionEvent event) {
@@ -206,10 +175,10 @@ public class EditFileDialogController extends ChildWindowsController implements 
 
     if(txtfldFileLocation.getText() != null) {
       try {
-        java.io.File currentFile = new java.io.File(txtfldFileLocation.getText());
+        File currentFile = new File(txtfldFileLocation.getText());
         if(currentFile.exists())
           fileChooser.setInitialFileName(currentFile.getName());
-        if(currentFile.getParentFile().exists())
+        if(currentFile.getParentFile() != null && currentFile.getParentFile().exists())
           fileChooser.setInitialDirectory(currentFile.getParentFile());
       } catch (Exception ex) {
         log.debug("Could not extract file name and directory from " + txtfldFileLocation.getText(), ex);
@@ -246,32 +215,20 @@ public class EditFileDialogController extends ChildWindowsController implements 
     }
   }
 
-  @FXML
-  public void handleButtonApplyAction(ActionEvent actionEvent) {
-    saveEditedFields();
-  }
-
-  @FXML
-  public void handleButtonCancelAction(ActionEvent actionEvent) {
-    closeDialog(DialogResult.Cancel);
-  }
-
-  @FXML
-  public void handleButtonOkAction(ActionEvent actionEvent) {
-    saveEditedFields();
-
-    if(file.isPersisted() == false)
-      Application.getDeepThought().addFile(file);
-
-    closeDialog(DialogResult.Ok);
-  }
-
   @Override
   protected void closeDialog() {
 //    if(person != null)
 //      person.removePersonListener(personListener);
 
     super.closeDialog();
+  }
+
+  @Override
+  protected void saveEntity() {
+    if(file.isPersisted() == false)
+      Application.getDeepThought().addFile(file);
+
+    saveEditedFields();
   }
 
   protected void saveEditedFields() {
@@ -361,21 +318,6 @@ public class EditFileDialogController extends ChildWindowsController implements 
           file = new FileLink(destinationFile.getPath());
       }
     });
-  }
-
-  @Override
-  protected boolean askIfStageShouldBeClosed() {
-    if(hasUnsavedChanges()) {
-      ButtonType result = Alerts.askUserIfEditedEntityShouldBeSaved(windowStage, "file");
-
-      if(result.equals(ButtonType.CANCEL))
-        return false;
-      else if(result.equals(ButtonType.YES)) {
-        saveEditedFields();
-      }
-    }
-
-    return true;
   }
 
 }

@@ -111,11 +111,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
 
   @Override
-  protected String getHelpTextResourceKeyPrefix() {
-    return "context.help.entry.";
-  }
-
-  @Override
   protected String getEntityType() {
     return "entry";
   }
@@ -191,8 +186,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     paneTagsAndCategories.setMinHeight(26);
     paneTagsAndCategories.setMinHeight(Region.USE_PREF_SIZE);
     paneTagsAndCategories.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    paneTagsAndCategories.setMaxHeight(Region.USE_PREF_SIZE);
-//    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
+//    paneTagsAndCategories.setMaxHeight(Region.USE_PREF_SIZE);
+    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
 
     // as ScrollPane is too stupid to resize correctly when entryTagsControl or entryCategoriesControl is expanded, i wrapped paneTagsAndCategories in another ScrollPane
     ScrollPane tagsAndCategoriesScrollPane = new ScrollPane(paneTagsAndCategories);
@@ -494,7 +489,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
 
-    contentPane.minHeightProperty().bind(windowStage.heightProperty().subtract(pnBottomBar.heightProperty())); // TODO: remove again?
+    contentPane.minHeightProperty().bind(windowStage.getScene().heightProperty().subtract(pnBottomBar.heightProperty()).subtract(8));
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
     FXUtils.focusNode(htmledContent);

@@ -42,16 +42,6 @@ public class EditPersonDialogController extends EntityDialogFrameController impl
   }
 
   @Override
-  protected String getHelpTextResourceKeyPrefix() {
-    return "context.help.person.";
-  }
-
-  @Override
-  protected ContextMenu createHiddenFieldsContextMenu() {
-    return null;
-  }
-
-  @Override
   protected void setupControls() {
     super.setupControls();
 

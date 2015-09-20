@@ -255,18 +255,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   @Override
-  protected String getHelpTextResourceKeyPrefix() {
-    return "context.help.series.title.";
-  }
-
-  @Override
   protected String getEntityType() {
     return "reference";
-  }
-
-  @Override
-  protected ContextMenu createHiddenFieldsContextMenu() {
-    return null;
   }
 
   @Override

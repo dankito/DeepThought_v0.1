@@ -7,10 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="328.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditFileDialogController">
-   <center>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+<VBox prefHeight="328.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditFileDialogController">
          <children>
             <VBox prefHeight="140.0">
                <children>
@@ -81,28 +78,8 @@
                   <Insets top="12.0" />
                </VBox.margin>
             </VBox>
-            <HBox alignment="CENTER_RIGHT" prefHeight="60.0">
-               <VBox.margin>
-                  <Insets bottom="6.0" top="12.0" />
-               </VBox.margin>
-               <children>
-                  <Button cancelButton="true" mnemonicParsing="false" onAction="#handleButtonCancelAction" prefHeight="35.0" prefWidth="100.0" text="%cancel">
-                     <HBox.margin>
-                        <Insets right="6.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button fx:id="btnApply" mnemonicParsing="false" onAction="#handleButtonApplyAction" prefHeight="35.0" prefWidth="100.0" text="%apply">
-                     <HBox.margin>
-                        <Insets right="6.0" />
-                     </HBox.margin>
-                  </Button>
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#handleButtonOkAction" prefHeight="35.0" prefWidth="100.0" text="%ok" />
-               </children>
-            </HBox>
          </children>
          <BorderPane.margin>
             <Insets left="6.0" right="6.0" />
          </BorderPane.margin>
       </VBox>
-   </center>
-</BorderPane>

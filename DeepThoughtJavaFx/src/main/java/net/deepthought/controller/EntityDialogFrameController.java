@@ -74,7 +74,9 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   protected ContextHelpControl contextHelpControl;
 
 
-  protected abstract String getHelpTextResourceKeyPrefix();
+  protected String getHelpTextResourceKeyPrefix() {
+    return "context.help." + getEntityType() + ".";
+  }
 
 
   @Override
@@ -198,7 +200,9 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   }
 
 
-  protected abstract ContextMenu createHiddenFieldsContextMenu();
+  protected ContextMenu createHiddenFieldsContextMenu() {
+    return null; // may be overwritten in sub class if needed
+  }
 
   @FXML
   public void handleButtonChooseFieldsToShowAction(ActionEvent event) {
