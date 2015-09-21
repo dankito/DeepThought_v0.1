@@ -1,39 +1,36 @@
 package net.deepthought.controls.file;
 
-import net.deepthought.controls.ICleanableControl;
-import net.deepthought.data.model.Entry;
+import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.data.model.listener.EntityListener;
-import net.deepthought.data.persistence.db.BaseEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javafx.application.Platform;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.TreeItem;
 
 /**
  * Created by ganymed on 27/12/14.
  */
-public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanableControl {
+public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(FileRootTreeItem.class);
 
 
-  protected Entry entry;
+  protected IEditedEntitiesHolder<FileLink> editedFiles;
 
   protected Map<FileLink, FileTreeItem> mapFileToItem = new HashMap<>();
 
 
-  public FileRootTreeItem(Entry entry) {
-    this.entry = entry;
-    entry.addEntityListener(entryListener);
+  public FileRootTreeItem(IEditedEntitiesHolder<FileLink> editedFiles) {
+    this.editedFiles = editedFiles;
+    editedFiles.getEditedEntities().addListener(entryListener);
 
-    for(FileLink file : entry.getFiles()) {
+    for(FileLink file : editedFiles.getEditedEntities()) {
       addFileToChildren(file);
     }
 
@@ -41,9 +38,11 @@ public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanableCo
   }
 
   @Override
-  public void cleanUpControl() {
-    if(entry != null)
-      entry.removeEntityListener(entryListener);
+  public void cleanUp() {
+    if(editedFiles != null) {
+      editedFiles.getEditedEntities().removeListener(entryListener);
+      editedFiles = null;
+    }
   }
 
   protected void addFileToChildren(FileLink file) {
@@ -58,40 +57,17 @@ public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanableCo
   }
 
 
-  protected EntityListener entryListener = new EntityListener() {
+  protected SetChangeListener<FileLink> entryListener = new SetChangeListener<FileLink>() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, final BaseEntity addedEntity) {
-      if(collection == ((Entry)collectionHolder).getFiles()) {
-        Platform.runLater(new Runnable() {
-          @Override
-          public void run() {
-            addFileToChildren((FileLink)addedEntity);
-            TreeItem.childrenModificationEvent();
-          }
-        });
+    public void onChanged(Change<? extends FileLink> change) {
+      if(change.wasRemoved()) {
+        removeFileFromChildren(change.getElementRemoved());
+        TreeItem.childrenModificationEvent();
       }
-    }
 
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, final BaseEntity removedEntity) {
-      if(collection == ((Entry)collectionHolder).getFiles()) {
-        Platform.runLater(new Runnable() {
-          @Override
-          public void run() {
-            removeFileFromChildren((FileLink)removedEntity);
-            TreeItem.childrenModificationEvent();
-          }
-        });
+      if(change.wasAdded()) {
+        addFileToChildren(change.getElementAdded());
+        TreeItem.childrenModificationEvent();
       }
     }
   };

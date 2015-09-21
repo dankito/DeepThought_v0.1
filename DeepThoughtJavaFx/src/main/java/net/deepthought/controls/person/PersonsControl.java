@@ -2,13 +2,12 @@ package net.deepthought.controls.person;
 
 import net.deepthought.Application;
 import net.deepthought.controls.CollapsiblePane;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.event.PersonsControlPersonsEditedEvent;
-import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -36,16 +35,13 @@ import javafx.scene.layout.Priority;
 /**
  * Created by ganymed on 01/02/15.
  */
-public abstract class PersonsControl extends CollapsiblePane implements IEditedEntitiesHolder<Person>, ICleanableControl {
+public abstract class PersonsControl extends CollapsiblePane implements IEditedEntitiesHolder<Person>, ICleanUp {
 
   protected final static Logger log = LoggerFactory.getLogger(PersonsControl.class);
 
 
-  protected Entry entry = null;
-
   protected DeepThought deepThought = null;
 
-  protected Set<Person> currentlySetPersonsOnEntity = new HashSet<>();
   protected Set<Person> addedPersons = new HashSet<>();
   protected Set<Person> removedPersons = new HashSet<>();
   protected ObservableSet<Person> editedEntityPersons = FXCollections.observableSet();
@@ -84,7 +80,7 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(this.deepThought != null)
@@ -144,8 +140,6 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
   }
 
   protected void setEntityPersons(Set<Person> persons) {
-    currentlySetPersonsOnEntity = persons;
-
     if(persons instanceof ObservableSet)
       editedEntityPersons = (ObservableSet<Person>)persons;
     else
@@ -173,6 +167,16 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
 
   public ObservableSet<Person> getEditedEntities() {
     return editedEntityPersons;
+  }
+
+  @Override
+  public Set<Person> getAddedEntities() {
+    return addedPersons;
+  }
+
+  @Override
+  public Set<Person> getRemovedEntities() {
+    return removedPersons;
   }
 
   public boolean containsEditedEntity(Person person) {
@@ -261,18 +265,6 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     this.personRemovedEventHandler = personRemovedEventHandler;
   }
 
-
-  public Set<Person> getEditedEntityPersons() {
-    return editedEntityPersons;
-  }
-
-  public Set<Person> getRemovedPersons() {
-    return removedPersons;
-  }
-
-  public Set<Person> getAddedPersons() {
-    return addedPersons;
-  }
 
   public Set<Person> getCopyOfRemovedPersonsAndClear() {
     Set<Person> copy = new HashSet<>(removedPersons);

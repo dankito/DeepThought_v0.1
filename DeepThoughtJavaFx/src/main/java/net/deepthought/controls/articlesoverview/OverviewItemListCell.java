@@ -1,7 +1,7 @@
 package net.deepthought.controls.articlesoverview;
 
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.util.ClipboardHelper;
 import net.deepthought.util.Localization;
@@ -36,7 +36,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 17/07/15.
  */
-public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> implements ICleanableControl {
+public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> implements ICleanUp {
 
   public interface ItemSelectionChangedEventHandler {
     void itemSelectionChanged(ArticlesOverviewItem item, boolean isSelected);
@@ -97,7 +97,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
   }
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     item = null;
 
     selectedItems.removeListener(selectedItemsListener);

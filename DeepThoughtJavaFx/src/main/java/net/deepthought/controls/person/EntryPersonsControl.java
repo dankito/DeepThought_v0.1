@@ -37,8 +37,8 @@ public class EntryPersonsControl extends PersonsControl {
   }
 
   @Override
-  public void cleanUpControl() {
-    super.cleanUpControl();
+  public void cleanUp() {
+    super.cleanUp();
 
     if(this.entry != null)
       this.entry.removeEntryPersonListener(entryPersonListener);

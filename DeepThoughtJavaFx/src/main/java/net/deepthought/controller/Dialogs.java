@@ -2,7 +2,7 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Category;
@@ -14,7 +14,6 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;

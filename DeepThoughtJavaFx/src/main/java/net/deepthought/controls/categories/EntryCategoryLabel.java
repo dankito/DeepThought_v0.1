@@ -33,8 +33,8 @@ public class EntryCategoryLabel extends CollectionItemLabel {
 
 
   @Override
-  public void cleanUpControl() {
-    super.cleanUpControl();
+  public void cleanUp() {
+    super.cleanUp();
 
     if(category != null)
       category.removeEntityListener(categoryListener);

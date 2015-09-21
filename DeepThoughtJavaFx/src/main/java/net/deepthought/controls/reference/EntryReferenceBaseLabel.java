@@ -2,7 +2,7 @@ package net.deepthought.controls.reference;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.CollectionItemLabel;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.Reference;
@@ -85,8 +85,8 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
 
   @Override
-  public void cleanUpControl() {
-    super.cleanUpControl();
+  public void cleanUp() {
+    super.cleanUp();
 
     if(referenceBase != null)
       referenceBase.removeEntityListener(referenceBaseListener);

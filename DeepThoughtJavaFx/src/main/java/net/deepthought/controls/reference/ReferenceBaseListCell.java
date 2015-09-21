@@ -4,8 +4,8 @@ import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
@@ -14,7 +14,6 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements ICleanableControl {
+public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(ReferenceBaseListCell.class);
 
@@ -84,7 +83,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
   }
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     if(getItem() != null)
       getItem().removeEntityListener(referenceBaseListener);
     if(referenceBase != null)

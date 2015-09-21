@@ -1,7 +1,7 @@
 package net.deepthought.controls.tabtags;
 
 import net.deepthought.Application;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.TextFieldTableCell;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;

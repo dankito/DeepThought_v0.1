@@ -1,6 +1,5 @@
 package net.deepthought.controller;
 
-import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.articlesoverview.OverviewItemListCell;
@@ -83,7 +82,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
     articleContentExtractor = null;
 
     for(OverviewItemListCell cell : overviewItemListCells) {
-      cell.cleanUpControl();
+      cell.cleanUp();
     }
     overviewItemListCells.clear();
 

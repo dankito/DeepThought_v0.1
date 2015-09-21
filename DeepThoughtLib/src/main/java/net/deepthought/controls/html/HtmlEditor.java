@@ -1,7 +1,7 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import netscape.javascript.JSObject;
  *
  * Created by ganymed on 28/08/15.
  */
-public class HtmlEditor implements ICleanableControl {
+public class HtmlEditor implements ICleanUp {
 
   public final static String HtmlEditorFolderName = "htmleditor";
 
@@ -116,7 +116,7 @@ public class HtmlEditor implements ICleanableControl {
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     setListener(null);
 
     try {

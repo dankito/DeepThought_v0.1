@@ -2,8 +2,8 @@ package net.deepthought.controls.tag;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -42,7 +42,7 @@ import javafx.scene.layout.Priority;
 /**
  * Created by ganymed on 30/11/14.
  */
-public class TagListCell extends ListCell<Tag> implements ICleanableControl {
+public class TagListCell extends ListCell<Tag> implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(TagListCell.class);
 
@@ -51,7 +51,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
 
   protected SearchAndSelectTagsControl searchAndSelectTagsControl = null;
 
-  protected IEditedEntitiesHolder editedTagsHolder = null;
+  protected net.deepthought.controls.utils.IEditedEntitiesHolder editedTagsHolder = null;
 
   protected HBox graphicPane = new HBox();
   protected CheckBox chkbxIsTagSelected = new CheckBox();
@@ -62,7 +62,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   protected TagsSearchResults lastSearchResults = null;
 
 
-  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, IEditedEntitiesHolder editedTagsHolder) {
+  public TagListCell(SearchAndSelectTagsControl searchAndSelectTagsControl, net.deepthought.controls.utils.IEditedEntitiesHolder editedTagsHolder) {
     this.searchAndSelectTagsControl = searchAndSelectTagsControl;
     this.editedTagsHolder = editedTagsHolder;
 
@@ -91,7 +91,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanableControl {
   }
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     editedTagsHolder.getEditedEntities().removeListener(editedTagsChangedListener);
     editedTagsHolder = null;
 

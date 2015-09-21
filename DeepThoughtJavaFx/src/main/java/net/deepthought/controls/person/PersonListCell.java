@@ -1,9 +1,8 @@
 package net.deepthought.controls.person;
 
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controls.Constants;
-import net.deepthought.controls.ICleanableControl;
-import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -36,12 +35,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.Font;
 
 /**
  * Created by ganymed on 27/12/14.
  */
-public class PersonListCell extends ListCell<Person> implements ICleanableControl {
+public class PersonListCell extends ListCell<Person> implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(PersonListCell.class);
 
@@ -92,7 +90,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanableContro
   protected SetChangeListener<Person> editedPersonsChangedListener = change -> personUpdated();
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     removeListener();
 
     if(editedPersonsHolder != null) {

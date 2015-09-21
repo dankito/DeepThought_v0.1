@@ -7,10 +7,10 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.event.EntryCategoriesEditedEvent;
-import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -60,7 +60,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryCategoriesControl extends CollapsiblePane implements IEditedEntitiesHolder<Category>, ICleanableControl {
+public class EntryCategoriesControl extends CollapsiblePane implements IEditedEntitiesHolder<Category>, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoriesControl.class);
 
@@ -125,7 +125,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     }
   };
 
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(deepThought != null)
@@ -136,11 +136,11 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
     clearEntryCategoryLabels();
 
-    ((TopLevelCategoryTreeItem)trvwCategories.getRoot()).cleanUpControl();
+    ((TopLevelCategoryTreeItem)trvwCategories.getRoot()).cleanUp();
     trvwCategories.setRoot(null);
 
     for(EntryCategoryTreeCell cell : entryCategoryTreeCells)
-      cell.cleanUpControl();
+      cell.cleanUp();
 
     categoryAddedEventHandler = null;
     categoryRemovedEventHandler = null;
@@ -337,6 +337,16 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
   @Override
   public ObservableSet<Category> getEditedEntities() {
     return editedEntryCategories;
+  }
+
+  @Override
+  public Set<Category> getAddedEntities() {
+    return addedCategories;
+  }
+
+  @Override
+  public Set<Category> getRemovedEntities() {
+    return removedCategories;
   }
 
   protected void addNewCategoryToEntry() {

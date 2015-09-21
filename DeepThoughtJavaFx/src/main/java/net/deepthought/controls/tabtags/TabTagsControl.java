@@ -4,7 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.tag.IDisplayedTagsChangedListener;

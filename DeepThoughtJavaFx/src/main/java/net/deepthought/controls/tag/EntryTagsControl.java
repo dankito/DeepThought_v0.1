@@ -4,8 +4,8 @@ import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.event.EntryTagsEditedEvent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
@@ -37,20 +36,15 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryTagsControl extends CollapsiblePane implements IEditedEntitiesHolder<Tag>, ICleanableControl {
+public class EntryTagsControl extends CollapsiblePane implements net.deepthought.controls.utils.IEditedEntitiesHolder<Tag>, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntryTagsControl.class);
 
@@ -110,7 +104,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     }
   };
 
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(deepThought != null)
@@ -121,7 +115,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
     clearEntryTagLabels();
 
-    searchAndSelectTagsControl.cleanUpControl();
+    searchAndSelectTagsControl.cleanUp();
 
     tagAddedEventHandler = null;
     tagRemovedEventHandler = null;
@@ -206,6 +200,16 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
 
   public ObservableSet<Tag> getEditedEntities() {
     return editedTags;
+  }
+
+  @Override
+  public Set<Tag> getAddedEntities() {
+    return addedTags;
+  }
+
+  @Override
+  public Set<Tag> getRemovedEntities() {
+    return removedTags;
   }
 
   public boolean containsEditedEntity(Tag entity) {

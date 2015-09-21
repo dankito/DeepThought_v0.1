@@ -9,7 +9,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fx:id="scrpnContent" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefHeight="750.0" prefViewportHeight="950.0" prefViewportWidth="650.0" prefWidth="905.0" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
+<ScrollPane fx:id="scrpnContent" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefHeight="750.0" prefViewportHeight="1050.0" prefViewportWidth="650.0" prefWidth="905.0" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
          <content>
             <VBox fx:id="contentPane" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -32,31 +32,6 @@
                         </HBox>
                      </children>
                   </AnchorPane>
-                  <TitledPane fx:id="ttldpnFiles" animated="false" contentDisplay="GRAPHIC_ONLY" expanded="false" maxHeight="1.7976931348623157E308">
-                     <graphic>
-                        <HBox alignment="CENTER_LEFT">
-                           <children>
-                              <Label text="%files" />
-                              <Button minHeight="30.0" minWidth="80.0" mnemonicParsing="false" onAction="#handleButtonAddFileAction" text="%add...">
-                                 <HBox.margin>
-                                    <Insets left="6.0" right="6.0" />
-                                 </HBox.margin>
-                              </Button>
-                              <FlowPane fx:id="flpnFilesPreview" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
-                           </children>
-                        </HBox>
-                     </graphic>
-                     <content>
-                        <TreeTableView fx:id="trtblvwFiles" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="400.0" prefWidth="500.0" showRoot="false">
-                          <columns>
-                            <TreeTableColumn fx:id="clmnFile" editable="false" minWidth="80.0" prefWidth="-1.0" text="%file" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TreeTableView>
-                     </content>
-                  </TitledPane>
                </children>
             </VBox>
          </content>

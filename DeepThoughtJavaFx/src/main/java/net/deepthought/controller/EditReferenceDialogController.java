@@ -4,7 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.html.HtmlEditorListener;
@@ -55,7 +55,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
@@ -667,32 +666,32 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected void cleanUpControls() {
     // i don't get it: referencePersonsControl never gets removed from Memory, all others in approximately 50 % of all cases
     // TODO: find Memory leaks
-    searchAndSelectSeriesTitleControl.cleanUpControl();
+    searchAndSelectSeriesTitleControl.cleanUp();
     paneSeriesTitle.getChildren().remove(searchAndSelectSeriesTitleControl);
     searchAndSelectSeriesTitleControl = null;
-    htmledSeriesTitleTableOfContents.cleanUpControl();
-    htmledSeriesTitleAbstract.cleanUpControl();
-    seriesTitlePersonsControl.cleanUpControl();
+    htmledSeriesTitleTableOfContents.cleanUp();
+    htmledSeriesTitleAbstract.cleanUp();
+    seriesTitlePersonsControl.cleanUp();
     paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
     seriesTitlePersonsControl = null;
-    htmledSeriesTitleNotes.cleanUpControl();
+    htmledSeriesTitleNotes.cleanUp();
 
-    searchAndSelectReferenceControl.cleanUpControl();
-    htmledReferenceAbstract.cleanUpControl();
-    htmledReferenceTableOfContents.cleanUpControl();
+    searchAndSelectReferenceControl.cleanUp();
+    htmledReferenceAbstract.cleanUp();
+    htmledReferenceTableOfContents.cleanUp();
     paneReference.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
-    htmledReferenceTableOfContents.cleanUpControl();
-    referencePersonsControl.cleanUpControl();
+    htmledReferenceTableOfContents.cleanUp();
+    referencePersonsControl.cleanUp();
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
-    htmledReferenceNotes.cleanUpControl();
+    htmledReferenceNotes.cleanUp();
 
-    htmledReferenceSubDivisionAbstract.cleanUpControl();
-    referenceSubDivisionPersonsControl.cleanUpControl();
+    htmledReferenceSubDivisionAbstract.cleanUp();
+    referenceSubDivisionPersonsControl.cleanUp();
     paneReferenceSubDivision.getChildren().remove(referenceSubDivisionPersonsControl);
     referenceSubDivisionPersonsControl = null;
-    htmledReferenceSubDivisionNotes.cleanUpControl();
+    htmledReferenceSubDivisionNotes.cleanUp();
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {

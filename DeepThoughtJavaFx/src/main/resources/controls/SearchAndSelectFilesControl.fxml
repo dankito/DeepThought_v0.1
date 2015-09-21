@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root maxHeight="-Infinity" minHeight="230.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <TreeTableView fx:id="trtblvwFiles" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="150.0" showRoot="false">
+            <columns>
+                <TreeTableColumn fx:id="clmFileName" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="280.0" text="%name" />
+                <TreeTableColumn fx:id="clmFileUri" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="600.0" text="%uri" />
+            </columns>
+        </TreeTableView>
+      <VBox fx:id="paneSearchFiles" prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <HBox fx:id="paneSearchBar" alignment="CENTER_LEFT" prefHeight="32.0">
+               <children>
+                  <Label maxHeight="-Infinity" minWidth="-Infinity" text="%search">
+                     <HBox.margin>
+                        <Insets right="6.0" />
+                     </HBox.margin></Label>
+               </children>
+               <VBox.margin>
+                  <Insets bottom="6.0" />
+               </VBox.margin>
+            </HBox>
+            <TreeTableView fx:id="trtblvwSearchResults" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="150.0" showRoot="false">
+               <columns>
+                  <TreeTableColumn fx:id="clmSearchResultFileName" editable="false" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="280.0" text="%name" />
+                  <TreeTableColumn fx:id="clmSearchResultFileUri" editable="false" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="600.0" text="%uri" />
+               </columns>
+            </TreeTableView>
+         </children>
+         <VBox.margin>
+            <Insets top="12.0" />
+         </VBox.margin>
+      </VBox>
+    </children>
+   <padding>
+      <Insets top="6.0" />
+   </padding>
+</fx:root>

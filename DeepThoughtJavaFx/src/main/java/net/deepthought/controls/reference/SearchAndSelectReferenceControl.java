@@ -2,8 +2,8 @@ package net.deepthought.controls.reference;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.data.listener.ApplicationListener;
@@ -18,7 +18,6 @@ import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -26,7 +25,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -36,7 +34,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -47,7 +44,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectReferenceControl extends VBox implements ICleanableControl {
+public class SearchAndSelectReferenceControl extends VBox implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectReferenceControl.class);
 
@@ -105,7 +102,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(deepThought != null)
@@ -116,7 +113,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
     lastReferenceBasesSearch = null;
 
     for(ReferenceBaseListCell cell : referenceBaseListCells)
-      cell.cleanUpControl();
+      cell.cleanUp();
     referenceBaseListCells.clear();
   }
 
@@ -135,7 +132,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanableC
   }
 
   protected void setupControl() {
-    // replace normal TextField txtfldSearchForPerson with a SearchTextField (with a cross to clear selection)
+    // replace normal TextField txtfldSearchForFiles with a SearchTextField (with a cross to clear selection)
     paneSearchForReference.getChildren().remove(txtfldSearchForReference);
     txtfldSearchForReference = (CustomTextField) TextFields.createClearableTextField();
     paneSearchForReference.getChildren().add(1, txtfldSearchForReference);

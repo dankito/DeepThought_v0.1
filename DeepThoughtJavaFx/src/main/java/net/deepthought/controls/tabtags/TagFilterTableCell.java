@@ -1,6 +1,6 @@
 package net.deepthought.controls.tabtags;
 
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.search.specific.TagsSearchResults;

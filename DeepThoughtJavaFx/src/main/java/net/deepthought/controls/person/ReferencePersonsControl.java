@@ -43,8 +43,8 @@ public class ReferencePersonsControl extends PersonsControl {
   }
 
   @Override
-  public void cleanUpControl() {
-    super.cleanUpControl();
+  public void cleanUp() {
+    super.cleanUp();
 
     if(this.reference != null)
       reference.removeEntityListener(referenceListener);

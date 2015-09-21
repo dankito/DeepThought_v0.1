@@ -24,7 +24,7 @@ import javax.persistence.Transient;
  * Created by ganymed on 16/12/14.
  */
 @Entity(name = TableConfig.FileLinkTableName)
-public class FileLink extends UserDataEntity implements Serializable {
+public class FileLink extends UserDataEntity implements Serializable, Comparable<FileLink> {
 
   private static final long serialVersionUID = -7508656557829870722L;
 
@@ -144,6 +144,11 @@ public class FileLink extends UserDataEntity implements Serializable {
     callPropertyChangedListeners(TableConfig.FileLinkSourceUriColumnName, previousValue, sourceUriString);
   }
 
+
+  public boolean hasEntries() {
+    return getEntries().size() > 0;
+  }
+
   public Collection<Entry> getEntries() {
     return entries;
   }
@@ -165,6 +170,11 @@ public class FileLink extends UserDataEntity implements Serializable {
     }
 
     return result;
+  }
+
+
+  public boolean hasReferenceBases() {
+    return getReferenceBases().size() > 0;
   }
 
   public Set<ReferenceBase> getReferenceBases() {
@@ -213,6 +223,21 @@ public class FileLink extends UserDataEntity implements Serializable {
   @Override
   public String toString() {
     return "File: " + getTextRepresentation();
+  }
+
+
+  @Override
+  public int compareTo(FileLink other) {
+    if(other == null)
+      return 1;
+
+    if(name.equals(other.getName()) == false)
+      return name.compareTo(other.getName());
+
+    if(uriString.equals(other.getUriString()) == false)
+      return uriString.compareTo(other.getUriString());
+
+    return 0;
   }
 
 }

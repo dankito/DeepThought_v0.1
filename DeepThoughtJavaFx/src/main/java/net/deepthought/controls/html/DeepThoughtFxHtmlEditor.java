@@ -1,6 +1,6 @@
 package net.deepthought.controls.html;
 
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.ICleanUp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import javafx.util.Callback;
 /**
  * Created by ganymed on 28/08/15.
  */
-public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor, ICleanableControl {
+public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(DeepThoughtFxHtmlEditor.class);
 
@@ -165,7 +165,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   }
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     htmlEditor.setListener(null);
   }
 

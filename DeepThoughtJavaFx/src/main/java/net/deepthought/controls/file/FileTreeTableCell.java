@@ -1,7 +1,7 @@
 package net.deepthought.controls.file;
 
 import net.deepthought.controller.Dialogs;
-import net.deepthought.data.model.Entry;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.JavaFxLocalization;
 
@@ -34,7 +34,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
 
 
   protected FileLink file = null;
-  protected Entry entry = null;
+  protected IEditedEntitiesHolder<FileLink> editedFiles = null;
 
   protected HBox graphicPane = new HBox();
 
@@ -50,8 +50,8 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
   protected Button viewFileButton = new Button();
 
 
-  public FileTreeTableCell(Entry entry) {
-    this.entry = entry;
+  public FileTreeTableCell(IEditedEntitiesHolder<FileLink> editedFiles) {
+    this.editedFiles = editedFiles;
 
     setText(null);
     setupGraphic();
@@ -206,8 +206,8 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
 
 
   protected void handleRemoveFileButtonAction() {
-    if(entry != null) {
-      entry.removeFile(file);
+    if(editedFiles != null) {
+      editedFiles.removeEntityFromEntry(file);
     }
   }
 

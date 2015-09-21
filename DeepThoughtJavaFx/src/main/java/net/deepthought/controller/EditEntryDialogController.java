@@ -3,16 +3,17 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
-import net.deepthought.controls.FXUtils;
 import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
-import net.deepthought.controls.file.FileRootTreeItem;
-import net.deepthought.controls.file.FileTreeTableCell;
+import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.html.HtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.controls.utils.EditedEntitiesHolder;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
@@ -46,7 +47,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.MouseEvent;
@@ -56,7 +56,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 /**
  * Created by ganymed on 21/12/14.
@@ -108,6 +107,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected TreeTableView<FileLink> trtblvwFiles;
   @FXML
   protected TreeTableColumn<FileLink, String> clmnFile;
+
+  protected FilesControl filesControl = null;
 
 
   @Override
@@ -171,13 +172,13 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> contextHelpControl.showContextHelpForResourceKey("default")); // TODO: remove as soon as other context help texts are
     // implemented
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnFiles);
-    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-      @Override
-      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-        return new FileTreeTableCell(entry);
-      }
-    });
+    filesControl = new FilesControl(new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles)));
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
+    filesControl.setMinHeight(Region.USE_PREF_SIZE);
+    filesControl.setMaxHeight(Double.MAX_VALUE);
+    contentPane.getChildren().add(6, filesControl);
+    VBox.setVgrow(filesControl, Priority.SOMETIMES);
+    VBox.setMargin(filesControl, new Insets(6, 0, 0, 0));
   }
 
   protected void setupTagsAndCategoriesControl() {
@@ -244,10 +245,10 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 //    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnFiles.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    filesControl.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     setButtonChooseFieldsToShowVisibility(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
-        entryPersonsControl.isVisible() == false || ttldpnFiles.isVisible() == false));
+        entryPersonsControl.isVisible() == false || filesControl.isVisible() == false));
 
     setCategoriesPaneVisibility();
   }
@@ -275,7 +276,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setEntryValues(final Entry entry) {
 //    txtfldTitle.setText(entry.getTitle());
 
-
     htmledAbstract.setHtml(entry.getAbstract());
 
     htmledAbstract.setExpanded(entry.hasAbstract());
@@ -284,9 +284,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
     entryCategoriesControl.setExpanded(entry.hasCategories() == false);
-
-    ttldpnFiles.setExpanded(entry.hasFiles() == false);
-    trtblvwFiles.setRoot(new FileRootTreeItem(entry));
 
     entryReferenceControl.setExpanded(entry.isAReferenceSet() == false);
 
@@ -302,14 +299,14 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void closeDialog() {
     entry.removeEntityListener(entryListener);
 
-    htmledAbstract.cleanUpControl();
-    htmledContent.cleanUpControl();
-    entryTagsControl.cleanUpControl();
-    entryCategoriesControl.cleanUpControl();
-    entryReferenceControl.cleanUpControl();
-    entryPersonsControl.cleanUpControl();
+    htmledAbstract.cleanUp();
+    htmledContent.cleanUp();
+    entryTagsControl.cleanUp();
+    entryCategoriesControl.cleanUp();
+    entryReferenceControl.cleanUp();
+    entryPersonsControl.cleanUp();
 
-    ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUpControl();
+    filesControl.cleanUp();
 
     super.closeDialog();
   }
@@ -419,11 +416,26 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryCategories);
     }
 
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryFiles)) {
+      IEditedEntitiesHolder<FileLink> editedFiles = filesControl.getEditedFiles();
+
+      for(FileLink removedFile : editedFiles.getRemovedEntities())
+        entry.removeFile(removedFile);
+      editedFiles.getRemovedEntities().clear();
+
+      for(FileLink addedFile : editedFiles.getAddedEntities())
+        entry.addFile(addedFile);
+      editedFiles.getAddedEntities().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryFiles);
+    }
+
     if(fieldsWithUnsavedChanges.size() > 0) {
       log.warn("We're at end of () method an  still contains unsaved fields:");
       for(FieldWithUnsavedChanges field : fieldsWithUnsavedChanges)
         log.warn("" + field);
     }
+
     // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
     btnApplyChanges.setDisable(true);
   }
@@ -449,8 +461,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     if(entryCategoriesControl.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, entryCategoriesControl, "categories");
 
-    if(ttldpnFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnFiles, "files");
+    if(filesControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, filesControl, "files");
 
     hiddenFieldsMenu.show(btnChooseFieldsToShow, Side.TOP, 0, 0);
 

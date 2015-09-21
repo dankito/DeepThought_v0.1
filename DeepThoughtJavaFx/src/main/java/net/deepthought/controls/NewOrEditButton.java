@@ -6,13 +6,10 @@ import net.deepthought.util.JavaFxLocalization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitMenuButton;
 
@@ -61,7 +58,7 @@ public class NewOrEditButton extends SplitMenuButton {
 
 
   public NewOrEditButton() {
-    if(FXUtils.loadControl(this, "NewOrEditButton")) {
+    if(net.deepthought.controls.utils.FXUtils.loadControl(this, "NewOrEditButton")) {
       setupControl();
     }
   }

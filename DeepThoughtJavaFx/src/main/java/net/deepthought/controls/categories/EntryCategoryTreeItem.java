@@ -1,7 +1,7 @@
 package net.deepthought.controls.categories;
 
 import net.deepthought.Application;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -17,7 +17,7 @@ import javafx.scene.control.TreeItem;
 /**
  * Created by ganymed on 03/02/15.
  */
-public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleanableControl {
+public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleanUp {
 
   protected Category category;
 
@@ -37,12 +37,12 @@ public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleana
   }
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     if(category != null)
       category.removeEntityListener(categoryListener);
 
     for(EntryCategoryTreeItem item : mapSubCategoryToTreeItem.values())
-      item.cleanUpControl();
+      item.cleanUp();
   }
 
   protected void addSubCategoriesTreeItems(Category category) {

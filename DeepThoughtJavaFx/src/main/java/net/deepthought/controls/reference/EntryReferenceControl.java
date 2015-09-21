@@ -8,8 +8,7 @@ import net.deepthought.controller.EditReferenceDialogController;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
-import net.deepthought.controls.ICleanableControl;
-import net.deepthought.controls.LazyLoadingObservableList;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
@@ -25,42 +24,33 @@ import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.data.search.Search;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
-import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntryReferenceControl extends CollapsiblePane implements ISelectedReferenceHolder, ICleanableControl {
+public class EntryReferenceControl extends CollapsiblePane implements ISelectedReferenceHolder, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntryReferenceControl.class);
 
@@ -178,7 +168,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     setDisable(creationResult == null);
   }
 
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(deepThought != null)
@@ -187,7 +177,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     if(this.entry != null)
       this.entry.removeEntityListener(entryListener);
 
-    searchAndSelectReferenceControl.cleanUpControl();
+    searchAndSelectReferenceControl.cleanUp();
 
     fieldChangedEvents.clear();
     clearCurrentReferenceLabel();
@@ -329,7 +319,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
 
   protected void clearCurrentReferenceLabel() {
     if(currentReferenceLabel != null) {
-      currentReferenceLabel.cleanUpControl();
+      currentReferenceLabel.cleanUp();
       currentReferenceLabel = null;
     }
 

@@ -2,9 +2,9 @@ package net.deepthought.controls.categories;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
-import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -49,7 +49,7 @@ import javafx.scene.text.Font;
 /**
  * Created by ganymed on 27/12/14.
  */
-public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanableControl {
+public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntryCategoryTreeCell.class);
 
@@ -101,7 +101,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleana
   protected SetChangeListener<Category> editedCategoriesChangedListener = change -> categoryUpdated();
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     if(this.category != null)
       this.category.removeEntityListener(categoryListener);
 

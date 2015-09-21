@@ -1,12 +1,10 @@
-package net.deepthought.controls.person;
+package net.deepthought.controls.file;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.CollectionItemLabel;
-import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.data.model.Person;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.ClipboardHelper;
 import net.deepthought.util.Localization;
 
 import java.util.Collection;
@@ -14,29 +12,28 @@ import java.util.Collection;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class PersonLabel extends CollectionItemLabel {
+public class FileLabel extends CollectionItemLabel {
 
-  protected Person person;
+  protected FileLink file;
 
   protected ContextMenu contextMenu = null;
 
 
-  public PersonLabel(Person person) {
-    this.person = person;
+  public FileLabel(FileLink file) {
+    this.file = file;
 
-    person.addEntityListener(personListener);
+    file.addEntityListener(fileListener);
 
     this.setOnMousePressed(event -> onMousePressedOrReleased(event));
     this.setOnMouseReleased(event -> onMousePressedOrReleased(event));
 
-    setUserData(person);
+    setUserData(file);
     itemDisplayNameUpdated();
   }
 
@@ -45,21 +42,21 @@ public class PersonLabel extends CollectionItemLabel {
   public void cleanUp() {
     super.cleanUp();
 
-    if(person != null)
-      person.removeEntityListener(personListener);
+    if(file != null)
+      file.removeEntityListener(fileListener);
   }
 
   @Override
   protected String getItemDisplayName() {
-    if(person != null)
-      return person.getNameRepresentation();
+    if(file != null)
+      return file.getName();
     return "";
   }
 
   @Override
   protected String getToolTipText() {
-    if(person != null)
-      return person.getNameRepresentationStartingWithFirstName();
+    if(file != null)
+      return file.getUriString();
     return "";
   }
 
@@ -78,7 +75,7 @@ public class PersonLabel extends CollectionItemLabel {
       if(event.getButton() == MouseButton.PRIMARY) {
         if(event.getClickCount() == 1) {
           event.consume();
-          Dialogs.showEditPersonDialog(this.person);
+          Dialogs.showEditFileDialog(this.file);
         }
       }
       else if(event.isPopupTrigger()) {
@@ -99,21 +96,20 @@ public class PersonLabel extends CollectionItemLabel {
     ContextMenu contextMenu = new ContextMenu();
 
     MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
-    FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
-    editMenuItem.setOnAction(event -> Dialogs.showEditPersonDialog(this.person));
+    editMenuItem.setOnAction(event -> Dialogs.showEditFileDialog(this.file));
     contextMenu.getItems().add(editMenuItem);
 
-    contextMenu.getItems().add(new SeparatorMenuItem());
-
-    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.person.text.to.clipboard"));
-    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getToolTipText()));
-    contextMenu.getItems().add(copyReferenceTextMenuItem);
+//    contextMenu.getItems().add(new SeparatorMenuItem());
+//
+//    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.person.text.to.clipboard"));
+//    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getToolTipText()));
+//    contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     return contextMenu;
   }
 
 
-  EntityListener personListener = new EntityListener() {
+  EntityListener fileListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       itemDisplayNameUpdated();

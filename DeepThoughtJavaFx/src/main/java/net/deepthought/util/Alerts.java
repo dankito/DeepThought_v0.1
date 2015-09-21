@@ -5,9 +5,10 @@ import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
@@ -86,8 +87,8 @@ public class Alerts {
 
   public static boolean deletePersonWithUserConfirmationIfIsSetOnEntries(DeepThought deepThought, Person person) {
     if(person.isSetOnEntries()) {
-      boolean confirmDeleteTag = showConfirmDeletePersonWithEntriesAlert(person);
-      if(confirmDeleteTag)
+      boolean confirmDeletePerson = showConfirmDeletePersonWithEntriesAlert(person);
+      if(confirmDeletePerson)
         return deepThought.removePerson(person);
     }
     else
@@ -117,8 +118,8 @@ public class Alerts {
 
   public static boolean deleteSeriesTitleWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, SeriesTitle seriesTitle) {
     if(seriesTitle.hasEntries() || seriesTitle.hasSerialParts()) {
-      boolean confirmDeleteTag = showConfirmDeleteSeriesTitleWithEntriesOrSerialPartsAlert(seriesTitle);
-      if(confirmDeleteTag)
+      boolean confirmDeleteSeriesTitle = showConfirmDeleteSeriesTitleWithEntriesOrSerialPartsAlert(seriesTitle);
+      if(confirmDeleteSeriesTitle)
         return deepThought.removeSeriesTitle(seriesTitle);
     } else
       return deepThought.removeSeriesTitle(seriesTitle);
@@ -134,8 +135,8 @@ public class Alerts {
 
   public static boolean deleteReferenceWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, Reference reference) {
     if(reference.hasEntries() || reference.hasSubDivisions()) {
-      boolean confirmDeleteTag = showConfirmDeleteReferenceWithEntriesOrSubDivisionsAlert(reference);
-      if(confirmDeleteTag)
+      boolean confirmDeleteReference = showConfirmDeleteReferenceWithEntriesOrSubDivisionsAlert(reference);
+      if(confirmDeleteReference)
         return deepThought.removeReference(reference);
     }
     else
@@ -152,8 +153,8 @@ public class Alerts {
 
   public static boolean deleteReferenceSubDivisionWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, ReferenceSubDivision subDivision) {
     if(subDivision.hasEntries() || subDivision.hasSubDivisions()) {
-      boolean confirmDeleteTag = showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(subDivision);
-      if(confirmDeleteTag)
+      boolean confirmDeleteSubDivision = showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(subDivision);
+      if(confirmDeleteSubDivision)
         return deepThought.removeReferenceSubDivision(subDivision);
     }
     else
@@ -165,6 +166,25 @@ public class Alerts {
   public static boolean showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(ReferenceSubDivision subDivision) {
     return showConfirmationDialog(Localization.getLocalizedString("alert.message.reference.sub.division.contains.entries.or.sub.divisions", subDivision.getTextRepresentation(),
             subDivision.getEntries().size(), subDivision.getSubDivisions().size()),
+        Localization.getLocalizedString("alert.title.confirm.delete"));
+  }
+
+
+  public static boolean deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(DeepThought deepThought, FileLink file) {
+    if(file.hasEntries() || file.hasReferenceBases()) { // TODO: add hasAttachtedEntries()
+      boolean confirmDeleteFile = showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(file);
+      if(confirmDeleteFile)
+        return deepThought.removeFile(file);
+    }
+    else
+      return deepThought.removeFile(file);
+
+    return false;
+  }
+
+  public static boolean showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(FileLink file) {
+    return showConfirmationDialog(Localization.getLocalizedString("alert.message.file.link.contains.entries.or.reference.bases", file.getTextRepresentation(),
+            file.getEntries().size(), file.getReferenceBases().size()),
         Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 

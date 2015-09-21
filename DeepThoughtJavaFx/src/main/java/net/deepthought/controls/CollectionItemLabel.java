@@ -23,7 +23,7 @@ import javafx.scene.text.Font;
 /**
  * Created by ganymed on 30/11/14.
  */
-public abstract class CollectionItemLabel extends HBox implements ICleanableControl {
+public abstract class CollectionItemLabel extends HBox implements ICleanUp {
 
   protected final static Background DefaultBackground = new Background(new BackgroundFill(Color.TRANSPARENT, new CornerRadii(0), new Insets(0)));
 
@@ -50,7 +50,7 @@ public abstract class CollectionItemLabel extends HBox implements ICleanableCont
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     setOnButtonRemoveItemFromCollectionEventHandler(null);
     setOnLabelClickedEventHandler(null);
   }

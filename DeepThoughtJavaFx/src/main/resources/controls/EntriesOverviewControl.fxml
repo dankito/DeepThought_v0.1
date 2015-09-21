@@ -57,7 +57,7 @@
                         </HBox>
                     </right>
                 </BorderPane>
-                <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" prefHeight="200.0" prefWidth="200.0" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblvwEntries" onMouseClicked="#handleTableViewEntriesOverviewMouseClickedAction" tableMenuButtonVisible="true" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="clmnId" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="46.0" text="%id" visible="false" />
                   <TableColumn fx:id="clmnReferencePreview" maxWidth="1.7976931348623157E308" minWidth="0.0" prefWidth="340.0" text="%reference" />

@@ -5,8 +5,7 @@ import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListene
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.CollapsiblePane;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Device;
 import net.deepthought.util.IconManager;
@@ -27,12 +26,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.paint.Color;
 
 /**
  * Created by ganymed on 13/09/15.
  */
-public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanableControl {
+public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
 
   protected DeepThoughtFxHtmlEditor htmlEditor = null;
@@ -56,7 +54,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanable
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
     DeepThoughtFxHtmlEditorPool.getInstance().htmlEditorReleased(htmlEditor);
   }

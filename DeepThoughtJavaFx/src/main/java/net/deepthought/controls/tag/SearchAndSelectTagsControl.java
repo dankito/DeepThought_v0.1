@@ -1,8 +1,8 @@
 package net.deepthought.controls.tag;
 
 import net.deepthought.Application;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -15,7 +15,6 @@ import net.deepthought.data.search.specific.TagsSearchResult;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;
@@ -24,7 +23,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -33,13 +31,11 @@ import java.util.List;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -48,12 +44,12 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectTagsControl extends VBox implements ICleanableControl {
+public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(SearchAndSelectTagsControl.class);
 
 
-  protected IEditedEntitiesHolder<Tag> editedTagsHolder = null;
+  protected net.deepthought.controls.utils.IEditedEntitiesHolder<Tag> editedTagsHolder = null;
 
   protected DeepThought deepThought = null;
 
@@ -78,7 +74,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
   protected ListView<Tag> lstvwTags;
 
 
-  public SearchAndSelectTagsControl(IEditedEntitiesHolder editedTagsHolder) {
+  public SearchAndSelectTagsControl(net.deepthought.controls.utils.IEditedEntitiesHolder editedTagsHolder) {
     this.editedTagsHolder = editedTagsHolder;
 
     Application.addApplicationListener(applicationListener);
@@ -107,7 +103,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(deepThought != null)
@@ -123,7 +119,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanableContro
     listViewTagsItems.clear();
 
     for(TagListCell cell : tagListCells)
-      cell.cleanUpControl();
+      cell.cleanUp();
     tagListCells.clear();
   }
 

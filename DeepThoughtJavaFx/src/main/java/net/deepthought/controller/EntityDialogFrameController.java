@@ -6,7 +6,7 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.listener.SettingsChangedListener;

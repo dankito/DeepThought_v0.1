@@ -32,8 +32,8 @@ public class EntryTagLabel extends CollectionItemLabel {
 
 
   @Override
-  public void cleanUpControl() {
-    super.cleanUpControl();
+  public void cleanUp() {
+    super.cleanUp();
 
     if(tag != null)
       tag.removeEntityListener(tagListener);

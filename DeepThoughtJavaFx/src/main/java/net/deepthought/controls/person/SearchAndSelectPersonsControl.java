@@ -2,10 +2,10 @@ package net.deepthought.controls.person;
 
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controls.FXUtils;
-import net.deepthought.controls.ICleanableControl;
+import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.tag.IEditedEntitiesHolder;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
@@ -14,7 +14,6 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.Search;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -22,7 +21,6 @@ import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +29,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
@@ -44,7 +41,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectPersonsControl extends VBox implements ICleanableControl {
+public class SearchAndSelectPersonsControl extends VBox implements ICleanUp {
 
   protected final static Logger log = LoggerFactory.getLogger(SearchAndSelectPersonsControl.class);
 
@@ -99,7 +96,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
 
 
   @Override
-  public void cleanUpControl() {
+  public void cleanUp() {
     Application.removeApplicationListener(applicationListener);
 
     if(this.deepThought != null)
@@ -108,7 +105,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanableCon
     listViewPersonsItems.clear();
 
     for(PersonListCell cell : personListCells)
-      cell.cleanUpControl();
+      cell.cleanUp();
     personListCells.clear();
 
     editedPersonsHolder = null;

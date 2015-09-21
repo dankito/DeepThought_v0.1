@@ -1,13 +1,14 @@
-package net.deepthought.controls;
+package net.deepthought.controls.utils;
 
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.Constants;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,18 +22,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Cell;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
@@ -131,9 +125,9 @@ public class FXUtils {
 
   public static void cleanUpChildrenAndClearPane(Pane pane) {
     for(Node node : pane.getChildren()) {
-      if(node instanceof ICleanableControl) {
-        ICleanableControl label = (ICleanableControl)node;
-        label.cleanUpControl();
+      if(node instanceof ICleanUp) {
+        ICleanUp label = (ICleanUp)node;
+        label.cleanUp();
       }
     }
 

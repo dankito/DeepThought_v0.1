@@ -14,7 +14,7 @@ import net.deepthought.communication.registration.UserDeviceRegistrationRequestL
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
-import net.deepthought.controls.FXUtils;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.registration.FoundRegistrationServerListCell;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
