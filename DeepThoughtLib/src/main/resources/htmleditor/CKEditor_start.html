@@ -35,25 +35,114 @@
 	} );
 
 	editor.on('loaded', function() {
-		editor.resize($(window).width(), $(window).height());
+		<!--editor.resize($(window).width(), $(window).height());-->
+
+		if(typeof app !== 'undefined') {
+			app.loaded();
+		}
+
+		<!--$(editor.editable).click( function(evt) {-->
+			<!--if(typeof app !== 'undefined') {-->
+				<!--app.elementClicked(evt.target);-->
+			<!--}-->
+		<!--});-->
 	});
 
-	editor.on('change', function() {
+	editor.on('change', function(evt) {
 		<!-- Notify Java code that Html text has changed -->
 		if(typeof app !== 'undefined') {
 			app.htmlChanged(editor.getData());
 		}
 	});
 
-	<!--editor.on('beforeCommandExec', function(evt) {-->
+	editor.on('beforeCommandExec', function(evt) {
+		if(typeof app !== 'undefined') {
+			return app.beforeCommandExecution(evt.data.name);
+		}
 		<!--alert(evt.data.name);-->
 		<!--return false; // command then won't be executed-->
-	<!--});-->
+	});
 
 	$(window).resize( function() {
 		<!-- This is curious, mostly it fits perfectly in window then, but sometimes it gets a margin -->
-		editor.resize($(window).width(), $(window).height());
+		editor.resize($(window).width() - 16, $(window).height() - 16);
 	});
+
+	<!-- handle Dialogs -->
+	  <!--CKEDITOR.on('dialogDefinition', function(ev) {-->
+        <!--// Take the dialog name and its definition from the event data-->
+        <!--var dialogName = ev.data.name;-->
+        <!--var dialogDefinition = ev.data.definition;-->
+
+        <!--if (dialogName == 'image') {-->
+           <!--dialogDefinition.onOk = function(e) {-->
+              <!--var imageSrcUrl = e.sender.originalElement.$.src;-->
+              <!--var imgHtml = CKEDITOR.dom.element.createFromHtml("<img src=" + imageSrcUrl + " alt='' align='right'/>");-->
+              <!--CKEDITOR.instances.body.insertElement(imgHtml);-->
+           <!--};-->
+        <!--}-->
+  <!--}-->
+
+	  <!--editor.on( 'contentDom', function() {-->
+	  	<!--var isCTRL = false;-->
+
+	  	<!--&lt;!&ndash;this.document.on('click', function(evt) {&ndash;&gt;-->
+			<!--&lt;!&ndash;var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;&ndash;&gt;-->
+			<!--&lt;!&ndash;if (element!=undefined &&  element.is( 'a' ) ) {&ndash;&gt;-->
+				<!--&lt;!&ndash;if (evt.preventDefault) {&ndash;&gt;-->
+					<!--&lt;!&ndash;alert('calling prevent default');&ndash;&gt;-->
+					<!--&lt;!&ndash;evt.preventDefault();&ndash;&gt;-->
+				<!--&lt;!&ndash;}&ndash;&gt;-->
+				<!--&lt;!&ndash;else {&ndash;&gt;-->
+					<!--&lt;!&ndash;alert('Setting returnValue to false');&ndash;&gt;-->
+					<!--&lt;!&ndash;evt.returnValue = false;&ndash;&gt;-->
+			<!--&lt;!&ndash;}&ndash;&gt;-->
+		<!--&lt;!&ndash;});&ndash;&gt;-->
+
+		<!--editor.document.on( 'keyup', function(event) {-->
+			<!--if(event.data.$.keyCode == 17) isCTRL=false;-->
+		<!--});-->
+
+		<!--editor.document.on( 'keydown', function(event) {-->
+			<!--if(event.data.$.keyCode == 17) isCTRL=true;-->
+		<!--});-->
+
+
+		<!--var editable = editor.editable();-->
+
+		<!--var removeListener = editable.attachListener( editable, 'click', function(evt) {-->
+			<!--var isCTRL = false;-->
+			<!--var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;-->
+			<!--if (element!=undefined &&  element.is( 'a' ) ) {-->
+				<!--&lt;!&ndash;if (evt.preventDefault) {&ndash;&gt;-->
+					<!--&lt;!&ndash;alert('calling prevent default');&ndash;&gt;-->
+					<!--&lt;!&ndash;evt.preventDefault();&ndash;&gt;-->
+				<!--&lt;!&ndash;}&ndash;&gt;-->
+				<!--&lt;!&ndash;else {&ndash;&gt;-->
+					<!--&lt;!&ndash;alert('Setting returnValue to false');&ndash;&gt;-->
+					<!--&lt;!&ndash;evt.returnValue = false;&ndash;&gt;-->
+				<!--&lt;!&ndash;}&ndash;&gt;-->
+				<!--&lt;!&ndash;alert('calling prevent default');&ndash;&gt;-->
+				<!--&lt;!&ndash;evt.preventDefault();&ndash;&gt;-->
+
+				<!--&lt;!&ndash;if(isCTRL)&ndash;&gt;-->
+				<!--&lt;!&ndash;{&ndash;&gt;-->
+					<!--&lt;!&ndash;window.open(element.$.href,'_blank');&ndash;&gt;-->
+				<!--&lt;!&ndash;}&ndash;&gt;-->
+			<!--}-->
+
+			<!--&lt;!&ndash; Notify Java code that an element has been clicked &ndash;&gt;-->
+			<!--if(typeof app !== 'undefined') {-->
+				<!--if(app.elementClicked(evt.data.getTarget().$.nodeName)) {-->
+					<!--&lt;!&ndash;evt.preventDefault(true);&ndash;&gt;-->
+				<!--}-->
+			<!--}-->
+		<!--});-->
+
+	    <!--editor.on( 'contentDomUnload', function() {-->
+		  <!--editable.removeAllListeners();-->
+	    <!--});-->
+	  <!--});-->
 
 </script>
 

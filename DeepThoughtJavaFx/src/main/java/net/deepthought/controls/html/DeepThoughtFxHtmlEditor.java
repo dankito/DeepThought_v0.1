@@ -97,6 +97,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     htmlEditor.setListener(listener);
   }
 
+  public void setListenerAndScrollToTop(HtmlEditorListener listener) {
+    htmlEditor.setListenerAndScrollToTop(listener);
+  }
+
 
   protected void testEvents() {
     engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
@@ -168,6 +172,5 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   public void cleanUp() {
     htmlEditor.setListener(null);
   }
-
 
 }

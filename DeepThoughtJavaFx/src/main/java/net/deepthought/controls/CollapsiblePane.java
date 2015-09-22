@@ -83,17 +83,17 @@ public class CollapsiblePane extends VBox {
   }
 
   /**
-   * The title of the TitledPane.  {@code Null} is returned when
+   * The title of the CollapsiblePane.  {@code Null} is returned when
    * if there is no title.
    *
-   * @return The title of this TitledPane.
+   * @return The title of this CollapsiblePane.
    */
   public final Node getTitle() {
     return title == null ? null : title.get();
   }
 
   /**
-   * The title of the TitledPane.
+   * The title of the CollapsiblePane.
    *
    * @return The title of the TitlePane.
    */
@@ -120,17 +120,17 @@ public class CollapsiblePane extends VBox {
   }
 
   /**
-   * The content of the TitledPane.  {@code Null} is returned when
+   * The content of the CollapsiblePane.  {@code Null} is returned when
    * if there is no content.
    *
-   * @return The content of this TitledPane.
+   * @return The content of this CollapsiblePane.
    */
   public final Node getContent() {
     return content == null ? null : content.get();
   }
 
   /**
-   * The content of the TitledPane.
+   * The content of the CollapsiblePane.
    *
    * @return The content of the TitlePane.
    */

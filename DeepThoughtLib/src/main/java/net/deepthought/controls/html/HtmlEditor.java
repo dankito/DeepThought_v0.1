@@ -2,10 +2,12 @@ package net.deepthought.controls.html;
 
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.html.HTMLDocument;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,6 +43,12 @@ public class HtmlEditor implements ICleanUp {
 
   protected JSObject ckEditor = null;
 
+  protected JSObject jqDocument = null;
+
+  protected HTMLDocument document = null;
+
+  protected String previousHtml = "";
+
   protected String htmlToSetWhenLoaded = null;
 
   protected HtmlEditorListener listener = null;
@@ -68,10 +76,22 @@ public class HtmlEditor implements ICleanUp {
 
       ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
 
+      document = (HTMLDocument)ckEditor.eval("document");
+
       if (htmlToSetWhenLoaded != null)
         setHtml(htmlToSetWhenLoaded);
     } catch(Exception ex) {
       log.error("Could not setup HtmlEditor in loaded event", ex);
+    }
+  }
+
+  public void scrollTo(int scrollPosition) {
+    try {
+      if(jqDocument != null) {
+        jqDocument.call("scrollTop", scrollPosition);
+      }
+    } catch(Exception ex) {
+      log.error("Could not scroll document to " + scrollPosition, ex);
     }
   }
 
@@ -94,6 +114,8 @@ public class HtmlEditor implements ICleanUp {
   }
 
   public void setHtml(String html) {
+    previousHtml = html;
+
     try {
       if(isCKEditorLoaded() == false)
         htmlToSetWhenLoaded = html;
@@ -114,6 +136,11 @@ public class HtmlEditor implements ICleanUp {
     this.listener = listener;
   }
 
+  public void setListenerAndScrollToTop(HtmlEditorListener listener) {
+    scrollTo(0);
+    setListener(listener);
+  }
+
 
   @Override
   public void cleanUp() {
@@ -131,9 +158,37 @@ public class HtmlEditor implements ICleanUp {
 
   /*    Methods over which JavaScript running in Browser communicates with Java code        */
 
+  public void loaded() {
+    jqDocument = (JSObject)scriptExecutor.executeScript("$(editor.document.$);");
+  }
+
   public void htmlChanged(String newHtmlCode) {
+    if(previousHtml.equals(newHtmlCode) == false) {
+      if(hasUnImageBeenRemoved(previousHtml, newHtmlCode)) {
+        // TODO: react on image has been deleted
+      }
+    }
+
     if(listener != null)
       listener.htmlCodeUpdated(newHtmlCode);
+  }
+
+  public boolean elementClicked(String element) {
+    boolean dummy = false;
+    return true;
+  }
+
+  public boolean beforeCommandExecution(String commandName) {
+    if(commandName.toLowerCase().equals("image"))
+      return false;
+    return true;
+  }
+
+  protected boolean hasUnImageBeenRemoved(String previousHtml, String newHtml) {
+    int countImgTagsInPreviousHtml = StringUtils.getNumberOfOccurrences("<img ", previousHtml);
+    int countImgTagsInNewHtml = StringUtils.getNumberOfOccurrences("<img ", newHtml);
+
+    return countImgTagsInPreviousHtml > countImgTagsInNewHtml;
   }
 
 

@@ -46,11 +46,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -98,15 +94,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
 
   protected EntryPersonsControl entryPersonsControl = null;
-
-  @FXML
-  protected TitledPane ttldpnFiles;
-  @FXML
-  protected FlowPane flpnFilesPreview;
-  @FXML
-  protected TreeTableView<FileLink> trtblvwFiles;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmnFile;
 
   protected FilesControl filesControl = null;
 
