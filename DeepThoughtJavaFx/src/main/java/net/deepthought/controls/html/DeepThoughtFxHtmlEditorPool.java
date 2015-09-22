@@ -25,7 +25,7 @@ public class DeepThoughtFxHtmlEditorPool {
   }
 
 
-  public DeepThoughtFxHtmlEditor getHtmlEditor(HtmlEditorListener listener) {
+  public DeepThoughtFxHtmlEditor getHtmlEditor(IHtmlEditorListener listener) {
     if(availableHtmlEditors.size() > 0) {
       DeepThoughtFxHtmlEditor editor = availableHtmlEditors.poll();
       editor.setListenerAndScrollToTop(listener);

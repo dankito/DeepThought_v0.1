@@ -14,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -31,6 +34,11 @@ public class HtmlEditor implements ICleanUp {
   public final static String HtmlEditorFileName = "CKEditor_start.html";
 
   public final static String HtmlEditorFolderAndFileName = new File(HtmlEditorFolderName, HtmlEditorFileName).getPath();
+
+
+  protected final static String ImageIdDataKey = "ID";
+
+  protected final static String ImageUrlDataKey = "URL";
 
 
   private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
@@ -51,7 +59,7 @@ public class HtmlEditor implements ICleanUp {
 
   protected String htmlToSetWhenLoaded = null;
 
-  protected HtmlEditorListener listener = null;
+  protected IHtmlEditorListener listener = null;
 
 
 
@@ -59,7 +67,7 @@ public class HtmlEditor implements ICleanUp {
     this.scriptExecutor = scriptExecutor;
   }
 
-  public HtmlEditor(IJavaScriptExecutor scriptExecutor, HtmlEditorListener listener) {
+  public HtmlEditor(IJavaScriptExecutor scriptExecutor, IHtmlEditorListener listener) {
     this(scriptExecutor);
     this.listener = listener;
   }
@@ -82,6 +90,14 @@ public class HtmlEditor implements ICleanUp {
         setHtml(htmlToSetWhenLoaded);
     } catch(Exception ex) {
       log.error("Could not setup HtmlEditor in loaded event", ex);
+    }
+  }
+
+  public void insertHtml(String html) {
+    try {
+      ckEditor.call("insertHtml", html, "unfiltered_html");
+    } catch(Exception ex) {
+      log.error("Could not insert Html " + html + " into CKEditor", ex);
     }
   }
 
@@ -128,15 +144,15 @@ public class HtmlEditor implements ICleanUp {
     }
   }
 
-  public HtmlEditorListener getListener() {
+  public IHtmlEditorListener getListener() {
     return listener;
   }
 
-  public void setListener(HtmlEditorListener listener) {
+  public void setListener(IHtmlEditorListener listener) {
     this.listener = listener;
   }
 
-  public void setListenerAndScrollToTop(HtmlEditorListener listener) {
+  public void setListenerAndScrollToTop(IHtmlEditorListener listener) {
     scrollTo(0);
     setListener(listener);
   }
@@ -165,12 +181,22 @@ public class HtmlEditor implements ICleanUp {
   public void htmlChanged(String newHtmlCode) {
     if(previousHtml.equals(newHtmlCode) == false) {
       if(hasUnImageBeenRemoved(previousHtml, newHtmlCode)) {
-        // TODO: react on image has been deleted
+        if(listener != null) {
+          List<Map<String, String>> imagesData = extractImageData(previousHtml, newHtmlCode);
+          for(Map<String, String> imageData : imagesData)
+            listener.imageHasBeenDeleted(imageData.get(ImageIdDataKey), imageData.get(ImageUrlDataKey)); // TODO: also check for undoing image deletion
+        }
       }
     }
 
     if(listener != null)
-      listener.htmlCodeUpdated(newHtmlCode);
+      listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
+  }
+
+  protected List<Map<String, String>> extractImageData(String previousHtml, String newHtmlCode) {
+    List<Map<String, String>> imagesData = new ArrayList<>();
+
+    return imagesData;
   }
 
   public boolean elementClicked(String element) {
@@ -179,8 +205,12 @@ public class HtmlEditor implements ICleanUp {
   }
 
   public boolean beforeCommandExecution(String commandName) {
-    if(commandName.toLowerCase().equals("image"))
-      return false;
+    if(listener != null) {
+      if (commandName.toLowerCase().equals("image")) {
+        return !listener.handleCommand(this, HtmEditorCommand.Image);
+      }
+    }
+
     return true;
   }
 
@@ -279,5 +309,4 @@ public class HtmlEditor implements ICleanUp {
       log.error("Could not write Jar entry " + entry.getName() + " to temp file " + tempFile, ex);
     }
   }
-
 }

@@ -4,10 +4,11 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
-import net.deepthought.controls.html.HtmlEditorListener;
+import net.deepthought.controls.html.IHtmlEditorListener;
 import net.deepthought.controls.person.ReferencePersonsControl;
 import net.deepthought.controls.person.ReferenceSubDivisionPersonsControl;
 import net.deepthought.controls.person.SeriesTitlePersonsControl;
@@ -1394,62 +1395,22 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
 
-  protected HtmlEditorListener seriesTitleTableOfContentsListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleTableOfContents);
-    }
-  };
+  protected IHtmlEditorListener seriesTitleTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleTableOfContents);
 
-  protected HtmlEditorListener seriesTitleAbstractListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAbstract);
-    }
-  };
+  protected IHtmlEditorListener seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
 
-  protected HtmlEditorListener seriesTitleNotesListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleNotes);
-    }
-  };
+  protected IHtmlEditorListener seriesTitleNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleNotes);
 
 
-  protected HtmlEditorListener referenceAbstractListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAbstract);
-    }
-  };
+  protected IHtmlEditorListener referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
 
-  protected HtmlEditorListener referenceTableOfContentsListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceTableOfContents);
-    }
-  };
+  protected IHtmlEditorListener referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
 
-  protected HtmlEditorListener referenceNotesListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceNotes);
-    }
-  };
+  protected IHtmlEditorListener referenceNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
 
 
-  protected HtmlEditorListener referenceSubDivisionAbstractListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
-    }
-  };
+  protected IHtmlEditorListener referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
 
-  protected HtmlEditorListener referenceSubDivisionNotesListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
-    }
-  };
+  protected IHtmlEditorListener referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
 
 }

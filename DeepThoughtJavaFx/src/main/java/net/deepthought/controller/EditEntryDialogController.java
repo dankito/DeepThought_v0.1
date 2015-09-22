@@ -7,7 +7,7 @@ import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
-import net.deepthought.controls.html.HtmlEditorListener;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,7 +64,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   protected EntryCreationResult creationResult = null;
 
-  protected ObservableList<FileLink> listViewFilesItems;
+  protected EditedEntitiesHolder<FileLink> editedAttachedFiles = null;
 
 
 
@@ -159,7 +158,10 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> contextHelpControl.showContextHelpForResourceKey("default")); // TODO: remove as soon as other context help texts are
     // implemented
 
-    filesControl = new FilesControl(new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles)));
+    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
+    contentListener.setEditedFilesHolder(editedAttachedFiles); // TODO: set to editedEmbeddedFiles
+
+    filesControl = new FilesControl(editedAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
     filesControl.setMaxHeight(Double.MAX_VALUE);
@@ -545,19 +547,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   };
 
 
-  protected HtmlEditorListener abstractListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAbstract);
-    }
-  };
+  protected DeepThoughtFxHtmlEditorListener abstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
 
-  protected HtmlEditorListener contentListener = new HtmlEditorListener() {
-    @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryContent);
-    }
-  };
+  protected DeepThoughtFxHtmlEditorListener contentListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
 
 
 }

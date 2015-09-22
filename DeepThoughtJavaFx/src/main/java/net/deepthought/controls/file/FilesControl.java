@@ -86,7 +86,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
       editedFiles.getEditedEntities().addListener(editedFilesChangedListener);
 
     if(pnSelectedFilesPreview != null) // on setup / calling setEditedFiles() from constructor pnSelectedFilesPreview is still null
-    updateFilesSetOnEntityPreview();
+      updateFilesSetOnEntityPreview();
   }
 
 
@@ -191,6 +191,9 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     HBox.setMargin(btnShowHideSearchPane, new Insets(0, 0, 0, 4));
 
     setTitle(titlePane);
+
+    if(editedFiles != null)
+      updateFilesSetOnEntityPreview();
   }
 
   protected void updateFilesSetOnEntityPreview() {

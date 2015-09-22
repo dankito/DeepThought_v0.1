@@ -38,7 +38,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     this(null);
   }
 
-  public DeepThoughtFxHtmlEditor(HtmlEditorListener listener) {
+  public DeepThoughtFxHtmlEditor(IHtmlEditorListener listener) {
     this.engine = webView.getEngine();
     this.htmlEditor = new HtmlEditor(this, listener);
 
@@ -93,11 +93,11 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     htmlEditor.setHtml(html);
   }
 
-  public void setListener(HtmlEditorListener listener) {
+  public void setListener(IHtmlEditorListener listener) {
     htmlEditor.setListener(listener);
   }
 
-  public void setListenerAndScrollToTop(HtmlEditorListener listener) {
+  public void setListenerAndScrollToTop(IHtmlEditorListener listener) {
     htmlEditor.setListenerAndScrollToTop(listener);
   }
 

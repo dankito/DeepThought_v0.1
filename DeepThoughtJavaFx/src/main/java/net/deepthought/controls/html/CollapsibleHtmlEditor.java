@@ -44,11 +44,11 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     this(null);
   }
 
-  public CollapsibleHtmlEditor(HtmlEditorListener listener) {
+  public CollapsibleHtmlEditor(IHtmlEditorListener listener) {
     this(null, listener);
   }
 
-  public CollapsibleHtmlEditor(String title, HtmlEditorListener listener) {
+  public CollapsibleHtmlEditor(String title, IHtmlEditorListener listener) {
     setupControl(title, listener);
   }
 
@@ -60,7 +60,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   }
 
 
-  protected void setupControl(String title, HtmlEditorListener listener) {
+  protected void setupControl(String title, IHtmlEditorListener listener) {
     htmlEditor = DeepThoughtFxHtmlEditorPool.getInstance().getHtmlEditor(listener);
     htmlEditor.setMaxHeight(Double.MAX_VALUE);
     setContent(htmlEditor);

@@ -4,13 +4,14 @@ import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
+import net.deepthought.controls.html.EntryContentHtmlEditorListener;
 import net.deepthought.controls.person.PersonLabel;
 import net.deepthought.controls.reference.EntryReferenceBaseLabel;
 import net.deepthought.controls.tag.EntryTagsControl;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -266,7 +267,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     });
 
 
-    htmledEntryContent = new DeepThoughtFxHtmlEditor(newHtmlCode -> contentUpdated(newHtmlCode));
+    htmledEntryContent = new DeepThoughtFxHtmlEditor(entryContentListener);
     htmledEntryContent.setMinHeight(250);
     htmledEntryContent.setMaxHeight(Double.MAX_VALUE);
     VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
@@ -383,6 +384,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     btnRemoveSelectedEntries.setDisable(selectedEntry == null);
     pnQuickEditEntry.setDisable(selectedEntry == null);
     currentEditedEntryTagsControl.setEntry(selectedEntry);
+    entryContentListener.setEntry(selectedEntry);
 
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
@@ -568,6 +570,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       Application.getSearchEngine().searchEntries(lastEntriesSearch);
     }
   }
+
+
+  protected EntryContentHtmlEditorListener entryContentListener = new EntryContentHtmlEditorListener();
 
 
 }
