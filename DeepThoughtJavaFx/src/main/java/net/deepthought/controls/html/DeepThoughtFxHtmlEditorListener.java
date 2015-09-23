@@ -1,16 +1,11 @@
 package net.deepthought.controls.html;
 
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
 
 import java.util.Collection;
-
-import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 22/09/15.
@@ -57,22 +52,7 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
   protected boolean handleImageCommand(HtmlEditor editor) {
     final FileLink newFile = new FileLink();
 
-    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok) {
-          if(editedFilesHolder != null) {
-            editedFilesHolder.addEntityToEntry(newFile);
-            editor.insertHtml("<img src='" + newFile.getUriString() + "' imageid='" + newFile.getId() + "' alt='" + newFile.getNotes() + "' ></img>");
-          }
-        }
-      }
-    });
+    Dialogs.showEditEmbeddedFileDialog(editor, newFile, null);
 
     return true;
   }

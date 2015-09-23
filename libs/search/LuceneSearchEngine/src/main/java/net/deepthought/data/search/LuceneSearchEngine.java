@@ -709,7 +709,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
     if(file.getFileType() != null)
       doc.add(new LongField(FieldName.FileFileType, file.getFileType().getId(), Field.Store.NO));
-    doc.add(new StringField(FieldName.FileNotes, file.getNotes().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.FileDescription, file.getDescription().toLowerCase(), Field.Store.NO));
     if(StringUtils.isNotNullOrEmpty(file.getSourceUriString()))
       doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
 

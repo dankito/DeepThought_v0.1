@@ -71,9 +71,9 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     entry.addFile(file);
 
     String newValue = "New value";
-    file.setNotes(newValue);
+    file.setDescription(newValue);
 
-    Assert.assertEquals(newValue, getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkNotesColumnName, file.getId()));
+    Assert.assertEquals(newValue, getValueFromTable(TableConfig.FileLinkTableName, TableConfig.FileLinkDescriptionColumnName, file.getId()));
   }
 
 }

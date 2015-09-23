@@ -7,15 +7,10 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="365.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditFileDialogController">
+<VBox prefHeight="295.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEmbeddedFileDialogController">
          <children>
             <VBox prefHeight="140.0">
                <children>
-                  <RadioButton fx:id="rdbtnFileOrUrl" mnemonicParsing="false" prefHeight="40.0" selected="true" text="%file">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="FileOptionGroup" />
-                     </toggleGroup>
-                  </RadioButton>
                   <HBox fx:id="pnFileSettings" alignment="CENTER_LEFT" prefHeight="40.0">
                      <children>
                         <Label prefWidth="100.0" text="%path.or.url" />
@@ -27,45 +22,49 @@
                         <Button mnemonicParsing="false" onAction="#handleButtonSelectFileAction" prefHeight="35.0" prefWidth="50.0" text="%..." />
                      </children>
                      <VBox.margin>
-                        <Insets left="24.0" />
+                        <Insets />
                      </VBox.margin>
                   </HBox>
             <AnchorPane maxHeight="40.0" minHeight="40.0">
                <children>
-                        <ComboBox fx:id="cmbxLocalFileLinkOptions" prefWidth="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="370.0" AnchorPane.topAnchor="0.0">
+                        <ComboBox fx:id="cmbxLocalFileLinkOptions" maxWidth="250.0" minWidth="250.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="390.0" AnchorPane.topAnchor="2.0">
                            <VBox.margin>
                               <Insets left="130.0" top="6.0" />
                            </VBox.margin>
                         </ComboBox>
-                  <Label fx:id="lblFileType" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Label fx:id="lblHtmlIncompatibleImageTypeSelected" alignment="CENTER_RIGHT" contentDisplay="TEXT_ONLY" text="%incompatible.html.image" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="256.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
                <VBox.margin>
-                  <Insets left="130.0" top="6.0" />
+                  <Insets bottom="6.0" left="106.0" top="6.0" />
                </VBox.margin>
             </AnchorPane>
-               </children>
-            </VBox>
-            <VBox prefHeight="100.0">
-               <children>
-                  <RadioButton fx:id="rdbtnFolder" mnemonicParsing="false" text="%folder" toggleGroup="$FileOptionGroup" />
-                  <HBox fx:id="pnFolderSettings" alignment="CENTER_LEFT" disable="true" prefHeight="40.0">
-                     <children>
-                        <Label prefWidth="100.0" text="%folder" />
-                        <CustomTextField fx:id="txtfldFolderLocation" prefHeight="35.0" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets left="6.0" right="6.0" />
-                           </HBox.margin>
-                        </CustomTextField>
-                        <Button mnemonicParsing="false" onAction="#handleButtonSelectFolderAction" prefHeight="35.0" prefWidth="50.0" text="%..." />
-                     </children>
-                     <VBox.margin>
-                        <Insets left="24.0" />
-                     </VBox.margin>
-                  </HBox>
-               </children>
+            <HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="40.0">
                <VBox.margin>
-                  <Insets bottom="12.0" top="12.0" />
+                  <Insets left="106.0" />
                </VBox.margin>
+               <children>
+                  <Label maxWidth="-Infinity" minWidth="-Infinity" text="%width" />
+                  <Spinner fx:id="spnImageWidth" maxWidth="80.0" minWidth="80.0" prefHeight="25.0" >
+                     <valueFactory>
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="100000"/>
+                     </valueFactory>
+                     <HBox.margin>
+                        <Insets left="4.0" right="12.0" />
+                     </HBox.margin>
+                  </Spinner>
+                  <Label maxWidth="-Infinity" minWidth="-Infinity" text="%height" />
+                  <Spinner fx:id="spnImageHeight" maxWidth="80.0" minWidth="80.0" prefHeight="30.0" >
+                     <valueFactory>
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="100000"/>
+                     </valueFactory>
+                     <HBox.margin>
+                        <Insets left="4.0" right="30.0" />
+                     </HBox.margin>
+                  </Spinner>
+                  <CheckBox fx:id="chkbxAlsoAttachToEntity" mnemonicParsing="false" text="%also.attach" visible="false" />
+               </children>
+            </HBox>
+               </children>
             </VBox>
             <HBox fx:id="pnFileSettings1" alignment="CENTER_LEFT" prefHeight="40.0">
                <children>
@@ -80,7 +79,7 @@
             <VBox>
                <children>
                   <Label text="%description" />
-                  <TextArea fx:id="txtarDescription" prefHeight="150.0" />
+                  <TextArea fx:id="txtarDescription" prefHeight="75.0" />
                </children>
                <VBox.margin>
                   <Insets top="12.0" />
@@ -90,4 +89,7 @@
          <BorderPane.margin>
             <Insets left="6.0" right="6.0" />
          </BorderPane.margin>
+   <padding>
+      <Insets left="2.0" right="2.0" top="2.0" />
+   </padding>
       </VBox>

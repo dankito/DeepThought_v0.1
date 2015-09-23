@@ -42,8 +42,8 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   @JoinColumn(name = TableConfig.FileLinkFileTypeColumnName)
   protected FileType fileType = FileType.getDefaultFileType();
 
-  @Column(name = TableConfig.FileLinkNotesColumnName)
-  protected String notes = "";
+  @Column(name = TableConfig.FileLinkDescriptionColumnName)
+  protected String description = "";
 
   @Column(name = TableConfig.FileLinkSourceUriColumnName)
   protected String sourceUriString = "";
@@ -124,14 +124,14 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
     this.fileType = fileType;
   }
 
-  public String getNotes() {
-    return notes;
+  public String getDescription() {
+    return description;
   }
 
-  public void setNotes(String notes) {
-    Object previousValue = this.notes;
-    this.notes = notes;
-    callPropertyChangedListeners(TableConfig.FileLinkNotesColumnName, previousValue, notes);
+  public void setDescription(String description) {
+    Object previousValue = this.description;
+    this.description = description;
+    callPropertyChangedListeners(TableConfig.FileLinkDescriptionColumnName, previousValue, description);
   }
 
   public String getSourceUriString() {

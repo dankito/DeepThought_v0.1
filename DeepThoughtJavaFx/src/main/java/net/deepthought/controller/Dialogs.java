@@ -2,9 +2,11 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
@@ -315,6 +317,44 @@ public class Dialogs {
       dialogStage.requestFocus();
     } catch(Exception ex) {
       log.error("Could not load / show EditFileDialog", ex);
+    }
+  }
+
+  public static void showEditEmbeddedFileDialog(HtmlEditor editor, FileLink file, ImageElementData imgElement) {
+    showEditEmbeddedFileDialog(editor, file, imgElement, null);
+  }
+
+  public static void showEditEmbeddedFileDialog(HtmlEditor editor, FileLink file, ImageElementData imgElement, final ChildWindowsControllerListener listener) {
+    try {
+      FXMLLoader loader = new FXMLLoader();
+      Stage dialogStage = createStageForEntityDialog(loader, "EditEmbeddedFileDialog.fxml", StageStyle.UTILITY);
+
+      // Set the file into the controller.
+      EditEmbeddedFileDialogController controller = loader.getController();
+      controller.setEditFile(dialogStage, editor, file, imgElement);
+
+      controller.setListener(new ChildWindowsControllerListener() {
+        @Override
+        public void windowClosing(Stage stage, ChildWindowsController controller) {
+          if(listener != null)
+            listener.windowClosing(stage, controller);
+        }
+
+        @Override
+        public void windowClosed(Stage stage, ChildWindowsController controller) {
+          removeClosedChildWindow(stage);
+
+          if(listener != null)
+            listener.windowClosed(stage, controller);
+        }
+      });
+
+      addOpenedChildWindow(dialogStage);
+
+      dialogStage.show();
+      dialogStage.requestFocus();
+    } catch(Exception ex) {
+      log.error("Could not load / show EditEmbeddedFileDialog", ex);
     }
   }
 

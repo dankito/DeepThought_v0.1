@@ -63,7 +63,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
         if(controller.getDialogResult() == DialogResult.Ok) {
           if(entry != null) {
             entry.addFile(newFile);
-            editor.insertHtml("<img src='" + newFile.getUriString() + "' imageid='" + newFile.getId() + "' alt='" + newFile.getNotes() + "'");
+            editor.insertHtml("<img src='" + newFile.getUriString() + "' imageid='" + newFile.getId() + "' alt='" + newFile.getDescription() + "'");
           }
         }
       }

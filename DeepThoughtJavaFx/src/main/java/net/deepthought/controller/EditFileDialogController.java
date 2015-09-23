@@ -1,7 +1,6 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
-import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.data.model.FileLink;
@@ -25,9 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
@@ -74,7 +71,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
   protected TextField txtfldFileName;
 
   @FXML
-  protected TextArea txtarNotes;
+  protected TextArea txtarDescription;
 
 
   @Override
@@ -119,7 +116,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
       updateWindowTitle();
     });
 
-    txtarNotes.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
+    txtarDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
   }
 
   protected void fileLocationChanged() {
@@ -180,7 +177,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
       txtfldFolderLocation.requestFocus();
     }
 
-    txtarNotes.setText(file.getNotes());
+    txtarDescription.setText(file.getDescription());
   }
 
 
@@ -278,7 +275,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.FileNotes)) {
-      file.setNotes(txtarNotes.getText());
+      file.setDescription(txtarDescription.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileNotes);
     }
   }

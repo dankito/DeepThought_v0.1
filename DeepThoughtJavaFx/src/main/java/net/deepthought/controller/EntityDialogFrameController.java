@@ -65,7 +65,11 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
   protected Pane pnBottomBar;
 
   @FXML
+  protected Button btnCancel;
+  @FXML
   protected Button btnApplyChanges;
+  @FXML
+  protected Button btnOk;
 
   @FXML
   protected Button btnChooseFieldsToShow;

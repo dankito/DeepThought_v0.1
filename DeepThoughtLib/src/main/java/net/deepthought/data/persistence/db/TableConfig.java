@@ -264,7 +264,7 @@ public class TableConfig {
   public final static String FileLinkNameColumnName = "name";
   public final static String FileLinkIsFolderColumnName = "folder";
   public final static String FileLinkFileTypeColumnName = "file_type";
-  public final static String FileLinkNotesColumnName = "notes";
+  public final static String FileLinkDescriptionColumnName = "description";
   public final static String FileLinkSourceUriColumnName = "source_uri";
   public final static String FileLinkDeepThoughtJoinColumnName = "deep_thought_id";
 

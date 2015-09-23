@@ -91,7 +91,7 @@ public class FieldName {
 
   public final static String FileFileType = "file_type";
 
-  public final static String FileNotes = "file_notes";
+  public final static String FileDescription = "file_description";
 
 
 }

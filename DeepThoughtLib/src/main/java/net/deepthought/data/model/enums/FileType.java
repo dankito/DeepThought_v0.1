@@ -80,6 +80,21 @@ public class FileType extends ExtensibleEnumeration {
     return defaultFileType;
   }
 
+  protected static FileType imageFileType = null;
+
+  public static FileType getImageFileType() {
+    if(imageFileType == null && Application.getDeepThought() != null) { // TODO: bad solution as then FileLink's FileType stays null
+      for(FileType fileType : Application.getDeepThought().getFileTypes()) {
+        if("file.type.image".equals(fileType.nameResourceKey)) {
+          imageFileType = fileType;
+          break;
+        }
+      }
+    }
+
+    return imageFileType;
+  }
+
   protected static Map<String, FileType> detectedFileTypesForResourceKeys = new HashMap<>();
 
   public static FileType getForResourceKey(String resourceKey) {

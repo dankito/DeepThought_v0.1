@@ -544,6 +544,20 @@ public class FileUtils {
     return FileType.getDefaultFileType();
   }
 
+  public static boolean isFileEmbeddableInHtml(String uri) {
+    if(getFileType(uri) == FileType.getImageFileType()) {
+      String fileExtension = getFileExtension(uri);
+      if(fileExtension != null)
+        fileExtension = fileExtension.toLowerCase();
+
+      return "jpeg".equals(fileExtension) || "png".equals(fileExtension) || "svg".equals(fileExtension) || "gif".equals(fileExtension) || "bmp".equals(fileExtension)
+          || "ico".equals(fileExtension) || "apng".equals(fileExtension) || "jpg".equals(fileExtension) || "jpe".equals(fileExtension);
+    }
+
+    return false;
+  }
+
+
   public static void writeToFile(String fileContent, File destinationFile) throws Exception {
     // TODO: what to do if file already exists?
     ensureFileExists(destinationFile);
