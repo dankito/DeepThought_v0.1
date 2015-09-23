@@ -57,11 +57,16 @@
 
 	editor.on('beforeCommandExec', function(evt) {
 		if(typeof app !== 'undefined') {
-			return app.beforeCommandExecution(evt.data.name);
+			return app.beforeCommandExecution(evt.data.name); // when returning false command then won't be executed
 		}
-		<!--alert(evt.data.name);-->
-		<!--return false; // command then won't be executed-->
 	});
+
+	editor.on( 'doubleclick', function( evt ) {
+		var element = evt.data.element;
+
+		if ( element.is( 'table' ) )
+			evt.data.dialog = 'tableProperties';
+	} );
 
 	$(window).resize( function() {
 		<!-- This is curious, mostly it fits perfectly in window then, but sometimes it gets a margin -->

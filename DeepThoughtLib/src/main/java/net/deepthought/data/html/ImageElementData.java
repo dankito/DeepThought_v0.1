@@ -11,6 +11,18 @@ public class ImageElementData {
 
   public final static int DefaultImageHeight = 300;
 
+  public final static String SourceAttributeName = "src";
+
+  public final static String ImageIdAttributeName = "imageid";
+
+  public final static String EmbeddingIdAttributeName = "embeddingid";
+
+  public final static String WidthAttributeName = "width";
+
+  public final static String HeightAttributeName = "height";
+
+  public final static String AltAttributeName = "alt";
+
 
   protected String imgElementHtmlCode = null;
 
@@ -50,7 +62,7 @@ public class ImageElementData {
 
   public String getHtmlCode() {
     if(imgElementHtmlCode == null)
-      imgElementHtmlCode = "<img src=\"" + source + "\" imageid=\"" + fileId + "\" embeddingid=\"" + embeddingId + "\" width=\"" +
+      imgElementHtmlCode = "<img src=\"" + source + "\" " + ImageIdAttributeName + "=\"" + fileId + "\" " + EmbeddingIdAttributeName + "=\"" + embeddingId + "\" width=\"" +
                            width + "\" height=\"" + height + "\" alt=\"" + alt + "\" />";
     return imgElementHtmlCode;
   }

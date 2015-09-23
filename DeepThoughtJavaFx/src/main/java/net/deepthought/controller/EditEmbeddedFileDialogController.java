@@ -292,11 +292,11 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     else {
       String currentHtml = editor.getHtml();
       ImageElementData currentImgElement = findImageElementInHtml(currentHtml, file, imgElement.getEmbeddingId());
-      if(currentImgElement == null)
+      if(currentImgElement == null) // should actually never be the case
         return;
 
-      currentHtml = currentHtml.replace(currentImgElement.getOriginalImgElementHtmlCode(), newImgElement.getHtmlCode());
-      editor.setHtml(currentHtml); // TODO: find a better way as in this way the insertion cursor should get lost
+      newImgElement.setEmbeddingId(currentImgElement.getEmbeddingId());
+      editor.replaceImageElement(currentImgElement, newImgElement);
     }
 
     this.imgElement = newImgElement;

@@ -2,6 +2,7 @@ package net.deepthought.controls.html;
 
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
@@ -180,7 +181,7 @@ public class HtmlEditor implements ICleanUp {
 
   public void htmlChanged(String newHtmlCode) {
     if(previousHtml.equals(newHtmlCode) == false) {
-      if(hasUnImageBeenRemoved(previousHtml, newHtmlCode)) {
+      if(hasAnImageBeenRemoved(previousHtml, newHtmlCode)) {
         if(listener != null) {
           List<Map<String, String>> imagesData = extractImageData(previousHtml, newHtmlCode);
           for(Map<String, String> imageData : imagesData)
@@ -214,7 +215,43 @@ public class HtmlEditor implements ICleanUp {
     return true;
   }
 
-  protected boolean hasUnImageBeenRemoved(String previousHtml, String newHtml) {
+  public void replaceImageElement(ImageElementData previousElement, ImageElementData newElement) {
+    try {
+      JSObject doc = (JSObject)ckEditor.getMember("document");
+      JSObject nodeList = (JSObject)doc.call("getElementsByTag", "img");
+      int length = (Integer)nodeList.call("count");
+
+      for(int i = 0; i < length; i++) {
+        JSObject imgNode = (JSObject)nodeList.call("getItem", i);
+        String idString = (String)imgNode.call("getAttribute", ImageElementData.EmbeddingIdAttributeName);
+        Long id = Long.parseLong(idString);
+
+        if(id.equals(previousElement.getEmbeddingId())) {
+          JSObject createdElement = createNewImageElement(newElement);
+
+          imgNode.call("insertBeforeMe", createdElement);
+          imgNode.call("remove");
+        }
+      }
+    } catch(Exception ex) {
+      log.error("Could not replace <img> element", ex);
+    }
+  }
+
+  protected JSObject createNewImageElement(ImageElementData newElement) {
+    JSObject createdElement = (JSObject)scriptExecutor.executeScript("new CKEDITOR.dom.element( 'img' );");
+
+    createdElement.call("setAttribute", ImageElementData.SourceAttributeName, newElement.getSource());
+    createdElement.call("setAttribute", ImageElementData.ImageIdAttributeName, newElement.getFileId());
+    createdElement.call("setAttribute", ImageElementData.EmbeddingIdAttributeName, newElement.getEmbeddingId());
+    createdElement.call("setAttribute", ImageElementData.WidthAttributeName, newElement.getWidth());
+    createdElement.call("setAttribute", ImageElementData.HeightAttributeName, newElement.getHeight());
+    createdElement.call("setAttribute", ImageElementData.AltAttributeName, newElement.getAlt());
+
+    return createdElement;
+  }
+
+  protected boolean hasAnImageBeenRemoved(String previousHtml, String newHtml) {
     int countImgTagsInPreviousHtml = StringUtils.getNumberOfOccurrences("<img ", previousHtml);
     int countImgTagsInNewHtml = StringUtils.getNumberOfOccurrences("<img ", newHtml);
 
