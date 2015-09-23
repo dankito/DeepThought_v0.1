@@ -1,7 +1,6 @@
 package net.deepthought.data.search.index;
 
 import net.deepthought.Application;
-import net.deepthought.data.importer_exporter.WikipediaImporter;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Person;
@@ -122,11 +121,11 @@ public class CreateBigIndex {
 
 
   protected void indexWikipediaArticles() {
-    WikipediaImporter importer = new WikipediaImporter();
-
-//    importer.getEnglishFeaturedArticles();
-
-    importer.getGermanGeschichtsPortalArticles();
+//    WikipediaImporter importer = new WikipediaImporter();
+//
+////    importer.getEnglishFeaturedArticles();
+//
+//    importer.getGermanGeschichtsPortalArticles();
   }
 
 

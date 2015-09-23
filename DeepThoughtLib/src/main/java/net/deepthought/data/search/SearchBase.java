@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class SearchBase {
 
+  public final static String EmptySearchTerm = "";
+
+
   private final static Logger log = LoggerFactory.getLogger(SearchBase.class);
 
 

@@ -1,6 +1,7 @@
 package net.deepthought.data.search;
 
 import net.deepthought.Application;
+import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
@@ -9,6 +10,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResult;
@@ -106,7 +108,19 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
+  public void searchCategories(Search<Category> search) {
+    // TODO
+    search.fireSearchCompleted();
+  }
+
+  @Override
+  public void searchFiles(FilesSearch search) {
+    // TODO
+    search.fireSearchCompleted();
+  }
+
+  @Override
+  protected void searchAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
     IEntityManager entityManager = Application.getEntityManager();
 
     String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (" +
@@ -128,7 +142,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
   // there's no way to complete this search with SQL -> do it in memory (very slow for a large amount of ReferenceBases) or with Lucene
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void searchEachReferenceBaseWithSeparateSearchTerm(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
 //    IEntityManager entityManager = Application.getEntityManager();
 //
 //    String query = "SELECT " + TableConfig.BaseEntityIdColumnName + " FROM " + TableConfig.ReferenceBaseTableName + " WHERE (";
@@ -168,16 +182,16 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterPersons(Search<Person> search, String personFilter) {
-    filterPersons(search, personFilter, personFilter, false);
+  protected void searchPersons(Search<Person> search, String personFilter) {
+    searchPersons(search, personFilter, personFilter, false);
   }
 
   @Override
-  protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
-    filterPersons(search, lastNameFilter, firstNameFilter, true);
+  protected void searchPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
+    searchPersons(search, lastNameFilter, firstNameFilter, true);
   }
 
-  protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter, boolean mustFitBothFilters) {
+  protected void searchPersons(Search<Person> search, String lastNameFilter, String firstNameFilter, boolean mustFitBothFilters) {
     // TODO: escape lastNameFilter and firstNameFilter (e.g. if they contain: ' )
     IEntityManager entityManager = Application.getEntityManager();
 

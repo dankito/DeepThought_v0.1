@@ -280,7 +280,7 @@ public abstract class SearchComparisonTestBase {
 //    searchEngine.searchReferenceBases(new Search<ReferenceBase>("sz", new SearchCompletedListener<ReferenceBase>() {
 //      @Override
 //      public void completed(Collection<ReferenceBase> results) {
-//        logOperationProcessTime("filterEachReferenceBaseWithSeparateFilter for sz");
+//        logOperationProcessTime("searchEachReferenceBaseWithSeparateSearchTerm for sz");
 //        searchResults.addAll(results);
 //        countDownLatch.countDown();
 //      }
@@ -291,10 +291,10 @@ public abstract class SearchComparisonTestBase {
 //
 //    Assert.assertEquals(316, searchResults.size());
 //
-////    searchEngine.filterEachReferenceBaseWithSeparateFilter(new Search<>("Angkor", new SearchCompletedListener<ReferenceBase>() {
+////    searchEngine.searchEachReferenceBaseWithSeparateSearchTerm(new Search<>("Angkor", new SearchCompletedListener<ReferenceBase>() {
 ////      @Override
 ////      public void completed(Collection<ReferenceBase> results) {
-////        logOperationProcessTime("filterEachReferenceBaseWithSeparateFilter for Angkor");
+////        logOperationProcessTime("searchEachReferenceBaseWithSeparateSearchTerm for Angkor");
 ////        Assert.assertEquals(1, results.size());
 ////      }
 ////    }));

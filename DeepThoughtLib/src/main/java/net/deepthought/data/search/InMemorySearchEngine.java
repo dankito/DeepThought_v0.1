@@ -1,6 +1,7 @@
 package net.deepthought.data.search;
 
 import net.deepthought.Application;
+import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
@@ -10,6 +11,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
@@ -98,7 +100,19 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
+  public void searchCategories(Search<Category> search) {
+    // TODO
+    search.fireSearchCompleted();
+  }
+
+  @Override
+  public void searchFiles(FilesSearch search) {
+    // TODO
+    search.fireSearchCompleted();
+  }
+
+  @Override
+  protected void searchAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
       setReferenceBasesEmptyFilterSearchResult(search);
       return;
@@ -132,7 +146,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void searchEachReferenceBaseWithSeparateSearchTerm(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
     if(StringUtils.isNullOrEmpty(search.getSearchTerm().trim())) {
       setReferenceBasesEmptyFilterSearchResult(search);
       return;
@@ -210,7 +224,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
 
 
   @Override
-  protected void filterPersons(Search<Person> search, String personFilter) {
+  protected void searchPersons(Search<Person> search, String personFilter) {
     for(Person person : Application.getDeepThought().getPersons()) {
       if(search.isInterrupted())
         return;
@@ -224,7 +238,7 @@ public class InMemorySearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
+  protected void searchPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
     for(Person person : Application.getDeepThought().getPersons()) {
       if(search.isInterrupted())
         return;

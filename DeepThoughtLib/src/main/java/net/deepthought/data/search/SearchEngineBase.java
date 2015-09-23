@@ -127,25 +127,25 @@ public abstract class SearchEngineBase implements ISearchEngine {
       Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
-          filterAllReferenceBaseTypesForSameFilter(search, lowerCaseFilter);
+          searchAllReferenceBaseTypesForSameFilter(search, lowerCaseFilter);
         }
       });
     }
     else {
-      filterEachReferenceBaseWithSeparateFilter(search, lowerCaseFilter);
+      searchEachReferenceBaseWithSeparateSearchTerm(search, lowerCaseFilter);
     }
   }
 
   protected void filterOnlyOneTypeOfReferenceBase(ReferenceBasesSearch search, String lowerCaseFilter) {
     if(search.getType() == ReferenceBaseType.SeriesTitle)
-      filterEachReferenceBaseWithSeparateFilter(search, lowerCaseFilter, null, null);
+      searchEachReferenceBaseWithSeparateSearchTerm(search, lowerCaseFilter, null, null);
     else if(search.getType() == ReferenceBaseType.Reference)
-      filterEachReferenceBaseWithSeparateFilter(search, null, lowerCaseFilter, null);
+      searchEachReferenceBaseWithSeparateSearchTerm(search, null, lowerCaseFilter, null);
     else if(search.getType() == ReferenceBaseType.ReferenceSubDivision)
-      filterEachReferenceBaseWithSeparateFilter(search, null, null, lowerCaseFilter);
+      searchEachReferenceBaseWithSeparateSearchTerm(search, null, null, lowerCaseFilter);
   }
 
-  protected void filterEachReferenceBaseWithSeparateFilter(final ReferenceBasesSearch search, String lowerCaseFilter) {
+  protected void searchEachReferenceBaseWithSeparateSearchTerm(final ReferenceBasesSearch search, String lowerCaseFilter) {
     String seriesTitleFilter = null, referenceFilter = null, referenceSubDivisionFilter = null;
     String[] parts = lowerCaseFilter.split(",");
 
@@ -169,14 +169,14 @@ public abstract class SearchEngineBase implements ISearchEngine {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        filterEachReferenceBaseWithSeparateFilter(search, finalSeriesTitleFilter, finalReferenceFilter, finalReferenceSubDivisionFilter);
+        searchEachReferenceBaseWithSeparateSearchTerm(search, finalSeriesTitleFilter, finalReferenceFilter, finalReferenceSubDivisionFilter);
       }
     });
   }
 
-  protected abstract void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter);
+  protected abstract void searchAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter);
 
-  protected abstract void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String FilterReferenceBasesreferenceSubDivisionFilter);
+  protected abstract void searchEachReferenceBaseWithSeparateSearchTerm(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String FilterReferenceBasesreferenceSubDivisionFilter);
 
   @Override
   public void searchPersons(final Search<Person> search) {
@@ -194,7 +194,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
       Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
-          filterPersons(search, lowerCaseFilter);
+          searchPersons(search, lowerCaseFilter);
         }
       });
     }
@@ -205,7 +205,7 @@ public abstract class SearchEngineBase implements ISearchEngine {
       Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
         public void run() {
-          filterPersons(search, lastNameFilter, firstNameFilter);
+          searchPersons(search, lastNameFilter, firstNameFilter);
         }
       });
     }
@@ -213,9 +213,9 @@ public abstract class SearchEngineBase implements ISearchEngine {
 //    search.fireSearchCompleted();
   }
 
-  protected abstract void filterPersons(Search<Person> search, String personFilter);
+  protected abstract void searchPersons(Search<Person> search, String personFilter);
 
-  protected abstract void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter);
+  protected abstract void searchPersons(Search<Person> search, String lastNameFilter, String firstNameFilter);
 
 
   protected ApplicationListener applicationListener = new ApplicationListener() {

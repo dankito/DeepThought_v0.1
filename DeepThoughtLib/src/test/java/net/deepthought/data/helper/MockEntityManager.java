@@ -19,6 +19,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.enums.BackupFileServiceType;
+import net.deepthought.data.model.enums.FileType;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.persistence.IEntityManager;
@@ -135,6 +136,8 @@ public class MockEntityManager implements IEntityManager {
     for(Note entity : deepThought.getNotes())
       persistEntity(entity);
 
+    for(FileType entity : deepThought.getFileTypes())
+      persistEntity(entity);
     for(FileLink entity : deepThought.getFiles())
       persistEntity(entity);
     for(BackupFileServiceType entity : deepThought.getBackupFileServiceTypes())

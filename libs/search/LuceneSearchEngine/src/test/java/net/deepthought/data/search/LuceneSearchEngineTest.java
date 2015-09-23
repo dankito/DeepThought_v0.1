@@ -5,6 +5,7 @@ import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
@@ -12,6 +13,7 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
@@ -529,7 +531,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntriesWithSpecificTag_OnlyEntriesWithSpecifiedTagGetFound() {
+  public void searchEntriesWithSpecificTag_OnlyEntriesWithSpecifiedTagGetFound() {
     Entry entry1 = new Entry("Love");
     Entry entry2 = new Entry("Love");
     Entry entry3 = new Entry("Love");
@@ -564,7 +566,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntriesContent_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
+  public void searchEntriesContent_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
     Entry entry1 = new Entry("Love");
     Entry entry2 = new Entry("Kill");
     Entry entry3 = new Entry("Love kills");
@@ -592,7 +594,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntriesAbstract_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
+  public void searchEntriesAbstract_SpecifyMoreThanTwoSearchTerms_EntryWithBothSearchTermsGetsFound() {
     Entry entry1 = new Entry("", "Love");
     Entry entry2 = new Entry("", "Kill");
     Entry entry3 = new Entry("", "Love kills");
@@ -620,7 +622,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntries_SearchResultIsInCorrectOrder() {
+  public void searchEntries_SearchResultIsInCorrectOrder() {
     Entry entry1 = new Entry("", "Mandela");
     Entry entry2 = new Entry("", "Mother");
     Entry entry3 = new Entry("", "Mahatma");
@@ -648,7 +650,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterEntriesWithGermanUmlaut() {
+  public void searchEntriesWithGermanUmlaut() {
     Entry entry = new Entry("", "Ägyptischer Journalist");
     deepThought.addEntry(entry);
 
@@ -771,56 +773,122 @@ public class LuceneSearchEngineTest {
   }
 
 
-//  @Test
-//  public void addCategory_CategoryGetsIndexed() {
-//    Category newCategory = new Category("category");
-//    deepThought.addCategory(newCategory);
-//
-//    final List<Category> results = new ArrayList<>();
-//    final CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//    searchEngine.filterCategories(new Search<Category>("Category", result -> {
-//      results.addAll(result);
-//      countDownLatch.countDown();
-//    }));
-//
-//    try { countDownLatch.await(); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(1, results.size());
-//  }
-//
-//  @Test
-//  public void updateCategory_SearchFindsUpdatedCategory() {
-//    Tag newTag = new Tag("tag");
-//    deepThought.addTag(newTag);
-//
-//    newTag.setName("Swag");
-//
-//    final List<Tag> results = new ArrayList<>();
-//    final CountDownLatch countDownLatch = new CountDownLatch(1);
-//
-//    searchEngine.searchTags(new Search<Tag>("swag", result -> {
-//      results.addAll(result);
-//      countDownLatch.countDown();
-//    }));
-//
-//    try { countDownLatch.await(); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(1, results.size());
-//
-//    // ensure previous tag name cannot be found anymore
-//    results.clear();
-//    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
-//
-//    searchEngine.searchTags(new Search<Tag>("tag", result -> {
-//      results.addAll(result);
-//      nextCountDownLatch.countDown();
-//    }));
-//
-//    try { nextCountDownLatch.await(); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(0, results.size());
-//  }
+  @Test
+  public void addCategory_CategoryGetsIndexed() {
+    Category newCategory = new Category("category");
+    deepThought.addCategory(newCategory);
+
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new Search<Category>("Category", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newCategory, results.get(0));
+  }
+
+  @Test
+  public void updateCategory_SearchFindsUpdatedCategory() {
+    Category newCategory = new Category("category");
+    deepThought.addCategory(newCategory);
+
+    newCategory.setName("Periodicals");
+
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new Search<Category>("perio", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newCategory, results.get(0));
+
+    // ensure previous tag name cannot be found anymore
+    results.clear();
+    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new Search<Category>("category", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        nextCountDownLatch.countDown();
+      }
+    }));
+
+    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
+  }
+
+  @Test
+  public void searchCategories_SearchResultsAreInCorrectAlphabeticalOrder() {
+    Category category1 = new Category("Liebe");
+    Category category2 = new Category("Hiebe");
+    Category category3 = new Category("Siebe");
+    Category category4 = new Category("Diebe");
+    deepThought.addCategory(category1);
+    deepThought.addCategory(category2);
+    deepThought.addCategory(category3);
+    deepThought.addCategory(category4);
+
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new Search<Category>("iebe", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(4, results.size());
+
+    Assert.assertEquals(category4, results.get(0));
+    Assert.assertEquals(category2, results.get(1));
+    Assert.assertEquals(category1, results.get(2));
+    Assert.assertEquals(category3, results.get(3));
+  }
+
+  @Test
+  public void deleteCategory_SearchDoesNotFindCategoryAnymore() {
+    Category newCategory = new Category("category");
+    deepThought.addCategory(newCategory);
+
+    deepThought.removeCategory(newCategory);
+
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new Search<Category>("category", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
+  }
 
 
   @Test
@@ -926,7 +994,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterPersonsForFirstAndLastName() {
+  public void searchPersonsForFirstAndLastName() {
     Person newPerson = new Person("Mahatma", "Gandhi");
     deepThought.addPerson(newPerson);
     deepThought.addPerson(new Person("dummy", ""));
@@ -989,7 +1057,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterPersons_SearchResultsAreInCorrectAlphabeticalOrder() {
+  public void searchPersons_SearchResultsAreInCorrectAlphabeticalOrder() {
     Person person1 = new Person("Mother", "Teresa");
     Person person2 = new Person("Mahatma", "Gandhi");
     Person person3 = new Person("Nelson", "Mandela");
@@ -1017,7 +1085,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterPersonsWithIdenticalLastNames_SearchResultsAreInCorrectAlphabeticalOrder() {
+  public void searchPersonsWithIdenticalLastNames_SearchResultsAreInCorrectAlphabeticalOrder() {
     Person person1 = new Person("Mohandas Karamchand", "Gandhi");
     Person person2 = new Person("Mahatma", "Gandhi");
     deepThought.addPerson(person1);
@@ -1042,7 +1110,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterPersonsForFirstAndLastName_SearchResultsAreInCorrectAlphabeticalOrder() {
+  public void searchPersonsForFirstAndLastName_SearchResultsAreInCorrectAlphabeticalOrder() {
     Person person1 = new Person("Mohandas Karamchand", "Gandhi");
     Person person2 = new Person("Mahatma", "Gandhi");
     deepThought.addPerson(person1);
@@ -1067,7 +1135,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterPersonWithTwoFirstNames_SearchingForSecondFirstName_PersonGetsFound() {
+  public void searchPersonWithTwoFirstNames_SearchingForSecondFirstName_PersonGetsFound() {
     Person person = new Person("Mohandas Karamchand", "Gandhi");
     deepThought.addPerson(person);
 
@@ -1192,7 +1260,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterSeriesTitles() {
+  public void searchSeriesTitles() {
     SeriesTitle newSeriesTitle = new SeriesTitle("SZ", "Ich brauch irgend einen Untertitel");
     deepThought.addSeriesTitle(newSeriesTitle);
     deepThought.addSeriesTitle(new SeriesTitle("dummy"));
@@ -1376,7 +1444,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferences() {
+  public void searchReferences() {
     Reference newReference = new Reference("Selbst Denken", "Anleitung zum Widerstand");
     newReference.setIssueOrPublishingDate("2012");
     deepThought.addReference(newReference);
@@ -1564,7 +1632,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferenceSubDivisions() {
+  public void searchReferenceSubDivisions() {
     Reference newReference = new Reference("SZ");
     deepThought.addReference(newReference);
 
@@ -1628,7 +1696,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterSeriesTitlesOnly_OtherReferenceBaseTypesDontGetFound() {
+  public void searchSeriesTitlesOnly_OtherReferenceBaseTypesDontGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
     Reference reference = new Reference("Test");
@@ -1654,7 +1722,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterSeriesTitlesOnly_SearchResultIsInCorrectOrder() {
+  public void searchSeriesTitlesOnly_SearchResultIsInCorrectOrder() {
     SeriesTitle seriesTitleGandhiMohandas = new SeriesTitle("Gandhi", "Mohandas");
     SeriesTitle seriesTitleTeresa = new SeriesTitle("Teresa");
     SeriesTitle seriesTitleGandhiMahatma = new SeriesTitle("Gandhi", "Mahatma");
@@ -1685,7 +1753,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferencesOnly_OtherReferenceBaseTypesDontGetFound() {
+  public void searchReferencesOnly_OtherReferenceBaseTypesDontGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
     Reference reference = new Reference("Test");
@@ -1711,7 +1779,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferencesOnly_SearchResultIsInCorrectOrder() {
+  public void searchReferencesOnly_SearchResultIsInCorrectOrder() {
     Reference referenceGandhiMohandas = new Reference("Gandhi", "Mohandas");
     Reference referenceTeresa = new Reference("Teresa");
     Reference referenceGandhiMahatma = new Reference("Gandhi", "Mahatma");
@@ -1742,7 +1810,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferencesOnly_UnrecognizedDateFormatIsSetAsIssue_ReferenceGetsFoundAnyway() {
+  public void searchReferencesOnly_UnrecognizedDateFormatIsSetAsIssue_ReferenceGetsFoundAnyway() {
     Reference reference = new Reference("Test");
     reference.setIssueOrPublishingDate("04 / 2015");
     deepThought.addReference(reference);
@@ -1765,7 +1833,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferenceSubDivisionsOnly_OtherReferenceBaseTypesDontGetFound() {
+  public void searchReferenceSubDivisionsOnly_OtherReferenceBaseTypesDontGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
     Reference reference = new Reference("Test");
@@ -1791,7 +1859,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterReferenceSubDivisionsOnly_SearchResultIsInCorrectOrder() {
+  public void searchReferenceSubDivisionsOnly_SearchResultIsInCorrectOrder() {
     ReferenceSubDivision subDivisionGandhiMohandas = new ReferenceSubDivision("Gandhi", "Mohandas");
     ReferenceSubDivision subDivisionTeresa = new ReferenceSubDivision("Teresa");
     ReferenceSubDivision subDivisionGandhiMahatma = new ReferenceSubDivision("Gandhi", "Mahatma");
@@ -1822,7 +1890,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterAllReferenceBaseTypes_AllGetFound() {
+  public void searchAllReferenceBaseTypes_AllGetFound() {
     SeriesTitle seriesTitle = new SeriesTitle("Test");
     deepThought.addSeriesTitle(seriesTitle);
     Reference reference = new Reference("Test");
@@ -1850,7 +1918,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterAllReferenceBaseTypes_SeriesTitlesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+  public void searchAllReferenceBaseTypes_SeriesTitlesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
     SeriesTitle seriesTitleSzJetzt = new SeriesTitle("SZ", "Jetzt");
     SeriesTitle seriesTitleSzMagazin = new SeriesTitle("SZ", "Magazin");
     SeriesTitle seriesTitleSz = new SeriesTitle("SZ", "");
@@ -1880,7 +1948,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterAllReferenceBaseTypes_ReferencesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+  public void searchAllReferenceBaseTypes_ReferencesHaveDifferentSubTitles_TheyAreSortedCorrectly() {
     Reference referenceSzJetzt = new Reference("SZ", "Jetzt");
     Reference referenceSzMagazin = new Reference("SZ", "Magazin");
     Reference referenceSz = new Reference("SZ", "");
@@ -1910,7 +1978,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterAllReferenceBaseTypes_ReferenceSubDivisionsHaveDifferentSubTitles_TheyAreSortedCorrectly() {
+  public void searchAllReferenceBaseTypes_ReferenceSubDivisionsHaveDifferentSubTitles_TheyAreSortedCorrectly() {
     ReferenceSubDivision subDivisionSzJetzt = new ReferenceSubDivision("SZ", "Jetzt");
     ReferenceSubDivision subDivisionSzMagazin = new ReferenceSubDivision("SZ", "Magazin");
     ReferenceSubDivision subDivisionSz = new ReferenceSubDivision("SZ", "");
@@ -1940,7 +2008,7 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
-  public void filterAllReferenceBaseTypes_TheyAreSortedCorrectly() {
+  public void searchAllReferenceBaseTypes_TheyAreSortedCorrectly() {
     SeriesTitle seriesTitleSzMagazin = new SeriesTitle("SZ Magazin");
     SeriesTitle seriesTitleSz = new SeriesTitle("SZ");
     deepThought.addSeriesTitle(seriesTitleSzMagazin);
@@ -2462,6 +2530,201 @@ public class LuceneSearchEngineTest {
     Assert.assertEquals(tag4, tagsResultList.get(0)); // Atag must be first result
     Assert.assertEquals(tag1, tagsResultList.get(1)); // tag second
     Assert.assertEquals(tag3, tagsResultList.get(2)); // and Ztag last
+  }
+
+
+  @Test
+  public void addFile_FileGetsIndexed() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "enlightenment");
+    deepThought.addFile(newFile);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("enli", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newFile, results.get(0));
+  }
+
+  @Test
+  public void addFile_SearchOnlyFileName() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "enlightenment");
+    FileLink testDummy = new FileLink("http://www.enlightenment.com", "but not in name");
+    testDummy.setDescription("enlightenment");
+    deepThought.addFile(newFile);
+    deepThought.addFile(testDummy);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("enli", true, false, false, new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newFile, results.get(0));
+  }
+
+  @Test
+  public void addFile_SearchOnlyUri() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "enlightenment");
+    FileLink testDummy = new FileLink("http://www.enlightenment.com", "philosophy");
+    testDummy.setDescription("philosophy");
+    deepThought.addFile(newFile);
+    deepThought.addFile(testDummy);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("philo", false, true, false, new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newFile, results.get(0));
+  }
+
+  @Test
+  public void addFile_SearchOnlyFileDescripton() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "enlightenment");
+    newFile.setDescription("Sokrates");
+    FileLink testDummy = new FileLink("http://www.sokrates.com", "Sokrates");
+    testDummy.setDescription("I know my nothing knowing");
+    deepThought.addFile(newFile);
+    deepThought.addFile(testDummy);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("sokr", false, false, true, new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newFile, results.get(0));
+  }
+
+  @Test
+  public void updateFile_SearchFindsUpdatedFile() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "Enlightenment");
+    deepThought.addFile(newFile);
+
+    newFile.setName("Sokrates");
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("Sok", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newFile, results.get(0));
+
+    // ensure previous tag name cannot be found anymore
+    results.clear();
+    final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("enl", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        nextCountDownLatch.countDown();
+      }
+    }));
+
+    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
+  }
+
+  @Test
+  public void searchFiles_SearchResultsAreInCorrectAlphabeticalOrder() {
+    FileLink file1 = new FileLink("/same/parent/directory/any", "Vain and insane");
+    FileLink file2 = new FileLink("/same/parent/directory/different", "Same");
+    FileLink file3 = new FileLink("/same/parent/directory/but", "Same");
+    FileLink file4 = new FileLink("/same/parent/directory/but", "Not the Same");
+
+    deepThought.addFile(file1);
+    deepThought.addFile(file2);
+    deepThought.addFile(file3);
+    deepThought.addFile(file4);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("sa", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(4, results.size());
+
+    Assert.assertEquals(file4, results.get(0));
+    Assert.assertEquals(file3, results.get(1));
+    Assert.assertEquals(file2, results.get(2));
+    Assert.assertEquals(file1, results.get(3));
+  }
+
+  @Test
+  public void deleteFile_SearchDoesNotFindFileAnymore() {
+    FileLink newFile = new FileLink("http://www.philosophy.com", "enlightenment");
+    deepThought.addFile(newFile);
+
+    deepThought.removeFile(newFile);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchFiles(new FilesSearch("enli", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
   }
 
 }

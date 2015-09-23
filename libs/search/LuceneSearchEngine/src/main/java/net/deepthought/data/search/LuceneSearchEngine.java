@@ -19,6 +19,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
 import net.deepthought.data.search.specific.EntriesSearch;
+import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
@@ -588,6 +589,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.CategoryName, category.getName().toLowerCase(), Field.Store.NO));
+    doc.add(new StringField(FieldName.CategoryDescription, category.getDescription().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, Category.class);
   }
@@ -977,62 +979,73 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  protected void filterPersons(Search<Person> search, String personFilter) {
+  public void searchCategories(Search<Category> search) {
     BooleanQuery query = new BooleanQuery();
-    personFilter = QueryParser.escape(personFilter);
+    String searchTerm = "*" + QueryParser.escape(search.getSearchTerm().toLowerCase()) + "*";
 
-    query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + personFilter + "*")), BooleanClause.Occur.SHOULD);
-    query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + personFilter + "*")), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.CategoryName, searchTerm)), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.CategoryDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+
+    executeQuery(search, query, Category.class, FieldName.CategoryId, SortOrder.Ascending, FieldName.CategoryName);
+  }
+
+  @Override
+  protected void searchPersons(Search<Person> search, String personSearchTerm) {
+    BooleanQuery query = new BooleanQuery();
+    personSearchTerm = QueryParser.escape(personSearchTerm);
+
+    query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + personSearchTerm + "*")), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + personSearchTerm + "*")), BooleanClause.Occur.SHOULD);
 
     executeQuery(search, query, Person.class, FieldName.PersonId, SortOrder.Ascending, FieldName.PersonLastName, FieldName.PersonFirstName);
   }
 
   @Override
-  protected void filterPersons(Search<Person> search, String lastNameFilter, String firstNameFilter) {
-    lastNameFilter = QueryParser.escape(lastNameFilter);
-    firstNameFilter = QueryParser.escape(firstNameFilter);
+  protected void searchPersons(Search<Person> search, String lastNameSearchTerm, String firstNameSearchTerm) {
+    lastNameSearchTerm = QueryParser.escape(lastNameSearchTerm);
+    firstNameSearchTerm = QueryParser.escape(firstNameSearchTerm);
 
     BooleanQuery query = new BooleanQuery();
 
-    query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + lastNameFilter + "*")), BooleanClause.Occur.MUST);
-    query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + firstNameFilter + "*")), BooleanClause.Occur.MUST);
+    query.add(new WildcardQuery(new Term(FieldName.PersonLastName, "*" + lastNameSearchTerm + "*")), BooleanClause.Occur.MUST);
+    query.add(new WildcardQuery(new Term(FieldName.PersonFirstName, "*" + firstNameSearchTerm + "*")), BooleanClause.Occur.MUST);
 
     executeQuery(search, query, Person.class, FieldName.PersonId, SortOrder.Ascending, FieldName.PersonLastName, FieldName.PersonFirstName);
   }
 
   @Override
-  protected void filterAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseFilter) {
+  protected void searchAllReferenceBaseTypesForSameFilter(ReferenceBasesSearch search, String referenceBaseSearchTerm) {
     BooleanQuery query = new BooleanQuery();
 
-    referenceBaseFilter = QueryParser.escape(referenceBaseFilter);
-    referenceBaseFilter = "*" + referenceBaseFilter + "*";
+    referenceBaseSearchTerm = QueryParser.escape(referenceBaseSearchTerm);
+    referenceBaseSearchTerm = "*" + referenceBaseSearchTerm + "*";
 
-    query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-
-    if(search.isInterrupted())
-      return;
-
-    query.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
-    query.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceBaseSearchTerm)), BooleanClause.Occur.SHOULD);
 
     if(search.isInterrupted())
       return;
 
-    query.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseFilter)), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceBaseSearchTerm)), BooleanClause.Occur.SHOULD);
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceBaseSearchTerm)), BooleanClause.Occur.SHOULD);
+
+    if(search.isInterrupted())
+      return;
+
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceBaseSearchTerm)), BooleanClause.Occur.SHOULD);
 
     executeReferenceBaseQuery(search, query);
   }
 
   @Override
-  protected void filterEachReferenceBaseWithSeparateFilter(ReferenceBasesSearch search, String seriesTitleFilter, String referenceFilter, String referenceSubDivisionFilter) {
+  protected void searchEachReferenceBaseWithSeparateSearchTerm(ReferenceBasesSearch search, String seriesTitleSearchTerm, String referenceSearchTerm, String referenceSubDivisionSearchTerm) {
     BooleanQuery query = new BooleanQuery();
 
-    if(seriesTitleFilter != null) {
-      seriesTitleFilter = "*" + QueryParser.escape(seriesTitleFilter) + "*";
+    if(seriesTitleSearchTerm != null) {
+      seriesTitleSearchTerm = "*" + QueryParser.escape(seriesTitleSearchTerm) + "*";
       BooleanQuery seriesTitleQuery = new BooleanQuery();
 
       seriesTitleQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, SeriesTitleReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
-      seriesTitleQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleFilter)), BooleanClause.Occur.MUST);
+      seriesTitleQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleSearchTerm)), BooleanClause.Occur.MUST);
 
       query.add(seriesTitleQuery, BooleanClause.Occur.MUST);
     }
@@ -1040,15 +1053,15 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(search.isInterrupted())
       return;
 
-    if(referenceFilter != null) {
-      referenceFilter = "*" + QueryParser.escape(referenceFilter) + "*";
+    if(referenceSearchTerm != null) {
+      referenceSearchTerm = "*" + QueryParser.escape(referenceSearchTerm) + "*";
       BooleanQuery referenceQuery = new BooleanQuery();
       referenceQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, ReferenceReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
 
       BooleanQuery referenceValuesQuery = new BooleanQuery();
-      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceFilter)), BooleanClause.Occur.SHOULD);
-      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceFilter)), BooleanClause.Occur.SHOULD);
-      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceFilter)), BooleanClause.Occur.SHOULD);
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceSearchTerm)), BooleanClause.Occur.SHOULD);
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceSearchTerm)), BooleanClause.Occur.SHOULD);
+      referenceValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceSearchTerm)), BooleanClause.Occur.SHOULD);
       referenceQuery.add(referenceValuesQuery, BooleanClause.Occur.MUST);
 
       query.add(referenceQuery, BooleanClause.Occur.MUST);
@@ -1057,16 +1070,16 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(search.isInterrupted())
       return;
 
-    if(referenceSubDivisionFilter != null) {
-      referenceSubDivisionFilter = "*" + QueryParser.escape(referenceSubDivisionFilter) + "*";
+    if(referenceSubDivisionSearchTerm != null) {
+      referenceSubDivisionSearchTerm = "*" + QueryParser.escape(referenceSubDivisionSearchTerm) + "*";
       BooleanQuery subDivisionQuery = new BooleanQuery();
       subDivisionQuery.add(new TermQuery(new Term(FieldName.ReferenceBaseType, ReferenceSubDivisionReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
 
       BooleanQuery subDivisionValuesQuery = new BooleanQuery();
-      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
-      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
-      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
-      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceSubDivisionFilter)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, referenceSubDivisionSearchTerm)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceTitle, referenceSubDivisionSearchTerm)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, referenceSubDivisionSearchTerm)), BooleanClause.Occur.SHOULD);
+      subDivisionValuesQuery.add(new WildcardQuery(new Term(FieldName.ReferenceSubDivisionTitle, referenceSubDivisionSearchTerm)), BooleanClause.Occur.SHOULD);
       subDivisionQuery.add(subDivisionValuesQuery, BooleanClause.Occur.MUST);
 
       query.add(subDivisionQuery, BooleanClause.Occur.MUST);
@@ -1090,6 +1103,23 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     search.fireSearchCompleted();
   }
+
+
+  @Override
+  public void searchFiles(FilesSearch search) {
+    BooleanQuery query = new BooleanQuery();
+    String searchTerm = "*" + QueryParser.escape(search.getSearchTerm().toLowerCase()) + "*";
+
+    if(search.searchFileName())
+      query.add(new WildcardQuery(new Term(FieldName.FileName, searchTerm)), BooleanClause.Occur.SHOULD);
+    if(search.searchFileUri())
+      query.add(new WildcardQuery(new Term(FieldName.FileUri, searchTerm)), BooleanClause.Occur.SHOULD);
+    if(search.searchFileDescription())
+      query.add(new WildcardQuery(new Term(FieldName.FileDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+
+    executeQuery(search, query, FileLink.class, FieldName.FileId, SortOrder.Ascending, FieldName.FileName, FieldName.FileUri);
+  }
+
 
   protected void executeQuery(Search search, Query query, Class<? extends BaseEntity> resultEntityClass, String idFieldName) {
     executeQuery(search, query, resultEntityClass, idFieldName, SortOrder.Unsorted);
@@ -1251,12 +1281,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
       return FieldName.EntryId;
     else if(entity instanceof Tag)
       return FieldName.TagId;
-    else if(entity instanceof Category) // TODO: will they ever be index?
+    else if(entity instanceof Category)
       return FieldName.CategoryId;
     else if(entity instanceof Person)
       return FieldName.PersonId;
     else if(entity instanceof ReferenceBase)
       return FieldName.ReferenceBaseId;
+    else if(entity instanceof FileLink)
+      return FieldName.FileId;
     else if(entity instanceof Note)
       return FieldName.NoteId;
 
