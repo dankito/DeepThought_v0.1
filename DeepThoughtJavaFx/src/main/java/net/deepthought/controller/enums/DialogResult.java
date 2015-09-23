@@ -7,6 +7,8 @@ public enum DialogResult {
 
   Unset,
   Ok,
-  Cancel
+  Cancel,
+  Apply,
+  ApplyAndThenCancel
 
 }

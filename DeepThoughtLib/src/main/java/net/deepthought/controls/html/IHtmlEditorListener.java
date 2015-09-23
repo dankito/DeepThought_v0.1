@@ -1,5 +1,7 @@
 package net.deepthought.controls.html;
 
+import net.deepthought.data.html.ImageElementData;
+
 /**
  * Created by ganymed on 28/08/15.
  */
@@ -13,6 +15,13 @@ public interface IHtmlEditorListener {
    * @return
    */
   boolean handleCommand(HtmlEditor editor, HtmEditorCommand command);
+
+  /**
+   * If a custom Command Double Click handling is desired, return true.
+   * If false is return default Double Click handling is executed.
+   * @return
+   */
+  boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData);
 
   void imageHasBeenDeleted(String imageId, String imageUrl);
 

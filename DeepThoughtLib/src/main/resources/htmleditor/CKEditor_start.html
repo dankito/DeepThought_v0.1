@@ -64,8 +64,13 @@
 	editor.on( 'doubleclick', function( evt ) {
 		var element = evt.data.element;
 
-		if ( element.is( 'table' ) )
-			evt.data.dialog = 'tableProperties';
+		if(typeof app !== 'undefined') {
+			if(app.elementDoubleClicked(element.getOuterHtml())) {
+				evt.data.dialog = '';
+				return false;// when returning false command then won't be executed
+			 }
+		}
+			<!--evt.data.dialog = 'tableProperties';-->
 	} );
 
 	$(window).resize( function() {
@@ -88,71 +93,38 @@
         <!--}-->
   <!--}-->
 
-  	<!-- Trying to prevent that clicks on links are not executed (that means: not navigated to link's target), but doesn't work -->
+  	<!-- Preventing clicks on links to prevent navigation to link's target -->
 
-	  <!--editor.on( 'contentDom', function() {-->
-	  	<!--var isCTRL = false;-->
+	  editor.on( 'contentDom', function() {
+		var editable = editor.editable();
 
-	  	<!--this.document.on('click', function(evt) {-->
-					<!--alert('Clicked');-->
-			<!--var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;-->
-			<!--if (element!=undefined &&  element.is( 'a' ) ) {-->
-				<!--if (evt.preventDefault) {-->
-					<!--alert('calling prevent default');-->
-					<!--evt.preventDefault();-->
-				<!--}-->
-				<!--else {-->
-					<!--alert('Setting returnValue to false');-->
-					<!--evt.returnValue = false;-->
+		var removeListener = editable.attachListener( editable, 'click', function(evt) {
+			var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;
+			if (element!=undefined &&  element.is( 'a' ) ) {
+				if (evt.data.preventDefault) {
+					evt.data.preventDefault();
+				}
+
+				if(evt.data.$.ctrlKey) {
+					<!-- link is opened in a new Tab -->
+					<!--window.open(element.$.href,'_blank');-->
+				}
+			}
+
+			<!-- Notify Java code that an element has been clicked -->
+			<!--if(typeof app !== 'undefined') {-->
+				<!--var data = evt.data.$;-->
+				<!--if(app.elementClicked(data.target.outerHTML, data.button, data.clientX, data.clientY)) {-->
+					<!--evt.preventDefault(true);-->
 					<!--return false;-->
 				<!--}-->
 			<!--}-->
-		<!--}, null, null, 1);-->
+		});
 
-		<!--editor.document.on( 'keyup', function(event) {-->
-			<!--if(event.data.$.keyCode == 17) isCTRL=false;-->
-		<!--});-->
-
-		<!--editor.document.on( 'keydown', function(event) {-->
-			<!--if(event.data.$.keyCode == 17) isCTRL=true;-->
-		<!--});-->
-
-
-		<!--&lt;!&ndash;var editable = editor.editable();&ndash;&gt;-->
-
-		<!--&lt;!&ndash;var removeListener = editable.attachListener( editable, 'click', function(evt) {&ndash;&gt;-->
-			<!--&lt;!&ndash;var isCTRL = false;&ndash;&gt;-->
-			<!--&lt;!&ndash;var element = CKEDITOR.plugins.link.getSelectedLink( editor ) || evt.data.element;&ndash;&gt;-->
-			<!--&lt;!&ndash;if (element!=undefined &&  element.is( 'a' ) ) {&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;if (evt.preventDefault) {&ndash;&gt;&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;alert('calling prevent default');&ndash;&gt;&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;evt.preventDefault();&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;}&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;else {&ndash;&gt;&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;alert('Setting returnValue to false');&ndash;&gt;&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;evt.returnValue = false;&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;}&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;alert('calling prevent default');&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;evt.preventDefault();&ndash;&gt;&ndash;&gt;-->
-
-				<!--&lt;!&ndash;&lt;!&ndash;if(isCTRL)&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;{&ndash;&gt;&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;window.open(element.$.href,'_blank');&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;&lt;!&ndash;}&ndash;&gt;&ndash;&gt;-->
-			<!--&lt;!&ndash;}&ndash;&gt;-->
-
-			<!--&lt;!&ndash;&lt;!&ndash; Notify Java code that an element has been clicked &ndash;&gt;&ndash;&gt;-->
-			<!--&lt;!&ndash;if(typeof app !== 'undefined') {&ndash;&gt;-->
-				<!--&lt;!&ndash;if(app.elementClicked(evt.data.getTarget().$.nodeName)) {&ndash;&gt;-->
-					<!--&lt;!&ndash;&lt;!&ndash;evt.preventDefault(true);&ndash;&gt;&ndash;&gt;-->
-				<!--&lt;!&ndash;}&ndash;&gt;-->
-			<!--&lt;!&ndash;}&ndash;&gt;-->
-		<!--&lt;!&ndash;});&ndash;&gt;-->
-
-	    <!--&lt;!&ndash;editor.on( 'contentDomUnload', function() {&ndash;&gt;-->
-		  <!--&lt;!&ndash;editable.removeAllListeners();&ndash;&gt;-->
-	    <!--&lt;!&ndash;});&ndash;&gt;-->
-	  <!--});-->
+	    editor.on( 'contentDomUnload', function() {
+		  editable.removeAllListeners();
+	    });
+	  });
 
 </script>
 

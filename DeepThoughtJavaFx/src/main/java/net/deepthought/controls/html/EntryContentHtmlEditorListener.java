@@ -4,6 +4,7 @@ import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 
@@ -32,6 +33,17 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
   public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
     if(command == HtmEditorCommand.Image)
       return handleImageCommand(editor);
+    return false;
+  }
+
+  @Override
+  public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+    FileLink file = getEmbeddedFileById(elementData.getFileId());
+    if(file != null) {
+      Dialogs.showEditEmbeddedFileDialog(editor, file, elementData);
+      return true;
+    }
+
     return false;
   }
 
@@ -70,6 +82,15 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
     });
 
     return true;
+  }
+
+  protected FileLink getEmbeddedFileById(long fileId) {
+    for(FileLink file : entry.getFiles()) {
+      if(file.getId().equals(fileId))
+        return file;
+    }
+
+    return null;
   }
 
 

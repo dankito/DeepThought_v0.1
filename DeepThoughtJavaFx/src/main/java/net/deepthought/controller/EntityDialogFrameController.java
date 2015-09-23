@@ -155,12 +155,16 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
+    setDialogResult(DialogResult.Apply);
     saveEntity();
   }
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    closeDialog(DialogResult.Cancel);
+    if(getDialogResult() == DialogResult.Apply)
+      closeDialog(DialogResult.ApplyAndThenCancel);
+    else
+      closeDialog(DialogResult.Cancel);
   }
 
   @FXML

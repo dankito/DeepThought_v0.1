@@ -200,9 +200,26 @@ public class HtmlEditor implements ICleanUp {
     return imagesData;
   }
 
-  public boolean elementClicked(String element) {
+  public boolean elementClicked(String element, int button, int clickX, int clickY) {
     boolean dummy = false;
     return true;
+  }
+
+  public boolean elementDoubleClicked(String element) {
+    if(isImageElement(element)) {
+      List<ImageElementData> imageElements = Application.getHtmlHelper().extractAllImageElementsFromHtml(element);
+      if(imageElements.size() > 0) {
+        ImageElementData imgElement = imageElements.get(0);
+        if(listener != null)
+          return listener.elementDoubleClicked(this, imgElement);
+      }
+    }
+
+    return false;
+  }
+
+  protected boolean isImageElement(String element) {
+    return element != null && element.toLowerCase().startsWith("<img ") && element.contains("class=\"cke_anchor\"") == false;
   }
 
   public boolean beforeCommandExecution(String commandName) {
@@ -227,15 +244,17 @@ public class HtmlEditor implements ICleanUp {
         Long id = Long.parseLong(idString);
 
         if(id.equals(previousElement.getEmbeddingId())) {
-          JSObject createdElement = createNewImageElement(newElement);
-
-          imgNode.call("insertBeforeMe", createdElement);
-          imgNode.call("remove");
+          replaceElementWith(imgNode, createNewImageElement(newElement));
         }
       }
     } catch(Exception ex) {
       log.error("Could not replace <img> element", ex);
     }
+  }
+
+  protected void replaceElementWith(JSObject elementToBeReplaced, JSObject newElement) {
+    elementToBeReplaced.call("insertBeforeMe", newElement);
+    elementToBeReplaced.call("remove");
   }
 
   protected JSObject createNewImageElement(ImageElementData newElement) {

@@ -54,20 +54,20 @@ public class JsoupHtmlHelper implements IHtmlHelper {
   protected ImageElementData parseImgElement(String html, Element imgElement) {
     ImageElementData elementData = new ImageElementData();
 
-    if(imgElement.hasAttr("src"))
-      elementData.setSource(imgElement.attr("src"));
-    if(imgElement.hasAttr("alt"))
-      elementData.setAlt(imgElement.attr("alt"));
+    if(imgElement.hasAttr(ImageElementData.SourceAttributeName))
+      elementData.setSource(imgElement.attr(ImageElementData.SourceAttributeName));
+    if(imgElement.hasAttr(ImageElementData.AltAttributeName))
+      elementData.setAlt(imgElement.attr(ImageElementData.AltAttributeName));
 
-    if(imgElement.hasAttr("imageid"))
-      elementData.setFileId(Long.parseLong(imgElement.attr("imageid")));
-    if(imgElement.hasAttr("embeddingid"))
-      elementData.setEmbeddingId(Long.parseLong(imgElement.attr("embeddingid")));
+    if(imgElement.hasAttr(ImageElementData.ImageIdAttributeName))
+      elementData.setFileId(Long.parseLong(imgElement.attr(ImageElementData.ImageIdAttributeName)));
+    if(imgElement.hasAttr(ImageElementData.EmbeddingIdAttributeName))
+      elementData.setEmbeddingId(Long.parseLong(imgElement.attr(ImageElementData.EmbeddingIdAttributeName)));
 
-    if(imgElement.hasAttr("width"))
-      elementData.setWidth(Integer.parseInt(imgElement.attr("width")));
-    if(imgElement.hasAttr("height"))
-      elementData.setHeight(Integer.parseInt(imgElement.attr("height")));
+    if(imgElement.hasAttr(ImageElementData.WidthAttributeName))
+      elementData.setWidth(Integer.parseInt(imgElement.attr(ImageElementData.WidthAttributeName)));
+    if(imgElement.hasAttr(ImageElementData.HeightAttributeName))
+      elementData.setHeight(Integer.parseInt(imgElement.attr(ImageElementData.HeightAttributeName)));
 
     // there is a bug in JSoup: calling imgElement.outerHtml() returns not real Element's Html. In this case <img> element ends with ' />', but outerHtml() returns '>'
     String outerHtml = imgElement.outerHtml();
