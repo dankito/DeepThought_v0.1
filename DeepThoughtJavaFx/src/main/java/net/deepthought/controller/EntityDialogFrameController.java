@@ -57,6 +57,8 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedChanges = FXCollections.observableSet();
 
+  protected boolean hasApplyBeenPressed = false;
+
 
   @FXML
   protected BorderPane dialogPane;
@@ -155,13 +157,13 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 
   @FXML
   public void handleButtonApplyAction(ActionEvent actionEvent) {
-    setDialogResult(DialogResult.Apply);
+    hasApplyBeenPressed = true;
     saveEntity();
   }
 
   @FXML
   public void handleButtonCancelAction(ActionEvent actionEvent) {
-    if(getDialogResult() == DialogResult.Apply)
+    if(hasApplyBeenPressed)
       closeDialog(DialogResult.ApplyAndThenCancel);
     else
       closeDialog(DialogResult.Cancel);

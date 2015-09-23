@@ -1,17 +1,12 @@
 package net.deepthought.controls.html;
 
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
 
 import java.util.Collection;
-
-import javafx.stage.Stage;
 
 /**
  * Created by ganymed on 22/09/15.
@@ -47,7 +42,7 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
   public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
     FileLink file = getEditedFileById(elementData.getFileId());
     if(file != null) {
-      Dialogs.showEditEmbeddedFileDialog(editor, file, elementData);
+      Dialogs.showEditEmbeddedFileDialog(editor, editedFilesHolder, file, elementData);
       return true;
     }
 
@@ -69,19 +64,7 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
   protected boolean handleImageCommand(HtmlEditor editor) {
     final FileLink newFile = new FileLink();
 
-    Dialogs.showEditEmbeddedFileDialog(editor, newFile, null, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok || controller.getDialogResult() == DialogResult.ApplyAndThenCancel) {
-          editedFilesHolder.addEntityToEntry(newFile);
-        }
-      }
-    });
+    Dialogs.showEditEmbeddedFileDialog(editor, editedFilesHolder, newFile);
 
     return true;
   }

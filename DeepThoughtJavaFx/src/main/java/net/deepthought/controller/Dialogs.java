@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.html.ImageElementData;
@@ -320,18 +321,22 @@ public class Dialogs {
     }
   }
 
-  public static void showEditEmbeddedFileDialog(HtmlEditor editor, FileLink file, ImageElementData imgElement) {
-    showEditEmbeddedFileDialog(editor, file, imgElement, null);
+
+  public static void showEditEmbeddedFileDialog(HtmlEditor editor, IEditedEntitiesHolder<FileLink> editedFiles, FileLink file) {
+    showEditEmbeddedFileDialog(editor, editedFiles, file, null);
   }
 
-  public static void showEditEmbeddedFileDialog(HtmlEditor editor, FileLink file, ImageElementData imgElement, final ChildWindowsControllerListener listener) {
+  public static void showEditEmbeddedFileDialog(HtmlEditor editor, IEditedEntitiesHolder<FileLink> editedFiles, FileLink file, ImageElementData imgElement) {
+    showEditEmbeddedFileDialog(editor, editedFiles, file, imgElement, null);
+  }
+
+  public static void showEditEmbeddedFileDialog(HtmlEditor editor, IEditedEntitiesHolder<FileLink> editedFiles, FileLink file, ImageElementData imgElement, final ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStageForEntityDialog(loader, "EditEmbeddedFileDialog.fxml", StageStyle.UTILITY);
 
-      // Set the file into the controller.
       EditEmbeddedFileDialogController controller = loader.getController();
-      controller.setEditFile(dialogStage, editor, file, imgElement);
+      controller.setEditFile(dialogStage, editor, editedFiles, file, imgElement);
 
       controller.setListener(new ChildWindowsControllerListener() {
         @Override

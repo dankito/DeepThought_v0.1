@@ -49,6 +49,9 @@ public enum FieldWithUnsavedChanges {
   FileFolderLocation,
   FileName,
   FileNotes,
+  FileImageWidth,
+  FileImageHeight,
+  FileImageAlsoAttachToEntity,
 
   ReferenceTitle,
   ReferenceSubTitle,

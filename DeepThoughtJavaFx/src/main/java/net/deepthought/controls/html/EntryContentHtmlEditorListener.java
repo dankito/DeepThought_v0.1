@@ -1,19 +1,21 @@
 package net.deepthought.controls.html;
 
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 
-import javafx.stage.Stage;
+import java.util.HashSet;
+import java.util.Set;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 
 /**
  * Created by ganymed on 22/09/15.
  */
-public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
+public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEditedEntitiesHolder<FileLink> {
 
   protected Entry entry = null;
 
@@ -40,7 +42,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
   public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
     FileLink file = getEmbeddedFileById(elementData.getFileId());
     if(file != null) {
-      Dialogs.showEditEmbeddedFileDialog(editor, file, elementData);
+      Dialogs.showEditEmbeddedFileDialog(editor, this, file, elementData);
       return true;
     }
 
@@ -64,22 +66,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
   protected boolean handleImageCommand(HtmlEditor editor) {
     final FileLink newFile = new FileLink();
 
-    Dialogs.showEditFileDialog(newFile, new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-        if(controller.getDialogResult() == DialogResult.Ok) {
-          if(entry != null) {
-            entry.addFile(newFile);
-            editor.insertHtml("<img src='" + newFile.getUriString() + "' imageid='" + newFile.getId() + "' alt='" + newFile.getDescription() + "'");
-          }
-        }
-      }
-    });
+    Dialogs.showEditEmbeddedFileDialog(editor, this, newFile);
 
     return true;
   }
@@ -102,4 +89,42 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener {
     this.entry = entry;
   }
 
+  @Override
+  public ObservableSet<FileLink> getEditedEntities() {
+    return FXCollections.observableSet(new HashSet<FileLink>(entry.getFiles()));
+  }
+
+  @Override
+  public Set<FileLink> getAddedEntities() {
+    return new HashSet<>();
+  }
+
+  @Override
+  public Set<FileLink> getRemovedEntities() {
+    return new HashSet<>();
+  }
+
+  @Override
+  public void addEntityToEntry(FileLink entity) {
+    if(entry != null)
+      entry.addFile(entity);
+  }
+
+  @Override
+  public void removeEntityFromEntry(FileLink entity) {
+    if(entry != null)
+      entry.removeFile(entity);
+  }
+
+  @Override
+  public boolean containsEditedEntity(FileLink entity) {
+    if(entry != null)
+      return entry.getFiles().contains(entity);
+    return false;
+  }
+
+  @Override
+  public void cleanUp() {
+
+  }
 }

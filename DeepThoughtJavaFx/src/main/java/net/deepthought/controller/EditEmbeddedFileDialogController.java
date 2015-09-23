@@ -5,6 +5,7 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.Alerts;
@@ -19,12 +20,16 @@ import net.deepthought.util.file.listener.FileOperationListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.List;
 import java.util.function.UnaryOperator;
+
+import javax.imageio.ImageIO;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -67,6 +72,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
   protected FileLink file;
 
   protected HtmlEditor editor;
+
+  protected IEditedEntitiesHolder<FileLink> editedFiles;
 
   protected ImageElementData imgElement;
 
@@ -139,19 +146,25 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     spnImageWidth.setEditable(true);
     spnImageWidth.getEditor().setAlignment(Pos.CENTER_RIGHT);
     spnImageWidth.getEditor().setTextFormatter(new TextFormatter<Integer>(new IntegerStringConverter(), ImageElementData.DefaultImageWidth, filter));
-    spnImageWidth.getEditor().textProperty().addListener((observable, oldValue, newValue) -> spnImageWidth.getValueFactory().setValue(Integer.parseInt(newValue)));
     spnImageWidth.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if(imgElement != null)
+      if (imgElement != null)
         updateImageElement();
+    });
+    spnImageWidth.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      spnImageWidth.getValueFactory().setValue(Integer.parseInt(newValue));
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileImageWidth);
     });
 
     spnImageHeight.setEditable(true);
     spnImageHeight.getEditor().setAlignment(Pos.CENTER_RIGHT);
     spnImageHeight.getEditor().setTextFormatter(new TextFormatter<Integer>(new IntegerStringConverter(), ImageElementData.DefaultImageHeight, filter));
-    spnImageHeight.getEditor().textProperty().addListener((observable, oldValue, newValue) -> spnImageHeight.getValueFactory().setValue(Integer.parseInt(newValue)));
     spnImageHeight.valueProperty().addListener((observable, oldValue, newValue) -> {
-      if(imgElement != null)
+      if (imgElement != null)
         updateImageElement();
+    });
+    spnImageHeight.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      spnImageHeight.getValueFactory().setValue(Integer.parseInt(newValue));
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileImageHeight);
     });
 
     txtfldFileName.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -173,6 +186,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       lblHtmlIncompatibleImageTypeSelected.setVisible(false);
       txtfldFileLocation.setStyle(DefaultTextFieldStyle);
 
+      tryToReadImageHeightAndWidth(uri);
+
       updateWindowTitle();
       updateFileName(uri);
 
@@ -187,6 +202,18 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       btnOk.setDisable(true);
       lblHtmlIncompatibleImageTypeSelected.setVisible(true);
       FXUtils.addStyleToCurrentStyle(txtfldFileLocation, "-fx-text-fill: #FF0000;");
+    }
+  }
+
+  protected void tryToReadImageHeightAndWidth(String uri) {
+    try {
+      if(uri.contains("://") == false)
+        uri = "file://" + uri;
+      BufferedImage image = ImageIO.read(new URL(uri));
+      spnImageWidth.getValueFactory().setValue(image.getWidth());
+      spnImageHeight.getValueFactory().setValue(image.getHeight());
+    } catch(Exception ex) {
+      log.warn("Could not load image from uri " + uri, ex);
     }
   }
 
@@ -211,9 +238,10 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     previousUriString = uriString;
   }
 
-  public void setEditFile(Stage dialogStage, HtmlEditor editor, FileLink file, ImageElementData imgElement) {
+  public void setEditFile(Stage dialogStage, HtmlEditor editor, IEditedEntitiesHolder<FileLink> editedFiles, FileLink file, ImageElementData imgElement) {
     this.file = file;
     this.editor = editor;
+    this.editedFiles = editedFiles;
     this.imgElement = imgElement;
     setWindowStage(dialogStage, file);
 
@@ -278,6 +306,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
     if(file.isPersisted() == false)
       Application.getDeepThought().addFile(file);
+    if(editedFiles.containsEditedEntity(file) == false)
+      editedFiles.addEntityToEntry(file);
 
     updateImageElement();
   }
@@ -326,6 +356,9 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       file.setDescription(txtarDescription.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileNotes);
     }
+
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileImageWidth);
+    fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileImageHeight);
   }
 
   protected ImageElementData createImageElement(FileLink file) {
