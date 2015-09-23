@@ -15,27 +15,38 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Notification;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
@@ -59,6 +70,15 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
   protected ToggleButton btnShowHideSearchPane;
 
   protected Button btnAddFile;
+
+
+  @FXML
+  protected TreeTableView<FileLink> trtblvwFiles;
+  @FXML
+  protected TreeTableColumn<FileLink, String> clmFileName;
+  @FXML
+  protected TreeTableColumn<FileLink, String> clmFileUri;
+
 
   protected SearchAndSelectFilesControl searchAndSelectFilesControl;
 
@@ -110,6 +130,8 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
+    ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUp();
+
     if(editedFiles != null) {
       editedFiles.getEditedEntities().removeListener(editedFilesChangedListener);
       editedFiles.cleanUp();
@@ -133,6 +155,51 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     setupTitle();
     this.setExpanded(false);
 
+    VBox contentPane = new VBox();
+
+    clmFileName = new TreeTableColumn<>();
+    JavaFxLocalization.bindTableColumnBaseText(clmFileName, "name");
+    clmFileName.setMinWidth(Region.USE_PREF_SIZE);
+    clmFileName.setPrefWidth(280);
+    clmFileName.setMaxWidth(Double.MAX_VALUE);
+
+    clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
+//    clmFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+//      @Override
+//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+//        return new FileTreeTableCell(editedFilesHolder);
+//      }
+//    });
+
+    clmFileUri = new TreeTableColumn<>();
+    JavaFxLocalization.bindTableColumnBaseText(clmFileName, "uri");
+    clmFileUri.setMinWidth(Region.USE_PREF_SIZE);
+    clmFileUri.setPrefWidth(600);
+    clmFileUri.setMaxWidth(Double.MAX_VALUE);
+
+    clmFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
+
+    trtblvwFiles = new TreeTableView<>();
+    trtblvwFiles.setShowRoot(false);
+    trtblvwFiles.setRoot(new FileRootTreeItem(editedFiles));
+    trtblvwFiles.getColumns().add(clmFileName);
+    trtblvwFiles.getColumns().add(clmFileUri);
+    trtblvwFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    trtblvwFiles.setMinHeight(150);
+    trtblvwFiles.setMaxHeight(Double.MAX_VALUE);
+
+    trtblvwFiles.setOnKeyPressed(event -> {
+      if (event.getCode() == KeyCode.DELETE) {
+        removeSelectedFiles();
+        event.consume();
+      }
+    });
+
+    contentPane.getChildren().add(trtblvwFiles);
+
     searchAndSelectFilesControl = new SearchAndSelectFilesControl(editedFiles);
 //    searchAndSelectFilesControl.setPrefHeight(250);
 //    searchAndSelectFilesControl.setMaxHeight(200);
@@ -140,7 +207,10 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 
     searchAndSelectFilesControl.paneSearchFiles.visibleProperty().bind(btnShowHideSearchPane.selectedProperty());
 
-    this.setContent(searchAndSelectFilesControl);
+    contentPane.getChildren().add(searchAndSelectFilesControl);
+    VBox.setMargin(searchAndSelectFilesControl, new Insets(8, 0, 0, 0));
+
+    this.setContent(contentPane);
   }
 
   protected void setupTitle() {
@@ -190,10 +260,32 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     titlePane.getChildren().add(btnShowHideSearchPane);
     HBox.setMargin(btnShowHideSearchPane, new Insets(0, 0, 0, 4));
 
+    btnShowHideSearchPane.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == true && isExpanded() == false)
+        setExpanded(true);
+    });
+
     setTitle(titlePane);
 
     if(editedFiles != null)
       updateFilesSetOnEntityPreview();
+  }
+
+  protected void removeSelectedFiles() {
+    for(FileLink selectedFile : getSelectedFiles()) {
+      if (editedFiles != null && editedFiles.containsEditedEntity(selectedFile))
+        editedFiles.removeEntityFromEntry(selectedFile);
+    }
+  }
+
+  protected Collection<FileLink> getSelectedFiles() {
+    Collection<FileLink> selectedFiles = new ArrayList<>(); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
+
+    for(TreeItem<FileLink> item : trtblvwFiles.getSelectionModel().getSelectedItems()) {
+      selectedFiles.add(item.getValue());
+    }
+
+    return selectedFiles;
   }
 
   protected void updateFilesSetOnEntityPreview() {

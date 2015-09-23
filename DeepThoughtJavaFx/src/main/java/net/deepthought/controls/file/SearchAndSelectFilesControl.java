@@ -54,19 +54,8 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
   protected DeepThought deepThought = null;
 
-  protected LazyLoadingObservableList<Person> listViewPersonsItems;
-
   protected FilesSearch lastFilesSearch = null;
 
-  protected List<PersonListCell> personListCells = new ArrayList<>();
-
-
-  @FXML
-  protected TreeTableView<FileLink> trtblvwFiles;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmFileName;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmFileUri;
 
   @FXML
   protected VBox paneSearchFiles;
@@ -119,13 +108,7 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
-    for(PersonListCell cell : personListCells)
-      cell.cleanUp();
-    personListCells.clear();
-
-    ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUp();
-
-    ((FileRootTreeItem)trtblvwSearchResults.getRoot()).cleanUp();
+    ((FileSearchResultsRootTreeItem)trtblvwSearchResults.getRoot()).cleanUp();
 
     editedFilesHolder = null;
   }
@@ -143,25 +126,6 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
   }
 
   protected void setupControl() {
-    clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
-//    clmFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-//      @Override
-//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-//        return new FileTreeTableCell(editedFilesHolder);
-//      }
-//    });
-    clmFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
-
-    trtblvwFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    trtblvwFiles.setOnKeyPressed(event -> {
-      if (event.getCode() == KeyCode.DELETE) {
-        deleteSelectedFiles();
-        event.consume();
-      }
-    });
-
     txtfldSearchForFiles = (CustomTextField) TextFields.createClearableTextField();
     paneSearchBar.getChildren().add(1, txtfldSearchForFiles);
     HBox.setHgrow(txtfldSearchForFiles, Priority.ALWAYS);
@@ -180,8 +144,6 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
       }
     });
 
-    trtblvwFiles.setRoot(new FileRootTreeItem(editedFilesHolder));
-
 
     clmSearchResultFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
         new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
@@ -193,6 +155,10 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     trtblvwSearchResults.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ENTER) {
         toggleSelectedFilesAffiliation();
+        event.consume();
+      }
+      else if (event.getCode() == KeyCode.DELETE) {
+        deleteSelectedFiles();
         event.consume();
       }
     });
@@ -235,7 +201,7 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
   protected Collection<FileLink> getSelectedFiles() {
     Collection<FileLink> selectedFiles = new ArrayList<>(); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
 
-    for(TreeItem<FileLink> item : trtblvwFiles.getSelectionModel().getSelectedItems()) {
+    for(TreeItem<FileLink> item : trtblvwSearchResults.getSelectionModel().getSelectedItems()) {
       selectedFiles.add(item.getValue());
     }
 
