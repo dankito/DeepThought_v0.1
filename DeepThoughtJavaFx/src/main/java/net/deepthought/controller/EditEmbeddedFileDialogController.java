@@ -3,6 +3,7 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
@@ -36,20 +37,19 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
@@ -59,7 +59,9 @@ import javafx.util.converter.IntegerStringConverter;
  */
 public class EditEmbeddedFileDialogController extends EntityDialogFrameController implements Initializable {
 
-  public final static Background WrongFileTypeEnteredBackground = new Background(new BackgroundFill(Color.RED, new CornerRadii(4), new Insets(0)));
+  protected final static ImageView LockClosedIcon = new ImageView(Constants.LockClosedIconPath);
+
+  protected final static ImageView LockOpenedIcon = new ImageView(Constants.LockOpenedIconPath);
 
   public static Background DefaultBackground;
 
@@ -79,6 +81,10 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
   protected String previousUriString = null;
 
+  protected int originalImageWidth = ImageElementData.DefaultImageWidth;
+  protected int originalImageHeight = ImageElementData.DefaultImageHeight;
+  protected double ratio = (double)ImageElementData.DefaultImageWidth / ImageElementData.DefaultImageHeight;
+
 
   @FXML
   protected Pane pnFileSettings;
@@ -91,6 +97,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
   @FXML
   protected Spinner<Integer> spnImageWidth;
+  @FXML
+  protected ToggleButton tglbtnPreserveImageRatio;
   @FXML
   protected Spinner<Integer> spnImageHeight;
   @FXML
@@ -124,6 +132,15 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
     JavaFxLocalization.bindControlToolTip(lblHtmlIncompatibleImageTypeSelected, "incompatible.html.image");
 
+    tglbtnPreserveImageRatio.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    tglbtnPreserveImageRatio.setGraphic(LockClosedIcon);
+    tglbtnPreserveImageRatio.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == true)
+        tglbtnPreserveImageRatio.setGraphic(LockClosedIcon);
+      else
+        tglbtnPreserveImageRatio.setGraphic(LockOpenedIcon);
+    });
+
     // TODO: prevent that in txtfldImageWidth and txtfldImageWidth other symbols than figures can be entered
 
     NumberFormat format = NumberFormat.getIntegerInstance();
@@ -150,6 +167,10 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       if (imgElement != null)
         updateImageElement();
     });
+    spnImageWidth.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == false && tglbtnPreserveImageRatio.isSelected())
+        spnImageHeight.getValueFactory().setValue((int) (spnImageWidth.getValue() / ratio));
+    });
     spnImageWidth.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       spnImageWidth.getValueFactory().setValue(Integer.parseInt(newValue));
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileImageWidth);
@@ -161,6 +182,10 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     spnImageHeight.valueProperty().addListener((observable, oldValue, newValue) -> {
       if (imgElement != null)
         updateImageElement();
+    });
+    spnImageHeight.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == false && tglbtnPreserveImageRatio.isSelected())
+        spnImageWidth.getValueFactory().setValue((int) (spnImageHeight.getValue() * ratio));
     });
     spnImageHeight.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
       spnImageHeight.getValueFactory().setValue(Integer.parseInt(newValue));
@@ -210,11 +235,17 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       if(uri.contains("://") == false)
         uri = "file://" + uri;
       BufferedImage image = ImageIO.read(new URL(uri));
-      spnImageWidth.getValueFactory().setValue(image.getWidth());
-      spnImageHeight.getValueFactory().setValue(image.getHeight());
+
+      originalImageWidth = image.getWidth();
+      spnImageWidth.getValueFactory().setValue(originalImageWidth);
+
+      originalImageHeight = image.getHeight();
+      spnImageHeight.getValueFactory().setValue(originalImageHeight);
     } catch(Exception ex) {
       log.warn("Could not load image from uri " + uri, ex);
     }
+
+    ratio = (double)originalImageWidth / originalImageHeight;
   }
 
   protected void updateFileName(String uriString) {

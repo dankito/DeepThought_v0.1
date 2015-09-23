@@ -31,6 +31,10 @@ public class Constants {
 
   public final static String WindowIconPath = "icons/window_icon_16x16.png";
 
+  public final static String LockClosedIconPath = "icons/lock_closed_icon_24x24.png";
+
+  public final static String LockOpenedIconPath = "icons/lock_opened_icon_24x24.png";
+
 
   public final static String AndroidIconPath = "icons/os/android_icon.png";
   public final static String AndroidLogoPath = "icons/os/android_logo.png";
