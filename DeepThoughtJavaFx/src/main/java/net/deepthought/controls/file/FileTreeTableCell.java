@@ -15,6 +15,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -37,6 +38,8 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
   protected IEditedEntitiesHolder<FileLink> editedFiles = null;
 
   protected HBox graphicPane = new HBox();
+
+  protected CheckBox isOnEntityCheckBox = new CheckBox();
 
   protected Label fileNameLabel = new Label();
 
@@ -82,11 +85,13 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
     HBox.setHgrow(fileNameLabel, Priority.ALWAYS);
-    HBox.setMargin(fileNameLabel, new Insets(0, 6, 0, 0));
+    HBox.setMargin(fileNameLabel, new Insets(0, 6, 0, 6));
     HBox.setMargin(removeFileButton, new Insets(0, 6, 0, 0));
     HBox.setMargin(editFileButton, new Insets(0, 6, 0, 0));
     HBox.setMargin(saveFileAsButton, new Insets(0, 6, 0, 0));
     HBox.setMargin(showFileInFileManagerButton, new Insets(0, 6, 0, 0));
+
+//    graphicPane.getChildren().add(isOnEntityCheckBox);
 
     fileNameLabel.setMaxWidth(Double.MAX_VALUE);
     graphicPane.getChildren().add(fileNameLabel);

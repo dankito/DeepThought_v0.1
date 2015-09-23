@@ -13,7 +13,7 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.Search;
+import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Notification;
@@ -56,7 +56,7 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
   protected LazyLoadingObservableList<Person> listViewPersonsItems;
 
-  protected Search<Person> lastPersonsSearch = null;
+  protected FilesSearch lastFilesSearch = null;
 
   protected List<PersonListCell> personListCells = new ArrayList<>();
 
@@ -76,6 +76,8 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
   protected TextField txtfldSearchForFiles;
   @FXML
   protected TreeTableView<FileLink> trtblvwSearchResults;
+
+  protected FileSearchResultsRootTreeItem searchResultsRootTreeItem;
   @FXML
   protected TreeTableColumn<FileLink, String> clmSearchResultFileName;
   @FXML
@@ -117,13 +119,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
-    listViewPersonsItems.clear();
-
     for(PersonListCell cell : personListCells)
       cell.cleanUp();
     personListCells.clear();
 
     ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUp();
+
+    ((FileRootTreeItem)trtblvwSearchResults.getRoot()).cleanUp();
 
     editedFilesHolder = null;
   }
@@ -134,33 +136,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
     this.deepThought = newDeepThought;
 
-    listViewPersonsItems.clear();
-
     if(newDeepThought != null) {
       newDeepThought.addEntityListener(deepThoughtListener);
-      resetListViewAllPersonsItems();
+      resetListViewSearchResultsItems();
     }
   }
 
   protected void setupControl() {
-    txtfldSearchForFiles = (CustomTextField) TextFields.createClearableTextField();
-    paneSearchBar.getChildren().add(1, txtfldSearchForFiles);
-    HBox.setHgrow(txtfldSearchForFiles, Priority.ALWAYS);
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForFiles, "search.files.prompt.text");
-    txtfldSearchForFiles.textProperty().addListener(new ChangeListener<String>() {
-      @Override
-      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-        searchFiles();
-      }
-    });
-    txtfldSearchForFiles.setOnAction((event) -> handleTextFieldSearchFilesAction());
-    txtfldSearchForFiles.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.ESCAPE) {
-        txtfldSearchForFiles.clear();
-        event.consume();
-      }
-    });
-
     clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
         new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
 //    clmFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
@@ -176,6 +158,24 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     trtblvwFiles.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedFiles();
+        event.consume();
+      }
+    });
+
+    txtfldSearchForFiles = (CustomTextField) TextFields.createClearableTextField();
+    paneSearchBar.getChildren().add(1, txtfldSearchForFiles);
+    HBox.setHgrow(txtfldSearchForFiles, Priority.ALWAYS);
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForFiles, "search.files.prompt.text");
+    txtfldSearchForFiles.textProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+        searchFiles();
+      }
+    });
+    txtfldSearchForFiles.setOnAction((event) -> handleTextFieldSearchFilesAction());
+    txtfldSearchForFiles.setOnKeyReleased(event -> {
+      if (event.getCode() == KeyCode.ESCAPE) {
+        txtfldSearchForFiles.clear();
         event.consume();
       }
     });
@@ -197,10 +197,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
       }
     });
 
-    trtblvwSearchResults.setRoot(new FileRootTreeItem(editedFilesHolder));
+    searchResultsRootTreeItem = new FileSearchResultsRootTreeItem(editedFilesHolder);
+    trtblvwSearchResults.setRoot(searchResultsRootTreeItem);
 
     setSearchPaneVisibility(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSearchFiles);
+
+    resetListViewSearchResultsItems();
   }
 
   public void setSearchPaneVisibility(boolean isVisible) {
@@ -241,13 +244,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
 
   protected void searchFiles() {
-    if(lastPersonsSearch != null && lastPersonsSearch.isCompleted() == false)
-      lastPersonsSearch.interrupt();
+    if(lastFilesSearch != null && lastFilesSearch.isCompleted() == false)
+      lastFilesSearch.interrupt();
 
-    lastPersonsSearch = new Search<>(txtfldSearchForFiles.getText(), (results) -> {
-      listViewPersonsItems.setUnderlyingCollection(results);
+    lastFilesSearch = new FilesSearch(txtfldSearchForFiles.getText(), (results) -> {
+      searchResultsRootTreeItem.setSearchResults(results);
     });
-    Application.getSearchEngine().searchPersons(lastPersonsSearch);
+    Application.getSearchEngine().searchFiles(lastFilesSearch);
   }
 
 
@@ -277,27 +280,27 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
+      if(collection == deepThought.getFiles()) {
+        resetListViewSearchResultsItems();
       }
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
+      if(collection == deepThought.getFiles()) {
+        resetListViewSearchResultsItems();
       }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getPersons()) {
-        resetListViewAllPersonsItems();
+      if(collection == deepThought.getFiles()) {
+        resetListViewSearchResultsItems();
       }
     }
   };
 
-  protected void resetListViewAllPersonsItems() {
+  protected void resetListViewSearchResultsItems() {
     searchFiles();
   }
 
