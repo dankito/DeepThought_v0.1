@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controller.enums.FileLinkOptions;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.file.SearchAndSelectFilesControl;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
@@ -13,6 +14,7 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
@@ -37,11 +39,13 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -50,6 +54,7 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
@@ -89,7 +94,14 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
   @FXML
   protected Pane pnFileSettings;
   @FXML
+  protected VBox upperPane;
+  @FXML
   protected TextField txtfldFileLocation;
+  @FXML
+  protected ToggleButton tglbtnShowSearchPane;
+
+  protected SearchAndSelectFilesControl searchAndSelectFilesControl;
+
   @FXML
   protected ComboBox<FileLinkOptions> cmbxLocalFileLinkOptions;
   @FXML
@@ -126,6 +138,17 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     txtfldFileLocation.textProperty().addListener((observable, oldValue, newValue) -> {
       fileLocationChanged();
     });
+
+    searchAndSelectFilesControl = new SearchAndSelectFilesControl(SelectionMode.SINGLE, event -> setSelectedFile(event.getSelectedEntity()));
+    searchAndSelectFilesControl.setVisible(false);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectFilesControl);
+    upperPane.getChildren().add(1, searchAndSelectFilesControl);
+    VBox.setMargin(searchAndSelectFilesControl, new Insets(6, 0, 6, 0));
+
+    searchAndSelectFilesControl.visibleProperty().bind(tglbtnShowSearchPane.selectedProperty());
+
+    tglbtnShowSearchPane.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+    tglbtnShowSearchPane.setGraphic(new ImageView(Constants.SearchIconPath));
 
     cmbxLocalFileLinkOptions.setItems(FXCollections.observableArrayList(FileLinkOptions.values()));
     cmbxLocalFileLinkOptions.getSelectionModel().select(FileLinkOptions.Link);
@@ -200,6 +223,11 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     txtarDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
   }
 
+  protected void setSelectedFile(FileLink selectedFile) {
+    this.file = selectedFile;
+    fileToEditSet(file, null);
+  }
+
   protected void fileLocationChanged() {
     fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileFileLocation);
 
@@ -232,7 +260,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
   protected void tryToReadImageHeightAndWidth(String uri) {
     try {
-      if(uri.contains("://") == false)
+      if(uri.contains("://") == false) // TODO: is it absolutely certain that it's then a local file?
         uri = "file://" + uri;
       BufferedImage image = ImageIO.read(new URL(uri));
 
@@ -274,6 +302,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
     this.editor = editor;
     this.editedFiles = editedFiles;
     this.imgElement = imgElement;
+
     setWindowStage(dialogStage, file);
 
     fileToEditSet(file, imgElement);
@@ -289,9 +318,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       spnImageWidth.getValueFactory().setValue(imgElement.getWidth());
       spnImageHeight.getValueFactory().setValue(imgElement.getHeight());
     }
-    else {
-      spnImageWidth.getValueFactory().setValue(ImageElementData.DefaultImageWidth);
-      spnImageHeight.getValueFactory().setValue(ImageElementData.DefaultImageHeight);
+    else if(StringUtils.isNotNullOrEmpty(file.getUriString())) {
+      tryToReadImageHeightAndWidth(file.getUriString());
     }
 
     txtarDescription.setText(file.getDescription());
@@ -387,6 +415,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       file.setDescription(txtarDescription.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileNotes);
     }
+
+    file.setFileType(FileUtils.getFileType(file));
 
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileImageWidth);
     fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileImageHeight);

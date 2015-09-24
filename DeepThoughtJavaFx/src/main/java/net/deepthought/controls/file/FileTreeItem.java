@@ -24,7 +24,7 @@ public class FileTreeItem extends TreeItem<FileLink> {
     super(file);
     this.file = file;
 
-    if(file.isFolder()) {
+    if(file.isFolder()) { // TODO: implement lazy loading
       try {
         File folder = new File(file.getUriString());
         for(File folderFile : folder.listFiles())

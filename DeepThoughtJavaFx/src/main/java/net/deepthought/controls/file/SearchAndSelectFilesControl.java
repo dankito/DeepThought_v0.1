@@ -3,8 +3,10 @@ package net.deepthought.controls.file;
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanUp;
-import net.deepthought.controls.LazyLoadingObservableList;
-import net.deepthought.controls.person.PersonListCell;
+import net.deepthought.controls.event.EntitySelectedEvent;
+import net.deepthought.controls.event.IMouseAndKeyEventReceiver;
+import net.deepthought.controls.file.cells.FileSearchResultFileNameTreeTableCell;
+import net.deepthought.controls.file.cells.FileSearchResultUriTreeTableCell;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
@@ -31,30 +33,39 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.util.Callback;
 
 /**
  * Created by ganymed on 01/02/15.
  */
-public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
+public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEventReceiver, ICleanUp {
 
   protected final static Logger log = LoggerFactory.getLogger(SearchAndSelectFilesControl.class);
 
 
-  protected IEditedEntitiesHolder<FileLink> editedFilesHolder = null;
-
   protected DeepThought deepThought = null;
 
   protected FilesSearch lastFilesSearch = null;
+
+  protected IEditedEntitiesHolder<FileLink> editedFilesHolder = null;
+
+  protected EventHandler<EntitySelectedEvent<FileLink>> entitySelectedEventHandler = null;
 
 
   @FXML
@@ -88,6 +99,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     }
   }
 
+  public SearchAndSelectFilesControl(SelectionMode selectionMode, EventHandler<EntitySelectedEvent<FileLink>> entitySelectedEventHandler) {
+    this(null);
+
+    this.entitySelectedEventHandler = entitySelectedEventHandler;
+    trtblvwSearchResults.getSelectionModel().setSelectionMode(selectionMode);
+  }
+
   protected ApplicationListener applicationListener = new ApplicationListener() {
     @Override
     public void deepThoughtChanged(DeepThought deepThought) {
@@ -111,6 +129,7 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     ((FileSearchResultsRootTreeItem)trtblvwSearchResults.getRoot()).cleanUp();
 
     editedFilesHolder = null;
+    entitySelectedEventHandler = null;
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {
@@ -145,21 +164,37 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     });
 
 
-    clmSearchResultFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
+//    clmSearchResultFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+//        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
+    clmSearchResultFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+      @Override
+      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+        return new FileSearchResultFileNameTreeTableCell();
+      }
+    });
 
-    clmSearchResultFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
+//    clmSearchResultFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+//        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
+    clmSearchResultFileUri.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+      @Override
+      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+        return new FileSearchResultUriTreeTableCell();
+      }
+    });
 
     trtblvwSearchResults.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     trtblvwSearchResults.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ENTER) {
-        toggleSelectedFilesAffiliation();
-        event.consume();
+        enterPressedOrFilesDoubleClicked(event);
       }
       else if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedFiles();
         event.consume();
+      }
+    });
+    trtblvwSearchResults.setOnMouseClicked(event -> {
+      if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+        enterPressedOrFilesDoubleClicked(event);
       }
     });
 
@@ -176,11 +211,20 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
     paneSearchFiles.setVisible(isVisible);
   }
 
+
+  protected void enterPressedOrFilesDoubleClicked(Event event) {
+    fireEntitySelectedEvent();
+    toggleSelectedFilesAffiliation();
+    event.consume();
+  }
+
   protected void toggleFileAffiliation(FileLink file) {
-    if(editedFilesHolder.containsEditedEntity(file))
-      editedFilesHolder.removeEntityFromEntry(file);
-    else
-      editedFilesHolder.addEntityToEntry(file);
+    if(editedFilesHolder != null) {
+      if (editedFilesHolder.containsEditedEntity(file))
+        editedFilesHolder.removeEntityFromEntry(file);
+      else
+        editedFilesHolder.addEntityToEntry(file);
+    }
   }
 
   protected void toggleSelectedFilesAffiliation() {
@@ -191,21 +235,34 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
 
   protected void deleteSelectedFiles() {
     for(FileLink selectedFile : getSelectedFiles()) {
-      if(Alerts.deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(deepThought, selectedFile)) {
-        if(editedFilesHolder != null && editedFilesHolder.containsEditedEntity(selectedFile))
-          editedFilesHolder.removeEntityFromEntry(selectedFile);
-      }
+      deleteFile(selectedFile);
     }
   }
 
-  protected Collection<FileLink> getSelectedFiles() {
-    Collection<FileLink> selectedFiles = new ArrayList<>(); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
+  protected void deleteFile(FileLink selectedFile) {
+    if(Alerts.deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(deepThought, selectedFile)) {
+      if(editedFilesHolder != null && editedFilesHolder.containsEditedEntity(selectedFile))
+        editedFilesHolder.removeEntityFromEntry(selectedFile);
+    }
+  }
+
+  protected List<FileLink> getSelectedFiles() {
+    List<FileLink> selectedFiles = new ArrayList<>(); // make a copy as when multiple Persons are selected after removing first one SelectionModel gets cleared
 
     for(TreeItem<FileLink> item : trtblvwSearchResults.getSelectionModel().getSelectedItems()) {
-      selectedFiles.add(item.getValue());
+      if(item != null) // clearly a bug, how can a 'selected' tree item ever be null?
+        selectedFiles.add(item.getValue());
     }
 
     return selectedFiles;
+  }
+
+  protected void fireEntitySelectedEvent() {
+    if(entitySelectedEventHandler != null) {
+      List<FileLink> selectedFiles = getSelectedFiles();
+      if(selectedFiles.size() > 0)
+        entitySelectedEventHandler.handle(new EntitySelectedEvent<FileLink>(selectedFiles.get(0)));
+    }
   }
 
 
@@ -271,4 +328,13 @@ public class SearchAndSelectFilesControl extends VBox implements ICleanUp {
   }
 
 
+  @Override
+  public void onMouseEvent(MouseEvent event) {
+
+  }
+
+  @Override
+  public void onKeyEvent(KeyEvent event) {
+
+  }
 }

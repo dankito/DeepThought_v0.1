@@ -278,6 +278,8 @@ public class EditFileDialogController extends EntityDialogFrameController implem
       file.setDescription(txtarDescription.getText());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.FileNotes);
     }
+
+    file.setFileType(detectedFileType);
   }
 
   protected void copyFileToDataFolder() {

@@ -65,6 +65,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected EntryCreationResult creationResult = null;
 
   protected EditedEntitiesHolder<FileLink> editedAttachedFiles = null;
+  protected EditedEntitiesHolder<FileLink> editedEmbeddedFiles = null;
+
+
+  protected DeepThoughtFxHtmlEditorListener abstractListener = null;
+
+  protected DeepThoughtFxHtmlEditorListener contentListener = null;
 
 
 
@@ -113,6 +119,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setupControls() {
     super.setupControls();
 
+    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
+    editedEmbeddedFiles = new EditedEntitiesHolder<>(entry.getFiles()); // TODO: set to EmbeddedFiles // no added / removed listener needed as Abstract / Content is updated then anyway
+
     setButtonChooseFieldsToShowVisibility(true);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
@@ -122,6 +131,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     paneTitle.setVisible(false);
     ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
 
+
+
+    abstractListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
@@ -129,6 +141,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     VBox.setVgrow(htmledAbstract, Priority.SOMETIMES);
     VBox.setMargin(htmledAbstract, new Insets(6, 0, 0, 0));
 
+    contentListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
     htmledContent = new CollapsibleHtmlEditor("content", contentListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
     contentPane.getChildren().add(2, htmledContent);
@@ -157,9 +170,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_ENTERED_TARGET, event -> showContextHelpForTarget(event));
     entryPersonsControl.addEventHandler(MouseEvent.MOUSE_EXITED_TARGET, event -> contextHelpControl.showContextHelpForResourceKey("default")); // TODO: remove as soon as other context help texts are
     // implemented
-
-    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
-    contentListener.setEditedFilesHolder(editedAttachedFiles); // TODO: set to editedEmbeddedFiles
 
     filesControl = new FilesControl(editedAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
@@ -545,11 +555,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     }
   };
-
-
-  protected DeepThoughtFxHtmlEditorListener abstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
-
-  protected DeepThoughtFxHtmlEditorListener contentListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
 
 
 }

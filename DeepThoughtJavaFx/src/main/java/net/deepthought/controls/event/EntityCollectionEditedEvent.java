@@ -1,4 +1,4 @@
-package net.deepthought.controls.utils;
+package net.deepthought.controls.event;
 
 import java.util.Collection;
 

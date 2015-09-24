@@ -627,6 +627,12 @@ public class FileUtils {
       destinationFile.createNewFile();
   }
 
+  public static void ensureFolderExists(String folderPath) {
+    File folder = new File(folderPath);
+    if(folder.exists() == false)
+      folder.mkdirs();
+  }
+
   public static boolean deleteFile(String path) {
     return deleteFile(new File(path));
   }
@@ -654,9 +660,35 @@ public class FileUtils {
     }
   }
 
-  public static void ensureFolderExists(String folderPath) {
-    File folder = new File(folderPath);
-    if(folder.exists() == false)
-      folder.mkdirs();
+
+  public static void openFileInOperatingSystemDefaultApplication(FileLink file) {
+    try {
+//        HostServices hostServices = DeepThoughtFx.hostServices();
+//        hostServices.showDocument(file.getUriString());
+
+//        ProcessBuilder.Redirect redirect = ProcessBuilder.Redirect.to(new java.io.File(file.getUriString()));
+      String program = file.getUriString();
+      String arguments = "";
+      File directory = null;
+
+      String os = System.getProperties().getProperty("os.name");
+      log.debug("Running on {}", os);
+      if(os.toLowerCase().contains("linux")) {
+        arguments = program;
+        program = "xdg-open";
+        directory = new File("/");
+      }
+      // TODO: how to start default program on Windows and MacOs?
+
+      ProcessBuilder builder = new ProcessBuilder(program, arguments);
+      builder.directory(directory);
+      Process process = builder.start();
+    } catch(Exception ex) {
+      log.error("Could not show file " + file + " in Operating System's default Application", ex);
+    }
+  }
+
+  public static void showFileInFileManager(FileLink file) {
+    // TODO
   }
 }

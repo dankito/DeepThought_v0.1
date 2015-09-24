@@ -2,6 +2,7 @@ package net.deepthought.controls.html;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.deepthought.controls.utils.EditedEntitiesHolder;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
@@ -13,14 +14,15 @@ import java.util.Collection;
  */
 public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
 
+  protected IEditedEntitiesHolder<FileLink> editedFilesHolder;
+
   protected Collection<FieldWithUnsavedChanges> fieldsWithUnsavedChanges;
 
   protected FieldWithUnsavedChanges fieldToAddOnChanges;
 
-  protected IEditedEntitiesHolder<FileLink> editedFilesHolder;
 
-
-  public DeepThoughtFxHtmlEditorListener(Collection<FieldWithUnsavedChanges> fieldsWithUnsavedChanges, FieldWithUnsavedChanges fieldToAddOnChanges) {
+  public DeepThoughtFxHtmlEditorListener(EditedEntitiesHolder<FileLink> editedFiles, Collection<FieldWithUnsavedChanges> fieldsWithUnsavedChanges, FieldWithUnsavedChanges fieldToAddOnChanges) {
+    this.editedFilesHolder = editedFiles;
     this.fieldsWithUnsavedChanges = fieldsWithUnsavedChanges;
     this.fieldToAddOnChanges = fieldToAddOnChanges;
   }
@@ -79,12 +81,8 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
   }
 
 
-
   public IEditedEntitiesHolder<FileLink> getEditedFilesHolder() {
     return editedFilesHolder;
   }
 
-  public void setEditedFilesHolder(IEditedEntitiesHolder<FileLink> editedFilesHolder) {
-    this.editedFilesHolder = editedFilesHolder;
-  }
 }

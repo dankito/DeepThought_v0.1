@@ -29,7 +29,9 @@ public class FileSearchResultsRootTreeItem extends TreeItem<FileLink> implements
 
   public FileSearchResultsRootTreeItem(IEditedEntitiesHolder<FileLink> editedFiles) {
     this.editedFiles = editedFiles;
-    editedFiles.getEditedEntities().addListener(entryListener);
+
+    if(editedFiles != null)
+      editedFiles.getEditedEntities().addListener(entryListener);
 
     setExpanded(true);
   }
@@ -64,15 +66,7 @@ public class FileSearchResultsRootTreeItem extends TreeItem<FileLink> implements
   protected SetChangeListener<FileLink> entryListener = new SetChangeListener<FileLink>() {
     @Override
     public void onChanged(Change<? extends FileLink> change) {
-      if(change.wasRemoved()) {
-        removeFileFromChildren(change.getElementRemoved());
-        TreeItem.childrenModificationEvent();
-      }
-
-      if(change.wasAdded()) {
-        addFileToChildren(change.getElementAdded());
-        TreeItem.childrenModificationEvent();
-      }
+      TreeItem.childrenModificationEvent(); // TODO: update only if TreeItem represents modified FileLink
     }
   };
 

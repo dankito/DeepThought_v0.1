@@ -1,6 +1,7 @@
 package net.deepthought.controls.utils;
 
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.event.EntityCollectionEditedEvent;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
 import java.util.Collection;

@@ -439,6 +439,12 @@ public class LuceneSearchEngine extends SearchEngineBase {
       for (ReferenceSubDivision subDivision : deepThought.getReferenceSubDivisions())
         indexReferenceSubDivision(subDivision);
 
+      for(Note note : deepThought.getNotes())
+        indexNote(note);
+
+      for(FileLink file : deepThought.getFiles())
+        indexFile(file);
+
       for(IndexWriter indexWriter : indexWriters.values())
         indexWriter.commit();
       log.debug("Done rebuilding Lucene Index.");
@@ -1190,7 +1196,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(entity instanceof UserDataEntity) {
         updateIndexForEntity((UserDataEntity) entity);
-        checkIfEntityIsOnEntry((UserDataEntity)entity);
+        updateEntitysOnEntries((UserDataEntity)entity);
       }
     }
 
@@ -1219,7 +1225,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected boolean isIndexedEntityOnEntry(BaseEntity entity) {
     return entity instanceof Tag || entity instanceof Category || entity instanceof Person || entity instanceof EntryPersonAssociation || entity instanceof Note ||
-        entity instanceof SeriesTitle || entity instanceof Reference || entity instanceof ReferenceSubDivision;
+        entity instanceof SeriesTitle || entity instanceof Reference || entity instanceof ReferenceSubDivision || entity instanceof FileLink;
   }
 
 
@@ -1295,7 +1301,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return null;
   }
 
-  protected void checkIfEntityIsOnEntry(UserDataEntity updatedEntity) {
+  protected void updateEntitysOnEntries(UserDataEntity updatedEntity) {
     if(updatedEntity instanceof Tag) {
       for(Entry entry : ((Tag)updatedEntity).getEntries())
         updateIndexForEntity(entry);

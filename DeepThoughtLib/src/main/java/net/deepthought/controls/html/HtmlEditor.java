@@ -131,6 +131,8 @@ public class HtmlEditor implements ICleanUp {
   }
 
   public void setHtml(String html) {
+    if(html == null)
+      html = "";
     previousHtml = html;
 
     try {
@@ -162,6 +164,7 @@ public class HtmlEditor implements ICleanUp {
   @Override
   public void cleanUp() {
     setListener(null);
+    previousHtml = "";
 
     try {
       JSObject win = (JSObject) scriptExecutor.executeScript("window");

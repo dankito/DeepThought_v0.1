@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
@@ -68,7 +69,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntriesOverviewControl extends SplitPane implements IMainWindowControl {
+public class EntriesOverviewControl extends SplitPane implements IMainWindowControl, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntriesOverviewControl.class);
 
@@ -575,4 +576,9 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   protected EntryContentHtmlEditorListener entryContentListener = new EntryContentHtmlEditorListener();
 
 
+  @Override
+  public void cleanUp() {
+    htmledEntryContent.cleanUp();
+    currentEditedEntryTagsControl.cleanUp();
+  }
 }

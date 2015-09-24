@@ -1,4 +1,4 @@
-package net.deepthought.controls.file;
+package net.deepthought.controls.file.cells;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;

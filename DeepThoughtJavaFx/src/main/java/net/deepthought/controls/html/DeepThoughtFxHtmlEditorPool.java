@@ -1,12 +1,14 @@
 package net.deepthought.controls.html;
 
+import net.deepthought.controls.ICleanUp;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Created by ganymed on 17/09/15.
  */
-public class DeepThoughtFxHtmlEditorPool {
+public class DeepThoughtFxHtmlEditorPool implements ICleanUp {
 
   protected static DeepThoughtFxHtmlEditorPool instance = null;
 
@@ -40,4 +42,9 @@ public class DeepThoughtFxHtmlEditorPool {
     htmlEditor.setListener(null);
   }
 
+  @Override
+  public void cleanUp() {
+    for(DeepThoughtFxHtmlEditor editor : availableHtmlEditors)
+      editor.cleanUp();
+  }
 }

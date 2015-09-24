@@ -8,6 +8,8 @@ import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.file.cells.FileNameTreeTableCell;
+import net.deepthought.controls.file.cells.FileUriTreeTableCell;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.listener.ApplicationListener;
@@ -15,9 +17,9 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Notification;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,10 +40,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -49,6 +53,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 /**
  * Created by ganymed on 01/02/15.
@@ -57,8 +62,6 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 
   protected final static Logger log = LoggerFactory.getLogger(FilesControl.class);
 
-
-  protected FileLink file = null;
 
   protected DeepThought deepThought = null;
 
@@ -163,14 +166,14 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     clmFileName.setPrefWidth(280);
     clmFileName.setMaxWidth(Double.MAX_VALUE);
 
-    clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
-//    clmFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-//      @Override
-//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-//        return new FileTreeTableCell(editedFilesHolder);
-//      }
-//    });
+//    clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+//        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
+    clmFileName.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+      @Override
+      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+        return new FileNameTreeTableCell(editedFiles);
+      }
+    });
 
     clmFileUri = new TreeTableColumn<>();
     JavaFxLocalization.bindTableColumnBaseText(clmFileName, "uri");
@@ -178,8 +181,14 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     clmFileUri.setPrefWidth(600);
     clmFileUri.setMaxWidth(Double.MAX_VALUE);
 
-    clmFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
-        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
+//    clmFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
+//        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
+    clmFileUri.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
+      @Override
+      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
+        return new FileUriTreeTableCell(editedFiles);
+      }
+    });
 
     trtblvwFiles = new TreeTableView<>();
     trtblvwFiles.setShowRoot(false);
@@ -192,9 +201,17 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     trtblvwFiles.setMaxHeight(Double.MAX_VALUE);
 
     trtblvwFiles.setOnKeyPressed(event -> {
-      if (event.getCode() == KeyCode.DELETE) {
+      if(event.getCode() == KeyCode.ENTER) {
+        editOrViewSelectedFile(event);
+      }
+      else if (event.getCode() == KeyCode.DELETE) {
         removeSelectedFiles();
         event.consume();
+      }
+    });
+    trtblvwFiles.setOnMouseClicked(event -> {
+      if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+        editOrViewSelectedFile(event);
       }
     });
 
@@ -261,7 +278,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     HBox.setMargin(btnShowHideSearchPane, new Insets(0, 0, 0, 4));
 
     btnShowHideSearchPane.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue == true && isExpanded() == false)
+      if (newValue == true && isExpanded() == false)
         setExpanded(true);
     });
 
@@ -269,6 +286,28 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 
     if(editedFiles != null)
       updateFilesSetOnEntityPreview();
+  }
+
+
+  protected void editOrViewSelectedFile(Event event) {
+    if(trtblvwFiles.getSelectionModel().getSelectedItem() != null) {
+      FileLink selectedFile = trtblvwFiles.getSelectionModel().getSelectedItem().getValue();
+      if(selectedFile != null) {
+        if (selectedFile.isPersisted() == false) // a Folder sub file, not a file added to Entry
+          viewFile(selectedFile);
+        else
+          showEditFileDialog(selectedFile);
+        event.consume();
+      }
+    }
+  }
+
+  protected void viewFile(FileLink file) {
+    FileUtils.openFileInOperatingSystemDefaultApplication(file);
+  }
+
+  protected void showEditFileDialog(FileLink file) {
+    Dialogs.showEditFileDialog(file);
   }
 
   protected void removeSelectedFiles() {

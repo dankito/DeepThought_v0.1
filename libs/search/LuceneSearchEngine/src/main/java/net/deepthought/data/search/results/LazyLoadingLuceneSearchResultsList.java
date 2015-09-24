@@ -122,20 +122,15 @@ public class LazyLoadingLuceneSearchResultsList<T extends BaseEntity> extends La
 
   @Override
   public Collection<Long> getEntityIds() {
-//    Set<Long> ids = new TreeSet<Long>(new Comparator<Long>() {
-//      @Override
-//      public int compare(Long o1, Long o2) {
-//        return o2.compareTo(o1);
-//      }
-//    });
-//    Set<Long> ids = new HashSet<>();
-    List<Long> ids = new ArrayList<>();
+    List<Long> ids = new ArrayList<>(); // do not use a Set as ids are may already sorted, a Set ruins sort order
 
     try {
       for (int index = 0; index < hits.length; index++) {
 //        ids.add(getEntityIdForIndex(index));
         Document hitDoc = searcher.doc(hits[index].doc);
-        ids.add(hitDoc.getField(idFieldName).numericValue().longValue());
+        Long entityId = hitDoc.getField(idFieldName).numericValue().longValue();
+        if(ids.contains(entityId) == false) // sometimes for an Entity two search results are retrieved, e.g. FileLinks when their Name value is contained in its URI
+          ids.add(entityId);
       }
     } catch(Exception ex) {
       log.error("Could not get all Entity IDs from Lucene Search Result", ex);

@@ -14,6 +14,7 @@ import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
@@ -370,6 +371,9 @@ public class MainWindowController implements Initializable {
     for(Stage openedWindow : Dialogs.getOpenedChildWindows()) {
       openedWindow.close();
     }
+
+    entriesOverviewControl.cleanUp();
+    DeepThoughtFxHtmlEditorPool.getInstance().cleanUp();
   }
 
   private void setStatusLabelText(final String statusText) {

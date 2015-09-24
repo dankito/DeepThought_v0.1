@@ -170,6 +170,10 @@ public class Alerts {
   }
 
 
+  public static boolean deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(FileLink file) {
+    return deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(Application.getDeepThought(), file);
+  }
+
   public static boolean deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(DeepThought deepThought, FileLink file) {
     if(file.hasEntries() || file.hasReferenceBases()) { // TODO: add hasAttachtedEntries()
       boolean confirmDeleteFile = showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(file);

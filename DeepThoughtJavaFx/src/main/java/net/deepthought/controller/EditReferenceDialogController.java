@@ -5,6 +5,7 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
+import net.deepthought.controls.utils.EditedEntitiesHolder;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
@@ -88,6 +89,34 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedSeriesTitleChanges = FXCollections.observableSet();
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceChanges = FXCollections.observableSet();
   protected ObservableSet<FieldWithUnsavedChanges> fieldsWithUnsavedReferenceSubDivisionChanges = FXCollections.observableSet();
+
+
+  protected EditedEntitiesHolder<FileLink> editedSeriesTitleAttachedFiles = null;
+  protected EditedEntitiesHolder<FileLink> editedSeriesTitleEmbeddedFiles = null;
+
+  protected IHtmlEditorListener seriesTitleTableOfContentsListener = null;
+
+  protected IHtmlEditorListener seriesTitleAbstractListener = null;
+
+  protected IHtmlEditorListener seriesTitleNotesListener = null;
+
+
+  protected EditedEntitiesHolder<FileLink> editedReferenceAttachedFiles = null;
+  protected EditedEntitiesHolder<FileLink> editedReferenceEmbeddedFiles = null;
+
+  protected IHtmlEditorListener referenceAbstractListener = null;
+
+  protected IHtmlEditorListener referenceTableOfContentsListener = null;
+
+  protected IHtmlEditorListener referenceNotesListener = null;
+
+
+  protected EditedEntitiesHolder<FileLink> editedReferenceSubDivisionAttachedFiles = null;
+  protected EditedEntitiesHolder<FileLink> editedReferenceSubDivisionEmbeddedFiles = null;
+
+  protected IHtmlEditorListener referenceSubDivisionAbstractListener = null;
+
+  protected IHtmlEditorListener referenceSubDivisionNotesListener = null;
 
 
   @FXML
@@ -284,6 +313,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
+    editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getFiles()); // TODO: set added /removed Event
+    editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getFiles()); // TODO: set to embedded files
+
+    seriesTitleTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleTableOfContents);
+    seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
+    seriesTitleNotesListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleNotes);
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
     paneSeriesTitle.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
 
@@ -373,6 +409,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceControls() {
+    editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getFiles()); // TODO: set added /removed Event
+    editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getFiles()); // TODO: set to embedded files
+
+    referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
+    referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
+    referenceNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
     paneReference.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
 
@@ -479,6 +522,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
+    editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getFiles()); // TODO: set added /removed Event
+    editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getFiles()); // TODO: set to embedded files
+
+    referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
+    referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
     paneReferenceSubDivision.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
 
@@ -682,7 +731,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     htmledReferenceTableOfContents.cleanUp();
     paneReference.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
-    htmledReferenceTableOfContents.cleanUp();
     referencePersonsControl.cleanUp();
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
@@ -1008,13 +1056,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   public void setWindowStageAndReferenceBase(Stage windowStage, ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase) {
     // TODO: if referenceBase != null disallow editing of Entities below referenceBase's Hierarchy (e.g. referenceBase instanceof Reference -> don't allow ReferenceSubDivision editing
     editedReferenceBase = referenceBase;
-    super.setWindowStage(windowStage, referenceBase);
 
     Node nodeToFocus = setReferenceBases(referenceBase, persistedParentReferenceBase);
 
     if(persistedParentReferenceBase != null) {
       nodeToFocus = setPersistedParentReferenceBase(persistedParentReferenceBase, nodeToFocus);
     }
+
+    super.setWindowStage(windowStage, referenceBase);
 
     setupDialog(nodeToFocus);
   }
@@ -1393,24 +1442,5 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     htmledReferenceSubDivisionNotes.setHtml(newValue);
     fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
   }
-
-
-  protected IHtmlEditorListener seriesTitleTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleTableOfContents);
-
-  protected IHtmlEditorListener seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
-
-  protected IHtmlEditorListener seriesTitleNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleNotes);
-
-
-  protected IHtmlEditorListener referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
-
-  protected IHtmlEditorListener referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
-
-  protected IHtmlEditorListener referenceNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
-
-
-  protected IHtmlEditorListener referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
-
-  protected IHtmlEditorListener referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
 
 }

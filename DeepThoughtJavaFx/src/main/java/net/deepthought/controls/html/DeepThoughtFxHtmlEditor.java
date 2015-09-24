@@ -170,7 +170,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   @Override
   public void cleanUp() {
-    htmlEditor.setListener(null);
+    htmlEditor.cleanUp();
   }
 
 }
