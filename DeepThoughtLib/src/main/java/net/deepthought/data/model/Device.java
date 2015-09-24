@@ -54,10 +54,10 @@ public class Device extends UserDataEntity {
 //  @JoinColumn(name = TableConfig.DeviceOwnerJoinColumnName)
 //  protected User deviceOwner;
 
-  @ManyToMany(fetch = FetchType.EAGER, mappedBy = "devices") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "devices") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }
   protected Set<User> users = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER, mappedBy = "devices")
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "devices")
   protected Set<Group> groups = new HashSet<>();
 
   @Column(name = TableConfig.DeviceIconColumnName)

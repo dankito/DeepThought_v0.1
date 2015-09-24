@@ -22,7 +22,7 @@ public class ApplicationLanguage extends ExtensibleEnumeration {
   @Column(name = TableConfig.ApplicationLanguageLanguageKeyColumnName)
   protected String languageKey;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ApplicationLanguageDeepThoughtApplicationJoinColumnName)
   protected DeepThoughtApplication application;
 

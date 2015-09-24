@@ -60,7 +60,7 @@ public abstract class ReferenceBase extends UserDataEntity {
 
   protected transient Set<Person> persons = null;
 
-  @ManyToMany(fetch = FetchType.EAGER )
+  @ManyToMany(fetch = FetchType.LAZY )
   @JoinTable(
       name = TableConfig.ReferenceBaseAttachedFileJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName) },
@@ -68,7 +68,7 @@ public abstract class ReferenceBase extends UserDataEntity {
   )
   protected Set<FileLink> attachedFiles = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER )
+  @ManyToMany(fetch = FetchType.LAZY )
   @JoinTable(
       name = TableConfig.ReferenceBaseEmbeddedFileJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseEmbeddedFileJoinTableReferenceBaseIdColumnName) },
@@ -76,7 +76,7 @@ public abstract class ReferenceBase extends UserDataEntity {
   )
   protected Set<FileLink> embeddedFiles = new HashSet<>();
 
-  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.ReferenceBasePreviewImageJoinColumnName)
   protected FileLink previewImage;
 

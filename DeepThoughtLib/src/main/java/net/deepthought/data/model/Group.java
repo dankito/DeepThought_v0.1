@@ -35,10 +35,10 @@ public class Group extends UserDataEntity {
   @Column(name = TableConfig.GroupDescriptionColumnName)
   protected String description = "";
 
-  @ManyToMany(fetch = FetchType.EAGER, mappedBy = "groups") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Entry?
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "groups") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Entry?
   protected Set<User> users = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
   @JoinTable(
       name = TableConfig.GroupDeviceJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.GroupDeviceJoinTableGroupIdColumnName/*, referencedColumnName = "id"*/) },

@@ -65,7 +65,7 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
         TableUtils.createTableIfNotExists(this.connectionSource, entity.getEntityClass());
     }
 
-    if (configuration.getDataBaseCurrentDataModelVersion() == 0)
+    if (configuration.getDataBaseCurrentDataModelVersion() < configuration.getApplicationDataModelVersion())
       Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 

@@ -38,7 +38,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   private static final long serialVersionUID = -7176298227016698447L;
 
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceSeriesTitleJoinColumnName)
   protected SeriesTitle series;
 

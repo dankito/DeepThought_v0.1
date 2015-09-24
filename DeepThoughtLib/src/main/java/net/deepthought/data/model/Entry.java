@@ -90,10 +90,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   protected transient Set<Person> persons = null;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "entry", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "entry", cascade = CascadeType.PERSIST)
   protected Set<Note> notes = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+  @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   @JoinTable(
       name = TableConfig.EntryEntriesLinkGroupJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
@@ -123,15 +123,15 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   // Reference
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntrySeriesTitleJoinColumnName)
   protected SeriesTitle series;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
   @JoinColumn(name = TableConfig.EntryReferenceJoinColumnName)
   protected Reference reference;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.EntryReferenceSubDivisionJoinColumnName)
   protected ReferenceSubDivision referenceSubDivision;
 

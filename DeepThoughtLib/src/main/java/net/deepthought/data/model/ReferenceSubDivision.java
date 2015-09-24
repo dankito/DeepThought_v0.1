@@ -27,7 +27,7 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   private static final long serialVersionUID = -967783983570745569L;
 
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceSubDivisionReferenceJoinColumnName)
   protected Reference reference;
 

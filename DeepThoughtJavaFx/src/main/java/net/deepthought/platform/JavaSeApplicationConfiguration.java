@@ -34,7 +34,7 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   public JavaSeApplicationConfiguration() {
     this.preferencesStore = new JavaSePreferencesStore();
     this.platformConfiguration = new JavaSePlatformConfiguration();
-    this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder());
+    this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder(), preferencesStore.getDatabaseDataModelVersion());
   }
 
 

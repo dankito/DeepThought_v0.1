@@ -38,13 +38,13 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
   @Column(name = TableConfig.DeepThoughtApplicationAutoLogOnLastLoggedOnUserColumnName)
   protected boolean autoLogOnLastLoggedOnUser = false;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "application", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "application", cascade = CascadeType.PERSIST)
   protected Set<User> users = new HashSet<>();
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "application", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "application", cascade = CascadeType.PERSIST)
   protected Set<Group> groups = new HashSet<>();
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "application", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "application", cascade = CascadeType.PERSIST)
   protected Set<Device> devices = new HashSet<>();
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)

@@ -39,7 +39,7 @@ public class ExtensibleEnumeration extends UserDataEntity implements Comparable<
   @Column(name = TableConfig.ExtensibleEnumerationIsDeletableColumnName)
   protected boolean isDeletable;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ExtensibleEnumerationDeepThoughtJoinColumnName)
   protected DeepThought deepThought;
 
