@@ -190,6 +190,14 @@ public class TableConfig {
   public final static String EntryAttachedFilesJoinTableFileLinkIdColumnName = "file_id";
 
 
+  /*          Entry Embedded Files Join Table Config        */
+
+  public final static String EntryEmbeddedFilesJoinTableName = "entry_embedded_files_join_table";
+
+  public final static String EntryEmbeddedFilesJoinTableEntryIdColumnName = "entry_id";
+  public final static String EntryEmbeddedFilesJoinTableFileLinkIdColumnName = "file_id";
+
+
   /*          Entry EntriesLinkGroup Join Table Config        */
 
   public final static String EntryEntriesLinkGroupJoinTableName = "entry_link_group_join_table";

@@ -51,8 +51,8 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
   protected Set<Entry> entriesAttachedTo = new HashSet<>();
 
-//  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
-//  protected Set<Entry> entriesEmbeddedIn = new HashSet<>();
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "embeddedFiles")
+  protected Set<Entry> entriesEmbeddedIn = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
   protected Set<ReferenceBase> referenceBasesAttachedTo = new HashSet<>();
@@ -166,6 +166,33 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
     boolean result = entriesAttachedTo.remove(entry);
     if(result) {
       callEntityRemovedListeners(entriesAttachedTo, entry);
+    }
+
+    return result;
+  }
+
+  public boolean isEmbeddedInEntries() {
+    return getEntriesEmbeddedIn().size() > 0;
+  }
+
+  public Collection<Entry> getEntriesEmbeddedIn() {
+    return entriesEmbeddedIn;
+  }
+
+  protected boolean addAsEmbeddingToEntry(Entry entry) {
+    boolean result = entriesEmbeddedIn.add(entry);
+    if(result) {
+      if(entry.isPersisted())
+        callEntityAddedListeners(entriesEmbeddedIn, entry);
+    }
+
+    return result;
+  }
+
+  protected boolean removeAsEmbeddingFromEntry(Entry entry) {
+    boolean result = entriesEmbeddedIn.remove(entry);
+    if(result) {
+      callEntityRemovedListeners(entriesEmbeddedIn, entry);
     }
 
     return result;

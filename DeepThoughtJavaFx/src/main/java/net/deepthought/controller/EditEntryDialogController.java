@@ -119,8 +119,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setupControls() {
     super.setupControls();
 
-    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getAttachedFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
-    editedEmbeddedFiles = new EditedEntitiesHolder<>(entry.getAttachedFiles()); // TODO: set to EmbeddedFiles // no added / removed listener needed as Abstract / Content is updated then anyway
+    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getAttachedFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAttachedFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryAttachedFiles));
+    editedEmbeddedFiles = new EditedEntitiesHolder<>(entry.getEmbeddedFiles()); // no added / removed listener needed as Abstract / Content is updated then anyway
 
     setButtonChooseFieldsToShowVisibility(true);
 
@@ -415,7 +415,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryCategories);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryFiles)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAttachedFiles)) {
       IEditedEntitiesHolder<FileLink> editedFiles = filesControl.getEditedFiles();
 
       for(FileLink removedFile : editedFiles.getRemovedEntities())
@@ -426,8 +426,16 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
         entry.addAttachedFile(addedFile);
       editedFiles.getAddedEntities().clear();
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryFiles);
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAttachedFiles);
     }
+
+    for(FileLink removedEmbeddedFile : editedEmbeddedFiles.getRemovedEntities())
+      entry.removeEmbeddedFile(removedEmbeddedFile);
+    editedEmbeddedFiles.getRemovedEntities().clear();
+
+    for(FileLink addedEmbeddedFile : editedEmbeddedFiles.getAddedEntities())
+      entry.addEmbeddedFile(addedEmbeddedFile);
+    editedEmbeddedFiles.getAddedEntities().clear();
 
     if(fieldsWithUnsavedChanges.size() > 0) {
       log.warn("We're at end of () method an  still contains unsaved fields:");

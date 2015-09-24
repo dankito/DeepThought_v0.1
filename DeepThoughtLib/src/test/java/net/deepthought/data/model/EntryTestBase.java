@@ -47,9 +47,14 @@ public abstract class EntryTestBase extends DataModelTestBase {
         TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName, linkGroupId);
   }
 
-  protected boolean doesEntryFileLinkJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
+  protected boolean doesEntryAttachedFileJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryAttachedFilesJoinTableName, TableConfig.EntryAttachedFilesJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryAttachedFilesJoinTableFileLinkIdColumnName, fileId);
+  }
+
+  protected boolean doesEntryEmbeddedFileJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
+    return doesJoinTableEntryExist(TableConfig.EntryEmbeddedFilesJoinTableName, TableConfig.EntryEmbeddedFilesJoinTableEntryIdColumnName, entryId,
+        TableConfig.EntryEmbeddedFilesJoinTableFileLinkIdColumnName, fileId);
   }
 
 
@@ -265,6 +270,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry2.addTag(tag2);
     entry2.addTag(tag3);
 
+    // this cannot work right now. Due to caching in static Registry no new Dao is created
     IEntityManager newEntityManager = getEntityManager(configuration);
 //    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
 //    Assert.assertEquals(1, queriedDeepThoughts.size());
@@ -375,7 +381,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry);
 
     entry.addCategory(category1);
-    entry.addCategory(category1);
+    entry.addCategory(category2);
 
     // assert entry really got written to database
     List<Object> joinTableEntries = getJoinTableEntries(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableEntryIdColumnName, entry.getId(),
@@ -930,26 +936,28 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
 
   @Test
-  public void addFile_RelationGetsPersisted() throws Exception {
+  public void addAttachedFile_RelationGetsPersisted() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     Entry entry = new Entry("test", "no content but a file link");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(internetFileAttachment);
 
     entry.addAttachedFile(internetFileAttachment);
 
     // assert FileLink really got written to database
-    Assert.assertTrue(doesEntryFileLinkJoinTableEntryExist(entry.getId(), internetFileAttachment.getId()));
+    Assert.assertTrue(doesEntryAttachedFileJoinTableEntryExist(entry.getId(), internetFileAttachment.getId()));
   }
 
   @Test
-  public void addFile_EntitiesGetAddedToRelatedCollections() throws Exception {
+  public void addAttachedFile_EntitiesGetAddedToRelatedCollections() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     Entry entry = new Entry("test", "no content but a file link");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(internetFileAttachment);
 
     entry.addAttachedFile(internetFileAttachment);
 
@@ -960,12 +968,13 @@ public abstract class EntryTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void removeFile_RelationGetsDeleted() throws Exception {
+  public void removeAttachedFile_RelationGetsDeleted() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     Entry entry = new Entry("test", "no content but a file link");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(internetFileAttachment);
 
     entry.addAttachedFile(internetFileAttachment);
 
@@ -973,7 +982,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.removeFile(internetFileAttachment);
 
     // assert entry really got deleted from database
-    Assert.assertFalse(doesEntryFileLinkJoinTableEntryExist(entry.getId(), internetFileAttachment.getId()));
+    Assert.assertFalse(doesEntryAttachedFileJoinTableEntryExist(entry.getId(), internetFileAttachment.getId()));
 
     Assert.assertFalse(entry.isDeleted());
     Assert.assertTrue(internetFileAttachment.isDeleted());
@@ -981,18 +990,90 @@ public abstract class EntryTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void removeFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
+  public void removeAttachedFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     Entry entry = new Entry("test", "no content but a file link");
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(internetFileAttachment);
 
     entry.addAttachedFile(internetFileAttachment);
 
     entry.removeAttachedFile(internetFileAttachment);
 
     Assert.assertFalse(entry.getAttachedFiles().contains(internetFileAttachment));
+  }
+
+
+  @Test
+  public void addEmbeddedFile_RelationGetsPersisted() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Entry entry = new Entry("test", "no content but a file link");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+    deepThought.addFile(internetFileEmbedding);
+
+    entry.addEmbeddedFile(internetFileEmbedding);
+
+    // assert FileLink really got written to database
+    Assert.assertTrue(doesEntryEmbeddedFileJoinTableEntryExist(entry.getId(), internetFileEmbedding.getId()));
+  }
+
+  @Test
+  public void addEmbeddedFile_EntitiesGetAddedToRelatedCollections() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Entry entry = new Entry("test", "no content but a file link");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+    deepThought.addFile(internetFileEmbedding);
+
+    entry.addEmbeddedFile(internetFileEmbedding);
+
+    Assert.assertEquals(1, entry.getEmbeddedFiles().size());
+    Assert.assertEquals(1, internetFileEmbedding.getEntriesEmbeddedIn().size());
+    Assert.assertEquals(entry, new ArrayList<Entry>(internetFileEmbedding.getEntriesEmbeddedIn()).get(0));
+    Assert.assertEquals(deepThought, internetFileEmbedding.getDeepThought());
+  }
+
+  @Test
+  public void removeEmbeddedFile_RelationGetsDeleted() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Entry entry = new Entry("test", "no content but a file link");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+    deepThought.addFile(internetFileEmbedding);
+
+    entry.addEmbeddedFile(internetFileEmbedding);
+
+    entry.removeEmbeddedFile(internetFileEmbedding);
+    deepThought.removeFile(internetFileEmbedding);
+
+    // assert entry really got deleted from database
+    Assert.assertFalse(doesEntryEmbeddedFileJoinTableEntryExist(entry.getId(), internetFileEmbedding.getId()));
+
+    Assert.assertFalse(entry.isDeleted());
+    Assert.assertTrue(internetFileEmbedding.isDeleted());
+    Assert.assertNull(internetFileEmbedding.getDeepThought());
+  }
+
+  @Test
+  public void removeEmbeddedFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
+    FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Entry entry = new Entry("test", "no content but a file link");
+
+    DeepThought deepThought = Application.getDeepThought();
+    deepThought.addEntry(entry);
+    deepThought.addFile(internetFileAttachment);
+
+    entry.addEmbeddedFile(internetFileAttachment);
+
+    entry.removeEmbeddedFile(internetFileAttachment);
+
+    Assert.assertFalse(entry.getEmbeddedFiles().contains(internetFileAttachment));
   }
 
 

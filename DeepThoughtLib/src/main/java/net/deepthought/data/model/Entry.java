@@ -101,13 +101,21 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   )
   protected Set<EntriesLinkGroup> linkGroups = new HashSet<>();
 
-  @ManyToMany(fetch = FetchType.EAGER )
+  @ManyToMany(fetch = FetchType.LAZY )
   @JoinTable(
       name = TableConfig.EntryAttachedFilesJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.EntryAttachedFilesJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
       inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryAttachedFilesJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<FileLink> attachedFiles = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY )
+  @JoinTable(
+      name = TableConfig.EntryEmbeddedFilesJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.EntryEmbeddedFilesJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEmbeddedFilesJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
+  )
+  protected Set<FileLink> embeddedFiles = new HashSet<>();
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.EntryPreviewImageJoinColumnName)
@@ -714,41 +722,41 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
-//  public boolean hasEmbeddedFiles() {
-//    return attachedFiles.size() > 0;
-//  }
-//
-//  public Collection<FileLink> getEmbeddedFiles() {
-//    return attachedFiles;
-//  }
-//
-//  public boolean addEmbeddedFile(FileLink file) {
-//    if(attachedFiles.contains(file))
-//      return false;
-//
-//    boolean result = attachedFiles.add(file);
-//    if(result) {
-//      file.addEntry(this);
-//
-//      if(file.getDeepThought() == null && this.deepThought != null)
-//        deepThought.addFile(file);
-//
-//      callEntityAddedListeners(attachedFiles, file);
-//    }
-//
-//    return result;
-//  }
-//
-//  public boolean removeEmbeddedFile(FileLink file) {
-//    boolean result = attachedFiles.remove(file);
-//    if(result) {
-//      file.removeAsAttachmentFromEntry(this);
-//
-//      callEntityRemovedListeners(attachedFiles, file);
-//    }
-//
-//    return result;
-//  }
+  public boolean hasEmbeddedFiles() {
+    return embeddedFiles.size() > 0;
+  }
+
+  public Collection<FileLink> getEmbeddedFiles() {
+    return embeddedFiles;
+  }
+
+  public boolean addEmbeddedFile(FileLink file) {
+    if(embeddedFiles.contains(file))
+      return false;
+
+    boolean result = embeddedFiles.add(file);
+    if(result) {
+      file.addAsEmbeddingToEntry(this);
+
+      if(file.getDeepThought() == null && this.deepThought != null)
+        deepThought.addFile(file);
+
+      callEntityAddedListeners(embeddedFiles, file);
+    }
+
+    return result;
+  }
+
+  public boolean removeEmbeddedFile(FileLink file) {
+    boolean result = embeddedFiles.remove(file);
+    if(result) {
+      file.removeAsEmbeddingFromEntry(this);
+
+      callEntityRemovedListeners(embeddedFiles, file);
+    }
+
+    return result;
+  }
 
 
   // TODO: remove again

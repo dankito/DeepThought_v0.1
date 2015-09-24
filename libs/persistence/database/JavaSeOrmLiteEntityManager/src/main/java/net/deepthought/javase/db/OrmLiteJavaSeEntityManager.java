@@ -2,8 +2,10 @@ package net.deepthought.javase.db;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.GenericRawResults;
+import com.j256.ormlite.instances.Instances;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.jpa.EntityConfig;
+import com.j256.ormlite.jpa.Registry;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.StatementExecutor;
 import com.j256.ormlite.table.TableUtils;
@@ -82,7 +84,10 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
       log.error("Could not close database connection", ex);
     }
 
-    mapEntityClassesToDaos.clear();
+    // TODO: try to get rid of these static Registries and Managers, they are only causing troubles (e.g. on Unit Testing where a lot of EntityManager instances are created)
+    Registry.setupRegistry(null, null);
+    Instances.setDaoManager(null);
+    Instances.setFieldTypeCreator(null);
   }
 
 
