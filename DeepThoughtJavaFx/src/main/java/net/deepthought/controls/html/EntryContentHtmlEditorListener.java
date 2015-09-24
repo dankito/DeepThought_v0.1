@@ -54,9 +54,9 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
     if(entry != null) {
       Long fileId = Long.parseLong(imageId);
 
-      for (FileLink file : entry.getFiles()) { // TODO: use embedded files
+      for (FileLink file : entry.getAttachedFiles()) { // TODO: use embedded files
         if (fileId.equals(file.getId())) { // TODO: what if the same image has been inserted multiple times into the document?
-          entry.removeFile(file);
+          entry.removeAttachedFile(file);
           break;
         }
       }
@@ -72,7 +72,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   }
 
   protected FileLink getEmbeddedFileById(long fileId) {
-    for(FileLink file : entry.getFiles()) {
+    for(FileLink file : entry.getAttachedFiles()) {
       if(file.getId().equals(fileId))
         return file;
     }
@@ -91,7 +91,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
 
   @Override
   public ObservableSet<FileLink> getEditedEntities() {
-    return FXCollections.observableSet(new HashSet<FileLink>(entry.getFiles()));
+    return FXCollections.observableSet(new HashSet<FileLink>(entry.getAttachedFiles()));
   }
 
   @Override
@@ -107,19 +107,19 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   @Override
   public void addEntityToEntry(FileLink entity) {
     if(entry != null)
-      entry.addFile(entity);
+      entry.addAttachedFile(entity);
   }
 
   @Override
   public void removeEntityFromEntry(FileLink entity) {
     if(entry != null)
-      entry.removeFile(entity);
+      entry.removeAttachedFile(entity);
   }
 
   @Override
   public boolean containsEditedEntity(FileLink entity) {
     if(entry != null)
-      return entry.getFiles().contains(entity);
+      return entry.getAttachedFiles().contains(entity);
     return false;
   }
 

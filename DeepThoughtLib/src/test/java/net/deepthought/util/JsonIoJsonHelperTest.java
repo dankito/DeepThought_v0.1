@@ -92,7 +92,7 @@ public class JsonIoJsonHelperTest {
       Assert.assertTrue(entry.getCategories().size() > 0);
       Assert.assertTrue(entry.hasTags());
       Assert.assertTrue(entry.getPersons().size() > 0);
-      Assert.assertTrue(entry.getFiles().size() > 0);
+      Assert.assertTrue(entry.getAttachedFiles().size() > 0);
       Assert.assertTrue(entry.getNotes().size() > 0);
 
       Assert.assertTrue(entry.getEntryIndex() > 0);

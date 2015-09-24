@@ -108,9 +108,9 @@ public class DataHelper {
     entry2.addPerson(paech);
     entry3.addPerson(graeber);
 
-    entry1.addFile(new FileLink("dummy"));
-    entry2.addFile(new FileLink("dummy"));
-    entry3.addFile(new FileLink("dummy"));
+    entry1.addAttachedFile(new FileLink("dummy"));
+    entry2.addAttachedFile(new FileLink("dummy"));
+    entry3.addAttachedFile(new FileLink("dummy"));
 
     entry1.addNote(new Note("dummy"));
     entry2.addNote(new Note("dummy"));

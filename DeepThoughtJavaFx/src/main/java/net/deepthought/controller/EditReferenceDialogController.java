@@ -313,8 +313,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
-    editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getFiles()); // TODO: set added /removed Event
-    editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getFiles()); // TODO: set to embedded files
+    editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles()); // TODO: set added /removed Event
+    editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles()); // TODO: set to embedded files
 
     seriesTitleTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
@@ -409,8 +409,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceControls() {
-    editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getFiles()); // TODO: set added /removed Event
-    editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getFiles()); // TODO: set to embedded files
+    editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles()); // TODO: set added /removed Event
+    editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles()); // TODO: set to embedded files
 
     referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
     referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
@@ -522,8 +522,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
-    editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getFiles()); // TODO: set added /removed Event
-    editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getFiles()); // TODO: set to embedded files
+    editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles()); // TODO: set added /removed Event
+    editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles()); // TODO: set to embedded files
 
     referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
@@ -589,7 +589,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
     btnChooseReferenceFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
@@ -602,7 +602,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledReferenceNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnReferenceFiles.setVisible(reference.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnReferenceFiles.setVisible(reference.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
     btnChooseReferenceSubDivisionFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
@@ -616,7 +616,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceSubDivisionOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
 
@@ -896,38 +896,47 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
-    if(seriesTitle != null) {
-      txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
-      txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
+    txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
+    txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
 
-      htmledSeriesTitleAbstract.setHtml(seriesTitle.getAbstract());
-      htmledSeriesTitleTableOfContents.setHtml(seriesTitle.getTableOfContents());
+    htmledSeriesTitleAbstract.setHtml(seriesTitle.getAbstract());
+    htmledSeriesTitleTableOfContents.setHtml(seriesTitle.getTableOfContents());
 
-      txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
+    txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
 
-      htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
+    htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
 
-      seriesTitlePersonsControl.setSeries(seriesTitle);
-    }
-    else {
-      txtfldSeriesTitleTitle.setText("");
-      txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
-
-      htmledSeriesTitleAbstract.setHtml(seriesTitle.getAbstract());
-      htmledSeriesTitleTableOfContents.setHtml(seriesTitle.getTableOfContents());
-
-      txtfldSeriesTitleOnlineAddress.setText(seriesTitle.getOnlineAddress());
-
-      htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
-
-      seriesTitlePersonsControl.setSeries(seriesTitle);
-    }
+    seriesTitlePersonsControl.setSeries(seriesTitle);
 
 //    trtblvwSeriesTitleFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
     fieldsWithUnsavedSeriesTitleChanges.clear();
 
     seriesTitle.addEntityListener(seriesTitleListener);
+    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
+  }
+
+  protected void setReferenceValues(final Reference reference) {
+    txtfldReferenceTitle.setText(reference.getTitle());
+    txtfldReferenceSubTitle.setText(reference.getSubTitle());
+
+    htmledReferenceAbstract.setHtml(reference.getAbstract());
+    htmledReferenceTableOfContents.setHtml(reference.getTableOfContents());
+
+    referencePersonsControl.setReference(reference);
+
+    txtfldReferenceIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
+    dtpckReferencePublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
+
+    txtfldReferenceOnlineAddress.setText(reference.getOnlineAddress());
+
+    htmledReferenceNotes.setHtml(reference.getNotes());
+
+//    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
+
+    fieldsWithUnsavedReferenceChanges.clear();
+
+    reference.addEntityListener(referenceListener);
     dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
@@ -1204,30 +1213,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       nodeToFocus = txtfldReferenceSubDivisionTitle;
     }
     return nodeToFocus;
-  }
-
-  protected void setReferenceValues(final Reference reference) {
-    txtfldReferenceTitle.setText(reference.getTitle());
-    txtfldReferenceSubTitle.setText(reference.getSubTitle());
-
-    htmledReferenceAbstract.setHtml(reference.getAbstract());
-    htmledReferenceTableOfContents.setHtml(reference.getTableOfContents());
-
-    referencePersonsControl.setReference(reference);
-
-    txtfldReferenceIssueOrPublishingDate.setText(reference.getIssueOrPublishingDate());
-    dtpckReferencePublishingDate.setValue(DateConvertUtils.asLocalDate(reference.getPublishingDate()));
-
-    txtfldReferenceOnlineAddress.setText(reference.getOnlineAddress());
-
-    htmledReferenceNotes.setHtml(reference.getNotes());
-
-//    trtblvwFiles.setRoot(new FileRootTreeItem(reference));
-
-    fieldsWithUnsavedReferenceChanges.clear();
-
-    reference.addEntityListener(referenceListener);
-    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
 

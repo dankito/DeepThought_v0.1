@@ -182,12 +182,12 @@ public class TableConfig {
   public final static String EntryCategoryJoinTableCategoryIdColumnName = "category_id";
 
 
-  /*          Entry FileLink Join Table Config        */
+  /*          Entry Attached Files Join Table Config        */
 
-  public final static String EntryFileLinkJoinTableName = "entry_file_link_join_table";
+  public final static String EntryAttachedFilesJoinTableName = "entry_attached_files_join_table";
 
-  public final static String EntryFileLinkJoinTableEntryIdColumnName = "entry_id";
-  public final static String EntryFileLinkJoinTableFileLinkIdColumnName = "file_link_id";
+  public final static String EntryAttachedFilesJoinTableEntryIdColumnName = "entry_id";
+  public final static String EntryAttachedFilesJoinTableFileLinkIdColumnName = "file_id";
 
 
   /*          Entry EntriesLinkGroup Join Table Config        */
@@ -291,12 +291,12 @@ public class TableConfig {
   public final static String ReferenceBasePersonAssociationPersonOrderColumnName = "person_order";
 
 
-  /*          ReferenceBase FileLink Join Table Config        */
+  /*          ReferenceBase AttachedFileL Join Table Config        */
 
-  public final static String ReferenceBaseFileLinkJoinTableName = "reference_base_file_link_join_table";
+  public final static String ReferenceBaseAttachedFileJoinTableName = "reference_base_attached_files_join_table";
 
-  public final static String ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName = "reference_base_id";
-  public final static String ReferenceBaseFileLinkJoinTableFileLinkIdColumnName = "file_link_id";
+  public final static String ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName = "reference_base_id";
+  public final static String ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName = "file_id";
 
 
   /*          SeriesTitle Table Config        */

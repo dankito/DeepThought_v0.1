@@ -683,10 +683,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public boolean removeFile(FileLink file) {
     if(files.remove(file)) {
       file.setDeepThought(null);
-      for(Entry entry : new ArrayList<>(file.getEntries()))
-        file.removeEntry(entry);
-      for(ReferenceBase referenceBase : new ArrayList<>(file.getReferenceBases()))
-        file.removeReferenceBase(referenceBase);
+      for(Entry entry : new ArrayList<>(file.getEntriesAttachedTo()))
+        file.removeAsAttachmentFromEntry(entry);
+      for(ReferenceBase referenceBase : new ArrayList<>(file.getReferenceBasesAttachedTo()))
+        file.removeAsAttachmentFromReferenceBase(referenceBase);
 
       callEntityRemovedListeners(files, file);
       return true;

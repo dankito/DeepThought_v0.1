@@ -175,7 +175,7 @@ public class DefaultDataMerger implements IDataMerger {
 //
 //    if(entity instanceof Entry) {
 //      Entry entry = (Entry)entity;
-//      for(FileLink file : entry.getFiles())
+//      for(FileLink file : entry.getAttachedFiles())
 //        resetEntityAndSubEntitiesIds(file);
 //      for(Note note : entry.getNotes())
 //        resetEntityAndSubEntitiesIds(note);

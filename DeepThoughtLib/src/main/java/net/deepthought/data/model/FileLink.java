@@ -48,15 +48,14 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   @Column(name = TableConfig.FileLinkSourceUriColumnName)
   protected String sourceUriString = "";
 
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = TableConfig.FileLinkEntryJoinColumnName)
-  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "files")
-  protected Set<Entry> entries = new HashSet<>();
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
+  protected Set<Entry> entriesAttachedTo = new HashSet<>();
 
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = TableConfig.FileLinkReferenceBaseJoinColumnName)
-  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "files")
-  protected Set<ReferenceBase> referenceBases = new HashSet<>();
+//  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
+//  protected Set<Entry> entriesEmbeddedIn = new HashSet<>();
+
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
+  protected Set<ReferenceBase> referenceBasesAttachedTo = new HashSet<>();
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.FileLinkDeepThoughtJoinColumnName)
@@ -145,56 +144,56 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   }
 
 
-  public boolean hasEntries() {
-    return getEntries().size() > 0;
+  public boolean isAttachedToEntries() {
+    return getEntriesAttachedTo().size() > 0;
   }
 
-  public Collection<Entry> getEntries() {
-    return entries;
+  public Collection<Entry> getEntriesAttachedTo() {
+    return entriesAttachedTo;
   }
 
-  protected boolean addEntry(Entry entry) {
-    boolean result = entries.add(entry);
+  protected boolean addAsAttachmentToEntry(Entry entry) {
+    boolean result = entriesAttachedTo.add(entry);
     if(result) {
       if(entry.isPersisted())
-        callEntityAddedListeners(entries, entry);
+        callEntityAddedListeners(entriesAttachedTo, entry);
     }
 
     return result;
   }
 
-  protected boolean removeEntry(Entry entry) {
-    boolean result = entries.remove(entry);
+  protected boolean removeAsAttachmentFromEntry(Entry entry) {
+    boolean result = entriesAttachedTo.remove(entry);
     if(result) {
-      callEntityRemovedListeners(entries, entry);
+      callEntityRemovedListeners(entriesAttachedTo, entry);
     }
 
     return result;
   }
 
 
-  public boolean hasReferenceBases() {
-    return getReferenceBases().size() > 0;
+  public boolean isAttachedToReferenceBases() {
+    return getReferenceBasesAttachedTo().size() > 0;
   }
 
-  public Set<ReferenceBase> getReferenceBases() {
-    return referenceBases;
+  public Set<ReferenceBase> getReferenceBasesAttachedTo() {
+    return referenceBasesAttachedTo;
   }
 
-  protected boolean addReferenceBase(ReferenceBase referenceBase) {
-    boolean result = referenceBases.add(referenceBase);
+  protected boolean addAsAttachmentToReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBasesAttachedTo.add(referenceBase);
     if(result) {
       if(referenceBase.isPersisted())
-        callEntityAddedListeners(referenceBases, referenceBase);
+        callEntityAddedListeners(referenceBasesAttachedTo, referenceBase);
     }
 
     return result;
   }
 
-  protected boolean removeReferenceBase(ReferenceBase referenceBase) {
-    boolean result = referenceBases.remove(referenceBase);
+  protected boolean removeAsAttachmentFromReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBasesAttachedTo.remove(referenceBase);
     if(result) {
-      callEntityRemovedListeners(referenceBases, referenceBase);
+      callEntityRemovedListeners(referenceBasesAttachedTo, referenceBase);
     }
 
     return result;

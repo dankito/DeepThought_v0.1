@@ -177,8 +177,8 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   }
 
   @Override
-  public boolean addFile(FileLink file) {
-    if(super.addFile(file)) {
+  public boolean addAttachedFile(FileLink file) {
+    if(super.addAttachedFile(file)) {
       if(file.getDeepThought() == null && this.deepThought != null)
         deepThought.addFile(file);
       return true;

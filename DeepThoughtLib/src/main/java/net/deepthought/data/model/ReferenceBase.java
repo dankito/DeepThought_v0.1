@@ -60,14 +60,13 @@ public abstract class ReferenceBase extends UserDataEntity {
 
   protected transient Set<Person> persons = null;
 
-//  @OneToMany(fetch = FetchType.EAGER, mappedBy = "referenceBase", cascade = CascadeType.PERSIST)
-  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.EAGER )
   @JoinTable(
-      name = TableConfig.ReferenceBaseFileLinkJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseFileLinkJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
+      name = TableConfig.ReferenceBaseAttachedFileJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName) }
   )
-  protected Set<FileLink> files = new HashSet<>();
+  protected Set<FileLink> attachedFiles = new HashSet<>();
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.ReferenceBasePreviewImageJoinColumnName)
@@ -211,31 +210,31 @@ public abstract class ReferenceBase extends UserDataEntity {
   }
 
 
-  public boolean hasFiles() {
-    return files.size() > 0;
+  public boolean hasAttachedFiles() {
+    return attachedFiles.size() > 0;
   }
 
-  public Collection<FileLink> getFiles() {
-    return files;
+  public Collection<FileLink> getAttachedFiles() {
+    return attachedFiles;
   }
 
-  public boolean addFile(FileLink file) {
-    boolean result = files.add(file);
+  public boolean addAttachedFile(FileLink file) {
+    boolean result = attachedFiles.add(file);
     if(result) {
-      file.addReferenceBase(this);
+      file.addAsAttachmentToReferenceBase(this);
 
-      callEntityAddedListeners(files, file);
+      callEntityAddedListeners(attachedFiles, file);
     }
 
     return result;
   }
 
-  public boolean removeFile(FileLink file) {
-    boolean result = files.remove(file);
+  public boolean removeAttachedFile(FileLink file) {
+    boolean result = attachedFiles.remove(file);
     if(result) {
-      file.removeReferenceBase(this);
+      file.removeAsAttachmentFromReferenceBase(this);
 
-      callEntityRemovedListeners(files, file);
+      callEntityRemovedListeners(attachedFiles, file);
     }
 
     return result;

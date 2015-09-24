@@ -276,7 +276,7 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
 
-    referenceBase.addFile(internetFileAttachment);
+    referenceBase.addAttachedFile(internetFileAttachment);
 
     // assert FileLink really got written to database
     Assert.assertTrue(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
@@ -287,9 +287,9 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
 
-    referenceBase.addFile(internetFileAttachment);
+    referenceBase.addAttachedFile(internetFileAttachment);
 
-    Assert.assertEquals(1, referenceBase.getFiles().size());
+    Assert.assertEquals(1, referenceBase.getAttachedFiles().size());
     Assert.assertEquals(Application.getDeepThought(), internetFileAttachment.getDeepThought());
   }
 
@@ -298,9 +298,9 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
 
-    referenceBase.addFile(internetFileAttachment);
+    referenceBase.addAttachedFile(internetFileAttachment);
 
-    referenceBase.removeFile(internetFileAttachment);
+    referenceBase.removeAttachedFile(internetFileAttachment);
 
     // assert file really got deleted from database
     Assert.assertFalse(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
@@ -319,11 +319,11 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
     ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
 
-    referenceBase.addFile(internetFileAttachment);
+    referenceBase.addAttachedFile(internetFileAttachment);
 
-    referenceBase.removeFile(internetFileAttachment);
+    referenceBase.removeAttachedFile(internetFileAttachment);
 
-    Assert.assertFalse(referenceBase.getFiles().contains(internetFileAttachment));
+    Assert.assertFalse(referenceBase.getAttachedFiles().contains(internetFileAttachment));
   }
 
 
@@ -366,8 +366,8 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
   protected boolean doesReferenceBaseFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
-    return doesJoinTableEntryExist(TableConfig.ReferenceBaseFileLinkJoinTableName, TableConfig.ReferenceBaseFileLinkJoinTableReferenceBaseIdColumnName, referenceBaseId,
-        TableConfig.ReferenceBaseFileLinkJoinTableFileLinkIdColumnName, fileId);
+    return doesJoinTableEntryExist(TableConfig.ReferenceBaseAttachedFileJoinTableName, TableConfig.ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName, referenceBaseId,
+        TableConfig.ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName, fileId);
   }
 
 }

@@ -101,14 +101,13 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   )
   protected Set<EntriesLinkGroup> linkGroups = new HashSet<>();
 
-//  @OneToMany(fetch = FetchType.EAGER, mappedBy = "entry", cascade = CascadeType.PERSIST)
-  @ManyToMany(fetch = FetchType.EAGER/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.EAGER )
   @JoinTable(
-      name = TableConfig.EntryFileLinkJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryFileLinkJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryFileLinkJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
+      name = TableConfig.EntryAttachedFilesJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.EntryAttachedFilesJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryAttachedFilesJoinTableFileLinkIdColumnName/*, referencedColumnName = "id"*/) }
   )
-  protected Set<FileLink> files = new HashSet<>();
+  protected Set<FileLink> attachedFiles = new HashSet<>();
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.EntryPreviewImageJoinColumnName)
@@ -678,43 +677,78 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
-  public boolean hasFiles() {
-    return files.size() > 0;
+  public boolean hasAttachedFiles() {
+    return attachedFiles.size() > 0;
   }
 
-  public Collection<FileLink> getFiles() {
-    return files;
+  public Collection<FileLink> getAttachedFiles() {
+    return attachedFiles;
   }
 
-  public boolean addFile(FileLink file) {
-    if(files.contains(file))
+  public boolean addAttachedFile(FileLink file) {
+    if(attachedFiles.contains(file))
       return false;
 
-    boolean result = files.add(file);
+    boolean result = attachedFiles.add(file);
     if(result) {
-      file.addEntry(this);
+      file.addAsAttachmentToEntry(this);
 
       if(file.getDeepThought() == null && this.deepThought != null)
         deepThought.addFile(file);
 
-      callEntityAddedListeners(files, file);
+      callEntityAddedListeners(attachedFiles, file);
     }
 
     return result;
   }
 
-  public boolean removeFile(FileLink file) {
-    boolean result = files.remove(file);
+  public boolean removeAttachedFile(FileLink file) {
+    boolean result = attachedFiles.remove(file);
     if(result) {
-      file.removeEntry(this);
-//      if(deepThought != null)
-//        deepThought.removeFile(file);
+      file.removeAsAttachmentFromEntry(this);
 
-      callEntityRemovedListeners(files, file);
+      callEntityRemovedListeners(attachedFiles, file);
     }
 
     return result;
   }
+
+
+//  public boolean hasEmbeddedFiles() {
+//    return attachedFiles.size() > 0;
+//  }
+//
+//  public Collection<FileLink> getEmbeddedFiles() {
+//    return attachedFiles;
+//  }
+//
+//  public boolean addEmbeddedFile(FileLink file) {
+//    if(attachedFiles.contains(file))
+//      return false;
+//
+//    boolean result = attachedFiles.add(file);
+//    if(result) {
+//      file.addEntry(this);
+//
+//      if(file.getDeepThought() == null && this.deepThought != null)
+//        deepThought.addFile(file);
+//
+//      callEntityAddedListeners(attachedFiles, file);
+//    }
+//
+//    return result;
+//  }
+//
+//  public boolean removeEmbeddedFile(FileLink file) {
+//    boolean result = attachedFiles.remove(file);
+//    if(result) {
+//      file.removeAsAttachmentFromEntry(this);
+//
+//      callEntityRemovedListeners(attachedFiles, file);
+//    }
+//
+//    return result;
+//  }
 
 
   // TODO: remove again

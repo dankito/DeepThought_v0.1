@@ -48,8 +48,8 @@ public abstract class EntryTestBase extends DataModelTestBase {
   }
 
   protected boolean doesEntryFileLinkJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
-    return doesJoinTableEntryExist(TableConfig.EntryFileLinkJoinTableName, TableConfig.EntryFileLinkJoinTableEntryIdColumnName, entryId,
-        TableConfig.EntryFileLinkJoinTableFileLinkIdColumnName, fileId);
+    return doesJoinTableEntryExist(TableConfig.EntryAttachedFilesJoinTableName, TableConfig.EntryAttachedFilesJoinTableEntryIdColumnName, entryId,
+        TableConfig.EntryAttachedFilesJoinTableFileLinkIdColumnName, fileId);
   }
 
 
@@ -937,7 +937,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(internetFileAttachment);
+    entry.addAttachedFile(internetFileAttachment);
 
     // assert FileLink really got written to database
     Assert.assertTrue(doesEntryFileLinkJoinTableEntryExist(entry.getId(), internetFileAttachment.getId()));
@@ -951,11 +951,11 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(internetFileAttachment);
+    entry.addAttachedFile(internetFileAttachment);
 
-    Assert.assertEquals(1, entry.getFiles().size());
-    Assert.assertEquals(1, internetFileAttachment.getEntries().size());
-    Assert.assertEquals(entry, new ArrayList<Entry>(internetFileAttachment.getEntries()).get(0));
+    Assert.assertEquals(1, entry.getAttachedFiles().size());
+    Assert.assertEquals(1, internetFileAttachment.getEntriesAttachedTo().size());
+    Assert.assertEquals(entry, new ArrayList<Entry>(internetFileAttachment.getEntriesAttachedTo()).get(0));
     Assert.assertEquals(deepThought, internetFileAttachment.getDeepThought());
   }
 
@@ -967,9 +967,9 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(internetFileAttachment);
+    entry.addAttachedFile(internetFileAttachment);
 
-    entry.removeFile(internetFileAttachment);
+    entry.removeAttachedFile(internetFileAttachment);
     deepThought.removeFile(internetFileAttachment);
 
     // assert entry really got deleted from database
@@ -988,11 +988,11 @@ public abstract class EntryTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(internetFileAttachment);
+    entry.addAttachedFile(internetFileAttachment);
 
-    entry.removeFile(internetFileAttachment);
+    entry.removeAttachedFile(internetFileAttachment);
 
-    Assert.assertFalse(entry.getFiles().contains(internetFileAttachment));
+    Assert.assertFalse(entry.getAttachedFiles().contains(internetFileAttachment));
   }
 
 

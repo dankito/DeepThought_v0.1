@@ -323,7 +323,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
       public void windowClosing(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
           Entry newEntry = new Entry();
-          newEntry.addFile(newFile);
+          newEntry.addAttachedFile(newFile);
           Dialogs.showEditEntryDialog(newEntry);
         }
       }
@@ -374,7 +374,7 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
           textContentExtractor.createEntryFromUrlAsync(newFile.getUriString(), result -> {
             if (result.successful()) {
               Entry newEntry = result.getCreatedEntry();
-              newEntry.addFile(newFile);
+              newEntry.addAttachedFile(newFile);
               Dialogs.showEditEntryDialog(result);
             } else
               showCouldNotCreateEntryError(result);

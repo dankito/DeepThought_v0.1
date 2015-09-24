@@ -119,8 +119,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setupControls() {
     super.setupControls();
 
-    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
-    editedEmbeddedFiles = new EditedEntitiesHolder<>(entry.getFiles()); // TODO: set to EmbeddedFiles // no added / removed listener needed as Abstract / Content is updated then anyway
+    editedAttachedFiles = new EditedEntitiesHolder<>(entry.getAttachedFiles(), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles), event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryFiles));
+    editedEmbeddedFiles = new EditedEntitiesHolder<>(entry.getAttachedFiles()); // TODO: set to EmbeddedFiles // no added / removed listener needed as Abstract / Content is updated then anyway
 
     setButtonChooseFieldsToShowVisibility(true);
 
@@ -244,7 +244,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 //    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    filesControl.setVisible(entry.hasFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    filesControl.setVisible(entry.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     setButtonChooseFieldsToShowVisibility(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
         entryPersonsControl.isVisible() == false || filesControl.isVisible() == false));
@@ -419,11 +419,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
       IEditedEntitiesHolder<FileLink> editedFiles = filesControl.getEditedFiles();
 
       for(FileLink removedFile : editedFiles.getRemovedEntities())
-        entry.removeFile(removedFile);
+        entry.removeAttachedFile(removedFile);
       editedFiles.getRemovedEntities().clear();
 
       for(FileLink addedFile : editedFiles.getAddedEntities())
-        entry.addFile(addedFile);
+        entry.addAttachedFile(addedFile);
       editedFiles.getAddedEntities().clear();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryFiles);
@@ -482,7 +482,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
       @Override
       public void windowClosed(Stage stage, ChildWindowsController controller) {
         if (controller.getDialogResult() == DialogResult.Ok) {
-          entry.addFile(newFile); // TODO: no, don't add file directly, wait till 'OK' button has been pressed
+          entry.addAttachedFile(newFile); // TODO: no, don't add file directly, wait till 'OK' button has been pressed
         }
       }
     });

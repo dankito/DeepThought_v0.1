@@ -160,7 +160,7 @@ public class EntryCreationResult {
       createdEntry.addPerson(person);
     }
 
-    for(FileLink file : createdEntry.getFiles()) {
+    for(FileLink file : createdEntry.getAttachedFiles()) {
       if(file.isPersisted() == false)
         deepThought.addFile(file);
     }

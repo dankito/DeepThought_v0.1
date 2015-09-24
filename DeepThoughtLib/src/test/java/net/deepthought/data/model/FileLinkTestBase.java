@@ -19,7 +19,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(file);
+    entry.addAttachedFile(file);
 
     String newValue = "/tmp";
     file.setUriString(newValue);
@@ -35,7 +35,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(file);
+    entry.addAttachedFile(file);
 
     String newName = "New name";
     file.setName(newName);
@@ -51,7 +51,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(file);
+    entry.addAttachedFile(file);
 
     boolean newValue = !file.isFolder();
     file.setIsFolder(newValue);
@@ -68,7 +68,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    entry.addFile(file);
+    entry.addAttachedFile(file);
 
     String newValue = "New value";
     file.setDescription(newValue);
