@@ -1196,7 +1196,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(entity instanceof UserDataEntity) {
         updateIndexForEntity((UserDataEntity) entity);
-        updateEntitysOnEntries((UserDataEntity)entity);
+        updateEntitysEntries((UserDataEntity) entity);
       }
     }
 
@@ -1301,34 +1301,36 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return null;
   }
 
-  protected void updateEntitysOnEntries(UserDataEntity updatedEntity) {
-    if(updatedEntity instanceof Tag) {
-      for(Entry entry : ((Tag)updatedEntity).getEntries())
-        updateIndexForEntity(entry);
-    }
-    else if(updatedEntity instanceof Category) {
-      for(Entry entry : ((Category)updatedEntity).getEntries())
-        updateIndexForEntity(entry);
-    }
-    else if(updatedEntity instanceof Person) {
-      for(Entry entry : ((Person)updatedEntity).getAssociatedEntries())
-        updateIndexForEntity(entry);
-    }
-    else if(updatedEntity instanceof Note) {
-      updateIndexForEntity(((Note)updatedEntity).getEntry());
-    }
-    else if(updatedEntity instanceof SeriesTitle) {
-      for(Entry entry : ((SeriesTitle)updatedEntity).getEntries())
-        updateIndexForEntity(entry);
-    }
-    else if(updatedEntity instanceof Reference) {
-      for(Entry entry : ((Reference)updatedEntity).getEntries())
-        updateIndexForEntity(entry);
-    }
-    else if(updatedEntity instanceof ReferenceSubDivision) {
-      for(Entry entry : ((ReferenceSubDivision)updatedEntity).getEntries())
-        updateIndexForEntity(entry);
-    }
+  protected void updateEntitysEntries(UserDataEntity updatedEntity) {
+    // currently for an Entry no information of other Entities are stored in Index. If that changes, uncomment this code again
+
+//    if(updatedEntity instanceof Tag) {
+//      for(Entry entry : ((Tag)updatedEntity).getEntries())
+//        updateIndexForEntity(entry);
+//    }
+//    else if(updatedEntity instanceof Category) {
+//      for(Entry entry : ((Category)updatedEntity).getEntries())
+//        updateIndexForEntity(entry);
+//    }
+//    else if(updatedEntity instanceof Person) {
+//      for(Entry entry : ((Person)updatedEntity).getAssociatedEntries())
+//        updateIndexForEntity(entry);
+//    }
+//    else if(updatedEntity instanceof Note) {
+//      updateIndexForEntity(((Note)updatedEntity).getEntry());
+//    }
+//    else if(updatedEntity instanceof SeriesTitle) {
+//      for(Entry entry : ((SeriesTitle)updatedEntity).getEntries())
+//        updateIndexForEntity(entry);
+//    }
+//    else if(updatedEntity instanceof Reference) {
+//      for(Entry entry : ((Reference)updatedEntity).getEntries())
+//        updateIndexForEntity(entry);
+//    }
+//    else if(updatedEntity instanceof ReferenceSubDivision) {
+//      for(Entry entry : ((ReferenceSubDivision)updatedEntity).getEntries())
+//        updateIndexForEntity(entry);
+//    }
   }
 
 
