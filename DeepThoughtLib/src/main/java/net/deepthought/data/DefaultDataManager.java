@@ -80,7 +80,7 @@ public class DefaultDataManager implements IDataManager {
     Application.getBackupManager().createBackupsForAllRegisteredBackupFileServices();
 
     if(entityManager != null) {
-      if(currentDeepThought != null)
+      if(currentDeepThought != null && Application.hasOnlyReadOnlyAccess() == false)
         entityManager.updateEntity(currentDeepThought);
       entityManager.close();
     }
@@ -184,12 +184,17 @@ public class DefaultDataManager implements IDataManager {
   // Created Entities get persisted immediately
   protected void entityCreated(BaseEntity entity) {
     log.info("Entity {} has been created", entity);
+    if(Application.hasOnlyReadOnlyAccess())
+      return;
+
     entityManager.persistEntity(entity);
   }
 
   // On updated Entities it depends if autoSaveChanges is set to true and after which time changes should be persisted
   protected synchronized void entityUpdated(BaseEntity entity) {
     log.info("Entity {} has been updated", entity);
+    if(Application.hasOnlyReadOnlyAccess())
+      return;
 
     if(getSettings().autoSaveChanges() == true) {
       if (getSettings().getAutoSaveChangesAfterMilliseconds() == 0) // persist modified entities immediately
@@ -207,6 +212,8 @@ public class DefaultDataManager implements IDataManager {
   // Deleted Entities also get persisted immediately (we don't delete any Entities physically, we only set its 'Deleted' flag to true)
   protected void entityDeleted(BaseEntity entity) {
     log.info("Entity {} has been deleted", entity);
+    if(Application.hasOnlyReadOnlyAccess())
+      return;
 
     if(entity instanceof AssociationEntity) { // AssociationEntities really get deleted from Database
       if(entity.isDeleted() == false) {

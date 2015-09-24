@@ -8,6 +8,7 @@ public enum NotificationType {
   Error,
   Info,
   ApplicationInstantiated,
+  HasOnlyReadOnlyAccessToData,
   DeepThoughtsConnectorStarted,
   PluginLoaded,
   LanguageChanged

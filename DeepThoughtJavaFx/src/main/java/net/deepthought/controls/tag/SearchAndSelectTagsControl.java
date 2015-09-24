@@ -135,7 +135,8 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
       newDeepThought.addEntityListener(deepThoughtListener);
     }
 
-    searchTags();
+    if(Application.isInstantiated())
+      searchTags();
   }
 
   protected void setupControl() {

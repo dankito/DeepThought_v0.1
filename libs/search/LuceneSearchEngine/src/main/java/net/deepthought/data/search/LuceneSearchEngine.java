@@ -24,6 +24,8 @@ import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResult;
+import net.deepthought.util.Notification;
+import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
@@ -53,6 +55,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.NumericUtils;
@@ -117,6 +120,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected Map<Class, IndexSearcher> indexSearchers = new HashMap<>();
 
   protected boolean isIndexReady = false;
+
+  protected boolean isReadOnly = false;
 
   protected int indexUpdatedEntitiesAfterMilliseconds = 1000;
   protected Queue<UserDataEntity> updatedEntitiesToIndex = new ConcurrentLinkedQueue<>();
@@ -291,7 +296,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     IndexWriter indexWriter = createIndexWriter(entityClass);
     indexWriters.put(entityClass, indexWriter);
 
-    createIndexSearcherOnOpeningDirectory(entityClass, indexWriter);
+    createIndexSearcherOnOpeningDirectory(entityClass);
   }
 
   /**
@@ -301,12 +306,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * </p>
    * @return
    * @param entityClass
-   * @param indexWriter
    */
-  protected void createIndexSearcherOnOpeningDirectory(Class entityClass, IndexWriter indexWriter) {
+  protected void createIndexSearcherOnOpeningDirectory(Class entityClass) {
     try {
-      DirectoryReader directoryReader = DirectoryReader.open(indexWriter, true);
-      directoryReaders.put(entityClass, directoryReader);
+      DirectoryReader directoryReader = createDirectoryReader(entityClass);
 
       IndexSearcher indexSearcher = new IndexSearcher(directoryReader);
       indexSearchers.put(entityClass, indexSearcher);
@@ -327,15 +330,22 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * @return Created IndexWriter or null on failure!
    */
   protected IndexWriter createIndexWriter(Directory directory) {
-    try {
-      IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, defaultAnalyzer);
-      config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-      return new IndexWriter(directory, config);
-    } catch (Exception ex) {
-      log.error("Could not create IndexWriter for DeepThought " + deepThought + " (directory = " + directory + ")", ex);
-    }
+    if(isReadOnly == false) { // it is better that when once isReadOnly has been set to true not to unset it again even though write access would not be possible again
+      try { // as otherwise all changes done till index becomes writable again would be lost which could lead to data inconsistency
+        IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_47, defaultAnalyzer);
+        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        return new IndexWriter(directory, config);
+      } catch (Exception ex) {
+        if (ex instanceof LockObtainFailedException) {
+          if (isReadOnly == false)
+            Application.notifyUser(new Notification(NotificationType.HasOnlyReadOnlyAccessToData)); // TODO: add message
+          isReadOnly = true;
+        } else
+          log.error("Could not create IndexWriter for DeepThought " + deepThought + " (directory = " + directory + ")", ex);
+      }
 
-    isIndexReady = false;
+      isIndexReady = false;
+    }
     return null;
   }
 
@@ -384,12 +394,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     if(indexSearcher == null) {
       try {
-        DirectoryReader directoryReader = directoryReaders.get(entityClass);
-        DirectoryReader newDirectoryReader = DirectoryReader.openIfChanged(directoryReader, getIndexWriter(entityClass), true);
-        if(newDirectoryReader != null) {
-          directoryReaders.put(entityClass, newDirectoryReader);
-          directoryReader = newDirectoryReader;
-        }
+        DirectoryReader directoryReader = createDirectoryReader(entityClass);
 
         indexSearcher = new IndexSearcher(directoryReader);
         indexSearchers.put(entityClass, indexSearcher);
@@ -399,6 +404,33 @@ public class LuceneSearchEngine extends SearchEngineBase {
     }
 
     return indexSearcher;
+  }
+
+  protected DirectoryReader createDirectoryReader(Class entityClass) {
+    try {
+      if(isReadOnly) {
+        DirectoryReader directoryReader = DirectoryReader.open(directories.get(entityClass)); // open readonly
+        directoryReaders.put(entityClass, directoryReader);
+        return directoryReader;
+      }
+      else if(directoryReaders.containsKey(entityClass) == false) { // on startup
+        DirectoryReader directoryReader = DirectoryReader.open(getIndexWriter(entityClass), true);
+        directoryReaders.put(entityClass, directoryReader);
+      }
+      else {
+        DirectoryReader directoryReader = directoryReaders.get(entityClass);
+        DirectoryReader newDirectoryReader = DirectoryReader.openIfChanged(directoryReader, getIndexWriter(entityClass), true);
+        if (newDirectoryReader != null) {
+          directoryReaders.put(entityClass, newDirectoryReader);
+          directoryReader = newDirectoryReader;
+        }
+        return directoryReader;
+      }
+    } catch(Exception ex) {
+      log.error("Could not create DirectoryReader for Entity class " + entityClass, ex);
+    }
+
+    return null;
   }
 
   private Class findIndexEntityClass(Class entityClass) {
@@ -416,6 +448,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * Deletes index and rebuilds it from scratch which can take a very long time if you have a big database
    */
   public void rebuildIndex() {
+    if(isReadOnly == true)
+      return;
     if(isIndexReady == false)
       return;
 
@@ -484,6 +518,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   public void indexEntity(UserDataEntity entity) {
+    if(isReadOnly == true)
+      return;
     if(entity.isPersisted() == false || entity.isDeleted() == true)
       return;
 
@@ -803,14 +839,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void filterTagsForEmptySearchTerm(TagsSearch search) {
     search.setHasEmptySearchTerm(true);
 
-    if(isIndexReady == false) {
-//      if(Application.getDeepThought() != null)
-//        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
-      search.setRelevantMatchesSorted(new ArrayList<Tag>());
-
-      search.fireSearchCompleted();
-      return;
-    }
+//    if(isIndexReady == false) {
+////      if(Application.getDeepThought() != null)
+////        search.addResult(new FilterTagsSearchResult("", Application.getDeepThought().getSortedTags()));
+//      search.setRelevantMatchesSorted(new ArrayList<Tag>());
+//
+//      search.fireSearchCompleted();
+//      return;
+//    }
 
     Query query = new WildcardQuery(new Term(FieldName.TagName, "*"));
     if(search.isInterrupted())
@@ -1293,6 +1329,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void removeEntityFromIndex(UserDataEntity removedEntity) {
+    if(isReadOnly == true)
+      return;
+
     log.debug("Removing Entity {} from index", removedEntity);
     updatedEntitiesToIndex.remove(removedEntity);
 

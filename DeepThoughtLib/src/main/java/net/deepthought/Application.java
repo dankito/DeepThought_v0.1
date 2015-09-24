@@ -82,6 +82,8 @@ public class Application {
 
   protected static boolean isInstantiated = false;
 
+  protected static boolean hasOnlyReadOnlyAccess = false;
+
   protected static Set<ApplicationListener> listeners = new HashSet<>();
 
 
@@ -268,6 +270,9 @@ public class Application {
     }
 
     listeners.clear();
+
+    isInstantiated = false;
+    hasOnlyReadOnlyAccess = false;
   }
 
 
@@ -290,6 +295,9 @@ public class Application {
   }
 
   public static void notifyUser(Notification notification) {
+    if(notification.getType() == NotificationType.HasOnlyReadOnlyAccessToData)
+      hasOnlyReadOnlyAccess = true;
+
     callNotificationListeners(notification);
   }
 
@@ -418,6 +426,10 @@ public class Application {
 
   public static boolean isInstantiated() {
     return isInstantiated;
+  }
+
+  public static boolean hasOnlyReadOnlyAccess() {
+    return hasOnlyReadOnlyAccess;
   }
 
   public static void setIsInstantiated(boolean isInstantiated) {
