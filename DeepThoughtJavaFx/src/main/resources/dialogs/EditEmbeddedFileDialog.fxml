@@ -7,100 +7,89 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="295.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEmbeddedFileDialogController">
-         <children>
-            <VBox fx:id="upperPane" prefHeight="140.0">
+
+<ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefViewportHeight="275.0" prefViewportWidth="750.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEmbeddedFileDialogController">
+   <content>
+      <VBox minHeight="-Infinity" prefWidth="750.0">
                <children>
-                  <HBox fx:id="pnFileSettings" alignment="CENTER_LEFT" prefHeight="40.0">
+                  <VBox fx:id="upperPane" prefHeight="-1">
                      <children>
-                        <Label prefWidth="100.0" text="%path.or.url" />
-                        <CustomTextField fx:id="txtfldFileLocation" prefHeight="35.0" HBox.hgrow="ALWAYS">
+                        <HBox fx:id="pnFileSettings" alignment="CENTER_LEFT" prefHeight="-1">
+                           <children>
+                              <Label prefWidth="100.0" text="%path.or.url" />
+                              <CustomTextField fx:id="txtfldFileLocation" maxHeight="35.0" minHeight="35.0" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="6.0" right="6.0" />
+                                 </HBox.margin>
+                              </CustomTextField>
+                              <Button maxHeight="35.0" minHeight="35.0" mnemonicParsing="false" onAction="#handleButtonSelectFileAction" prefWidth="50.0" text="%...">
+                                 <HBox.margin>
+                                    <Insets right="8.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <ToggleButton fx:id="tglbtnShowSearchPane" maxHeight="35.0" maxWidth="40.0" minHeight="35.0" minWidth="40.0" selected="false">
+                        </ToggleButton>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </HBox>
+                  <AnchorPane maxHeight="40.0" minHeight="40.0">
+                     <children>
+                              <ComboBox fx:id="cmbxLocalFileLinkOptions" maxWidth="250.0" minWidth="250.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="390.0" AnchorPane.topAnchor="2.0">
+                                 <VBox.margin>
+                                    <Insets left="130.0" top="6.0" />
+                                 </VBox.margin>
+                              </ComboBox>
+                        <Label fx:id="lblHtmlIncompatibleImageTypeSelected" alignment="CENTER_RIGHT" contentDisplay="TEXT_ONLY" text="%incompatible.html.image" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="256.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="6.0" left="106.0" top="6.0" />
+                     </VBox.margin>
+                  </AnchorPane>
+                  <HBox fx:id="pnImageSize" alignment="CENTER_LEFT" maxHeight="40.0" minHeight="40.0">
+                     <VBox.margin>
+                        <Insets left="106.0" />
+                     </VBox.margin>
+                     <children>
+                        <Label maxWidth="-Infinity" minWidth="-Infinity" text="%width" />
+                        <ToggleButton fx:id="tglbtnPreserveImageRatio" maxHeight="30.0" maxWidth="40.0" minHeight="30.0" minWidth="40.0" selected="true">
+                           <HBox.margin>
+                              <Insets left="24.0" right="20.0" />
+                           </HBox.margin>
+                         </ToggleButton>
+                        <Label maxWidth="-Infinity" minWidth="-Infinity" text="%height" />
+                        <CheckBox fx:id="chkbxAlsoAttachToEntity" mnemonicParsing="false" text="%also.attach" visible="false" />
+                     </children>
+                  </HBox>
+                     </children>
+                  </VBox>
+                  <HBox fx:id="pnFileSettings1" alignment="CENTER_LEFT" prefHeight="40.0">
+                     <children>
+                        <Label prefWidth="100.0" text="%name" />
+                        <CustomTextField fx:id="txtfldFileName" prefHeight="35.0" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets left="6.0" right="6.0" />
                            </HBox.margin>
                         </CustomTextField>
-                        <Button mnemonicParsing="false" onAction="#handleButtonSelectFileAction" prefHeight="35.0" prefWidth="50.0" text="%..." >
-                           <HBox.margin>
-                              <Insets right="8.0" />
-                           </HBox.margin>
-                        </Button>
-                        <ToggleButton fx:id="tglbtnShowSearchPane" selected="false" maxWidth="40.0" minWidth="40.0" minHeight="35.0" maxHeight="35.0" >
-                        </ToggleButton>
+                     </children>
+                  </HBox>
+                  <VBox>
+                     <children>
+                        <Label text="%description" />
+                        <TextArea fx:id="txtarDescription" prefHeight="75.0" />
                      </children>
                      <VBox.margin>
-                        <Insets />
+                        <Insets top="12.0" />
                      </VBox.margin>
-                  </HBox>
-            <AnchorPane maxHeight="40.0" minHeight="40.0">
-               <children>
-                        <ComboBox fx:id="cmbxLocalFileLinkOptions" maxWidth="250.0" minWidth="250.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="390.0" AnchorPane.topAnchor="2.0">
-                           <VBox.margin>
-                              <Insets left="130.0" top="6.0" />
-                           </VBox.margin>
-                        </ComboBox>
-                  <Label fx:id="lblHtmlIncompatibleImageTypeSelected" alignment="CENTER_RIGHT" contentDisplay="TEXT_ONLY" text="%incompatible.html.image" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="256.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  </VBox>
                </children>
-               <VBox.margin>
-                  <Insets bottom="6.0" left="106.0" top="6.0" />
-               </VBox.margin>
-            </AnchorPane>
-            <HBox alignment="CENTER_LEFT" maxHeight="40.0" minHeight="40.0">
-               <VBox.margin>
-                  <Insets left="106.0" />
-               </VBox.margin>
-               <children>
-                  <Label maxWidth="-Infinity" minWidth="-Infinity" text="%width" />
-                  <Spinner fx:id="spnImageWidth" maxWidth="80.0" minWidth="80.0" prefHeight="25.0" >
-                     <valueFactory>
-                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="100000"/>
-                     </valueFactory>
-                     <HBox.margin>
-                        <Insets left="4.0" right="0.0" />
-                     </HBox.margin>
-                  </Spinner>
-                  <ToggleButton fx:id="tglbtnPreserveImageRatio" selected="true" maxWidth="40.0" minWidth="40.0" minHeight="30.0" maxHeight="30.0" >
-                     <HBox.margin>
-                        <Insets left="24.0" right="20.0" />
-                     </HBox.margin>
-                   </ToggleButton>
-                  <Label maxWidth="-Infinity" minWidth="-Infinity" text="%height" />
-                  <Spinner fx:id="spnImageHeight" maxWidth="80.0" minWidth="80.0" prefHeight="30.0" >
-                     <valueFactory>
-                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="0" max="100000"/>
-                     </valueFactory>
-                     <HBox.margin>
-                        <Insets left="4.0" right="30.0" />
-                     </HBox.margin>
-                  </Spinner>
-                  <CheckBox fx:id="chkbxAlsoAttachToEntity" mnemonicParsing="false" text="%also.attach" visible="false" />
-               </children>
-            </HBox>
-               </children>
+               <BorderPane.margin>
+                  <Insets left="6.0" right="6.0" />
+               </BorderPane.margin>
+         <padding>
+            <Insets left="2.0" right="2.0" top="2.0" />
+         </padding>
             </VBox>
-            <HBox fx:id="pnFileSettings1" alignment="CENTER_LEFT" prefHeight="40.0">
-               <children>
-                  <Label prefWidth="100.0" text="%name" />
-                  <CustomTextField fx:id="txtfldFileName" prefHeight="35.0" HBox.hgrow="ALWAYS">
-                     <HBox.margin>
-                        <Insets left="6.0" right="6.0" />
-                     </HBox.margin>
-                  </CustomTextField>
-               </children>
-            </HBox>
-            <VBox>
-               <children>
-                  <Label text="%description" />
-                  <TextArea fx:id="txtarDescription" prefHeight="75.0" />
-               </children>
-               <VBox.margin>
-                  <Insets top="12.0" />
-               </VBox.margin>
-            </VBox>
-         </children>
-         <BorderPane.margin>
-            <Insets left="6.0" right="6.0" />
-         </BorderPane.margin>
-   <padding>
-      <Insets left="2.0" right="2.0" top="2.0" />
-   </padding>
-      </VBox>
+   </content>
+</ScrollPane>

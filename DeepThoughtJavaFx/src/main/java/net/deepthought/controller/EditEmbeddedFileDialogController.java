@@ -47,12 +47,14 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -108,6 +110,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
   protected Label lblHtmlIncompatibleImageTypeSelected;
 
   @FXML
+  protected HBox pnImageSize;
+  @FXML
   protected Spinner<Integer> spnImageWidth;
   @FXML
   protected ToggleButton tglbtnPreserveImageRatio;
@@ -141,6 +145,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
     searchAndSelectFilesControl = new SearchAndSelectFilesControl(SelectionMode.SINGLE, event -> setSelectedFile(event.getSelectedEntity()));
     searchAndSelectFilesControl.setVisible(false);
+    searchAndSelectFilesControl.setMaxHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectFilesControl);
     upperPane.getChildren().add(1, searchAndSelectFilesControl);
     VBox.setMargin(searchAndSelectFilesControl, new Insets(6, 0, 6, 0));
@@ -155,16 +160,41 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
     JavaFxLocalization.bindControlToolTip(lblHtmlIncompatibleImageTypeSelected, "incompatible.html.image");
 
+    setupPaneImageSize();
+
+    txtfldFileName.textProperty().addListener((observable, oldValue, newValue) -> {
+      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileName);
+      updateWindowTitle();
+    });
+
+    txtarDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
+  }
+
+  protected void setupPaneImageSize() {
+    spnImageWidth = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100000));
+    spnImageWidth.setMinWidth(80);
+    spnImageWidth.setMaxWidth(80);
+    spnImageWidth.setMinHeight(30);
+    spnImageWidth.setMaxHeight(30);
+    pnImageSize.getChildren().add(1, spnImageWidth);
+    HBox.setMargin(spnImageWidth, new Insets(0, 0, 0, 4));
+
     tglbtnPreserveImageRatio.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
     tglbtnPreserveImageRatio.setGraphic(LockClosedIcon);
     tglbtnPreserveImageRatio.selectedProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue == true)
+      if (newValue == true)
         tglbtnPreserveImageRatio.setGraphic(LockClosedIcon);
       else
         tglbtnPreserveImageRatio.setGraphic(LockOpenedIcon);
     });
 
-    // TODO: prevent that in txtfldImageWidth and txtfldImageWidth other symbols than figures can be entered
+    spnImageHeight = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100000));
+    spnImageHeight.setMinWidth(80);
+    spnImageHeight.setMaxWidth(80);
+    spnImageHeight.setMinHeight(30);
+    spnImageHeight.setMaxHeight(30);
+    pnImageSize.getChildren().add(4, spnImageHeight);
+    HBox.setMargin(spnImageHeight, new Insets(0, 30, 0, 4));
 
     NumberFormat format = NumberFormat.getIntegerInstance();
     UnaryOperator<TextFormatter.Change> filter = c -> {
@@ -214,13 +244,6 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       spnImageHeight.getValueFactory().setValue(Integer.parseInt(newValue));
       fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileImageHeight);
     });
-
-    txtfldFileName.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileName);
-      updateWindowTitle();
-    });
-
-    txtarDescription.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.FileNotes));
   }
 
   protected void setSelectedFile(FileLink selectedFile) {
