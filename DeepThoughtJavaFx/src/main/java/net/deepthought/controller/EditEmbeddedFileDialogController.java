@@ -143,7 +143,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
       fileLocationChanged();
     });
 
-    searchAndSelectFilesControl = new SearchAndSelectFilesControl(SelectionMode.SINGLE, event -> setSelectedFile(event.getSelectedEntity()));
+    searchAndSelectFilesControl = new SearchAndSelectFilesControl(true, SelectionMode.SINGLE, event -> setSelectedFile(event.getSelectedEntity()));
     searchAndSelectFilesControl.setVisible(false);
     searchAndSelectFilesControl.setMaxHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectFilesControl);

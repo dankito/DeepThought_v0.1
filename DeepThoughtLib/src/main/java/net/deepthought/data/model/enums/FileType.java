@@ -65,6 +65,11 @@ public class FileType extends ExtensibleEnumeration {
   }
 
 
+  public static void resetStaticCaches() {
+    defaultFileType = null;
+    imageFileType = null;
+  }
+
   protected static FileType defaultFileType = null;
 
   public static FileType getDefaultFileType() {

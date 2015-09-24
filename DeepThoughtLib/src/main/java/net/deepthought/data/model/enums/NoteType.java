@@ -66,6 +66,10 @@ public class NoteType extends ExtensibleEnumeration {
   }
 
 
+  public static void resetStaticCaches() {
+    defaultNoteType = null;
+  }
+
   protected static NoteType defaultNoteType = null;
 
   public static NoteType getDefaultNoteType() {

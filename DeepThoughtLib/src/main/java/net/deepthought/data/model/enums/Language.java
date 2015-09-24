@@ -59,6 +59,10 @@ public class Language extends ExtensibleEnumeration {
   }
 
 
+  public static void resetStaticCaches() {
+    defaultLanguage = null;
+  }
+
   public static Language LanguageWithThatNameNotFound = new Language("Language with that name not found");
 
   protected static Language defaultLanguage = null;

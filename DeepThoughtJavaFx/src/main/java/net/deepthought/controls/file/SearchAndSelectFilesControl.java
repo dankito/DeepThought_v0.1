@@ -61,6 +61,8 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
 
   protected DeepThought deepThought = null;
 
+  protected boolean searchInHtmlEmbeddableFilesOnly = false;
+
   protected FilesSearch lastFilesSearch = null;
 
   protected IEditedEntitiesHolder<FileLink> editedFilesHolder = null;
@@ -85,7 +87,12 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
 
 
   public SearchAndSelectFilesControl(IEditedEntitiesHolder<FileLink> editedFilesHolder) {
+    this(editedFilesHolder, false);
+  }
+
+  public SearchAndSelectFilesControl(IEditedEntitiesHolder<FileLink> editedFilesHolder, boolean searchInHtmlEmbeddableFilesOnly) {
     this.editedFilesHolder = editedFilesHolder;
+    this.searchInHtmlEmbeddableFilesOnly = searchInHtmlEmbeddableFilesOnly;
 
     deepThought = Application.getDeepThought();
 
@@ -99,8 +106,8 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
     }
   }
 
-  public SearchAndSelectFilesControl(SelectionMode selectionMode, EventHandler<EntitySelectedEvent<FileLink>> entitySelectedEventHandler) {
-    this(null);
+  public SearchAndSelectFilesControl(boolean searchInHtmlEmbeddableFilesOnly, SelectionMode selectionMode, EventHandler<EntitySelectedEvent<FileLink>> entitySelectedEventHandler) {
+    this(null, searchInHtmlEmbeddableFilesOnly);
 
     this.entitySelectedEventHandler = entitySelectedEventHandler;
     trtblvwSearchResults.getSelectionModel().setSelectionMode(selectionMode);
@@ -273,6 +280,7 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
     lastFilesSearch = new FilesSearch(txtfldSearchForFiles.getText(), (results) -> {
       searchResultsRootTreeItem.setSearchResults(results);
     });
+    lastFilesSearch.setInHtmlEmbeddableFilesOnly(searchInHtmlEmbeddableFilesOnly);
     Application.getSearchEngine().searchFiles(lastFilesSearch);
   }
 

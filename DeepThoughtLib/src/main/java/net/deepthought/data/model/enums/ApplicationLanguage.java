@@ -65,6 +65,10 @@ public class ApplicationLanguage extends ExtensibleEnumeration {
   }
 
 
+  public static void resetStaticCaches() {
+    defaultApplicationLanguage = null;
+  }
+
   public static ApplicationLanguage ApplicationLanguageWithThatNameNotFound = new ApplicationLanguage("ApplicationLanguage with that name not found");
 
   protected static ApplicationLanguage defaultApplicationLanguage = null;

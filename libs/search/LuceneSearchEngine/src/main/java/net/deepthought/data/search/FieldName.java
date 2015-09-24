@@ -92,7 +92,17 @@ public class FieldName {
 
   public final static String FileFileType = "file_type";
 
+  public final static String FileIsEmbeddableInHtml = "file_embeddable_in_html";
+
   public final static String FileDescription = "file_description";
+
+  public final static String FileIsAttachedToEntries = "file_attached_to_entries";
+
+  public final static String FileIsEmbeddedInEntries = "file_embedded_in_entries";
+
+  public final static String FileIsAttachedToReferenceBase = "file_attached_in_reference_bases";
+
+  public final static String FileIsEmbeddedInReferenceBase = "file_embedded_to_reference_bases";
 
 
 }

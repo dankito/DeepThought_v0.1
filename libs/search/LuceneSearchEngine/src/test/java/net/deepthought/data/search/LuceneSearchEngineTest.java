@@ -14,11 +14,11 @@ import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.data.search.specific.FilesSearch;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
+import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
-import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Localization;
 
 import org.apache.lucene.index.Term;
@@ -2629,6 +2629,32 @@ public class LuceneSearchEngineTest {
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
+  }
+
+  @Test
+  public void addFile_SearchOnlyEmbeddableInHtmlFiles() {
+    FileLink senseOfLifeResultPic = new FileLink("SenseOfLifeResult.jpeg", "We finally found the Sense of Life, this picture shows it!"); // embeddable in HTML
+    FileLink senseOfLifeResearchData = new FileLink("SenseOfLifeResearches.bin", "Researches for Sense of Life binary data");
+    deepThought.addFile(senseOfLifeResultPic);
+    deepThought.addFile(senseOfLifeResearchData);
+
+    final List<FileLink> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    FilesSearch filesSearch = new FilesSearch("sense", new SearchCompletedListener<Collection<FileLink>>() {
+      @Override
+      public void completed(Collection<FileLink> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    });
+    filesSearch.setInHtmlEmbeddableFilesOnly(true);
+    searchEngine.searchFiles(filesSearch);
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(senseOfLifeResultPic, results.get(0));
   }
 
   @Test

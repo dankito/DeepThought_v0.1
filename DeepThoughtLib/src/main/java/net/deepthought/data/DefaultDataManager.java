@@ -9,6 +9,9 @@ import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Group;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.enums.ApplicationLanguage;
+import net.deepthought.data.model.enums.FileType;
+import net.deepthought.data.model.enums.Language;
+import net.deepthought.data.model.enums.NoteType;
 import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
@@ -82,10 +85,19 @@ public class DefaultDataManager implements IDataManager {
       entityManager.close();
     }
 
+    resetStaticCaches();
+
     application = null;
     loggedOnUser = null;
     currentDeepThought = null;
     entityManager = null;
+  }
+
+  protected void resetStaticCaches() {
+    ApplicationLanguage.resetStaticCaches();
+    Language.resetStaticCaches();
+    NoteType.resetStaticCaches();
+    FileType.resetStaticCaches();
   }
 
 

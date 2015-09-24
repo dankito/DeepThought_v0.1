@@ -544,6 +544,10 @@ public class FileUtils {
     return FileType.getDefaultFileType();
   }
 
+  public static boolean isFileEmbeddableInHtml(FileLink file) {
+    return file != null && isFileEmbeddableInHtml(file.getUriString());
+  }
+
   public static boolean isFileEmbeddableInHtml(String uri) {
     if(getFileType(uri) == FileType.getImageFileType()) {
       String fileExtension = getFileExtension(uri);

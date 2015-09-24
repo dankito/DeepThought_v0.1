@@ -25,6 +25,7 @@ import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResult;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.DateTools;
@@ -76,6 +77,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LuceneSearchEngine extends SearchEngineBase {
+
+  public static final String BooleanFieldFalseValue = "false";
+  public static final String BooleanFieldTrueValue = "true";
 
   public final static String NoTagsFieldValue = "notags";
   public final static String NoCategoriesFieldValue = "nocategories";
@@ -715,13 +719,23 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.FileName, file.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
+
     if(file.getFileType() != null)
       doc.add(new LongField(FieldName.FileFileType, file.getFileType().getId(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileDescription, file.getDescription().toLowerCase(), Field.Store.NO));
     if(StringUtils.isNotNullOrEmpty(file.getSourceUriString()))
       doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
 
+    addBooleanFieldToDocument(doc, FieldName.FileIsEmbeddableInHtml, FileUtils.isFileEmbeddableInHtml(file));
+
     indexDocument(doc, FileLink.class);
+  }
+
+  protected void addBooleanFieldToDocument(Document doc, String fieldName, boolean isTrueBooleanValue) {
+    if(isTrueBooleanValue)
+      doc.add(new StringField(fieldName, BooleanFieldTrueValue, Field.Store.NO));
+    else
+      doc.add(new StringField(fieldName, BooleanFieldFalseValue, Field.Store.NO));
   }
 
   protected void addDateFieldToDocument(Document doc, String fieldName, Date date) {
@@ -1114,14 +1128,21 @@ public class LuceneSearchEngine extends SearchEngineBase {
   @Override
   public void searchFiles(FilesSearch search) {
     BooleanQuery query = new BooleanQuery();
+
     String searchTerm = "*" + QueryParser.escape(search.getSearchTerm().toLowerCase()) + "*";
+    BooleanQuery contentQuery = new BooleanQuery();
 
     if(search.searchFileName())
-      query.add(new WildcardQuery(new Term(FieldName.FileName, searchTerm)), BooleanClause.Occur.SHOULD);
+      contentQuery.add(new WildcardQuery(new Term(FieldName.FileName, searchTerm)), BooleanClause.Occur.SHOULD);
     if(search.searchFileUri())
-      query.add(new WildcardQuery(new Term(FieldName.FileUri, searchTerm)), BooleanClause.Occur.SHOULD);
+      contentQuery.add(new WildcardQuery(new Term(FieldName.FileUri, searchTerm)), BooleanClause.Occur.SHOULD);
     if(search.searchFileDescription())
-      query.add(new WildcardQuery(new Term(FieldName.FileDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+      contentQuery.add(new WildcardQuery(new Term(FieldName.FileDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+
+    query.add(contentQuery, BooleanClause.Occur.MUST);
+
+    if(search.inHtmlEmbeddableFilesOnly())
+      query.add(new WildcardQuery(new Term(FieldName.FileIsEmbeddableInHtml, BooleanFieldTrueValue)), BooleanClause.Occur.MUST);
 
     executeQuery(search, query, FileLink.class, FieldName.FileId, SortOrder.Ascending, FieldName.FileName, FieldName.FileUri);
   }

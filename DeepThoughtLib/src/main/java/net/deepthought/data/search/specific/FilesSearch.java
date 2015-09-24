@@ -18,6 +18,8 @@ public class FilesSearch extends Search<FileLink> {
 
   protected boolean searchFileDescription;
 
+  protected boolean inHtmlEmbeddableFilesOnly = false;
+
 
   public FilesSearch(String searchTerm, SearchCompletedListener<Collection<FileLink>> completedListener) {
     this(searchTerm, true, true, true, completedListener);
@@ -41,6 +43,14 @@ public class FilesSearch extends Search<FileLink> {
 
   public boolean searchFileDescription() {
     return searchFileDescription;
+  }
+
+  public boolean inHtmlEmbeddableFilesOnly() {
+    return inHtmlEmbeddableFilesOnly;
+  }
+
+  public void setInHtmlEmbeddableFilesOnly(boolean inHtmlEmbeddableFilesOnly) {
+    this.inHtmlEmbeddableFilesOnly = inHtmlEmbeddableFilesOnly;
   }
 
 }
