@@ -391,14 +391,14 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
       txtfldEntryAbstract.setText(selectedEntry.getAbstractAsPlainText());
       txtfldEntryAbstract.positionCaret(0);
-      htmledEntryContent.setHtml(selectedEntry.getContent());
+      htmledEntryContent.setHtml(selectedEntry.getContent(), true);
       txtfldEntryAbstract.selectAll();
 
       setPaneReferenceAndPersons(selectedEntry);
     }
     else {
       txtfldEntryAbstract.setText("");
-      htmledEntryContent.setHtml("");
+      htmledEntryContent.setHtml("", true);
       pnReferenceAndPersonsScrollPane.setVisible(false);
     }
   }

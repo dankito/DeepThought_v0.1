@@ -60,6 +60,9 @@ public class HtmlEditor implements ICleanUp {
 
   protected String htmlToSetWhenLoaded = null;
 
+  protected boolean editorHasBeenNewlyInitialized = false;
+  protected boolean resetUndoStack = false;
+
   protected IHtmlEditorListener listener = null;
 
 
@@ -112,6 +115,14 @@ public class HtmlEditor implements ICleanUp {
     }
   }
 
+  public void resetUndoStack() {
+    try {
+      ckEditor.call("resetUndo");
+    } catch(Exception ex) {
+      log.error("Could not reset CKEditor's Undo stack", ex);
+    }
+  }
+
 
   public boolean isCKEditorLoaded() {
     return ckEditor != null;
@@ -131,9 +142,14 @@ public class HtmlEditor implements ICleanUp {
   }
 
   public void setHtml(String html) {
+    setHtml(html, false);
+  }
+
+  public void setHtml(String html, boolean resetUndoStack) {
     if(html == null)
       html = "";
     previousHtml = html;
+    this.resetUndoStack = resetUndoStack;
 
     try {
       if(isCKEditorLoaded() == false)
@@ -155,9 +171,12 @@ public class HtmlEditor implements ICleanUp {
     this.listener = listener;
   }
 
-  public void setListenerAndScrollToTop(IHtmlEditorListener listener) {
+  public void reInitHtmlEditor(IHtmlEditorListener listener) {
     scrollTo(0);
+    resetUndoStack();
     setListener(listener);
+
+    editorHasBeenNewlyInitialized = true;
   }
 
 
@@ -194,6 +213,12 @@ public class HtmlEditor implements ICleanUp {
     }
 
     previousHtml = newHtmlCode;
+
+    if(editorHasBeenNewlyInitialized == true || resetUndoStack == true) {
+      resetUndoStack();
+      editorHasBeenNewlyInitialized = false;
+      resetUndoStack = false;
+    }
   }
 
   protected void imageAddedOrRemoved(String previousHtml, String newHtmlCode, IHtmlEditorListener listener) {

@@ -30,7 +30,7 @@ public class DeepThoughtFxHtmlEditorPool implements ICleanUp {
   public DeepThoughtFxHtmlEditor getHtmlEditor(IHtmlEditorListener listener) {
     if(availableHtmlEditors.size() > 0) {
       DeepThoughtFxHtmlEditor editor = availableHtmlEditors.poll();
-      editor.setListenerAndScrollToTop(listener);
+      editor.reInitHtmlEditor(listener);
       return editor;
     }
 

@@ -90,15 +90,23 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   }
 
   public void setHtml(String html) {
-    htmlEditor.setHtml(html);
+    setHtml(html, false);
+  }
+
+  public void setHtml(String html, boolean resetUndoStack) {
+    htmlEditor.setHtml(html, resetUndoStack);
   }
 
   public void setListener(IHtmlEditorListener listener) {
     htmlEditor.setListener(listener);
   }
 
-  public void setListenerAndScrollToTop(IHtmlEditorListener listener) {
-    htmlEditor.setListenerAndScrollToTop(listener);
+  public void reInitHtmlEditor(IHtmlEditorListener listener) {
+    htmlEditor.reInitHtmlEditor(listener);
+  }
+
+  public void resetUndoStack() {
+    htmlEditor.resetUndoStack();
   }
 
 
