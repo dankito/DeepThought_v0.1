@@ -23,6 +23,8 @@ public interface IHtmlEditorListener {
    */
   boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData);
 
-  void imageHasBeenDeleted(String imageId, String imageUrl);
+  void imageAdded(ImageElementData addedImage);
+
+  void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml);
 
 }

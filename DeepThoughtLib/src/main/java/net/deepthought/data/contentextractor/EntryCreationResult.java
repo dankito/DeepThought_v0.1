@@ -40,6 +40,10 @@ public class EntryCreationResult {
 
   protected List<Person> extractedPersons = new ArrayList<>();
 
+  protected List<FileLink> extractedAttachedFiles = new ArrayList<>();
+
+  protected List<FileLink> extractedEmbeddedFiles = new ArrayList<>();
+
 
   public EntryCreationResult(Object source, DeepThoughtError error) {
     this.source = source;
@@ -126,6 +130,21 @@ public class EntryCreationResult {
     this.extractedPersons = extractedPersons;
   }
 
+  public List<FileLink> getAttachedFiles() {
+    return extractedAttachedFiles;
+  }
+
+  public void setAttachedFiles(List<FileLink> attachedFiles) {
+    this.extractedAttachedFiles = attachedFiles;
+  }
+
+  public List<FileLink> getEmbeddedFiles() {
+    return extractedEmbeddedFiles;
+  }
+
+  public void setEmbeddedFiles(List<FileLink> embeddedFiles) {
+    this.extractedEmbeddedFiles = embeddedFiles;
+  }
 
   @Override
   public String toString() {
@@ -160,9 +179,16 @@ public class EntryCreationResult {
       createdEntry.addPerson(person);
     }
 
-    for(FileLink file : createdEntry.getAttachedFiles()) {
+    for(FileLink file : extractedAttachedFiles) {
       if(file.isPersisted() == false)
         deepThought.addFile(file);
+      createdEntry.addAttachedFile(file);
+    }
+
+    for(FileLink file : extractedEmbeddedFiles) {
+      if(file.isPersisted() == false)
+        deepThought.addFile(file);
+      createdEntry.addEmbeddedFile(file);
     }
 
     saveReferenceBases(deepThought);

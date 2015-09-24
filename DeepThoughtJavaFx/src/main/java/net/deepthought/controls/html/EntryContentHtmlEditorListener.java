@@ -1,5 +1,6 @@
 package net.deepthought.controls.html;
 
+import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.html.ImageElementData;
@@ -50,15 +51,21 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   }
 
   @Override
-  public void imageHasBeenDeleted(String imageId, String imageUrl) {
+  public void imageAdded(ImageElementData addedImage) {
     if(entry != null) {
-      Long fileId = Long.parseLong(imageId);
+      FileLink file = getFileById(addedImage.getFileId());
+      if (file != null) {
+        entry.addEmbeddedFile(file);
+      }
+    }
+  }
 
-      for (FileLink file : entry.getAttachedFiles()) { // TODO: use embedded files
-        if (fileId.equals(file.getId())) { // TODO: what if the same image has been inserted multiple times into the document?
-          entry.removeAttachedFile(file);
-          break;
-        }
+  @Override
+  public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
+    if(entry != null && isStillInAnotherInstanceOnHtml == false) {
+      FileLink file = getEmbeddedFileById(deletedImage.getFileId());
+      if(file != null) {
+        entry.removeEmbeddedFile(file);
       }
     }
   }
@@ -72,7 +79,16 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   }
 
   protected FileLink getEmbeddedFileById(long fileId) {
-    for(FileLink file : entry.getAttachedFiles()) {
+    for(FileLink file : entry.getEmbeddedFiles()) {
+      if(file.getId().equals(fileId))
+        return file;
+    }
+
+    return null;
+  }
+
+  protected FileLink getFileById(long fileId) {
+    for(FileLink file : Application.getDeepThought().getFiles()) {
       if(file.getId().equals(fileId))
         return file;
     }
@@ -91,7 +107,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
 
   @Override
   public ObservableSet<FileLink> getEditedEntities() {
-    return FXCollections.observableSet(new HashSet<FileLink>(entry.getAttachedFiles()));
+    return FXCollections.observableSet(new HashSet<FileLink>(entry.getEmbeddedFiles()));
   }
 
   @Override
@@ -119,7 +135,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   @Override
   public boolean containsEditedEntity(FileLink entity) {
     if(entry != null)
-      return entry.getAttachedFiles().contains(entity);
+      return entry.getEmbeddedFiles().contains(entity);
     return false;
   }
 

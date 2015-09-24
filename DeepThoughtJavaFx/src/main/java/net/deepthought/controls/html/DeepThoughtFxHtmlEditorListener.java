@@ -1,5 +1,6 @@
 package net.deepthought.controls.html;
 
+import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.utils.EditedEntitiesHolder;
@@ -52,13 +53,19 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
   }
 
   @Override
-  public void imageHasBeenDeleted(String imageId, String imageUrl) {
-    Long fileId = Long.parseLong(imageId);
+  public void imageAdded(ImageElementData addedImage) {
+    FileLink file = getFileById(addedImage.getFileId());
+    if(file != null) {
+      editedFilesHolder.addEntityToEntry(file);
+    }
+  }
 
-    for(FileLink file : editedFilesHolder.getEditedEntities()) {
-      if(fileId.equals(file.getId())) { // TODO: what if the same image has been inserted multiple times into the document?
+  @Override
+  public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
+    if(isStillInAnotherInstanceOnHtml == false) {
+      FileLink file = getEditedFileById(deletedImage.getFileId());
+      if(file != null) {
         editedFilesHolder.removeEntityFromEntry(file);
-        break;
       }
     }
   }
@@ -73,6 +80,15 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
 
   protected FileLink getEditedFileById(long fileId) {
     for(FileLink file : editedFilesHolder.getEditedEntities()) {
+      if(file.getId().equals(fileId))
+        return file;
+    }
+
+    return null;
+  }
+
+  protected FileLink getFileById(long fileId) {
+    for(FileLink file : Application.getDeepThought().getFiles()) {
       if(file.getId().equals(fileId))
         return file;
     }

@@ -184,17 +184,44 @@ public class HtmlEditor implements ICleanUp {
 
   public void htmlChanged(String newHtmlCode) {
     if(previousHtml.equals(newHtmlCode) == false) {
-      if(hasAnImageBeenRemoved(previousHtml, newHtmlCode)) {
-        if(listener != null) {
-          List<Map<String, String>> imagesData = extractImageData(previousHtml, newHtmlCode);
-          for(Map<String, String> imageData : imagesData)
-            listener.imageHasBeenDeleted(imageData.get(ImageIdDataKey), imageData.get(ImageUrlDataKey)); // TODO: also check for undoing image deletion
+      if (listener != null) {
+        if(hasCountImagesChanged(previousHtml, newHtmlCode)) {
+          imageAddedOrRemoved(previousHtml, newHtmlCode, listener);
         }
       }
+
+      listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
     }
 
-    if(listener != null)
-      listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
+    previousHtml = newHtmlCode;
+  }
+
+  protected void imageAddedOrRemoved(String previousHtml, String newHtmlCode, IHtmlEditorListener listener) {
+    List<ImageElementData> previousImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(previousHtml);
+    List<ImageElementData> currentImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(newHtmlCode);
+
+    for(ImageElementData previousImage : previousImages) {
+      if(isImageInList(previousImage, currentImages) == false)
+        listener.imageHasBeenDeleted(previousImage, isStillInAnotherInstanceOnHtml(newHtmlCode, previousImage));
+    }
+
+    for(ImageElementData currentImage : currentImages) {
+      if(isImageInList(currentImage, previousImages) == false)
+        listener.imageAdded(currentImage);
+    }
+  }
+
+  protected boolean isImageInList(ImageElementData imageToTest, List<ImageElementData> imageList) {
+    for(ImageElementData image : imageList) {
+      if(((Long)imageToTest.getFileId()).equals(image.getFileId()) && ((Long)imageToTest.getEmbeddingId()).equals(image.getEmbeddingId()))
+        return true;
+    }
+
+    return false;
+  }
+
+  protected boolean isStillInAnotherInstanceOnHtml(String html, ImageElementData image) {
+    return html.contains(ImageElementData.ImageIdAttributeName + "=\"" + image.getFileId());
   }
 
   protected List<Map<String, String>> extractImageData(String previousHtml, String newHtmlCode) {
@@ -273,11 +300,11 @@ public class HtmlEditor implements ICleanUp {
     return createdElement;
   }
 
-  protected boolean hasAnImageBeenRemoved(String previousHtml, String newHtml) {
+  protected boolean hasCountImagesChanged(String previousHtml, String newHtml) {
     int countImgTagsInPreviousHtml = StringUtils.getNumberOfOccurrences("<img ", previousHtml);
     int countImgTagsInNewHtml = StringUtils.getNumberOfOccurrences("<img ", newHtml);
 
-    return countImgTagsInPreviousHtml > countImgTagsInNewHtml;
+    return countImgTagsInPreviousHtml != countImgTagsInNewHtml;
   }
 
 
