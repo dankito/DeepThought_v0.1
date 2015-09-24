@@ -68,6 +68,14 @@ public abstract class ReferenceBase extends UserDataEntity {
   )
   protected Set<FileLink> attachedFiles = new HashSet<>();
 
+  @ManyToMany(fetch = FetchType.EAGER )
+  @JoinTable(
+      name = TableConfig.ReferenceBaseEmbeddedFileJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseEmbeddedFileJoinTableReferenceBaseIdColumnName) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.ReferenceBaseEmbeddedFileJoinTableFileLinkIdColumnName) }
+  )
+  protected Set<FileLink> embeddedFiles = new HashSet<>();
+
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
   @JoinColumn(name = TableConfig.ReferenceBasePreviewImageJoinColumnName)
   protected FileLink previewImage;
@@ -239,6 +247,41 @@ public abstract class ReferenceBase extends UserDataEntity {
 
     return result;
   }
+
+
+  public boolean hasEmbeddedFiles() {
+    return embeddedFiles.size() > 0;
+  }
+
+  public Collection<FileLink> getEmbeddedFiles() {
+    return embeddedFiles;
+  }
+
+  public boolean addEmbeddedFile(FileLink file) {
+    if(embeddedFiles.contains(file))
+      return false;
+
+    boolean result = embeddedFiles.add(file);
+    if(result) {
+      file.addAsEmbeddingToReferenceBase(this);
+
+      callEntityAddedListeners(embeddedFiles, file);
+    }
+
+    return result;
+  }
+
+  public boolean removeEmbeddedFile(FileLink file) {
+    boolean result = embeddedFiles.remove(file);
+    if(result) {
+      file.removeAsEmbeddingFromReferenceBase(this);
+
+      callEntityRemovedListeners(embeddedFiles, file);
+    }
+
+    return result;
+  }
+
 
   public FileLink getPreviewImage() {
     return previewImage;

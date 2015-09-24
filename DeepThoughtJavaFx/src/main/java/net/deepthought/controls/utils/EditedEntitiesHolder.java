@@ -92,9 +92,8 @@ public class EditedEntitiesHolder<T extends UserDataEntity> implements IEditedEn
     if(removedEntities.contains(entity)) {
       removedEntities.remove(entity);
     }
-    else {
-      addedEntities.add(entity);
-    }
+
+    addedEntities.add(entity);
 
     editedEntities.add(entity);
 
@@ -107,9 +106,8 @@ public class EditedEntitiesHolder<T extends UserDataEntity> implements IEditedEn
     if(addedEntities.contains(entity)) {
       addedEntities.remove(entity);
     }
-    else {
-      removedEntities.add(entity);
-    }
+
+    removedEntities.add(entity);
 
     editedEntities.remove(entity);
 

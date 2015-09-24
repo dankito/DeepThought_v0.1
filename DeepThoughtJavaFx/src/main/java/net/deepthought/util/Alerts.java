@@ -175,7 +175,7 @@ public class Alerts {
   }
 
   public static boolean deleteFileWithUserConfirmationIfIsSetOnEntriesOrReferenceBases(DeepThought deepThought, FileLink file) {
-    if(file.isAttachedToEntries() || file.isAttachedToReferenceBases()) { // TODO: add hasAttachtedEntries()
+    if(file.isAttachedToEntries() || file.isEmbeddedInEntries() || file.isAttachedToReferenceBases() || file.isEmbeddedInReferenceBases()) {
       boolean confirmDeleteFile = showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(file);
       if(confirmDeleteFile)
         return deepThought.removeFile(file);
@@ -188,7 +188,7 @@ public class Alerts {
 
   public static boolean showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(FileLink file) {
     return showConfirmationDialog(Localization.getLocalizedString("alert.message.file.link.contains.entries.or.reference.bases", file.getTextRepresentation(),
-            file.getEntriesAttachedTo().size(), file.getReferenceBasesAttachedTo().size()),
+            file.getEntriesAttachedTo().size() + file.getEntriesEmbeddedIn().size(), file.getReferenceBasesAttachedTo().size() + file.getReferenceBasesEmbeddedIn().size()),
         Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 

@@ -61,7 +61,8 @@ public enum FieldWithUnsavedChanges {
   ReferenceOnlineAddress,
   ReferenceLastAccess,
   ReferenceNotes,
-  ReferenceBaseFiles,
+  ReferenceAttachedFiles,
+  ReferenceEmbeddedFiles,
 
 
   SeriesTitleTitle,
@@ -71,7 +72,8 @@ public enum FieldWithUnsavedChanges {
   SeriesTitleOnlineAddress,
   SeriesTitleLastAccess,
   SeriesTitleNotes,
-  SeriesTitleFiles,
+  SeriesTitleAttachedFiles,
+  SeriesTitleEmbeddedFiles,
   SeriesTitleSeriesTitleCategory,
   SeriesTitleTitleSupplement,
   SeriesTitleTableOfContents,
@@ -109,6 +111,7 @@ public enum FieldWithUnsavedChanges {
   ReferenceSubDivisionOnlineAddress,
   ReferenceSubDivisionLastAccess,
   ReferenceSubDivisionNotes,
-  ReferenceSubDivisionFiles,
+  ReferenceSubDivisionAttachedFiles,
+  ReferenceSubDivisionEmbeddedFiles,
 
 }

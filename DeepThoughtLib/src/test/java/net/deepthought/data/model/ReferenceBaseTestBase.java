@@ -272,21 +272,23 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
 
 
   @Test
-  public void addFile_RelationGetsPersisted() throws Exception {
+  public void addAttachedFile_RelationGetsPersisted() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    Application.getDeepThought().addFile(internetFileAttachment);
 
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     referenceBase.addAttachedFile(internetFileAttachment);
 
     // assert FileLink really got written to database
-    Assert.assertTrue(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
+    Assert.assertTrue(doesReferenceBaseAttachedFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
   }
 
   @Test
-  public void addFile_EntitiesGetAddedToRelatedCollections() throws Exception {
+  public void addAttachedFile_EntitiesGetAddedToRelatedCollections() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    Application.getDeepThought().addFile(internetFileAttachment);
 
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     referenceBase.addAttachedFile(internetFileAttachment);
 
     Assert.assertEquals(1, referenceBase.getAttachedFiles().size());
@@ -294,16 +296,17 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void removeFile_RelationGetsDeleted() throws Exception {
+  public void removeAttachedFile_RelationGetsDeleted() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    Application.getDeepThought().addFile(internetFileAttachment);
 
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     referenceBase.addAttachedFile(internetFileAttachment);
 
     referenceBase.removeAttachedFile(internetFileAttachment);
 
     // assert file really got deleted from database
-    Assert.assertFalse(doesReferenceBaseFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
+    Assert.assertFalse(doesReferenceBaseAttachedFileJoinTableEntryExist(referenceBase.getId(), internetFileAttachment.getId()));
 
     Assert.assertFalse(referenceBase.isDeleted());
     Assert.assertFalse(internetFileAttachment.isDeleted());
@@ -315,15 +318,76 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
   @Test
-  public void removeFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
+  public void removeAttachedFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
     FileLink internetFileAttachment = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
-    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    Application.getDeepThought().addFile(internetFileAttachment);
 
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
     referenceBase.addAttachedFile(internetFileAttachment);
 
     referenceBase.removeAttachedFile(internetFileAttachment);
 
     Assert.assertFalse(referenceBase.getAttachedFiles().contains(internetFileAttachment));
+  }
+
+
+  @Test
+  public void addEmbeddedFile_RelationGetsPersisted() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Application.getDeepThought().addFile(internetFileEmbedding);
+
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    referenceBase.addEmbeddedFile(internetFileEmbedding);
+
+    // assert FileLink really got written to database
+    Assert.assertTrue(doesReferenceBaseEmbeddedFileJoinTableEntryExist(referenceBase.getId(), internetFileEmbedding.getId()));
+  }
+
+  @Test
+  public void addEmbeddedFile_EntitiesGetAddedToRelatedCollections() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Application.getDeepThought().addFile(internetFileEmbedding);
+
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    referenceBase.addEmbeddedFile(internetFileEmbedding);
+
+    Assert.assertEquals(1, referenceBase.getEmbeddedFiles().size());
+    Assert.assertEquals(Application.getDeepThought(), internetFileEmbedding.getDeepThought());
+  }
+
+  @Test
+  public void removeEmbeddedFile_RelationGetsDeleted() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Application.getDeepThought().addFile(internetFileEmbedding);
+
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    referenceBase.addEmbeddedFile(internetFileEmbedding);
+
+    referenceBase.removeEmbeddedFile(internetFileEmbedding);
+
+    // assert file really got deleted from database
+    Assert.assertFalse(doesReferenceBaseEmbeddedFileJoinTableEntryExist(referenceBase.getId(), internetFileEmbedding.getId()));
+
+    Assert.assertFalse(referenceBase.isDeleted());
+    Assert.assertFalse(internetFileEmbedding.isDeleted());
+
+    Application.getDeepThought().removeFile(internetFileEmbedding);
+
+    Assert.assertNull(internetFileEmbedding.getDeepThought());
+    Assert.assertTrue(internetFileEmbedding.isDeleted());
+  }
+
+  @Test
+  public void removeEmbeddedFile_EntitiesGetRemovedFromRelatedCollections() throws Exception {
+    FileLink internetFileEmbedding = new FileLink("http://img0.joyreactor.com/pics/post/demotivation-posters-auto-347958.jpeg");
+    Application.getDeepThought().addFile(internetFileEmbedding);
+
+    ReferenceBase referenceBase = createReferenceBaseInstanceAndAddToDeepThought();
+    referenceBase.addEmbeddedFile(internetFileEmbedding);
+
+    referenceBase.removeEmbeddedFile(internetFileEmbedding);
+
+    Assert.assertFalse(referenceBase.getEmbeddedFiles().contains(internetFileEmbedding));
   }
 
 
@@ -360,14 +424,19 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
 
   protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.ReferenceBasePersonAssociationTableName + " WHERE " +
-        TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName +  "=" + referenceBaseId +
+        TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName + "=" + referenceBaseId +
         " AND " + TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName + "=" + personId);
     return result.size() == 1;
   }
 
-  protected boolean doesReferenceBaseFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
+  protected boolean doesReferenceBaseAttachedFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.ReferenceBaseAttachedFileJoinTableName, TableConfig.ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName, referenceBaseId,
         TableConfig.ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName, fileId);
+  }
+
+  protected boolean doesReferenceBaseEmbeddedFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
+    return doesJoinTableEntryExist(TableConfig.ReferenceBaseEmbeddedFileJoinTableName, TableConfig.ReferenceBaseEmbeddedFileJoinTableReferenceBaseIdColumnName, referenceBaseId,
+        TableConfig.ReferenceBaseEmbeddedFileJoinTableFileLinkIdColumnName, fileId);
   }
 
 }

@@ -701,9 +701,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     if(result) {
       file.addAsAttachmentToEntry(this);
 
-      if(file.getDeepThought() == null && this.deepThought != null)
-        deepThought.addFile(file);
-
       callEntityAddedListeners(attachedFiles, file);
     }
 
@@ -737,9 +734,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     boolean result = embeddedFiles.add(file);
     if(result) {
       file.addAsEmbeddingToEntry(this);
-
-      if(file.getDeepThought() == null && this.deepThought != null)
-        deepThought.addFile(file);
 
       callEntityAddedListeners(embeddedFiles, file);
     }

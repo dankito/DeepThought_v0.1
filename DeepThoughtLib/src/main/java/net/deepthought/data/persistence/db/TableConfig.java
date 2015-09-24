@@ -299,12 +299,20 @@ public class TableConfig {
   public final static String ReferenceBasePersonAssociationPersonOrderColumnName = "person_order";
 
 
-  /*          ReferenceBase AttachedFileL Join Table Config        */
+  /*          ReferenceBase Attached Files Join Table Config        */
 
   public final static String ReferenceBaseAttachedFileJoinTableName = "reference_base_attached_files_join_table";
 
   public final static String ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName = "reference_base_id";
   public final static String ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName = "file_id";
+
+
+  /*          ReferenceBase Embedded Files Join Table Config        */
+
+  public final static String ReferenceBaseEmbeddedFileJoinTableName = "reference_base_embedded_files_join_table";
+
+  public final static String ReferenceBaseEmbeddedFileJoinTableReferenceBaseIdColumnName = "reference_base_id";
+  public final static String ReferenceBaseEmbeddedFileJoinTableFileLinkIdColumnName = "file_id";
 
 
   /*          SeriesTitle Table Config        */

@@ -57,6 +57,9 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "attachedFiles")
   protected Set<ReferenceBase> referenceBasesAttachedTo = new HashSet<>();
 
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "embeddedFiles")
+  protected Set<ReferenceBase> referenceBasesEmbeddedIn = new HashSet<>();
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.FileLinkDeepThoughtJoinColumnName)
   protected DeepThought deepThought;
@@ -225,6 +228,34 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
 
     return result;
   }
+
+  public boolean isEmbeddedInReferenceBases() {
+    return getReferenceBasesEmbeddedIn().size() > 0;
+  }
+
+  public Collection<ReferenceBase> getReferenceBasesEmbeddedIn() {
+    return referenceBasesEmbeddedIn;
+  }
+
+  protected boolean addAsEmbeddingToReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBasesEmbeddedIn.add(referenceBase);
+    if(result) {
+      if(referenceBase.isPersisted())
+        callEntityAddedListeners(referenceBasesEmbeddedIn, referenceBase);
+    }
+
+    return result;
+  }
+
+  protected boolean removeAsEmbeddingFromReferenceBase(ReferenceBase referenceBase) {
+    boolean result = referenceBasesEmbeddedIn.remove(referenceBase);
+    if(result) {
+      callEntityRemovedListeners(referenceBasesEmbeddedIn, referenceBase);
+    }
+
+    return result;
+  }
+
 
   public DeepThought getDeepThought() {
     return deepThought;

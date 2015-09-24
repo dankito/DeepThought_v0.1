@@ -416,15 +416,13 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAttachedFiles)) {
-      IEditedEntitiesHolder<FileLink> editedFiles = filesControl.getEditedFiles();
-
-      for(FileLink removedFile : editedFiles.getRemovedEntities())
+      for(FileLink removedFile : editedAttachedFiles.getRemovedEntities())
         entry.removeAttachedFile(removedFile);
-      editedFiles.getRemovedEntities().clear();
+      editedAttachedFiles.getRemovedEntities().clear();
 
-      for(FileLink addedFile : editedFiles.getAddedEntities())
+      for(FileLink addedFile : editedAttachedFiles.getAddedEntities())
         entry.addAttachedFile(addedFile);
-      editedFiles.getAddedEntities().clear();
+      editedAttachedFiles.getAddedEntities().clear();
 
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAttachedFiles);
     }

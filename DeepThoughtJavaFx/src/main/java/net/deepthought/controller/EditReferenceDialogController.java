@@ -313,8 +313,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
-    editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles()); // TODO: set added /removed Event
-    editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles()); // TODO: set to embedded files
+    editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles(), event -> fieldsWithUnsavedSeriesTitleChanges.add
+        (FieldWithUnsavedChanges.SeriesTitleAttachedFiles), event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAttachedFiles));
+    editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getEmbeddedFiles());
 
     seriesTitleTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleTableOfContents);
     seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
@@ -409,8 +410,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceControls() {
-    editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles()); // TODO: set added /removed Event
-    editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles()); // TODO: set to embedded files
+    editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles(), event -> fieldsWithUnsavedReferenceChanges.add
+        (FieldWithUnsavedChanges.ReferenceAttachedFiles), event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAttachedFiles));
+    editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getEmbeddedFiles());
 
     referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
     referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
@@ -522,8 +524,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
-    editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles()); // TODO: set added /removed Event
-    editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles()); // TODO: set to embedded files
+    editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles(), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add
+        (FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles));
+    editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getEmbeddedFiles());
 
     referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
@@ -787,10 +790,25 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
     }
 
-    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleFiles)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleAttachedFiles)) {
+      for(FileLink removedFile : editedSeriesTitleAttachedFiles.getRemovedEntities())
+        seriesTitle.removeAttachedFile(removedFile);
+      editedSeriesTitleAttachedFiles.getRemovedEntities().clear();
 
-      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleFiles);
+      for(FileLink addedFile : editedSeriesTitleAttachedFiles.getAddedEntities())
+        seriesTitle.addAttachedFile(addedFile);
+      editedSeriesTitleAttachedFiles.getAddedEntities().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAttachedFiles);
     }
+
+    for(FileLink removedEmbeddedFile : editedSeriesTitleEmbeddedFiles.getRemovedEntities())
+      seriesTitle.removeEmbeddedFile(removedEmbeddedFile);
+    editedSeriesTitleEmbeddedFiles.getRemovedEntities().clear();
+
+    for(FileLink addedEmbeddedFile : editedSeriesTitleEmbeddedFiles.getAddedEntities())
+      seriesTitle.addEmbeddedFile(addedEmbeddedFile);
+    editedSeriesTitleEmbeddedFiles.getAddedEntities().clear();
   }
 
   protected void saveEditedFieldsOnReference() {
@@ -847,10 +865,25 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
     }
 
-//    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanged.ReferenceBaseFiles)) {
-//
-//      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanged.ReferenceBaseFiles);
-//    }
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceAttachedFiles)) {
+      for(FileLink removedFile : editedReferenceAttachedFiles.getRemovedEntities())
+        reference.removeAttachedFile(removedFile);
+      editedReferenceAttachedFiles.getRemovedEntities().clear();
+
+      for(FileLink addedFile : editedReferenceAttachedFiles.getAddedEntities())
+        reference.addAttachedFile(addedFile);
+      editedReferenceAttachedFiles.getAddedEntities().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceAttachedFiles);
+    }
+
+    for(FileLink removedEmbeddedFile : editedReferenceEmbeddedFiles.getRemovedEntities())
+      reference.removeEmbeddedFile(removedEmbeddedFile);
+    editedReferenceEmbeddedFiles.getRemovedEntities().clear();
+
+    for(FileLink addedEmbeddedFile : editedReferenceEmbeddedFiles.getAddedEntities())
+      reference.addEmbeddedFile(addedEmbeddedFile);
+    editedReferenceEmbeddedFiles.getAddedEntities().clear();
   }
 
   protected void saveEditedFieldsOnReferenceSubDivision() {
@@ -888,10 +921,25 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
     }
 
-    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionFiles)) {
+    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles)) {
+      for(FileLink removedFile : editedReferenceSubDivisionAttachedFiles.getRemovedEntities())
+        referenceSubDivision.removeAttachedFile(removedFile);
+      editedReferenceSubDivisionAttachedFiles.getRemovedEntities().clear();
 
-      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionFiles);
+      for(FileLink addedFile : editedReferenceSubDivisionAttachedFiles.getAddedEntities())
+        referenceSubDivision.addAttachedFile(addedFile);
+      editedReferenceSubDivisionAttachedFiles.getAddedEntities().clear();
+
+      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles);
     }
+
+    for(FileLink removedEmbeddedFile : editedReferenceSubDivisionEmbeddedFiles.getRemovedEntities())
+      referenceSubDivision.removeEmbeddedFile(removedEmbeddedFile);
+    editedReferenceSubDivisionEmbeddedFiles.getRemovedEntities().clear();
+
+    for(FileLink addedEmbeddedFile : editedReferenceSubDivisionEmbeddedFiles.getAddedEntities())
+      referenceSubDivision.addEmbeddedFile(addedEmbeddedFile);
+    editedReferenceSubDivisionEmbeddedFiles.getAddedEntities().clear();
   }
 
 
