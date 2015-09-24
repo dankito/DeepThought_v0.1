@@ -728,6 +728,11 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     addBooleanFieldToDocument(doc, FieldName.FileIsEmbeddableInHtml, FileUtils.isFileEmbeddableInHtml(file));
 
+    addBooleanFieldToDocument(doc, FieldName.FileIsAttachedToEntries, file.isAttachedToEntries());
+    addBooleanFieldToDocument(doc, FieldName.FileIsEmbeddedInEntries, file.isEmbeddedInEntries());
+    addBooleanFieldToDocument(doc, FieldName.FileIsAttachedToReferenceBase, file.isAttachedToReferenceBases());
+    addBooleanFieldToDocument(doc, FieldName.FileIsEmbeddedInReferenceBase, file.isEmbeddedInReferenceBases());
+
     indexDocument(doc, FileLink.class);
   }
 
