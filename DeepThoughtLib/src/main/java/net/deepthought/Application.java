@@ -80,8 +80,9 @@ public class Application {
 
   protected static IDeepThoughtsConnector deepThoughtsConnector = null;
 
-  protected static Set<ApplicationListener> listeners = new HashSet<>();
+  protected static boolean isInstantiated = false;
 
+  protected static Set<ApplicationListener> listeners = new HashSet<>();
 
 
   public static void instantiateAsync(final IApplicationConfiguration applicationConfiguration) {
@@ -146,6 +147,7 @@ public class Application {
       Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
       deepThoughtsConnector.runAsync();
 
+      isInstantiated = true;
       callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated));
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
@@ -414,4 +416,11 @@ public class Application {
     return dataFolderPath;
   }
 
+  public static boolean isInstantiated() {
+    return isInstantiated;
+  }
+
+  public static void setIsInstantiated(boolean isInstantiated) {
+    Application.isInstantiated = isInstantiated;
+  }
 }

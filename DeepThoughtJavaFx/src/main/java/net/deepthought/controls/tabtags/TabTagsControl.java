@@ -142,7 +142,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     }
 
     allTagsSearchResult = null;
-    searchForAllTags();
+
+    if(Application.isInstantiated() == true) // Application not instantiated yet -> searchForAllTags() will then be called in applicationInstantiated()
+      searchForAllTags();
   }
 
   public void applicationInstantiated() {
