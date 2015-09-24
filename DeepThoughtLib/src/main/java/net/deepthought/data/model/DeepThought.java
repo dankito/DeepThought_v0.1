@@ -124,7 +124,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected Set<FileLink> files = new HashSet<>();
 
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
   protected Set<Language> languages = new TreeSet<>(); // these are Languages User can set to specify Language of their Entries, References, ...
 
