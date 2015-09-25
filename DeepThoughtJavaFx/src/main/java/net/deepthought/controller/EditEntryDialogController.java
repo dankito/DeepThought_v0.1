@@ -79,22 +79,14 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   @FXML
   protected VBox contentPane;
 
-  @FXML
-  protected Pane paneTitle;
-  @FXML
-  protected TextField txtfldTitle;
-
   protected CollapsibleHtmlEditor htmledAbstract;
 
   protected CollapsibleHtmlEditor htmledContent;
-
-  protected SplitPane paneTagsAndCategories;
 
   protected EntryTagsControl entryTagsControl = null;
 
   protected EntryCategoriesControl entryCategoriesControl = null;
 
-  @FXML
   protected EntryReferenceControl entryReferenceControl;
 
 
@@ -124,13 +116,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     setButtonChooseFieldsToShowVisibility(true);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneTitle);
-    txtfldTitle.textProperty().addListener((observable, oldValue, newValue) -> {
-      fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTitle);
-    });
-    paneTitle.setVisible(false);
-    ((Pane)paneTitle.getParent()).getChildren().remove(paneTitle); // TODO: remove paneTitle completely or leave on parent if Title doesn't get removed
-
+//    scrpnContent = new ScrollPane();
+//    scrpnContent.setPrefWidth(905);
+//    scrpnContent.setMaxWidth(Double.MAX_VALUE);
+//    scrpnContent.setMaxHeight(Double.MAX_VALUE);
+//    scrpnContent.setFitToWidth(true);
+//    scrpnContent.setFitToHeight(true);
 
 
     abstractListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
@@ -208,7 +199,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
-//    paneTitle.setVisible(StringUtils.isNotNullOrEmpty(entry.getTitle()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
     filesControl.setVisible(entry.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
@@ -232,8 +222,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void setEntryValues(final Entry entry) {
-//    txtfldTitle.setText(entry.getTitle());
-
     htmledAbstract.setHtml(entry.getAbstract());
 
     htmledAbstract.setExpanded(entry.hasAbstract());
@@ -303,11 +291,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void saveEditedFieldsOnEntry() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryTitle)) {
-//      entry.setTitle(txtfldTitle.getText());
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryTitle);
-    }
-
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
       entry.setAbstract(htmledAbstract.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
@@ -409,8 +392,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   public ContextMenu createHiddenFieldsContextMenu() {
     ContextMenu hiddenFieldsMenu = new ContextMenu();
 
-//    if(paneTitle.isVisible() == false)
-//      createHiddenFieldMenuItem(hiddenFieldsMenu, paneTitle, "title");
     if(htmledAbstract.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledAbstract, "entry.abstract");
     if(htmledContent.isVisible() == false)

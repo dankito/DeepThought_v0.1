@@ -11,28 +11,6 @@
 
 <ScrollPane fx:id="scrpnContent" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefViewportHeight="650.0" prefViewportWidth="650.0" prefWidth="905.0" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditEntryDialogController">
          <content>
-            <VBox fx:id="contentPane">
-               <children>
-                  <AnchorPane maxHeight="40.0">
-                     <children>
-                        <HBox fx:id="paneTitle" alignment="CENTER_LEFT" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <Label prefHeight="40.0" prefWidth="120.0" text="%title" />
-                              <TextField fx:id="txtfldTitle" prefHeight="35.0" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets />
-                                 </HBox.margin>
-                              </TextField>
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" height="34.0" stroke="BLACK" strokeType="INSIDE" visible="false" width="3.0">
-                                 <HBox.margin>
-                                    <Insets left="6.0" />
-                                 </HBox.margin>
-                              </Rectangle>
-                           </children>
-                        </HBox>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </VBox>
+            <VBox fx:id="contentPane" />
          </content>
       </ScrollPane>

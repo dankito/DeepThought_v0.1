@@ -5,7 +5,6 @@ package net.deepthought.controller.enums;
  */
 public enum FieldWithUnsavedChanges {
 
-  EntryTitle,
   EntryAbstract,
   EntryContent,
   EntrySeriesTitle,
