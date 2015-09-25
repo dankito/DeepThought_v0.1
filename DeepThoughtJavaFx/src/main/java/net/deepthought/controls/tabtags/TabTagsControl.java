@@ -11,6 +11,7 @@ import net.deepthought.controls.tag.IDisplayedTagsChangedListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
@@ -116,21 +117,13 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 
     if(FXUtils.loadControl(this, "TabTagsControl"))
       setupControl();
-
-    if(deepThought != null)
-      deepThought.addEntityListener(deepThoughtListener);
   }
 
   public void deepThoughtChanged(DeepThought newDeepThought) {
-    if(this.deepThought != null)
-      this.deepThought.removeEntityListener(deepThoughtListener);
-
     this.deepThought = newDeepThought;
     this.systemTags.clear();
 
     if(newDeepThought != null) {
-      newDeepThought.addEntityListener(deepThoughtListener);
-
       this.systemTags = Arrays.asList(new Tag[] { deepThought.AllEntriesSystemTag(), deepThought.EntriesWithoutTagsSystemTag() });
 //      showAllTagsInListViewTags(deepThought);
 
@@ -148,8 +141,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
   public void applicationInstantiated() {
-    allTagsSearchResult = null;
-    searchForAllTags();
+    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+
+    updateTags();
   }
 
   public void clearData() {
@@ -471,14 +465,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
 
-  protected void tagHasBeenAdded(Tag tag) {
+  protected void updateTags() {
     allTagsSearchResult = null;
     searchTags();
-  }
-
-  protected void tagHasBeenRemoved(Tag tag) {
-    allTagsSearchResult.remove(tag);
-    tableViewTagsItems.remove(tag);
   }
 
   public boolean addDisplayedTagsChangedListener(IDisplayedTagsChangedListener listener) {
@@ -554,41 +543,36 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    public void entityCreated(BaseEntity entity) {
+      if(entity instanceof Tag) {
+        updateTags();
+      }
+    }
 
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(entity instanceof Tag) {
+        updateTags();
+      }
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+      if(entity instanceof Tag) {
+        updateTags();
+      }
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getTags()){
-        if(Platform.isFxApplicationThread())
-          tagHasBeenAdded((Tag)addedEntity);
-        else
-          Platform.runLater(() -> tagHasBeenAdded((Tag)addedEntity));
-      }
-    }
 
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == deepThought.getTags()) {
-        searchTags();
-      }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getTags()) {
-        if(Platform.isFxApplicationThread()) {
-          tagHasBeenRemoved((Tag)removedEntity);
-        }
-        else {
-          Platform.runLater(() -> {
-            tagHasBeenRemoved((Tag)removedEntity);
-          });
-        }
-      }
+
     }
   };
 

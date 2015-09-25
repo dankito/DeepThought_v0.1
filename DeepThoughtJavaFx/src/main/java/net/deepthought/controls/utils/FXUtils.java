@@ -25,6 +25,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Cell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.input.KeyCode;
@@ -152,6 +153,22 @@ public class FXUtils {
         nodeToFocus.requestFocus();
       }
     });
+  }
+
+  // thanks for this code to https://stackoverflow.com/questions/12837592/how-to-scroll-to-make-a-node-within-the-content-of-a-scrollpane-visible
+  public static void scrollToNode(ScrollPane pane, Node node) {
+    double width = pane.getContent().getBoundsInLocal().getWidth();
+    double height = pane.getContent().getBoundsInLocal().getHeight();
+
+    double x = node.getBoundsInParent().getMaxX();
+    double y = node.getBoundsInParent().getMaxY();
+
+    // scrolling values range from 0 to 1
+    pane.setVvalue(y/height);
+    pane.setHvalue(x/width);
+
+    // just for usability
+    node.requestFocus();
   }
 
 
