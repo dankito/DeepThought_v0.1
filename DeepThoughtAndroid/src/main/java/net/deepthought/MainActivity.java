@@ -18,6 +18,7 @@ import android.view.MenuItem;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
+import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
@@ -258,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void showArticlesOverview() {
-    List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = Application.getContentExtractorManager().getOnlineArticleContentExtractorsWithArticleOverview();
+    final List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = Application.getContentExtractorManager().getOnlineArticleContentExtractorsWithArticleOverview();
     final String[] articlesOverviews = new String[onlineArticleContentExtractors.size()];
     final Map<String, IOnlineArticleContentExtractor> nameToContentExtractorMap = new HashMap<>();
 
@@ -269,11 +270,18 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder = builder.setItems(articlesOverviews, new DialogInterface.OnClickListener() {
+//    builder = builder.setItems(articlesOverviews, new DialogInterface.OnClickListener() {
+//      @Override
+//      public void onClick(DialogInterface dialog, int which) {
+//        String name = articlesOverviews[which];
+//        IOnlineArticleContentExtractor contentExtractor = nameToContentExtractorMap.get(name);
+//      }
+//    });
+    builder = builder.setAdapter(new OnlineArticleContentExtractorsWithArticleOverviewAdapter(this, onlineArticleContentExtractors), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        String name = articlesOverviews[which];
-        IOnlineArticleContentExtractor contentExtractor = nameToContentExtractorMap.get(name);
+        IOnlineArticleContentExtractor clickedExtractor = onlineArticleContentExtractors.get(which);
+        ActivityManager.getInstance().showArticlesOverviewActivity(clickedExtractor);
       }
     });
 

@@ -10,7 +10,7 @@
     <string name="drawer_open">Öffne Navigationsleiste</string>
     <string name="drawer_close">Schließe Navigationsleiste</string>
 
-    <string name="import_from">Importieren von …</string>
+    <string name="import_article">Artikel importieren</string>
 
     <string name="yes">Ja</string>
     <string name="no">Nein</string>

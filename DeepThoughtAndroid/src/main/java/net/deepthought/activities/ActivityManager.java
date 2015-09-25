@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import net.deepthought.MainActivity;
 import net.deepthought.R;
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.fragments.EntriesFragment;
@@ -69,6 +70,27 @@ public class ActivityManager {
       log.error("Could not start EditEntryActivity", ex);
     }
   }
+
+
+  /*    Articles OverviewA ctivity     */
+
+  protected IOnlineArticleContentExtractor extractorToShowArticlesOverviewActivityFor = null;
+
+  public IOnlineArticleContentExtractor getExtractorToShowArticlesOverviewActivityFor() {
+    return extractorToShowArticlesOverviewActivityFor;
+  }
+
+  public void showArticlesOverviewActivity(IOnlineArticleContentExtractor extractor) {
+    try {
+      this.extractorToShowArticlesOverviewActivityFor = extractor;
+
+      Intent startEditEntryActivityIntent = new Intent(mainActivity, ArticlesOverviewActivity.class);
+      mainActivity.startActivity(startEditEntryActivityIntent);
+    } catch(Exception ex) {
+      log.error("Could not start EditEntryActivity", ex);
+    }
+  }
+
 
   public void navigateToEntriesFragment(FragmentManager fragmentManager, Collection<Entry> entries, int fragmentToReplace) {
     Fragment entriesFragment = new EntriesFragment(entries);

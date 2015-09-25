@@ -7,15 +7,15 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
  */
 public interface IOnlineArticleContentExtractor extends IContentExtractor {
 
-  public final static String NoIcon = "No_Icon";
+  String NoIcon = "No_Icon";
 
 
-  public String getSiteBaseUrl();
+  String getSiteBaseUrl();
 
-  public String getIconUrl();
+  String getIconUrl();
 
-  public boolean hasArticlesOverview();
+  boolean hasArticlesOverview();
 
-  public void getArticlesOverviewAsync(ArticlesOverviewListener listener);
+  void getArticlesOverviewAsync(ArticlesOverviewListener listener);
 
 }

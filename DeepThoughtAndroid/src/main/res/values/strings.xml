@@ -10,7 +10,7 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
-    <string name="import_from">Import from ...</string>
+    <string name="import_article">Import Article</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
