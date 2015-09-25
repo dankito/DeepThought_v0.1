@@ -10,6 +10,10 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.platform.IPlatformConfiguration;
 import net.deepthought.platform.IPreferencesStore;
 import net.deepthought.platform.PreferencesStoreBase;
+import net.deepthought.plugin.IPlugin;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -52,6 +56,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
     if(entityManagerConfiguration == null)
       entityManagerConfiguration = new TestEntityManagerConfiguration();
     return entityManagerConfiguration;
+  }
+
+  @Override
+  public Collection<IPlugin> getStaticallyLinkedPlugins() {
+    return new ArrayList<>();
   }
 
 

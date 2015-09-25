@@ -2,6 +2,12 @@ package net.deepthought.platform;
 
 import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
+import net.deepthought.data.contentextractor.PostillonContentExtractor;
+import net.deepthought.data.contentextractor.SpiegelContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
+import net.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -12,9 +18,13 @@ import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
+import net.deepthought.plugin.IPlugin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -51,6 +61,12 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   @Override
   public EntityManagerConfiguration getEntityManagerConfiguration() {
     return entityManagerConfiguration;
+  }
+
+  @Override
+  public Collection<IPlugin> getStaticallyLinkedPlugins() {
+    return Arrays.asList(new IPlugin[] { new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
+                                         new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor() } );
   }
 
   @Override

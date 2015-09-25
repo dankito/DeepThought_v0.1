@@ -45,9 +45,12 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
     try {
       URL url = PostillonContentExtractor.class.getClassLoader().getResource("der-postillon_icon.png");
       return url.toExternalForm();
-      //return url.toString();
     } catch(Exception ex) {
-      log.error("Could not load der-postillon_icon.png from Resources", ex);
+      String iconFile = tryToManuallyLoadIcon(PostillonContentExtractor.class, "der-postillon_icon.png");
+      if (iconFile != IOnlineArticleContentExtractor.NoIcon)
+        return iconFile;
+      else
+        log.error("Could not load der-postillon_icon.png from Resources", ex);
     }
 
     return super.getIconUrl();

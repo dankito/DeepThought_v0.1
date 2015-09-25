@@ -144,7 +144,7 @@ public class Application {
 //      logResolvingDependencyDuration("DataMerger", startTime);
 
       Application.pluginManager = dependencyResolver.createPluginManager();
-      pluginManager.loadPluginsAsync();
+      pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
 
       Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
       deepThoughtsConnector.runAsync();

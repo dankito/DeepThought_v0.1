@@ -21,7 +21,11 @@ public abstract class SueddeutscheContentExtractorBase extends OnlineNewspaperCo
       return url.toExternalForm();
       //return url.toString();
     } catch(Exception ex) {
-      log.error("Could not load sz_icon.png from Resources", ex);
+      String iconFile = tryToManuallyLoadIcon(SueddeutscheContentExtractorBase.class, "sz_icon.png");
+      if (iconFile != IOnlineArticleContentExtractor.NoIcon)
+        return iconFile;
+      else
+        log.error("Could not load sz_icon.png from Resources", ex);
     }
 
     return super.getIconUrl();

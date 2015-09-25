@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
+import java.util.Collection;
+import java.util.List;
 import java.util.ServiceLoader;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 25/04/15.
@@ -29,52 +29,43 @@ public class DefaultPluginManager implements IPluginManager {
   private final static Logger log = LoggerFactory.getLogger(DefaultPluginManager.class);
 
 
+  protected List<Class> loadedPluginTypes = new CopyOnWriteArrayList<>();
+
+
   public DefaultPluginManager() {
     FileUtils.ensureFolderExists(getPluginsFolderPath());
-    checkIfForStaticallyProvidedPlugins();
   }
 
 
   public File getPluginsFolderFile() {
-//    return new File(Application.getDataFolderPath(), PluginsFolderName);
-    return new File(PluginsFolderName); // TODO: on Android this will not work -> use a folder on SD-Card
+    File pluginsParentFolder = new File(Application.getDataFolderPath());
+    pluginsParentFolder = pluginsParentFolder.getAbsoluteFile();
+    pluginsParentFolder = pluginsParentFolder.getParentFile();
+    return new File(pluginsParentFolder, PluginsFolderName);
   }
 
   public String getPluginsFolderPath() {
     return getPluginsFolderFile().getPath();
   }
 
-  protected void checkIfForStaticallyProvidedPlugins() {
-    try {
-      JarFile jar = FileUtils.getDeepThoughtLibJarFile();
-      Enumeration enumEntries = jar.entries();
 
-      while (enumEntries.hasMoreElements()) {
-        JarEntry entry = (JarEntry)enumEntries.nextElement();
-
-        if(entry.getName().startsWith("plugins/")) {
-          String extension = FileUtils.getFileExtension(entry.getName());
-          if("jar".equals(extension)) {
-            FileUtils.extractJarFileEntry(jar, entry, (File)null);
-          }
-        }
-      }
-    } catch(Exception ex) {
-      log.warn("Could not load Plugins from 'plugins' Resource folder", ex);
-    }
-  }
-
-
-  public void loadPluginsAsync() {
+  public void loadPluginsAsync(final Collection<IPlugin> staticallyLinkedPlugins) {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        loadPlugins();
+        loadPlugins(staticallyLinkedPlugins);
       }
     });
   }
 
-  protected void loadPlugins() {
+  protected void loadPlugins(Collection<IPlugin> staticallyLinkedPlugins) {
+    loadPluginsFromPluginsFolder();
+
+    if(staticallyLinkedPlugins != null)
+      loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
+  }
+
+  protected void loadPluginsFromPluginsFolder() {
     try {
       for (File file : getPluginsFolderFile().listFiles()) {
         if ("jar" .equals(FileUtils.getFileExtension(file)))
@@ -91,14 +82,7 @@ public class DefaultPluginManager implements IPluginManager {
 
       ServiceLoader<IPlugin> pluginLoader = ServiceLoader.load(IPlugin.class, classLoader);
       for(IPlugin plugin : pluginLoader) {
-        try {
-          if(plugin instanceof IContentExtractor)
-            Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
-
-          Application.notifyUser(new Notification(NotificationType.PluginLoaded, Localization.getLocalizedString("plugin.loaded", plugin.getName()), plugin));
-        } catch(Exception ex) {
-          log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
-        }
+        pluginLoaded(plugin);
       }
 
       // to circumvent problems with ServiceLoader, xbeans ResourceFinder can be used
@@ -110,6 +94,27 @@ public class DefaultPluginManager implements IPluginManager {
 //        foundContentExtractorPlugin(implementation);
     } catch(Exception ex) {
       log.error("Could not search for Plugins in Jar file " + jar.getAbsolutePath(), ex);
+    }
+  }
+
+  protected void loadStaticallyLinkedPlugins(Collection<IPlugin> staticallyLinkedPlugins) {
+    for(IPlugin plugin : staticallyLinkedPlugins) {
+      pluginLoaded(plugin);
+    }
+  }
+
+  protected void pluginLoaded(IPlugin plugin) {
+    try {
+      if(loadedPluginTypes.contains(plugin.getClass()))  // avoid that different instances of same plugin get added twice (can for example happen if the same plugin is loaded statically and dynamically
+        return;
+      loadedPluginTypes.add(plugin.getClass());
+
+      if(plugin instanceof IContentExtractor)
+        Application.getContentExtractorManager().addContentExtractor((IContentExtractor)plugin);
+
+      Application.notifyUser(new Notification(NotificationType.PluginLoaded, Localization.getLocalizedString("plugin.loaded", plugin.getName()), plugin));
+    } catch(Exception ex) {
+      log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
     }
   }
 

@@ -2,6 +2,7 @@ package net.deepthought;
 
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -44,7 +46,10 @@ import net.deepthought.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -253,7 +258,28 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void showArticlesOverview() {
+    List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = Application.getContentExtractorManager().getOnlineArticleContentExtractorsWithArticleOverview();
+    final String[] articlesOverviews = new String[onlineArticleContentExtractors.size()];
+    final Map<String, IOnlineArticleContentExtractor> nameToContentExtractorMap = new HashMap<>();
 
+    for(int i = 0; i < onlineArticleContentExtractors.size(); i++) {
+      IOnlineArticleContentExtractor contentExtractor = onlineArticleContentExtractors.get(i);
+      articlesOverviews[i] = contentExtractor.getName();
+      nameToContentExtractorMap.put(contentExtractor.getName(), contentExtractor);
+    }
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder = builder.setItems(articlesOverviews, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        String name = articlesOverviews[which];
+        IOnlineArticleContentExtractor contentExtractor = nameToContentExtractorMap.get(name);
+      }
+    });
+
+    builder.setNegativeButton(R.string.cancel, null);
+
+    builder.create().show();
   }
 
   protected void setControlsEnabledState(boolean enable) {

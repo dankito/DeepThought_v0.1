@@ -16,6 +16,9 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URL;
+import java.security.CodeSource;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -155,6 +158,23 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
   protected String formatDateToDeepThoughtDateString(Date parsedDate) {
     return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+  }
+
+  protected String tryToManuallyLoadIcon(Class classInJarWithIcon, String iconName) {
+    try {
+      CodeSource source = classInJarWithIcon.getProtectionDomain().getCodeSource();
+      URL codeLocation = source.getLocation();
+      String location = codeLocation.toExternalForm();
+      location = location.replace("/classes/main/", "/resources/main/");
+      if(location.startsWith("file:"))
+        location = location.substring("file:".length());
+
+      File iconFile = new File(location, iconName);
+      if(iconFile.exists())
+        return iconFile.toURI().toURL().toExternalForm();
+    } catch(Exception ex2) { }
+
+    return IOnlineArticleContentExtractor.NoIcon;
   }
 
 }

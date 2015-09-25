@@ -6,7 +6,6 @@ import net.deepthought.util.file.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -158,7 +157,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
     return onlineArticleContentExtractors.size() > 0;
   }
 
-  public Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractors() {
+  public List<IOnlineArticleContentExtractor> getOnlineArticleContentExtractors() {
     return onlineArticleContentExtractors;
   }
 
@@ -166,7 +165,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
     return getOnlineArticleContentExtractorsWithArticleOverview().size() > 0;
   }
 
-  public Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview() {
+  public List<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview() {
     return onlineArticleContentExtractorsWithArticleOverview;
   }
 

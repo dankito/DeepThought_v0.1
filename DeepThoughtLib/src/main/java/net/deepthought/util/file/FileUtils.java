@@ -595,11 +595,11 @@ public class FileUtils {
     return null;
   }
 
-  public static void extractJarFileEntry(JarFile jar, JarEntry entry, String destinationDir) throws IOException {
-    extractJarFileEntry(jar, entry, new File(destinationDir));
+  public static File extractJarFileEntry(JarFile jar, JarEntry entry, String destinationDir) throws IOException {
+    return extractJarFileEntry(jar, entry, new File(destinationDir));
   }
 
-  public static void extractJarFileEntry(JarFile jar, JarEntry entry, File destinationDir) throws IOException {
+  public static File extractJarFileEntry(JarFile jar, JarEntry entry, File destinationDir) throws IOException {
     File destinationFile = new File(destinationDir, entry.getName());
     if(destinationDir != null && StringUtils.isNullOrEmpty(destinationDir.getPath()))
       destinationFile = new File(entry.getName());
@@ -619,9 +619,13 @@ public class FileUtils {
 
       fos.close();
       is.close();
+
+      return destinationFile;
     } catch(Exception ex) {
       log.error("Could not write Jar entry " + entry.getName() + " to temp file " + destinationFile, ex);
     }
+
+    return null;
   }
 
 

@@ -14,13 +14,13 @@ import net.deepthought.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by ganymed on 17/08/15.
  */
-public class AndroidPluginManager implements IPluginManager {
+public class AndroidPluginManager extends DefaultPluginManager {
 
   public final static String TextContentExtractorPluginIntentName = "com.renard.plugin.TextFairyPlugin";
 
@@ -36,28 +36,14 @@ public class AndroidPluginManager implements IPluginManager {
   }
 
 
-  @Override
-  public File getPluginsFolderFile() {
-    return null; // not needed in Android
-  }
-
-  @Override
-  public String getPluginsFolderPath() {
-    return null; // not needed in Android
-  }
-
-  @Override
-  public void loadPluginsAsync() {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        loadPlugins();
-      }
-    });
-  }
-
-  protected void loadPlugins() {
+  protected void loadPlugins(Collection<IPlugin> staticallyLinkedPlugins) {
     checkIfOcrContentExtractorPluginIsInstalled();
+    super.loadPlugins(staticallyLinkedPlugins);
+  }
+
+  @Override
+  protected void loadPluginsFromPluginsFolder() {
+    // simply don't do it, ServiceLoader crashes Android Application
   }
 
   protected void checkIfOcrContentExtractorPluginIsInstalled() {
