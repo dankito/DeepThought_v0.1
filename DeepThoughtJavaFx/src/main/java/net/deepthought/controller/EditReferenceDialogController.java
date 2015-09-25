@@ -208,15 +208,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected CollapsibleHtmlEditor htmledReferenceNotes;
 
-
-  @FXML
-  protected TitledPane ttldpnReferenceFiles;
-  @FXML
-  protected FlowPane flpnReferenceFilesPreview;
-  @FXML
-  protected TreeTableView<FileLink> trtblvwReferenceFiles;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmnReferenceFile;
+  protected FilesControl referenceFilesControl;
 
 
   @FXML
@@ -248,14 +240,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected CollapsibleHtmlEditor htmledReferenceSubDivisionNotes;
 
-  @FXML
-  protected TitledPane ttldpnReferenceSubDivisionFiles;
-  @FXML
-  protected FlowPane flpnReferenceSubDivisionFilesPreview;
-  @FXML
-  protected TreeTableView<FileLink> trtblvwReferenceSubDivisionFiles;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmnReferenceSubDivisionFile;
+  protected FilesControl referenceSubDivisionFilesControl;
 
 
   @Override
@@ -386,10 +371,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
 
     seriesTitleFilesControl = new FilesControl(editedSeriesTitleAttachedFiles);
-//    seriesTitleFilesControl.setExpanded(true);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
     seriesTitleFilesControl.setMinHeight(Region.USE_PREF_SIZE);
-//    seriesTitleFilesControl.setMinHeight(250);
     seriesTitleFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
     seriesTitleFilesControl.setMaxHeight(Double.MAX_VALUE);
     paneSeriesTitle.getChildren().add(7, seriesTitleFilesControl);
@@ -494,13 +477,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReference.getChildren().add(7, htmledReferenceNotes);
     VBox.setMargin(htmledReferenceNotes, new Insets(6, 0, 0, 0));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceFiles);
-//    clmnFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-//      @Override
-//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-//        return new FileTreeTableCell(reference);
-//      }
-//    });
+    referenceFilesControl = new FilesControl(editedReferenceAttachedFiles);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceFilesControl);
+    referenceFilesControl.setMinHeight(Region.USE_PREF_SIZE);
+    referenceFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    referenceFilesControl.setMaxHeight(Double.MAX_VALUE);
+    paneReference.getChildren().add(8, referenceFilesControl);
+    VBox.setMargin(referenceFilesControl, new Insets(6, 0, 0, 0));
   }
 
   protected void setReferenceIssueTextFieldToDateSelectedInDatePicker() {
@@ -571,14 +554,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceSubDivision.getChildren().add(5, htmledReferenceSubDivisionNotes);
     VBox.setMargin(htmledReferenceSubDivisionNotes, new Insets(6, 0, 0, 0));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnReferenceSubDivisionFiles);
-
-//    clmnReferenceSubDivisionFile.setCellFactory(new Callback<TreeTableColumn<FileLink, String>, TreeTableCell<FileLink, String>>() {
-//      @Override
-//      public TreeTableCell<FileLink, String> call(TreeTableColumn<FileLink, String> param) {
-//        return new FileTreeTableCell(referenceSubDivision);
-//      }
-//    });
+    referenceSubDivisionFilesControl = new FilesControl(editedReferenceSubDivisionAttachedFiles);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionFilesControl);
+    referenceSubDivisionFilesControl.setMinHeight(Region.USE_PREF_SIZE);
+    referenceSubDivisionFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    referenceSubDivisionFilesControl.setMaxHeight(Double.MAX_VALUE);
+    paneReferenceSubDivision.getChildren().add(6, referenceSubDivisionFilesControl);
+    VBox.setMargin(referenceSubDivisionFilesControl, new Insets(6, 0, 0, 0));
   }
 
 
@@ -608,8 +590,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(reference.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledReferenceNotes.setVisible(StringUtils.isNotNullOrEmpty(reference.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnReferenceFiles.setVisible(reference.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-
+    referenceFilesControl.setVisible(reference.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     btnChooseReferenceSubDivisionFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
 
@@ -622,7 +603,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceSubDivisionOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledReferenceSubDivisionNotes.setVisible(StringUtils.isNotNullOrEmpty(referenceSubDivision.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnReferenceSubDivisionFiles.setVisible(referenceSubDivision.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    referenceSubDivisionFilesControl.setVisible(referenceSubDivision.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
   }
 
 
@@ -1071,8 +1052,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     if(htmledReferenceNotes.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceNotes, "notes");
-    if(ttldpnReferenceFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceFiles, "files");
+    if(referenceFilesControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, referenceFilesControl, "files");
 
     hiddenFieldsMenu.show(btnChooseReferenceFieldsToShow, Side.BOTTOM, 0, 0);
   }
@@ -1104,8 +1085,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     if(htmledReferenceSubDivisionNotes.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledReferenceSubDivisionNotes, "notes");
-    if(ttldpnReferenceSubDivisionFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnReferenceSubDivisionFiles, "files");
+    if(referenceSubDivisionFilesControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, referenceSubDivisionFilesControl, "files");
 
     hiddenFieldsMenu.show(btnChooseReferenceSubDivisionFieldsToShow, Side.BOTTOM, 0, 0);
   }
