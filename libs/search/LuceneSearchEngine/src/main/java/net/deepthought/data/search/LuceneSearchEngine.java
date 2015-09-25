@@ -416,6 +416,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       else if(directoryReaders.containsKey(entityClass) == false) { // on startup
         DirectoryReader directoryReader = DirectoryReader.open(getIndexWriter(entityClass), true);
         directoryReaders.put(entityClass, directoryReader);
+        return directoryReader;
       }
       else {
         DirectoryReader directoryReader = directoryReaders.get(entityClass);

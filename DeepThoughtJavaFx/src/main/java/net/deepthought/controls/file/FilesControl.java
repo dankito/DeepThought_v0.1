@@ -61,6 +61,7 @@ import javafx.util.Callback;
 public class FilesControl extends CollapsiblePane implements ICleanUp {
 
   protected final static Logger log = LoggerFactory.getLogger(FilesControl.class);
+  public static final int ContentPaneMinHeight = 150;
 
 
   protected DeepThought deepThought = null;
@@ -74,6 +75,8 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 
   protected Button btnAddFile;
 
+
+  VBox contentPane;
 
   @FXML
   protected TreeTableView<FileLink> trtblvwFiles;
@@ -158,7 +161,12 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     setupTitle();
     this.setExpanded(false);
 
-    VBox contentPane = new VBox();
+    contentPane = new VBox();
+    contentPane.setMinHeight(ContentPaneMinHeight);
+    contentPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    contentPane.setMaxHeight(Region.USE_PREF_SIZE);
+    contentPane.setMaxWidth(Double.MAX_VALUE);
+    contentPane.setPadding(new Insets(6, 0, 0, 0));
 
     clmFileName = new TreeTableColumn<>();
     JavaFxLocalization.bindTableColumnBaseText(clmFileName, "name");
@@ -176,7 +184,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     });
 
     clmFileUri = new TreeTableColumn<>();
-    JavaFxLocalization.bindTableColumnBaseText(clmFileName, "uri");
+    JavaFxLocalization.bindTableColumnBaseText(clmFileUri, "uri");
     clmFileUri.setMinWidth(Region.USE_PREF_SIZE);
     clmFileUri.setPrefWidth(600);
     clmFileUri.setMaxWidth(Double.MAX_VALUE);
@@ -280,6 +288,12 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     btnShowHideSearchPane.selectedProperty().addListener((observable, oldValue, newValue) -> {
       if (newValue == true && isExpanded() == false)
         setExpanded(true);
+
+      double searchPaneHeight = searchAndSelectFilesControl.getHeight() > searchAndSelectFilesControl.getMinHeight() ?
+          searchAndSelectFilesControl.getHeight() : searchAndSelectFilesControl.getMinHeight();
+      double newHeight = newValue == true ? ContentPaneMinHeight + searchPaneHeight : ContentPaneMinHeight;
+      contentPane.setMinHeight(newHeight);
+      contentPane.setMaxHeight(newHeight);
     });
 
     setTitle(titlePane);

@@ -1,5 +1,7 @@
 package net.deepthought.controls;
 
+import net.deepthought.controls.utils.FXUtils;
+
 import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
@@ -261,9 +263,10 @@ public class CollapsiblePane extends VBox {
     }
 
     if(newContent != null) {
-      net.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(newContent);
+      FXUtils.ensureNodeOnlyUsesSpaceIfVisible(newContent);
       this.getChildren().add(newContent);
       VBox.setVgrow(newContent, Priority.ALWAYS);
+//      VBox.setMargin(newContent, new Insets(6, 0, 0, 0));
       newContent.setVisible(isExpanded());
 
       if(newContent instanceof Region)

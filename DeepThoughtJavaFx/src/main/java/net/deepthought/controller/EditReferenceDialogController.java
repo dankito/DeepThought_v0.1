@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
 import net.deepthought.controls.utils.EditedEntitiesHolder;
 import net.deepthought.controls.utils.FXUtils;
@@ -65,6 +66,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -162,15 +165,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   protected CollapsibleHtmlEditor htmledSeriesTitleNotes;
 
-
-  @FXML
-  protected TitledPane ttldpnSeriesTitleFiles;
-  @FXML
-  protected FlowPane flpnSeriesTitleFilesPreview;
-  @FXML
-  protected TreeTableView<FileLink> trtblvwSeriesTitleFiles;
-  @FXML
-  protected TreeTableColumn<FileLink, String> clmnSeriesTitleFile;
+  protected FilesControl seriesTitleFilesControl;
 
 
   @FXML
@@ -390,7 +385,15 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneSeriesTitle.getChildren().add(6, htmledSeriesTitleNotes);
     VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(ttldpnSeriesTitleFiles);
+    seriesTitleFilesControl = new FilesControl(editedSeriesTitleAttachedFiles);
+//    seriesTitleFilesControl.setExpanded(true);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
+    seriesTitleFilesControl.setMinHeight(Region.USE_PREF_SIZE);
+//    seriesTitleFilesControl.setMinHeight(250);
+    seriesTitleFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
+    seriesTitleFilesControl.setMaxHeight(Double.MAX_VALUE);
+    paneSeriesTitle.getChildren().add(7, seriesTitleFilesControl);
+    VBox.setMargin(seriesTitleFilesControl, new Insets(6, 0, 0, 0));
   }
 
   protected void setSeriesTitle(SeriesTitle newSeriesTitle) {
@@ -592,7 +595,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneSeriesTitleOnlineAddress.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getOnlineAddress()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
     htmledSeriesTitleNotes.setVisible(StringUtils.isNotNullOrEmpty(seriesTitle.getNotes()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    ttldpnSeriesTitleFiles.setVisible(seriesTitle.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    seriesTitleFilesControl.setVisible(seriesTitle.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
 
 
     btnChooseReferenceFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll);
@@ -790,7 +793,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.SeriesTitleAttachedFiles)) {
+    if(fieldsWithUnsavedSeriesTitleChanges.contains(FieldWithUnsavedChanges.SeriesTitleAttachedFiles)) {
       for(FileLink removedFile : editedSeriesTitleAttachedFiles.getRemovedEntities())
         seriesTitle.removeAttachedFile(removedFile);
       editedSeriesTitleAttachedFiles.getRemovedEntities().clear();
@@ -799,7 +802,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         seriesTitle.addAttachedFile(addedFile);
       editedSeriesTitleAttachedFiles.getAddedEntities().clear();
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.SeriesTitleAttachedFiles);
+      fieldsWithUnsavedSeriesTitleChanges.remove(FieldWithUnsavedChanges.SeriesTitleAttachedFiles);
     }
 
     for(FileLink removedEmbeddedFile : editedSeriesTitleEmbeddedFiles.getRemovedEntities())
@@ -865,7 +868,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceAttachedFiles)) {
+    if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceAttachedFiles)) {
       for(FileLink removedFile : editedReferenceAttachedFiles.getRemovedEntities())
         reference.removeAttachedFile(removedFile);
       editedReferenceAttachedFiles.getRemovedEntities().clear();
@@ -874,7 +877,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         reference.addAttachedFile(addedFile);
       editedReferenceAttachedFiles.getAddedEntities().clear();
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceAttachedFiles);
+      fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAttachedFiles);
     }
 
     for(FileLink removedEmbeddedFile : editedReferenceEmbeddedFiles.getRemovedEntities())
@@ -921,7 +924,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles)) {
+    if(fieldsWithUnsavedReferenceSubDivisionChanges.contains(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles)) {
       for(FileLink removedFile : editedReferenceSubDivisionAttachedFiles.getRemovedEntities())
         referenceSubDivision.removeAttachedFile(removedFile);
       editedReferenceSubDivisionAttachedFiles.getRemovedEntities().clear();
@@ -930,7 +933,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         referenceSubDivision.addAttachedFile(addedFile);
       editedReferenceSubDivisionAttachedFiles.getAddedEntities().clear();
 
-      fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles);
+      fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles);
     }
 
     for(FileLink removedEmbeddedFile : editedReferenceSubDivisionEmbeddedFiles.getRemovedEntities())
@@ -955,8 +958,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     htmledSeriesTitleNotes.setHtml(seriesTitle.getNotes());
 
     seriesTitlePersonsControl.setSeries(seriesTitle);
-
-//    trtblvwSeriesTitleFiles.setRoot(new FileRootTreeItem(seriesTitle));
 
     fieldsWithUnsavedSeriesTitleChanges.clear();
 
@@ -1038,8 +1039,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     if(htmledSeriesTitleNotes.isVisible() == false)
       createHiddenFieldMenuItem(hiddenFieldsMenu, htmledSeriesTitleNotes, "notes");
-    if(ttldpnSeriesTitleFiles.isVisible() == false)
-      createHiddenFieldMenuItem(hiddenFieldsMenu, ttldpnSeriesTitleFiles, "files");
+    if(seriesTitleFilesControl.isVisible() == false)
+      createHiddenFieldMenuItem(hiddenFieldsMenu, seriesTitleFilesControl, "files");
 
     hiddenFieldsMenu.show(btnChooseSeriesTitleFieldsToShow, Side.BOTTOM, 0, 0);
   }

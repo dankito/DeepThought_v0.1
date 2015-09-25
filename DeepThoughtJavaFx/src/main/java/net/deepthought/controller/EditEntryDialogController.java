@@ -122,20 +122,27 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 //    scrpnContent.setMaxHeight(Double.MAX_VALUE);
 //    scrpnContent.setFitToWidth(true);
 //    scrpnContent.setFitToHeight(true);
-
+//    scrpnContent.setPrefViewportHeight(650);
+//    scrpnContent.setPrefViewportWidth(650);
+//    scrpnContent.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+//    scrpnContent.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+//
+//    contentPane = new VBox();
+//    contentPane.setFillWidth(true);
+//    scrpnContent.setContent(contentPane);
 
     abstractListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
-    contentPane.getChildren().add(1, htmledAbstract);
+    contentPane.getChildren().add(0, htmledAbstract);
     VBox.setVgrow(htmledAbstract, Priority.SOMETIMES);
     VBox.setMargin(htmledAbstract, new Insets(6, 0, 0, 0));
 
     contentListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
     htmledContent = new CollapsibleHtmlEditor("content", contentListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
-    contentPane.getChildren().add(2, htmledContent);
+    contentPane.getChildren().add(1, htmledContent);
     VBox.setVgrow(htmledContent, Priority.ALWAYS);
     VBox.setMargin(htmledContent, new Insets(6, 0, 0, 0));
 
@@ -144,7 +151,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
-    contentPane.getChildren().add(5, entryReferenceControl);
+    contentPane.getChildren().add(4, entryReferenceControl);
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
 
@@ -153,7 +160,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
-    contentPane.getChildren().add(6, entryPersonsControl);
+    contentPane.getChildren().add(5, entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
 
@@ -166,7 +173,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
     filesControl.setMaxHeight(Double.MAX_VALUE);
-    contentPane.getChildren().add(7, filesControl);
+    contentPane.getChildren().add(6, filesControl);
     VBox.setVgrow(filesControl, Priority.SOMETIMES);
     VBox.setMargin(filesControl, new Insets(6, 0, 0, 0));
   }
@@ -182,7 +189,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryTagsControl.setExpanded(true);
     VBox.setVgrow(entryTagsControl, Priority.SOMETIMES);
     VBox.setMargin(entryTagsControl, new Insets(6, 0, 0, 0));
-    contentPane.getChildren().add(3, entryTagsControl);
+    contentPane.getChildren().add(2, entryTagsControl);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
@@ -193,7 +200,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryCategoriesControl.setExpanded(true);
     VBox.setVgrow(entryCategoriesControl, Priority.SOMETIMES);
     VBox.setMargin(entryCategoriesControl, new Insets(6, 0, 0, 0));
-    contentPane.getChildren().add(4, entryCategoriesControl);
+    contentPane.getChildren().add(3, entryCategoriesControl);
 
     setCategoriesPaneVisibility();
   }

@@ -560,7 +560,15 @@ public class Dialogs {
     loader.setLocation(Dialogs.class.getClassLoader().getResource(DialogsBaseFolder + dialogFilename));
 
     Parent parent = loader.load();
-    JavaFxLocalization.resolveResourceKeys(parent);
+    return createStage(parent, stageStyle, modality, owner, createInEntityDialogFrame, loader);
+  }
+
+  protected static Stage createStage(Parent rootNode, StageStyle stageStyle, Modality modality, Window owner) throws IOException {
+    return createStage(rootNode, stageStyle, modality, owner, false, null);
+  }
+
+  protected static Stage createStage(Parent rootNode, StageStyle stageStyle, Modality modality, Window owner, boolean createInEntityDialogFrame, FXMLLoader loader) throws IOException {
+    JavaFxLocalization.resolveResourceKeys(rootNode);
 
     Stage dialogStage = new Stage();
     if(owner != null)
@@ -570,11 +578,11 @@ public class Dialogs {
 
     Scene scene = null;
     if(createInEntityDialogFrame) {
-      BorderPane dialogFrame = loadDialogFrame(loader, parent);
+      BorderPane dialogFrame = loadDialogFrame(loader, rootNode);
       scene = new Scene(dialogFrame);
     }
     else
-      scene = new Scene(parent);
+      scene = new Scene(rootNode);
 
     dialogStage.setScene(scene);
     return dialogStage;
