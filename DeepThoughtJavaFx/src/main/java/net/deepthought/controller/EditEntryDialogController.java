@@ -153,7 +153,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
-    contentPane.getChildren().add(4, entryReferenceControl);
+    contentPane.getChildren().add(5, entryReferenceControl);
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
 
@@ -162,7 +162,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
-    contentPane.getChildren().add(5, entryPersonsControl);
+    contentPane.getChildren().add(6, entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
 
@@ -175,28 +175,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
     filesControl.setMaxHeight(Double.MAX_VALUE);
-    contentPane.getChildren().add(6, filesControl);
+    contentPane.getChildren().add(7, filesControl);
     VBox.setVgrow(filesControl, Priority.SOMETIMES);
     VBox.setMargin(filesControl, new Insets(6, 0, 0, 0));
   }
 
   protected void setupTagsAndCategoriesControl() {
-    paneTagsAndCategories = new SplitPane();
-
-    paneTagsAndCategories.setMinHeight(26);
-    paneTagsAndCategories.setMinHeight(Region.USE_PREF_SIZE);
-    paneTagsAndCategories.setPrefHeight(Region.USE_COMPUTED_SIZE);
-//    paneTagsAndCategories.setMaxHeight(Region.USE_PREF_SIZE);
-    paneTagsAndCategories.setMaxHeight(Double.MAX_VALUE);
-
-    // as ScrollPane is too stupid to resize correctly when entryTagsControl or entryCategoriesControl is expanded, i wrapped paneTagsAndCategories in another ScrollPane
-    ScrollPane tagsAndCategoriesScrollPane = new ScrollPane(paneTagsAndCategories);
-    tagsAndCategoriesScrollPane.setFitToWidth(true);
-
-    contentPane.getChildren().add(3, tagsAndCategoriesScrollPane);
-    VBox.setVgrow(tagsAndCategoriesScrollPane, Priority.SOMETIMES);
-    VBox.setMargin(tagsAndCategoriesScrollPane, new Insets(6, 0, 0, 0));
-
     // TODO: replace entry by IEditedEntitiesHolder<Tags> so that Dialog controls edited tags -> if a Tag is removed which is in creationResult, it can be removed from creationResult as well (also Categories, ...)
     entryTagsControl = new EntryTagsControl(entry);
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
@@ -205,7 +189,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
-    paneTagsAndCategories.getItems().add(entryTagsControl);
+    VBox.setVgrow(entryTagsControl, Priority.SOMETIMES);
+    VBox.setMargin(entryTagsControl, new Insets(6, 0, 0, 0));
+    contentPane.getChildren().add(3, entryTagsControl);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
@@ -214,30 +200,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryTagsControl.setPrefHeight(250);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setExpanded(true);
-    paneTagsAndCategories.getItems().add(entryCategoriesControl);
-
-    entryTagsControl.heightProperty().addListener((observable, oldValue, newValue) -> setPaneTagsAndCategoriesHeight());
-    entryCategoriesControl.heightProperty().addListener((observable, oldValue, newValue) -> setPaneTagsAndCategoriesHeight());
+    VBox.setVgrow(entryCategoriesControl, Priority.SOMETIMES);
+    VBox.setMargin(entryCategoriesControl, new Insets(6, 0, 0, 0));
+    contentPane.getChildren().add(4, entryCategoriesControl);
 
     setCategoriesPaneVisibility();
-  }
-
-  protected void setPaneTagsAndCategoriesHeight() {
-    // TODO: i just don't know how to do it but paneTagsAndCategories never resized correctly
-    // right now if entryTagsControl or entryCategoriesControl is expanded it uses rest of dialog an other controls are now shown
-    double height = entryTagsControl.getHeight() > entryCategoriesControl.getHeight() ? entryTagsControl.getHeight() : entryCategoriesControl.getHeight();
-//    paneTagsAndCategories.setMinHeight(height);
-//    paneTagsAndCategories.setPrefHeight(height);
-//    paneTagsAndCategories.setMaxHeight(height);
-//    paneTagsAndCategories.layout();
-    entryTagsControl.setVisible(false);
-
-    Platform.runLater(() -> {
-      entryTagsControl.setVisible(true);
-      Platform.runLater(() -> {
-        scrpnContent.layout();
-      });
-    });
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
@@ -258,14 +225,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   protected void setCategoriesPaneVisibility(boolean showCategories) {
     entryCategoriesControl.setVisible(showCategories);
-
-    if(showCategories) {
-      if(paneTagsAndCategories.getItems().contains(entryCategoriesControl) == false)
-        paneTagsAndCategories.getItems().add(entryCategoriesControl);
-    }
-    else {
-      paneTagsAndCategories.getItems().remove(entryCategoriesControl);
-    }
   }
 
   protected void referenceControlFieldChanged(FieldChangedEvent event) {
@@ -506,7 +465,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     setEntryValues(entry);
     entry.addEntityListener(entryListener);
 
-    contentPane.minHeightProperty().bind(windowStage.getScene().heightProperty().subtract(pnBottomBar.heightProperty()).subtract(8));
+//    contentPane.minHeightProperty().bind(windowStage.getScene().heightProperty().subtract(pnBottomBar.heightProperty()).subtract(8));
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
     FXUtils.focusNode(htmledContent);
