@@ -457,14 +457,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
   }
 
 
-  protected void clearTableViewTagsItemsWithoutInvokingTableViewTagsSelectedItemChangedEvent() {
-    log.debug("Calling clear() on tableViewTagsItems");
-    tblvwTags.getSelectionModel().selectedItemProperty().removeListener(tableViewTagsSelectedItemChangedListener);
-    tableViewTagsItems.clear();
-    tblvwTags.getSelectionModel().selectedItemProperty().addListener(tableViewTagsSelectedItemChangedListener);
-  }
-
-
   protected void updateTags() {
     allTagsSearchResult = null;
     searchTags();
@@ -482,32 +474,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     for(IDisplayedTagsChangedListener listener : displayedTagsChangedListeners)
       listener.displayedTagsChanged(results);
   }
-
-
-  protected Comparator<Tag> tagComparator = new Comparator<Tag>() {
-    @Override
-    public int compare(Tag tag1, Tag tag2) {
-      if(tag1 == null || tag2 == null) {
-        log.debug("This should actually never be the case, both tag's name are null");
-        return 0;
-      }
-      if(tag1 == null || tag1.getName() == null) {
-        log.debug("tag1 {} or its name is null", tag1);
-        return -1;
-      }
-      if(tag2 == null || tag2.getName() == null) {
-        log.debug("tag2 {} or its name is null", tag2);
-        return 1;
-      }
-
-      if(tag1 instanceof SystemTag == true && tag2 instanceof SystemTag == false)
-        return -1;
-      else if(tag1 instanceof SystemTag == false && tag2 instanceof SystemTag == true)
-        return 1;
-
-      return tag1.getName().compareTo(tag2.getName());
-    }
-  };
 
 
   @FXML
