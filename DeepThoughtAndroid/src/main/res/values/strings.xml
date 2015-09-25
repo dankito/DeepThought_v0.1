@@ -3,12 +3,14 @@
 
     <string name="app_name">Deep Thought</string>
 
-    <string name="drawer_open">Open navigation drawer</string>
-    <string name="drawer_close">Close navigation drawer</string>
-
     <string name="title_section_entries">Entries</string>
     <string name="title_section_tags">Tags</string>
     <string name="title_section_search">Search</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="import_from">Import from ...</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

@@ -25,6 +25,7 @@ import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
@@ -130,6 +131,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     else if(notification.getType() == NotificationType.Info)
       AlertHelper.showInfoMessage(this, notification);
     else if(notification.getType() == NotificationType.PluginLoaded) {
+      if(notification.getParameter() instanceof IOnlineArticleContentExtractor && ((IOnlineArticleContentExtractor)notification.getParameter()).hasArticlesOverview())
+        invalidateOptionsMenu(); // now there may are some Article Overview Providers to show -> invalidate its Action
 //      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
@@ -249,6 +252,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     new RegisterUserDevicesDialog().show(fragmentManager, RegisterUserDevicesDialog.TAG);
   }
 
+  protected void showArticlesOverview() {
+
+  }
+
   protected void setControlsEnabledState(boolean enable) {
     if(loadingDataProgressDialog != null) {
       if(enable)
@@ -282,6 +289,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         menu.findItem(R.id.action_device_registration).setTitle(Localization.getLocalizedString("device.registration"));
 
+    MenuItem articlesOverviewItem = menu.findItem(R.id.action_articles_overview);
+    articlesOverviewItem.setVisible(Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview());
+
         return true;
     }
 
@@ -295,6 +305,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           showRegisterUserDevicesDialog();
           return true;
         }
+      else if (id == R.id.action_articles_overview) {
+        showArticlesOverview();
+        return true;
+      }
+
         return super.onOptionsItemSelected(item);
     }
 

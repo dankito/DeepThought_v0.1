@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.ServiceLoader;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Created by ganymed on 25/04/15.
@@ -28,6 +31,7 @@ public class DefaultPluginManager implements IPluginManager {
 
   public DefaultPluginManager() {
     FileUtils.ensureFolderExists(getPluginsFolderPath());
+    checkIfForStaticallyProvidedPlugins();
   }
 
 
@@ -39,6 +43,27 @@ public class DefaultPluginManager implements IPluginManager {
   public String getPluginsFolderPath() {
     return getPluginsFolderFile().getPath();
   }
+
+  protected void checkIfForStaticallyProvidedPlugins() {
+    try {
+      JarFile jar = FileUtils.getDeepThoughtLibJarFile();
+      Enumeration enumEntries = jar.entries();
+
+      while (enumEntries.hasMoreElements()) {
+        JarEntry entry = (JarEntry)enumEntries.nextElement();
+
+        if(entry.getName().startsWith("plugins/")) {
+          String extension = FileUtils.getFileExtension(entry.getName());
+          if("jar".equals(extension)) {
+            FileUtils.extractJarFileEntry(jar, entry, (File)null);
+          }
+        }
+      }
+    } catch(Exception ex) {
+      log.warn("Could not load Plugins from 'plugins' Resource folder", ex);
+    }
+  }
+
 
   public void loadPluginsAsync() {
     Application.getThreadPool().runTaskAsync(new Runnable() {

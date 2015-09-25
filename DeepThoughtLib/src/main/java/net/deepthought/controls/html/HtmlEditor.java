@@ -11,11 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.html.HTMLDocument;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -360,11 +358,11 @@ public class HtmlEditor implements ICleanUp {
     String htmlEditorPath = null;
 
     try {
-      JarFile jar = getJarFilePath();
+      String htmlEditorDirectory = Application.getDataFolderPath();
 
-      File htmlEditorDirectory = new File(Application.getDataFolderPath());
+      JarFile jar = FileUtils.getDeepThoughtLibJarFile();
+      Enumeration enumEntries = jar.entries();
 
-      java.util.Enumeration enumEntries = jar.entries();
       while (enumEntries.hasMoreElements()) {
         JarEntry entry = (JarEntry)enumEntries.nextElement();
         if (entry.isDirectory()) {
@@ -378,7 +376,7 @@ public class HtmlEditor implements ICleanUp {
         }
 
         if(entry.getName().startsWith(HtmlEditorFolderName)) {
-          writeHtmlEditorFileToTempDir(jar, entry, htmlEditorDirectory);
+          FileUtils.extractJarFileEntry(jar, entry, htmlEditorDirectory);
         }
       }
     } catch(Exception ex) {
@@ -386,38 +384,5 @@ public class HtmlEditor implements ICleanUp {
     }
 
     return htmlEditorPath;
-  }
-
-  protected static JarFile getJarFilePath() throws IOException {
-    URL url = HtmlEditor.class.getClassLoader().getResource(HtmlEditorFolderAndFileName);
-    String jarPathString = url.toExternalForm();
-    jarPathString = jarPathString.replace("!/" + HtmlEditorFolderAndFileName, "");
-    if(jarPathString.startsWith("jar:"))
-      jarPathString = jarPathString.substring(4);
-    if(jarPathString.startsWith("file:"))
-      jarPathString = jarPathString.substring(5);
-    return new JarFile(jarPathString);
-  }
-
-  protected static void writeHtmlEditorFileToTempDir(JarFile jar, JarEntry entry, File tempDir) throws IOException {
-    File tempFile = new File(tempDir, entry.getName());
-    try {
-      tempFile.getParentFile().mkdirs();
-      try { tempFile.createNewFile(); } catch(Exception ex) { }
-
-      InputStream is = jar.getInputStream(entry); // get the input stream
-      FileOutputStream fos = new FileOutputStream(tempFile);
-      byte[] buf = new byte[4096];
-      int r;
-
-      while ((r = is.read(buf)) != -1) {
-        fos.write(buf, 0, r);
-      }
-
-      fos.close();
-      is.close();
-    } catch(Exception ex) {
-      log.error("Could not write Jar entry " + entry.getName() + " to temp file " + tempFile, ex);
-    }
   }
 }

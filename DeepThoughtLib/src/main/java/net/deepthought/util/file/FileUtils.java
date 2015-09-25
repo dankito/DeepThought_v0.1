@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
 
@@ -26,6 +27,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Created by ganymed on 01/01/15.
@@ -559,6 +562,66 @@ public class FileUtils {
     }
 
     return false;
+  }
+
+  public static JarFile getDeepThoughtLibJarFile() {
+    try {
+      return new JarFile(getDeepThoughtLibJarFilePath());
+    } catch(Exception ex) {
+      log.error("Could not retrieve DeepThoughtLib's Jar file path", ex);
+    }
+
+    return null;
+  }
+
+  public static String getDeepThoughtLibJarFilePath() {
+    try {
+      String pathOfAnyResource = "Strings.properties"; // take the name of any Resource that's for save there
+      URL url = Application.class.getClassLoader().getResource(pathOfAnyResource);
+
+      String jarPathString = url.toExternalForm();
+      jarPathString = jarPathString.replace("!/" + pathOfAnyResource, ""); // remove path of resource from path and last '!/' as well (file ends with '.jar!/'
+
+      if(jarPathString.startsWith("jar:")) // remove leading jar:
+        jarPathString = jarPathString.substring(4);
+      if(jarPathString.startsWith("file:")) // remove leading file:
+        jarPathString = jarPathString.substring(5);
+
+      return jarPathString;
+    } catch(Exception ex) {
+      log.error("Could not retrieve DeepThoughtLib's Jar file path", ex);
+    }
+
+    return null;
+  }
+
+  public static void extractJarFileEntry(JarFile jar, JarEntry entry, String destinationDir) throws IOException {
+    extractJarFileEntry(jar, entry, new File(destinationDir));
+  }
+
+  public static void extractJarFileEntry(JarFile jar, JarEntry entry, File destinationDir) throws IOException {
+    File destinationFile = new File(destinationDir, entry.getName());
+    if(destinationDir != null && StringUtils.isNullOrEmpty(destinationDir.getPath()))
+      destinationFile = new File(entry.getName());
+
+    try {
+      destinationFile.getParentFile().mkdirs();
+      try { destinationFile.createNewFile(); } catch(Exception ex) { log.error("Could not create file " + destinationFile.getAbsolutePath(), ex); }
+
+      InputStream is = jar.getInputStream(entry); // get the input stream
+      FileOutputStream fos = new FileOutputStream(destinationFile);
+      byte[] buf = new byte[4096];
+      int r;
+
+      while ((r = is.read(buf)) != -1) {
+        fos.write(buf, 0, r);
+      }
+
+      fos.close();
+      is.close();
+    } catch(Exception ex) {
+      log.error("Could not write Jar entry " + entry.getName() + " to temp file " + destinationFile, ex);
+    }
   }
 
 

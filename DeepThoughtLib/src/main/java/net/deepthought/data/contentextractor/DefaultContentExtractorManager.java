@@ -6,6 +6,7 @@ import net.deepthought.util.file.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -19,6 +20,8 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
   protected List<IOcrContentExtractor> ocrContentExtractors = new CopyOnWriteArrayList<>();
 
   protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = new CopyOnWriteArrayList<>();
+
+  protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractorsWithArticleOverview = new CopyOnWriteArrayList<>();
 
 
   public DefaultContentExtractorManager() {
@@ -52,6 +55,8 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
   //@Override
   public boolean addOnlineArticleContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
+    if(contentExtractor.hasArticlesOverview())
+      onlineArticleContentExtractorsWithArticleOverview.add(contentExtractor);
     return onlineArticleContentExtractors.add(contentExtractor);
   }
 
@@ -147,6 +152,22 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
     }
 
     return null;
+  }
+
+  public boolean hasOnlineArticleContentExtractors() {
+    return onlineArticleContentExtractors.size() > 0;
+  }
+
+  public Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractors() {
+    return onlineArticleContentExtractors;
+  }
+
+  public boolean hasOnlineArticleContentExtractorsWithArticleOverview() {
+    return getOnlineArticleContentExtractorsWithArticleOverview().size() > 0;
+  }
+
+  public Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview() {
+    return onlineArticleContentExtractorsWithArticleOverview;
   }
 
 }

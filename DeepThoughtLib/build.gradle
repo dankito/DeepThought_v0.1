@@ -2,75 +2,6 @@ apply plugin: 'java'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-// don't do this, Android won't be able to compile then
-//sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
-//sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
-
-//println "DeepThoughtLib: isAndroid = " + extensions.findByName("isAndroid")
-//println "DeepThoughtLib: isAndroid = " + extensions.properties.get("isAndroid")
-//println "DeepThoughtLib: isAndroid = " + properties.get("isAndroid")
-//println "DeepThoughtLib: isAndroid = " + project.isAndroid
-println "DeepThoughtLib: isAndroid = " + System.properties.get("isAndroid")
-if(System.properties.get("isAndroid") == true) {
-    println "I think i'm on Android"
-//    sourceSets.main.resources.srcDirs = ['src/main/res']
-    println sourceSets.main.resources.srcDirs
-
-    sourceSets {
-        main {
-            java {
-                exclude 'Strings_de.properties'
-            }
-        }
-    }
-
-
-}
-else {
-    println "I think i'm on Java"
-    println "Going to manually copyFile resources ..."
-    fileTree(sourceSets.main.output.resourcesDir).visit { FileVisitDetails details ->
-        copy {
-            from details.file
-            into sourceSets.main.output.classesDir
-        }
-    }
-    fileTree(sourceSets.test.output.resourcesDir).visit { FileVisitDetails details ->
-        copy {
-            from details.file
-            into sourceSets.test.output.classesDir
-        }
-    }
-}
-
-//println "Resources dir before: " + sourceSets.main.resources.srcDirs
-//sourceSets.main.resources.srcDirs = ['src/main/resources']
-//println "Resources dir after: " + sourceSets.main.resources.srcDirs
-
-//task copyTestResources(type: Copy) {
-//    println "Going to manually copyFile resources ..."
-//    from "${projectDir}/src/main/resources"
-//    into "${buildDir}/classes/main"
-//}
-//processTestResources.dependsOn copyTestResources
-
-////if(properties.hasProperty("isAndroid") == false /*|| properties.get("isAndroid") == false*/) {
-//if(extensions.findByName("isAndroid") == false) { // Android packages Resources automatically correctly, for Java Gradle Projects we have to do this for ourselves
-//    println "Going to manually copyFile resources ..."
-//    fileTree(sourceSets.main.output.resourcesDir).visit { FileVisitDetails details ->
-//        copy {
-//            from details.file
-//            into sourceSets.main.output.classesDir
-//        }
-//    }
-//    fileTree(sourceSets.test.output.resourcesDir).visit { FileVisitDetails details ->
-//        copy {
-//            from details.file
-//            into sourceSets.test.output.classesDir
-//        }
-//    }
-//}
-
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile project(':json-io')
@@ -86,6 +17,7 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.10.19'
 }
 
+// so that Test classes from other projects can see classes from src/test folder
 task testJar(type: Jar, dependsOn: testClasses) {
     baseName = "test-${project.archivesBaseName}"
     from sourceSets.test.output

@@ -2,21 +2,31 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 
+import java.util.Collection;
+
 /**
  * Created by ganymed on 24/04/15.
  */
 public interface IContentExtractorManager {
 
-//  public Collection<IContentExtractor> getContentExtractors();
+//  Collection<IContentExtractor> getContentExtractors();
 
-  public boolean addContentExtractor(IContentExtractor contentExtractor);
+  boolean addContentExtractor(IContentExtractor contentExtractor);
 
-//  public List<IContentExtractor> getContentExtractorsForUrl(String url);
+//  List<IContentExtractor> getContentExtractorsForUrl(String url);
 
-  public ContentExtractOptions getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent);
+  ContentExtractOptions getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent);
 
-  public boolean hasOcrContentExtractors();
+  boolean hasOcrContentExtractors();
 
-  public IOcrContentExtractor getPreferredOcrContentExtractor();
+  IOcrContentExtractor getPreferredOcrContentExtractor();
+
+  boolean hasOnlineArticleContentExtractors();
+
+  Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractors();
+
+  boolean hasOnlineArticleContentExtractorsWithArticleOverview();
+
+   Collection<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview();
 
 }
