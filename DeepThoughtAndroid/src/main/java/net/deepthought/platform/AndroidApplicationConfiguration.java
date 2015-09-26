@@ -20,6 +20,7 @@ import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.plugin.AndroidPluginManager;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.plugin.IPluginManager;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,13 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
 
     this.preferencesStore = new AndroidPreferencesStore(context);
     this.platformConfiguration = new AndroidPlatformConfiguration(context);
-    this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder());
+    this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder(), preferencesStore.getDatabaseDataModelVersion());
+
+    // if App has been uninstalled and not gets reinstalled data folder on SD card may still exists (doesn't get deleted on Uninstall)
+    // -> it still contains data, especially the Lucene search index which points to not anymore existing Entities
+    // TODO: may also save Database and Android Preferences in data folder so that after uninstalling complete data can be restored
+    if(preferencesStore.getDatabaseDataModelVersion() == 0)
+      FileUtils.deleteFile(preferencesStore.getDataFolder());
   }
 
 

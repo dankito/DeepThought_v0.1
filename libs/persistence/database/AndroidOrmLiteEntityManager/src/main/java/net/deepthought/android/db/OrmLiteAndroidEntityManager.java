@@ -75,15 +75,15 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
     EntityConfig[] entities = configurator.readEntityConfiguration(configuration, connectionSource);
 
     getDaosAndMayCreateTables(configuration, entities);
+
+    if (configuration.getDataBaseCurrentDataModelVersion() != configuration.getApplicationDataModelVersion())
+      Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 
   protected void getDaosAndMayCreateTables(EntityManagerConfiguration configuration, EntityConfig[] entities) throws SQLException {
     for(EntityConfig entity : entities) {
       mapEntityClassesToDaos.put(entity.getEntityClass(), entity.getDao());
     }
-
-    if (configuration.getDataBaseCurrentDataModelVersion() == 0)
-      Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 
   protected void deleteRegisteredDevice() {
