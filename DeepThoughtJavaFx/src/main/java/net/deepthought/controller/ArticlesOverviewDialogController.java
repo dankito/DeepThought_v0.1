@@ -215,6 +215,6 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
   protected void showCouldNotCreateEntryError(Object source, DeepThoughtError error) {
     log.error("Could not create Entry from Source " + source, error.getException());
-    Alerts.showErrorMessage(windowStage, error.getNotificationMessage(), Localization.getLocalizedString("can.not.create.entry.from", source), error.getException());
+    Alerts.showErrorMessage(windowStage, error, Localization.getLocalizedString("can.not.create.entry.from", source));
   }
 }

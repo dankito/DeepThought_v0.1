@@ -62,15 +62,18 @@ public class TagsAdapter extends BaseAdapter {
 
     @Override
     public void notification(Notification notification) {
-      if(notification.getType() == NotificationType.ApplicationInstantiated)
+      if(notification.getType() == NotificationType.ApplicationInstantiated) {
         Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+        searchForAllTags();
+      }
     }
   };
 
   protected void deepThoughtChanged(DeepThought deepThought) {
     this.deepThought = deepThought;
 
-    searchForAllTags();
+    if(Application.isInstantiated())
+      searchForAllTags();
   }
 
 

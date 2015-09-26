@@ -18,52 +18,6 @@ public class AlertHelper {
   }
 
 
-  public static void showErrorMessage(final Activity activity, int errorMessageResId) {
-    showErrorMessage(activity, activity.getString(errorMessageResId));
-  }
-
-  public static void showErrorMessage(final Activity activity, int errorMessageResId, int alertTitleResId) {
-    showErrorMessage(activity, activity.getString(errorMessageResId), activity.getString(alertTitleResId));
-  }
-
-  public static void showErrorMessage(final Activity activity, DeepThoughtError error) {
-    if(error.hasNotificationMessageTitle())
-      showErrorMessage(activity, error.getNotificationMessage(), error.getNotificationMessageTitle());
-    else
-      showErrorMessage(activity, error.getNotificationMessage());
-  }
-
-  public static void showErrorMessage(final Activity activity, final CharSequence errorMessage) {
-    showErrorMessage(activity, errorMessage, null);
-  }
-
-  public static void showErrorMessage(final Activity activity, final CharSequence errorMessage, final CharSequence alertTitle) {
-    if(isRunningOnUiThread() == true) {
-      showErrorMessageOnUiThread(activity, errorMessage, alertTitle);
-    }
-    else {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          showErrorMessageOnUiThread(activity, errorMessage, alertTitle);
-        }
-      });
-    }
-  }
-
-  public static void showErrorMessageOnUiThread(final Activity activity, final CharSequence errorMessage, final CharSequence alertTitle) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-    if(alertTitle != null)
-      builder = builder.setTitle(alertTitle);
-    builder = builder.setMessage(errorMessage);
-    // TODO: set error icon
-
-    builder.setNegativeButton(R.string.ok, null);
-
-    builder.create().show();
-  }
-
-
   public static void showInfoMessage(Activity activity, int infoMessageResId) {
     showInfoMessage(activity, activity.getString(infoMessageResId));
   }
@@ -107,4 +61,52 @@ public class AlertHelper {
 
     builder.create().show();
   }
+
+
+  public static void showErrorMessage(final Activity activity, int errorMessageResId) {
+    showErrorMessage(activity, activity.getString(errorMessageResId));
+  }
+
+  public static void showErrorMessage(final Activity activity, int errorMessageResId, int alertTitleResId) {
+    showErrorMessage(activity, activity.getString(errorMessageResId), activity.getString(alertTitleResId));
+  }
+
+  public static void showErrorMessage(final Activity activity, DeepThoughtError error) {
+    showErrorMessage(activity, error, error.getNotificationMessageTitle());
+  }
+
+  public static void showErrorMessage(final Activity activity, DeepThoughtError error, CharSequence alertTitle) {
+    showErrorMessage(activity, error.getNotificationMessage(), alertTitle);
+  }
+
+  public static void showErrorMessage(final Activity activity, final CharSequence errorMessage) {
+    showErrorMessage(activity, errorMessage, null);
+  }
+
+  public static void showErrorMessage(final Activity activity, final CharSequence errorMessage, final CharSequence alertTitle) {
+    if(isRunningOnUiThread() == true) {
+      showErrorMessageOnUiThread(activity, errorMessage, alertTitle);
+    }
+    else {
+      activity.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          showErrorMessageOnUiThread(activity, errorMessage, alertTitle);
+        }
+      });
+    }
+  }
+
+  public static void showErrorMessageOnUiThread(final Activity activity, final CharSequence errorMessage, final CharSequence alertTitle) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    if(alertTitle != null)
+      builder = builder.setTitle(alertTitle);
+    builder = builder.setMessage(errorMessage);
+    // TODO: set error icon
+
+    builder.setNegativeButton(R.string.ok, null);
+
+    builder.create().show();
+  }
+
 }

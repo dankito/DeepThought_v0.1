@@ -36,6 +36,8 @@ public class EntriesAdapter extends BaseAdapter {
 
   protected List<Entry> searchResults = null;
 
+  protected String lastSearchTerm = null;
+
 
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     this.context = context;
@@ -134,6 +136,8 @@ public class EntriesAdapter extends BaseAdapter {
     if(entriesSearch != null && entriesSearch.isCompleted() == false)
       entriesSearch.interrupt();
 
+    lastSearchTerm = searchTerm;
+
     // TODO: enable filtering Abstract or Content only (currently both set to true)
     entriesSearch = new EntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
@@ -152,6 +156,7 @@ public class EntriesAdapter extends BaseAdapter {
 
   public void showAllEntries() {
     searchResults = null;
+    lastSearchTerm = null;
     notifyDataSetChangedThreadSafe();
   }
 
@@ -194,8 +199,12 @@ public class EntriesAdapter extends BaseAdapter {
   };
 
   protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
-    if(entity instanceof Entry /*|| entity instanceof Tag*/)
-      notifyDataSetChangedThreadSafe();
+    if(entity instanceof Entry /*|| entity instanceof Tag*/) {
+      if(lastSearchTerm != null) // reapply last search to update Entries
+        searchEntries(lastSearchTerm);
+      else
+        notifyDataSetChangedThreadSafe();
+    }
   }
 
   public void cleanUp() {

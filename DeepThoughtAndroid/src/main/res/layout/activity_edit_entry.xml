@@ -17,7 +17,7 @@
     <TextView
         android:id="@+id/txtvwEditEntryAbstractLabel"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/edit_entry_title_height"
+        android:layout_height="@dimen/edit_entry_abstract_height"
         android:layout_below="@+id/toolbar"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="4dp"
@@ -28,10 +28,11 @@
     <EditText
         android:id="@+id/edtxtEditEntryAbstract"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/edit_entry_title_height"
+        android:layout_height="wrap_content"
         android:layout_alignTop="@+id/txtvwEditEntryAbstractLabel"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/txtvwEditEntryAbstractLabel"
+        android:layout_alignBottom="@+id/txtvwEditEntryAbstractLabel"
         android:textSize="@dimen/edit_entry_edit_texts_text_size"
         />
 
@@ -61,6 +62,7 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/txtvwEditEntryTagsLabel"
+            android:layout_alignBottom="@+id/txtvwEditEntryTagsLabel"
             android:layout_marginRight="4dp"
             android:textSize="@dimen/edit_entry_labels_text_size"
             android:ellipsize="none"
@@ -76,13 +78,6 @@
             android:visibility="visible"
             >
 
-            <!--<LinearLayout-->
-                <!--android:id="@+id/llydEditEntryTags"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:orientation="horizontal"-->
-                <!--/>-->
-
             <EditText
                 android:id="@+id/edtxtEditEntrySearchTag"
                 android:layout_width="wrap_content"
@@ -97,10 +92,12 @@
             <Button
                 android:id="@+id/btnEditEntryNewTag"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/edit_entry_search_tags_height"
+                android:layout_height="wrap_content"
                 android:minWidth="70dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
+                android:layout_alignBottom="@+id/edtxtEditEntrySearchTag"
+                android:textSize="@dimen/edit_entry_edit_texts_text_size"
                 android:text="@string/edit_entry_button_new_tag_text"
                 />
 
@@ -109,9 +106,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/edit_entry_list_view_tags_height"
                 android:minHeight="@dimen/edit_entry_list_view_tags_min_height"
+                android:layout_below="@+id/edtxtEditEntrySearchTag"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/edtxtEditEntrySearchTag"
                 />
 
 
@@ -123,12 +120,13 @@
         android:id="@+id/txtvwEditEntryTextLabel"
         android:layout_width="match_parent"
         android:layout_height="@dimen/edit_entry_entry_label_height"
+        android:maxHeight="@dimen/edit_entry_entry_label_height"
         android:layout_below="@+id/rlydTags"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
         android:textSize="@dimen/edit_entry_labels_text_size"
-        android:text="@string/edit_entry_entry_label"
+        android:text="@string/edit_entry_content_label"
         />
 
     <EditText
@@ -139,8 +137,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="-2dp"
         android:gravity="start"
+        android:textSize="@dimen/edit_entry_edit_texts_text_size"
         />
 
 </RelativeLayout>

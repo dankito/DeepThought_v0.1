@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import net.deepthought.MainActivity;
 import net.deepthought.R;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -56,14 +57,35 @@ public class ActivityManager {
 
   protected Entry entryToBeEdited = null;
 
+  protected EntryCreationResult entryCreationResultToBeEdited = null;
+
   public Entry getEntryToBeEdited() {
     return entryToBeEdited;
   }
 
-  public void showEditEntryActivity(Entry entry) {
-    try {
-      entryToBeEdited = entry;
+  public EntryCreationResult getEntryCreationResultToBeEdited() {
+    return entryCreationResultToBeEdited;
+  }
 
+  public void resetEditEntryActivityCachedData() {
+    entryToBeEdited = null;
+    entryCreationResultToBeEdited = null;
+  }
+
+
+  public void showEditEntryActivity(Entry entry) {
+    showEditEntryActivity(entry, null);
+  }
+
+  public void showEditEntryActivity(EntryCreationResult creationResult) {
+    showEditEntryActivity(null, creationResult);
+  }
+
+  protected void showEditEntryActivity(Entry entry, EntryCreationResult creationResult) {
+    entryToBeEdited = entry;
+    entryCreationResultToBeEdited = creationResult;
+
+    try {
       Intent startEditEntryActivityIntent = new Intent(mainActivity, EditEntryActivity.class);
       mainActivity.startActivityForResult(startEditEntryActivityIntent, EditEntryActivity.RequestCode);
     } catch(Exception ex) {
@@ -72,7 +94,7 @@ public class ActivityManager {
   }
 
 
-  /*    Articles OverviewA ctivity     */
+  /*    Articles Overview Activity     */
 
   protected IOnlineArticleContentExtractor extractorToShowArticlesOverviewActivityFor = null;
 

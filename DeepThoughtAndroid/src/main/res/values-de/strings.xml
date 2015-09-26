@@ -39,7 +39,7 @@
     <string name="edit_entry_tags_label">Schlagwörter:</string>
     <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
     <string name="edit_entry_button_new_tag_text">Neu</string>
-    <string name="edit_entry_entry_label">Eintrag</string>
+    <string name="edit_entry_content_label">Eintrag</string>
     <string name="ok">OK</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
 

@@ -32,6 +32,7 @@ import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.html.IJavaScriptExecutor;
+import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
@@ -59,8 +60,9 @@ public class EditEntryActivity extends AppCompatActivity {
   private final static Logger log = LoggerFactory.getLogger(EditEntryActivity.class);
 
 
-  protected Entry entry;
-  protected List<Tag> entryTags = new ArrayList<>();
+  protected Entry entry = null;
+  protected EntryCreationResult entryCreationResult = null;
+  protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected EditText edtxtEditEntryAbstract;
   protected EditText edtxtEditEntryContent;
@@ -83,6 +85,8 @@ public class EditEntryActivity extends AppCompatActivity {
     setEntryValues();
 
     unsetEntryHasBeenEdited();
+    if(entryCreationResult != null)
+      setEntryHasBeenEdited();
   }
 
   protected void setupUi() {
@@ -185,21 +189,31 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
+    if(entry != null) {
+      entryEditedTags = new ArrayList<>(entry.getTagsSorted());
+    }
+
+    entryCreationResult = ActivityManager.getInstance().getEntryCreationResultToBeEdited();
+    if(entryCreationResult != null) {
+      entry = entryCreationResult.getCreatedEntry();
+      entryEditedTags = entryCreationResult.getTags();
+    }
 
     if(entry != null) {
-      entryTags = new ArrayList<>(entry.getTagsSorted());
-      setTextViewEditEntryTags();
-
       edtxtEditEntryAbstract.setText(Html.fromHtml(entry.getAbstract()));
       edtxtEditEntryContent.setText(Html.fromHtml(entry.getContent()));
-      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
         public void entryTagsChanged(List<Tag> entryTags) {
           setEntryHasBeenEdited();
           setTextViewEditEntryTags();
         }
       }));
+
+      setTextViewEditEntryTags();
     }
+
+    ActivityManager.getInstance().resetEditEntryActivityCachedData();
   }
 
   @Override
@@ -312,7 +326,7 @@ public class EditEntryActivity extends AppCompatActivity {
   protected void setTextViewEditEntryTags() {
     String tags = "";
 
-    for(Tag tag : entryTags)
+    for(Tag tag : entryEditedTags)
       tags += tag.getName() + ", ";
 
     if(tags.length() > 1)
@@ -366,10 +380,12 @@ public class EditEntryActivity extends AppCompatActivity {
     entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
     entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
 
+    if(entryCreationResult != null)
+      entryCreationResult.saveCreatedEntities();
     if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
 
-    entry.setTags(entryTags);
+    entry.setTags(entryEditedTags);
 
     unsetEntryHasBeenEdited();
   }
@@ -431,9 +447,9 @@ public class EditEntryActivity extends AppCompatActivity {
     else {
       Tag newTag = new Tag(tagName);
       Application.getDeepThought().addTag(newTag);
-      entryTags.add(newTag);
+      entryEditedTags.add(newTag);
       setEntryHasBeenEdited();
-      Collections.sort(entryTags);
+      Collections.sort(entryEditedTags);
       setTextViewEditEntryTags();
     }
   }

@@ -315,16 +315,22 @@ public class Alerts {
 
   public static void showErrorMessage(final Stage owner, DeepThoughtError error) {
     String title = error.getNotificationMessageTitle();
+    if(error.getNotificationMessageTitle() == null)
+      title = Localization.getLocalizedString("alert.message.title.error.occurred");
+
+    showErrorMessage(owner, error, title);
+  }
+
+  public static void showErrorMessage(final Stage owner, DeepThoughtError error, String alertTitle) {
     String message = error.getNotificationMessage();
 
     if(error.isSevere()) {
-      title = Localization.getLocalizedString("alert.message.title.severe.error.occurred");
+      if(StringUtils.isNullOrEmpty(alertTitle))
+        alertTitle = Localization.getLocalizedString("alert.message.title.severe.error.occurred");
       message = Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage());
     }
-    else if(error.getNotificationMessageTitle() == null)
-      title = Localization.getLocalizedString("alert.message.title.error.occurred");
 
-    showErrorMessage(owner, message, title, error.getException());
+    showErrorMessage(owner, message, alertTitle, error.getException());
   }
 
   public static void showErrorMessage(final Stage owner, final String errorMessage, final String alertTitle) {

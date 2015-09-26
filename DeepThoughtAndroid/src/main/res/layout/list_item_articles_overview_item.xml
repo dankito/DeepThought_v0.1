@@ -2,7 +2,8 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="@dimen/list_item_article_overview_item_height"
+              android:layout_height="wrap_content"
+              android:minHeight="@dimen/list_item_article_overview_item_height"
     >
 
     <!-- Without setting focusable to false ImageView would receive focus and list item would therefore not be clickable (but receives on click events anyway) -->
@@ -19,38 +20,47 @@
         android:focusable="false"
         />
 
-    <TextView
-        android:id="@+id/txtvwArticleSubTitle"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_item_article_overview_item_titles_height"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/imgvwArticlePreviewImage"
-        android:textSize="@dimen/list_item_article_overview_item_titles_text_size"
-        />
-
-    <TextView
-        android:id="@+id/txtvwArticleTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/list_item_article_overview_item_titles_height"
-        android:layout_centerVertical="true"
-        android:layout_below="@+id/txtvwArticleSubTitle"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/imgvwArticlePreviewImage"
-        android:textSize="@dimen/list_item_article_overview_item_titles_text_size"
-        />
-
-    <TextView
-        android:id="@+id/txtvwArticleSummary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_below="@+id/txtvwArticleTitle"
+        android:layout_height="fill_parent"
+        android:minHeight="@dimen/list_item_article_overview_item_height"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_toRightOf="@+id/imgvwArticlePreviewImage"
-        android:gravity="center|left"
-        android:textSize="@dimen/list_item_article_overview_item_summary_text_size"
-        />
+        >
+
+        <TextView
+            android:id="@+id/txtvwArticleSubTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:minHeight="@dimen/list_item_article_overview_item_titles_min_height"
+            android:maxHeight="@dimen/list_item_article_overview_item_titles_max_height"
+            android:textSize="@dimen/list_item_article_overview_item_titles_text_size"
+            />
+
+        <TextView
+            android:id="@+id/txtvwArticleTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:minHeight="@dimen/list_item_article_overview_item_titles_min_height"
+            android:maxHeight="@dimen/list_item_article_overview_item_titles_max_height"
+            android:textSize="@dimen/list_item_article_overview_item_titles_text_size"
+            />
+
+        <TextView
+            android:id="@+id/txtvwArticleSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center|left"
+            android:textSize="@dimen/list_item_article_overview_item_summary_text_size"
+            />
+
+    </LinearLayout>
 
 </RelativeLayout>

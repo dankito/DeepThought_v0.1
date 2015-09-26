@@ -266,19 +266,26 @@ public class MainWindowController implements Initializable {
       MenuItem articleContentExtractorMenuItem = new MenuItem(onlineArticleContentExtractor.getSiteBaseUrl());
       articleContentExtractorMenuItem.setOnAction(event -> Dialogs.showArticlesOverviewDialog(onlineArticleContentExtractor));
 
-      if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
-        HBox graphicsPane = new HBox(new ImageView(onlineArticleContentExtractor.getIconUrl()));
-        graphicsPane.setPrefWidth(38);
-        graphicsPane.setMaxWidth(38);
-        graphicsPane.setAlignment(Pos.CENTER);
-        articleContentExtractorMenuItem.setGraphic(graphicsPane);
-      }
+      if(onlineArticleContentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon)
+        articleContentExtractorMenuItem.setGraphic(createOnlineArticleContentExtractorIcon(onlineArticleContentExtractor.getIconUrl()));
 
       btnOnlineArticleExtractors.getItems().add(articleContentExtractorMenuItem);
-//        btnOnlineArticleExtractors.setDisable(false);
       btnOnlineArticleExtractors.setVisible(true);
-//        grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(btnOnlineArticleExtractors.getPrefWidth());
     }
+  }
+
+  protected Node createOnlineArticleContentExtractorIcon(String iconUrl) {
+    ImageView iconView = new ImageView(iconUrl);
+    iconView.setPreserveRatio(true);
+    iconView.setFitHeight(38);
+
+    HBox graphicsPane = new HBox(iconView);
+    graphicsPane.setPrefWidth(38);
+    graphicsPane.setMaxWidth(38);
+    graphicsPane.setMaxHeight(38);
+    graphicsPane.setAlignment(Pos.CENTER);
+
+    return graphicsPane;
   }
 
   protected void deepThoughtChangedThreadSafe(final DeepThought deepThought) {

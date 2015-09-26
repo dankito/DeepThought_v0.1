@@ -33,7 +33,6 @@ import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Entry;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.SearchFragment;
@@ -47,10 +46,8 @@ import net.deepthought.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -260,23 +257,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   protected void showArticlesOverview() {
     final List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = Application.getContentExtractorManager().getOnlineArticleContentExtractorsWithArticleOverview();
-    final String[] articlesOverviews = new String[onlineArticleContentExtractors.size()];
-    final Map<String, IOnlineArticleContentExtractor> nameToContentExtractorMap = new HashMap<>();
-
-    for(int i = 0; i < onlineArticleContentExtractors.size(); i++) {
-      IOnlineArticleContentExtractor contentExtractor = onlineArticleContentExtractors.get(i);
-      articlesOverviews[i] = contentExtractor.getName();
-      nameToContentExtractorMap.put(contentExtractor.getName(), contentExtractor);
-    }
 
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//    builder = builder.setItems(articlesOverviews, new DialogInterface.OnClickListener() {
-//      @Override
-//      public void onClick(DialogInterface dialog, int which) {
-//        String name = articlesOverviews[which];
-//        IOnlineArticleContentExtractor contentExtractor = nameToContentExtractorMap.get(name);
-//      }
-//    });
     builder = builder.setAdapter(new OnlineArticleContentExtractorsWithArticleOverviewAdapter(this, onlineArticleContentExtractors), new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
@@ -353,8 +335,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     switch(requestCode) {
       case EditEntryActivity.RequestCode:
         if(resultCode == RESULT_OK && data != null) {
-          Entry entry = ActivityManager.getInstance().getEntryToBeEdited();
-
+          // Entry has been updated
         }
         break;
     }

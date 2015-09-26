@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.deepthought.R;
@@ -82,15 +81,12 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
     ArticlesOverviewItem article = getArticleAt(position);
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
+    imgvwArticlePreviewImage.setImageBitmap(null);
     if(article.hasPreviewImageUrl()) {
       IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
     }
-    else
-      imgvwArticlePreviewImage.setImageBitmap(null);
 
     TextView txtvwArticleSubTitle = (TextView)convertView.findViewById(R.id.txtvwArticleSubTitle);
-    RelativeLayout.LayoutParams subTitleParams = (RelativeLayout.LayoutParams)txtvwArticleSubTitle.getLayoutParams();
-
     if(article.hasSubTitle()) {
       txtvwArticleSubTitle.setVisibility(View.VISIBLE);
       txtvwArticleSubTitle.setText(article.getSubTitle());
@@ -99,25 +95,21 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
       txtvwArticleSubTitle.setVisibility(View.GONE);
 
     TextView txtvwArticleTitle = (TextView)convertView.findViewById(R.id.txtvwArticleTitle);
-    RelativeLayout.LayoutParams titleParams = (RelativeLayout.LayoutParams)txtvwArticleTitle.getLayoutParams();
-    txtvwArticleTitle.setText(article.getTitle());
-    if(article.hasSubTitle())
-      titleParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
+    if(article.hasTitle()) {
+      txtvwArticleTitle.setVisibility(View.VISIBLE);
+      txtvwArticleTitle.setText(article.getTitle());
+    }
     else
-      titleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+      txtvwArticleTitle.setVisibility(View.GONE);
 
     TextView txtvwArticleSummary = (TextView)convertView.findViewById(R.id.txtvwArticleSummary);
     if(article.hasSummary()) {
       txtvwArticleSummary.setVisibility(View.VISIBLE);
-      subTitleParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
       txtvwArticleSummary.setText(article.getSummary());
     }
     else {
       txtvwArticleSummary.setVisibility(View.GONE);
-      subTitleParams.removeRule(RelativeLayout.ALIGN_PARENT_TOP);
     }
-
-    txtvwArticleSubTitle.setLayoutParams(subTitleParams);
 
     return convertView;
   }

@@ -13,6 +13,8 @@ import net.deepthought.adapter.ArticlesOverviewAdapter;
 import net.deepthought.data.contentextractor.CreateEntryListener;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.helper.AlertHelper;
+import net.deepthought.util.Localization;
 
 /**
  * Created by ganymed on 25/09/15.
@@ -61,10 +63,10 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
         public void entryCreated(EntryCreationResult creationResult) {
           // TODO: this is the same code as in CreateEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst() and in ArticlesOverviewDialogController -> unify
           if (creationResult.successful())
-            ActivityManager.getInstance().showEditEntryActivity(creationResult.getCreatedEntry());
-          // TODO:
-//        else
-//          showCouldNotCreateEntryError(creationResult);
+            ActivityManager.getInstance().showEditEntryActivity(creationResult);
+        else
+          AlertHelper.showErrorMessage(ArticlesOverviewActivity.this, creationResult.getError(),
+              Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
         }
       });
     }

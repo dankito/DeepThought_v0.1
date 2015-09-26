@@ -68,7 +68,7 @@ public class OnlineArticleContentExtractorsWithArticleOverviewAdapter extends Ba
       imgvwExtractorIcon.setImageBitmap(null);
 
     TextView txtvwExtractorName = (TextView)convertView.findViewById(R.id.txtvwExtractorName);
-    txtvwExtractorName.setText(extractor.getName());
+    txtvwExtractorName.setText(extractor.getSiteBaseUrl());
 
     return convertView;
   }
