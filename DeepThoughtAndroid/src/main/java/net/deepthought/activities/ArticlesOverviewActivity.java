@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -51,6 +53,25 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     ListView lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
+  }
+
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.activity_articles_overview_menu, menu);
+    return super.onCreateOptionsMenu(menu);
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    if(id == R.id.mnitmActionUpdateArticlesOverview) {
+      articlesOverviewAdapter.retrieveArticles();
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
   }
 
 

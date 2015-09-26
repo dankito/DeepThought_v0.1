@@ -12,6 +12,8 @@
 
     <string name="import_article">Artikel importieren</string>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Abbrechen</string>
     <string name="yes">Ja</string>
     <string name="no">Nein</string>
 
@@ -19,7 +21,7 @@
     <string name="add">Hinzufügen</string>
     <string name="find">Suchen</string>
     <string name="save">Speichern</string>
-    <string name="cancel">Abbrechen</string>
+    <string name="update">Update</string>
     <string name="ocr">OCR</string>
 
     <string name="name">Name</string>
@@ -40,7 +42,6 @@
     <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
     <string name="edit_entry_button_new_tag_text">Neu</string>
     <string name="edit_entry_content_label">Eintrag</string>
-    <string name="ok">OK</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
 
     <string name="alert_dialog_entry_has_unsaved_changes_text">Eintrag beinhaltet nicht gespeicherte Änderungen. Möchten Sie sie speichern?</string>

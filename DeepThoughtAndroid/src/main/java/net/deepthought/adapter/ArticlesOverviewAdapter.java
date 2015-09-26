@@ -42,7 +42,7 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
     retrieveArticles();
   }
 
-  private void retrieveArticles() {
+  public void retrieveArticles() {
     articlesOverviewItems.clear();
     extractorWithArticleOverview.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override

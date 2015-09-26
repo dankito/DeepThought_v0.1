@@ -54,6 +54,9 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
 
     getDaosAndMayCreateTables(configuration, entities);
 
+    if (configuration.getDataBaseCurrentDataModelVersion() < configuration.getApplicationDataModelVersion())
+      Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
+
     statementExecutor = new StatementExecutor(connectionSource.getDatabaseType(), entities[0], entities[0].getDao());
   }
 
@@ -64,9 +67,6 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
       if (configuration.getDataBaseCurrentDataModelVersion() == 0)
         TableUtils.createTableIfNotExists(this.connectionSource, entity.getEntityClass());
     }
-
-    if (configuration.getDataBaseCurrentDataModelVersion() < configuration.getApplicationDataModelVersion())
-      Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 
 
