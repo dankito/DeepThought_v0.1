@@ -16,33 +16,46 @@
         android:background="@color/toolbar_background">
     </android.support.v7.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/txtvwEditEntryAbstractLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/edit_entry_abstract_height"
-        android:layout_below="@+id/toolbar"
-        android:layout_alignParentLeft="true"
-        android:layout_marginRight="4dp"
-        android:textSize="@dimen/edit_entry_labels_text_size"
-        android:text="@string/edit_entry_abstract_label"
-        />
-
-    <EditText
-        android:id="@+id/edtxtEditEntryAbstract"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/rlydEntryAbstract"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/txtvwEditEntryAbstractLabel"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/txtvwEditEntryAbstractLabel"
-        android:layout_alignBottom="@+id/txtvwEditEntryAbstractLabel"
-        android:textSize="@dimen/edit_entry_edit_texts_text_size"
-        />
+        android:layout_below="@+id/toolbar"
+        >
+
+        <TextView
+            android:id="@+id/txtvwEditEntryAbstractLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/edit_entry_abstract_height"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="4dp"
+            android:gravity="center_vertical"
+            android:textSize="@dimen/edit_entry_labels_text_size"
+            android:text="@string/edit_entry_abstract_label"
+            />
+
+        <TextView
+            android:id="@+id/txtvwEntryAbstractPreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/txtvwEditEntryAbstractLabel"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/txtvwEditEntryAbstractLabel"
+            android:layout_alignBottom="@+id/txtvwEditEntryAbstractLabel"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="@dimen/edit_entry_labels_text_size"
+            />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/rlydTags"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/txtvwEditEntryAbstractLabel"
+        android:layout_below="@+id/rlydEntryAbstract"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true">
 

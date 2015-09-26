@@ -7,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -65,7 +64,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EntryCreationResult entryCreationResult = null;
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
-  protected EditText edtxtEditEntryAbstract;
+  protected TextView txtvwEditEntryAbstract;
+  protected RelativeLayout rlydEntryAbstract;
 
   protected RelativeLayout rlydTags;
   protected RelativeLayout rlydEditEntryEditTags;
@@ -73,6 +73,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EditText edtxtEditEntrySearchTag;
   protected ListView lstvwEditEntryTags;
 
+  protected AndroidHtmlEditor abstractHtmlEditor = null;
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected boolean hasEntryBeenEdited = false;
@@ -106,8 +107,22 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         actionBar.setHomeButtonEnabled(true);
       }
 
-      edtxtEditEntryAbstract = (EditText) findViewById(R.id.edtxtEditEntryAbstract);
-      edtxtEditEntryAbstract.addTextChangedListener(entryAbstractOrContentChangedWatcher);
+      txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
+
+      rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
+      rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
+
+      abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentAndAbstractListener);
+      rlydEntryAbstract.addView(abstractHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
+
+      RelativeLayout.LayoutParams abstractEditorParams = (RelativeLayout.LayoutParams)abstractHtmlEditor.getLayoutParams();
+      abstractEditorParams.addRule(RelativeLayout.BELOW, R.id.txtvwEditEntryAbstractLabel);
+      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+      abstractHtmlEditor.setLayoutParams(abstractEditorParams);
+      abstractHtmlEditor.setVisibility(View.GONE);
 
       rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
       rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -125,17 +140,17 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
 
-      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
+      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentAndAbstractListener);
       RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
       rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-      RelativeLayout.LayoutParams editorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
-      editorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-      editorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-      editorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-      editorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+      RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
+      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
-      contentHtmlEditor.setLayoutParams(editorParams);
+      contentHtmlEditor.setLayoutParams(contentEditorParams);
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
@@ -169,7 +184,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     if(entry != null) {
-      edtxtEditEntryAbstract.setText(Html.fromHtml(entry.getAbstract()));
+      txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
+      abstractHtmlEditor.setHtml(entry.getAbstract());
       contentHtmlEditor.setHtml(entry.getContent());
 
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
@@ -340,6 +356,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   public void cleanUp() {
+    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
     AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
   }
 
@@ -349,7 +366,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntry() {
-    entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
+    entry.setAbstract(abstractHtmlEditor.getHtml());
     entry.setContent(contentHtmlEditor.getHtml());
 
     if(entryCreationResult != null)
@@ -361,6 +378,17 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     unsetEntryHasBeenEdited();
   }
+
+
+  protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      if(abstractHtmlEditor.getVisibility() == View.GONE)
+        abstractHtmlEditor.setVisibility(View.VISIBLE);
+      else
+        abstractHtmlEditor.setVisibility(View.GONE);
+    }
+  };
 
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override
@@ -443,7 +471,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   };
 
-  protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
+  protected IHtmlEditorListener contentAndAbstractListener = new IHtmlEditorListener() {
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
       setEntryHasBeenEdited();

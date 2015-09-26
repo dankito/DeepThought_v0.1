@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       AlertHelper.showErrorMessage(this, (DeepThoughtError) notification);
     else if(notification.getType() == NotificationType.Info)
       AlertHelper.showInfoMessage(this, notification);
+    else if(notification.getType() == NotificationType.ApplicationInstantiated) {
+//      preloadHtmlEditors();
+    }
     else if(notification.getType() == NotificationType.PluginLoaded) {
       if(notification.getParameter() instanceof IOnlineArticleContentExtractor && ((IOnlineArticleContentExtractor)notification.getParameter()).hasArticlesOverview())
         invalidateOptionsMenu(); // now there may are some Article Overview Providers to show -> invalidate its Action
