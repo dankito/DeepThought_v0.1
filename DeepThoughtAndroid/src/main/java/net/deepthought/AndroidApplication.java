@@ -1,5 +1,6 @@
 package net.deepthought;
 
+import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.platform.AndroidApplicationConfiguration;
 
 /**
@@ -21,6 +22,7 @@ public class AndroidApplication extends android.app.Application {
   @Override
   public void onTerminate() {
     Application.shutdown();
+    AndroidHtmlEditorPool.getInstance().cleanUp();
     super.onTerminate();
   }
 

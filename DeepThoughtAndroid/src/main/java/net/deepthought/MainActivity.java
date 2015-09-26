@@ -28,6 +28,7 @@ import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
@@ -134,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     else if(notification.getType() == NotificationType.Info)
       AlertHelper.showInfoMessage(this, notification);
     else if(notification.getType() == NotificationType.ApplicationInstantiated) {
-//      preloadHtmlEditors();
+      AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
     }
     else if(notification.getType() == NotificationType.PluginLoaded) {
       if(notification.getParameter() instanceof IOnlineArticleContentExtractor && ((IOnlineArticleContentExtractor)notification.getParameter()).hasArticlesOverview())

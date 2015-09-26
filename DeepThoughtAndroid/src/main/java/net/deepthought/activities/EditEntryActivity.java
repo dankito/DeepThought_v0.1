@@ -107,12 +107,13 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         actionBar.setHomeButtonEnabled(true);
       }
 
+      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
+      abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, abstractListener);
+
       txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
 
       rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
       rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
-
-      abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentAndAbstractListener);
       rlydEntryAbstract.addView(abstractHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
 
       RelativeLayout.LayoutParams abstractEditorParams = (RelativeLayout.LayoutParams)abstractHtmlEditor.getLayoutParams();
@@ -140,8 +141,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
 
-      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentAndAbstractListener);
       RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
+      contentHtmlEditor.setVisibility(View.VISIBLE);
       rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
       RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
@@ -471,7 +472,34 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   };
 
-  protected IHtmlEditorListener contentAndAbstractListener = new IHtmlEditorListener() {
+  protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
+      return false;
+    }
+
+    @Override
+    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+      return false;
+    }
+
+    @Override
+    public void imageAdded(ImageElementData addedImage) {
+
+    }
+
+    @Override
+    public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
+
+    }
+  };
+
+  protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
       setEntryHasBeenEdited();

@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.view.ViewGroup;
 
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.data.html.ImageElementData;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -44,12 +47,56 @@ public class AndroidHtmlEditorPool implements ICleanUp {
     htmlEditor.resetInstanceVariables();
     if(htmlEditor.getParent() instanceof ViewGroup)
       ((ViewGroup)htmlEditor.getParent()).removeView(htmlEditor);
-    availableHtmlEditors.offer(htmlEditor);
+    if(availableHtmlEditors.contains(htmlEditor) == false)
+      availableHtmlEditors.offer(htmlEditor);
+  }
+
+  public void preloadHtmlEditors(Activity context, int numberOfHtmlEditors) {
+    final Map<Integer, AndroidHtmlEditor> preloadedHtmlEditors = new HashMap<>(numberOfHtmlEditors);
+
+    for(int i = 0; i < numberOfHtmlEditors; i++) {
+      final Integer instance = i;
+      AndroidHtmlEditor htmlEditor = getHtmlEditor(context, new IHtmlEditorListener() {
+        @Override
+        public void htmlCodeUpdated(String newHtmlCode) {
+          // Editor is loaded now
+          if(preloadedHtmlEditors.containsKey(instance)) {
+            AndroidHtmlEditor htmlEditor = preloadedHtmlEditors.remove(instance);
+//            htmlEditor.setHtml("");
+            htmlEditorReleased(htmlEditor);
+          }
+        }
+
+        @Override
+        public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
+          return false;
+        }
+
+        @Override
+        public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+          return false;
+        }
+
+        @Override
+        public void imageAdded(ImageElementData addedImage) {
+
+        }
+
+        @Override
+        public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
+
+        }
+      });
+
+      preloadedHtmlEditors.put(instance, htmlEditor);
+      htmlEditor.setHtml("a");
+    }
   }
 
   @Override
   public void cleanUp() {
     for(AndroidHtmlEditor editor : availableHtmlEditors)
       editor.cleanUp();
+    instance = null;
   }
 }

@@ -184,7 +184,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
         public void run() {
           setHtml(htmlToSetWhenLoaded);
         }
-      }, 50); // i don't know why but executing Script immediately results in an error -> wait some (unrecognizable) time
+      }, 400); // i don't know why but executing Script immediately results in an error -> wait some (unrecognizable) time
     }
   }
 
@@ -194,9 +194,9 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
         if(hasCountImagesChanged(previousHtml, newHtmlCode)) {
           imageAddedOrRemoved(previousHtml, newHtmlCode, listener);
         }
-      }
 
-      listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
+        listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
+      }
     }
 
     previousHtml = newHtmlCode;
@@ -243,17 +243,17 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   }
 
   public boolean elementClicked(String element, int button, int clickX, int clickY) {
-    boolean dummy = false;
     return true;
   }
 
   public boolean elementDoubleClicked(String element) {
-    if(isImageElement(element)) {
-      List<ImageElementData> imageElements = Application.getHtmlHelper().extractAllImageElementsFromHtml(element);
-      if(imageElements.size() > 0) {
-        ImageElementData imgElement = imageElements.get(0);
-        if(listener != null)
+    if(listener != null) {
+      if (isImageElement(element)) {
+        List<ImageElementData> imageElements = Application.getHtmlHelper().extractAllImageElementsFromHtml(element);
+        if (imageElements.size() > 0) {
+          ImageElementData imgElement = imageElements.get(0);
           return listener.elementDoubleClicked(this, imgElement);
+        }
       }
     }
 
@@ -297,7 +297,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();
