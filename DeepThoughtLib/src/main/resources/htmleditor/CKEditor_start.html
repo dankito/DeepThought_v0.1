@@ -35,11 +35,11 @@
 	} );
 
 	editor.on('loaded', function() {
-		resizeEditorToFitWindow();
-
 		if(typeof app !== 'undefined') {
 			app.loaded();
 		}
+
+		resizeEditorToFitWindow();
 
 		<!--$(editor.editable).click( function(evt) {-->
 			<!--if(typeof app !== 'undefined') {-->

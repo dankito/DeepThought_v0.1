@@ -13,6 +13,9 @@ import android.webkit.WebViewClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by ganymed on 26/09/15.
  */
@@ -21,9 +24,11 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   private final static Logger log = LoggerFactory.getLogger(AndroidHtmlEditor.class);
 
 
+  protected Activity activity;
+
   protected HtmlEditor htmlEditor = null;
 
-  protected Activity activity;
+  protected List<IJavaScriptBridge> javaScriptBridgesToCall = new ArrayList<>();
 
 
   public AndroidHtmlEditor(Activity context, IHtmlEditorListener listener) {
@@ -46,6 +51,8 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   protected void setupHtmlEditor(IHtmlEditorListener listener) {
     this.getSettings().setJavaScriptEnabled(true);
+//    setInitialScale(95);
+    getSettings().setTextZoom(70);
 
     htmlEditor = new HtmlEditor(this, listener);
 
@@ -54,15 +61,12 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         htmlEditor.editorLoaded();
-      }
-
-      @Override
-      public void onLoadResource(WebView view, String url) {
-        super.onLoadResource(view, url);
+        executeScript("resizeEditorToFitWindow()");
       }
 
       @Override
       public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        log.error("An error occurred in WebView when calling Url " + failingUrl + ": " + description);
         super.onReceivedError(view, errorCode, description, failingUrl);
       }
     });
@@ -71,13 +75,12 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       @Override
       public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
 //        return super.onJsAlert(view, url, message, result);
-        result.confirm();
+        result.confirm(); // do not show any JavaScript alert to user
         return true;
       }
     });
 
-    addJavascriptInterface(this, "app");
-    addJavascriptInterface(this, "android");
+    addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
     loadUrl(htmlEditor.getHtmlEditorPath());
   }
 
@@ -123,6 +126,8 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   protected void executeScriptOnUiThread(final String javaScript, final ExecuteJavaScriptResultListener listener) {
     try {
+//      loadUrl("javascript:" + javaScript);
+
       evaluateJavascript(javaScript, new ValueCallback<String>() {
         @Override
         public void onReceiveValue(String value) {
@@ -130,27 +135,28 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
             listener.scriptExecuted(value);
         }
       });
-
-//      loadUrl("javascript:" + javaScript);
     } catch(Exception ex) {
       log.error("Could not evaluate JavaScript " + javaScript, ex);
     }
   }
 
   @Override
-  public void setJavaScriptMember(String name, Object member) {
-    // since Android Api 17 all methods callable from JavaScript must be annotated with @JavascriptInterface, an Android specific annotation -> HtmlEditor cannot know this annotation
-//    addJavascriptInterface(member, name);
+  public void setJavaScriptMember(String name, IJavaScriptBridge member) {
+    // since Android Api 17 all methods callable from JavaScript must be annotated with @JavascriptInterface, an Android specific annotation
+    // -> HtmlEditor cannot know this annotation, so we save the member instance, let the method call on ourself and then pass the method call on to the member
+    javaScriptBridgesToCall.add(member);
   }
 
   @JavascriptInterface
   public void loaded() {
-    htmlEditor.loaded();
+    for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
+      bridge.loaded();
   }
 
   @JavascriptInterface
   public void htmlChanged(String newHtmlCode) {
-    htmlEditor.htmlChanged(newHtmlCode);
+    for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
+      bridge.htmlChanged(newHtmlCode);
   }
 
 }

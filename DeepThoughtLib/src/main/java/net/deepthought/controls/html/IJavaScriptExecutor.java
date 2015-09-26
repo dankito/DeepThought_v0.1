@@ -9,6 +9,6 @@ public interface IJavaScriptExecutor {
 
   void executeScript(String javaScript, ExecuteJavaScriptResultListener listener);
 
-  void setJavaScriptMember(String name, Object member);
+  void setJavaScriptMember(String name, IJavaScriptBridge member);
 
 }

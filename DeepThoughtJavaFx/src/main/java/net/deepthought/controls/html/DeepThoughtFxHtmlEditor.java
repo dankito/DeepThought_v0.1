@@ -120,7 +120,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
                              {
                                @Override
-                               public Boolean call (String param){
+                               public Boolean call(String param) {
                                  return false;
                                }
                              }
@@ -175,12 +175,13 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
         listener.scriptExecuted(result);
     } catch(Exception ex) {
       log.error("Could not execute JavaScript " + javaScript, ex);
-      listener.scriptExecuted(null); // TODO: what to return in this case? A NullObject? How to get JavaScript 'undefined' JSObject?
+      if(listener != null)
+        listener.scriptExecuted(null); // TODO: what to return in this case? A NullObject? How to get JavaScript 'undefined' JSObject?
     }
   }
 
   @Override
-  public void setJavaScriptMember(final String name, final Object member) {
+  public void setJavaScriptMember(final String name, final IJavaScriptBridge member) {
     executeScript("window", new ExecuteJavaScriptResultListener() {
       @Override
       public void scriptExecuted(Object result) {

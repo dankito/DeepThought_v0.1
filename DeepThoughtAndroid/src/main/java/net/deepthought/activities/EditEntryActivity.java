@@ -64,7 +64,6 @@ public class EditEntryActivity extends AppCompatActivity {
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected EditText edtxtEditEntryAbstract;
-  protected EditText edtxtEditEntryContent;
 
   protected RelativeLayout rlydTags;
   protected RelativeLayout rlydEditEntryEditTags;
@@ -107,9 +106,6 @@ public class EditEntryActivity extends AppCompatActivity {
 
       edtxtEditEntryAbstract = (EditText) findViewById(R.id.edtxtEditEntryAbstract);
       edtxtEditEntryAbstract.addTextChangedListener(entryAbstractOrContentChangedWatcher);
-
-//      edtxtEditEntryContent = (EditText) findViewById(R.id.edtxtEditEntryContent);
-//      edtxtEditEntryContent.addTextChangedListener(entryAbstractOrContentChangedWatcher);
 
       rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
       rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -172,7 +168,6 @@ public class EditEntryActivity extends AppCompatActivity {
 
     if(entry != null) {
       edtxtEditEntryAbstract.setText(Html.fromHtml(entry.getAbstract()));
-//      edtxtEditEntryContent.setText(Html.fromHtml(entry.getContent()));
       contentHtmlEditor.setHtml(entry.getContent());
 
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
@@ -315,7 +310,6 @@ public class EditEntryActivity extends AppCompatActivity {
       else if (result.recognitionSuccessful() == false) {
         AlertHelper.showErrorMessage(this, result.getErrorMessage());
       } else {
-//        edtxtEditEntryContent.getText().insert(edtxtEditEntryContent.getSelectionEnd(), Html.fromHtml(result.getRecognizedText()));
         contentHtmlEditor.setHtml(contentHtmlEditor.getHtml() + result.getRecognizedText()); // TODO: insert at cursor position
       }
     } catch(Exception ex) {
@@ -335,7 +329,6 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void saveEntry() {
     entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
-//    entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
     entry.setContent(contentHtmlEditor.getHtml());
 
     if(entryCreationResult != null)

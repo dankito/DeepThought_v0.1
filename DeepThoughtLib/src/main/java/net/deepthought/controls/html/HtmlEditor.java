@@ -101,12 +101,12 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   public String getHtml() {
     try {
       // no need for calling a JavaScript function as each time HTML updates htmlChanged() is called -> we're always up to date
-      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
-        @Override
-        public void scriptExecuted(Object result) {
-
-        }
-      });
+//      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
+//        @Override
+//        public void scriptExecuted(Object result) {
+//
+//        }
+//      });
       return previousHtml;
     } catch(Exception ex) {
       log.error("Could not get HtmlEditor's html text", ex);
@@ -177,7 +177,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   /*    Methods over which JavaScript running in Browser communicates with Java code        */
 
   public void loaded() {
-
+    scriptExecutor.executeScript("resizeEditorToFitWindow()"); // don't know why but without calling it CKEditor doesn't size correctly
   }
 
   public void htmlChanged(String newHtmlCode) {
