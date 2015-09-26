@@ -38,8 +38,8 @@ public class DeepThoughtFxHtmlEditorPool implements ICleanUp {
   }
 
   public void htmlEditorReleased(DeepThoughtFxHtmlEditor htmlEditor) {
-    availableHtmlEditors.offer(htmlEditor);
     htmlEditor.setListener(null);
+    availableHtmlEditors.offer(htmlEditor);
   }
 
   @Override

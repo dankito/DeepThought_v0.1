@@ -56,6 +56,8 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   @Override
   public void cleanUp() {
     Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
+
+    setContent(null); // remove from Parent
     DeepThoughtFxHtmlEditorPool.getInstance().htmlEditorReleased(htmlEditor);
   }
 

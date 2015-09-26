@@ -1,8 +1,6 @@
 package net.deepthought.controls.html;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.AttributeSet;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
@@ -11,6 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import net.deepthought.AndroidHelper;
+import net.deepthought.controls.ICleanUp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * Created by ganymed on 26/09/15.
  */
-public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJavaScriptExecutor {
+public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJavaScriptExecutor, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(AndroidHtmlEditor.class);
 
@@ -39,17 +38,6 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     setupHtmlEditor(listener);
   }
 
-  public AndroidHtmlEditor(Context context, AttributeSet attrs) {
-    super(context, attrs);
-  }
-
-  public AndroidHtmlEditor(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-  }
-
-  public AndroidHtmlEditor(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-  }
 
   protected void setupHtmlEditor(IHtmlEditorListener listener) {
     this.getSettings().setJavaScriptEnabled(true);
@@ -100,12 +88,14 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     htmlEditor.setHtml(html, resetUndoStack);
   }
 
-  public void setListener(IHtmlEditorListener listener) {
-    htmlEditor.setListener(listener);
+  public void reInitHtmlEditor(Activity context, IHtmlEditorListener listener) {
+    this.activity = context;
+    htmlEditor.reInitHtmlEditor(listener);
   }
 
-  public void reInitHtmlEditor(IHtmlEditorListener listener) {
-    htmlEditor.reInitHtmlEditor(listener);
+  public void resetInstanceVariables() {
+    this.activity = null;
+    htmlEditor.setListener(null);
   }
 
 
@@ -196,5 +186,10 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       result &= bridge.beforeCommandExecution(commandName);
 
     return result;
+  }
+
+  @Override
+  public void cleanUp() {
+    htmlEditor.cleanUp();
   }
 }

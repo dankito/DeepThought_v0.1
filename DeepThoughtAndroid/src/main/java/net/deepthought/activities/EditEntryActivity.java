@@ -26,7 +26,9 @@ import android.widget.Toast;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.html.AndroidHtmlEditor;
+import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.controls.html.HtmEditorCommand;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.html.IHtmlEditorListener;
@@ -48,7 +50,7 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EditEntryActivity extends AppCompatActivity {
+public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   public final static String EntryArgumentKey = "EntryArgument";
   public final static int RequestCode = 1;
@@ -123,7 +125,7 @@ public class EditEntryActivity extends AppCompatActivity {
 
       lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
 
-      contentHtmlEditor = new AndroidHtmlEditor(this, contentListener);
+      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
       RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
       rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -247,8 +249,10 @@ public class EditEntryActivity extends AppCompatActivity {
   public void onBackPressed() {
     if(hasEntryBeenEdited == true)
       askUserIfChangesShouldBeSaved();
-    else
+    else {
+      cleanUp();
       super.onBackPressed();
+    }
   }
 
   protected void askUserIfChangesShouldBeSaved() {
@@ -256,6 +260,13 @@ public class EditEntryActivity extends AppCompatActivity {
     TextView view = new TextView(this);
     view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
     builder.setView(view);
+
+    builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+
+      }
+    });
 
     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
       @Override
@@ -320,6 +331,16 @@ public class EditEntryActivity extends AppCompatActivity {
   protected void saveEntryAndCloseActivity() {
     saveEntryIfNeeded();
     finish();
+  }
+
+  @Override
+  public void finish() {
+    cleanUp();
+    super.finish();
+  }
+
+  public void cleanUp() {
+    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
   }
 
   protected void saveEntryIfNeeded() {
