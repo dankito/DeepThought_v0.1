@@ -31,7 +31,8 @@ function hideToolbarWithOtherwiseGroupedItems() {
 
 function setToolbarGroups() {
     CKEDITOR.config.toolbarGroups = [
-    		{ name: 'styles', groups: [ 'styles', 'basicstyles' ] },
+    		{ name: 'styles', groups: [ 'styles' ] },
+    		{ name: 'basicstyles', groups: [ 'basicstyles' ] },
     		{ name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
     		{ name: 'format', groups: [ /*'list_and_indent',*/ 'justify_and_insert', 'colors', 'find' ] },
     		{ name: 'language_and_rare_items', groups: [ 'spellchecker', /*'bidi',*/ 'maximize_and_rare_used_items' ] }, // may show Language button again and give BiDi options their own Drop Down back again

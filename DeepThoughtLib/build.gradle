@@ -5,6 +5,8 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile project(':json-io')
+    compile project(':commons-lang')
+
     compile 'org.eclipse.persistence:javax.persistence:2.1.0'
     compile 'com.norconex.language:langdetect:1.3.0'
     compile 'org.apache.tika:tika-core:1.8'

@@ -13,12 +13,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.webkit.JsResult;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,11 +26,14 @@ import android.widget.Toast;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
+import net.deepthought.controls.html.AndroidHtmlEditor;
+import net.deepthought.controls.html.HtmEditorCommand;
 import net.deepthought.controls.html.HtmlEditor;
-import net.deepthought.controls.html.IJavaScriptExecutor;
+import net.deepthought.controls.html.IHtmlEditorListener;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.helper.AlertHelper;
@@ -73,6 +72,8 @@ public class EditEntryActivity extends AppCompatActivity {
   protected EditText edtxtEditEntrySearchTag;
   protected ListView lstvwEditEntryTags;
 
+  protected AndroidHtmlEditor contentHtmlEditor = null;
+
   protected boolean hasEntryBeenEdited = false;
 
 
@@ -106,8 +107,9 @@ public class EditEntryActivity extends AppCompatActivity {
 
       edtxtEditEntryAbstract = (EditText) findViewById(R.id.edtxtEditEntryAbstract);
       edtxtEditEntryAbstract.addTextChangedListener(entryAbstractOrContentChangedWatcher);
-      edtxtEditEntryContent = (EditText) findViewById(R.id.edtxtEditEntryContent);
-      edtxtEditEntryContent.addTextChangedListener(entryAbstractOrContentChangedWatcher);
+
+//      edtxtEditEntryContent = (EditText) findViewById(R.id.edtxtEditEntryContent);
+//      edtxtEditEntryContent.addTextChangedListener(entryAbstractOrContentChangedWatcher);
 
       rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
       rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -125,53 +127,22 @@ public class EditEntryActivity extends AppCompatActivity {
 
       lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
 
-//      setupHtmlEditor();
+      contentHtmlEditor = new AndroidHtmlEditor(this, contentListener);
+      RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
+      rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+      RelativeLayout.LayoutParams editorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
+      editorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+      editorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+      editorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+      editorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+      contentHtmlEditor.setLayoutParams(editorParams);
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
       finish();
     }
-  }
-
-  protected void setupHtmlEditor() {
-    final WebView webView = new WebView(this);
-    webView.getSettings().setJavaScriptEnabled(true);
-    rlydTags.addView(webView);
-
-    final HtmlEditor htmlEditor = new HtmlEditor(new IJavaScriptExecutor() {
-      @Override
-      public Object executeScript(String javaScript) {
-        webView.evaluateJavascript(javaScript, new ValueCallback<String>() {
-          @Override
-          public void onReceiveValue(String value) {
-
-          }
-        });
-
-        return null;
-      }
-    });
-
-    webView.setWebViewClient(new WebViewClient() {
-      @Override
-      public void onPageFinished(WebView view, String url) {
-        super.onPageFinished(view, url);
-//        htmlEditor.editorLoaded();
-      }
-
-      @Override
-      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        super.onReceivedError(view, errorCode, description, failingUrl);
-      }
-    });
-    webView.setWebChromeClient(new WebChromeClient() {
-      @Override
-      public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-        return super.onJsAlert(view, url, message, result);
-      }
-    });
-
-    webView.loadUrl(htmlEditor.getHtmlEditorPath());
   }
 
   protected void setLogo(Toolbar toolbar) {
@@ -201,7 +172,9 @@ public class EditEntryActivity extends AppCompatActivity {
 
     if(entry != null) {
       edtxtEditEntryAbstract.setText(Html.fromHtml(entry.getAbstract()));
-      edtxtEditEntryContent.setText(Html.fromHtml(entry.getContent()));
+//      edtxtEditEntryContent.setText(Html.fromHtml(entry.getContent()));
+      contentHtmlEditor.setHtml(entry.getContent());
+
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override
         public void entryTagsChanged(List<Tag> entryTags) {
@@ -265,23 +238,6 @@ public class EditEntryActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-
-  protected TextWatcher entryAbstractOrContentChangedWatcher = new TextWatcher() {
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-      setEntryHasBeenEdited();
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-
-    }
-  };
 
   protected void setEntryHasBeenEdited() {
     hasEntryBeenEdited = true;
@@ -359,7 +315,8 @@ public class EditEntryActivity extends AppCompatActivity {
       else if (result.recognitionSuccessful() == false) {
         AlertHelper.showErrorMessage(this, result.getErrorMessage());
       } else {
-        edtxtEditEntryContent.getText().insert(edtxtEditEntryContent.getSelectionEnd(), Html.fromHtml(result.getRecognizedText()));
+//        edtxtEditEntryContent.getText().insert(edtxtEditEntryContent.getSelectionEnd(), Html.fromHtml(result.getRecognizedText()));
+        contentHtmlEditor.setHtml(contentHtmlEditor.getHtml() + result.getRecognizedText()); // TODO: insert at cursor position
       }
     } catch(Exception ex) {
       log.error("Could not handle TextRecognitionResult " + result, ex);
@@ -378,7 +335,8 @@ public class EditEntryActivity extends AppCompatActivity {
 
   protected void saveEntry() {
     entry.setAbstract(Html.toHtml(edtxtEditEntryAbstract.getText()));
-    entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
+//    entry.setContent(Html.toHtml(edtxtEditEntryContent.getText()));
+    entry.setContent(contentHtmlEditor.getHtml());
 
     if(entryCreationResult != null)
       entryCreationResult.saveCreatedEntities();
@@ -453,4 +411,48 @@ public class EditEntryActivity extends AppCompatActivity {
       setTextViewEditEntryTags();
     }
   }
+
+  protected TextWatcher entryAbstractOrContentChangedWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
+  };
+
+  protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
+    @Override
+    public void htmlCodeUpdated(String newHtmlCode) {
+      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
+      return false;
+    }
+
+    @Override
+    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+      return false;
+    }
+
+    @Override
+    public void imageAdded(ImageElementData addedImage) {
+
+    }
+
+    @Override
+    public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
+
+    }
+  };
 }

@@ -5,6 +5,10 @@ package net.deepthought.controls.html;
  */
 public interface IJavaScriptExecutor {
 
-  Object executeScript(String javaScript);
+  void executeScript(String javaScript);
+
+  void executeScript(String javaScript, ExecuteJavaScriptResultListener listener);
+
+  void setJavaScriptMember(String name, Object member);
 
 }

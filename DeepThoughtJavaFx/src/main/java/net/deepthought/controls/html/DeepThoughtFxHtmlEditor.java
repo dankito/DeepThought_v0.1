@@ -18,6 +18,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
+import netscape.javascript.JSObject;
 
 /**
  * Created by ganymed on 28/08/15.
@@ -105,10 +106,6 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     htmlEditor.reInitHtmlEditor(listener);
   }
 
-  public void resetUndoStack() {
-    htmlEditor.resetUndoStack();
-  }
-
 
   protected void testEvents() {
     engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
@@ -166,14 +163,35 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
 
   @Override
-  public Object executeScript(String javaScript) {
+  public void executeScript(String javaScript) {
+    executeScript(javaScript, null);
+  }
+
+  @Override
+  public void executeScript(String javaScript, ExecuteJavaScriptResultListener listener) {
     try {
-      return engine.executeScript(javaScript);
+      Object result = engine.executeScript(javaScript);
+      if(listener != null)
+        listener.scriptExecuted(result);
     } catch(Exception ex) {
       log.error("Could not execute JavaScript " + javaScript, ex);
+      listener.scriptExecuted(null); // TODO: what to return in this case? A NullObject? How to get JavaScript 'undefined' JSObject?
     }
+  }
 
-    return null; // TODO: what to return in this case? A NullObject? How to get JavaScript 'undefined' JSObject?
+  @Override
+  public void setJavaScriptMember(final String name, final Object member) {
+    executeScript("window", new ExecuteJavaScriptResultListener() {
+      @Override
+      public void scriptExecuted(Object result) {
+        try {
+          JSObject win = (JSObject) result;
+          win.setMember(name, member);
+        } catch (Exception ex) {
+          log.error("Could not set JavaScript member '" + name + "' to " + member, ex);
+        }
+      }
+    });
   }
 
   @Override

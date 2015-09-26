@@ -6,9 +6,9 @@ import net.deepthought.data.html.ImageElementData;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.html.HTMLDocument;
 
 import java.io.File;
 import java.net.URL;
@@ -26,18 +26,13 @@ import netscape.javascript.JSObject;
  *
  * Created by ganymed on 28/08/15.
  */
-public class HtmlEditor implements ICleanUp {
+public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public final static String HtmlEditorFolderName = "htmleditor";
 
   public final static String HtmlEditorFileName = "CKEditor_start.html";
 
   public final static String HtmlEditorFolderAndFileName = new File(HtmlEditorFolderName, HtmlEditorFileName).getPath();
-
-
-  protected final static String ImageIdDataKey = "ID";
-
-  protected final static String ImageUrlDataKey = "URL";
 
 
   private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
@@ -48,11 +43,9 @@ public class HtmlEditor implements ICleanUp {
 
   protected IJavaScriptExecutor scriptExecutor = null;
 
+  protected boolean editorLoaded = false;
+
   protected JSObject ckEditor = null;
-
-  protected JSObject jqDocument = null;
-
-  protected HTMLDocument document = null;
 
   protected String previousHtml = "";
 
@@ -80,58 +73,41 @@ public class HtmlEditor implements ICleanUp {
   }
 
   public void editorLoaded() {
-    try {
-      JSObject win = (JSObject) scriptExecutor.executeScript("window");
-      win.setMember("app", this);
+    scriptExecutor.setJavaScriptMember("app", this);
 
-      ckEditor = (JSObject)scriptExecutor.executeScript("CKEDITOR.instances.editor");
+    editorLoaded = true;
 
-      document = (HTMLDocument)ckEditor.eval("document");
-
-      if (htmlToSetWhenLoaded != null)
-        setHtml(htmlToSetWhenLoaded);
-    } catch(Exception ex) {
-      log.error("Could not setup HtmlEditor in loaded event", ex);
-    }
+    if (htmlToSetWhenLoaded != null)
+      setHtml(htmlToSetWhenLoaded);
   }
 
   public void insertHtml(String html) {
-    try {
-      ckEditor.call("insertHtml", html, "unfiltered_html");
-    } catch(Exception ex) {
-      log.error("Could not insert Html " + html + " into CKEditor", ex);
-    }
+    scriptExecutor.executeScript("CKEDITOR.instances.editor.insertHtml('" + StringEscapeUtils.escapeEcmaScript(html) + "', 'unfiltered_html')");
   }
 
   public void scrollTo(int scrollPosition) {
-    try {
-      if(jqDocument != null) {
-        jqDocument.call("scrollTop", scrollPosition);
-      }
-    } catch(Exception ex) {
-      log.error("Could not scroll document to " + scrollPosition, ex);
-    }
+    scriptExecutor.executeScript("$(CKEDITOR.instances.editor.document.$).scrollTop(" + scrollPosition + ");");
   }
 
   public void resetUndoStack() {
-    try {
-      ckEditor.call("resetUndo");
-    } catch(Exception ex) {
-      log.error("Could not reset CKEditor's Undo stack", ex);
-    }
+    scriptExecutor.executeScript("CKEDITOR.instances.editor.resetUndo()");
   }
 
 
   public boolean isCKEditorLoaded() {
-    return ckEditor != null;
+    return editorLoaded;
   }
 
   public String getHtml() {
     try {
-      if(isCKEditorLoaded()) {
-        Object obj = ckEditor.call("getData");
-        return obj.toString();
-      }
+      // no need for calling a JavaScript function as each time HTML updates htmlChanged() is called -> we're always up to date
+      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
+        @Override
+        public void scriptExecuted(Object result) {
+
+        }
+      });
+      return previousHtml;
     } catch(Exception ex) {
       log.error("Could not get HtmlEditor's html text", ex);
     }
@@ -153,9 +129,10 @@ public class HtmlEditor implements ICleanUp {
       if(isCKEditorLoaded() == false)
         htmlToSetWhenLoaded = html;
       else {
-        ckEditor.call("setData", html);
+        scriptExecutor.executeScript("CKEDITOR.instances.editor.setData('" + StringEscapeUtils.escapeEcmaScript(html) + "')");
         htmlToSetWhenLoaded = null;
       }
+
     } catch(Exception ex) {
       log.error("Could not set HtmlEditor's html text", ex);
     }
@@ -184,19 +161,23 @@ public class HtmlEditor implements ICleanUp {
     previousHtml = "";
 
     try {
-      JSObject win = (JSObject) scriptExecutor.executeScript("window");
-      win.setMember("app", null);
+      scriptExecutor.executeScript("window", new ExecuteJavaScriptResultListener() {
+        @Override
+        public void scriptExecuted(Object result) {
+//          JSObject win = (JSObject) result;
+//          win.setMember("app", null);
+        }
+      });
     } catch(Exception ex) { }
 
     this.scriptExecutor = null;
-    ckEditor = null;
   }
 
 
   /*    Methods over which JavaScript running in Browser communicates with Java code        */
 
   public void loaded() {
-    jqDocument = (JSObject)scriptExecutor.executeScript("$(editor.document.$);");
+
   }
 
   public void htmlChanged(String newHtmlCode) {
@@ -297,7 +278,7 @@ public class HtmlEditor implements ICleanUp {
         Long id = Long.parseLong(idString);
 
         if(id.equals(previousElement.getEmbeddingId())) {
-          replaceElementWith(imgNode, createNewImageElement(newElement));
+          replaceElementWithImageElement(imgNode, newElement);
         }
       }
     } catch(Exception ex) {
@@ -305,22 +286,42 @@ public class HtmlEditor implements ICleanUp {
     }
   }
 
+  protected void replaceElementWithImageElement(final JSObject elementToBeReplaced, ImageElementData newElement) {
+    createNewImageElement(newElement, new ExecuteJavaScriptResultListener() {
+      @Override
+      public void scriptExecuted(Object result) {
+        replaceElementWith(elementToBeReplaced, (JSObject) result);
+      }
+    });
+  }
+
   protected void replaceElementWith(JSObject elementToBeReplaced, JSObject newElement) {
     elementToBeReplaced.call("insertBeforeMe", newElement);
     elementToBeReplaced.call("remove");
   }
 
-  protected JSObject createNewImageElement(ImageElementData newElement) {
-    JSObject createdElement = (JSObject)scriptExecutor.executeScript("new CKEDITOR.dom.element( 'img' );");
+  protected void createNewImageElement(final ImageElementData newElement, final ExecuteJavaScriptResultListener listener) {
+    scriptExecutor.executeScript("new CKEDITOR.dom.element( 'img' );", new ExecuteJavaScriptResultListener() {
+      @Override
+      public void scriptExecuted(Object result) {
+        if(result instanceof JSObject) {
+          JSObject createdElement = (JSObject) result;
 
-    createdElement.call("setAttribute", ImageElementData.SourceAttributeName, newElement.getSource());
-    createdElement.call("setAttribute", ImageElementData.ImageIdAttributeName, newElement.getFileId());
-    createdElement.call("setAttribute", ImageElementData.EmbeddingIdAttributeName, newElement.getEmbeddingId());
-    createdElement.call("setAttribute", ImageElementData.WidthAttributeName, newElement.getWidth());
-    createdElement.call("setAttribute", ImageElementData.HeightAttributeName, newElement.getHeight());
-    createdElement.call("setAttribute", ImageElementData.AltAttributeName, newElement.getAlt());
+          createdElement.call("setAttribute", ImageElementData.SourceAttributeName, newElement.getSource());
+          createdElement.call("setAttribute", ImageElementData.ImageIdAttributeName, newElement.getFileId());
+          createdElement.call("setAttribute", ImageElementData.EmbeddingIdAttributeName, newElement.getEmbeddingId());
+          createdElement.call("setAttribute", ImageElementData.WidthAttributeName, newElement.getWidth());
+          createdElement.call("setAttribute", ImageElementData.HeightAttributeName, newElement.getHeight());
+          createdElement.call("setAttribute", ImageElementData.AltAttributeName, newElement.getAlt());
 
-    return createdElement;
+          listener.scriptExecuted(createdElement);
+        }
+        else {
+          log.error("Could not create a new CKEDITOR.dom.element. Return value was " + result);
+//          listener.scriptExecuted(null);
+        }
+      }
+    });
   }
 
   protected boolean hasCountImagesChanged(String previousHtml, String newHtml) {

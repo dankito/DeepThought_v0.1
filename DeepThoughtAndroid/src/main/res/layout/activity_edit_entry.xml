@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/rlyEditEntryActivity"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -129,8 +130,21 @@
         android:text="@string/edit_entry_content_label"
         />
 
-    <EditText
-        android:id="@+id/edtxtEditEntryContent"
+    <!--<EditText-->
+        <!--android:id="@+id/edtxtEditEntryContent"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/txtvwEditEntryTextLabel"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_marginTop="-2dp"-->
+        <!--android:gravity="start"-->
+        <!--android:textSize="@dimen/edit_entry_edit_texts_text_size"-->
+        <!--/>-->
+
+    <RelativeLayout
+        android:id="@+id/rlydContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/txtvwEditEntryTextLabel"
@@ -138,8 +152,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="-2dp"
-        android:gravity="start"
-        android:textSize="@dimen/edit_entry_edit_texts_text_size"
-        />
+        android:gravity="fill_vertical"
+        >
+
+    </RelativeLayout>
 
 </RelativeLayout>

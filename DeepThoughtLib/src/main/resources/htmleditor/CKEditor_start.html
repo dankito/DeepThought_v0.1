@@ -35,7 +35,7 @@
 	} );
 
 	editor.on('loaded', function() {
-		<!--editor.resize($(window).width(), $(window).height());-->
+		resizeEditorToFitWindow();
 
 		if(typeof app !== 'undefined') {
 			app.loaded();
@@ -74,9 +74,13 @@
 	} );
 
 	$(window).resize( function() {
+		resizeEditorToFitWindow();
+	});
+
+	function resizeEditorToFitWindow() {
 		<!-- This is curious, mostly it fits perfectly in window then, but sometimes it gets a margin -->
 		editor.resize($(window).width() - 16, $(window).height() - 16);
-	});
+	}
 
 	<!-- handle Dialogs -->
 	  <!--CKEDITOR.on('dialogDefinition', function(ev) {-->
