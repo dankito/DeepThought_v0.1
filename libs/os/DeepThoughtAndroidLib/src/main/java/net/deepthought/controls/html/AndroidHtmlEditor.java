@@ -10,6 +10,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import net.deepthought.AndroidHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +62,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       @Override
       public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
-        htmlEditor.editorLoaded();
+        htmlEditor.webControlLoaded();
         executeScript("resizeEditorToFitWindow()");
       }
 
@@ -114,7 +116,9 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   @Override
   public void executeScript(final String javaScript, final ExecuteJavaScriptResultListener listener) {
-    if(true) {
+    if(AndroidHelper.isRunningOnUiThread())
+      executeScriptOnUiThread(javaScript, listener);
+    else {
       activity.runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -147,16 +151,50 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     javaScriptBridgesToCall.add(member);
   }
 
+  @Override
   @JavascriptInterface
-  public void loaded() {
+  public void ckEditorLoaded() {
     for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
-      bridge.loaded();
+      bridge.ckEditorLoaded();
   }
 
+  @Override
   @JavascriptInterface
   public void htmlChanged(String newHtmlCode) {
     for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
       bridge.htmlChanged(newHtmlCode);
   }
 
+  @Override
+  @JavascriptInterface
+  public boolean elementClicked(String element, int button, int clickX, int clickY) {
+    boolean result = true;
+
+    for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
+      result &= bridge.elementClicked(element, button, clickX, clickY);
+
+    return result;
+  }
+
+  @Override
+  @JavascriptInterface
+  public boolean elementDoubleClicked(String element) {
+    boolean result = true;
+
+    for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
+      result &= bridge.elementDoubleClicked(element);
+
+    return result;
+  }
+
+  @Override
+  @JavascriptInterface
+  public boolean beforeCommandExecution(String commandName) {
+    boolean result = true;
+
+    for(IJavaScriptBridge bridge : javaScriptBridgesToCall)
+      result &= bridge.beforeCommandExecution(commandName);
+
+    return result;
+  }
 }

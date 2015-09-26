@@ -6,6 +6,7 @@
 	<script src="ckeditor/ckeditor.js"></script>
 	<script src="toolbar.js"></script>
 	<script src="jquery-2.1.4.js"></script>
+	<script src="adapters/jquery.js"></script>
 </head>
 
 <body>
@@ -36,7 +37,7 @@
 
 	editor.on('loaded', function() {
 		if(typeof app !== 'undefined') {
-			app.loaded();
+			app.ckEditorLoaded();
 		}
 
 		resizeEditorToFitWindow();
@@ -129,6 +130,15 @@
 		  editable.removeAllListeners();
 	    });
 	  });
+
+
+	  function replaceImageElement(imageId, newNodeHtml) {
+		var nodeToReplace = ($(editor.document.$).find('img[imageid=' + imageId + ']'))[0];
+		alert(nodeToReplace);
+		if(typeof nodeToReplace !== 'undefined') {
+			$(nodeToReplace).replaceWith(newNodeHtml);
+		}
+	  }
 
 </script>
 

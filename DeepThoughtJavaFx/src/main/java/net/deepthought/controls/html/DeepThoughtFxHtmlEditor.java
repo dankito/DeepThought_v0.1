@@ -5,6 +5,7 @@ import net.deepthought.controls.ICleanUp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -72,7 +73,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
           @Override
           public void changed(ObservableValue<? extends Worker.State> ov, Worker.State oldState, Worker.State newState) {
             if (newState == Worker.State.SUCCEEDED) {
-              htmlEditor.editorLoaded();
+              htmlEditor.webControlLoaded();
             } else if (newState == Worker.State.FAILED) {
               log.error("Loading CKEditor failed");
               // TODO: notify user
@@ -168,7 +169,14 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   }
 
   @Override
-  public void executeScript(String javaScript, ExecuteJavaScriptResultListener listener) {
+  public void executeScript(final String javaScript, final ExecuteJavaScriptResultListener listener) {
+    if(Platform.isFxApplicationThread())
+      executeScriptOnUiThread(javaScript, listener);
+    else
+      Platform.runLater(() -> executeScriptOnUiThread(javaScript, listener));
+  }
+
+  public void executeScriptOnUiThread(String javaScript, ExecuteJavaScriptResultListener listener) {
     try {
       Object result = engine.executeScript(javaScript);
       if(listener != null)

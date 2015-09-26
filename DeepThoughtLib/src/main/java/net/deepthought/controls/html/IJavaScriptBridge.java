@@ -7,8 +7,15 @@ package net.deepthought.controls.html;
  */
 public interface IJavaScriptBridge {
 
-  void loaded();
+  void ckEditorLoaded();
 
   void htmlChanged(String newHtmlCode);
+
+
+  boolean elementClicked(String element, int button, int clickX, int clickY);
+
+  boolean elementDoubleClicked(String element);
+
+  boolean beforeCommandExecution(String commandName);
 
 }

@@ -1,9 +1,9 @@
 package net.deepthought.helper;
 
 import android.app.Activity;
-import android.os.Looper;
 import android.support.v7.app.AlertDialog;
 
+import net.deepthought.AndroidHelper;
 import net.deepthought.R;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Notification;
@@ -12,11 +12,6 @@ import net.deepthought.util.Notification;
  * Created by ganymed on 18/08/15.
  */
 public class AlertHelper {
-
-  public static boolean isRunningOnUiThread() {
-    return Looper.getMainLooper().getThread() == Thread.currentThread();
-  }
-
 
   public static void showInfoMessage(Activity activity, int infoMessageResId) {
     showInfoMessage(activity, activity.getString(infoMessageResId));
@@ -38,7 +33,7 @@ public class AlertHelper {
   }
 
   public static void showInfoMessage(final Activity activity, final CharSequence infoMessage, final CharSequence alertTitle) {
-    if(isRunningOnUiThread() == true) {
+    if(AndroidHelper.isRunningOnUiThread() == true) {
       showInfoMessageOnUiThread(activity, infoMessage, alertTitle);
     }
     else {
@@ -84,7 +79,7 @@ public class AlertHelper {
   }
 
   public static void showErrorMessage(final Activity activity, final CharSequence errorMessage, final CharSequence alertTitle) {
-    if(isRunningOnUiThread() == true) {
+    if(AndroidHelper.isRunningOnUiThread() == true) {
       showErrorMessageOnUiThread(activity, errorMessage, alertTitle);
     }
     else {
