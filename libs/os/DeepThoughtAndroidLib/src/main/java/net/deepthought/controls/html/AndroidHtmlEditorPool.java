@@ -89,7 +89,7 @@ public class AndroidHtmlEditorPool implements ICleanUp {
       });
 
       preloadedHtmlEditors.put(instance, htmlEditor);
-      htmlEditor.setHtml("a");
+      htmlEditor.setHtml("<p></p>");
     }
   }
 

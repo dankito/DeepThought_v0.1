@@ -6,7 +6,7 @@ package net.deepthought.util;
 public class StringUtils {
 
   public static boolean isNullOrEmpty(String string) {
-    return string == null || string.isEmpty();
+    return string == null || /*string.isEmpty() */ string.trim().length() == 0; // unbelievable, Android 2.2 cannot handle string.isEmpty()
   }
 
   public static boolean isNotNullOrEmpty(String string) {

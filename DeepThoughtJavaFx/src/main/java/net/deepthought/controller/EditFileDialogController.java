@@ -8,6 +8,7 @@ import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
@@ -140,7 +141,7 @@ public class EditFileDialogController extends EntityDialogFrameController implem
           txtfldFileName.setText(file.getName());
         }
         else if(previousUriString != null && previousUriString.endsWith("/") &&
-            (txtfldFileName.getText() == null || txtfldFileName.getText().isEmpty() || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
+            (StringUtils.isNullOrEmpty(txtfldFileName.getText()) || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
           File file = new File(uriString);
           txtfldFileName.setText(file.getName());
         }

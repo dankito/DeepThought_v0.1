@@ -504,6 +504,7 @@ public class FileUtils {
 
   // TODO: make compatible with Android
   protected static MimeTypes mimeTypeDetector = MimeTypes.getDefaultMimeTypes();
+//  protected static MimeTypes mimeTypeDetector = null;
 
   public static String getMimeType(FileLink file) {
     return getMimeType(file.getUriString());
@@ -514,11 +515,13 @@ public class FileUtils {
 //    return mimeTypesMap.getContentType(file.).toLowerCase();
 
     try {
-      Metadata metadata = new Metadata();
-      metadata.set(Metadata.RESOURCE_NAME_KEY, file);
-      MediaType mediaType = mimeTypeDetector.detect(null, metadata);
-      if(mediaType != null)
-        return mediaType.toString();
+      if(mimeTypeDetector != null) {
+        Metadata metadata = new Metadata();
+        metadata.set(Metadata.RESOURCE_NAME_KEY, file);
+        MediaType mediaType = mimeTypeDetector.detect(null, metadata);
+        if (mediaType != null)
+          return mediaType.toString();
+      }
     } catch(Exception ex) {
       log.warn("Could not detect Mime Type for file " + file, ex);
     }
@@ -688,6 +691,14 @@ public class FileUtils {
     } catch(Exception ex) { }
 
     return false;
+  }
+
+  public static boolean doesFileExist(String file) {
+    return doesFileExist(new File(file));
+  }
+
+  public static boolean doesFileExist(File file) {
+    return file != null && file.exists();
   }
 
   protected static void ensureFileExists(File destinationFile) throws IOException {

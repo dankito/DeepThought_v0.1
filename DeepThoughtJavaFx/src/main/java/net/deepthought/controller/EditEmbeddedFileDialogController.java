@@ -309,7 +309,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
           txtfldFileName.setText(file.getName());
         }
         else if(previousUriString != null && previousUriString.endsWith("/") &&
-            (txtfldFileName.getText() == null || txtfldFileName.getText().isEmpty() || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
+            (StringUtils.isNullOrEmpty(txtfldFileName.getText()) || previousUriString.endsWith(txtfldFileName.getText() + "/"))) {
           File file = new File(uriString);
           txtfldFileName.setText(file.getName());
         }

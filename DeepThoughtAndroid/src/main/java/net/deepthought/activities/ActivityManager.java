@@ -1,5 +1,6 @@
 package net.deepthought.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +45,16 @@ public class ActivityManager {
     return instance;
   }
 
+  public static void cleanUp() {
+    if(instance != null) {
+      instance.resetEditEntryActivityCachedData();
+      instance.resetShowArticlesOverviewActivityCachedData();
+      instance.mainActivity = null;
+    }
+
+    instance = null;
+  }
+
 
   protected MainActivity mainActivity = null;
 
@@ -73,15 +84,15 @@ public class ActivityManager {
   }
 
 
-  public void showEditEntryActivity(Entry entry) {
-    showEditEntryActivity(entry, null);
+  public void showEditEntryActivity(Activity activity, Entry entry) {
+    showEditEntryActivity(activity, entry, null);
   }
 
-  public void showEditEntryActivity(EntryCreationResult creationResult) {
-    showEditEntryActivity(null, creationResult);
+  public void showEditEntryActivity(Activity activity, EntryCreationResult creationResult) {
+    showEditEntryActivity(activity, null, creationResult);
   }
 
-  protected void showEditEntryActivity(Entry entry, EntryCreationResult creationResult) {
+  protected void showEditEntryActivity(Activity activity, Entry entry, EntryCreationResult creationResult) {
     entryToBeEdited = entry;
     entryCreationResultToBeEdited = creationResult;
 
@@ -101,6 +112,11 @@ public class ActivityManager {
   public IOnlineArticleContentExtractor getExtractorToShowArticlesOverviewActivityFor() {
     return extractorToShowArticlesOverviewActivityFor;
   }
+
+  public void resetShowArticlesOverviewActivityCachedData() {
+    extractorToShowArticlesOverviewActivityFor = null;
+  }
+
 
   public void showArticlesOverviewActivity(IOnlineArticleContentExtractor extractor) {
     try {

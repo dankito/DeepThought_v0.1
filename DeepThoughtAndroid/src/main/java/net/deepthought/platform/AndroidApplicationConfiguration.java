@@ -56,8 +56,12 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
     // if App has been uninstalled and not gets reinstalled data folder on SD card may still exists (doesn't get deleted on Uninstall)
     // -> it still contains data, especially the Lucene search index which points to not anymore existing Entities
     // TODO: may also save Database and Android Preferences in data folder so that after uninstalling complete data can be restored
-    if(preferencesStore.getDatabaseDataModelVersion() == 0)
-      FileUtils.deleteFile(preferencesStore.getDataFolder());
+    try {
+      if (preferencesStore.getDatabaseDataModelVersion() == 0 && FileUtils.doesFileExist(preferencesStore.getDataFolder()))
+        FileUtils.deleteFile(preferencesStore.getDataFolder());
+    } catch(Exception ex) {
+      log.error("Could not delete previous' installation data", ex);
+    }
   }
 
 

@@ -75,6 +75,10 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   }
 
 
+  public void insertHtml(String html) {
+    htmlEditor.insertHtml(html);
+  }
+
 
   public String getHtml() {
     return htmlEditor.getHtml();

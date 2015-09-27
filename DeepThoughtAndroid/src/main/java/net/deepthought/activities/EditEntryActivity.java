@@ -1,6 +1,7 @@
 package net.deepthought.activities;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import net.deepthought.AndroidHelper;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
@@ -36,12 +38,15 @@ import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Tag;
 import net.deepthought.helper.AlertHelper;
+import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +59,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   public final static String EntryArgumentKey = "EntryArgument";
   public final static int RequestCode = 1;
   public final static String ResultKey = "EntryResult";
+
+  public final static int TakePhotoRequestCode = 3;
 
   public final static int RecognizeTextFromCameraPhotoRequestCode = 2;
 
@@ -143,7 +150,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
       contentHtmlEditor.setVisibility(View.VISIBLE);
-      rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+      rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
       RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
       contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -218,14 +225,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
       MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddContentFromOcr);
       mnitmActionAddContentFromOcr.setVisible(true);
-
-      mnitmActionAddContentFromOcr.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-          addContentFromOcr();
-          return true;
-        }
-      });
     }
 
     return super.onCreateOptionsMenu(menu);
@@ -245,7 +244,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return true;
     }
     else if (id == R.id.mnitmActionAddContentFromOcr) {
-      addContentFromOcr();
+//      addContentFromOcr();
+      insertPhotoFromCamera();
       return true;
     }
 
@@ -318,6 +318,27 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
 
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == TakePhotoRequestCode && resultCode == RESULT_OK) {
+      if(takenPhotoTempFile != null) {
+        // TODO: move to DeepThought folder
+        FileLink imageFile = new FileLink(takenPhotoTempFile.getAbsolutePath());
+        Application.getDeepThought().addFile(imageFile);
+        ImageElementData imageData = new ImageElementData(imageFile);
+        contentHtmlEditor.insertHtml(imageData.getHtmlCode());
+      }
+    }
+
+    takenPhotoTempFile = null;
+  }
+
+  protected File takenPhotoTempFile = null;
+
+  protected void insertPhotoFromCamera() {
+    takenPhotoTempFile = AndroidHelper.takePhoto(this, TakePhotoRequestCode);
+  }
+
   protected void addContentFromOcr() {
     if(Application.getContentExtractorManager().hasOcrContentExtractors() == false)
       return;
@@ -329,7 +350,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
     });
   }
-
   protected void textRecognized(TextRecognitionResult result) {
     try {
       if (result.isUserCancelled() || (result.isDone() && result.getRecognizedText() == null)) {
@@ -441,7 +461,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected void createNewTag() {
     String tagName = edtxtEditEntrySearchTag.getText().toString();
 
-    if(tagName == null || tagName.isEmpty())
+    if(StringUtils.isNullOrEmpty(tagName))
       Toast.makeText(this, getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG).show();
     else if(Application.getDeepThought().containsTagOfName(tagName))
       Toast.makeText(this, getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();

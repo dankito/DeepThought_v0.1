@@ -325,7 +325,7 @@ public class SearchFragment extends Fragment implements SearchForTagsAdapter.Tag
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Entry searchResult = searchResultsAdapter.getSearchResultAt(position);
-      ActivityManager.getInstance().showEditEntryActivity(searchResult);
+      ActivityManager.getInstance().showEditEntryActivity(getActivity(), searchResult);
     }
   };
 }

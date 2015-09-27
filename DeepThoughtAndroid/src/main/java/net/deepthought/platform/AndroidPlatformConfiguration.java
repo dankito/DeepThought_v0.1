@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
+import net.deepthought.AndroidHelper;
+
 /**
  * Created by ganymed on 23/08/15.
  */
@@ -36,11 +38,6 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
 
   @Override
   public boolean hasCaptureDevice() {
-    try {
-      PackageManager pm = context.getPackageManager();
-      return pm.hasSystemFeature(PackageManager.FEATURE_CAMERA);
-    } catch(Exception ex) { }
-
-    return false;
+    return AndroidHelper.hasPermission(context, PackageManager.FEATURE_CAMERA);
   }
 }

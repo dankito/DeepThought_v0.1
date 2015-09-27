@@ -53,6 +53,8 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     ListView lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
+
+    ActivityManager.getInstance().resetShowArticlesOverviewActivityCachedData();
   }
 
 
@@ -84,7 +86,7 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
         public void entryCreated(EntryCreationResult creationResult) {
           // TODO: this is the same code as in CreateEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst() and in ArticlesOverviewDialogController -> unify
           if (creationResult.successful())
-            ActivityManager.getInstance().showEditEntryActivity(creationResult);
+            ActivityManager.getInstance().showEditEntryActivity(ArticlesOverviewActivity.this, creationResult);
         else
           AlertHelper.showErrorMessage(ArticlesOverviewActivity.this, creationResult.getError(),
               Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));

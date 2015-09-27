@@ -24,7 +24,6 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -86,7 +85,7 @@ public class EntriesFragment extends Fragment {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Entry entry = (Entry)parent.getItemAtPosition(position);
-      ActivityManager.getInstance().showEditEntryActivity(entry);
+      ActivityManager.getInstance().showEditEntryActivity(getActivity(), entry);
     }
   };
 
@@ -126,7 +125,7 @@ public class EntriesFragment extends Fragment {
 
   protected void onActionAddEntrySelected() {
     Entry entry = new Entry();
-    ActivityManager.getInstance().showEditEntryActivity(entry);
+    ActivityManager.getInstance().showEditEntryActivity(getActivity(), entry);
   }
 
 
@@ -145,7 +144,7 @@ public class EntriesFragment extends Fragment {
     switch(item.getItemId()) {
       case R.id.list_item_entry_context_menu_edit:
         Entry entryToEdit = entriesAdapter.getEntryAt(info.position);
-        ActivityManager.getInstance().showEditEntryActivity(entryToEdit);
+        ActivityManager.getInstance().showEditEntryActivity(getActivity(), entryToEdit);
         return true;
       case R.id.list_item_entry_context_menu_delete:
         Entry entryToDelete = entriesAdapter.getEntryAt(info.position);

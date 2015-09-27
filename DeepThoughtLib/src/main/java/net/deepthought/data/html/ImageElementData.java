@@ -46,6 +46,10 @@ public class ImageElementData {
 
   }
 
+  public ImageElementData(FileLink file) {
+    this(file, -1, -1);
+  }
+
   public ImageElementData(FileLink file, int width, int height) {
     this(file.getUriString(), file.getId(), createUniqueEmbeddingId(), width, height, file.getDescription());
   }
@@ -61,9 +65,15 @@ public class ImageElementData {
 
 
   public String getHtmlCode() {
-    if(imgElementHtmlCode == null)
-      imgElementHtmlCode = "<img src=\"" + source + "\" " + ImageIdAttributeName + "=\"" + fileId + "\" " + EmbeddingIdAttributeName + "=\"" + embeddingId + "\" width=\"" +
-                           width + "\" height=\"" + height + "\" alt=\"" + alt + "\" />";
+    if(imgElementHtmlCode == null) {
+      imgElementHtmlCode = "<img src=\"" + source + "\" " + ImageIdAttributeName + "=\"" + fileId + "\" " + EmbeddingIdAttributeName + "=\"" + embeddingId + "\"";
+      if(width > 0)
+        imgElementHtmlCode += " width=\"" + width + "\"";
+      if(height > 0)
+        imgElementHtmlCode += " height=\"" + height + "\"";
+      imgElementHtmlCode +=  " alt=\"" + alt + "\" />";
+    }
+
     return imgElementHtmlCode;
   }
 

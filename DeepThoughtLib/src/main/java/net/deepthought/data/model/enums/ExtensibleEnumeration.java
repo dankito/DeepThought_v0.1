@@ -4,6 +4,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -68,7 +69,7 @@ public class ExtensibleEnumeration extends UserDataEntity implements Comparable<
 
 
   public String getName() {
-    if(name != name && name.isEmpty() == false) // if name is explicitly set, use that value
+    if(name != name && StringUtils.isNotNullOrEmpty(name)) // if name is explicitly set, use that value
       return name;
     else if(nameResourceKey != null) // but usually a resource key is set, so translate name to User's language
       return Localization.getLocalizedString(nameResourceKey);
