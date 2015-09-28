@@ -71,15 +71,19 @@ public class AndroidHtmlEditorPool implements ICleanUp {
       final Integer instance = i;
       AndroidHtmlEditor htmlEditor = getHtmlEditor(context, new IHtmlEditorListener() {
         @Override
-        public void htmlCodeUpdated(String newHtmlCode) {
-          log.info("htmlCodeUpdated() called");
+        public void editorHasLoaded(HtmlEditor editor) {
+          log.info("editorHasLoaded() called");
           // Editor is loaded now
           if(preloadedHtmlEditors.containsKey(instance)) {
             log.info("Releasing preloaded HtmlEditor");
             AndroidHtmlEditor htmlEditor = preloadedHtmlEditors.remove(instance);
-//            htmlEditor.setHtml("");
             htmlEditorReleased(htmlEditor);
           }
+        }
+
+        @Override
+        public void htmlCodeUpdated(String newHtmlCode) {
+
         }
 
         @Override
@@ -104,8 +108,6 @@ public class AndroidHtmlEditorPool implements ICleanUp {
       });
 
       preloadedHtmlEditors.put(instance, htmlEditor);
-      htmlEditor.setHtml("<p></p>");
-      log.info("HtmlEditor preloaded");
     }
   }
 

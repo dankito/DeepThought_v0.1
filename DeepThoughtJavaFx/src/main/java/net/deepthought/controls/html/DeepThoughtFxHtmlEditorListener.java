@@ -30,6 +30,11 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
 
 
   @Override
+  public void editorHasLoaded(HtmlEditor editor) {
+
+  }
+
+  @Override
   public void htmlCodeUpdated(String newHtmlCode) {
     fieldsWithUnsavedChanges.add(fieldToAddOnChanges);
   }

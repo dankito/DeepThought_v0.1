@@ -184,8 +184,11 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
         public void run() {
           setHtml(htmlToSetWhenLoaded);
         }
-      }, 400); // i don't know why but executing Script immediately results in an error -> wait some (unrecognizable) time
+      }, 100); // i don't know why but executing Script immediately results in an error -> wait some (unrecognizable) time
     }
+
+    if(listener != null)
+      listener.editorHasLoaded(this);
   }
 
   public void htmlChanged(String newHtmlCode) {

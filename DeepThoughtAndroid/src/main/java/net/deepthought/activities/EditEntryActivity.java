@@ -477,6 +477,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
     @Override
+    public void editorHasLoaded(HtmlEditor editor) {
+
+    }
+
+    @Override
     public void htmlCodeUpdated(String newHtmlCode) {
       setEntryHasBeenEdited();
     }
@@ -503,6 +508,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   };
 
   protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
+    @Override
+    public void editorHasLoaded(HtmlEditor editor) {
+
+    }
+
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
       setEntryHasBeenEdited();

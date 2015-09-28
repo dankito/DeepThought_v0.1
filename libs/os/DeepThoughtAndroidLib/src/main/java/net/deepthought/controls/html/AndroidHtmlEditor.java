@@ -112,7 +112,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   public void executeScript(final String javaScript, final ExecuteJavaScriptResultListener listener) {
     if(AndroidHelper.isRunningOnUiThread())
       executeScriptOnUiThread(javaScript, listener);
-    else {
+    else if(activity != null) {
       activity.runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -120,6 +120,8 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
         }
       });
     }
+    else
+      log.error("Trying to execute Script '" + javaScript + "', but activity is null");
   }
 
   protected void executeScriptOnUiThread(final String javaScript, final ExecuteJavaScriptResultListener listener) {

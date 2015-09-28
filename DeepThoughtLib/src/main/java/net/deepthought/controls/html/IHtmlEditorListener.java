@@ -7,6 +7,8 @@ import net.deepthought.data.html.ImageElementData;
  */
 public interface IHtmlEditorListener {
 
+  void editorHasLoaded(HtmlEditor editor);
+
   void htmlCodeUpdated(String newHtmlCode);
 
   /**

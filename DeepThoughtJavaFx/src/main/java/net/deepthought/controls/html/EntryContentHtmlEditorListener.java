@@ -27,6 +27,11 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
 
 
   @Override
+  public void editorHasLoaded(HtmlEditor editor) {
+
+  }
+
+  @Override
   public void htmlCodeUpdated(String newHtmlCode) {
     if(entry != null)
       entry.setContent(newHtmlCode);
