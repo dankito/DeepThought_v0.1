@@ -80,7 +80,9 @@
 
 	function resizeEditorToFitWindow() {
 		<!-- This is curious, mostly it fits perfectly in window then, but sometimes it gets a margin -->
-		editor.resize($(window).width() - 16, $(window).height() - 16);
+		if(typeof editor !== 'undefined' && typeof window !== 'undefined' && typeof $(window).width() !== 'undefined') {
+			try { editor.resize($(window).width() - 16, $(window).height() - 16); } catch (e) { }
+		}
 	}
 
 	<!-- handle Dialogs -->

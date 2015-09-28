@@ -23,7 +23,7 @@
         android:title="@string/ocr"
         android:icon="@android:drawable/ic_menu_camera"
         app:showAsAction="always"
-        android:visible="true"
+        android:visible="false"
         >
     </item>
 

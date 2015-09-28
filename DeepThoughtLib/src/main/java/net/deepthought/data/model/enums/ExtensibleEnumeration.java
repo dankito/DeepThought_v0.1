@@ -83,6 +83,10 @@ public class ExtensibleEnumeration extends UserDataEntity implements Comparable<
     callPropertyChangedListeners(TableConfig.ExtensibleEnumerationNameColumnName, previousValue, name);
   }
 
+  public String getNameResourceKey() {
+    return nameResourceKey;
+  }
+
   public String getDescription() {
     return description;
   }

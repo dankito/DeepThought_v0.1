@@ -42,11 +42,11 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Tag;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -84,6 +84,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected boolean hasEntryBeenEdited = false;
+
+  protected FileLink takenPhotoTempFile = null;
 
 
   @Override
@@ -244,8 +246,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return true;
     }
     else if (id == R.id.mnitmActionAddContentFromOcr) {
-//      addContentFromOcr();
-      insertPhotoFromCamera();
+      addContentFromOcr();
+//      insertPhotoFromCamera();
       return true;
     }
 
@@ -322,8 +324,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == TakePhotoRequestCode && resultCode == RESULT_OK) {
       if(takenPhotoTempFile != null) {
-        // TODO: move to DeepThought folder
-        FileLink imageFile = new FileLink(takenPhotoTempFile.getAbsolutePath());
+        FileLink imageFile = FileUtils.moveFileToCapturedImagesFolder(takenPhotoTempFile);
         Application.getDeepThought().addFile(imageFile);
         ImageElementData imageData = new ImageElementData(imageFile);
         contentHtmlEditor.insertHtml(imageData.getHtmlCode());
@@ -332,8 +333,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     takenPhotoTempFile = null;
   }
-
-  protected File takenPhotoTempFile = null;
 
   protected void insertPhotoFromCamera() {
     takenPhotoTempFile = AndroidHelper.takePhoto(this, TakePhotoRequestCode);
@@ -475,22 +474,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
-  protected TextWatcher entryAbstractOrContentChangedWatcher = new TextWatcher() {
-    @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-      setEntryHasBeenEdited();
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-
-    }
-  };
 
   protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
     @Override

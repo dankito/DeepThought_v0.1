@@ -133,6 +133,9 @@ public class EntriesAdapter extends BaseAdapter {
 
 
   public void searchEntries(String searchTerm) {
+    if(Application.isInstantiated() == false)
+      return;
+
     if(entriesSearch != null && entriesSearch.isCompleted() == false)
       entriesSearch.interrupt();
 

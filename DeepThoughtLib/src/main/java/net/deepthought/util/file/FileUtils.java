@@ -25,8 +25,11 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -51,6 +54,9 @@ public class FileUtils {
   public final static String AudioFilesFolderName = "audio";
   public final static String VideoFilesFolderName = "video";
   public final static String OtherFilesFolderName = "other";
+
+  public final static String CapturedImagesFolderName = "captured";
+  public final static String CapturedImagesTempFolderName = "temp";
 
 
 
@@ -132,6 +138,54 @@ public class FileUtils {
           listener.fileOperationDone(overallSuccessful, destinationFile);
       }
     });
+  }
+
+  public static FileLink moveFileToCapturedImagesFolder(FileLink file) {
+    String destinationFilename = new File(getCapturedImagesFolder(), file.getName()).getAbsolutePath();
+
+    if(moveFile(file, destinationFilename)) {
+      if(isFileInCapturedImagesTempFolder(file)) {
+        boolean debug = deleteFile(file.getUriString());
+        if(debug) { }
+      }
+
+      file.setUriString(destinationFilename);
+    }
+
+    return file;
+  }
+
+  public static boolean moveFile(final FileLink sourceFile, String destinationFileName) {
+    return moveFile(sourceFile, destinationFileName, null);
+  }
+
+  public static boolean moveFile(final FileLink sourceFile, String destinationFileName, final FileOperationListener listener) {
+    final AtomicBoolean result = new AtomicBoolean(false);
+
+    moveFile(new File(sourceFile.getUriString()), new File(destinationFileName), new FileOperationListener() {
+      @Override
+      public ExistingFileHandling destinationFileAlreadyExists(File existingFile, File newFile, FileNameSuggestion suggestion) {
+        if(listener != null)
+          return listener.destinationFileAlreadyExists(existingFile, newFile, suggestion);
+        return ExistingFileHandling.ReplaceExistingFile;
+      }
+
+      @Override
+      public void errorOccurred(DeepThoughtError error) {
+        if (listener != null)
+          listener.errorOccurred(error);
+      }
+
+      @Override
+      public void fileOperationDone(boolean successful, File destinationFile) {
+        result.set(successful);
+
+        if (listener != null)
+          listener.fileOperationDone(successful, destinationFile);
+      }
+    });
+
+    return result.get();
   }
 
   public static void moveFile(File sourceFile, File destinationFile) {
@@ -378,11 +432,15 @@ public class FileUtils {
 
 
   public static String getUserDataFolderForFile(FileLink file) {
+    return getUserDataFolderForFile(file.getFileType());
+  }
+
+  public static String getUserDataFolderForFile(FileType fileType) {
     String fileDataFolder = getUserDataFolder();
 
     if(fileDataFolder != Application.CouldNotGetDataFolderPath) {
       try {
-        File tmp = new File(fileDataFolder, getFileUserDataSubFolder(file));
+        File tmp = new File(fileDataFolder, getFileUserDataSubFolder(fileType));
 
         if (tmp.exists() == false)
           tmp.mkdirs();
@@ -417,20 +475,54 @@ public class FileUtils {
     return userDataFolder;
   }
 
-  public static String getFileUserDataSubFolder(FileLink file) {
-    String mimeType = getMimeType(file);
+  public static String getFileUserDataSubFolder(FileType fileType) {
+    String resourceKey = fileType.getNameResourceKey();
 
-    if(isDocumentFile(mimeType))
+    if("file.type.document".equals(resourceKey))
       return DocumentsFilesFolderName;
-    else if(isImageFile(mimeType))
+    else if("file.type.image".equals(resourceKey))
       return ImagesFilesFolderName;
-    else if(isAudioFile(mimeType))
+    else if("file.type.audio".equals(resourceKey))
       return AudioFilesFolderName;
-    else if(isVideoFile(mimeType))
+    else if("file.type.video".equals(resourceKey))
       return VideoFilesFolderName;
 
     return OtherFilesFolderName;
   }
+
+  public static String getCapturedImagesFolder() {
+    File imagesFolder = new File(getUserDataFolderForFile(FileType.getImageFileType()), CapturedImagesFolderName);
+    ensureFolderExists(imagesFolder);
+
+    return imagesFolder.getAbsolutePath();
+  }
+
+  public static String getCapturedImagesTempFolder() {
+    File imagesTempFolder = new File(getCapturedImagesFolder(), CapturedImagesTempFolderName);
+    ensureFolderExists(imagesTempFolder);
+
+    return imagesTempFolder.getAbsolutePath();
+  }
+
+  public static FileLink createCapturedImagesTempFile() {
+    String folder = getCapturedImagesTempFolder();
+    String imageFileName = createCapturedImagesTempFileName();
+
+    File imageFile = new File(folder, imageFileName);
+    try { imageFile.createNewFile(); } catch(Exception ex) { log.error("Could not create temp file for captured image " + imageFileName, ex); }
+
+    return new FileLink(imageFile.getAbsolutePath());
+  }
+
+  public static String createCapturedImagesTempFileName() {
+    String timeStamp = new SimpleDateFormat("yyyy.MM.dd_HH-mm-ss").format(new Date());
+    return "captured_" + timeStamp + ".jpg";
+  }
+
+  public static boolean isFileInCapturedImagesTempFolder(FileLink file) {
+    return true;
+  }
+
 
   public static boolean isDocumentFile(FileLink file) {
     return isDocumentFile(getMimeType(file));
@@ -535,6 +627,7 @@ public class FileUtils {
 
   public static FileType getFileType(String file) {
     String mimeType = getMimeType(file);
+
     if(mimeType != CouldNotDetectMimeType) {
       if(isDocumentFile(mimeType))
         return FileType.getForResourceKey("file.type.document");
@@ -710,7 +803,10 @@ public class FileUtils {
   }
 
   public static void ensureFolderExists(String folderPath) {
-    File folder = new File(folderPath);
+    ensureFolderExists(new File(folderPath));
+  }
+
+  public static void ensureFolderExists(File folder) {
     if(folder.exists() == false)
       folder.mkdirs();
   }

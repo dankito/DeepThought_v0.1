@@ -5,17 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
+
+import net.deepthought.data.model.FileLink;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by ganymed on 26/09/15.
@@ -38,42 +37,22 @@ public class AndroidHelper {
     return false;
   }
 
-  public static File takePhoto(Activity activity, int requestCode) {
+
+  public static FileLink takePhoto(Activity activity, int requestCode) {
     Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
     // Ensure that there's a camera activity to handle the intent
     if (takePictureIntent.resolveActivity(activity.getPackageManager()) != null) {
       // Create the File where the photo should go
-      File photoFile = null;
-      try {
-        photoFile = createImageFile();
-      } catch (IOException ex) {
-        log.error("Could not create Temp file", ex);
-      }
+      FileLink photoFile = FileUtils.createCapturedImagesTempFile();
 
       if (photoFile != null) {
-        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(photoFile.getUriString())));
         activity.startActivityForResult(takePictureIntent, requestCode);
         return photoFile;
       }
     }
 
     return null;
-  }
-
-  protected static File createImageFile() throws IOException {
-    // Create an image file name
-    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    String imageFileName = "JPEG_" + timeStamp + "_";
-    File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    File imageFile = File.createTempFile(
-        imageFileName,  /* prefix */
-        ".jpg",         /* suffix */
-        storageDir      /* directory */
-    );
-
-    // Save a file: path for use with ACTION_VIEW intents
-//    mCurrentPhotoPath = "file:" + imageFile.getAbsolutePath();
-    return imageFile;
   }
 
 }
