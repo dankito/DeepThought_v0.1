@@ -75,11 +75,11 @@ public class OpenOfficeDocumentsImporterExporter {
       Iterator<Paragraph> paragraphs = textDocument.getParagraphIterator();
       while(paragraphs.hasNext()) {
         Paragraph paragraph = paragraphs.next();
-        extractedText += paragraph.getTextContent() + System.lineSeparator();
+        extractedText += paragraph.getTextContent() + Application.getPlatformConfiguration().getLineSeparator();
       }
 
       if(extractedText.length() > 0)
-        extractedText = extractedText.substring(0, extractedText.length() - System.lineSeparator().length());
+        extractedText = extractedText.substring(0, extractedText.length() - Application.getPlatformConfiguration().getLineSeparator().length());
     } catch (Exception ex) {
       log.error("Could not load text document " + documentPath, ex);
     }

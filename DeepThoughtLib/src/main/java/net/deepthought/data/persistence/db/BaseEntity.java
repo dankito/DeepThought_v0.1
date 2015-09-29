@@ -39,8 +39,7 @@ public class BaseEntity implements Serializable {
 //  @JsonIgnore
   @Column(name = TableConfig.BaseEntityIdColumnName)
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY) // Toplink cannot handle this in conjunction with SQlite (SEQ_GEN_IDENTITY: platform DatabasePlatform doesn't support NativeSequence.)
-//  @GeneratedValue(strategy = GenerationType.TABLE)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   protected Long id;
 
 //  @JsonIgnore

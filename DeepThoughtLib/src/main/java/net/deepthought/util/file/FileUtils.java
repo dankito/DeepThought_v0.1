@@ -610,8 +610,8 @@ public class FileUtils {
   }
 
   // TODO: make compatible with Android
-  protected static MimeTypes mimeTypeDetector = MimeTypes.getDefaultMimeTypes();
-//  protected static MimeTypes mimeTypeDetector = null;
+//  protected static MimeTypes mimeTypeDetector = MimeTypes.getDefaultMimeTypes();
+  protected static MimeTypes mimeTypeDetector = null;
 
   public static String getMimeType(FileLink file) {
     return getMimeType(file.getUriString());

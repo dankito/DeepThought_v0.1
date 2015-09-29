@@ -1,5 +1,7 @@
 package net.deepthought.util;
 
+import net.deepthought.Application;
+
 /**
  * Created by ganymed on 19/08/15.
  */
@@ -13,6 +15,10 @@ public class OsHelper {
     }
 
     return isRunningOnAndroid;
+  }
+
+  public static boolean isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(int minimumApiLevel) {
+    return isRunningOnAndroid() == false || Application.getPlatformConfiguration().getOsVersion() >= minimumApiLevel;
   }
 
   private static Boolean determineIfIsRunningOnAndroid() {

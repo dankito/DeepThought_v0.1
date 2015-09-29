@@ -16,7 +16,13 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
-  public String getOsVersion() {
+  public int getOsVersion() {
+    // TODO: don't know how to do this generically on JavaSE (but this information is anyway right now only used for Android)
+    return 0;
+  }
+
+  @Override
+  public String getOsVersionString() {
     return System.getProperty("os.version");
   }
 
@@ -24,4 +30,10 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
   public boolean hasCaptureDevice() {
     return false;
   }
+
+  @Override
+  public String getLineSeparator() {
+    return System.lineSeparator();
+  }
+
 }

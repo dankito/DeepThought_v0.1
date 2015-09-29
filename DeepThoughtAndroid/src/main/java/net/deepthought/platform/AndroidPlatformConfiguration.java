@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import net.deepthought.AndroidHelper;
+import net.deepthought.util.OsHelper;
 
 /**
  * Created by ganymed on 23/08/15.
@@ -32,12 +33,24 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
-  public String getOsVersion() {
+  public int getOsVersion() {
+    return Build.VERSION.SDK_INT;
+  }
+
+  @Override
+  public String getOsVersionString() {
     return Build.VERSION.RELEASE;
   }
 
   @Override
   public boolean hasCaptureDevice() {
     return AndroidHelper.hasPermission(context, PackageManager.FEATURE_CAMERA);
+  }
+
+  @Override
+  public String getLineSeparator() {
+    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(19))
+      return System.lineSeparator();
+    return "\n"; // is always '\n' on Android, see https://developer.android.com/reference/java/lang/System.html#lineSeparator%28%29
   }
 }

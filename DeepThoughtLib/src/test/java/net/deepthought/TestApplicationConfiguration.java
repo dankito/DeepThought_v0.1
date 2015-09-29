@@ -90,13 +90,23 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
       }
 
       @Override
-      public String getOsVersion() {
+      public int getOsVersion() {
+        return -1;
+      }
+
+      @Override
+      public String getOsVersionString() {
         return "-1 preAlpha";
       }
 
       @Override
       public boolean hasCaptureDevice() {
         return false;
+      }
+
+      @Override
+      public String getLineSeparator() {
+        return System.lineSeparator();
       }
     };
   }

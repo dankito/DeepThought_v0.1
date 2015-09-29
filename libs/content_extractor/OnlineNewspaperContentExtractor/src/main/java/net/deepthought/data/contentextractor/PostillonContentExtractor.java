@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.Application;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
@@ -216,7 +217,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
                 else if(divChild instanceof Element) {
                   Element divChildElement = (Element) divChild;
                   if("br".equals(divChildElement.nodeName()))
-                    item.setSummary(item.getSummary() + System.lineSeparator());
+                    item.setSummary(item.getSummary() + Application.getPlatformConfiguration().getLineSeparator());
                   else
                     item.setSummary(item.getSummary() + divChildElement.text());
                 }

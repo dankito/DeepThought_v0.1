@@ -9,8 +9,12 @@ public interface IPlatformConfiguration {
 
   String getPlatformName();
 
-  String getOsVersion();
+  int getOsVersion();
+
+  String getOsVersionString();
 
   boolean hasCaptureDevice();
+
+  String getLineSeparator();
 
 }

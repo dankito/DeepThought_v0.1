@@ -58,7 +58,10 @@ public class Localization {
 
   static {
     try {
-      StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
+      if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
+        StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
+      else
+        StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale); // ResourceBundle.Control requires API Level 9 or higher -> on older versions only ASCII symbols can be displayed
     } catch(Exception ex) {
       log.error("Could not load " + StringsResourceBundleName + ". No Strings will now be translated, only their resource keys will be displayed.", ex);
     }

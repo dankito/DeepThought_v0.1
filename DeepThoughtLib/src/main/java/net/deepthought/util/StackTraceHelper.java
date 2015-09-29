@@ -2,6 +2,8 @@ package net.deepthought.util;
 
 import com.sun.javafx.stage.StageHelper;
 
+import net.deepthought.Application;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,7 @@ public class StackTraceHelper {
       StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
       for (int i = 2; i < stackTrace.length; i++) {
-        stackTraceString += System.lineSeparator() + stackTrace[i].toString();
+        stackTraceString += Application.getPlatformConfiguration().getLineSeparator() + stackTrace[i].toString();
       }
     } catch(Exception ex) {
       log.error("Could not get StackTrace", ex);

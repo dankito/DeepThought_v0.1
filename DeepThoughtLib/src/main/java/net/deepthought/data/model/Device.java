@@ -258,7 +258,7 @@ public class Device extends UserDataEntity {
       platform = "Android";
 
     Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
-        platform, Application.getPlatformConfiguration().getOsVersion(), System.getProperty("os.arch"));
+        platform, Application.getPlatformConfiguration().getOsVersionString(), System.getProperty("os.arch"));
 
 //    , System.getProperty("os.arch")
 //    userDefaultDevice.setUserRegion(System.getProperty("user.country"));

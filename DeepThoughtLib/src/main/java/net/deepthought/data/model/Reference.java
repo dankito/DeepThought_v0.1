@@ -1,6 +1,5 @@
 package net.deepthought.data.model;
 
-import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
@@ -63,7 +62,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   @Column(name = TableConfig.ReferencePublishingDateColumnName)
   @Temporal(TemporalType.TIMESTAMP)
-  protected Date publishingDate; // SQLite needs this, can't handle null dates
+  protected Date publishingDate;
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceDeepThoughtJoinColumnName)
@@ -229,7 +228,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   public String getIssueOrPublishingDate() {
     if(StringUtils.isNullOrEmpty(issueOrPublishingDate) && publishingDate != null)
-      DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
+      return formatPublishingDate();
     return issueOrPublishingDate;
   }
 
@@ -288,11 +287,15 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Transient
   public String getPreview() {
     if(preview == null) {
-//      preview = getTextRepresentation();
-//      addCategorySpecificInfo();
       preview = title;
-      if(StringUtils.isNullOrEmpty(title) && issueOrPublishingDate != null)
-        preview = issueOrPublishingDate.toString();
+      if(StringUtils.isNullOrEmpty(title)) {
+        if(publishingDate != null) {
+          preview = formatPublishingDate();
+        }
+        else if(issueOrPublishingDate != null) {
+          preview = issueOrPublishingDate.toString();
+        }
+      }
 
       if (series != null)
         preview = series.getTextRepresentation() + (StringUtils.isNullOrEmpty(preview) ? "" : " " + preview);
@@ -304,6 +307,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   }
 
 
+
+  protected String formatPublishingDate() {
+    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
+  }
 
   public static Date tryToParseIssueOrPublishingDateToDate(String issueOrPublishingDate) {
     if(StringUtils.isNullOrEmpty(issueOrPublishingDate))
@@ -351,10 +358,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return "Reference " + getTextRepresentation();
   }
 
-  public static Reference createReferenceFromStringRepresentation(String stringRepresentation) {
-    Reference newReference = new Reference(stringRepresentation); // TODO
-    return newReference;
-  }
 
   @Override
   public int compareTo(Reference other) {
@@ -364,12 +367,4 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     return getPreview().compareTo(other.getPreview()); // TODO
   }
 
-  public static Reference findReferenceFromStringRepresentation(String stringRepresentation) {
-    // TODO:
-    for(Reference reference : Application.getDeepThought().getReferences()) {
-      if(reference.getTitle().equals(stringRepresentation))
-        return reference;
-    }
-    return null;
-  }
 }

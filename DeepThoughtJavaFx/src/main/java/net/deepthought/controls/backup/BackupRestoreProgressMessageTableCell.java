@@ -1,5 +1,6 @@
 package net.deepthought.controls.backup;
 
+import net.deepthought.Application;
 import net.deepthought.controller.RestoreBackupDialogController;
 import net.deepthought.data.backup.RestoreBackupStepResult;
 import net.deepthought.util.Localization;
@@ -57,9 +58,9 @@ public class BackupRestoreProgressMessageTableCell extends BackupRestoreProgress
       message = progressItem.getStep().toString();
     else {
       if(progressItem.getResult().successful())
-        message = progressItem.getStep().toString() + System.lineSeparator() + Localization.getLocalizedString("successful");
+        message = progressItem.getStep().toString() + Application.getPlatformConfiguration().getLineSeparator() + Localization.getLocalizedString("successful");
       else
-        message = progressItem.getStep().toString() + System.lineSeparator() + progressItem.getResult().getError().getNotificationMessage();
+        message = progressItem.getStep().toString() + Application.getPlatformConfiguration().getLineSeparator() + progressItem.getResult().getError().getNotificationMessage();
     }
 
     setItem(message);

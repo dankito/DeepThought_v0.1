@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.Application;
 import net.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
@@ -282,7 +283,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         Document document = retrieveOnlineDocument(url);
         content += readHtmlOfAllImagesInGallery(getElementByClassAndNodeName(document.body(), "div", "body"));
       } catch (Exception ex) {
-        log.error("Could not retrieve Html Document for next image in Gallery. Next Image Url was " + url + System.lineSeparator() + "Current image article body element: " + articleBodyElement.outerHtml(), ex);
+        log.error("Could not retrieve Html Document for next image in Gallery. Next Image Url was " + url + Application.getPlatformConfiguration().getLineSeparator() + "Current image article body element: " + articleBodyElement.outerHtml(), ex);
       }
     }
 
