@@ -21,6 +21,7 @@ public class Addresses {
 
   public final static String StartCaptureImageAndDoOcrMethodName = "StartCaptureImageAndDoOcr";
   public final static String OcrResultMethodName = "OcrResult";
+  public final static String CaptureImageResultMethodName = "CaptureImageResult";
   public final static String StopCaptureImageAndDoOcrMethodName = "StopCaptureImageAndDoOcr";
 
   protected final static List<String> MethodNames;
@@ -28,7 +29,7 @@ public class Addresses {
 
   static {
     MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, SendAskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
-                  StartCaptureImageAndDoOcrMethodName, OcrResultMethodName, StopCaptureImageAndDoOcrMethodName);
+                  StartCaptureImageAndDoOcrMethodName, OcrResultMethodName, CaptureImageResultMethodName, StopCaptureImageAndDoOcrMethodName);
   }
 
 
@@ -60,6 +61,10 @@ public class Addresses {
 
   public static String getOcrResultAddress(String host, int port) {
     return createAddress(host, port, OcrResultMethodName);
+  }
+
+  public static String getCaptureImageResultAddress(String host, int port) {
+    return createAddress(host, port, CaptureImageResultMethodName);
   }
 
   public static String getStopCaptureImageAndDoOcrAddress(String host, int port) {

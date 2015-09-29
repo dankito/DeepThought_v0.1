@@ -34,6 +34,7 @@ import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.SearchFragment;
@@ -43,10 +44,12 @@ import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,6 +57,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
   private final static Logger log = LoggerFactory.getLogger(MainActivity.class);
+
+
+  protected final static int CaptureImageForConnectPeerRequestCode = 7;
 
 
   protected static boolean hasDeepThoughtBeenSetup = false;
@@ -342,6 +348,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           // Entry has been updated
         }
         break;
+      case CaptureImageForConnectPeerRequestCode:
+        if(resultCode == RESULT_OK) {
+          if (captureImageRequest != null && temporaryImageFile != null) {
+            File imageFile = new File(temporaryImageFile.getUriString());
+            try {
+              byte[] imageData = FileUtils.readFile(imageFile);
+              Application.getDeepThoughtsConnector().getCommunicator().sendCaptureImageResult(captureImageRequest, imageData, null);
+            } catch (Exception ex) {
+              log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
+              // TODO: send error response
+            }
+
+            imageFile.delete();
+          }
+        }
+
+        temporaryImageFile = null;
+        captureImageRequest = null;
+        break;
     }
 
     super.onActivityResult(requestCode, resultCode, data);
@@ -392,8 +417,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   };
 
-  protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
+  protected FileLink temporaryImageFile = null;
+  protected CaptureImageOrDoOcrRequest captureImageRequest = null;
 
+  protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
+    temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
+    if(temporaryImageFile != null)
+      this.captureImageRequest = request;
   }
 
   protected void captureImageAndDoOcr(final CaptureImageOrDoOcrRequest request) {

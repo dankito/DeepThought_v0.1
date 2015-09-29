@@ -3,7 +3,6 @@ package net.deepthought.controls.html;
 import android.app.Activity;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
-import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -42,7 +41,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   protected void setupHtmlEditor(IHtmlEditorListener listener) {
     this.getSettings().setJavaScriptEnabled(true);
 //    setInitialScale(95);
-    getSettings().setTextZoom(70);
+    getSettings().setTextZoom(80);
 
     htmlEditor = new HtmlEditor(this, listener);
 
@@ -126,15 +125,16 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   protected void executeScriptOnUiThread(final String javaScript, final ExecuteJavaScriptResultListener listener) {
     try {
-//      loadUrl("javascript:" + javaScript);
+      loadUrl("javascript:" + javaScript);
 
-      evaluateJavascript(javaScript, new ValueCallback<String>() {
-        @Override
-        public void onReceiveValue(String value) {
-          if(listener != null)
-            listener.scriptExecuted(value);
-        }
-      });
+      // evaluateJavascript() only works on API 19 and newer!
+//      evaluateJavascript(javaScript, new ValueCallback<String>() {
+//        @Override
+//        public void onReceiveValue(String value) {
+//          if(listener != null)
+//            listener.scriptExecuted(value);
+//        }
+//      });
     } catch(Exception ex) {
       log.error("Could not evaluate JavaScript " + javaScript, ex);
     }

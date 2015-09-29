@@ -12,6 +12,7 @@ import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListen
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.Response;
@@ -436,6 +437,12 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
       for(MessagesReceiverListener listener : messagesReceiverListeners)
         listener.startCaptureImageOrDoOcr(request);
+    }
+
+    @Override
+    public void captureImageResult(CaptureImageResultResponse response) {
+      for(MessagesReceiverListener listener : messagesReceiverListeners)
+        listener.captureImageResult(response);
     }
 
     @Override

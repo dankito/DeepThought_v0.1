@@ -1,6 +1,7 @@
 package net.deepthought.communication.listener;
 
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -15,6 +16,8 @@ public interface MessagesReceiverListener extends UserDeviceRegistrationRequestL
   void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice);
 
   void deviceIsStillConnected(ConnectedDevice connectedDevice);
+
+  void captureImageResult(CaptureImageResultResponse response);
 
   void ocrResult(OcrResultResponse response);
 

@@ -51,7 +51,6 @@
 
 	editor.on('change', function(evt) {
 		<!-- Notify Java code that Html text has changed -->
-		alert('change');
 		if(typeof app !== 'undefined') {
 			app.htmlChanged(editor.getData());
 		}

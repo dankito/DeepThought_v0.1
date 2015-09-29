@@ -9,6 +9,7 @@ import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.GenericRequest;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
@@ -17,6 +18,7 @@ import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.User;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
@@ -143,6 +145,19 @@ public class Communicator {
     });
   }
 
+  public void sendCaptureImageResult(final CaptureImageOrDoOcrRequest request, final byte[] imageBytes, final ResponseListener listener) {
+    String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
+    CaptureImageResult result = new CaptureImageResult(imageBytes);
+    final CaptureImageResultResponse response = new CaptureImageResultResponse(result, request.getMessageId());
+
+    sendMessageAsync(address, response, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(response, communicatorResponse, listener);
+      }
+    });
+  }
+
   public void sendOcrResult(final CaptureImageOrDoOcrRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
@@ -153,18 +168,6 @@ public class Communicator {
         dispatchResponse(response, communicatorResponse, listener);
       }
     });
-  }
-
-  public void sendCapturedImage(final CaptureImageOrDoOcrRequest request, final byte[] imageBytes, final ResponseListener listener) {
-//    String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
-//    final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
-//
-//    sendMessageAsync(address, response, new CommunicatorResponseListener() {
-//      @Override
-//      public void responseReceived(Response communicatorResponse) {
-//        dispatchResponse(response, communicatorResponse, listener);
-//      }
-//    });
   }
 
   public void stopCaptureImage(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
@@ -306,6 +309,20 @@ public class Communicator {
     @Override
     public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
 
+    }
+
+    @Override
+    public void captureImageResult(CaptureImageResultResponse response) {
+      Integer messageId = response.getMessageId();
+
+      for(CaptureImageOrDoOcrRequest request : captureImageOrDoOcrListeners.keySet()) {
+        if(messageId.equals(request.getMessageId())) {
+          CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(request);
+          listener.captureImageResult(response.getResult());
+
+          break;
+        }
+      }
     }
 
     @Override

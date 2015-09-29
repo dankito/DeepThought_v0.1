@@ -36,15 +36,15 @@ public class Localization {
   }
 
   public static void setLanguageLocale(Locale languageLocale) {
-    LanguageLocale = languageLocale;
-    Locale.setDefault(languageLocale);
-    StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
+//    LanguageLocale = languageLocale;
+//    Locale.setDefault(languageLocale);
+//    StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
   }
 
   public static void setLanguageLocale(ApplicationLanguage language) {
     try {
 //      setLanguageLocale(Locale.forLanguageTag(language.getLanguageKey())); // crashes on older Androids
-      setLanguageLocale(new Locale(language.getLanguageKey()));
+//      setLanguageLocale(new Locale(language.getLanguageKey()));
     } catch(Exception ex) {
       log.error("Could not find Locale for ApplicationLanguage's LanguageKey " + language.getLanguageKey() + " of ApplicationLanguage " + language.getName(), ex);
     }

@@ -157,15 +157,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     setListener(null);
     previousHtml = "";
 
-    try {
-      scriptExecutor.executeScript("window", new ExecuteJavaScriptResultListener() {
-        @Override
-        public void scriptExecuted(Object result) {
-//          JSObject win = (JSObject) result;
-//          win.setMember("app", null);
-        }
-      });
-    } catch(Exception ex) { }
+    scriptExecutor.setJavaScriptMember("app", null);
 
     this.scriptExecutor = null;
   }

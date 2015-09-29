@@ -7,6 +7,7 @@
 package net.deepthought;
 
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
@@ -26,6 +27,8 @@ import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -195,8 +198,6 @@ public class MainWindowController implements Initializable {
 
       @Override
       public void notification(Notification notification) {
-        if(notification.getType() == NotificationType.ApplicationInstantiated)
-          tabTagsControl.applicationInstantiated();
         notifyUserThreadSafe(notification);
       }
     });
@@ -230,6 +231,8 @@ public class MainWindowController implements Initializable {
       showErrorOccurredMessage((DeepThoughtError) notification);
     else if(notification.getType() == NotificationType.Info)
       showInfoMessage(notification);
+    if(notification.getType() == NotificationType.ApplicationInstantiated)
+      applicationInstantiated();
     else if(notification.getType() == NotificationType.PluginLoaded) {
       showInfoMessage(notification);
       if(notification.getParameter() instanceof IPlugin) {
@@ -253,6 +256,10 @@ public class MainWindowController implements Initializable {
 
   protected void showErrorOccurredMessage(DeepThoughtError error) {
     Alerts.showErrorMessage(stage, error);
+  }
+
+  protected void applicationInstantiated() {
+    tabTagsControl.applicationInstantiated();
   }
 
   protected void pluginLoaded(IPlugin plugin) {

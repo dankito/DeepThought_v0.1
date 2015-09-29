@@ -63,7 +63,7 @@ public class RegisterUserDevicesDialog extends DialogFragment {
 
   protected void setupControls(View view) {
     spnDeviceRegistrationOptions = (Spinner)view.findViewById(R.id.spnDeviceRegistrationOptions);
-    String[] options = { Localization.getLocalizedString("open.registration.server"), Localization.getLocalizedString("open.registration.server")
+    String[] options = { Localization.getLocalizedString("open.registration.server"), Localization.getLocalizedString("search.for.registration.servers")
                          /*, Localization.getLocalizedString("show.registered.devices")*/ };
     spnDeviceRegistrationOptions.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_dropdown_item_1line, options));
     spnDeviceRegistrationOptions.setOnItemSelectedListener(spnDeviceRegistrationOptionsItemSelectedListener);

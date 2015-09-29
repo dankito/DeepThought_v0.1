@@ -6,10 +6,17 @@ import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Device;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.file.FileUtils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.geometry.HPos;
@@ -31,6 +38,8 @@ import javafx.scene.layout.RowConstraints;
  * Created by ganymed on 13/09/15.
  */
 public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
+
+  protected final static Logger log = LoggerFactory.getLogger(CollapsibleHtmlEditor.class);
 
 
   protected DeepThoughtFxHtmlEditor htmlEditor = null;
@@ -136,17 +145,18 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     icon.maxHeight(24);
 //    icon.setUserData(connectedDevice);
 
-//    pnConnectedDevices.getChildren().add(icon);
-//    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
-
-    Label label = new Label(null, icon);
-    label.setUserData(connectedDevice);
+    final Label label = new Label(null, icon);
+    label.setUserData(connectedDevice); // add a Label so that we can set a ToolTip (ImageViews have no ToolTips)
     JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
         connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
 
     pnConnectedDevices.getChildren().add(label);
     HBox.setMargin(label, new Insets(0, 4, 0, 0));
     label.setOnContextMenuRequested(event -> createConnectedDeviceContextMenu(connectedDevice, label));
+    label.setOnMouseClicked(event -> {
+      createConnectedDeviceContextMenu(connectedDevice, label);
+      event.consume();
+    });
   }
 
   protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, Node icon) {
@@ -190,12 +200,32 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
   protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
     @Override
+    public void captureImageResult(CaptureImageResult captureImageResult) {
+      if (captureImageResult.successful())
+        imageSuccessfullyCaptured(captureImageResult);
+      // TODO: show error message (or has it already been shown at this time?)
+    }
+
+    @Override
     public void ocrResult(final TextRecognitionResult ocrResult) {
       if(ocrResult.recognitionSuccessful())
         Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText()));
+      // TODO: show error message (or has it already been shown at this time?)
     }
   };
 
+  protected void imageSuccessfullyCaptured(CaptureImageResult captureImageResult) {
+    FileLink imageFile = FileUtils.createCapturedImageFile();
+    try {
+      FileUtils.writeToFile(captureImageResult.getImageData(), imageFile);
+      Application.getDeepThought().addFile(imageFile);
+
+      final ImageElementData imageElementData = new ImageElementData(imageFile);
+      Platform.runLater(() -> htmlEditor.insertHtml(imageElementData.getHtmlCode()));
+    } catch(Exception ex) {
+      log.error("Could not save Captured Image to file " + imageFile.getUriString(), ex);
+    }
+  }
 
 
   public DeepThoughtFxHtmlEditor getHtmlEditor() {

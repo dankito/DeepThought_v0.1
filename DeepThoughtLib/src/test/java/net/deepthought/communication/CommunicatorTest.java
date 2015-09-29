@@ -8,18 +8,23 @@ import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.util.file.FileUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -214,6 +219,11 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), new CaptureImageOrDoOcrResponseListener() {
       @Override
+      public void captureImageResult(CaptureImageResult captureImageResult) {
+
+      }
+
+      @Override
       public void ocrResult(TextRecognitionResult ocrResult) {
         methodCalled.set(true);
         ocrResults.add(ocrResult);
@@ -225,6 +235,42 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     Assert.assertTrue(methodCalled.get());
     Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
+  }
+
+
+  @Test
+  public void sendCaptureImageResult_RequestIsReceived() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+      }
+    });
+
+
+    File debug = new File("test_image.jpg");
+    boolean exists = debug.exists();
+    URL debug2 = CommunicatorTest.class.getClassLoader().getResource("test_image.jpg");
+    String debug3 = debug2.toExternalForm();
+    try {
+      byte[] imageData = FileUtils.readFile(new File("test_image.jpg"));
+    } catch(Exception ex) {
+      Assert.fail("Could not load test image: " + ex.getMessage());
+    }
+//    communicator.sendCaptureImageResult(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
   }
 
 
@@ -246,6 +292,11 @@ public class CommunicatorTest extends CommunicationTestBase {
 
       @Override
       public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
+
+      }
+
+      @Override
+      public void captureImageResult(CaptureImageResultResponse response) {
 
       }
 
@@ -329,6 +380,11 @@ public class CommunicatorTest extends CommunicationTestBase {
   }
 
   protected CaptureImageOrDoOcrResponseListener ocrResponseListener = new CaptureImageOrDoOcrResponseListener() {
+    @Override
+    public void captureImageResult(CaptureImageResult captureImageResult) {
+
+    }
+
     @Override
     public void ocrResult(TextRecognitionResult ocrResult) {
 

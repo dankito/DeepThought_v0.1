@@ -108,6 +108,11 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   }
 
 
+  public void insertHtml(String html) {
+    htmlEditor.insertHtml(html);
+  }
+
+
   protected void testEvents() {
     engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
       @Override

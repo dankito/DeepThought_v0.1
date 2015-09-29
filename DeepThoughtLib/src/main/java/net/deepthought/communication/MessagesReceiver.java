@@ -5,6 +5,7 @@ import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.GenericRequest;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
@@ -89,6 +90,8 @@ public class MessagesReceiver extends NanoHTTPD {
         return respondToHeartbeatMessage(session);
       case Addresses.StartCaptureImageAndDoOcrMethodName:
         return respondToStartCaptureImageAndDoOcrRequest(session);
+      case Addresses.CaptureImageResultMethodName:
+        return respondToCaptureImageResultResponse(session);
       case Addresses.OcrResultMethodName:
         return respondToOcrResultResponse(session);
       case Addresses.StopCaptureImageAndDoOcrMethodName:
@@ -140,6 +143,14 @@ public class MessagesReceiver extends NanoHTTPD {
     CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)parseRequestBody(session, CaptureImageOrDoOcrRequest.class);
 
     listener.startCaptureImageOrDoOcr(request);
+
+    return createResponse(net.deepthought.communication.messages.Response.OK);
+  }
+
+  protected Response respondToCaptureImageResultResponse(IHTTPSession session) {
+    CaptureImageResultResponse request = (CaptureImageResultResponse)parseRequestBody(session, CaptureImageResultResponse.class);
+
+    listener.captureImageResult(request);
 
     return createResponse(net.deepthought.communication.messages.Response.OK);
   }

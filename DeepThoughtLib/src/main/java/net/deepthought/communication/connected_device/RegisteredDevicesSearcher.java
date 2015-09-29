@@ -94,7 +94,7 @@ public class RegisteredDevicesSearcher {
 
       }
     } catch(Exception ex) {
-      log.error("An error occurred starting RegistrationServer", ex);
+      log.error("An error occurred starting RegisteredDevicesSearcher", ex);
     }
   }
 

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -497,6 +498,16 @@ public class FileUtils {
     return imagesFolder.getAbsolutePath();
   }
 
+  public static FileLink createCapturedImageFile() {
+    String folder = getCapturedImagesFolder();
+    String imageFileName = createCapturedImagesTempFileName();
+
+    File imageFile = new File(folder, imageFileName);
+    try { imageFile.createNewFile(); } catch(Exception ex) { log.error("Could not create file for captured image " + imageFileName, ex); }
+
+    return new FileLink(imageFile.getAbsolutePath());
+  }
+
   public static String getCapturedImagesTempFolder() {
     File imagesTempFolder = new File(getCapturedImagesFolder(), CapturedImagesTempFolderName);
     ensureFolderExists(imagesTempFolder);
@@ -732,6 +743,10 @@ public class FileUtils {
     BufferedWriter writer = new BufferedWriter(new FileWriter(destinationFile));
     writer.write(fileContent);
     writer.close();
+  }
+
+  public static void writeToFile(byte[] data, FileLink destinationFile) throws Exception {
+    writeToFile(new ByteArrayInputStream(data), new File(destinationFile.getUriString()));
   }
 
   public static void writeToFile(InputStream inputStream, File destinationFile) throws Exception {
