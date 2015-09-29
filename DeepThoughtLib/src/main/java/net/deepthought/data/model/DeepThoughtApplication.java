@@ -10,6 +10,7 @@ import net.deepthought.util.Localization;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -311,7 +312,8 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
   }
 
   protected static void setApplicationDefaultLanguage(DeepThoughtApplication application, UserDeviceSettings settings) {
-    String userLanguage = System.getProperty("user.language").toLowerCase();
+//    String userLanguage = System.getProperty("user.language").toLowerCase();
+    String userLanguage = Locale.getDefault().getLanguage();
 
     for(ApplicationLanguage language : application.getApplicationLanguages()) {
       if(language.getLanguageKey().toLowerCase().startsWith(userLanguage)) {
@@ -320,6 +322,7 @@ public class DeepThoughtApplication extends BaseEntity implements Serializable {
       }
     }
 
+    // No ApplicationLanguage found to User's language -> set ApplicationLanguage to English
     String applicationLanguageEnglish = Localization.getLocalizedString("application.language.english");
 
     for(ApplicationLanguage language : application.getApplicationLanguages()) {

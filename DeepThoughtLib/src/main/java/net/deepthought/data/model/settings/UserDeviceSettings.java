@@ -45,6 +45,9 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
   }
 
   public void setLanguage(ApplicationLanguage language) {
+    if(language == this.language)
+      return;
+
     Object previousValue = this.language;
     this.language = language;
 
