@@ -1,7 +1,5 @@
 package net.deepthought.data.contentextractor.ocr;
 
-import net.deepthought.Application;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,17 +20,12 @@ public class CaptureImageResult {
 
   protected byte[] imageData = null;
 
-  protected String encodedImageData = null;
-
 
   public CaptureImageResult() {
 
   }
 
   public CaptureImageResult(byte[] imageData) {
-    if(Application.getPlatformTools() != null) // for sending over the wire Base64 encode data. The user doesn't know this, externally she/he sees only the byte array
-      this.encodedImageData = Application.getPlatformTools().base64EncodeByteArray(imageData);
-    else
       this.imageData = imageData;
 
     this.successful = true;
@@ -67,12 +60,6 @@ public class CaptureImageResult {
   }
 
   public byte[] getImageData() {
-    if(imageData == null && encodedImageData != null && Application.getPlatformTools() != null) {
-      log.debug("Decoding Base64 Image Data ...");
-      imageData = Application.getPlatformTools().base64DecodeByteArray(encodedImageData);
-      log.debug("Decoding done");
-    }
-
     return imageData;
   }
 

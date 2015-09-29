@@ -54,6 +54,7 @@ public class MessagesReceiver extends NanoHTTPD {
     if(isDeepThoughtMessage(session))
       return respondToRequest(session);
 
+    log.debug("Don't know how to handle Request of Uri " + session.getUri());
     return super.serve(session);
   }
 
@@ -131,7 +132,7 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected Response respondToSendAskForDeviceRegistrationResponse(IHTTPSession session) {
-    AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage)parseRequestBody(session, AskForDeviceRegistrationRequest.class);
+    AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage)parseRequestBody(session, AskForDeviceRegistrationResponseMessage.class);
 
     listener.askForDeviceRegistrationResponseReceived(message);
 
@@ -175,22 +176,33 @@ public class MessagesReceiver extends NanoHTTPD {
 
 
   protected Request parseRequestBody(IHTTPSession session, Class<? extends Request> requestClass) {
+    String messageBody = getMessageBody(session);
+
+    if(messageBody != null) {
+      log.debug("Deserializing received message body ...");
+      DeserializationResult deserializationResult = JsonIoJsonHelper.parseJsonString(messageBody, requestClass);
+      log.debug("Deserializing done");
+      if(deserializationResult.successful())
+        return (Request)deserializationResult.getResult();
+    }
+
+    return null;
+  }
+
+  protected String getMessageBody(IHTTPSession session) {
+    log.debug("Extracting received message body ...");
     Map<String, String> bodyValues = new HashMap<>();
     try {
-      session.parseBody(bodyValues); }
+      session.parseBody(bodyValues);
+    }
     catch(Exception ex) {
       log.error("Could not parse session's body" + session, ex);
       return null;
     }
 
+    log.debug("Extracting done");
     if(bodyValues.size() == 1) {
-      String body = new ArrayList<String>(bodyValues.values()).get(0);
-
-      log.debug("Deserializing received message body ...");
-      DeserializationResult deserializationResult = JsonIoJsonHelper.parseJsonString(body, requestClass);
-      log.debug("Deserializing done");
-      if(deserializationResult.successful())
-        return (Request)deserializationResult.getResult();
+      return new ArrayList<String>(bodyValues.values()).get(0);
     }
 
     return null;

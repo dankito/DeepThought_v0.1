@@ -1,4 +1,4 @@
-package net.deepthought.data.persistence;
+package net.deepthought.data.persistence.json;
 
 import net.deepthought.Application;
 import net.deepthought.TestApplicationConfiguration;
@@ -8,10 +8,10 @@ import net.deepthought.data.helper.DataHelper;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.User;
+import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
-import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
 
 import org.junit.After;

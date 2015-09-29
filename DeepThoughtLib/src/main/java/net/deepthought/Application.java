@@ -28,6 +28,7 @@ import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
+import net.deepthought.util.LogHelper;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
@@ -224,7 +225,7 @@ public class Application {
 
   protected static void logResolvingDependencyDuration(String dependencyName, Date startTime) {
     long millisecondsElapsed = (new Date().getTime() - startTime.getTime());
-    log.info("Resolving " + dependencyName + " dependency took " + (millisecondsElapsed / 1000) + "." + String.format("%03d", millisecondsElapsed).substring(0, 3) + " seconds");
+    log.info("Resolving " + dependencyName + " dependency took " + LogHelper.createTimeElapsedString(millisecondsElapsed) + " seconds");
   }
 
   public static void shutdown() {

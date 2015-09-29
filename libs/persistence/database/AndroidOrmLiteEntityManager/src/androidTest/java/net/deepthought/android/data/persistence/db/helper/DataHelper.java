@@ -1,4 +1,4 @@
-package net.deepthought.android.db.helper;
+package net.deepthought.android.data.persistence.db.helper;
 
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;

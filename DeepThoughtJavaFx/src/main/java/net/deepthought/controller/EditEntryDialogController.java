@@ -236,7 +236,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     htmledContent.setHtml(entry.getContent());
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
-    entryCategoriesControl.setExpanded(entry.hasCategories() == false);
+//    entryCategoriesControl.setExpanded(entry.hasCategories() == false);
+    entryCategoriesControl.setExpanded(false);
 
     entryReferenceControl.setExpanded(entry.isAReferenceSet() == false);
 

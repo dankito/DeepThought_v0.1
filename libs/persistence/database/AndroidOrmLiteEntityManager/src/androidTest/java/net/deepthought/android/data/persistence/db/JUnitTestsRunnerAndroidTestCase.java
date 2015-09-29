@@ -1,4 +1,4 @@
-package net.deepthought.android.db;
+package net.deepthought.android.data.persistence.db;
 
 import android.content.Context;
 import android.test.AndroidTestCase;

@@ -16,15 +16,13 @@ import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
-import net.deepthought.util.file.FileUtils;
+import net.deepthought.data.helper.FileHelper;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -258,7 +256,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] imageData = loadTestImage();
+    byte[] imageData = FileHelper.loadTestImage();
 
     communicator.sendCaptureImageResult(request, imageData, null);
 
@@ -288,7 +286,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] sentImageData = loadTestImage();
+    byte[] sentImageData = FileHelper.loadTestImage();
 
     communicator.sendCaptureImageResult(request, sentImageData, null);
 
@@ -451,11 +449,5 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     streamWriter.close();
     pr.destroy();
-  }
-
-  protected byte[] loadTestImage() throws IOException {
-    URL imageUrl = CommunicatorTest.class.getClassLoader().getResource("test_image.jpg");
-    String imagePath = imageUrl.toExternalForm().replace("file:", "");
-    return FileUtils.readFile(new File(imagePath));
   }
 }

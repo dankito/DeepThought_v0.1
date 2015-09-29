@@ -1,4 +1,4 @@
-package net.deepthought.android.db;
+package net.deepthought.android.data.persistence.db;
 
 import android.test.AndroidTestCase;
 
@@ -7,7 +7,7 @@ import com.j256.ormlite.dao.cda.jointable.JoinTableDaoRegistry;
 import net.deepthought.Application;
 import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.TestEntityManagerConfiguration;
-import net.deepthought.android.db.helper.TestJoinTableDaoRegistry;
+import net.deepthought.android.data.persistence.db.helper.TestJoinTableDaoRegistry;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 

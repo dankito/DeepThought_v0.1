@@ -4,7 +4,7 @@ import android.content.Context;
 
 import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
-import net.deepthought.android.db.OrmLiteAndroidEntityManager;
+import net.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
 import net.deepthought.data.AndroidDataManager;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.contentextractor.PostillonContentExtractor;

@@ -1,4 +1,4 @@
-package net.deepthought.android.db.helper;
+package net.deepthought.android.data.persistence.db.helper;
 
 import com.j256.ormlite.dao.cda.jointable.JoinTableDao;
 import com.j256.ormlite.dao.cda.jointable.JoinTableDaoRegistry;

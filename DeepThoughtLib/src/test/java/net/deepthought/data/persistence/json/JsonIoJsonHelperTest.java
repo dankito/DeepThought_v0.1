@@ -1,4 +1,4 @@
-package net.deepthought.util;
+package net.deepthought.data.persistence.json;
 
 import net.deepthought.data.helper.DataHelper;
 import net.deepthought.data.model.DeepThought;
@@ -7,7 +7,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.User;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
-import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
 
 import org.junit.Assert;

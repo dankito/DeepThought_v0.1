@@ -99,7 +99,7 @@ public class ConnectedDevice {
       }
     }
 
-    // TODO: this happens on each new Registration
-    log.error("Could not find local device with unique id " + getUniqueDeviceId());
+    // TODO: this happens on Server side on each new Device Registration (as there the remote device is not added yet to logged on User's devices)
+    log.error("Could not find local device with unique id " + getUniqueDeviceId() + ". But this happens on Server side on each new Device Registration");
   }
 }

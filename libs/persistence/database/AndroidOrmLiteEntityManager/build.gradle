@@ -1,10 +1,10 @@
 apply plugin: 'com.android.library'
 
-extensions.add("isAndroid", true) // so that build.gradle in platform neutral projects can distinguish if it's a Java or Android project (as they package resources differently)
-extensions.properties.put("isAndroid", true)
-println "AndroidOrmLite: isAndroid = " + extensions.properties.get("isAndroid")
-properties.put("isAndroid", true)
-println "AndroidOrmLite: isAndroid = " + properties.get("isAndroid")
+//extensions.add("isAndroid", true) // so that build.gradle in platform neutral projects can distinguish if it's a Java or Android project (as they package resources differently)
+//extensions.properties.put("isAndroid", true)
+//println "AndroidOrmLite: isAndroid = " + extensions.properties.get("isAndroid")
+//properties.put("isAndroid", true)
+//println "AndroidOrmLite: isAndroid = " + properties.get("isAndroid")
 
 android {
     compileSdkVersion 22
