@@ -239,38 +239,64 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 
   @Test
-  public void sendCaptureImageResult_RequestIsReceived() {
+  public void sendCaptureImageResult_ResultIsReceived() throws IOException {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    ConnectedDevice self = ConnectedDevice.createSelfInstance();
+    CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(self.getAddress(), self.getMessagesPort(), true, false);
+    connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
       @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+      public void captureImageResult(CaptureImageResult captureImageResult) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
 
       @Override
-      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+      public void ocrResult(TextRecognitionResult ocrResult) {
 
       }
     });
 
+    byte[] imageData = loadTestImage();
 
-    File debug = new File("test_image.jpg");
-    boolean exists = debug.exists();
-    URL debug2 = CommunicatorTest.class.getClassLoader().getResource("test_image.jpg");
-    String debug3 = debug2.toExternalForm();
-    try {
-      byte[] imageData = FileUtils.readFile(new File("test_image.jpg"));
-    } catch(Exception ex) {
-      Assert.fail("Could not load test image: " + ex.getMessage());
-    }
-//    communicator.sendCaptureImageResult(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
+    communicator.sendCaptureImageResult(request, imageData, null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
+  }
+
+
+  @Test
+  public void sendCaptureImageResult_ReceivedImageDataIsCorrect() throws IOException {
+    final List<byte[]> receivedImageData = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    ConnectedDevice self = ConnectedDevice.createSelfInstance();
+    CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(self.getAddress(), self.getMessagesPort(), true, false);
+    connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
+      @Override
+      public void captureImageResult(CaptureImageResult captureImageResult) {
+        receivedImageData.add(captureImageResult.getImageData());
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void ocrResult(TextRecognitionResult ocrResult) {
+
+      }
+    });
+
+    byte[] sentImageData = loadTestImage();
+
+    communicator.sendCaptureImageResult(request, sentImageData, null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, receivedImageData.size());
+    Assert.assertEquals(sentImageData.length, receivedImageData.get(0).length);
+    Assert.assertArrayEquals(sentImageData, receivedImageData.get(0));
   }
 
 
@@ -425,5 +451,11 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     streamWriter.close();
     pr.destroy();
+  }
+
+  protected byte[] loadTestImage() throws IOException {
+    URL imageUrl = CommunicatorTest.class.getClassLoader().getResource("test_image.jpg");
+    String imagePath = imageUrl.toExternalForm().replace("file:", "");
+    return FileUtils.readFile(new File(imagePath));
   }
 }

@@ -41,7 +41,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   protected void setupHtmlEditor(IHtmlEditorListener listener) {
     this.getSettings().setJavaScriptEnabled(true);
 //    setInitialScale(95);
-    getSettings().setTextZoom(80);
+    getSettings().setTextZoom(85);
 
     htmlEditor = new HtmlEditor(this, listener);
 

@@ -99,6 +99,7 @@ public class ConnectedDevice {
       }
     }
 
+    // TODO: this happens on each new Registration
     log.error("Could not find local device with unique id " + getUniqueDeviceId());
   }
 }

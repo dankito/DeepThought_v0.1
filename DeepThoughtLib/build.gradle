@@ -19,6 +19,9 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.10.19'
 }
 
+
+sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
+
 // so that Test classes from other projects can see classes from src/test folder
 task testJar(type: Jar, dependsOn: testClasses) {
     baseName = "test-${project.archivesBaseName}"

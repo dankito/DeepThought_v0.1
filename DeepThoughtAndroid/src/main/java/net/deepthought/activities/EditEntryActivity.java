@@ -97,8 +97,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     setEntryValues();
 
     unsetEntryHasBeenEdited();
-    if(entryCreationResult != null)
-      setEntryHasBeenEdited();
   }
 
   protected void setupUi() {
@@ -181,6 +179,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     });
   }
 
+  protected boolean hasAbstractManuallyBeenChanged = false;
+  protected boolean hasContentManuallyBeenChanged = false;
+
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
     if(entry != null) {
@@ -195,7 +196,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     if(entry != null) {
       txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
+      hasAbstractManuallyBeenChanged = true;
       abstractHtmlEditor.setHtml(entry.getAbstract());
+
+      hasContentManuallyBeenChanged = true;
       contentHtmlEditor.setHtml(entry.getContent());
 
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
@@ -381,11 +385,12 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntryIfNeeded() {
-    if(hasEntryBeenEdited == true)
+    if(hasEntryBeenEdited == true || (entryCreationResult != null && entry.isPersisted() == false))
       saveEntry();
   }
 
   protected void saveEntry() {
+    // TODO: only save changed fields
     entry.setAbstract(abstractHtmlEditor.getHtml());
     entry.setContent(contentHtmlEditor.getHtml());
 
@@ -483,7 +488,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
-      setEntryHasBeenEdited();
+      if(hasAbstractManuallyBeenChanged == false)
+        setEntryHasBeenEdited();
+      else
+        hasAbstractManuallyBeenChanged = false; // reset
     }
 
     @Override
@@ -515,7 +523,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated(String newHtmlCode) {
-      setEntryHasBeenEdited();
+      if(hasContentManuallyBeenChanged == false)
+        setEntryHasBeenEdited();
+      else
+        hasContentManuallyBeenChanged = false; // reset
     }
 
     @Override

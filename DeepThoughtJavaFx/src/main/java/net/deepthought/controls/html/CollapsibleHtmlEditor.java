@@ -169,15 +169,15 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
-    if(connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
-      captureImageMenuItem.setOnAction(event -> {
-        // TODO: load image which text should be recognized
-//        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
-      });
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
+    // TODO: load image which text should be recognized
+//    if(connectedDevice.canDoOcr()) {
+//      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+//      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
+//      captureImageMenuItem.setOnAction(event -> {
+////        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
+//      });
+//      contextMenu.getItems().add(captureImageMenuItem);
+//    }
 
     if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
@@ -217,9 +217,12 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   protected void imageSuccessfullyCaptured(CaptureImageResult captureImageResult) {
     FileLink imageFile = FileUtils.createCapturedImageFile();
     try {
+      log.debug("Writing captured Image to file ...");
       FileUtils.writeToFile(captureImageResult.getImageData(), imageFile);
+      log.debug("Wrote to file, adding it to DeepThought ...");
       Application.getDeepThought().addFile(imageFile);
 
+      log.debug("Inserting it into HtmlEditor ...");
       final ImageElementData imageElementData = new ImageElementData(imageFile);
       Platform.runLater(() -> htmlEditor.insertHtml(imageElementData.getHtmlCode()));
     } catch(Exception ex) {

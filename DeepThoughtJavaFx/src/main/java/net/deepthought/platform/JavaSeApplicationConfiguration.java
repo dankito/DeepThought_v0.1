@@ -75,6 +75,11 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   }
 
   @Override
+  public IPlatformTools createPlatformTools() {
+    return new JavaSePlatformTools();
+  }
+
+  @Override
   public ISearchEngine createSearchEngine() {
     try {
 //          return new LuceneSearchEngine();

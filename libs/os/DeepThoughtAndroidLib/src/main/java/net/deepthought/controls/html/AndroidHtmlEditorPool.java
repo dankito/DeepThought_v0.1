@@ -41,10 +41,8 @@ public class AndroidHtmlEditorPool implements ICleanUp {
 
   public AndroidHtmlEditor getHtmlEditor(Activity context, IHtmlEditorListener listener) {
     if(availableHtmlEditors.size() > 0) {
-      log.info("Returning cached HtmlEditor");
       AndroidHtmlEditor editor = availableHtmlEditors.poll();
       editor.reInitHtmlEditor(context, listener);
-      log.info("There are now " + availableHtmlEditors.size() + " cached HtmlEditor");
       return editor;
     }
 
@@ -53,15 +51,11 @@ public class AndroidHtmlEditorPool implements ICleanUp {
   }
 
   public void htmlEditorReleased(AndroidHtmlEditor htmlEditor) {
-    log.info("HtmlEditor released");
-
     htmlEditor.resetInstanceVariables();
     if(htmlEditor.getParent() instanceof ViewGroup)
       ((ViewGroup)htmlEditor.getParent()).removeView(htmlEditor);
     if(availableHtmlEditors.contains(htmlEditor) == false)
       availableHtmlEditors.offer(htmlEditor);
-
-    log.info("There are now " + availableHtmlEditors.size() + " cached HtmlEditor");
   }
 
   public void preloadHtmlEditors(Activity context, int numberOfHtmlEditors) {
@@ -72,10 +66,8 @@ public class AndroidHtmlEditorPool implements ICleanUp {
       AndroidHtmlEditor htmlEditor = getHtmlEditor(context, new IHtmlEditorListener() {
         @Override
         public void editorHasLoaded(HtmlEditor editor) {
-          log.info("editorHasLoaded() called");
           // Editor is loaded now
           if(preloadedHtmlEditors.containsKey(instance)) {
-            log.info("Releasing preloaded HtmlEditor");
             AndroidHtmlEditor htmlEditor = preloadedHtmlEditors.remove(instance);
             htmlEditorReleased(htmlEditor);
           }

@@ -12,7 +12,7 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
-import net.deepthought.platform.IPlatformConfiguration;
+import net.deepthought.platform.IPlatformTools;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.IThreadPool;
 
@@ -23,28 +23,30 @@ public interface IDependencyResolver {
 
   IThreadPool createThreadPool();
 
-  public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception;
+  IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception;
 
-  public IDataManager createDataManager(IEntityManager entityManager);
+  IDataManager createDataManager(IEntityManager entityManager);
 
-  public IBackupManager createBackupManager();
+  IPlatformTools createPlatformTools();
 
-  public IDataComparer createDataComparer();
+  IBackupManager createBackupManager();
 
-  public IDataMerger createDataMerger();
+  IDataComparer createDataComparer();
 
-  public ILanguageDetector createLanguageDetector();
+  IDataMerger createDataMerger();
 
-  public ISearchEngine createSearchEngine();
+  ILanguageDetector createLanguageDetector();
 
-  public IHtmlHelper createHtmlHelper();
+  ISearchEngine createSearchEngine();
 
-  public IFileDownloader createDownloader();
+  IHtmlHelper createHtmlHelper();
 
-  public IPluginManager createPluginManager();
+  IFileDownloader createDownloader();
 
-  public IContentExtractorManager createContentExtractorManager();
+  IPluginManager createPluginManager();
 
-  public IDeepThoughtsConnector createDeepThoughtsConnector();
+  IContentExtractorManager createContentExtractorManager();
+
+  IDeepThoughtsConnector createDeepThoughtsConnector();
 
 }

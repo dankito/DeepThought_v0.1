@@ -148,7 +148,9 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected Response respondToCaptureImageResultResponse(IHTTPSession session) {
+    log.debug("Parsing CaptureImageResultResponse ...");
     CaptureImageResultResponse request = (CaptureImageResultResponse)parseRequestBody(session, CaptureImageResultResponse.class);
+    log.debug("Parsing done");
 
     listener.captureImageResult(request);
 
@@ -184,7 +186,9 @@ public class MessagesReceiver extends NanoHTTPD {
     if(bodyValues.size() == 1) {
       String body = new ArrayList<String>(bodyValues.values()).get(0);
 
+      log.debug("Deserializing received message body ...");
       DeserializationResult deserializationResult = JsonIoJsonHelper.parseJsonString(body, requestClass);
+      log.debug("Deserializing done");
       if(deserializationResult.successful())
         return (Request)deserializationResult.getResult();
     }

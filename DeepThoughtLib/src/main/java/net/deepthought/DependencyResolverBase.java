@@ -22,6 +22,7 @@ import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.NoOpLanguageDetector;
+import net.deepthought.platform.IPlatformTools;
 import net.deepthought.plugin.DefaultPluginManager;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.IThreadPool;
@@ -75,6 +76,11 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
   @Override
   public IDataManager createDataManager(IEntityManager entityManager) {
     return new DefaultDataManager(entityManager);
+  }
+
+  @Override
+  public IPlatformTools createPlatformTools() {
+    return null;
   }
 
   @Override

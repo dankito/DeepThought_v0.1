@@ -14,6 +14,7 @@ import net.deepthought.R;
 import net.deepthought.adapter.ArticlesOverviewAdapter;
 import net.deepthought.data.contentextractor.CreateEntryListener;
 import net.deepthought.data.contentextractor.EntryCreationResult;
+import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.Localization;
@@ -37,18 +38,27 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
   protected void setupUi() {
     setContentView(R.layout.activity_articles_overview);
 
+    IOnlineArticleContentExtractor contentExtractor = ActivityManager.getInstance().getExtractorToShowArticlesOverviewActivityFor();
+
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 //      setLogo(toolbar);
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(false);
+      actionBar.setDisplayShowTitleEnabled(true);
       actionBar.setDisplayHomeAsUpEnabled(true);
       actionBar.setHomeButtonEnabled(true);
+
+//      if(contentExtractor.getIconUrl() != IOnlineArticleContentExtractor.NoIcon) {
+//        ImageView iconView = new ImageView(this);
+//        toolbar.addView(iconView);
+//        IconManager.getInstance().setImageViewToImageFromUrl(iconView, contentExtractor.getIconUrl());
+//      }
+      actionBar.setTitle(contentExtractor.getSiteBaseUrl());
     }
 
-    articlesOverviewAdapter = new ArticlesOverviewAdapter(this, ActivityManager.getInstance().getExtractorToShowArticlesOverviewActivityFor());
+    articlesOverviewAdapter = new ArticlesOverviewAdapter(this, contentExtractor);
 
     ListView lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);

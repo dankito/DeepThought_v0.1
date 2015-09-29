@@ -88,6 +88,11 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   }
 
   @Override
+  public IPlatformTools createPlatformTools() {
+    return new AndroidPlatformTools();
+  }
+
+  @Override
   public ISearchEngine createSearchEngine() {
     try {
 //          return new LuceneSearchEngine();

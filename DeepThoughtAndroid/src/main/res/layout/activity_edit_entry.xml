@@ -132,24 +132,24 @@
 
         </RelativeLayout>
 
-    <TextView
-        android:id="@+id/txtvwEditEntryTextLabel"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/edit_entry_entry_label_height"
-        android:maxHeight="@dimen/edit_entry_entry_label_height"
-        android:layout_below="@+id/rlydTags"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="4dp"
-        android:textSize="@dimen/edit_entry_labels_text_size"
-        android:text="@string/edit_entry_content_label"
-        />
+    <!--<TextView-->
+        <!--android:id="@+id/txtvwEditEntryTextLabel"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/edit_entry_entry_label_height"-->
+        <!--android:maxHeight="@dimen/edit_entry_entry_label_height"-->
+        <!--android:layout_below="@+id/rlydTags"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_marginTop="4dp"-->
+        <!--android:textSize="@dimen/edit_entry_labels_text_size"-->
+        <!--android:text="@string/edit_entry_content_label"-->
+        <!--/>-->
 
     <RelativeLayout
         android:id="@+id/rlydContent"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/txtvwEditEntryTextLabel"
+        android:layout_below="@+id/rlydTags"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"

@@ -325,7 +325,11 @@ public class FileUtils {
   }
 
   public static byte[] readFile(File file) throws IOException {
-    FileChannel source = new FileInputStream(file).getChannel();
+    return readFile(new FileInputStream(file));
+  }
+
+  public static byte[] readFile(FileInputStream fileInputStream) throws IOException {
+    FileChannel source = fileInputStream.getChannel();
     ByteBuffer buffer = ByteBuffer.allocate((int) source.size());
     int bytesRead = source.read(buffer);
     return buffer.array();

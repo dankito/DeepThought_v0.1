@@ -22,6 +22,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformConfiguration;
+import net.deepthought.platform.IPlatformTools;
 import net.deepthought.platform.IPreferencesStore;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
@@ -56,6 +57,7 @@ public class Application {
   protected static IDependencyResolver dependencyResolver = null;
   protected static IPreferencesStore preferencesStore;
   protected static IPlatformConfiguration platformConfiguration;
+  protected static IPlatformTools platformTools;
   protected static IThreadPool threadPool;
 
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
@@ -108,6 +110,7 @@ public class Application {
     if(threadPool == null)
       threadPool = dependencyResolver.createThreadPool();
     Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
+    Application.platformTools = applicationConfiguration.createPlatformTools();
 
     HtmlEditor.extractHtmlEditorIfNeededAsync();
 
@@ -324,6 +327,10 @@ public class Application {
 
   public static IPlatformConfiguration getPlatformConfiguration() {
     return platformConfiguration;
+  }
+
+  public static IPlatformTools getPlatformTools() {
+    return platformTools;
   }
 
   public static IThreadPool getThreadPool() {

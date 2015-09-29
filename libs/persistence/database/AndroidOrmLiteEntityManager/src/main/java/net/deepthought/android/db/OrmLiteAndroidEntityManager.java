@@ -20,15 +20,12 @@ import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.db.EntitiesConfigurator;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -380,20 +377,7 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   }
 
   public void copyFile(File source, File destination) {
-    try {
-      InputStream inputStream = new FileInputStream(source);
-      OutputStream outputStream = new FileOutputStream(destination);
-
-      // Transfer bytes from inputStream to outputStream
-      byte[] buf = new byte[10 * 1024];
-      int len;
-      while ((len = inputStream.read(buf)) > 0) {
-        outputStream.write(buf, 0, len);
-      }
-
-      inputStream.close();
-      outputStream.close();
-    } catch(Exception ex) { log.error("Could not copyFile file " + source + " to " + destination, ex); }
+    FileUtils.copyFile(source, destination);
   }
 
   public String getDatabasePath() {
