@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.OsHelper;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
@@ -609,9 +610,16 @@ public class FileUtils {
     return file.substring(file.lastIndexOf(".") + 1);
   }
 
-  // TODO: make compatible with Android
-//  protected static MimeTypes mimeTypeDetector = MimeTypes.getDefaultMimeTypes();
   protected static MimeTypes mimeTypeDetector = null;
+
+  protected static MimeTypes getMimeTypeDetector() {
+    if(mimeTypeDetector == null) {
+      if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9)) // TODO: make compatible with lower Android versions
+        mimeTypeDetector = MimeTypes.getDefaultMimeTypes();
+    }
+
+    return mimeTypeDetector;
+  }
 
   public static String getMimeType(FileLink file) {
     return getMimeType(file.getUriString());
@@ -622,10 +630,10 @@ public class FileUtils {
 //    return mimeTypesMap.getContentType(file.).toLowerCase();
 
     try {
-      if(mimeTypeDetector != null) {
+      if(getMimeTypeDetector() != null) {
         Metadata metadata = new Metadata();
         metadata.set(Metadata.RESOURCE_NAME_KEY, file);
-        MediaType mediaType = mimeTypeDetector.detect(null, metadata);
+        MediaType mediaType = getMimeTypeDetector().detect(null, metadata);
         if (mediaType != null)
           return mediaType.toString();
       }

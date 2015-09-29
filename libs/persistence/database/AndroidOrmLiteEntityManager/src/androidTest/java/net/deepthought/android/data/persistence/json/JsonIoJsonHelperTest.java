@@ -2,6 +2,8 @@ package net.deepthought.android.data.persistence.json;
 
 import android.test.AndroidTestCase;
 
+import com.j256.ormlite.jpa.StringHelper;
+
 import net.deepthought.android.R;
 import net.deepthought.android.data.persistence.db.helper.DataHelper;
 import net.deepthought.android.data.persistence.db.helper.ResourceHelper;
@@ -35,7 +37,7 @@ public class JsonIoJsonHelperTest extends AndroidTestCase {
 
     assertTrue(serializationResult.successful());
     assertTrue(serializationResult.getSerializationResult() != null);
-    assertFalse(serializationResult.getSerializationResult().isEmpty());
+    assertTrue(StringHelper.isNotNullOrEmpty(serializationResult.getSerializationResult()));
   }
 
   public void testDeserializeDeepThoughtApplicationFromJson() throws IOException {

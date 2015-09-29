@@ -16,10 +16,12 @@ import net.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
+import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.deepthought.plugin.AndroidPluginManager;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.plugin.IPluginManager;
+import net.deepthought.util.OsHelper;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -95,8 +97,12 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public ISearchEngine createSearchEngine() {
     try {
+      if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9)) {
 //          return new LuceneSearchEngine();
-      return new LuceneAndDatabaseSearchEngine();
+        return new LuceneAndDatabaseSearchEngine();
+      }
+      else
+        return new InMemorySearchEngine(); // TODO: implement InMemorySearchEngine
     } catch (Exception ex) {
       log.error("Could not initialize LuceneSearchEngine", ex);
     }

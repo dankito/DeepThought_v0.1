@@ -2,10 +2,14 @@ package net.deepthought.controls.html;
 
 import android.app.Activity;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import net.deepthought.AndroidHelper;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.util.OsHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,38 +42,39 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   protected void setupHtmlEditor(IHtmlEditorListener listener) {
     this.getSettings().setJavaScriptEnabled(true);
 
-//    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(14))
-//      getSettings().setTextZoom(85);
-//    else
-//      setInitialScale(95);
+    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(14))
+      getSettings().setTextZoom(85);
+    else
+      setInitialScale(95);
 
     htmlEditor = new HtmlEditor(this, listener);
 
-//    setWebViewClient(new WebViewClient() {
-//      @Override
-//      public void onPageFinished(WebView view, String url) {
-//        super.onPageFinished(view, url);
-//        htmlEditor.webControlLoaded();
-//        executeScript("resizeEditorToFitWindow()");
-//      }
-//
-//      @Override
-//      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-//        log.error("An error occurred in WebView when calling Url " + failingUrl + ": " + description);
-//        super.onReceivedError(view, errorCode, description, failingUrl);
-//      }
-//    });
-//
-//    setWebChromeClient(new WebChromeClient() {
-//      @Override
-//      public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-////        return super.onJsAlert(view, url, message, result);
-//        result.confirm(); // do not show any JavaScript alert to user
-//        return true;
-//      }
-//    });
-//
-//    addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
+    setWebViewClient(new WebViewClient() {
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        htmlEditor.webControlLoaded();
+        executeScript("resizeEditorToFitWindow()");
+      }
+
+      @Override
+      public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        log.error("An error occurred in WebView when calling Url " + failingUrl + ": " + description);
+        super.onReceivedError(view, errorCode, description, failingUrl);
+      }
+    });
+
+    setWebChromeClient(new WebChromeClient() {
+      @Override
+      public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+//        return super.onJsAlert(view, url, message, result);
+        result.confirm(); // do not show any JavaScript alert to user
+        return true;
+      }
+    });
+
+    // crashes in Emulator for Android 2.3
+    addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
     loadUrl(htmlEditor.getHtmlEditorPath());
   }
 

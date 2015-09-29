@@ -1891,7 +1891,7 @@ public class JsonReader implements Closeable
             {   // Ensure .type field set on JsonObject
                 JsonObject job = (JsonObject) rhs;
                 String type = job.type;
-                if (type == null || type.isEmpty())
+                if (isStringNullOrEmpty(type))
                 {
                     job.setType(fieldType.getName());
                 }
@@ -1990,7 +1990,11 @@ public class JsonReader implements Closeable
         }
     }
 
-    private static void markUntypedObjects(Type type, Object rhs) throws IOException
+  protected static boolean isStringNullOrEmpty(String type) {
+    return type == null || type.length() == 0;
+  }
+
+  private static void markUntypedObjects(Type type, Object rhs) throws IOException
     {
         LinkedList<Object[]> stack = new LinkedList<>();
         stack.addFirst(new Object[] {type, rhs});
@@ -2130,7 +2134,7 @@ public class JsonReader implements Closeable
         if (o instanceof JsonObject && clazz != null)
         {
             JsonObject jObj = (JsonObject) o;
-            if ((jObj.type == null || jObj.type.isEmpty()) && jObj.target == null)
+            if ((isStringNullOrEmpty(jObj.type)) && jObj.target == null)
             {
                 jObj.type = clazz.getName();
             }
@@ -3047,7 +3051,7 @@ public class JsonReader implements Closeable
 
     private static Class classForName(String name) throws IOException
     {
-        if (name == null || name.isEmpty())
+        if (isStringNullOrEmpty(name))
         {
             error("Invalid class name specified");
         }
@@ -3064,7 +3068,7 @@ public class JsonReader implements Closeable
 
     static Class classForName2(String name) throws IOException
     {
-        if (name == null || name.isEmpty())
+        if (isStringNullOrEmpty(name))
         {
             error("Empty class name.");
         }

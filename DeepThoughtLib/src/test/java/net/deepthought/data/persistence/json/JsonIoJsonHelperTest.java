@@ -8,6 +8,7 @@ import net.deepthought.data.model.User;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.serializer.SerializationResult;
+import net.deepthought.util.StringUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +41,7 @@ public class JsonIoJsonHelperTest {
 
     Assert.assertTrue(serializationResult.successful());
     Assert.assertTrue(serializationResult.getSerializationResult() != null);
-    Assert.assertFalse(serializationResult.getSerializationResult().isEmpty());
+    Assert.assertTrue(StringUtils.isNotNullOrEmpty(serializationResult.getSerializationResult()));
   }
 
   @Test
