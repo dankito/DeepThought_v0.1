@@ -55,20 +55,20 @@ android {
 
 }
 
-sourceSets {
-    main {
-        resources {
-            output.resourcesDir = output.classesDir
-        }
-    }
-}
+//sourceSets {
+//    main {
+//        resources {
+//            output.resourcesDir = output.classesDir
+//        }
+//    }
+//}
 
 dependencies {
 
     compile project(':DeepThoughtAndroidLib')
     compile project(':AndroidOrmLiteEntityManager')
     compile project(':LuceneSearchEngine')
-    compile project(':OnlineNewspaperContentExtractor')
+//    compile project(':OnlineNewspaperContentExtractor')
 
 //    compile 'com.android.support:appcompat-v7:19.1.0'
 //    compile 'com.android.support:appcompat-v7:21.0.3'

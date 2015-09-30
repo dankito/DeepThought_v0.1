@@ -7,12 +7,6 @@ import net.deepthought.IApplicationConfiguration;
 import net.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
 import net.deepthought.data.AndroidDataManager;
 import net.deepthought.data.IDataManager;
-import net.deepthought.data.contentextractor.PostillonContentExtractor;
-import net.deepthought.data.contentextractor.SpiegelContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
-import net.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
@@ -28,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -74,9 +68,9 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
 
   @Override
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
-//    return new ArrayList<>();
-    return Arrays.asList(new IPlugin[]{ new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
-                                        new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor() } );
+    return new ArrayList<>();
+//    return Arrays.asList(new IPlugin[]{ new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
+//                                        new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor() } );
   }
 
   @Override
