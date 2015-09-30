@@ -2,6 +2,9 @@ apply plugin: 'java'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 
+sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+
+
 dependencies {
     compile project(':DeepThoughtLib')
 

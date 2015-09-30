@@ -727,17 +727,8 @@ public class FileUtils {
       destinationFile.getParentFile().mkdirs();
       try { destinationFile.createNewFile(); } catch(Exception ex) { log.error("Could not create file " + destinationFile.getAbsolutePath(), ex); }
 
-      InputStream is = jar.getInputStream(entry); // get the input stream
-      FileOutputStream fos = new FileOutputStream(destinationFile);
-      byte[] buf = new byte[4096];
-      int r;
-
-      while ((r = is.read(buf)) != -1) {
-        fos.write(buf, 0, r);
-      }
-
-      fos.close();
-      is.close();
+      InputStream inputStream = jar.getInputStream(entry); // get the input stream
+      writeToFile(inputStream, destinationFile);
 
       return destinationFile;
     } catch(Exception ex) {

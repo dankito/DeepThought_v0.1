@@ -186,10 +186,22 @@ public class ResourceFinder {
     Enumeration<URL> resources = getResources(fulluri);
     while (resources.hasMoreElements()) {
       URL url = resources.nextElement();
-      String string = readContents(url);
-      strings.add(string);
+      String fileContent = readContents(url);
+      for(String line : getLines(fileContent))
+        strings.add(line);
     }
     return strings;
+  }
+
+  protected String[] getLines(String fileContent) {
+    if(fileContent.contains("\r\n"))
+      return fileContent.split("\r\n");
+    else if(fileContent.contains("\n"))
+      return fileContent.split("\n");
+    else if(fileContent.contains("\r"))
+      return fileContent.split("\r");
+
+    return new String[] { fileContent };
   }
 
   /**

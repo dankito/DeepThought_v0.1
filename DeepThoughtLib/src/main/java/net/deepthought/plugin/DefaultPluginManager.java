@@ -7,6 +7,7 @@ import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
 
+import org.apache.xbean.finder.ResourceFinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +15,11 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Created by ganymed on 25/04/15.
@@ -59,10 +62,12 @@ public class DefaultPluginManager implements IPluginManager {
   }
 
   protected void loadPlugins(Collection<IPlugin> staticallyLinkedPlugins) {
+    copyStaticallyProvidedPluginsToPluginsFolder();
+
     loadPluginsFromPluginsFolder();
 
-    if(staticallyLinkedPlugins != null)
-      loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
+//    if(staticallyLinkedPlugins != null)
+//      loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
   }
 
   protected void loadPluginsFromPluginsFolder() {
@@ -76,24 +81,55 @@ public class DefaultPluginManager implements IPluginManager {
     }
   }
 
-  protected void searchJarFileForPlugins(File jar) {
+  protected void searchJarFileForPlugins(File jarFile) {
     try {
-      ClassLoader classLoader = new URLClassLoader(new URL[] { jar.toURI().toURL() });
+      URL url = jarFile.toURI().toURL();
+      ClassLoader classLoader = new URLClassLoader(new URL[] { url });
 
-      ServiceLoader<IPlugin> pluginLoader = ServiceLoader.load(IPlugin.class, classLoader);
-      for(IPlugin plugin : pluginLoader) {
-        pluginLoaded(plugin);
-      }
+//      ServiceLoader<IPlugin> pluginLoader = ServiceLoader.load(IPlugin.class, classLoader);
+//      for(IPlugin plugin : pluginLoader) {
+//        pluginLoaded(plugin);
+//      }
 
       // to circumvent problems with ServiceLoader, xbeans ResourceFinder can be used
       // for a really good explanation about the ServiceLoader's problems and ResourceFinder's usage see:
       // http://stackoverflow.com/questions/7039467/java-serviceloader-with-multiple-classloaders
-//      ResourceFinder finder = new ResourceFinder("META-INF/services/", classLoader, jar.toURI().toURL());
-//      List<Class> implementations = finder.findAllImplementations(IContentExtractor.class);
-//      for(Class implementation : implementations)
-//        foundContentExtractorPlugin(implementation);
+      ResourceFinder finder = new ResourceFinder("META-INF/services/", classLoader, url);
+      List<Class> implementations = finder.findAllImplementations(IPlugin.class);
+      for(Class implementation : implementations)
+        foundPlugin(implementation);
     } catch(Exception ex) {
-      log.error("Could not search for Plugins in Jar file " + jar.getAbsolutePath(), ex);
+      log.error("Could not search for Plugins in Jar file " + jarFile.getAbsolutePath(), ex);
+    }
+  }
+
+  protected void foundPlugin(Class pluginImplementation) {
+    try {
+      Object newInstance = pluginImplementation.newInstance();
+      if(newInstance instanceof IPlugin)
+        pluginLoaded((IPlugin)newInstance);
+    } catch(Exception ex) {
+      log.error("Could not create new IPlugin instance for class " + pluginImplementation.getName(), ex);
+    }
+  }
+
+  protected void copyStaticallyProvidedPluginsToPluginsFolder() {
+    try {
+      JarFile jar = FileUtils.getDeepThoughtLibJarFile();
+      Enumeration enumEntries = jar.entries();
+
+      while (enumEntries.hasMoreElements()) {
+        JarEntry entry = (JarEntry)enumEntries.nextElement();
+
+        if(entry.getName().startsWith("plugins/")) {
+          String extension = FileUtils.getFileExtension(entry.getName());
+          if("jar".equals(extension)) {
+            FileUtils.extractJarFileEntry(jar, entry, getPluginsFolderFile().getParentFile());
+          }
+        }
+      }
+    } catch(Exception ex) {
+      log.warn("Could not load Plugins from 'plugins' Resource folder", ex);
     }
   }
 
@@ -118,11 +154,4 @@ public class DefaultPluginManager implements IPluginManager {
     }
   }
 
-  protected void foundContentExtractorPlugin(Class<IContentExtractor> contentExtractorClass) {
-    try {
-      Application.getContentExtractorManager().addContentExtractor(contentExtractorClass.newInstance());
-    } catch(Exception ex) {
-      log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for class " + contentExtractorClass.getName(), ex);
-    }
-  }
 }

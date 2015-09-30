@@ -41,11 +41,6 @@ public class AndroidPluginManager extends DefaultPluginManager {
     super.loadPlugins(staticallyLinkedPlugins);
   }
 
-  @Override
-  protected void loadPluginsFromPluginsFolder() {
-    // simply don't do it, ServiceLoader crashes Android Application
-  }
-
   protected void checkIfOcrContentExtractorPluginIsInstalled() {
     try {
       PackageManager packageManager = context.getPackageManager();
