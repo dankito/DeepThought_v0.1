@@ -260,53 +260,6 @@ public class MainWindowController implements Initializable {
 
   protected void applicationInstantiated() {
     tabTagsControl.applicationInstantiated();
-
-    Alerts.showInfoMessage(stage, "Adding embedded images to DeepThought. DeepThought currently has " + deepThought.getFiles().size() + " files.", "");
-
-    for(Entry entry : Application.getDeepThought().getEntries()) {
-      if(entry.getAbstract() == null)
-        entry.setAbstract("");
-      List<ImageElementData> abstractEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(entry.getAbstract());
-      handleEmbeddedImages(abstractEmbeddedImages, entry, false);
-      List<ImageElementData> contentEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(entry.getContent());
-      handleEmbeddedImages(contentEmbeddedImages, entry, true);
-    }
-
-    Alerts.showInfoMessage(stage, "Added embedded images to DeepThought. DeepThought has now " + deepThought.getFiles().size() + " files", "");
-  }
-
-  protected void handleEmbeddedImages(List<ImageElementData> embeddedImages, Entry entry, boolean isContent) {
-    for(ImageElementData imageData : embeddedImages) {
-      if(imageData.getFileId() == null)
-        aNewImageHasBeenEmbedded(imageData, entry, isContent);
-      else {
-        FileLink file = Application.getDeepThought().getFileById(imageData.getFileId());
-        if (file != null && entry.containsEmbeddedFile(file) == false) {
-          entry.addEmbeddedFile(file);
-        }
-      }
-    }
-  }
-
-  protected void aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry, boolean isContent) {
-    FileLink newFile = imageData.createFile();
-    if(StringUtils.isNullOrEmpty(newFile.getDescription()))
-      newFile.setDescription(entry.getAbstractAsPlainText());
-    if("image.jpg".equals(newFile.getName()))
-      newFile.setName(newFile.getDescription());
-
-    if(Application.getDeepThought().addFile(newFile)) {
-      if(entry.addEmbeddedFile(newFile)) {
-        imageData.setFileId(newFile.getId());
-        if(imageData.getEmbeddingId() == null)
-          imageData.setEmbeddingId(ImageElementData.createUniqueEmbeddingId());
-
-        if(isContent)
-          entry.setContent(entry.getContent().replace(imageData.getOriginalImgElementHtmlCode(), imageData.createHtmlCode()));
-        else
-          entry.setAbstract(entry.getAbstract().replace(imageData.getOriginalImgElementHtmlCode(), imageData.createHtmlCode()));
-      }
-    }
   }
 
   protected void pluginLoaded(IPlugin plugin) {
