@@ -40,6 +40,10 @@ public class DefaultPluginManager implements IPluginManager {
   }
 
 
+  protected String getPluginsFileExtension() {
+    return "jar";
+  }
+
   public File getPluginsFolderFile() {
     File pluginsParentFolder = new File(Application.getDataFolderPath());
     pluginsParentFolder = pluginsParentFolder.getAbsoluteFile();
@@ -66,25 +70,25 @@ public class DefaultPluginManager implements IPluginManager {
 
     loadPluginsFromPluginsFolder();
 
-//    if(staticallyLinkedPlugins != null)
-//      loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
+    if(staticallyLinkedPlugins != null)
+      loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
   }
 
   protected void loadPluginsFromPluginsFolder() {
     try {
       for (File file : getPluginsFolderFile().listFiles()) {
-        if ("jar" .equals(FileUtils.getFileExtension(file)))
-          searchJarFileForPlugins(file);
+        if (getPluginsFileExtension().equals(FileUtils.getFileExtension(file)))
+          searchFileForPlugins(file);
       }
     } catch(Exception ex) {
       log.error("Could not load Plugins", ex);
     }
   }
 
-  protected void searchJarFileForPlugins(File jarFile) {
+  protected void searchFileForPlugins(File pluginFile) {
     try {
-      URL url = jarFile.toURI().toURL();
-      ClassLoader classLoader = new URLClassLoader(new URL[] { url });
+      URL url = pluginFile.toURI().toURL();
+      ClassLoader classLoader = createClassLoaderForPluginFile(url);
 
 //      ServiceLoader<IPlugin> pluginLoader = ServiceLoader.load(IPlugin.class, classLoader);
 //      for(IPlugin plugin : pluginLoader) {
@@ -96,11 +100,17 @@ public class DefaultPluginManager implements IPluginManager {
       // http://stackoverflow.com/questions/7039467/java-serviceloader-with-multiple-classloaders
       ResourceFinder finder = new ResourceFinder("META-INF/services/", classLoader, url);
       List<Class> implementations = finder.findAllImplementations(IPlugin.class);
-      for(Class implementation : implementations)
-        foundPlugin(implementation);
+      for(Class implementation : implementations) {
+        if(IPlugin.class.isAssignableFrom(implementation))
+          foundPlugin(implementation);
+      }
     } catch(Exception ex) {
-      log.error("Could not search for Plugins in Jar file " + jarFile.getAbsolutePath(), ex);
+      log.error("Could not search for Plugins in file " + pluginFile.getAbsolutePath(), ex);
     }
+  }
+
+  protected ClassLoader createClassLoaderForPluginFile(URL url) {
+    return new URLClassLoader(new URL[] { url });
   }
 
   protected void foundPlugin(Class pluginImplementation) {
@@ -123,7 +133,7 @@ public class DefaultPluginManager implements IPluginManager {
 
         if(entry.getName().startsWith("plugins/")) {
           String extension = FileUtils.getFileExtension(entry.getName());
-          if("jar".equals(extension)) {
+          if(getPluginsFileExtension().equals(extension)) {
             FileUtils.extractJarFileEntry(jar, entry, getPluginsFolderFile().getParentFile());
           }
         }
@@ -139,8 +149,26 @@ public class DefaultPluginManager implements IPluginManager {
     }
   }
 
-  protected void pluginLoaded(IPlugin plugin) {
+  protected void pluginLoaded(final IPlugin plugin) {
+    // if plugin is outdated, e.g. does not have methods needed for loading plugin, an AbstractMethodError will be thrown which
+    // is not caught by try-catch clause -> dispatch to a new Thread so that only new Thread dies, not current one
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        handleLoadedPluginOnNewThread(plugin);
+      }
+    });
+  }
+
+  protected void handleLoadedPluginOnNewThread(IPlugin plugin) {
     try {
+      if(isCompatibleWithPluginSystemVersion(plugin) == false) {
+        log.warn("Found plugin " + plugin.getName() + " of outdated version " + plugin.getSupportedPluginSystemVersion() + ". Plugin cannot be loaded though.");
+        Application.notifyUser(new Notification(NotificationType.OutdatedPluginFound, Localization.getLocalizedString("alert.message.outdated.plugin.found", plugin.getName(),
+            plugin.getSupportedPluginSystemVersion(), Application.CurrentPluginSystemVersion), Localization.getLocalizedString("alert.title.outdated.plugin.found"), plugin));
+        return;
+      }
+
       if(loadedPluginTypes.contains(plugin.getClass()))  // avoid that different instances of same plugin get added twice (can for example happen if the same plugin is loaded statically and dynamically
         return;
       loadedPluginTypes.add(plugin.getClass());
@@ -152,6 +180,10 @@ public class DefaultPluginManager implements IPluginManager {
     } catch(Exception ex) {
       log.error("Could not create new IContentExtractor instance or add it to ContentExtractorManager for extractor " + plugin, ex);
     }
+  }
+
+  protected boolean isCompatibleWithPluginSystemVersion(IPlugin plugin) {
+    return ((Integer)Application.CurrentPluginSystemVersion).equals(plugin.getSupportedPluginSystemVersion());
   }
 
 }

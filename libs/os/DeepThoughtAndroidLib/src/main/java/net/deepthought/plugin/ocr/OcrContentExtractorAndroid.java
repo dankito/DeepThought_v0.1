@@ -35,6 +35,17 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
 
 
   @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
+  @Override
   public boolean canCreateEntryFromUrl(String url) {
     return false;
   }

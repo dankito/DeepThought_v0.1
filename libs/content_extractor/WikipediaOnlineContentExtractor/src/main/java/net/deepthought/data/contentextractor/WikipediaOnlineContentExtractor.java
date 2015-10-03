@@ -24,6 +24,17 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
 
   @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
+  @Override
   public String getName() {
     return Localization.getLocalizedString("named.content.extractor", "Wikipedia");
   }

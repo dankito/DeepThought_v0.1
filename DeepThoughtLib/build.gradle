@@ -22,7 +22,7 @@ dependencies {
 }
 
 
-sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
+//sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
 
 // so that Test classes from other projects can see classes from src/test folder
 task testJar(type: Jar, dependsOn: testClasses) {

@@ -14,10 +14,22 @@ import javafx.scene.image.Image;
  */
 public class DefaultLocalFileContentExtractor implements ILocalFileContentExtractor {
 
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
   @Override
   public String getName() {
     return Localization.getLocalizedString("local.file.content.extractor");
   }
+
 
   @Override
   public boolean canAttachFileToEntry(String url) {

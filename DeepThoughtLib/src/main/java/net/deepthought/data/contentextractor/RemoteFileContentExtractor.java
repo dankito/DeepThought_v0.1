@@ -7,10 +7,22 @@ import net.deepthought.util.file.FileUtils;
 
 public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
 
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
   @Override
   public String getName() {
     return Localization.getLocalizedString("remote.file.content.extractor");
   }
+
 
   @Override
   public boolean canDownloadFile(String url) {

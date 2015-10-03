@@ -30,6 +30,19 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
   private final static Logger log = LoggerFactory.getLogger(PostillonContentExtractor.class);
 
+  public String nei = "nei";
+
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
 
   @Override
   public String getNewspaperName() {

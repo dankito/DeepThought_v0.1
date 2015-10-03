@@ -23,6 +23,18 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheJetztContentExtractor.class);
 
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
   @Override
   public String getNewspaperName() {
     return "SZ Jetzt";
