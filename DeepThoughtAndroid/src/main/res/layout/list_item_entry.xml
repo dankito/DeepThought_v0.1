@@ -3,30 +3,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="@dimen/list_item_entry_height"
-              android:minHeight="@dimen/list_item_entry_min_height"
     >
 
-    <!--<TextView-->
-        <!--android:id="@+id/txtvwListItemEntryTitle"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="@dimen/list_item_entry_title_height"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:singleLine="true"-->
-        <!--android:ellipsize="end"-->
-        <!--android:textSize="@dimen/list_item_entry_title_text_size"/>-->
+    <TextView
+        android:id="@+id/txtvwListItemEntryReferencePreview"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_entry_reference_preview_height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="@dimen/list_item_entry_reference_preview_text_size"
+        />
 
     <TextView
         android:id="@+id/txtvwListItemEntryPreview"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/list_item_entry_preview_height"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/list_item_entry_preview_height"
+        android:maxHeight="@dimen/list_item_entry_height"
+        android:layout_below="@+id/txtvwListItemEntryReferencePreview"
+        android:layout_above="@+id/txtvwListItemEntryTags"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:maxLines="2"
+        android:minLines="3"
         android:ellipsize="end"
-        android:textSize="@dimen/list_item_entry_preview_text_size"/>
+        android:textSize="@dimen/list_item_entry_preview_text_size"
+        />
 
     <TextView
         android:id="@+id/txtvwListItemEntryTags"
@@ -35,9 +39,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/txtvwListItemEntryPreview"
-        android:maxLines="1"
+        android:singleLine="true"
         android:ellipsize="end"
-        android:textSize="@dimen/list_item_entry_preview_text_size"/>
+        android:textSize="@dimen/list_item_entry_tags_text_size"
+        />
 
 </RelativeLayout>

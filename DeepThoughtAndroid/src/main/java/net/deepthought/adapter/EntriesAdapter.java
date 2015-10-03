@@ -122,11 +122,23 @@ public class EntriesAdapter extends BaseAdapter {
 
     Entry entry = getEntryAt(position);
 
+    TextView txtvwListItemEntryReferencePreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryReferencePreview);
+    txtvwListItemEntryReferencePreview.setText(entry.getReferenceOrPersonsPreview());
+    txtvwListItemEntryReferencePreview.setVisibility(entry.hasPersonsOrIsAReferenceSet() ? View.VISIBLE : View.GONE);
+
     TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
-    txtvwPreview.setText(entry.getPreview());
+    txtvwPreview.setText(entry.getLongPreview());
+
+    int txtvwPreviewLines = entry.hasPersonsOrIsAReferenceSet() ? 3 : 4;
 
     TextView txtvwTags = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTags);
     txtvwTags.setText(entry.getTagsPreview());
+
+    txtvwTags.setVisibility(entry.hasTags() ? View.VISIBLE : View.GONE);
+    if(entry.hasTags() == false)
+      txtvwPreviewLines++;
+
+    txtvwPreview.setLines(txtvwPreviewLines);
 
     return convertView;
   }

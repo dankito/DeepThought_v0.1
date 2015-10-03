@@ -200,6 +200,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     this.abstractString = abstractString == null ? "" : abstractString;
     plainTextAbstract = null;
     preview = null;
+    longPreview = null;
     callPropertyChangedListeners(TableConfig.EntryAbstractColumnName, previousAbstract, abstractString);
   }
 
@@ -228,6 +229,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     this.content = content;
     plainTextContent = null;
     preview = null;
+    longPreview = null;
     callPropertyChangedListeners(TableConfig.EntryContentColumnName, previousContent, content);
   }
 
@@ -809,20 +811,40 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
-  private final static int PreviewMaxLength = 150;
+  protected final static int PreviewMaxLength = 150;
+
+  protected final static int LongPreviewMaxLength = 500;
 
   protected transient String preview = null;
+
+  protected transient String longPreview = null;
 
   @Transient
   public String getPreview() {
     if(preview == null) {
-      String temp = determinePreview();
       if(Application.getHtmlHelper() == null)
-        return temp;
-      preview = temp;
+        return "";
+
+      preview = determinePreview();
+      if(preview.length() >= PreviewMaxLength)
+        preview = preview.substring(0, PreviewMaxLength) + " ...";
     }
 
     return preview;
+  }
+
+  @Transient
+  public String getLongPreview() {
+    if(longPreview == null) {
+      if(Application.getHtmlHelper() == null)
+        return "";
+
+      longPreview = determinePreview();
+      if(longPreview.length() >= LongPreviewMaxLength)
+        longPreview = longPreview.substring(0, LongPreviewMaxLength) + " ...";
+    }
+
+    return longPreview;
   }
 
   protected String determinePreview() {
@@ -842,9 +864,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
         preview += " - ";
       preview += getContentAsPlainText();
     }
-
-    if (preview.length() >= PreviewMaxLength)
-      preview = preview.substring(0, PreviewMaxLength) + " ...";
 
     preview = preview.replace("\r", "").replace("\n", "");
 

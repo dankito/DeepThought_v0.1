@@ -56,6 +56,8 @@ public class AndroidHtmlEditorPool implements ICleanUp {
       ((ViewGroup)htmlEditor.getParent()).removeView(htmlEditor);
     if(availableHtmlEditors.contains(htmlEditor) == false)
       availableHtmlEditors.offer(htmlEditor);
+
+    log.info("Released HtmlEditor. There are now " + availableHtmlEditors.size() + " available HtmlEditors in Pool.");
   }
 
   public void preloadHtmlEditors(Activity context, int numberOfHtmlEditors) {

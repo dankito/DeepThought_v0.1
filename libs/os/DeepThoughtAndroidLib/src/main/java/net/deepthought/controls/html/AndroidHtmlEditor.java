@@ -74,7 +74,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     });
 
     // crashes in Emulator, and only in the Emulator, for Android 2.3
-//    if(OsHelper.isRunningOnOnAndroidApiLevel(9) == false)
+    if(OsHelper.isRunningOnOnAndroidApiLevel(9) == false && OsHelper.isRunningOnOnAndroidApiLevel(10) == false)
       addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
     loadUrl(htmlEditor.getHtmlEditorPath());
   }
