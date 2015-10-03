@@ -148,7 +148,7 @@ public class ImageElementData {
   }
 
 
-  protected static long createUniqueEmbeddingId() {
+  public static long createUniqueEmbeddingId() {
     String milliseconds = Long.toString(System.currentTimeMillis());
     milliseconds = milliseconds.substring(milliseconds.length() - 7);
 

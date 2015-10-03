@@ -292,7 +292,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();
