@@ -81,10 +81,7 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
     ArticlesOverviewItem article = getArticleAt(position);
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
-    imgvwArticlePreviewImage.setImageBitmap(null);
-    if(article.hasPreviewImageUrl()) {
-      IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
-    }
+    IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
 
     TextView txtvwArticleSubTitle = (TextView)convertView.findViewById(R.id.txtvwArticleSubTitle);
     if(article.hasSubTitle()) {

@@ -32,7 +32,11 @@ public class IconManager {
 
 
   public void setImageViewToImageFromUrl(ImageView imageView, String url) {
-    new DownloadImagesTask(imageView).execute(url);
+    imageView.setImageBitmap(null);
+    imageView.setTag(url);
+
+    if(StringUtils.isNotNullOrEmpty(url))
+      new DownloadImagesTask(imageView, url).execute();
   }
 
   public Bitmap getImageFromUrl(String urlString) {
@@ -63,27 +67,28 @@ public class IconManager {
     return bm;
   }
 
-  public class DownloadImagesTask extends AsyncTask<String, Void, Bitmap> {
+  public class DownloadImagesTask extends AsyncTask<Void, Void, Bitmap> {
 
     protected ImageView imageView = null;
 
     protected String url;
 
 
-    public DownloadImagesTask(ImageView imageView) {
+    public DownloadImagesTask(ImageView imageView, String url) {
       this.imageView = imageView;
+      this.url = url;
     }
 
 
     @Override
-    protected Bitmap doInBackground(String... urls) {
-      this.url = urls[0];
+    protected Bitmap doInBackground(Void... params) {
       return IconManager.getInstance().getImageFromUrl(url);
     }
 
     @Override
     protected void onPostExecute(Bitmap result) {
-      imageView.setImageBitmap(result);
+      if(url.equals(imageView.getTag())) // if imageView's Tag doesn't equal url anymore, imageView has been set to another Url in the meantime
+        imageView.setImageBitmap(result);
     }
 
   }
