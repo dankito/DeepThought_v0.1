@@ -172,8 +172,7 @@ public class Application {
     } catch(Exception ex) {
       log.error("Could not resolve EntityManager dependency", ex);
       if(isDatabaseAlreadyInUseException(ex))
-        callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.database.already.in.use"), ex, true,
-            Localization.getLocalizedString("alert.message.title.database.already.in.use")));
+        callNotificationListeners(createDataIsReadonlyNotification(ex));
       else
         callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.a.severe.error.occurred.opening.database"), ex, true,
             Localization.getLocalizedString("alert.message.title.a.severe.error.occurred.opening.database")));
@@ -301,11 +300,18 @@ public class Application {
       listener.notification(notification);
   }
 
-  public static void notifyUser(Notification notification) {
-    if(notification.getType() == NotificationType.HasOnlyReadOnlyAccessToData)
-      hasOnlyReadOnlyAccess = true;
+  protected static DeepThoughtError createDataIsReadonlyNotification(Exception ex) {
+    return new DeepThoughtError(Localization.getLocalizedString("alert.message.message.database.already.in.use"), ex, true,
+        Localization.getLocalizedString("alert.message.title.database.already.in.use"));
+  }
 
-    callNotificationListeners(notification);
+  public static void notifyUser(Notification notification) {
+    if(notification.getType() == NotificationType.HasOnlyReadOnlyAccessToData) {
+      hasOnlyReadOnlyAccess = true;
+      callNotificationListeners(createDataIsReadonlyNotification(null));
+    }
+    else
+      callNotificationListeners(notification);
   }
 
   protected static ApplicationListener dataManagerListener = new ApplicationListener() {
