@@ -12,6 +12,7 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -237,6 +238,8 @@ public class EntryCreationResult {
 
   protected void aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry) {
     FileLink newFile = imageData.createFile();
+    if(StringUtils.isNullOrEmpty(newFile.getDescription()))
+      newFile.setDescription(entry.getAbstractAsPlainText());
 
     if(Application.getDeepThought().addFile(newFile))
       entry.addEmbeddedFile(newFile);

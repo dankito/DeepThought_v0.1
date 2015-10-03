@@ -29,11 +29,13 @@ import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
@@ -51,6 +53,7 @@ import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
+import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -260,6 +263,39 @@ public class MainWindowController implements Initializable {
 
   protected void applicationInstantiated() {
     tabTagsControl.applicationInstantiated();
+
+    for(Entry entry : Application.getDeepThought().getEntries()) {
+      if(entry.getAbstract() == null)
+        entry.setAbstract("");
+      List<ImageElementData> abstractEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(entry.getAbstract());
+      handleEmbeddedImages(abstractEmbeddedImages, entry);
+      List<ImageElementData> contentEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(entry.getContent());
+      handleEmbeddedImages(contentEmbeddedImages, entry);
+    }
+  }
+
+  protected void handleEmbeddedImages(List<ImageElementData> embeddedImages, Entry entry) {
+    for(ImageElementData imageData : embeddedImages) {
+      if(imageData.getFileId() == null)
+        aNewImageHasBeenEmbedded(imageData, entry);
+      else {
+        FileLink file = Application.getDeepThought().getFileById(imageData.getFileId());
+        if (file != null && entry.containsEmbeddedFile(file) == false) {
+          entry.addEmbeddedFile(file);
+        }
+      }
+    }
+  }
+
+  protected void aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry) {
+    FileLink newFile = imageData.createFile();
+    if(StringUtils.isNullOrEmpty(newFile.getDescription()))
+      newFile.setDescription(entry.getAbstractAsPlainText());
+    if("image.jpg".equals(newFile.getName()))
+      newFile.setName(newFile.getDescription());
+
+    if(Application.getDeepThought().addFile(newFile))
+      entry.addEmbeddedFile(newFile);
   }
 
   protected void pluginLoaded(IPlugin plugin) {
