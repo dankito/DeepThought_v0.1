@@ -47,6 +47,9 @@ public class Application {
 
   public final static int CurrentDataModelVersion = 1;
 
+  public final static int CurrentPluginSystemVersion = 1;
+
+
   public final static String CouldNotGetDataFolderPath = "Could not get data folder path";
 
 

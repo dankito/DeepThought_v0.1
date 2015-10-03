@@ -17,6 +17,18 @@ import java.io.StringWriter;
  */
 public class OcrContentExtractorJava extends OcrContentExtractorBase {
 
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
   @Override
   protected void createEntryFromUrl(String url, CreateEntryListener listener) {
     if(listener != null)

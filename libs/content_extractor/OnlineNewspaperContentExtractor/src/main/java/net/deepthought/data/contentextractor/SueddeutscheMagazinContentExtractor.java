@@ -26,6 +26,18 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheMagazinContentExtractor.class);
 
+
+  @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
   @Override
   public String getNewspaperName() {
     return "SZ Magazin";

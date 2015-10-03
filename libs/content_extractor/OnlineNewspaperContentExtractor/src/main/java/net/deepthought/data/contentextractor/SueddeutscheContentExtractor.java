@@ -39,6 +39,17 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
 
   @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
+  @Override
   public boolean hasArticlesOverview() {
     return true;
   }

@@ -24,6 +24,17 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
 
 
   @Override
+  public int getSupportedPluginSystemVersion() {
+    return 1;
+  }
+
+  @Override
+  public String getPluginVersion() {
+    return "0.1";
+  }
+
+
+  @Override
   public String getNewspaperName() {
     return "Spiegel";
   }

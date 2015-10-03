@@ -14,8 +14,12 @@ import net.deepthought.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+
+import dalvik.system.DexFile;
 
 /**
  * Created by ganymed on 17/08/15.
@@ -36,9 +40,33 @@ public class AndroidPluginManager extends DefaultPluginManager {
   }
 
 
+  @Override
+  protected String getPluginsFileExtension() {
+    return "apk";
+  }
+
+  @Override
+  protected ClassLoader createClassLoaderForPluginFile(URL url) {
+    try {
+      DexFile dexFile = new DexFile(new File(url.toURI()));
+//      return new DexClassLoader()
+      return new dalvik.system.PathClassLoader(
+          new File(url.toURI()).getAbsolutePath(),
+          ClassLoader.getSystemClassLoader());
+    } catch(Exception ex) { log.error("Could not create ClassLoader for file " + url, ex); }
+
+    return null;
+  }
+
   protected void loadPlugins(Collection<IPlugin> staticallyLinkedPlugins) {
     checkIfOcrContentExtractorPluginIsInstalled();
     super.loadPlugins(staticallyLinkedPlugins);
+  }
+
+  @Override
+  protected void loadPluginsFromPluginsFolder() {
+    // don't try to load Plugins from plugins folder in Android
+    // does not work (yet) as Android cannot load .class files and no .dex version is implemented yet
   }
 
   protected void checkIfOcrContentExtractorPluginIsInstalled() {

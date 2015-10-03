@@ -11,6 +11,7 @@ public enum NotificationType {
   HasOnlyReadOnlyAccessToData,
   DeepThoughtsConnectorStarted,
   PluginLoaded,
+  OutdatedPluginFound,
   LanguageChanged
 
 }

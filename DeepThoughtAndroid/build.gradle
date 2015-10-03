@@ -23,10 +23,7 @@ android {
         versionName "0.1"
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
+
     buildTypes {
         release {
 //            runProguard false
@@ -47,6 +44,12 @@ android {
 
         pickFirst 'Strings.properties'
         pickFirst 'Strings_de.properties'
+
+        pickFirst 'META-INF/services/net.deepthought.plugin.IPlugin'
+        pickFirst 'der-postillon_icon.png'
+        pickFirst 'sz_icon.png'
+        exclude 'der-postillon_icon.png Non Licence !.txt'
+        exclude 'sz_icon.png Licence.txt'
     }
 
     lintOptions {
@@ -68,7 +71,7 @@ dependencies {
     compile project(':DeepThoughtAndroidLib')
     compile project(':AndroidOrmLiteEntityManager')
     compile project(':LuceneSearchEngine')
-//    compile project(':OnlineNewspaperContentExtractor')
+    compile project(':OnlineNewspaperContentExtractor')
 
 //    compile 'com.android.support:appcompat-v7:19.1.0'
 //    compile 'com.android.support:appcompat-v7:21.0.3'
