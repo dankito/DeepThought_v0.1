@@ -126,13 +126,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
     });
 
-    if (Application.getDeepThought() == null) {
-      loadingDataProgressDialog = new ProgressDialog(this);
-      loadingDataProgressDialog.setMessage(getString(R.string.loading_data_wait_message));
-      loadingDataProgressDialog.setIndeterminate(true);
-      loadingDataProgressDialog.setCancelable(false);
-      loadingDataProgressDialog.show();
-    }
+    setControlsEnabledState(Application.getDeepThought() != null);
   }
 
   protected void notifyUser(Notification notification) {
@@ -283,12 +277,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void setControlsEnabledState(boolean enable) {
-    if(loadingDataProgressDialog != null) {
-      if(enable)
-        loadingDataProgressDialog.hide();
-      else
+      if(enable) {
+        if(loadingDataProgressDialog != null) {
+          loadingDataProgressDialog.hide();
+          loadingDataProgressDialog = null;
+        }
+      }
+      else {
+        loadingDataProgressDialog = new ProgressDialog(this);
+        loadingDataProgressDialog.setMessage(getString(R.string.loading_data_wait_message));
+        loadingDataProgressDialog.setIndeterminate(true);
+        loadingDataProgressDialog.setCancelable(false);
         loadingDataProgressDialog.show();
-    }
+      }
   }
 
 
