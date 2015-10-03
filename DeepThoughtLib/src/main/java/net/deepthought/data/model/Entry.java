@@ -723,6 +723,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return embeddedFiles.size() > 0;
   }
 
+  public boolean containsEmbeddedFile(FileLink file) {
+    return getEmbeddedFiles().contains(file);
+  }
+
   public Collection<FileLink> getEmbeddedFiles() {
     return embeddedFiles;
   }

@@ -695,6 +695,15 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return false;
   }
 
+  public FileLink getFileById(Long fileId) {
+    for(FileLink file : getFiles()) {
+      if(file.getId().equals(fileId))
+        return file;
+    }
+
+    return null;
+  }
+
 
   public DeepThoughtSettings getSettings() {
     if(settings == null) {

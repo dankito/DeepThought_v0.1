@@ -58,7 +58,7 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
   @Override
   public void imageAdded(ImageElementData addedImage) {
     if(entry != null) {
-      FileLink file = getFileById(addedImage.getFileId());
+      FileLink file = Application.getDeepThought().getFileById(addedImage.getFileId());
       if (file != null) {
         entry.addEmbeddedFile(file);
       }
@@ -83,17 +83,8 @@ public class EntryContentHtmlEditorListener implements IHtmlEditorListener, IEdi
     return true;
   }
 
-  protected FileLink getEmbeddedFileById(long fileId) {
+  protected FileLink getEmbeddedFileById(Long fileId) {
     for(FileLink file : entry.getEmbeddedFiles()) {
-      if(file.getId().equals(fileId))
-        return file;
-    }
-
-    return null;
-  }
-
-  protected FileLink getFileById(long fileId) {
-    for(FileLink file : Application.getDeepThought().getFiles()) {
       if(file.getId().equals(fileId))
         return file;
     }

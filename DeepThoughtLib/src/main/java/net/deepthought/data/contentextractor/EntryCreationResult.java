@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
+import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -191,6 +192,11 @@ public class EntryCreationResult {
       createdEntry.addEmbeddedFile(file);
     }
 
+    List<ImageElementData> abstractEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(createdEntry.getAbstract());
+    handleEmbeddedImages(abstractEmbeddedImages, createdEntry);
+    List<ImageElementData> contentEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(createdEntry.getContent());
+    handleEmbeddedImages(contentEmbeddedImages, createdEntry);
+
     saveReferenceBases(deepThought);
   }
 
@@ -214,6 +220,26 @@ public class EntryCreationResult {
       extractedSubDivision.setReference(extractedReference);
       createdEntry.setReferenceSubDivision(extractedSubDivision);
     }
+  }
+
+  protected void handleEmbeddedImages(List<ImageElementData> embeddedImages, Entry entry) {
+    for(ImageElementData imageData : embeddedImages) {
+      if(imageData.getFileId() == null)
+        aNewImageHasBeenEmbedded(imageData, entry);
+      else {
+        FileLink file = Application.getDeepThought().getFileById(imageData.getFileId());
+        if (file != null && entry.containsEmbeddedFile(file) == false) {
+          entry.addEmbeddedFile(file);
+        }
+      }
+    }
+  }
+
+  protected void aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry) {
+    FileLink newFile = imageData.createFile();
+
+    if(Application.getDeepThought().addFile(newFile))
+      entry.addEmbeddedFile(newFile);
   }
 
 }

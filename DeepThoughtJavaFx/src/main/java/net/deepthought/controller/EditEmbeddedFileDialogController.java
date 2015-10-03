@@ -400,7 +400,7 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
 
     ImageElementData newImgElement = createImageElement(file);
     if(imgElement == null)
-      editor.insertHtml(newImgElement.getHtmlCode());
+      editor.insertHtml(newImgElement.createHtmlCode());
     else {
       String currentHtml = editor.getHtml();
       ImageElementData currentImgElement = findImageElementInHtml(currentHtml, file, imgElement.getEmbeddingId());

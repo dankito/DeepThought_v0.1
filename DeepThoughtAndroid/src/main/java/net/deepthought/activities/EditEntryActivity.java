@@ -331,7 +331,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         FileLink imageFile = FileUtils.moveFileToCapturedImagesFolder(takenPhotoTempFile);
         Application.getDeepThought().addFile(imageFile);
         ImageElementData imageData = new ImageElementData(imageFile);
-        contentHtmlEditor.insertHtml(imageData.getHtmlCode());
+        contentHtmlEditor.insertHtml(imageData.createHtmlCode());
       }
     }
 

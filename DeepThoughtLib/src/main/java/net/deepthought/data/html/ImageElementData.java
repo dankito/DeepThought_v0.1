@@ -31,9 +31,9 @@ public class ImageElementData {
   
   protected String source;
 
-  protected long fileId;
+  protected Long fileId;
 
-  protected long embeddingId;
+  protected Long embeddingId;
   
   protected int width = DefaultImageWidth;
 
@@ -54,7 +54,7 @@ public class ImageElementData {
     this(file.getUriString(), file.getId(), createUniqueEmbeddingId(), width, height, file.getDescription());
   }
 
-  public ImageElementData(String source, long fileId, long embeddingId, int width, int height, String alt) {
+  public ImageElementData(String source, Long fileId, long embeddingId, int width, int height, String alt) {
     this.source = source;
     this.fileId = fileId;
     this.embeddingId = embeddingId;
@@ -64,7 +64,14 @@ public class ImageElementData {
   }
 
 
-  public String getHtmlCode() {
+  public FileLink createFile() {
+    FileLink file = new FileLink(getSource());
+    file.setDescription(alt != null ? alt : "");
+
+    return file;
+  }
+
+  public String createHtmlCode() {
     if(imgElementHtmlCode == null) {
       imgElementHtmlCode = "<img src=\"" + source + "\" " + ImageIdAttributeName + "=\"" + fileId + "\" " + EmbeddingIdAttributeName + "=\"" + embeddingId + "\"";
       if(width > 0)
@@ -95,20 +102,20 @@ public class ImageElementData {
     imgElementHtmlCode = null;
   }
 
-  public long getFileId() {
+  public Long getFileId() {
     return fileId;
   }
 
-  public void setFileId(long fileId) {
+  public void setFileId(Long fileId) {
     this.fileId = fileId;
     imgElementHtmlCode = null;
   }
 
-  public long getEmbeddingId() {
+  public Long getEmbeddingId() {
     return embeddingId;
   }
 
-  public void setEmbeddingId(long embeddingId) {
+  public void setEmbeddingId(Long embeddingId) {
     this.embeddingId = embeddingId;
     imgElementHtmlCode = null;
   }

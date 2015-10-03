@@ -59,7 +59,7 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
 
   @Override
   public void imageAdded(ImageElementData addedImage) {
-    FileLink file = getFileById(addedImage.getFileId());
+    FileLink file = Application.getDeepThought().getFileById(addedImage.getFileId());
     if(file != null) {
       editedFilesHolder.addEntityToEntry(file);
     }
@@ -83,17 +83,8 @@ public class DeepThoughtFxHtmlEditorListener implements IHtmlEditorListener {
     return true;
   }
 
-  protected FileLink getEditedFileById(long fileId) {
+  protected FileLink getEditedFileById(Long fileId) {
     for(FileLink file : editedFilesHolder.getEditedEntities()) {
-      if(file.getId().equals(fileId))
-        return file;
-    }
-
-    return null;
-  }
-
-  protected FileLink getFileById(long fileId) {
-    for(FileLink file : Application.getDeepThought().getFiles()) {
       if(file.getId().equals(fileId))
         return file;
     }

@@ -224,7 +224,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
       log.debug("Inserting it into HtmlEditor ...");
       final ImageElementData imageElementData = new ImageElementData(imageFile);
-      Platform.runLater(() -> htmlEditor.insertHtml(imageElementData.getHtmlCode()));
+      Platform.runLater(() -> htmlEditor.insertHtml(imageElementData.createHtmlCode()));
     } catch(Exception ex) {
       log.error("Could not save Captured Image to file " + imageFile.getUriString(), ex);
     }

@@ -220,7 +220,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   protected boolean isImageInList(ImageElementData imageToTest, List<ImageElementData> imageList) {
     for(ImageElementData image : imageList) {
-      if(((Long)imageToTest.getFileId()).equals(image.getFileId()) && ((Long)imageToTest.getEmbeddingId()).equals(image.getEmbeddingId()))
+      if(imageToTest.getFileId().equals(image.getFileId()) && imageToTest.getEmbeddingId().equals(image.getEmbeddingId()))
         return true;
     }
 
@@ -270,7 +270,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   }
 
   public void replaceImageElement(ImageElementData previousElement, ImageElementData newElement) {
-    scriptExecutor.executeScript("replaceImageElement(" + previousElement.getFileId() + ", '" + StringEscapeUtils.escapeEcmaScript(newElement.getHtmlCode()) + "')");
+    scriptExecutor.executeScript("replaceImageElement(" + previousElement.getFileId() + ", '" + StringEscapeUtils.escapeEcmaScript(newElement.createHtmlCode()) + "')");
   }
 
   protected boolean hasCountImagesChanged(String previousHtml, String newHtml) {

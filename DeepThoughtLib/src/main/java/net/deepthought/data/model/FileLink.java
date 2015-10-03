@@ -131,6 +131,9 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
   }
 
   public void setDescription(String description) {
+    if(description == null)
+      description = "";
+
     Object previousValue = this.description;
     this.description = description;
     callPropertyChangedListeners(TableConfig.FileLinkDescriptionColumnName, previousValue, description);
