@@ -8,6 +8,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import net.deepthought.AndroidHelper;
+import net.deepthought.Application;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.util.OsHelper;
 
@@ -74,7 +75,7 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     });
 
     // crashes in Emulator, and only in the Emulator, for Android 2.3
-    if(OsHelper.isRunningOnOnAndroidApiLevel(9) == false && OsHelper.isRunningOnOnAndroidApiLevel(10) == false)
+    if(Application.getPlatformConfiguration().isRunningInEmulator() == false || (OsHelper.isRunningOnOnAndroidApiLevel(9) == false && OsHelper.isRunningOnOnAndroidApiLevel(10) == false))
       addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
     loadUrl(htmlEditor.getHtmlEditorPath());
   }

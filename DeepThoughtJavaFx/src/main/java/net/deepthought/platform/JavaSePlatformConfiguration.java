@@ -27,6 +27,11 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
+  public boolean isRunningInEmulator() {
+    return false; // only needed on Android
+  }
+
+  @Override
   public boolean hasCaptureDevice() {
     return false;
   }

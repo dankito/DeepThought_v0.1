@@ -13,6 +13,8 @@ public interface IPlatformConfiguration {
 
   String getOsVersionString();
 
+  boolean isRunningInEmulator();
+
   boolean hasCaptureDevice();
 
   String getLineSeparator();

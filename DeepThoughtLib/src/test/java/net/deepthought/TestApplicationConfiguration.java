@@ -100,6 +100,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
       }
 
       @Override
+      public boolean isRunningInEmulator() {
+        return false; // only needed on Android
+      }
+
+      @Override
       public boolean hasCaptureDevice() {
         return false;
       }

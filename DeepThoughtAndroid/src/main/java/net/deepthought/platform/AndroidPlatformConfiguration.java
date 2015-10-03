@@ -43,6 +43,11 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
+  public boolean isRunningInEmulator() {
+    return Build.FINGERPRINT.startsWith("generic") || Build.DEVICE.startsWith("generic") || Build.PRODUCT.contains("sdk") || Build.MODEL.toLowerCase().contains("sdk");
+  }
+
+  @Override
   public boolean hasCaptureDevice() {
     return AndroidHelper.hasPermission(context, PackageManager.FEATURE_CAMERA);
   }
