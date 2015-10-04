@@ -8,6 +8,7 @@ import net.deepthought.data.model.User;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
+import net.deepthought.util.OsHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,14 @@ public class ConnectorMessagesCreator {
 
   protected byte[] createMessage(String messageHeader, String messageBody) {
     String messageString = createMessageString(messageHeader, messageBody);
-    return messageString.getBytes(Constants.MessagesCharset);
+    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
+      return messageString.getBytes(Constants.MessagesCharset);
+    else {
+      try {
+        return messageString.getBytes(Constants.MessagesCharsetName);
+      } catch (Exception ex) { log.error("Could not create byte array for Charset " + Constants.MessagesCharset + " from message " + messageString, ex); }
+      return new byte[0];
+    }
   }
 
   protected String createMessageString(String messageHeader, String messageBody) {

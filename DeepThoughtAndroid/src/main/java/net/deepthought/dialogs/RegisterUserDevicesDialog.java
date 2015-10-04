@@ -1,6 +1,5 @@
 package net.deepthought.dialogs;
 
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -31,7 +30,7 @@ import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
-public class RegisterUserDevicesDialog extends DialogFragment {
+public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFragment {
 
   public final static String TAG = RegisterUserDevicesDialog.class.getSimpleName();
 

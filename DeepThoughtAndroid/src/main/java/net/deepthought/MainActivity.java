@@ -1,12 +1,12 @@
 package net.deepthought;
 
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //  };
 
   protected void showRegisterUserDevicesDialog() {
-    FragmentManager fragmentManager = getFragmentManager();
+    FragmentManager fragmentManager = getSupportFragmentManager();
     new RegisterUserDevicesDialog().show(fragmentManager, RegisterUserDevicesDialog.TAG);
   }
 
