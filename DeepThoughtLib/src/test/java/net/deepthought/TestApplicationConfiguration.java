@@ -113,6 +113,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
       public String getLineSeparator() {
         return System.lineSeparator();
       }
+
+      @Override
+      public String getTempDir() {
+        return System.getProperty("java.io.tmpdir");
+      }
     };
   }
 

@@ -884,6 +884,8 @@ public class MainWindowController implements Initializable {
       return;
 
     Device device = connectedDevice.getDevice();
+    if(device == null)
+      return;
 
     String iconPath = IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
     ImageView icon = new ImageView(iconPath);

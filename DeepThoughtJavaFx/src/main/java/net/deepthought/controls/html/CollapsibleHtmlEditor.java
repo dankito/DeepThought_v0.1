@@ -147,6 +147,10 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
   protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
     Device device = connectedDevice.getDevice();
+    if(device == null) { // TODO: how can that ever happen?
+      log.error("Got a ConnectedDevice " + connectedDevice + ", but its Device property is null");
+      return;
+    }
 
     ImageView icon = new ImageView(IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture()));
     icon.setPreserveRatio(true);

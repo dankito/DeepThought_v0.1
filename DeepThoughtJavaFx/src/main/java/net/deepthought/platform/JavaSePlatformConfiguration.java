@@ -41,4 +41,9 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
     return System.lineSeparator();
   }
 
+  @Override
+  public String getTempDir() {
+    return System.getProperty("java.io.tmpdir");
+  }
+
 }

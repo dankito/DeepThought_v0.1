@@ -90,7 +90,14 @@ public class ConnectorMessagesCreator {
 
 
   protected String parseBytesToString(byte[] receivedBytes, int packetLength) {
-    return new String(receivedBytes, 0, packetLength, Constants.MessagesCharset);
+    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
+      return new String(receivedBytes, 0, packetLength, Constants.MessagesCharset);
+    else  {
+      try {
+        return new String(receivedBytes, 0, packetLength, Constants.MessagesCharsetName);
+      } catch (Exception ex) { log.error("Could not create String from byte array for Charset " + Constants.MessagesCharset, ex); }
+      return "";
+    }
   }
 
   protected byte[] createMessage(String messageHeader, String messageBody) {

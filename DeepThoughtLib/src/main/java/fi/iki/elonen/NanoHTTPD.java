@@ -33,6 +33,8 @@ package fi.iki.elonen;
  * #L%
  */
 
+import net.deepthought.Application;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -408,7 +410,7 @@ public abstract class NanoHTTPD {
     private final List<TempFile> tempFiles;
 
     public DefaultTempFileManager() {
-      this.tmpdir = System.getProperty("java.io.tmpdir");
+      this.tmpdir = Application.getPlatformConfiguration().getTempDir();
       this.tempFiles = new ArrayList<TempFile>();
     }
 

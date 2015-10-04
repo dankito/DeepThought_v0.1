@@ -19,4 +19,6 @@ public interface IPlatformConfiguration {
 
   String getLineSeparator();
 
+  String getTempDir();
+
 }

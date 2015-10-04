@@ -58,4 +58,10 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
       return System.lineSeparator();
     return "\n"; // is always '\n' on Android, see https://developer.android.com/reference/java/lang/System.html#lineSeparator%28%29
   }
+
+  @Override
+  public String getTempDir() {
+    return context.getCacheDir().getAbsolutePath();
+  }
+
 }
