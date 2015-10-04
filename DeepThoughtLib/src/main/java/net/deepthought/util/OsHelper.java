@@ -21,7 +21,7 @@ public class OsHelper {
     return isRunningOnAndroid() == false || Application.getPlatformConfiguration().getOsVersion() >= minimumApiLevel;
   }
 
-  public static boolean isRunningOnOnAndroidApiLevel(int apiLevel) {
+  public static boolean isRunningOnAndroidApiLevel(int apiLevel) {
     return isRunningOnAndroid() == true && Application.getPlatformConfiguration().getOsVersion() == apiLevel;
   }
 

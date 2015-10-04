@@ -13,10 +13,18 @@ import net.deepthought.data.model.Device;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
+import net.deepthought.util.ObjectHolder;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
 import javafx.geometry.HPos;
@@ -33,6 +41,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.stage.FileChooser;
 
 /**
  * Created by ganymed on 13/09/15.
@@ -170,19 +179,17 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     }
 
     // TODO: load image which text should be recognized
-//    if(connectedDevice.canDoOcr()) {
-//      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-//      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
-//      captureImageMenuItem.setOnAction(event -> {
-////        Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener);
-//      });
-//      contextMenu.getItems().add(captureImageMenuItem);
-//    }
+    if(connectedDevice.canDoOcr()) {
+      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
+      captureImageMenuItem.setOnAction(event -> selectImagesForOcr(connectedDevice));
+      contextMenu.getItems().add(captureImageMenuItem);
+    }
 
     if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageOrDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
@@ -196,6 +203,47 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
         break;
       }
     }
+  }
+
+  protected void selectImagesForOcr(ConnectedDevice connectedDevice) {
+    // TODO: set file filter to Html compatible image types
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.getLocalizedString("image.files") + " (*.jpg, *.png)",
+        "*.jpg", "*.png"));
+
+    List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
+    if(selectedFiles != null && selectedFiles.size() > 0) {
+      doOcrForSelectedFiles(connectedDevice, selectedFiles);
+    }
+  }
+
+  protected void doOcrForSelectedFiles(final ConnectedDevice connectedDevice, List<File> selectedFiles) {
+    final Queue<File> imagesToRecognize = new LinkedList<>(selectedFiles);
+    final int totalAmountOfImages = selectedFiles.size();
+    final AtomicInteger currentImageIndex = new AtomicInteger(0);
+    final ObjectHolder<File> currentImage = new ObjectHolder(imagesToRecognize.poll());
+//    lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", 0, totalAmountOfImages));
+//    lblDoOcrProgress.setVisible(true);
+
+    Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, new CaptureImageOrDoOcrResponseListener() {
+      @Override
+      public void captureImageResult(CaptureImageResult captureImageResult) {
+
+      }
+
+      @Override
+      public void ocrResult(TextRecognitionResult ocrResult) {
+//        lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", currentImageIndex.incrementAndGet(), totalAmountOfImages));
+        captureImageOrDoOcrResponseListener.ocrResult(ocrResult);
+
+        if (imagesToRecognize.size() > 0) {
+          currentImage.set(imagesToRecognize.poll());
+          Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, this);
+        } else {
+//          lblDoOcrProgress.setVisible(false);
+        }
+      }
+    });
   }
 
   protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {

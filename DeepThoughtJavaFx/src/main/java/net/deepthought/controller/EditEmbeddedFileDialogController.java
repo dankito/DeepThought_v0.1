@@ -353,6 +353,8 @@ public class EditEmbeddedFileDialogController extends EntityDialogFrameControlle
   public void handleButtonSelectFileAction(ActionEvent event) {
     // TODO: set file filter to Html compatible image types
     FileChooser fileChooser = new FileChooser();
+    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.getLocalizedString("image.files") + " (*.jpg, *.png, *.gif, *.bmp, *.svg, *.ico)",
+        "*.jpg", "*.png", "*.gif", "*.bmp", "*.svg", "*.ico"));
 
     if(txtfldFileLocation.getText() != null) {
       try {

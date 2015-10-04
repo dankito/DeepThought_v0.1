@@ -3,6 +3,7 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.Application;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.OsHelper;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -44,7 +45,8 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
 
 
   static {
-    CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE)); // maybe it helps so that Sueddeutsche cookies don't get set
+    if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
+      CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE)); // maybe it helps so that Sueddeutsche cookies don't get set
   }
 
 

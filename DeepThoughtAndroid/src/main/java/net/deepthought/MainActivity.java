@@ -445,8 +445,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   }
 
-  protected void doOcrAndSendToCaller(CaptureImageOrDoOcrRequest request) {
-
+  protected void doOcrAndSendToCaller(final CaptureImageOrDoOcrRequest request) {
+    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
+      Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(request.getConfiguration(), new RecognizeTextListener() {
+        @Override
+        public void textRecognized(TextRecognitionResult result) {
+          Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
+            @Override
+            public void responseReceived(Request request, Response response) {
+              if(response.getResponseValue() == ResponseValue.Error) {
+                // TODO: stop process then
+              }
+            }
+          });
+        }
+      });
+    }
   }
 
   @Override

@@ -17,6 +17,7 @@ import net.deepthought.communication.registration.UserDeviceRegistrationRequestL
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.helper.FileHelper;
+import net.deepthought.util.ObjectHolder;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -188,7 +189,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
+    communicator.startCaptureImageOrDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -215,7 +216,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), new CaptureImageOrDoOcrResponseListener() {
+    communicator.startCaptureImageOrDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), new CaptureImageOrDoOcrResponseListener() {
       @Override
       public void captureImageResult(CaptureImageResult captureImageResult) {
 
@@ -228,6 +229,80 @@ public class CommunicatorTest extends CommunicationTestBase {
         waitLatch.countDown();
       }
     });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+    Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
+  }
+
+
+  @Test
+  public void startDoOcr_RequestIsReceived() throws IOException {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+    final ObjectHolder<byte[]> receivedImageData = new ObjectHolder<>();
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        methodCalled.set(true);
+        receivedImageData.set(request.getImageToRecognize());
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+      }
+    });
+
+    byte[] imageData = new byte[] { 47, 11 };
+
+    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), imageData, false, false, null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+    Assert.assertArrayEquals(imageData, receivedImageData.get());
+  }
+
+  @Test
+  public void startDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() throws IOException {
+    final List<TextRecognitionResult> ocrResults = new ArrayList<>();
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final String recognizedText = "Hyper, hyper";
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+        communicator.sendOcrResult(request, TextRecognitionResult.createRecognitionSuccessfulResult(recognizedText), null);
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+
+      }
+    });
+
+    byte[] imageData = new byte[] { 47, 11 };
+
+    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
+        imageData, false, false, new CaptureImageOrDoOcrResponseListener() {
+          @Override
+          public void captureImageResult(CaptureImageResult captureImageResult) {
+
+          }
+
+          @Override
+          public void ocrResult(TextRecognitionResult ocrResult) {
+            methodCalled.set(true);
+            ocrResults.add(ocrResult);
+            waitLatch.countDown();
+          }
+        });
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -346,7 +421,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    communicator.startCaptureImageOrDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
     communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
@@ -372,7 +447,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    communicator.startCaptureImageOrDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -395,7 +470,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    communicator.startCaptureImageOrDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
     Assert.assertEquals(1, communicator.captureImageOrDoOcrListeners.size());
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }

@@ -1,6 +1,9 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
 import net.deepthought.data.contentextractor.ocr.OcrContentExtractorBase;
+import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
 
 import org.apache.tika.metadata.Metadata;
@@ -67,4 +70,10 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
     if(listener != null)
       listener.entryCreated(new EntryCreationResult(contentExtractOption.getSource(), new Entry(extractedText)));
   }
+
+  @Override
+  protected void recognizeText(CaptureImageOrDoOcrConfiguration configuration, RecognizeTextListener listener) {
+    listener.textRecognized(TextRecognitionResult.createErrorOccurredResult("Not implemented yet"));
+  }
+
 }

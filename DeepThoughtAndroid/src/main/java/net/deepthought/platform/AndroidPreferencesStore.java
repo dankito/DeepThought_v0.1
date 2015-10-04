@@ -15,11 +15,13 @@ public class AndroidPreferencesStore extends PreferencesStoreBase {
 
   protected SharedPreferences preferences = null;
 
-  protected String androidDefaultDataFolderPath = getDefaultDataFolder();
+  protected String androidDefaultDataFolderPath;
 
 
   public AndroidPreferencesStore(Context context) {
     this.context = context;
+    this.androidDefaultDataFolderPath = getDefaultDataFolder();
+    DefaultDataFolder = androidDefaultDataFolderPath;
     this.preferences = context.getSharedPreferences("DeepThoughtAndroidApplicationConfiguration", Context.MODE_PRIVATE);
   }
 
@@ -57,14 +59,16 @@ public class AndroidPreferencesStore extends PreferencesStoreBase {
       dataFolderFile = new File(dataFolderFile, "data");
     }
     else {
-      dataFolderFile = new File(Environment.getDataDirectory(), "data");
-//      dataFolderFile = new File(dataFolderFile, "net.deepthought");
-//      dataFolderFile = new File(dataFolderFile, "data");
+      if(context != null)
+        dataFolderFile = context.getDir("DeepThought", Context.MODE_WORLD_READABLE);
+      else
+      dataFolderFile = new File(Environment.getDataDirectory(), "DeepThought");
+        dataFolderFile = new File(dataFolderFile, "data");
     }
 
     if (dataFolderFile.exists() == false) {
-      dataFolderFile.mkdirs();
-      dataFolderFile.mkdir();
+      boolean test = dataFolderFile.mkdirs();
+      test = dataFolderFile.mkdir();
     }
     return dataFolderFile.getAbsolutePath() + "/";
   }

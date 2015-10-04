@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor.ocr;
 
+import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
 import net.deepthought.data.contentextractor.IContentExtractor;
 
 /**
@@ -7,8 +8,10 @@ import net.deepthought.data.contentextractor.IContentExtractor;
  */
 public interface IOcrContentExtractor extends IContentExtractor {
 
-  public boolean canCaptureImage();
+  void recognizeTextAsync(CaptureImageOrDoOcrConfiguration configuration, RecognizeTextListener listener);
 
-  public void captureImagesAndRecognizeTextAsync(RecognizeTextListener listener);
+  boolean canCaptureImage();
+
+  void captureImagesAndRecognizeTextAsync(RecognizeTextListener listener);
 
 }
