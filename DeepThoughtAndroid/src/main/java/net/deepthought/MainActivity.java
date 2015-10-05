@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       if(hasDeepThoughtBeenSetup == false) {
         setupDeepThought();
 
-        ActivityManager.createInstance(this);
+//        ActivityManager.createInstance();
         hasDeepThoughtBeenSetup = true;
       }
 
@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       @Override
       public void onClick(DialogInterface dialog, int which) {
         IOnlineArticleContentExtractor clickedExtractor = onlineArticleContentExtractors.get(which);
-        ActivityManager.getInstance().showArticlesOverviewActivity(clickedExtractor);
+        ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, clickedExtractor);
       }
     });
 

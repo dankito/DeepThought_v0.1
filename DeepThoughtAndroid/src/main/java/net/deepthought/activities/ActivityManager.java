@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import net.deepthought.MainActivity;
 import net.deepthought.R;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -37,11 +36,13 @@ public class ActivityManager {
 
   protected static ActivityManager instance = null;
 
-  public static void createInstance(MainActivity mainActivity) {
-    instance = new ActivityManager(mainActivity);
-  }
+//  public static void createInstance() {
+//    instance = new ActivityManager();
+//  }
 
   public static ActivityManager getInstance() {
+    if(instance == null)
+      instance = new ActivityManager();
     return instance;
   }
 
@@ -49,18 +50,15 @@ public class ActivityManager {
     if(instance != null) {
       instance.resetEditEntryActivityCachedData();
       instance.resetShowArticlesOverviewActivityCachedData();
-      instance.mainActivity = null;
     }
 
     instance = null;
   }
 
 
-  protected MainActivity mainActivity = null;
 
+  protected ActivityManager() {
 
-  protected ActivityManager(MainActivity mainActivity) {
-    this.mainActivity = mainActivity;
   }
 
 
@@ -97,8 +95,8 @@ public class ActivityManager {
     entryCreationResultToBeEdited = creationResult;
 
     try {
-      Intent startEditEntryActivityIntent = new Intent(mainActivity, EditEntryActivity.class);
-      mainActivity.startActivityForResult(startEditEntryActivityIntent, EditEntryActivity.RequestCode);
+      Intent startEditEntryActivityIntent = new Intent(activity, EditEntryActivity.class);
+      activity.startActivityForResult(startEditEntryActivityIntent, EditEntryActivity.RequestCode);
     } catch(Exception ex) {
       log.error("Could not start EditEntryActivity", ex);
     }
@@ -118,12 +116,12 @@ public class ActivityManager {
   }
 
 
-  public void showArticlesOverviewActivity(IOnlineArticleContentExtractor extractor) {
+  public void showArticlesOverviewActivity(Activity activity, IOnlineArticleContentExtractor extractor) {
     try {
       this.extractorToShowArticlesOverviewActivityFor = extractor;
 
-      Intent startEditEntryActivityIntent = new Intent(mainActivity, ArticlesOverviewActivity.class);
-      mainActivity.startActivity(startEditEntryActivityIntent);
+      Intent startEditEntryActivityIntent = new Intent(activity, ArticlesOverviewActivity.class);
+      activity.startActivity(startEditEntryActivityIntent);
     } catch(Exception ex) {
       log.error("Could not start EditEntryActivity", ex);
     }
