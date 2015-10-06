@@ -12,13 +12,20 @@ import net.deepthought.communication.messages.Request;
 import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
+import net.deepthought.util.StringUtils;
+import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -141,7 +148,13 @@ public class MessagesReceiver extends NanoHTTPD {
 
 
   protected Response respondToStartCaptureImageAndDoOcrRequest(IHTTPSession session) {
-    CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)parseRequestBody(session, CaptureImageOrDoOcrRequest.class);
+    CaptureImageOrDoOcrRequest request = null;
+    try {
+      request = parseStartCaptureImageAndDoOcrRequestBody(session);
+    } catch(Exception ex) {
+      log.error("Could not decode StartCaptureImageAndDoOcrRequest Post Body", ex);
+      return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.Response.Denied);
+    }
 
     listener.startCaptureImageOrDoOcr(request);
 
@@ -207,6 +220,66 @@ public class MessagesReceiver extends NanoHTTPD {
 
     return null;
   }
+
+  protected CaptureImageOrDoOcrRequest parseStartCaptureImageAndDoOcrRequestBody(IHTTPSession session) throws Exception {
+    String address = null;
+    int port = 0;
+    DoOcrConfiguration configuration = null;
+    String imageFileUri = null;
+
+    Map<String, String> partFiles = parseMultipartRequestBody(session);
+    for(String partName : partFiles.keySet()) {
+      String partFilename = partFiles.get(partName);
+
+      if(ConnectorMessagesCreator.DoOcrMultipartKeyAddress.equals(partName))
+        address = FileUtils.readTextFile(new File(partFilename));
+      else if(ConnectorMessagesCreator.DoOcrMultipartKeyPort.equals(partName)) {
+        String portString = FileUtils.readTextFile(new File(partFilename));
+        if(StringUtils.isNotNullOrEmpty(portString))
+          port = Integer.parseInt(portString);
+      }
+      else if(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration.equals(partName)) {
+        String json = FileUtils.readTextFile(new File(partFilename));
+        DeserializationResult<DoOcrConfiguration> result = JsonIoJsonHelper.parseJsonString(json, DoOcrConfiguration.class);
+        if(result.successful())
+          configuration = result.getResult();
+      }
+      else if(ConnectorMessagesCreator.DoOcrMultipartKeyImage.equals(partName)) {
+        // as NanoHTTPD deletes all temp file as soon as message is handled (soon after this method returns)
+        // copy Image file to another temp file
+        // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
+        File tempFile = FileUtils.createTempFile();
+        tempFile.deleteOnExit();
+        FileUtils.moveFile(new File(partFilename), tempFile);
+//        FileUtils.copyFile(new File(partFilename), tempFile);
+        imageFileUri = tempFile.getAbsolutePath();
+      }
+    }
+
+    if(configuration != null)
+      configuration.setImageUri(imageFileUri);
+
+    return new CaptureImageOrDoOcrRequest(address, port, configuration);
+  }
+
+  protected Map<String, String> parseMultipartRequestBody(IHTTPSession session) throws Exception {
+//    String debug = getMessageBody(session);
+    File tempFile = FileUtils.createTempFile(); // TODO: if filename is set, apply it to file
+    RandomAccessFile randomAccessFile = new RandomAccessFile(tempFile, "rw");
+
+    session.storeIncomingDataToBuffer(randomAccessFile, 1024);
+
+    randomAccessFile.seek(0);
+    ByteBuffer buffer = randomAccessFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, tempFile.length());
+
+    Map<String, String> files = new HashMap<>();
+    session.decodeMultipartFormData(buffer, files);
+
+    buffer.clear();
+    randomAccessFile.close();
+    return files;
+  }
+
 
   protected Response createResponse(net.deepthought.communication.messages.Response response) {
     return createResponse(Response.Status.OK, response);

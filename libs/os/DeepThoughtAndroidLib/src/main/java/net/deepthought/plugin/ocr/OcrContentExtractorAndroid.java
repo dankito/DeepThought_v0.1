@@ -7,7 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 
-import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.CreateEntryListener;
@@ -87,26 +87,8 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
 
   @Override
   protected void captureImagesAndRecognizeText(RecognizeTextListener listener) {
-    recognizeText(new CaptureImageOrDoOcrConfiguration(null, true, true), listener);
-  }
-
-  @Override
-  protected void recognizeText(CaptureImageOrDoOcrConfiguration configuration, RecognizeTextListener listener) {
     try {
-      OcrResultBroadcastReceiver ocrResultBroadcastReceiver = new OcrResultBroadcastReceiver(context, listener);
-
-      Uri imageUri = saveImageToTempFile(configuration);
-
-      ActivityInfo activityInfo = resolveInfo.activityInfo;
-      Intent intent = new Intent();
-      intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-      intent.putExtra(INTENT_KEY_CAPTURE_IMAGE, configuration.captureImage());
-      if(imageUri != null)
-        intent.putExtra(INTENT_KEY_IMAGE_TO_RECOGNIZE_URI, imageUri.toString());
-      intent.putExtra(INTENT_KEY_SHOW_SETTINGS_UI, configuration.showSettingsUi());
-      intent.putExtra(INTENT_KEY_SHOW_MESSAGE_ON_REMOTE_DEVICE_WHEN_PROCESSING_DONE, configuration.showMessageOnRemoteDeviceWhenProcessingDone());
+      Intent intent = createIntentToStartOcrPlugin(true, true, listener);
 
       context.startActivity(intent);
     } catch(Exception ex) {
@@ -114,7 +96,40 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
     }
   }
 
-  protected Uri saveImageToTempFile(CaptureImageOrDoOcrConfiguration configuration) {
+  @Override
+  protected void recognizeText(DoOcrConfiguration configuration, RecognizeTextListener listener) {
+    try {
+      Intent intent = createIntentToStartOcrPlugin(true, configuration.showSettingsUi(), listener);
+      intent.putExtra(INTENT_KEY_SHOW_MESSAGE_ON_REMOTE_DEVICE_WHEN_PROCESSING_DONE, configuration.showMessageOnRemoteDeviceWhenProcessingDone());
+
+      Uri imageUri = Uri.parse(configuration.getImageUri());
+      if(imageUri == null && configuration.getImageToRecognize() != null)
+        imageUri = saveImageToTempFile(configuration);
+
+      if(imageUri != null)
+        intent.putExtra(INTENT_KEY_IMAGE_TO_RECOGNIZE_URI, imageUri.toString());
+
+      context.startActivity(intent);
+    } catch(Exception ex) {
+      log.error("Could not start OcrContentExtractor plugin", ex);
+    }
+  }
+
+  protected Intent createIntentToStartOcrPlugin(boolean captureImage, boolean showSettingsUi, RecognizeTextListener listener) {
+    OcrResultBroadcastReceiver ocrResultBroadcastReceiver = new OcrResultBroadcastReceiver(context, listener);
+
+    ActivityInfo activityInfo = resolveInfo.activityInfo;
+    Intent intent = new Intent();
+    intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+    intent.putExtra(INTENT_KEY_CAPTURE_IMAGE, captureImage);
+    intent.putExtra(INTENT_KEY_SHOW_SETTINGS_UI, showSettingsUi);
+
+    return intent;
+  }
+
+  protected Uri saveImageToTempFile(DoOcrConfiguration configuration) {
     if(configuration.getImageToRecognize() != null) {
       try {
         File tempFile = File.createTempFile("image_for_ocr_", ".image");

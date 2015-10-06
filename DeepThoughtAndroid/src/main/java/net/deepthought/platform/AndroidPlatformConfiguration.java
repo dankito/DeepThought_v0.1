@@ -3,9 +3,12 @@ package net.deepthought.platform;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
 
 import net.deepthought.AndroidHelper;
 import net.deepthought.util.OsHelper;
+
+import java.io.File;
 
 /**
  * Created by ganymed on 23/08/15.
@@ -61,6 +64,11 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
 
   @Override
   public String getTempDir() {
+    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+      File tempDir = new File(Environment.getExternalStorageDirectory(), "tmp");
+      tempDir.mkdirs();
+      return tempDir.getAbsolutePath();
+    }
     return context.getCacheDir().getAbsolutePath();
   }
 

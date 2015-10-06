@@ -887,4 +887,17 @@ public class FileUtils {
   public static void showFileInFileManager(FileLink file) {
     // TODO
   }
+
+  public static File createTempFile() {
+    return createTempFile(".tmp");
+  }
+
+  public static File createTempFile(String fileExtension) {
+    String tempDir = Application.getPlatformConfiguration().getTempDir();
+
+    File tempFile = new File(tempDir, "temp_" + System.currentTimeMillis() + fileExtension);
+    tempFile.deleteOnExit();
+
+    return tempFile;
+  }
 }

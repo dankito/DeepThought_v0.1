@@ -559,12 +559,87 @@ public abstract class NanoHTTPD {
       }
     }
 
+    protected String getMultipartBoundaryName() {
+      String contentTypeHeader = this.headers.get("content-type");
+      String boundaryStartString = "boundary=";
+      int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
+
+      String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
+      if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
+        boundary = boundary.substring(1, boundary.length() - 1);
+      }
+
+      return boundary;
+    }
+
+    /**
+     * Find the byte positions where multipart boundaries start. This reads
+     * a large block at a time and uses a temporary buffer to optimize
+     * (memory mapped) file access.
+     */
+    protected int[] getMultipartBoundaryPositions(ByteBuffer b, String boundary) {
+      return getMultipartBoundaryPositions(b, boundary.getBytes());
+    }
+
+    /**
+     * Find the byte positions where multipart boundaries start. This reads
+     * a large block at a time and uses a temporary buffer to optimize
+     * (memory mapped) file access.
+     */
+    protected int[] getMultipartBoundaryPositions(ByteBuffer b, byte[] boundary) {
+      int[] res = new int[0];
+      if (b.remaining() < boundary.length) {
+        return res;
+      }
+
+      int search_window_pos = 0;
+      byte[] search_window = new byte[4 * 1024 + boundary.length];
+
+      int first_fill = (b.remaining() < search_window.length) ? b.remaining() : search_window.length;
+      b.get(search_window, 0, first_fill);
+      int new_bytes = first_fill - boundary.length;
+
+      do {
+        // Search the search_window
+        for (int j = 0; j < new_bytes; j++) {
+          for (int i = 0; i < boundary.length; i++) {
+            if (search_window[j + i] != boundary[i])
+              break;
+            if (i == boundary.length - 1) {
+              // Match found, add it to results
+              int[] new_res = new int[res.length + 1];
+              System.arraycopy(res, 0, new_res, 0, res.length);
+              new_res[res.length] = search_window_pos + j;
+              res = new_res;
+            }
+          }
+        }
+        search_window_pos += new_bytes;
+
+        // Copy the end of the buffer to the start
+        System.arraycopy(search_window, search_window.length - boundary.length, search_window, 0, boundary.length);
+
+        // Refill search_window
+        new_bytes = search_window.length - boundary.length;
+        new_bytes = (b.remaining() < new_bytes) ? b.remaining() : new_bytes;
+        b.get(search_window, boundary.length, new_bytes);
+      } while (new_bytes > 0);
+      return res;
+    }
+
+    @Override
+    public void decodeMultipartFormData(ByteBuffer fbuf, Map<String, String> files) throws ResponseException {
+      String boundary = getMultipartBoundaryName();
+
+      decodeMultipartFormData(boundary, fbuf, this.parms, files);
+    }
+
     /**
      * Decodes the Multipart Body data and put it into Key/Value pairs.
      */
-    private void decodeMultipartFormData(String boundary, ByteBuffer fbuf, Map<String, String> parms, Map<String, String> files) throws ResponseException {
+    protected void decodeMultipartFormData(String boundary, ByteBuffer fbuf, Map<String, String> parms, Map<String, String> files) throws ResponseException {
       try {
-        int[] boundary_idxs = getBoundaryPositions(fbuf, boundary.getBytes());
+        int[] boundary_idxs = getMultipartBoundaryPositions(fbuf, boundary);
         if (boundary_idxs.length < 2) {
           throw new ResponseException(Response.Status.BAD_REQUEST, "BAD REQUEST: Content type is multipart/form-data but contains less than two boundary strings.");
         }
@@ -792,52 +867,6 @@ public abstract class NanoHTTPD {
       return 0;
     }
 
-    /**
-     * Find the byte positions where multipart boundaries start. This reads
-     * a large block at a time and uses a temporary buffer to optimize
-     * (memory mapped) file access.
-     */
-    private int[] getBoundaryPositions(ByteBuffer b, byte[] boundary) {
-      int[] res = new int[0];
-      if (b.remaining() < boundary.length) {
-        return res;
-      }
-
-      int search_window_pos = 0;
-      byte[] search_window = new byte[4 * 1024 + boundary.length];
-
-      int first_fill = (b.remaining() < search_window.length) ? b.remaining() : search_window.length;
-      b.get(search_window, 0, first_fill);
-      int new_bytes = first_fill - boundary.length;
-
-      do {
-        // Search the search_window
-        for (int j = 0; j < new_bytes; j++) {
-          for (int i = 0; i < boundary.length; i++) {
-            if (search_window[j + i] != boundary[i])
-              break;
-            if (i == boundary.length - 1) {
-              // Match found, add it to results
-              int[] new_res = new int[res.length + 1];
-              System.arraycopy(res, 0, new_res, 0, res.length);
-              new_res[res.length] = search_window_pos + j;
-              res = new_res;
-            }
-          }
-        }
-        search_window_pos += new_bytes;
-
-        // Copy the end of the buffer to the start
-        System.arraycopy(search_window, search_window.length - boundary.length, search_window, 0, boundary.length);
-
-        // Refill search_window
-        new_bytes = search_window.length - boundary.length;
-        new_bytes = (b.remaining() < new_bytes) ? b.remaining() : new_bytes;
-        b.get(search_window, boundary.length, new_bytes);
-      } while (new_bytes > 0);
-      return res;
-    }
-
     @Override
     public CookieHandler getCookies() {
       return this.cookies;
@@ -888,14 +917,7 @@ public abstract class NanoHTTPD {
       final int MEMORY_STORE_LIMIT = 1024;
       RandomAccessFile randomAccessFile = null;
       try {
-        long size;
-        if (this.headers.containsKey("content-length")) {
-          size = Integer.parseInt(this.headers.get("content-length"));
-        } else if (this.splitbyte < this.rlen) {
-          size = this.rlen - this.splitbyte;
-        } else {
-          size = 0;
-        }
+        long size = getContentLength();
 
         ByteArrayOutputStream baos = null;
         DataOutput request_data_output = null;
@@ -910,14 +932,7 @@ public abstract class NanoHTTPD {
         }
 
         // Read all the body and write it to request_data_output
-        byte[] buf = new byte[REQUEST_BUFFER_LEN];
-        while (this.rlen >= 0 && size > 0) {
-          this.rlen = this.inputStream.read(buf, 0, (int) Math.min(size, REQUEST_BUFFER_LEN));
-          size -= this.rlen;
-          if (this.rlen > 0) {
-            request_data_output.write(buf, 0, this.rlen);
-          }
-        }
+        storeIncomingDataToBuffer(request_data_output, REQUEST_BUFFER_LEN);
 
         ByteBuffer fbuf = null;
         if (baos != null) {
@@ -948,14 +963,7 @@ public abstract class NanoHTTPD {
                   "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
             }
 
-            String boundaryStartString = "boundary=";
-            int boundaryContentStart = contentTypeHeader.indexOf(boundaryStartString) + boundaryStartString.length();
-            String boundary = contentTypeHeader.substring(boundaryContentStart, contentTypeHeader.length());
-            if (boundary.startsWith("\"") && boundary.endsWith("\"")) {
-              boundary = boundary.substring(1, boundary.length() - 1);
-            }
-
-            decodeMultipartFormData(boundary, fbuf, this.parms, files);
+            decodeMultipartFormData(fbuf, files);
           } else {
             byte[] postBytes = new byte[fbuf.remaining()];
             fbuf.get(postBytes);
@@ -976,6 +984,35 @@ public abstract class NanoHTTPD {
       } finally {
         safeClose(randomAccessFile);
       }
+    }
+
+    @Override
+    public void storeIncomingDataToBuffer(DataOutput request_data_output, int bufferLength) throws IOException {
+      storeIncomingDataToBuffer(request_data_output, bufferLength, getContentLength());
+    }
+
+    protected void storeIncomingDataToBuffer(DataOutput request_data_output, int REQUEST_BUFFER_LEN, long size) throws IOException {
+      byte[] buf = new byte[REQUEST_BUFFER_LEN];
+      while (this.rlen >= 0 && size > 0) {
+        this.rlen = this.inputStream.read(buf, 0, (int) Math.min(size, REQUEST_BUFFER_LEN));
+        size -= this.rlen;
+        if (this.rlen > 0) {
+          request_data_output.write(buf, 0, this.rlen);
+        }
+      }
+    }
+
+    @Override
+    public long getContentLength() {
+      long size;
+      if (this.headers.containsKey("content-length")) {
+        size = Integer.parseInt(this.headers.get("content-length"));
+      } else if (this.splitbyte < this.rlen) {
+        size = this.rlen - this.splitbyte;
+      } else {
+        size = 0;
+      }
+      return size;
     }
 
     /**
@@ -1036,6 +1073,12 @@ public abstract class NanoHTTPD {
      *            map to modify
      */
     void parseBody(Map<String, String> files) throws IOException, ResponseException;
+
+    void decodeMultipartFormData(ByteBuffer fbuf, Map<String, String> files) throws ResponseException;
+
+    void storeIncomingDataToBuffer(DataOutput request_data_output, int bufferLength) throws IOException;
+
+    long getContentLength();
   }
 
   /**

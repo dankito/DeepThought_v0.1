@@ -1,45 +1,54 @@
 package net.deepthought.communication.messages;
 
-import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
+import net.deepthought.communication.model.DoOcrConfiguration;
+
+import java.io.IOException;
 
 /**
  * Created by ganymed on 23/08/15.
  */
 public class CaptureImageOrDoOcrRequest extends RequestWithAsynchronousResponse {
 
-  protected CaptureImageOrDoOcrConfiguration configuration = null;
+  protected boolean captureImage;
+  protected boolean doOcr;
+
+  protected DoOcrConfiguration configuration = null;
 
 
   public CaptureImageOrDoOcrRequest(String ipAddress, int port, boolean captureImage) {
-    super(ipAddress, port);
-    this.configuration = new CaptureImageOrDoOcrConfiguration(null, captureImage, false);
+    this(ipAddress, port, captureImage, false);
   }
 
   public CaptureImageOrDoOcrRequest(String ipAddress, int port, boolean captureImage, boolean doOcr) {
     super(ipAddress, port);
-    this.configuration = new CaptureImageOrDoOcrConfiguration(null, captureImage, doOcr);
+    this.captureImage = captureImage;
+    this.doOcr = doOcr;
   }
 
-  public CaptureImageOrDoOcrRequest(String ipAddressString, int messageReceiverPort, CaptureImageOrDoOcrConfiguration configuration) {
-    super(ipAddressString, messageReceiverPort);
+  public CaptureImageOrDoOcrRequest(String ipAddressString, int messageReceiverPort, DoOcrConfiguration configuration) {
+    this(ipAddressString, messageReceiverPort, false, true);
     this.configuration = configuration;
   }
 
 
-  public CaptureImageOrDoOcrConfiguration getConfiguration() {
-    return configuration;
-  }
-
   public boolean captureImage() {
-    return configuration.captureImage();
+    return captureImage;
   }
 
   public boolean doOcr() {
-    return configuration.doOcr();
+    return doOcr;
+  }
+
+  public DoOcrConfiguration getConfiguration() {
+    return configuration;
   }
 
   public byte[] getImageToRecognize() {
     return configuration.getImageToRecognize();
+  }
+
+  public byte[] readBytesFromImageUri() throws IOException {
+    return configuration.readBytesFromImageUri();
   }
 
   public boolean showSettingsUi() {

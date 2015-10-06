@@ -11,13 +11,17 @@ import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMe
 import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.CaptureImageResultResponse;
 import net.deepthought.communication.messages.GenericRequest;
+import net.deepthought.communication.messages.MultipartPart;
+import net.deepthought.communication.messages.MultipartRequest;
+import net.deepthought.communication.messages.MultipartType;
 import net.deepthought.communication.messages.OcrResultResponse;
 import net.deepthought.communication.messages.Request;
+import net.deepthought.communication.messages.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.Response;
 import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
-import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
@@ -32,12 +36,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +63,7 @@ public class Communicator {
 
   protected Map<AskForDeviceRegistrationRequest, AskForDeviceRegistrationListener> askForDeviceRegistrationListeners = new HashMap<>();
 
-  protected Map<CaptureImageOrDoOcrRequest, CaptureImageOrDoOcrResponseListener> captureImageOrDoOcrListeners = new HashMap<>();
+  protected Map<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> captureImageOrDoOcrListeners = new HashMap<>();
 
 
   public Communicator(IDeepThoughtsConnector connector, CommunicatorListener communicatorListener) {
@@ -127,12 +135,28 @@ public class Communicator {
 
 
   public void startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
-    startCaptureImageOrDoOcr(new CaptureImageOrDoOcrConfiguration(deviceToDoTheJob, true, false), listener);
+    startCaptureImageOrDoOcr(deviceToDoTheJob, true, false, listener);
   }
 
-  public void startCaptureImageOrDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
-    startCaptureImageOrDoOcr(new CaptureImageOrDoOcrConfiguration(deviceToDoTheJob, true, true), listener);
+  public void startCaptureImageAndDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
+    startCaptureImageOrDoOcr(deviceToDoTheJob, true, true, listener);
   }
+
+  protected void startCaptureImageOrDoOcr(ConnectedDevice deviceToDoTheJob, boolean captureImage, boolean doOcr, final CaptureImageOrDoOcrResponseListener listener) {
+    String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), captureImage, doOcr);
+
+    if(listener != null)
+      captureImageOrDoOcrListeners.put(request, listener);
+
+    sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
+      }
+    });
+  }
+
 
   public void startDoOcr(ConnectedDevice deviceToDoTheJob, File imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone, CaptureImageOrDoOcrResponseListener listener) {
     try {
@@ -146,24 +170,28 @@ public class Communicator {
   }
 
   public void startDoOcr(ConnectedDevice deviceToDoTheJob, byte[] imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone, CaptureImageOrDoOcrResponseListener listener) {
-    startCaptureImageOrDoOcr(new CaptureImageOrDoOcrConfiguration(deviceToDoTheJob, imageToRecognize, showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone), listener);
+    startDoOcr(deviceToDoTheJob, new DoOcrConfiguration(imageToRecognize, showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone), listener);
   }
 
-  public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrConfiguration configuration, final CaptureImageOrDoOcrResponseListener listener) {
-    ConnectedDevice deviceToDoTheJob = configuration.getDeviceToDoTheJob();
+  public void startDoOcr(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final CaptureImageOrDoOcrResponseListener listener) {
     String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), configuration);
+
+    byte[] imageData = configuration.getAndResetImageToRecognize();
+    final MultipartRequest request = new MultipartRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
+                                          new MultipartPart<DoOcrConfiguration>(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration, MultipartType.Text, configuration),
+                                          new MultipartPart<byte[]>(ConnectorMessagesCreator.DoOcrMultipartKeyImage, MultipartType.Binary, imageData) });
 
     if(listener != null)
       captureImageOrDoOcrListeners.put(request, listener);
 
-    sendMessageAsync(address, request, new CommunicatorResponseListener() {
+    sendMultipartMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
       }
     });
   }
+
 
   public void sendCaptureImageResult(final CaptureImageOrDoOcrRequest request, final byte[] imageBytes, final ResponseListener listener) {
     String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
@@ -195,7 +223,7 @@ public class Communicator {
   }
 
   public void stopCaptureImageAndDoOcr(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
-    CaptureImageOrDoOcrRequest captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
+    RequestWithAsynchronousResponse captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
     if(captureRequest == null) {
       log.error("stopCaptureImageOrDoOcr() has been called but no CaptureImageOrDoOcrRequest has been found for listenerToUnset");
       return;
@@ -212,9 +240,9 @@ public class Communicator {
     });
   }
 
-  protected CaptureImageOrDoOcrRequest findCaptureImageOrDoOcrRequestForListener(CaptureImageOrDoOcrResponseListener listenerToUnset) {
-    CaptureImageOrDoOcrRequest request = null;
-    for(Map.Entry<CaptureImageOrDoOcrRequest, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
+  protected RequestWithAsynchronousResponse findCaptureImageOrDoOcrRequestForListener(CaptureImageOrDoOcrResponseListener listenerToUnset) {
+    RequestWithAsynchronousResponse request = null;
+    for(Map.Entry<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
       if(entry.getValue() == listenerToUnset) {
         request = entry.getKey();
         captureImageOrDoOcrListeners.remove(request);
@@ -234,7 +262,7 @@ public class Communicator {
       @Override
       public void run() {
         Response response = sendMessage(address, request, responseClass);
-        if(listener != null)
+        if (listener != null)
           listener.responseReceived(response);
       }
     });
@@ -242,31 +270,102 @@ public class Communicator {
 
   protected Response sendMessage(String address, Request request, Class<? extends Response> responseClass) {
     try {
-      DefaultHttpClient httpClient = new DefaultHttpClient();
+      HttpEntity postEntity = createPostBody(request);
 
-      HttpPost postRequest = new HttpPost(address);
-      SerializationResult result = JsonIoJsonHelper.generateJsonString(request);
-      if (result.successful() == false) {
-        log.error("Could not generate Json from Request", result.getError()); // TODO: what to do in this case?
-      }
-
-      StringEntity postEntity = new StringEntity(result.getSerializationResult(), Constants.MessagesCharsetName);
-      postEntity.setContentType(Constants.JsonMimeType);
-      postRequest.setEntity(postEntity);
-
-      HttpResponse response = httpClient.execute(postRequest);
-      HttpEntity entity = response.getEntity();
-      log.debug("Request Handled for url " + address + " ?: " + response.getStatusLine());
-
-      String responseString = EntityUtils.toString(entity);
-      httpClient.getConnectionManager().shutdown();
-
-      return deserializeResponse(responseString, responseClass);
+      sendMessage(address, postEntity, responseClass);
     } catch(Exception ex) {
       log.error("Could not send message to address " + address + " for Request " + request, ex);
     }
 
     return null;
+  }
+
+  protected HttpEntity createPostBody(Request request) throws Exception {
+    SerializationResult result = JsonIoJsonHelper.generateJsonString(request);
+    if (result.successful() == false) {
+      log.error("Could not generate Json from Request", result.getError());
+      throw new Exception("Could not serialize Request " + request + " to Json", result.getError());
+    }
+
+    StringEntity postEntity = new StringEntity(result.getSerializationResult(), Constants.MessagesCharsetName);
+    postEntity.setContentType(Constants.JsonMimeType);
+
+    return postEntity;
+  }
+
+
+  protected void sendMultipartMessageAsync(String address, MultipartRequest request, CommunicatorResponseListener listener) {
+    sendMultipartMessageAsync(address, request, Response.class, listener);
+  }
+
+  protected void sendMultipartMessageAsync(final String address, final MultipartRequest request, final Class<? extends Response> responseClass, final CommunicatorResponseListener listener) {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        Response response = sendMultipartMessage(address, request, responseClass);
+        if (listener != null)
+          listener.responseReceived(response);
+      }
+    });
+  }
+
+  protected Response sendMultipartMessage(String address, MultipartRequest request, Class<? extends Response> responseClass) {
+    try {
+      HttpEntity postEntity = createMultipartPostBody(request);
+
+      sendMessage(address, postEntity, responseClass);
+    } catch(Exception ex) {
+      log.error("Could not send message to address " + address + " for Request " + request, ex);
+    }
+
+    return null;
+  }
+
+  protected HttpEntity createMultipartPostBody(MultipartRequest request) throws Exception {
+    MultipartEntity postEntity = new MultipartEntity();
+
+    for(MultipartPart part : request.getParts()) {
+      if(part.getType() == MultipartType.Text) {
+        addTextualPart(postEntity, part);
+      }
+      else if(part.getType() == MultipartType.Binary) {
+        postEntity.addPart(part.getPartName(), new ByteArrayBody((byte[])part.getData(), "ToDo-SetFileName.tmp"));
+      }
+    }
+
+    return postEntity;
+  }
+
+  protected void addTextualPart(MultipartEntity postEntity, MultipartPart part) throws Exception {
+    String text = null;
+    if(part.getData() instanceof String)
+      text = (String)part.getData();
+    else {
+      SerializationResult result = JsonIoJsonHelper.generateJsonString(part.getData());
+      if (result.successful() == false) {
+        log.error("Could not generate Json from Request", result.getError());
+        throw new Exception("Could not serialize Multipart data " + part.getData() + " to Json", result.getError());
+      }
+      text = result.getSerializationResult();
+    }
+
+    postEntity.addPart(part.getPartName(), new StringBody(text, Constants.MessagesCharset));
+  }
+
+
+  protected Response sendMessage(String address, HttpEntity postEntity, Class<? extends Response> responseClass) throws IOException {
+    DefaultHttpClient httpClient = new DefaultHttpClient();
+    HttpPost postRequest = new HttpPost(address);
+    postRequest.setEntity(postEntity);
+
+    HttpResponse response = httpClient.execute(postRequest);
+    HttpEntity entity = response.getEntity();
+    log.debug("Request Handled for url " + address + " ?: " + response.getStatusLine());
+
+    String responseString = EntityUtils.toString(entity);
+    httpClient.getConnectionManager().shutdown();
+
+    return deserializeResponse(responseString, responseClass);
   }
 
   protected Response deserializeResponse(String responseString, Class<? extends Response> responseClass) {
@@ -335,7 +434,7 @@ public class Communicator {
     public void captureImageResult(CaptureImageResultResponse response) {
       Integer messageId = response.getMessageId();
 
-      for(CaptureImageOrDoOcrRequest request : captureImageOrDoOcrListeners.keySet()) {
+      for(RequestWithAsynchronousResponse request : captureImageOrDoOcrListeners.keySet()) {
         if(messageId.equals(request.getMessageId())) {
           CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(request);
           listener.captureImageResult(response.getResult());
@@ -349,7 +448,7 @@ public class Communicator {
     public void ocrResult(OcrResultResponse response) {
       Integer messageId = response.getMessageId();
 
-      for(CaptureImageOrDoOcrRequest request : captureImageOrDoOcrListeners.keySet()) {
+      for(RequestWithAsynchronousResponse request : captureImageOrDoOcrListeners.keySet()) {
         if(messageId.equals(request.getMessageId())) {
           CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(request);
           listener.ocrResult(response.getTextRecognitionResult());

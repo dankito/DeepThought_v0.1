@@ -1,7 +1,7 @@
 package net.deepthought.data.contentextractor.ocr;
 
 import net.deepthought.Application;
-import net.deepthought.communication.model.CaptureImageOrDoOcrConfiguration;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.CreateEntryListener;
@@ -84,7 +84,7 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor {
 
 
   @Override
-  public void recognizeTextAsync(final CaptureImageOrDoOcrConfiguration configuration, final RecognizeTextListener listener) {
+  public void recognizeTextAsync(final DoOcrConfiguration configuration, final RecognizeTextListener listener) {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
@@ -93,7 +93,7 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor {
     });
   }
 
-  protected abstract void recognizeText(CaptureImageOrDoOcrConfiguration configuration, RecognizeTextListener listener);
+  protected abstract void recognizeText(DoOcrConfiguration configuration, RecognizeTextListener listener);
 
 
   @Override

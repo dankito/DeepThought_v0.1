@@ -193,7 +193,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageOrDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
