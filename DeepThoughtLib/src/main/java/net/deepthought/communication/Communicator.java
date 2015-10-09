@@ -224,6 +224,7 @@ public class Communicator {
 
   public void stopCaptureImageAndDoOcr(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
     RequestWithAsynchronousResponse captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
+    removeFromCaptureImageOrDoOcrListenersMap(captureRequest);
     if(captureRequest == null) {
       log.error("stopCaptureImageOrDoOcr() has been called but no CaptureImageOrDoOcrRequest has been found for listenerToUnset");
       return;
@@ -245,7 +246,6 @@ public class Communicator {
     for(Map.Entry<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
       if(entry.getValue() == listenerToUnset) {
         request = entry.getKey();
-        captureImageOrDoOcrListeners.remove(request);
         break;
       }
     }
@@ -439,6 +439,8 @@ public class Communicator {
           CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(request);
           listener.captureImageResult(response.getResult());
 
+          if(response.getResult().isDone())
+            removeFromCaptureImageOrDoOcrListenersMap(request);
           break;
         }
       }
@@ -453,6 +455,8 @@ public class Communicator {
           CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(request);
           listener.ocrResult(response.getTextRecognitionResult());
 
+          if(response.getTextRecognitionResult().isDone())
+            removeFromCaptureImageOrDoOcrListenersMap(request);
           break;
         }
       }
@@ -463,5 +467,9 @@ public class Communicator {
 
     }
   };
+
+  protected void removeFromCaptureImageOrDoOcrListenersMap(RequestWithAsynchronousResponse request) {
+    captureImageOrDoOcrListeners.remove(request);
+  }
 
 }

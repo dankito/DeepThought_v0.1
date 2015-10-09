@@ -55,6 +55,8 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
   protected Label lblTitle = null;
 
+  protected Label lblDoOcrProgress = null;
+
   protected HBox pnConnectedDevices = new HBox();
 
 
@@ -100,6 +102,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.LEFT, false));
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.RIGHT, false));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.RIGHT, false));
 
     if(title != null) {
       lblTitle = new Label();
@@ -107,7 +110,10 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
       titlePane.add(lblTitle, 0, 0);
     }
 
-    titlePane.add(pnConnectedDevices, 2, 0);
+    lblDoOcrProgress = new Label();
+    titlePane.add(lblDoOcrProgress, 2, 0);
+
+    titlePane.add(pnConnectedDevices, 3, 0);
 
     setTitle(titlePane);
   }
@@ -222,12 +228,13 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   }
 
   protected void doOcrForSelectedFiles(final ConnectedDevice connectedDevice, List<File> selectedFiles) {
+    // TODO: what if doOcrForSelectedFiles() gets called a second time before first call has finished? Than there exist two parallel imagesToRecognize -> avoid
     final Queue<File> imagesToRecognize = new LinkedList<>(selectedFiles);
     final int totalAmountOfImages = selectedFiles.size();
     final AtomicInteger currentImageIndex = new AtomicInteger(0);
     final ObjectHolder<File> currentImage = new ObjectHolder(imagesToRecognize.poll());
-//    lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", 0, totalAmountOfImages));
-//    lblDoOcrProgress.setVisible(true);
+    lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", 0, totalAmountOfImages));
+    lblDoOcrProgress.setVisible(true);
 
     Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, new CaptureImageOrDoOcrResponseListener() {
       @Override
@@ -237,15 +244,18 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
       @Override
       public void ocrResult(TextRecognitionResult ocrResult) {
-//        lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", currentImageIndex.incrementAndGet(), totalAmountOfImages));
         captureImageOrDoOcrResponseListener.ocrResult(ocrResult);
 
-        if (imagesToRecognize.size() > 0) {
+        if (ocrResult.isDone() && imagesToRecognize.size() > 0) {
           currentImage.set(imagesToRecognize.poll());
           Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, this);
-        } else {
-//          lblDoOcrProgress.setVisible(false);
         }
+
+        Platform.runLater(() -> {
+        lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", currentImageIndex.incrementAndGet(), totalAmountOfImages));
+          if(imagesToRecognize.size() == 0)
+            lblDoOcrProgress.setVisible(false);
+        });
       }
     });
   }
