@@ -11,33 +11,33 @@ tasks.withType(Compile) {
 }
 
 
-// to implement a separate folder structure for integration tests
-sourceSets {
-    integrationTest {
-        java.srcDir file('src/integTest/java')
-        resources.srcDir file('src/integTest/resources')
-        compileClasspath = sourceSets.main.output + configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
-    }
-}
-
-task integrationTest(type: Test) {
-    description = 'Runs the integration tests.'
-    group = 'verification'
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    // TODO: produces error: Error:(28, 0) Could not find property 'testResultsDirs' on task ':DeepThoughtLib:integrationTest'.
-    //testResultsDir = file("$testResultsDirs/integration")
-}
+//// to implement a separate folder structure for integration tests
+//sourceSets {
+//    integrationTest {
+//        java.srcDir file('src/integTest/java')
+//        resources.srcDir file('src/integTest/resources')
+//        compileClasspath = sourceSets.main.output + configurations.testRuntime
+//        runtimeClasspath = output + compileClasspath
+//    }
+//}
+//
+//task integrationTest(type: Test) {
+//    description = 'Runs the integration tests.'
+//    group = 'verification'
+//    testClassesDir = sourceSets.integrationTest.output.classesDir
+//    classpath = sourceSets.integrationTest.runtimeClasspath
+//    // TODO: produces error: Error:(28, 0) Could not find property 'testResultsDirs' on task ':DeepThoughtLib:integrationTest'.
+//    //testResultsDir = file("$testResultsDirs/integration")
+//}
 
 // apply some code analysis with JaCoCo on integration tests (not that senseful actually, apply it to unit tests)
 
-apply plugin: 'jacoco'
-
-task jacocoIntegrationTestReport(type: JacocoReport) {
-    sourceSets sourceSets.main
-    executionData integrationTest
-}
+//apply plugin: 'jacoco'
+//
+//task jacocoIntegrationTestReport(type: JacocoReport) {
+//    sourceSets sourceSets.main
+//    executionData integrationTest
+//}
 
 // apply versioning
 allprojects {
