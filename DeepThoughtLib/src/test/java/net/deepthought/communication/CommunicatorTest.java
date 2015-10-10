@@ -263,7 +263,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), imageData, false, false, null);
 
-    try { waitLatch.await(2, TimeUnit.HOURS); } catch(Exception ex) { }
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
     Assert.assertArrayEquals(imageData, receivedImageData.get());

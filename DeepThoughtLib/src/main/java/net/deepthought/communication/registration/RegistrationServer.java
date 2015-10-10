@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -44,9 +45,12 @@ public class RegistrationServer {
 
   protected void startRegistrationServer() {
     try {
-      serverSocket = new DatagramSocket(Constants.RegistrationServerPort);
-      isSocketOpened = true;
+      serverSocket = new DatagramSocket(null);
+      serverSocket.setReuseAddress(true); // setReuseAddress() has to be called before bind() (therefore we may not pass port to DatagramSocket constructor)
+      serverSocket.bind(new InetSocketAddress(Constants.RegistrationServerPort));
+
       serverSocket.setBroadcast(true);
+      isSocketOpened = true;
 
       byte[] buffer = new byte[1024];
       DatagramPacket packet = new DatagramPacket(buffer, buffer.length);

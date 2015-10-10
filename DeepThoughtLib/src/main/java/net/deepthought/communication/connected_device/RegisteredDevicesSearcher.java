@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -71,9 +72,12 @@ public class RegisteredDevicesSearcher {
 
   protected void startServer() {
     try {
-      serverSocket = new DatagramSocket(Constants.RegisteredDevicesListenerPort);
-      isServerSocketOpened = true;
+      serverSocket = new DatagramSocket(null);
+      serverSocket.setReuseAddress(true);
+      serverSocket.bind(new InetSocketAddress(Constants.RegisteredDevicesListenerPort));
+
       serverSocket.setBroadcast(true);
+      isServerSocketOpened = true;
 
       byte[] buffer = new byte[1024];
       DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
