@@ -280,7 +280,10 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     FileLink imageFile = FileUtils.createCapturedImageFile();
     try {
       log.debug("Writing captured Image to file ...");
-      FileUtils.writeToFile(captureImageResult.getImageData(), imageFile);
+      if(captureImageResult.getImageUri() != null)
+        FileUtils.copyFile(new File(captureImageResult.getImageUri()), new File(imageFile.getUriString())); // TODO: move or copy file
+      else if(captureImageResult.getImageData() != null)
+        FileUtils.writeToFile(captureImageResult.getImageData(), imageFile);
       log.debug("Wrote to file, adding it to DeepThought ...");
       Application.getDeepThought().addFile(imageFile);
 

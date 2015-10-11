@@ -26,8 +26,8 @@ public class MultipartRequest extends RequestWithAsynchronousResponse {
     super(address, port);
     this.parts = parts;
 
-    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.DoOcrMultipartKeyAddress, MultipartType.Text, address));
-    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.DoOcrMultipartKeyPort, MultipartType.Text, Integer.toString(port)));
+    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyAddress, MultipartType.Text, address));
+    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyPort, MultipartType.Text, Integer.toString(port)));
   }
 
 

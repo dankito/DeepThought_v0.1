@@ -24,11 +24,15 @@ public class ConnectorMessagesCreator {
   public final static String SearchingForRegisteredDevicesMessage = "Searching for Registered Devices";
   public final static String RegisteredDeviceFoundMessage = "Registered Device Found";
 
-  public static final String DoOcrMultipartKeyAddress = "address";
-  public static final String DoOcrMultipartKeyPort = "port";
+  public static final String MultipartKeyAddress = "address";
+  public static final String MultipartKeyPort = "port";
+  public static final String MultipartKeyMessageId = "message_id";
 
   public static final String DoOcrMultipartKeyConfiguration = "configuration";
   public static final String DoOcrMultipartKeyImage = "image";
+
+  public static final String CaptureImageResultMultipartKeyResponse = "response";
+  public static final String CaptureImageResultMultipartKeyImage = "image";
 
 
   private final static Logger log = LoggerFactory.getLogger(ConnectorMessagesCreator.class);

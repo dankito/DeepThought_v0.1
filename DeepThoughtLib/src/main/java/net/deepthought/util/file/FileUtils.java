@@ -508,7 +508,6 @@ public class FileUtils {
     String imageFileName = createCapturedImagesTempFileName();
 
     File imageFile = new File(folder, imageFileName);
-    try { imageFile.createNewFile(); } catch(Exception ex) { log.error("Could not create file for captured image " + imageFileName, ex); }
 
     return new FileLink(imageFile.getAbsolutePath());
   }

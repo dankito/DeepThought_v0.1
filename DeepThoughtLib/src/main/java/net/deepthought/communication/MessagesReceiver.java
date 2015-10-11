@@ -13,6 +13,7 @@ import net.deepthought.communication.messages.ResponseValue;
 import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -163,8 +165,14 @@ public class MessagesReceiver extends NanoHTTPD {
 
   protected Response respondToCaptureImageResultResponse(IHTTPSession session) {
     log.debug("Parsing CaptureImageResultResponse ...");
-    CaptureImageResultResponse request = (CaptureImageResultResponse)parseRequestBody(session, CaptureImageResultResponse.class);
-    log.debug("Parsing done");
+    CaptureImageResultResponse request = null;
+    try {
+      request = parseCaptureImageResultResponseRequestBody(session);
+      log.debug("Parsing done");
+    } catch(Exception ex) {
+      log.error("Could not decode CaptureImageResultResponse Post Body", ex);
+      return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.Response.Denied);
+    }
 
     listener.captureImageResult(request);
 
@@ -222,23 +230,31 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected CaptureImageOrDoOcrRequest parseStartCaptureImageAndDoOcrRequestBody(IHTTPSession session) throws Exception {
-    String address = null;
-    int port = 0;
+    if(session.isMultipartMessage() == false) // a CaptureImageOrDoOcrRequest without ImageData. Just a normal Request Body, no Multipart Request Body
+      return (CaptureImageOrDoOcrRequest)parseRequestBody(session, CaptureImageOrDoOcrRequest.class);
+
+    return parseMultiPartStartCaptureImageAndDoOcrRequestBody(session);
+  }
+
+  protected CaptureImageOrDoOcrRequest parseMultiPartStartCaptureImageAndDoOcrRequestBody(IHTTPSession session) throws Exception {
+    Map<String, String> partFiles = parseMultipartRequestBody(session);
+
+    String address = getAddressFromMultipartRequest(partFiles);
+    int port = getPortFromMultipartRequest(partFiles);
+
+    DoOcrConfiguration configuration = parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(partFiles);
+
+    return new CaptureImageOrDoOcrRequest(address, port, configuration);
+  }
+
+  protected DoOcrConfiguration parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(Map<String, String> partFiles) throws IOException {
     DoOcrConfiguration configuration = null;
     String imageFileUri = null;
 
-    Map<String, String> partFiles = parseMultipartRequestBody(session);
     for(String partName : partFiles.keySet()) {
       String partFilename = partFiles.get(partName);
 
-      if(ConnectorMessagesCreator.DoOcrMultipartKeyAddress.equals(partName))
-        address = FileUtils.readTextFile(new File(partFilename));
-      else if(ConnectorMessagesCreator.DoOcrMultipartKeyPort.equals(partName)) {
-        String portString = FileUtils.readTextFile(new File(partFilename));
-        if(StringUtils.isNotNullOrEmpty(portString))
-          port = Integer.parseInt(portString);
-      }
-      else if(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration.equals(partName)) {
+      if(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration.equals(partName)) {
         String json = FileUtils.readTextFile(new File(partFilename));
         DeserializationResult<DoOcrConfiguration> result = JsonIoJsonHelper.parseJsonString(json, DoOcrConfiguration.class);
         if(result.successful())
@@ -259,7 +275,83 @@ public class MessagesReceiver extends NanoHTTPD {
     if(configuration != null)
       configuration.setImageUri(imageFileUri);
 
-    return new CaptureImageOrDoOcrRequest(address, port, configuration);
+    return configuration;
+  }
+
+  protected CaptureImageResultResponse parseCaptureImageResultResponseRequestBody(IHTTPSession session) throws Exception {
+    Map<String, String> partFiles = parseMultipartRequestBody(session);
+
+//    String address = getAddressFromMultipartRequest(partFiles);
+//    int port = getPortFromMultipartRequest(partFiles);
+    int messageId = getMessageIdFromMultipartRequest(partFiles);
+
+    CaptureImageResult captureImageResult = parseCaptureImageResultFromCaptureImageResultResponseRequestBody(partFiles);
+
+    return new CaptureImageResultResponse(captureImageResult, messageId);
+  }
+
+  protected CaptureImageResult parseCaptureImageResultFromCaptureImageResultResponseRequestBody(Map<String, String> partFiles) throws IOException {
+    CaptureImageResult captureImageResult = null;
+    String imageFileUri = null;
+
+    for(String partName : partFiles.keySet()) {
+      String partFilename = partFiles.get(partName);
+
+      if(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse.equals(partName)) {
+        String json = FileUtils.readTextFile(new File(partFilename));
+        DeserializationResult<CaptureImageResult> result = JsonIoJsonHelper.parseJsonString(json, CaptureImageResult.class);
+        if(result.successful())
+          captureImageResult = result.getResult();
+      }
+      else if(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage.equals(partName)) {
+        // as NanoHTTPD deletes all temp file as soon as message is handled (soon after this method returns)
+        // copy Image file to another temp file
+        // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
+        File tempFile = FileUtils.createTempFile();
+        tempFile.deleteOnExit();
+        FileUtils.moveFile(new File(partFilename), tempFile);
+//        FileUtils.copyFile(new File(partFilename), tempFile);
+        imageFileUri = tempFile.getAbsolutePath();
+      }
+    }
+
+    if(captureImageResult != null)
+      captureImageResult.setImageUri(imageFileUri);
+
+    return captureImageResult;
+  }
+
+  protected String getAddressFromMultipartRequest(Map<String, String> partFiles) throws IOException {
+    if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyAddress)) {
+      String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyAddress);
+      return FileUtils.readTextFile(new File(partFilename));
+    }
+
+    return null;
+  }
+
+  protected int getPortFromMultipartRequest(Map<String, String> partFiles) throws IOException {
+    if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyPort)) {
+      String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyPort);
+
+      String portString = FileUtils.readTextFile(new File(partFilename));
+      if(StringUtils.isNotNullOrEmpty(portString))
+        return Integer.parseInt(portString);
+    }
+
+    return 0;
+  }
+
+  protected int getMessageIdFromMultipartRequest(Map<String, String> partFiles) throws IOException {
+    if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyMessageId)) {
+      String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyMessageId);
+
+      String portString = FileUtils.readTextFile(new File(partFilename));
+      if(StringUtils.isNotNullOrEmpty(portString))
+        return Integer.parseInt(portString);
+    }
+
+    return -1;
   }
 
   protected Map<String, String> parseMultipartRequestBody(IHTTPSession session) throws Exception {

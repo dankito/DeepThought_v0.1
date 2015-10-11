@@ -64,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   protected static boolean hasDeepThoughtBeenSetup = false;
 
+  // make them static otherwise the will be cleaned up when starting TakePhoto Activity
+  protected static FileLink temporaryImageFile = null;
+  protected static CaptureImageOrDoOcrRequest captureImageRequest = null;
+
 
   protected ProgressDialog loadingDataProgressDialog = null;
 
@@ -350,27 +354,31 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
         break;
       case CaptureImageForConnectPeerRequestCode:
-        if(resultCode == RESULT_OK) {
-          if (captureImageRequest != null && temporaryImageFile != null) {
-            File imageFile = new File(temporaryImageFile.getUriString());
-            try {
-              byte[] imageData = FileUtils.readFile(imageFile);
-              Application.getDeepThoughtsConnector().getCommunicator().sendCaptureImageResult(captureImageRequest, imageData, null);
-            } catch (Exception ex) {
-              log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
-              // TODO: send error response
-            }
-
-            imageFile.delete();
-          }
-        }
-
-        temporaryImageFile = null;
-        captureImageRequest = null;
+        handleCaptureImageResult(resultCode);
         break;
     }
 
     super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  protected void handleCaptureImageResult(int resultCode) {
+    if(resultCode == RESULT_OK) {
+      if (captureImageRequest != null && temporaryImageFile != null) {
+        File imageFile = new File(temporaryImageFile.getUriString());
+        try {
+          byte[] imageData = FileUtils.readFile(imageFile);
+          Application.getDeepThoughtsConnector().getCommunicator().sendCaptureImageResult(captureImageRequest, imageData, null);
+        } catch (Exception ex) {
+          log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
+          // TODO: send error response
+        }
+
+        imageFile.delete();
+      }
+    }
+
+    temporaryImageFile = null;
+    captureImageRequest = null;
   }
 
   @Override
@@ -417,9 +425,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     }
   };
-
-  protected FileLink temporaryImageFile = null;
-  protected CaptureImageOrDoOcrRequest captureImageRequest = null;
 
   protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
     temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);

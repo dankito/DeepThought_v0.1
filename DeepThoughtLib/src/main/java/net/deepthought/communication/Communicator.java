@@ -193,15 +193,19 @@ public class Communicator {
   }
 
 
-  public void sendCaptureImageResult(final CaptureImageOrDoOcrRequest request, final byte[] imageBytes, final ResponseListener listener) {
+  public void sendCaptureImageResult(final CaptureImageOrDoOcrRequest request, final byte[] imageData, final ResponseListener listener) {
     String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
-    CaptureImageResult result = new CaptureImageResult(imageBytes);
-    final CaptureImageResultResponse response = new CaptureImageResultResponse(result, request.getMessageId());
+    CaptureImageResult result = new CaptureImageResult(imageData != null && imageData.length > 0);
 
-    sendMessageAsync(address, response, new CommunicatorResponseListener() {
+    final MultipartRequest multiPartResponse = new MultipartRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
+        new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyMessageId, MultipartType.Text, Integer.toString(request.getMessageId())),
+        new MultipartPart<CaptureImageResult>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse, MultipartType.Text, result),
+        new MultipartPart<byte[]>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage, MultipartType.Binary, imageData) });
+
+    sendMultipartMessageAsync(address, multiPartResponse, new CommunicatorResponseListener() {
       @Override
       public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(response, communicatorResponse, listener);
+        dispatchResponse(multiPartResponse, communicatorResponse, listener);
       }
     });
   }

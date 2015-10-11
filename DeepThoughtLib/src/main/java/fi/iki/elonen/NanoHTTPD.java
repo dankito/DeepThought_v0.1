@@ -945,22 +945,17 @@ public abstract class NanoHTTPD {
         // If the method is POST, there may be parameters
         // in data section, too, read it:
         if (Method.POST.equals(this.method)) {
-          String contentType = "";
-          String contentTypeHeader = this.headers.get("content-type");
+          String contentType = getContentType();
 
-          StringTokenizer st = null;
-          if (contentTypeHeader != null) {
-            st = new StringTokenizer(contentTypeHeader, ",; ");
-            if (st.hasMoreTokens()) {
-              contentType = st.nextToken();
-            }
-          }
-
-          if ("multipart/form-data".equalsIgnoreCase(contentType)) {
+          if (isMultipartMessage()) {
             // Handle multipart/form-data
-            if (!st.hasMoreTokens()) {
-              throw new ResponseException(Response.Status.BAD_REQUEST,
-                  "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
+            String contentTypeHeader = this.headers.get("content-type");
+            if(contentTypeHeader != null) {
+              StringTokenizer st = new StringTokenizer(contentTypeHeader, ",; ");
+              if (!st.hasMoreTokens()) {
+                throw new ResponseException(Response.Status.BAD_REQUEST,
+                    "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html");
+              }
             }
 
             decodeMultipartFormData(fbuf, files);
@@ -984,6 +979,31 @@ public abstract class NanoHTTPD {
       } finally {
         safeClose(randomAccessFile);
       }
+    }
+
+    @Override
+    public String getContentType() {
+      String contentType = "";
+      String contentTypeHeader = this.headers.get("content-type");
+
+      StringTokenizer st = null;
+      if (contentTypeHeader != null) {
+        st = new StringTokenizer(contentTypeHeader, ",; ");
+        if (st.hasMoreTokens()) {
+          contentType = st.nextToken();
+        }
+      }
+
+      return contentType;
+    }
+
+    @Override
+    public boolean isMultipartMessage() {
+      return isMultipartMessage(getContentType());
+    }
+
+    protected boolean isMultipartMessage(String contentType) {
+      return "multipart/form-data".equalsIgnoreCase(contentType);
     }
 
     @Override
@@ -1075,6 +1095,10 @@ public abstract class NanoHTTPD {
     void parseBody(Map<String, String> files) throws IOException, ResponseException;
 
     void decodeMultipartFormData(ByteBuffer fbuf, Map<String, String> files) throws ResponseException;
+
+    String getContentType();
+
+    boolean isMultipartMessage();
 
     void storeIncomingDataToBuffer(DataOutput request_data_output, int bufferLength) throws IOException;
 

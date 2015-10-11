@@ -16,12 +16,15 @@ import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
-import net.deepthought.data.helper.FileHelper;
 import net.deepthought.util.ObjectHolder;
+import net.deepthought.util.file.FileUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -34,6 +37,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by ganymed on 20/08/15.
  */
 public class CommunicatorTest extends CommunicationTestBase {
+
+  private final static Logger log = LoggerFactory.getLogger(CommunicatorTest.class);
+
 
   @Override
   public void setup() {
@@ -249,7 +255,7 @@ public class CommunicatorTest extends CommunicationTestBase {
         methodCalled.set(true);
         try {
           receivedImageData.set(request.readBytesFromImageUri());
-        } catch(Exception ex) { }
+        } catch (Exception ex) { log. error("Could not get image data from CaptureImageOrDoOcrRequest", ex); }
         waitLatch.countDown();
       }
 
@@ -259,7 +265,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] imageData = new byte[] { 47, 11 };
+    byte[] imageData = getTestImage();
 
     communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), imageData, false, false, null);
 
@@ -289,7 +295,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] imageData = new byte[] { 47, 11 };
+    byte[] imageData = getTestImage();
 
     communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
         imageData, false, false, new CaptureImageOrDoOcrResponseListener() {
@@ -333,7 +339,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] imageData = FileHelper.loadTestImage();
+    byte[] imageData = getTestImage();
 
     communicator.sendCaptureImageResult(request, imageData, null);
 
@@ -353,7 +359,12 @@ public class CommunicatorTest extends CommunicationTestBase {
     connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
       @Override
       public void captureImageResult(CaptureImageResult captureImageResult) {
-        receivedImageData.add(captureImageResult.getImageData());
+        try {
+          if(captureImageResult.getImageData() != null)
+            receivedImageData.add(captureImageResult.getImageData());
+          else if(captureImageResult.getImageUri() != null)
+            receivedImageData.add(FileUtils.readFile(new File(captureImageResult.getImageUri())));
+        } catch(Exception ex) { log. error("Could not get image data from CaptureImageResult", ex); }
         waitLatch.countDown();
       }
 
@@ -363,11 +374,12 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    byte[] sentImageData = FileHelper.loadTestImage();
+    byte[] sentImageData = getTestImage();
 
     communicator.sendCaptureImageResult(request, sentImageData, null);
 
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(2, TimeUnit.SECONDS);
+    } catch (Exception ex) { }
 
     Assert.assertEquals(1, receivedImageData.size());
     Assert.assertEquals(sentImageData.length, receivedImageData.get(0).length);
@@ -426,7 +438,8 @@ public class CommunicatorTest extends CommunicationTestBase {
     communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
     communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(3, TimeUnit.SECONDS);
+    } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
   }
@@ -451,7 +464,8 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(3, TimeUnit.SECONDS);
+    } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
   }
@@ -475,7 +489,9 @@ public class CommunicatorTest extends CommunicationTestBase {
     communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
     Assert.assertEquals(1, communicator.captureImageOrDoOcrListeners.size());
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(3, TimeUnit.SECONDS);
+    } catch (Exception ex) {
+    }
 
     Assert.assertEquals(0, communicator.captureImageOrDoOcrListeners.size());
   }
@@ -510,6 +526,12 @@ public class CommunicatorTest extends CommunicationTestBase {
     hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
 
     return hostInfo;
+  }
+
+
+  protected byte[] getTestImage() throws IOException {
+//    return FileHelper.loadTestImage();
+    return new byte[] { 47, 11 };
   }
 
 

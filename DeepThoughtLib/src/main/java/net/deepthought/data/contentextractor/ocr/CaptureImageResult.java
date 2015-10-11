@@ -20,15 +20,21 @@ public class CaptureImageResult {
 
   protected byte[] imageData = null;
 
+  protected String imageUri = null;
+
 
   public CaptureImageResult() {
 
   }
 
-  public CaptureImageResult(byte[] imageData) {
-      this.imageData = imageData;
+  public CaptureImageResult(boolean successful) {
+    this.successful = successful;
+  }
 
-    this.successful = true;
+  public CaptureImageResult(byte[] imageData) {
+    this(true);
+
+    this.imageData = imageData;
   }
 
   public boolean isUserCancelled() {
@@ -65,6 +71,14 @@ public class CaptureImageResult {
 
   public void setImageData(byte[] imageData) {
     this.imageData = imageData;
+  }
+
+  public String getImageUri() {
+    return imageUri;
+  }
+
+  public void setImageUri(String imageUri) {
+    this.imageUri = imageUri;
   }
 
 
