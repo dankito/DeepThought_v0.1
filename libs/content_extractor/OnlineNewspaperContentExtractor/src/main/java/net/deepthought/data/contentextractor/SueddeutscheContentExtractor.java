@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -226,9 +227,27 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     for(Element imageDivision : imageDivisions) {
       if("div".equals(imageDivision.nodeName()))
         galleryHtml += extractImageFromFigureNode(imageDivision.parent());
+      else if("figure".equals(imageDivision.nodeName()))
+        galleryHtml += parseInlineGalleryFromFigureNode(imageDivision);
     }
 
     return galleryHtml;
+  }
+
+  protected String parseInlineGalleryFromFigureNode(Element figureNode) {
+    Elements anchors = figureNode.getElementsByTag("a");
+    for(Element anchor : anchors) {
+      if(anchor.hasAttr("data-pagetype") && anchor.attr("data-pagetype").contains("image") && anchor.attr("data-pagetype").contains("gallery")) {
+        String galleryUrl = anchor.attr("href");
+        try {
+          return readHtmlOfAllImagesInGalleryOfUrl(galleryUrl);
+        } catch(Exception ex) {
+          log.error("Could not read Inline Gallery from Url " + galleryUrl, ex);
+        }
+      }
+    }
+
+    return "";
   }
 
   protected String extractImageFromFigureNode(Element figureNode) {
@@ -290,13 +309,21 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     String url = getUrlOfNextImageInGallery(articleBodyElement);
     if(url != null) {
       try {
-        Document document = retrieveOnlineDocument(url);
-        content += readHtmlOfAllImagesInGallery(getElementByClassAndNodeName(document.body(), "div", "body"));
+        content += readHtmlOfAllImagesInGalleryOfUrl(url);
       } catch (Exception ex) {
         log.error("Could not retrieve Html Document for next image in Gallery. Next Image Url was " + url + Application.getPlatformConfiguration().getLineSeparator() + "Current image article body element: " + articleBodyElement.outerHtml(), ex);
       }
     }
 
+
+    return content;
+  }
+
+  protected String readHtmlOfAllImagesInGalleryOfUrl(String url) throws IOException {
+    String content = "";
+
+    Document document = retrieveOnlineDocument(url);
+    content += readHtmlOfAllImagesInGallery(getElementByClassAndNodeName(document.body(), "div", "body"));
 
     return content;
   }

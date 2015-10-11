@@ -102,7 +102,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithInlineImageGallery() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/wirtschaft/preise-alles-wird-teurer-nicht-1.2539186");
-    testImportedArticleValues(creationResult, 2833, "27.06.2015", "Alles wird teurer. Nicht.", "Preise",
+    testImportedArticleValues(creationResult, 3099, "27.06.2015", "Alles wird teurer. Nicht.", "Preise",
         "Ob im Supermarkt oder der Bäckerei, alles scheint teurer zu werden. Doch dieses Gefühl trügt. In Wahrheit sind viele Produkte heute viel schneller verdient als früher.");
 
     Assert.assertEquals(6, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
