@@ -197,8 +197,7 @@ public class Communicator {
     String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
     CaptureImageResult result = new CaptureImageResult(imageData != null && imageData.length > 0);
 
-    final MultipartRequest multiPartResponse = new MultipartRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
-        new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyMessageId, MultipartType.Text, Integer.toString(request.getMessageId())),
+    final MultipartRequest multiPartResponse = new MultipartRequest(request.getMessageId(), NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
         new MultipartPart<CaptureImageResult>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse, MultipartType.Text, result),
         new MultipartPart<byte[]>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage, MultipartType.Binary, imageData) });
 
@@ -276,7 +275,7 @@ public class Communicator {
     try {
       HttpEntity postEntity = createPostBody(request);
 
-      sendMessage(address, postEntity, responseClass);
+      return sendMessage(address, postEntity, responseClass);
     } catch(Exception ex) {
       log.error("Could not send message to address " + address + " for Request " + request, ex);
     }

@@ -241,10 +241,11 @@ public class MessagesReceiver extends NanoHTTPD {
 
     String address = getAddressFromMultipartRequest(partFiles);
     int port = getPortFromMultipartRequest(partFiles);
+    int messageId = getMessageIdFromMultipartRequest(partFiles);
 
     DoOcrConfiguration configuration = parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(partFiles);
 
-    return new CaptureImageOrDoOcrRequest(address, port, configuration);
+    return new CaptureImageOrDoOcrRequest(messageId, address, port, configuration);
   }
 
   protected DoOcrConfiguration parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(Map<String, String> partFiles) throws IOException {
@@ -266,8 +267,7 @@ public class MessagesReceiver extends NanoHTTPD {
         // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
         File tempFile = FileUtils.createTempFile();
         tempFile.deleteOnExit();
-        FileUtils.moveFile(new File(partFilename), tempFile);
-//        FileUtils.copyFile(new File(partFilename), tempFile);
+        FileUtils.copyFile(new File(partFilename), tempFile);
         imageFileUri = tempFile.getAbsolutePath();
       }
     }
@@ -309,8 +309,7 @@ public class MessagesReceiver extends NanoHTTPD {
         // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
         File tempFile = FileUtils.createTempFile();
         tempFile.deleteOnExit();
-        FileUtils.moveFile(new File(partFilename), tempFile);
-//        FileUtils.copyFile(new File(partFilename), tempFile);
+        FileUtils.copyFile(new File(partFilename), tempFile);
         imageFileUri = tempFile.getAbsolutePath();
       }
     }

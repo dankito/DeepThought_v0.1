@@ -20,13 +20,25 @@ public class CaptureImageOrDoOcrRequest extends RequestWithAsynchronousResponse 
   }
 
   public CaptureImageOrDoOcrRequest(String ipAddress, int port, boolean captureImage, boolean doOcr) {
-    super(ipAddress, port);
+    this(getNextMessageId(), ipAddress, port, captureImage, doOcr);
+    this.captureImage = captureImage;
+    this.doOcr = doOcr;
+  }
+
+  public CaptureImageOrDoOcrRequest(int messageId, String ipAddress, int port, boolean captureImage, boolean doOcr) {
+    super(messageId, ipAddress, port);
     this.captureImage = captureImage;
     this.doOcr = doOcr;
   }
 
   public CaptureImageOrDoOcrRequest(String ipAddressString, int messageReceiverPort, DoOcrConfiguration configuration) {
     this(ipAddressString, messageReceiverPort, false, true);
+    this.configuration = configuration;
+  }
+
+  public CaptureImageOrDoOcrRequest(int messageId, String ipAddressString, int messageReceiverPort, DoOcrConfiguration configuration) {
+    this(messageId, ipAddressString, messageReceiverPort, false, true);
+
     this.configuration = configuration;
   }
 

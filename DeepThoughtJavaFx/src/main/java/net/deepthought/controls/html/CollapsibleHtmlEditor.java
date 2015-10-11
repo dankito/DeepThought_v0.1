@@ -293,7 +293,6 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     } catch(Exception ex) {
       log.error("Could not save Captured Image to file " + imageFile.getUriString(), ex);
     }
-
   }
 
 

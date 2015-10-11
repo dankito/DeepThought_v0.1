@@ -23,11 +23,20 @@ public class MultipartRequest extends RequestWithAsynchronousResponse {
   }
 
   public MultipartRequest(String address, int port, List<MultipartPart> parts) {
-    super(address, port);
+    this(getNextMessageId(), address, port, parts);
+  }
+
+  public MultipartRequest(int messageId, String address, int port, MultipartPart[] parts) {
+    this(messageId, address, port, new ArrayList<MultipartPart>(Arrays.asList(parts)));
+  }
+
+  public MultipartRequest(int messageId, String address, int port, List<MultipartPart> parts) {
+    super(messageId, address, port);
     this.parts = parts;
 
     parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyAddress, MultipartType.Text, address));
     parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyPort, MultipartType.Text, Integer.toString(port)));
+    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyMessageId, MultipartType.Text, Integer.toString(messageId)));
   }
 
 

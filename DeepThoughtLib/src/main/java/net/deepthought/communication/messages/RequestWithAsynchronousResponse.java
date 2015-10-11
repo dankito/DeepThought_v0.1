@@ -16,11 +16,22 @@ public class RequestWithAsynchronousResponse extends Request {
 
 
   protected RequestWithAsynchronousResponse() {
-    this.messageId = MessageId++;
+    this(getNextMessageId());
+  }
+
+  protected RequestWithAsynchronousResponse(int messageId) {
+    this.messageId = messageId;
   }
 
   public RequestWithAsynchronousResponse(String address, int port) {
     this();
+
+    this.address = address;
+    this.port = port;
+  }
+
+  public RequestWithAsynchronousResponse(int messageId, String address, int port) {
+    this(messageId);
 
     this.address = address;
     this.port = port;
@@ -38,4 +49,11 @@ public class RequestWithAsynchronousResponse extends Request {
   public int getMessageId() {
     return messageId;
   }
+
+
+
+  protected static int getNextMessageId() {
+    return MessageId++;
+  }
+
 }

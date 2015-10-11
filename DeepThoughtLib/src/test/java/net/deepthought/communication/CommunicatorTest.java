@@ -236,7 +236,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
     Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
