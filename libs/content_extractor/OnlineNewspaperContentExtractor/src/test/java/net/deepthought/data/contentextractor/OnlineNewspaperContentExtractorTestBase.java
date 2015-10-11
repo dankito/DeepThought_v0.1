@@ -53,8 +53,10 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
 
     Assert.assertTrue(result.getCategories().size() > 0);
     Category periodicalCategory = null;
+    String newspaperName = contentExtractor.getNewspaperName().toLowerCase();
     for(Category category : result.getCategories()) {
-      if(contentExtractor.getNewspaperName().toLowerCase().contains(category.getName())) // 'jetzt' Category Name is only contained in Newspaper Name 'SZ Jetzt'
+      String categoryName = category.getName().toLowerCase();
+      if(categoryName.contains(newspaperName) || newspaperName.contains(categoryName)) // 'jetzt' Category Name is only contained in Newspaper Name 'SZ Jetzt'
         periodicalCategory = category;
     }
     Assert.assertNotNull(periodicalCategory);

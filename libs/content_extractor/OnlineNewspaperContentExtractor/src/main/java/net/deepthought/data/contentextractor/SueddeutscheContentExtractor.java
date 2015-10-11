@@ -144,7 +144,6 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     }
 
     entry.setContent(content.replaceAll("\u00A0", " ")); // Converting nbsp entities
-//    Application.getDeepThought().addEntry(entry);
 
     return entry;
   }
@@ -210,10 +209,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       if(imageGalleryElement != null)
         return parseInlineImageGallery(topEnrichmentElements.get(0));
 
-      Element panoramaElement = getElementByClassAndNodeName(topEnrichmentElements.get(0), "div", "panorama");
-      if(panoramaElement != null && panoramaElement.hasClass("basebox") && panoramaElement.hasClass("include")) {
-        makeLazyLoadingChildrenEagerLoading(panoramaElement);
-        return panoramaElement.outerHtml();
+      Element includeElement = getElementByClassAndNodeName(topEnrichmentElements.get(0), "div", "include");
+      if(includeElement != null && includeElement.hasClass("basebox")) {
+        makeLazyLoadingChildrenEagerLoading(includeElement);
+        return includeElement.outerHtml();
       }
     }
 

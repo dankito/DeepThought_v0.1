@@ -54,28 +54,28 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importDiePharmaindustrieIstSchlimmerAlsDieMafiaArticle() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/gesundheit/kritik-an-arzneimittelherstellern-die-pharmaindustrie-ist-schlimmer-als-die-mafia-1.2267631");
-    testImportedArticleValues(creationResult, 19219, "06.02.2015", "\"Die Pharmaindustrie ist schlimmer als die Mafia\"", "Kritik an Arzneimittelherstellern",
+    testImportedArticleValues(creationResult, 19211, "06.02.2015", "\"Die Pharmaindustrie ist schlimmer als die Mafia\"", "Kritik an Arzneimittelherstellern",
         "Medikamente sollen uns ein langes, gesundes Leben bescheren. Doch die Pharmaindustrie bringt mehr Menschen um als die Mafia, sagt der dänische Mediziner Peter C. Gøtzsche - und fordert für die Branche eine Revolution.");
   }
 
   @Test
   public void importArticleWithMultiplePages() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/kultur/reich-und-arm-willkommen-in-der-staendegesellschaft--1.2419985");
-    testImportedArticleValues(creationResult, 10643, "03.04.2015", "Dummköpfe ante portas", "Soziale Gerechtigkeit in Deutschland",
+    testImportedArticleValues(creationResult, 10627, "03.04.2015", "Dummköpfe ante portas", "Soziale Gerechtigkeit in Deutschland",
         "Vom Kindergarten bis zum Erbe - Ungerechtigkeit. Zwei Bücher beleuchten das deutsche Klassensystem aus unterschiedlicher Perspektive. Die Autoren kommen zum selben Ergebnis.");
   }
 
   @Test
   public void importArticleWithMultiplePagesAndStartImageForEach() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/karriere/arbeitszeitmodelle-arbeiten-nach-dem-lustprinzip-1.2373716");
-    testImportedArticleValues(creationResult, 18237, "13.03.2015", "Arbeiten nach dem Lustprinzip", "Arbeitszeitmodelle",
+    testImportedArticleValues(creationResult, 18197, "13.03.2015", "Arbeiten nach dem Lustprinzip", "Arbeitszeitmodelle",
         "Führungskraft in Teilzeit, Sparen für das Freizeit-Konto oder Rentnerin auf Abruf: Manche Firmen lassen ihre Beschäftigten arbeiten, wie sie wollen. Fünf Arbeitnehmer berichten.");
   }
 
   @Test
   public void importArticleWithGraphics() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/fluechtlingspolitik-so-viel-kostet-die-festung-europa-1.2516084");
-    testImportedArticleValues(creationResult, 7223, "18.06.2015", "So viel kostet die Festung Europa", "Flüchtlingspolitik",
+    testImportedArticleValues(creationResult, 7257, "18.06.2015", "So viel kostet die Festung Europa", "Flüchtlingspolitik",
         "Das Datenprojekt Migrants Files hat einen Teil der Kosten für die Abschottungspolitik der EU zusammengetragen. Die meisten Kosten entstehen bei der Abschiebung von Flüchtlingen. Zwischen 2000 und 2014 haben die Mitgliedsstaaten sowie Norwegen und die Schweiz dafür 11,3 Milliarden Euro ausgegeben. 1,6 Milliarden Euro entfallen auf Grenzschutzmaßnahmen.");
 
     Assert.assertEquals(4, StringUtils.getNumberOfOccurrences("<div class=\"basebox ", creationResult.getCreatedEntry().getContent()));
@@ -84,7 +84,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithImages() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/muenchen/ebersberg/schloss-falkenberg-wo-der-pappenheimer-wohnte-1.2517879");
-    testImportedArticleValues(creationResult, 9944, "18.06.2015", "Wo der Pappenheimer wohnte", "Schloss Falkenberg",
+    testImportedArticleValues(creationResult, 9928, "18.06.2015", "Wo der Pappenheimer wohnte", "Schloss Falkenberg",
         "Die Wittelsbacher ließen im frühen zwölften Jahrhundert in Falkenberg eine Burg errichten, auf deren Ruinen das spätere Schloss entstand. In den 436 Jahren seines Bestehens wurde das Schloss insgesamt 18 Mal verkauft, alleine zwölf Mal in den vergangenen 200 Jahren, nur acht Mal wurde es vererbt Viele Münchner kennen heute den Biergarten, nicht aber das Schloss.");
 
     Assert.assertEquals(2, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
@@ -93,7 +93,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importImageGalleryArticle() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/jahre-schlacht-von-waterloo-blutrot-sind-hier-nur-die-uniformen-1.2528430");
-    testImportedArticleValues(creationResult, 9856, "19.06.2015", "Blutrot sind hier nur die Uniformen", "200 Jahre Schlacht von Waterloo",
+    testImportedArticleValues(creationResult, 10342, "19.06.2015", "Blutrot sind hier nur die Uniformen", "200 Jahre Schlacht von Waterloo",
         "Es ist ein Spiel, das mit großem Ernst betrieben wird: 5000 Geschichtsfans stellen in Belgien die Schlacht von Waterloo nach. Auf historische Authentizität legen sie großen Wert. Doch das klappt nicht immer.");
 
     Assert.assertEquals(18, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
@@ -111,7 +111,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithInlineImageGalleryAndContent() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/muenchen/stellwerk-in-tuessling-abschied-von-der-eisenbahn-nostalgie-1.2527297");
-    testImportedArticleValues(creationResult, 8879, "19.06.2015", "Abschied von der Eisenbahn-Nostalgie", "Stellwerk in Tüssling",
+    testImportedArticleValues(creationResult, 8964, "19.06.2015", "Abschied von der Eisenbahn-Nostalgie", "Stellwerk in Tüssling",
             "In einem Stellwerk in Tüßling werden Weichen und Signale noch per Hand gesteuert: Züge nach Mühldorf und Freilassing leitet ein Fahrdienstleister mit Hebeln und Drahtseilen. " +
             "Auch während der Fahrt mit einem ganz normalen Zug kann man dort Einblicke in die Historie der Eisenbahn erleben: Einige Streckenabschnitte funktionieren schon mit moderner Technik. " +
             "2016 sollen Stellwerk und Weichenwärterhäuschen abgerissen werden - die Modernisierung wird vor allem von den Industriebetrieben im bayerischen Chemiedreieck gefordert.");
@@ -122,7 +122,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void checkIfImportingWrongAbstractBugHasBeenFixed() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/jahre-wiener-kongress-europa-feiernd-neu-ausgekungelt-1.2135536");
-    testImportedArticleValues(creationResult, 12459, "18.09.2014", "Europa feiernd neu ausgekungelt", "200 Jahre Wiener Kongress",
+    testImportedArticleValues(creationResult, 12427, "18.09.2014", "Europa feiernd neu ausgekungelt", "200 Jahre Wiener Kongress",
         "Am 18. September 1814 beginnen die Gegner Napoleons in Wien, Europa neu zu ordnen. Der Machtpoker gleicht einer Riesenparty, sorgt für kuriose Amouren und führt zu Entscheidungen, die teilweise 200 Jahre später nachwirken.");
 
     Assert.assertEquals(4, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
@@ -163,15 +163,24 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithInteractiveGraphics() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/sport/grafik-zu-bundesliga-transfers-darmstadt-pluendert-die-liga-1.2628259");
-    testImportedArticleValues(creationResult, 10205, "02.09.2015", "Darmstadt plündert die Liga", "Grafik zu Bundesliga-Transfers",
+    testImportedArticleValues(creationResult, 10200, "02.09.2015", "Darmstadt plündert die Liga", "Grafik zu Bundesliga-Transfers",
         "Der Audi-Klub Ingolstadt ist bescheidener als der Traditionsverein Darmstadt, das kleine Sinsheim wird multikulturell - und Bayern wildert in Italien. Unsere Transfergrafik zeigt, wie Zugänge die Bundesliga verändern.");
   }
 
   @Test
-  public void questionsAreMissing() {
+  public void interviewQuestionsAreMissing() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/wirtschaft/abschiebung-psychisch-kranker-es-ist-immer-noch-ueblich-patienten-sozial-zu-isolieren-1.2542962?reduced=true");
-    testImportedArticleValues(creationResult, 8158, "02.07.2015", "\"Es ist immer noch üblich, Patienten sozial zu isolieren\"", "Abschiebung psychisch Kranker",
+    testImportedArticleValues(creationResult, 8284, "02.07.2015", "\"Es ist immer noch üblich, Patienten sozial zu isolieren\"", "Abschiebung psychisch Kranker",
         "Kaum etwas fürchten Menschen so sehr, wie nicht mehr gebraucht zu werden. Macht der Kapitalismus uns zum Wegwerfartikel? Ein Gespräch mit Klaus Dörner, einem großen Reformer der Psychiatrie.");
+
+    Assert.assertFalse(creationResult.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
+  }
+
+  @Test
+  public void testGraphicInSummaryIsIncluded() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/panorama/katholische-kirche-so-viel-geld-haben-deutschlands-bistuemer-1.2679236");
+    testImportedArticleValues(creationResult, 7217, "07.10.2015", "So viel Geld haben Deutschlands Bistümer", "Katholische Kirche",
+        "Das Bistum Paderborn besitzt mehr als vier Milliarden Euro. Doch was sagt das über den Reichtum der Kirche insgesamt? Und welche Zahlen werden nicht verraten?");
 
     Assert.assertFalse(creationResult.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
   }
