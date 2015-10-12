@@ -76,7 +76,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
   protected Button btnAddFile;
 
 
-  VBox contentPane;
+  protected VBox contentPane;
 
   @FXML
   protected TreeTableView<FileLink> trtblvwFiles;
@@ -135,6 +135,10 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
+
+    searchAndSelectFilesControl.cleanUp();
+
+    clearSelectedFilesPreview();
 
     ((FileRootTreeItem)trtblvwFiles.getRoot()).cleanUp();
 
@@ -342,11 +346,15 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
   }
 
   protected void updateFilesSetOnEntityPreview() {
-    FXUtils.cleanUpChildrenAndClearPane(pnSelectedFilesPreview);
+    clearSelectedFilesPreview();
 
     for(FileLink file : new TreeSet<>(editedFiles.getEditedEntities())) {
       pnSelectedFilesPreview.getChildren().add(createFilePreviewLabel(file));
     }
+  }
+
+  protected void clearSelectedFilesPreview() {
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedFilesPreview);
   }
 
   protected void handleButtonAddFileAction(ActionEvent event) {

@@ -74,7 +74,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 21/12/14.
  */
-public class cleEditReferenceDialogController extends EntityDialogFrameController implements Initializable {
+public class EditReferenceDialogController extends EntityDialogFrameController implements Initializable {
 
   private final static Logger log = LoggerFactory.getLogger(EditReferenceDialogController.class);
 
