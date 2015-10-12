@@ -83,8 +83,11 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
-    mockNumberOfConnectedDevices(connector, 1);
-    connector.registeredDeviceDisconnectedListener.registeredDeviceDisconnected(new ConnectedDevice("", "", 0));
+    ConnectedDevice disconnectedDevice = new ConnectedDevice("", "", 0);
+    ConnectedDevicesManager mockConnectedDevicesManager = mockNumberOfConnectedDevices(connector, 1);
+    Mockito.when(mockConnectedDevicesManager.disconnectedFromDevice(disconnectedDevice)).thenReturn(true);
+
+    connector.registeredDeviceDisconnectedListener.registeredDeviceDisconnected(disconnectedDevice);
 
     Assert.assertTrue(connector.isRegisteredDevicesSearcherRunning());
   }
@@ -134,10 +137,12 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     Mockito.when(registeredDevicesManager.hasRegisteredDevices()).thenReturn(numberOfRegisteredDevices > 0);
   }
 
-  protected void mockNumberOfConnectedDevices(IDeepThoughtsConnector connector, int numberOfConnectedDevices) {
+  protected ConnectedDevicesManager mockNumberOfConnectedDevices(IDeepThoughtsConnector connector, int numberOfConnectedDevices) {
     ConnectedDevicesManager connectedDevicesManager = Mockito.mock(ConnectedDevicesManager.class);
     ((DeepThoughtsConnector)connector).setConnectedDevicesManager(connectedDevicesManager);
 
     Mockito.when(connectedDevicesManager.getConnectedDevicesCount()).thenReturn(numberOfConnectedDevices);
+
+    return connectedDevicesManager;
   }
 }
