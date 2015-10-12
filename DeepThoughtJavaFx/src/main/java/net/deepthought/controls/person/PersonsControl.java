@@ -86,6 +86,10 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     if(this.deepThought != null)
       this.deepThought.removeEntityListener(deepThoughtListener);
 
+    clearSelectedPersonsPreview();
+
+    searchAndSelectPersonsControl.cleanUp();
+
     personAddedEventHandler = null;
     personRemovedEventHandler = null;
   }
@@ -152,11 +156,15 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
   }
 
   protected void updatePersonsSetOnEntityPreview() {
-    FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersonsPreview);
+    clearSelectedPersonsPreview();
 
     for(Person person : new TreeSet<>(editedEntityPersons)) {
       pnSelectedPersonsPreview.getChildren().add(createPersonPreviewLabel(person));
     }
+  }
+
+  protected void clearSelectedPersonsPreview() {
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersonsPreview);
   }
 
   protected PersonLabel createPersonPreviewLabel(Person person) {

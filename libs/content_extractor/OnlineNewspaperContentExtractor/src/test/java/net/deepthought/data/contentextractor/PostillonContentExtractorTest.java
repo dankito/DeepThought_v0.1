@@ -31,23 +31,31 @@ public class PostillonContentExtractorTest extends GermanOnlineNewspaperContentE
   @Test
   public void importKolonieDeutschSuedostEuropaArtilce() {
     EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/kolonie-deutsch-sudosteuropa.html");
-    testImportedArticleValues(creationResult, 2532, "15.07.2015", "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze", "",
+    testImportedArticleValues(creationResult, 2513, "15.07.2015", "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze", "",
         "Kolonie Deutsch-Südosteuropa verabschiedet auf Geheiß Berlins neue Gesetze");
   }
 
   @Test
   public void importKleinerTimmyMussInsHeimWeilErAnKatzenhaarAllergieLeidetArtilce() {
     EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/kleiner-timmy-9-muss-ins-heim-weil.html");
-    testImportedArticleValues(creationResult, 1554, "15.07.2015", "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet", "",
+    testImportedArticleValues(creationResult, 1535, "15.07.2015", "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet", "",
         "Kleiner Timmy (9) muss ins Heim, weil Familien-Katze an Kinderhaarallergie leidet");
   }
 
   @Test
   public void importSchaeubleHatEigentlichKopfVonVaroufakisGefordertArtilce() {
     EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/07/schauble-ich-habe-ursprunglich-den-kopf.html");
-    testImportedArticleValues(creationResult, 6199, "14.07.2015", "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"", "",
+    testImportedArticleValues(creationResult, 6180, "14.07.2015", "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"", "",
         "Schäuble: \"Ich habe eigentlich den Kopf von Varoufakis auf einem Silbertablett gefordert\"");
   }
+
+  @Test
+  public void importSonntagsFrageArtilce() {
+    EntryCreationResult creationResult = testImportArticle("http://www.der-postillon.com/2015/08/sonntagsfrage-173-wie-finden-sie-dass.html");
+    testImportedArticleValues(creationResult, 1626, "30.08.2015", "Sonntagsfrage (173): Wie denken Sie darüber, dass Obama Merkels Flüchtlingspolitik gelobt hat?", "",
+        "Sonntagsfrage (173): Wie denken Sie darüber, dass Obama Merkels Flüchtlingspolitik gelobt hat?");
+  }
+
 
   @Test
   public void testGetArticlesOverview() {

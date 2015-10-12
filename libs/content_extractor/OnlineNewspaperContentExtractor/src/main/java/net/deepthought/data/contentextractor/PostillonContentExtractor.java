@@ -30,7 +30,6 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
   private final static Logger log = LoggerFactory.getLogger(PostillonContentExtractor.class);
 
-  public String nei = "nei";
 
 
   @Override
@@ -107,8 +106,12 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
         // TODO: if also introducing image should be displayed, extract div element with class="separator" as well
 //        if(child instanceof TextNode)
 //          content += ((TextNode)child).text();
-        if("div".equals(child.nodeName()) == false && "span".equals(child.nodeName()) == false)
+        if(isContentTextNode(child))
           content += child.outerHtml();
+        else if("div".equals(child.nodeName())) {
+          if(isDivisionSonntagsFrage(child))
+            content += extractSonntagsFrage(child);
+        }
       }
     }
     else {
@@ -127,6 +130,57 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
     addNewspaperCategory(creationResult, false);
 
     return creationResult;
+  }
+
+  protected boolean isContentTextNode(Node child) {
+    return "div".equals(child.nodeName()) == false &&
+           "span".equals(child.nodeName()) == false &&
+           ("a".equals(child.nodeName()) == false || child.hasAttr("name") == false || "more".equals(child.attr("name")) == false);
+  }
+
+  protected boolean isDivisionSonntagsFrage(Node node) {
+    if(node instanceof Element) {
+      Elements noScriptChildren = ((Element)node).getElementsByTag("noscript");
+      if(noScriptChildren.size() > 0) {
+        Element noScriptElement = noScriptChildren.first();
+        return noScriptElement.html().contains("://polldaddy.com/poll/");
+      }
+    }
+
+    return false;
+  }
+
+  protected String extractSonntagsFrage(Node sonntagsFrageElement) {
+    String html = "<div align=\"center\">";
+
+    for(Node child : sonntagsFrageElement.childNodes()) {
+      if("noscript".equals(child.nodeName()) == false)
+        html += child.outerHtml();
+      else {
+        Elements anchorChildren = ((Element)child).getElementsByTag("a");
+        if(anchorChildren.size() > 0) {
+          Element anchor = anchorChildren.first();
+          html += readSonntagsFrageFromUrl(anchor.attr("href"));
+        }
+      }
+    }
+
+    return html + "</div>";
+  }
+
+  protected String readSonntagsFrageFromUrl(String url) {
+    // download Sonntags Frage
+//    try {
+//      Document sonntagsFrageDoc = retrieveOnlineDocument(url);
+//      Elements pollElements = sonntagsFrageDoc.body().getElementsByClass("poll");
+//      if(pollElements.size() > 0) {
+//        return pollElements.first().outerHtml();
+//      }
+//    } catch(Exception ex) { log.error("Could not download SonntagsFrage from Url " + url, ex ); }
+
+    // show Sonntags Frage in an iFrame (but then there's also PollDaddy's website visible like the header, the Social Media shit, ...)
+    // as well we cannot store its content locally in database
+    return "<iframe src=\"" + url + "\" height=\"600\" width=\"100%\" />";
   }
 
   protected ReferenceSubDivision extractReferenceSubDivisionFromPostElement(EntryCreationResult creationResult, String articleUrl, Element postDivElement) {

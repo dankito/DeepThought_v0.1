@@ -74,7 +74,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 21/12/14.
  */
-public class EditReferenceDialogController extends EntityDialogFrameController implements Initializable {
+public class cleEditReferenceDialogController extends EntityDialogFrameController implements Initializable {
 
   private final static Logger log = LoggerFactory.getLogger(EditReferenceDialogController.class);
 
@@ -712,6 +712,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
     seriesTitlePersonsControl = null;
     htmledSeriesTitleNotes.cleanUp();
+    seriesTitleFilesControl.cleanUp();
 
     searchAndSelectReferenceControl.cleanUp();
     htmledReferenceAbstract.cleanUp();
@@ -722,12 +723,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReference.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
     htmledReferenceNotes.cleanUp();
+    referenceFilesControl.cleanUp();
 
     htmledReferenceSubDivisionAbstract.cleanUp();
     referenceSubDivisionPersonsControl.cleanUp();
     paneReferenceSubDivision.getChildren().remove(referenceSubDivisionPersonsControl);
     referenceSubDivisionPersonsControl = null;
     htmledReferenceSubDivisionNotes.cleanUp();
+    referenceSubDivisionFilesControl.cleanUp();
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {
