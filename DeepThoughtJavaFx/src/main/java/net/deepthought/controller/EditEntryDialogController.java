@@ -275,11 +275,8 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void persistEntitiesIfNecessary() {
     if(creationResult == null)
       persistEntities();
-    else {
-      creationResult.getCreatedEntry().setAbstract(htmledAbstract.getHtml());
-      creationResult.getCreatedEntry().setContent(htmledContent.getHtml());
-      creationResult.saveCreatedEntities();
-    }
+    else
+      creationResult.saveCreatedEntities(htmledAbstract.getHtml(), htmledContent.getHtml());
   }
 
   protected void persistEntities() {

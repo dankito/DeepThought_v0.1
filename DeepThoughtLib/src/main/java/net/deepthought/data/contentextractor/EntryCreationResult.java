@@ -159,6 +159,13 @@ public class EntryCreationResult {
     return description;
   }
 
+  public void saveCreatedEntities(String updatedAbstract, String updatedContent) {
+    createdEntry.setAbstract(updatedAbstract);
+    createdEntry.setContent(updatedContent);
+
+    saveCreatedEntities();
+  }
+
   public void saveCreatedEntities() {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(createdEntry);

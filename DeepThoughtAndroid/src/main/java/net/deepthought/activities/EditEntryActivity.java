@@ -395,9 +395,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     entry.setContent(contentHtmlEditor.getHtml());
 
     if(entryCreationResult != null) {
-      entryCreationResult.getCreatedEntry().setAbstract(abstractHtmlEditor.getHtml());
-      entryCreationResult.getCreatedEntry().setContent(contentHtmlEditor.getHtml());
-      entryCreationResult.saveCreatedEntities();
+      entryCreationResult.saveCreatedEntities(abstractHtmlEditor.getHtml(), contentHtmlEditor.getHtml());
     }
 
     if(entry.isPersisted() == false) // a new Entry
