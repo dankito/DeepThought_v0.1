@@ -28,6 +28,9 @@ import java.util.jar.JarFile;
  */
 public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
+  private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
+
+
   public final static String HtmlEditorFolderName = "htmleditor";
 
   public final static String HtmlEditorFileName = "CKEditor_start.html";
@@ -35,7 +38,6 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   public final static String HtmlEditorFolderAndFileName = new File(HtmlEditorFolderName, HtmlEditorFileName).getPath();
 
 
-  private final static Logger log = LoggerFactory.getLogger(HtmlEditor.class);
   protected static final String CKEditorInstanceName = "CKEDITOR.instances.editor";
 
 
@@ -119,17 +121,17 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   public void setHtml(String html, boolean resetUndoStack) {
     if(html == null)
       html = "";
+
     previousHtml = html;
     this.resetUndoStack = resetUndoStack;
 
     try {
       if(isCKEditorLoaded() == false)
-        htmlToSetWhenLoaded = html;
+        htmlToSetWhenLoaded = html; // save html so that it can be set as soon as CKEditor is loaded
       else {
         scriptExecutor.executeScript(CKEditorInstanceName + ".setData('" + StringEscapeUtils.escapeEcmaScript(html) + "')");
         htmlToSetWhenLoaded = null;
       }
-
     } catch(Exception ex) {
       log.error("Could not set HtmlEditor's html text", ex);
     }
@@ -176,7 +178,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
         public void run() {
           setHtml(htmlToSetWhenLoaded);
         }
-      }, 100); // i don't know why but executing Script immediately results in an error -> wait some (unrecognizable) time
+      }, 100); // i don't know why but executing Script immediately results in an error (maybe the JavaScript code is blocked till method is finished -> wait some (unrecognizable) time
     }
 
     if(listener != null)

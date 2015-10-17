@@ -35,7 +35,8 @@
 		}
 	} );
 
-	editor.on('loaded', function() {
+    <!-- Use instanceReady instead of loaded event as on loaded CKEditor is not fully initialized yet -->
+	editor.on('instanceReady', function() {
 		if(typeof app !== 'undefined') {
 			app.ckEditorLoaded();
 		}
