@@ -300,11 +300,13 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   protected void saveEditedFieldsOnEntry() {
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
+      abstractListener.handleEditedEmbeddedFiles(entry.getAbstract(), htmledAbstract.getHtml());
       entry.setAbstract(htmledAbstract.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
+      contentListener.handleEditedEmbeddedFiles(entry.getContent(), htmledContent.getHtml());
       entry.setContent(htmledContent.getHtml());
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }

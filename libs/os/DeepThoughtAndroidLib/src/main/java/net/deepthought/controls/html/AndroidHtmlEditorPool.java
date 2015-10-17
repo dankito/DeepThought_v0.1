@@ -76,7 +76,7 @@ public class AndroidHtmlEditorPool implements ICleanUp {
         }
 
         @Override
-        public void htmlCodeUpdated(String newHtmlCode) {
+        public void htmlCodeUpdated(String updatedHtmlCode) {
 
         }
 
@@ -88,16 +88,6 @@ public class AndroidHtmlEditorPool implements ICleanUp {
         @Override
         public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
           return false;
-        }
-
-        @Override
-        public void imageAdded(ImageElementData addedImage) {
-
-        }
-
-        @Override
-        public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
-
         }
       });
 

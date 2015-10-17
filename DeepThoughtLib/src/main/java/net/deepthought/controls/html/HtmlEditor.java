@@ -3,7 +3,6 @@ package net.deepthought.controls.html;
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.html.ImageElementData;
-import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -12,10 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.jar.JarEntry;
@@ -188,10 +185,6 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   public void htmlChanged(String newHtmlCode) {
     if(previousHtml.equals(newHtmlCode) == false) {
       if (listener != null) {
-        if(hasCountImagesChanged(previousHtml, newHtmlCode)) {
-          imageAddedOrRemoved(previousHtml, newHtmlCode, listener);
-        }
-
         listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
       }
     }
@@ -203,40 +196,6 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
       editorHasBeenNewlyInitialized = false;
       resetUndoStack = false;
     }
-  }
-
-  protected void imageAddedOrRemoved(String previousHtml, String newHtmlCode, IHtmlEditorListener listener) {
-    List<ImageElementData> previousImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(previousHtml);
-    List<ImageElementData> currentImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(newHtmlCode);
-
-    for(ImageElementData previousImage : previousImages) {
-      if(isImageInList(previousImage, currentImages) == false)
-        listener.imageHasBeenDeleted(previousImage, isStillInAnotherInstanceOnHtml(newHtmlCode, previousImage));
-    }
-
-    for(ImageElementData currentImage : currentImages) {
-      if(isImageInList(currentImage, previousImages) == false)
-        listener.imageAdded(currentImage);
-    }
-  }
-
-  protected boolean isImageInList(ImageElementData imageToTest, List<ImageElementData> imageList) {
-    for(ImageElementData image : imageList) {
-      if(imageToTest.getFileId().equals(image.getFileId()) && imageToTest.getEmbeddingId().equals(image.getEmbeddingId()))
-        return true;
-    }
-
-    return false;
-  }
-
-  protected boolean isStillInAnotherInstanceOnHtml(String html, ImageElementData image) {
-    return html.contains(ImageElementData.ImageIdAttributeName + "=\"" + image.getFileId());
-  }
-
-  protected List<Map<String, String>> extractImageData(String previousHtml, String newHtmlCode) {
-    List<Map<String, String>> imagesData = new ArrayList<>();
-
-    return imagesData;
   }
 
   public boolean elementClicked(String element, int button, int clickX, int clickY) {
@@ -272,14 +231,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   }
 
   public void replaceImageElement(ImageElementData previousElement, ImageElementData newElement) {
-    scriptExecutor.executeScript("replaceImageElement(" + previousElement.getFileId() + ", '" + StringEscapeUtils.escapeEcmaScript(newElement.createHtmlCode()) + "')");
-  }
-
-  protected boolean hasCountImagesChanged(String previousHtml, String newHtml) {
-    int countImgTagsInPreviousHtml = StringUtils.getNumberOfOccurrences("<img ", previousHtml);
-    int countImgTagsInNewHtml = StringUtils.getNumberOfOccurrences("<img ", newHtml);
-
-    return countImgTagsInPreviousHtml != countImgTagsInNewHtml;
+    scriptExecutor.executeScript("replaceImageElement(" + previousElement.getEmbeddingId() + ", '" + StringEscapeUtils.escapeEcmaScript(newElement.createHtmlCode()) + "')");
   }
 
 

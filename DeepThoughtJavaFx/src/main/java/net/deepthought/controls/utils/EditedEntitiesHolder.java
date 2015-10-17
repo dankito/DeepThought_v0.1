@@ -97,7 +97,7 @@ public class EditedEntitiesHolder<T extends UserDataEntity> implements IEditedEn
 
     editedEntities.add(entity);
 
-    firePersonAddedEvent(entity);
+    fireEntityAddedEvent(entity);
 
   }
 
@@ -111,17 +111,17 @@ public class EditedEntitiesHolder<T extends UserDataEntity> implements IEditedEn
 
     editedEntities.remove(entity);
 
-    firePersonRemovedEvent(entity);
+    fireEntityRemovedEvent(entity);
   }
 
 
 
-  protected void firePersonAddedEvent(T entity) {
+  protected void fireEntityAddedEvent(T entity) {
     if(entityAddedEventHandler != null)
       entityAddedEventHandler.handle(new EntityCollectionEditedEvent(editedEntities, entity));
   }
 
-  protected void firePersonRemovedEvent(T entity) {
+  protected void fireEntityRemovedEvent(T entity) {
     if(entityRemovedEventHandler != null)
       entityRemovedEventHandler.handle(new EntityCollectionEditedEvent(editedEntities, entity));
   }

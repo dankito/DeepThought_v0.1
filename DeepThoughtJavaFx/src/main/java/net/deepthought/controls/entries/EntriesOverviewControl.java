@@ -511,11 +511,11 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
         txtfldEntryAbstract.setText(((Entry) entity).getAbstractAsPlainText());
       }
       else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
-        if(txtfldReferenceIndication.getText().equals(((Entry) entity).getContent()) == false) // don't update txtfldReferenceIndication if change has been commited by it
+        if(txtfldReferenceIndication.getText().equals(((Entry) entity).getIndication()) == false) // don't update txtfldReferenceIndication if change has been committed by it
           txtfldReferenceIndication.setText(((Entry) entity).getIndication());
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
-        if(htmledEntryContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been commited by it
+        if(htmledEntryContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
           htmledEntryContent.setHtml(((Entry) entity).getContent());
       }
       else if(propertyName.equals(TableConfig.EntrySeriesTitleJoinColumnName) || propertyName.equals(TableConfig.EntryReferenceJoinColumnName) ||

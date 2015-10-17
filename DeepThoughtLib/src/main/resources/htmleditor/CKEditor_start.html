@@ -135,8 +135,8 @@
 	  });
 
 
-	  function replaceImageElement(imageId, newNodeHtml) {
-		var nodeToReplace = ($(editor.document.$).find('img[imageid=' + imageId + ']'))[0];
+	  function replaceImageElement(embeddingId, newNodeHtml) {
+		var nodeToReplace = ($(editor.document.$).find('img[embeddingid=' + embeddingId + ']'))[0];
 		alert(nodeToReplace);
 		if(typeof nodeToReplace !== 'undefined') {
 			$(nodeToReplace).replaceWith(newNodeHtml);

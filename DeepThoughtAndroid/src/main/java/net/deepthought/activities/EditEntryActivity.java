@@ -487,7 +487,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
+    public void htmlCodeUpdated(String updatedHtmlCode) {
       if(hasAbstractManuallyBeenChanged == false)
         setEntryHasBeenEdited();
       else
@@ -503,16 +503,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
       return false;
     }
-
-    @Override
-    public void imageAdded(ImageElementData addedImage) {
-
-    }
-
-    @Override
-    public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
-
-    }
   };
 
   protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
@@ -522,7 +512,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     @Override
-    public void htmlCodeUpdated(String newHtmlCode) {
+    public void htmlCodeUpdated(String updatedHtmlCode) {
       if(hasContentManuallyBeenChanged == false)
         setEntryHasBeenEdited();
       else
@@ -537,16 +527,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     @Override
     public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
       return false;
-    }
-
-    @Override
-    public void imageAdded(ImageElementData addedImage) {
-
-    }
-
-    @Override
-    public void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml) {
-
     }
   };
 }

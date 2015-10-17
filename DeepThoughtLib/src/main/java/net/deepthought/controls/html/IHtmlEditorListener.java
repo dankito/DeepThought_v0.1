@@ -9,7 +9,13 @@ public interface IHtmlEditorListener {
 
   void editorHasLoaded(HtmlEditor editor);
 
-  void htmlCodeUpdated(String newHtmlCode);
+  /**
+   * <p> Called each time Html in CKEditor has changed.</p>
+   *  <b><p>Important: Do not execute any expensive functions in listener method.</p>
+   *  <p>This method is called indirectly from JavaScript code. Doing expensive functions can slow down even machines with 8 (virtual) cores.</p></b>
+   * @param updatedHtmlCode The updated Html code
+   */
+  void htmlCodeUpdated(String updatedHtmlCode);
 
   /**
    * If a custom Command handling is desired, handle the Command and return true.
@@ -24,9 +30,5 @@ public interface IHtmlEditorListener {
    * @return
    */
   boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData);
-
-  void imageAdded(ImageElementData addedImage);
-
-  void imageHasBeenDeleted(ImageElementData deletedImage, boolean isStillInAnotherInstanceOnHtml);
 
 }
