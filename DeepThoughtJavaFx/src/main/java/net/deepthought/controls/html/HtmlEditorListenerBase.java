@@ -63,16 +63,19 @@ public abstract class HtmlEditorListenerBase implements IHtmlEditorListener {
   }
 
 
-  public void handleEditedEmbeddedFiles(String previousHtml, String newHtml) {
+  public String handleEditedEmbeddedFiles(String previousHtml, String newHtml) {
     List<ImageElementData> addedImages = new ArrayList<>();
     List<ImageElementData> removedImages = new ArrayList<>();
 
     if(haveEmbeddedImagesChanged(previousHtml, newHtml, addedImages, removedImages)) {
       if(removedImages.size() > 0)
         handleRemovedEmbeddedImages(removedImages);
+
       if(addedImages.size() > 0)
-        handleAddedEmbeddedImages(addedImages);
+        return handleAddedEmbeddedImages(addedImages, newHtml);
     }
+
+    return newHtml;
   }
 
   protected void handleRemovedEmbeddedImages(List<ImageElementData> removedImages) {
@@ -84,18 +87,22 @@ public abstract class HtmlEditorListenerBase implements IHtmlEditorListener {
     }
   }
 
-  protected void handleAddedEmbeddedImages(List<ImageElementData> addedImages) {
+  protected String handleAddedEmbeddedImages(List<ImageElementData> addedImages, String newHtml) {
     for(ImageElementData addedImage : addedImages) {
       FileLink file = Application.getDeepThought().getFileById(addedImage.getFileId());
       if(file == null) { // a new file
         file = addedImage.createFile();
         Application.getDeepThought().addFile(file);
+        addedImage.setFileId(file.getId());
+        newHtml = newHtml.replace(addedImage.getOriginalImgElementHtmlCode(), addedImage.createHtmlCode());
       }
 
       if (file != null) {
         editedFilesHolder.addEntityToEntry(file);
       }
     }
+
+    return newHtml;
   }
 
   protected boolean haveEmbeddedImagesChanged(String previousHtml, String newHtml, List<ImageElementData> addedImages, List<ImageElementData> removedImages) {

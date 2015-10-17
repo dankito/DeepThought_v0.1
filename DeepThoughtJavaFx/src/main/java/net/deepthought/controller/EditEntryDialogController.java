@@ -275,8 +275,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void persistEntitiesIfNecessary() {
     if(creationResult == null)
       persistEntities();
-    else
+    else {
+      creationResult.getCreatedEntry().setAbstract(htmledAbstract.getHtml());
+      creationResult.getCreatedEntry().setContent(htmledContent.getHtml());
       creationResult.saveCreatedEntities();
+    }
   }
 
   protected void persistEntities() {
@@ -300,14 +303,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   protected void saveEditedFieldsOnEntry() {
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
-      abstractListener.handleEditedEmbeddedFiles(entry.getAbstract(), htmledAbstract.getHtml());
-      entry.setAbstract(htmledAbstract.getHtml());
+      entry.setAbstract(abstractListener.handleEditedEmbeddedFiles(entry.getAbstract(), htmledAbstract.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
     if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
-      contentListener.handleEditedEmbeddedFiles(entry.getContent(), htmledContent.getHtml());
-      entry.setContent(htmledContent.getHtml());
+      entry.setContent(contentListener.handleEditedEmbeddedFiles(entry.getContent(), htmledContent.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
 

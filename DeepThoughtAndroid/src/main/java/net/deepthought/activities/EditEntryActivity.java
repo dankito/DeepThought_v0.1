@@ -394,8 +394,12 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     entry.setAbstract(abstractHtmlEditor.getHtml());
     entry.setContent(contentHtmlEditor.getHtml());
 
-    if(entryCreationResult != null)
+    if(entryCreationResult != null) {
+      entryCreationResult.getCreatedEntry().setAbstract(abstractHtmlEditor.getHtml());
+      entryCreationResult.getCreatedEntry().setContent(contentHtmlEditor.getHtml());
       entryCreationResult.saveCreatedEntities();
+    }
+
     if(entry.isPersisted() == false) // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
 

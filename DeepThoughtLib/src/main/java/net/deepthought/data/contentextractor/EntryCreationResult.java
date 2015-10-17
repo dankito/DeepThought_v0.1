@@ -189,14 +189,14 @@ public class EntryCreationResult {
 
     for(FileLink file : extractedEmbeddedFiles) {
       if(file.isPersisted() == false)
-        deepThought.addFile(file);
+        deepThought.addFile(file); // TODO: if that would ever be the case also the corresponding element in Html code would have to be updated (setting fileid attribute)
       createdEntry.addEmbeddedFile(file);
     }
 
     List<ImageElementData> abstractEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(createdEntry.getAbstract());
-    handleEmbeddedImages(abstractEmbeddedImages, createdEntry);
+    createdEntry.setAbstract(handleEmbeddedImages(abstractEmbeddedImages, createdEntry, createdEntry.getAbstract()));
     List<ImageElementData> contentEmbeddedImages = Application.getHtmlHelper().extractAllImageElementsFromHtml(createdEntry.getContent());
-    handleEmbeddedImages(contentEmbeddedImages, createdEntry);
+    createdEntry.setContent(handleEmbeddedImages(contentEmbeddedImages, createdEntry, createdEntry.getContent()));
 
     saveReferenceBases(deepThought);
   }
@@ -223,10 +223,10 @@ public class EntryCreationResult {
     }
   }
 
-  protected void handleEmbeddedImages(List<ImageElementData> embeddedImages, Entry entry) {
+  protected String handleEmbeddedImages(List<ImageElementData> embeddedImages, Entry entry, String html) {
     for(ImageElementData imageData : embeddedImages) {
       if(imageData.getFileId() == null)
-        aNewImageHasBeenEmbedded(imageData, entry);
+        html = aNewImageHasBeenEmbedded(imageData, entry, html);
       else {
         FileLink file = Application.getDeepThought().getFileById(imageData.getFileId());
         if (file != null && entry.containsEmbeddedFile(file) == false) {
@@ -234,15 +234,23 @@ public class EntryCreationResult {
         }
       }
     }
+
+    return html;
   }
 
-  protected void aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry) {
+  protected String aNewImageHasBeenEmbedded(ImageElementData imageData, Entry entry, String html) {
     FileLink newFile = imageData.createFile();
     if(StringUtils.isNullOrEmpty(newFile.getDescription()))
       newFile.setDescription(entry.getAbstractAsPlainText());
 
-    if(Application.getDeepThought().addFile(newFile))
+    // TODO: this is (almost) the same code as in HtmlEditorListenerBase.handleAddedEmbeddedImages() -> merge
+    if(Application.getDeepThought().addFile(newFile)) {
       entry.addEmbeddedFile(newFile);
+      imageData.setFileId(newFile.getId());
+      return html.replace(imageData.getOriginalImgElementHtmlCode(), imageData.createHtmlCode());
+    }
+
+    return html;
   }
 
 }
