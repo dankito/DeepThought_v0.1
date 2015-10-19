@@ -27,6 +27,7 @@
       <AnchorPane fx:id="pnTopBar" prefHeight="40.0">
          <children>
             <Button fx:id="btnUpdateArticlesOverview" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" maxHeight="38.0" maxWidth="38.0" minHeight="38.0" minWidth="38.0" mnemonicParsing="false" onAction="#handleButtonUpdateArticlesOverviewAction" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="1.0" />
+            <Label fx:id="lblLastUpdateTime" maxWidth="1.7976931348623157E308" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="44.0" AnchorPane.rightAnchor="756.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
    </children>
