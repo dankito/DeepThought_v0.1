@@ -39,6 +39,7 @@ public class DeepThoughtFxHtmlEditorPool implements ICleanUp {
 
   public void htmlEditorReleased(DeepThoughtFxHtmlEditor htmlEditor) {
     htmlEditor.setListener(null);
+    htmlEditor.setHtml("", true);
     availableHtmlEditors.offer(htmlEditor);
   }
 

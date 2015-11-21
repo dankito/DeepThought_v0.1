@@ -229,11 +229,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void setEntryValues(final Entry entry) {
-    htmledAbstract.setHtml(entry.getAbstract());
+    htmledAbstract.setHtml(entry.getAbstract(), true);
 
     htmledAbstract.setExpanded(entry.hasAbstract());
 
-    htmledContent.setHtml(entry.getContent());
+    htmledContent.setHtml(entry.getContent(), true);
 
     entryTagsControl.setExpanded(entry.hasTags() == false);
 //    entryCategoriesControl.setExpanded(entry.hasCategories() == false);

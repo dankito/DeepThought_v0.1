@@ -15,7 +15,14 @@ public interface IHtmlEditorListener {
    *  <p>This method is called indirectly from JavaScript code. Doing expensive functions can slow down even machines with 8 (virtual) cores.</p></b>
    * @param updatedHtmlCode The updated Html code
    */
-  void htmlCodeUpdated(String updatedHtmlCode);
+  void htmlCodeUpdated();
+
+  /**
+   * <p>
+   *   Called if after changing HTML the Undo Button is so often pressed that all changes have been undone -> original set HTML has been restored.
+   * </p>
+   */
+  void htmlCodeHasBeenReset();
 
   /**
    * If a custom Command handling is desired, handle the Command and return true.

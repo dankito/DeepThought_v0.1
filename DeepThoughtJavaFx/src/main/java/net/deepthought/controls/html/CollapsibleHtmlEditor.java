@@ -271,7 +271,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     @Override
     public void ocrResult(final TextRecognitionResult ocrResult) {
       if(ocrResult.recognitionSuccessful())
-        Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText()));
+        Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
       // TODO: show error message (or has it already been shown at this time?)
     }
   };
@@ -305,7 +305,11 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   }
 
   public void setHtml(String html) {
-    htmlEditor.setHtml(html);
+    setHtml(html, false);
+  }
+
+  public void setHtml(String html, boolean resetUndoStack) {
+    htmlEditor.setHtml(html, resetUndoStack);
   }
 
 }

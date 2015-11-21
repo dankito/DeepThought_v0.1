@@ -489,11 +489,17 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     @Override
-    public void htmlCodeUpdated(String updatedHtmlCode) {
+    public void htmlCodeUpdated() {
       if(hasAbstractManuallyBeenChanged == false)
         setEntryHasBeenEdited();
       else
         hasAbstractManuallyBeenChanged = false; // reset
+    }
+
+    @Override
+    public void htmlCodeHasBeenReset() {
+      // Changes to Abstract have been undone
+      // TODO: how to check now if Entry has been edited or not?
     }
 
     @Override
@@ -514,11 +520,17 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     @Override
-    public void htmlCodeUpdated(String updatedHtmlCode) {
+    public void htmlCodeUpdated() {
       if(hasContentManuallyBeenChanged == false)
         setEntryHasBeenEdited();
       else
         hasContentManuallyBeenChanged = false; // reset
+    }
+
+    @Override
+    public void htmlCodeHasBeenReset() {
+      // Changes to Content have been undone
+      // TODO: how to check now if Entry has been edited or not?
     }
 
     @Override

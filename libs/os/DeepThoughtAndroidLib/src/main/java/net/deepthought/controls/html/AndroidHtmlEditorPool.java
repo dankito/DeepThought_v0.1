@@ -54,6 +54,7 @@ public class AndroidHtmlEditorPool implements ICleanUp {
     htmlEditor.resetInstanceVariables();
     if(htmlEditor.getParent() instanceof ViewGroup)
       ((ViewGroup)htmlEditor.getParent()).removeView(htmlEditor);
+
     if(availableHtmlEditors.contains(htmlEditor) == false)
       availableHtmlEditors.offer(htmlEditor);
 
@@ -76,7 +77,12 @@ public class AndroidHtmlEditorPool implements ICleanUp {
         }
 
         @Override
-        public void htmlCodeUpdated(String updatedHtmlCode) {
+        public void htmlCodeUpdated() {
+
+        }
+
+        @Override
+        public void htmlCodeHasBeenReset() {
 
         }
 

@@ -29,8 +29,13 @@ public class DeepThoughtFxHtmlEditorListener extends HtmlEditorListenerBase impl
   }
 
   @Override
-  public void htmlCodeUpdated(String updatedHtmlCode) {
+  public void htmlCodeUpdated() {
     fieldsWithUnsavedChanges.add(fieldToAddOnChanges);
+  }
+
+  @Override
+  public void htmlCodeHasBeenReset() {
+    fieldsWithUnsavedChanges.remove(fieldToAddOnChanges);
   }
 
 }

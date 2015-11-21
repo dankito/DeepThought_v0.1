@@ -516,7 +516,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
         if(htmledEntryContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
-          htmledEntryContent.setHtml(((Entry) entity).getContent());
+          htmledEntryContent.setHtml(((Entry) entity).getContent(), false);
       }
       else if(propertyName.equals(TableConfig.EntrySeriesTitleJoinColumnName) || propertyName.equals(TableConfig.EntryReferenceJoinColumnName) ||
           propertyName.equals(TableConfig.EntryReferenceSubDivisionJoinColumnName)) {

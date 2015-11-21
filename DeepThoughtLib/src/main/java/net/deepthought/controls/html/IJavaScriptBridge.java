@@ -9,7 +9,9 @@ public interface IJavaScriptBridge {
 
   void ckEditorLoaded();
 
-  void htmlChanged(String newHtmlCode);
+  void htmlChanged();
+
+  void htmlHasBeenReset();
 
 
   boolean elementClicked(String element, int button, int clickX, int clickY);

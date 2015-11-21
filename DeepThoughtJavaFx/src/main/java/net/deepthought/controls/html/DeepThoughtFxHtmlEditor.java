@@ -64,7 +64,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
     loadCKEditor();
 
-//    testEvents();
+    testEvents();
   }
 
   protected void loadCKEditor() {

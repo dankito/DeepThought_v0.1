@@ -11,10 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -45,12 +48,9 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   protected boolean ckEditorLoaded = false;
 
-  protected String previousHtml = "";
-
   protected String htmlToSetWhenLoaded = null;
 
   protected boolean editorHasBeenNewlyInitialized = false;
-  protected boolean resetUndoStack = false;
 
   protected IHtmlEditorListener listener = null;
 
@@ -95,15 +95,27 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   }
 
   public String getHtml() {
+    return getHtmlAsyncViaJavaScript();
+  }
+
+  protected String getHtmlAsyncViaJavaScript() {
     try {
-      // no need for calling a JavaScript function as each time HTML updates htmlChanged() is called -> we're always up to date
-//      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
-//        @Override
-//        public void scriptExecuted(Object result) {
-//
-//        }
-//      });
-      return previousHtml;
+      final List<Object> htmlHolder = new ArrayList<>();
+      final CountDownLatch waitForAsyncResponseLatch = new CountDownLatch(1);
+
+      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
+        @Override
+        public void scriptExecuted(Object result) {
+          htmlHolder.add(result);
+          waitForAsyncResponseLatch.countDown();
+        }
+      });
+
+      try { waitForAsyncResponseLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+      if(htmlHolder.size() > 0 && htmlHolder.get(0) instanceof String) {
+        return htmlHolder.get(0).toString();
+      }
     } catch(Exception ex) {
       log.error("Could not get HtmlEditor's html text", ex);
     }
@@ -119,14 +131,12 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     if(html == null)
       html = "";
 
-    previousHtml = html;
-    this.resetUndoStack = resetUndoStack;
-
     try {
       if(isCKEditorLoaded() == false)
         htmlToSetWhenLoaded = html; // save html so that it can be set as soon as CKEditor is loaded
       else {
-        scriptExecutor.executeScript(CKEditorInstanceName + ".setData('" + StringEscapeUtils.escapeEcmaScript(html) + "')");
+//        scriptExecutor.executeScript(CKEditorInstanceName + ".setData('" + StringEscapeUtils.escapeEcmaScript(html) + "')");
+        scriptExecutor.executeScript("setHtml('" + StringEscapeUtils.escapeEcmaScript(html) + "', " + resetUndoStack + ")");
         htmlToSetWhenLoaded = null;
       }
     } catch(Exception ex) {
@@ -154,7 +164,6 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   @Override
   public void cleanUp() {
     setListener(null);
-    previousHtml = "";
 
     scriptExecutor.setJavaScriptMember("app", null);
 
@@ -173,28 +182,28 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
       new Timer().schedule(new TimerTask() {
         @Override
         public void run() {
-          setHtml(htmlToSetWhenLoaded);
+          setHtml(htmlToSetWhenLoaded, true);
         }
-      }, 100); // i don't know why but executing Script immediately results in an error (maybe the JavaScript code is blocked till method is finished -> wait some (unrecognizable) time
+      }, 300); // i don't know why but executing Script immediately results in an error (maybe the JavaScript code is blocked till method is finished -> wait some (unrecognizable) time
     }
 
     if(listener != null)
       listener.editorHasLoaded(this);
   }
 
-  public void htmlChanged(String newHtmlCode) {
-    if(previousHtml.equals(newHtmlCode) == false) {
-      if (listener != null) {
-        listener.htmlCodeUpdated(newHtmlCode); // TODO: may also pass previousHtml as parameter
-      }
+  public void htmlChanged() {
+    if (listener != null) {
+      listener.htmlCodeUpdated();
     }
 
-    previousHtml = newHtmlCode;
-
-    if(editorHasBeenNewlyInitialized == true || resetUndoStack == true) {
-      resetUndoStack();
+    if(editorHasBeenNewlyInitialized == true) {
       editorHasBeenNewlyInitialized = false;
-      resetUndoStack = false;
+    }
+  }
+
+  public void htmlHasBeenReset() {
+    if(listener != null) {
+      listener.htmlCodeHasBeenReset();
     }
   }
 
@@ -246,7 +255,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();

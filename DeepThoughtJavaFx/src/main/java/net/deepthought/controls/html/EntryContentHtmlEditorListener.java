@@ -29,11 +29,16 @@ public class EntryContentHtmlEditorListener extends HtmlEditorListenerBase imple
   }
 
   @Override
-  public void htmlCodeUpdated(String updatedHtmlCode) {
+  public void htmlCodeUpdated() {
     if(entry != null) {
-      handleEditedEmbeddedFiles(entry.getContent(), updatedHtmlCode); // TODO: we should not call expensive functions in this listener method -> find a better place to check for embedded files changes
-      entry.setContent(updatedHtmlCode);
+//      handleEditedEmbeddedFiles(entry.getContent(), updatedHtmlCode); // TODO: we should not call expensive functions in this listener method -> find a better place to check for embedded files changes
+//      entry.setContent(updatedHtmlCode);
     }
+  }
+
+  @Override
+  public void htmlCodeHasBeenReset() {
+
   }
 
 
