@@ -1,6 +1,6 @@
 package net.deepthought.communication;
 
-import net.deepthought.communication.messages.Response;
+import net.deepthought.communication.messages.response.Response;
 
 /**
  * Created by ganymed on 23/08/15.

@@ -1,4 +1,4 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.request;
 
 /**
  * Created by ganymed on 23/08/15.

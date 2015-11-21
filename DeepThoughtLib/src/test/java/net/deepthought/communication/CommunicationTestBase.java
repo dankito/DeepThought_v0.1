@@ -6,6 +6,8 @@ import net.deepthought.TestApplicationConfiguration;
 import org.junit.After;
 import org.junit.Before;
 
+import java.io.IOException;
+
 /**
  * Created by ganymed on 20/08/15.
  */
@@ -20,7 +22,7 @@ public class CommunicationTestBase {
 
 
   @Before
-  public void setup() {
+  public void setup() throws IOException {
     Application.instantiate(new TestApplicationConfiguration());
 
     connector = Application.getDeepThoughtsConnector();

@@ -1,4 +1,4 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.response;
 
 import net.deepthought.Application;
 import net.deepthought.communication.NetworkHelper;
@@ -11,7 +11,7 @@ import net.deepthought.data.model.User;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class AskForDeviceRegistrationResponseMessage extends AskForDeviceRegistrationRequest {
+public class AskForDeviceRegistrationResponseMessage extends net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest {
 
   public final static AskForDeviceRegistrationResponseMessage Deny = new AskForDeviceRegistrationResponseMessage(false);
 

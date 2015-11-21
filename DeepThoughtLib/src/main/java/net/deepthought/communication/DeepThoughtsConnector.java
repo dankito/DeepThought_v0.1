@@ -9,14 +9,17 @@ import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
-import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
-import net.deepthought.communication.messages.CaptureImageResultResponse;
-import net.deepthought.communication.messages.OcrResultResponse;
-import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.messages.Response;
-import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
+import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
+import net.deepthought.communication.messages.MessagesDispatcher;
+import net.deepthought.communication.messages.MessagesReceiver;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.GenericRequest;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
@@ -48,7 +51,9 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected Communicator communicator;
 
-  protected MessagesReceiver messagesReceiver;
+  protected AsynchronousResponseListenerManager listenerManager;
+
+  protected net.deepthought.communication.messages.MessagesReceiver messagesReceiver;
 
   protected RegisteredDevicesManager registeredDevicesManager;
 
@@ -80,7 +85,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.messageReceiverPort = messageReceiverPort;
 
     // TODO: make configurable
-    this.communicator = new Communicator(this, communicatorListener);
+    this.listenerManager = new AsynchronousResponseListenerManager();
+    this.communicator = new Communicator(new MessagesDispatcher(), listenerManager, this, communicatorListener);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator();
@@ -94,7 +100,9 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       public void run() {
         try {
           DeepThoughtsConnector.this.run();
-        } catch(Exception ex) { log.error("An error occurred trying to run DeepThoughtsConnector on port " + messageReceiverPort, ex); }
+        } catch (Exception ex) {
+          log.error("An error occurred trying to run DeepThoughtsConnector on port " + messageReceiverPort, ex);
+        }
       }
     });
   }
@@ -130,7 +138,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected void startMessageReceiver(int messageReceiverPort) {
     try {
-      messagesReceiver = new MessagesReceiver(messageReceiverPort, messagesReceiverListener);
+      messagesReceiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(messageReceiverPort, listenerManager), messagesReceiverListener);
       messagesReceiver.start();
 
       this.messageReceiverPort = messageReceiverPort;
@@ -252,7 +260,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
 
-  protected void connectedToRegisteredDevice(ConnectedDevice device) {
+  protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
     if(device.getDevice() == null)
       device.setStoredDeviceInstance(); // if it's from a Communicator message locally stored Device instance isn't set yet
 
@@ -265,6 +273,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
     mayStopRegisteredDevicesSearcher();
     mayStartConnectionsAliveWatcher();
+
+    return true;
   }
 
   protected void disconnectedFromRegisteredDevice(ConnectedDevice device) {
@@ -291,6 +301,16 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected void setCommunicator(Communicator communicator) {
     this.communicator = communicator;
+  }
+
+  @Override
+  public AsynchronousResponseListenerManager getListenerManager() {
+    return listenerManager;
+  }
+
+  @Override
+  public boolean isRegisteringAllowed() {
+    return isRegistrationServerRunning();
   }
 
   @Override
@@ -421,44 +441,48 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
 
     @Override
-    public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
-      connectedToRegisteredDevice(connectedDevice);
-    }
-
-    @Override
-    public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
-
-    }
-
-    @Override
-    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-      for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-        listener.startCaptureImageOrDoOcr(request);
-
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.startCaptureImageOrDoOcr(request);
-    }
-
-    @Override
-    public void captureImageResult(CaptureImageResultResponse response) {
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.captureImageResult(response);
-    }
-
-    @Override
-    public void ocrResult(OcrResultResponse ocrResult) {
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.ocrResult(ocrResult);
-    }
-
-    @Override
-    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
-      for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-        listener.stopCaptureImageOrDoOcr(request);
-
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.stopCaptureImageOrDoOcr(request);
+    public boolean messageReceived(String methodName, Request request) {
+      return handleReceivedMessage(methodName, request);
     }
   };
+
+  protected boolean handleReceivedMessage(String methodName, Request request) {
+    for(MessagesReceiverListener listener : messagesReceiverListeners)
+      listener.messageReceived(methodName, request);
+
+    if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
+      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>)request).getRequestBody());
+    }
+    else if(Addresses.HeartbeatMethodName.equals(methodName)) {
+      // TODO: is this correct, calling connectedToRegisteredDevice() ?
+      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>)request).getRequestBody());
+    }
+    else if(Addresses.StartCaptureImageAndDoOcrMethodName.equals(methodName)) {
+      return handleStartCaptureImageAndDoOcrMessage((CaptureImageOrDoOcrRequest) request);
+    }
+    else if(Addresses.CaptureImageResultMethodName.equals(methodName)) {
+      return true;
+    }
+    else if(Addresses.OcrResultMethodName.equals(methodName)) {
+      return true;
+    }
+    else if(Addresses.StopCaptureImageAndDoOcrMethodName.equals(methodName)) {
+      return handleStopCaptureImageOrDoOcrMessage((StopCaptureImageOrDoOcrRequest) request);
+    }
+
+    return false;
+  }
+
+  protected boolean handleStartCaptureImageAndDoOcrMessage(CaptureImageOrDoOcrRequest request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.startCaptureImageOrDoOcr(request);
+    return true;
+  }
+
+  protected boolean handleStopCaptureImageOrDoOcrMessage(StopCaptureImageOrDoOcrRequest request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.stopCaptureImageOrDoOcr(request);
+    return true;
+  }
 
 }

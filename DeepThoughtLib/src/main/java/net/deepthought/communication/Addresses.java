@@ -24,7 +24,7 @@ public class Addresses {
   public final static String CaptureImageResultMethodName = "CaptureImageResult";
   public final static String StopCaptureImageAndDoOcrMethodName = "StopCaptureImageAndDoOcr";
 
-  protected final static List<String> MethodNames;
+  public final static List<String> MethodNames;
 
 
   static {

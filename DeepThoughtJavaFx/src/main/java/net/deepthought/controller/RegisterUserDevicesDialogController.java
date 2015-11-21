@@ -3,11 +3,11 @@ package net.deepthought.controller;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
-import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.messages.Response;
-import net.deepthought.communication.messages.ResponseValue;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.Response;
+import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -189,7 +189,7 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
     Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
-        if(result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
+        if(result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
           Alerts.showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.device", request.getDevice()),
               Localization.getLocalizedString("alert.title.device.registration.successful"));
         }

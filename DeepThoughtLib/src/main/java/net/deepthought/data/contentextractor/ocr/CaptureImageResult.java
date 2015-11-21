@@ -1,7 +1,11 @@
 package net.deepthought.data.contentextractor.ocr;
 
+import net.deepthought.util.file.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * Created by ganymed on 18/08/15.
@@ -66,6 +70,11 @@ public class CaptureImageResult {
   }
 
   public byte[] getImageData() {
+    if(imageData == null && imageUri != null) {
+      try {
+        imageData = FileUtils.readFile(new File(imageUri));
+      } catch(Exception ex) { log.error("Could not read Image Data from Uri " + imageUri, ex); }
+    }
     return imageData;
   }
 

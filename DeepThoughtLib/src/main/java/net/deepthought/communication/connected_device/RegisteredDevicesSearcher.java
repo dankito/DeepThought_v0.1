@@ -17,6 +17,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -72,12 +73,7 @@ public class RegisteredDevicesSearcher {
 
   protected void startServer() {
     try {
-      serverSocket = new DatagramSocket(null);
-      serverSocket.setReuseAddress(true);
-      serverSocket.bind(new InetSocketAddress(Constants.RegisteredDevicesListenerPort));
-
-      serverSocket.setBroadcast(true);
-      isServerSocketOpened = true;
+      this.serverSocket = createServerSocket();
 
       byte[] buffer = new byte[1024];
       DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -95,11 +91,21 @@ public class RegisteredDevicesSearcher {
         }
 
         serverReceivedPacket(buffer, packet);
-
       }
     } catch(Exception ex) {
       log.error("An error occurred starting RegisteredDevicesSearcher", ex);
     }
+  }
+
+  protected DatagramSocket createServerSocket() throws SocketException {
+    DatagramSocket serverSocket = new DatagramSocket(null); // so that other Applications on the same Host can also use this port, set bindAddress to null ..,
+    serverSocket.setReuseAddress(true); // and reuseAddress to true
+    serverSocket.bind(new InetSocketAddress(Constants.RegisteredDevicesListenerPort));
+
+    serverSocket.setBroadcast(true);
+    isServerSocketOpened = true;
+
+    return serverSocket;
   }
 
   protected boolean isSocketCloseException(Exception ex) {
@@ -109,16 +115,20 @@ public class RegisteredDevicesSearcher {
   protected void serverReceivedPacket(byte[] buffer, DatagramPacket packet) {
     if(messagesCreator.isSearchingForRegisteredDevicesMessage(buffer, packet.getLength())) {
       HostInfo clientInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
-      if(Application.getLoggedOnUser().getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
-          Application.getApplication().getLocalDevice().getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
-          clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true)))
-        return; // a self send packet
+      if(isSelfSentPacket(clientInfo))
+        return;
 
       if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(clientInfo) == true &&
           Application.getDeepThoughtsConnector().getConnectedDevicesManager().isConnectedToDevice(clientInfo) == false) {
         respondToSearchingForRegisteredDevicesMessage(packet);
       }
     }
+  }
+
+  protected boolean isSelfSentPacket(HostInfo clientInfo) {
+    return Application.getLoggedOnUser().getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
+        Application.getApplication().getLocalDevice().getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
+        clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 
   protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {

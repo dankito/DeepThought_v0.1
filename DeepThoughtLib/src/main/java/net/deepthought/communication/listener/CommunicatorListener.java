@@ -1,7 +1,7 @@
 package net.deepthought.communication.listener;
 
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 
 /**
  * Created by ganymed on 23/08/15.

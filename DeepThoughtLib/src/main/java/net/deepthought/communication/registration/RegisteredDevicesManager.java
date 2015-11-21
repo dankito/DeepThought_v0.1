@@ -1,7 +1,7 @@
 package net.deepthought.communication.registration;
 
 import net.deepthought.Application;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;

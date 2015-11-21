@@ -22,11 +22,11 @@ import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverview
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
-import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.messages.Response;
-import net.deepthought.communication.messages.ResponseValue;
-import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.Response;
+import net.deepthought.communication.messages.response.ResponseCode;
+import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
             @Override
             public void responseReceived(Request request, Response response) {
-              if(response.getResponseValue() == ResponseValue.Error) {
+              if(response.getResponseCode() == ResponseCode.Error) {
                 // TODO: stop process then
               }
             }
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
             @Override
             public void responseReceived(Request request, Response response) {
-              if(response.getResponseValue() == ResponseValue.Error) {
+              if(response.getResponseCode() == ResponseCode.Error) {
                 // TODO: stop process then
               }
             }

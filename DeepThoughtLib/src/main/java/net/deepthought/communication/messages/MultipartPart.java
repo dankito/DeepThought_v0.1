@@ -9,12 +9,19 @@ public class MultipartPart<T> {
 
   protected MultipartType type;
 
+  protected Class dataType;
+
   protected T data;
 
 
-  public MultipartPart(String partName, MultipartType type, T data) {
+  public MultipartPart(String partName, MultipartType type, Class dataType) {
     this.partName = partName;
     this.type = type;
+    this.dataType = dataType;
+  }
+
+  public MultipartPart(String partName, MultipartType type, T data) {
+    this(partName, type, data.getClass());
     this.data = data;
   }
 
@@ -27,10 +34,17 @@ public class MultipartPart<T> {
     return type;
   }
 
+  public Class getDataType() {
+    return dataType;
+  }
+
   public T getData() {
     return data;
   }
 
+  public void setData(T data) {
+    this.data = data;
+  }
 
   @Override
   public String toString() {

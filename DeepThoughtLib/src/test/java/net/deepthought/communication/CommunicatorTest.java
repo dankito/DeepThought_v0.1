@@ -5,30 +5,34 @@ import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
-import net.deepthought.communication.messages.CaptureImageOrDoOcrRequest;
-import net.deepthought.communication.messages.CaptureImageResultResponse;
-import net.deepthought.communication.messages.OcrResultResponse;
-import net.deepthought.communication.messages.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
+import net.deepthought.communication.messages.MessagesReceiver;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.GenericRequest;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
-import net.deepthought.util.ObjectHolder;
-import net.deepthought.util.file.FileUtils;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,13 +44,45 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   private final static Logger log = LoggerFactory.getLogger(CommunicatorTest.class);
 
+  protected final static String TestDeviceId = "Cuddle";
+
+  protected final static String TestIpAddress = "0.0.0.0";
+
+  protected final static int CommunicatorPort = 54321;
+
+  protected final static int TestMessageId = 4711;
+
+
+//  protected Communicator communicator = null;
+
+  protected net.deepthought.communication.messages.MessagesReceiver receiver = null;
+
+  protected ConnectedDevice localHost = null;
+
+  protected CountDownLatch waitLatch = new CountDownLatch(1);
+
+  protected Map<String, Request> receivedRequests = new HashMap<>();
+
 
   @Override
-  public void setup() {
+  public void setup() throws IOException {
     super.setup();
+
+//    communicator = new Communicator(new MessagesDispatcher(), null, null);
+    receiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(CommunicatorPort, connector.getListenerManager()), receiverListener);
+    receiver.start();
+    localHost = new ConnectedDevice(TestDeviceId, TestIpAddress, CommunicatorPort);
 
     try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
   }
+
+  @After
+  public void tearDown() {
+    receiver.stop();
+
+    super.tearDown();
+  }
+
 
   @Test
   public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
@@ -172,35 +208,59 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 
   @Test
-  public void notifyRemoteWeHaveConnected() {
-    Assert.fail("Yet to implement");
+  public void notifyRemoteWeHaveConnected() throws IOException {
+    communicator.notifyRemoteWeHaveConnected(localHost);
+
+    waitTillListenerHasBeenCalled();
+
+    GenericRequest request = (GenericRequest)assertThatCorrectMethodHasBeenCalled(Addresses.NotifyRemoteWeHaveConnectedMethodName, GenericRequest.class);
+    Assert.assertTrue(request.getRequestBody() instanceof ConnectedDevice);
+  }
+
+  @Test
+  public void sendHeartbeat() throws IOException {
+    communicator.sendHeartbeat(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+
+    GenericRequest request = (GenericRequest)assertThatCorrectMethodHasBeenCalled(Addresses.HeartbeatMethodName, GenericRequest.class);
+    Assert.assertTrue(request.getRequestBody() instanceof ConnectedDevice);
   }
 
 
   @Test
   public void startCaptureImageAndDoOcr_RequestIsReceived() {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+    communicator.startCaptureImageAndDoOcr(localHost, null);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        methodCalled.set(true);
-        waitLatch.countDown();
-      }
+    waitTillListenerHasBeenCalled(100);
 
-      @Override
-      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
-
-      }
-    });
-
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), null);
-
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
+    assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
   }
+
+//  @Test
+//  public void startCaptureImageAndDoOcr_addCaptureImageOrDoOcrListenerIsCalled() {
+//    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+//    final CountDownLatch waitLatch = new CountDownLatch(1);
+//
+//    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+//      @Override
+//      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+//        methodCalled.set(true);
+//        waitLatch.countDown();
+//      }
+//
+//      @Override
+//      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+//
+//      }
+//    });
+//
+//    communicator.startCaptureImageAndDoOcr(localHost, null);
+//
+//    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+//
+//    Assert.assertTrue(methodCalled.get());
+//  }
 
   @Test
   public void startCaptureImageAndDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() {
@@ -245,150 +305,134 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void startDoOcr_RequestIsReceived() throws IOException {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-    final ObjectHolder<byte[]> receivedImageData = new ObjectHolder<>();
-
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        methodCalled.set(true);
-        try {
-          receivedImageData.set(request.readBytesFromImageUri());
-        } catch (Exception ex) { log. error("Could not get image data from CaptureImageOrDoOcrRequest", ex); }
-        waitLatch.countDown();
-      }
-
-      @Override
-      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
-
-      }
-    });
-
     byte[] imageData = getTestImage();
+    communicator.startDoOcr(localHost, imageData, false, false, null);
 
-    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), imageData, false, false, null);
+    waitTillListenerHasBeenCalled(100);
 
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
-    Assert.assertArrayEquals(imageData, receivedImageData.get());
+    CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
+    Assert.assertNotNull(request.getConfiguration());
+    Assert.assertArrayEquals(imageData, request.readBytesFromImageUri());
   }
 
+//  @Test
+//  public void startDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() throws IOException {
+//    final List<TextRecognitionResult> ocrResults = new ArrayList<>();
+//    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+//    final String recognizedText = "Hyper, hyper";
+//    final CountDownLatch waitLatch = new CountDownLatch(1);
+//
+//    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+//
+//      @Override
+//      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+//        communicator.sendOcrResult(request, TextRecognitionResult.createRecognitionSuccessfulResult(recognizedText), null);
+//      }
+//
+//      @Override
+//      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+//
+//      }
+//    });
+//
+//    byte[] imageData = getTestImage();
+//
+//    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
+//        imageData, false, false, new CaptureImageOrDoOcrResponseListener() {
+//          @Override
+//          public void captureImageResult(CaptureImageResult captureImageResult) {
+//
+//          }
+//
+//          @Override
+//          public void ocrResult(TextRecognitionResult ocrResult) {
+//            methodCalled.set(true);
+//            ocrResults.add(ocrResult);
+//            waitLatch.countDown();
+//          }
+//        });
+//
+//    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+//
+//    Assert.assertTrue(methodCalled.get());
+//    Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
+//  }
+
+
+//  @Test
+//  public void sendCaptureImageResult_ResultIsReceived() throws IOException {
+//    byte[] imageData = getTestImage();
+//    communicator.startDoOcr(localHost, imageData, false, false, null);
+//
+//    waitTillListenerHasBeenCalled(100);
+//
+//    CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
+//    Assert.assertNotNull(request.getConfiguration());
+//    Assert.assertArrayEquals(imageData, request.readBytesFromImageUri());
+//
+//    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+//    final CountDownLatch waitLatch = new CountDownLatch(1);
+//
+//    ConnectedDevice self = ConnectedDevice.createSelfInstance();
+//    CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(self.getAddress(), self.getMessagesPort(), true, false);
+//    connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
+//      @Override
+//      public void captureImageResult(CaptureImageResult captureImageResult) {
+//        methodCalled.set(true);
+//        waitLatch.countDown();
+//      }
+//
+//      @Override
+//      public void ocrResult(TextRecognitionResult ocrResult) {
+//
+//      }
+//    });
+//
+//    byte[] imageData = getTestImage();
+//
+//    communicator.sendCaptureImageResult(request, imageData, null);
+//
+//    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+//
+//    Assert.assertTrue(methodCalled.get());
+//  }
+
   @Test
-  public void startDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() throws IOException {
-    final List<TextRecognitionResult> ocrResults = new ArrayList<>();
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final String recognizedText = "Hyper, hyper";
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+  public void sendCapturedImage_ResultIsReceived() throws IOException {
+    communicator.sendCaptureImageResult(new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), getTestImage(), null);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    waitTillListenerHasBeenCalled();
 
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        communicator.sendOcrResult(request, TextRecognitionResult.createRecognitionSuccessfulResult(recognizedText), null);
-      }
-
-      @Override
-      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
-
-      }
-    });
-
-    byte[] imageData = getTestImage();
-
-    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
-        imageData, false, false, new CaptureImageOrDoOcrResponseListener() {
-          @Override
-          public void captureImageResult(CaptureImageResult captureImageResult) {
-
-          }
-
-          @Override
-          public void ocrResult(TextRecognitionResult ocrResult) {
-            methodCalled.set(true);
-            ocrResults.add(ocrResult);
-            waitLatch.countDown();
-          }
-        });
-
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
-    Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
-  }
-
-
-  @Test
-  public void sendCaptureImageResult_ResultIsReceived() throws IOException {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-
-    ConnectedDevice self = ConnectedDevice.createSelfInstance();
-    CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(self.getAddress(), self.getMessagesPort(), true, false);
-    connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
-      @Override
-      public void captureImageResult(CaptureImageResult captureImageResult) {
-        methodCalled.set(true);
-        waitLatch.countDown();
-      }
-
-      @Override
-      public void ocrResult(TextRecognitionResult ocrResult) {
-
-      }
-    });
-
-    byte[] imageData = getTestImage();
-
-    communicator.sendCaptureImageResult(request, imageData, null);
-
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
+    CaptureImageResultResponse request = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
+    Assert.assertNotNull(request.getResult());
+    Assert.assertNotNull(request.getResult().getImageUri());
   }
 
 
   @Test
   public void sendCaptureImageResult_ReceivedImageDataIsCorrect() throws IOException {
-    final List<byte[]> receivedImageData = new ArrayList<>();
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-
-    ConnectedDevice self = ConnectedDevice.createSelfInstance();
-    CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(self.getAddress(), self.getMessagesPort(), true, false);
-    connector.getCommunicator().captureImageOrDoOcrListeners.put(request, new CaptureImageOrDoOcrResponseListener() {
-      @Override
-      public void captureImageResult(CaptureImageResult captureImageResult) {
-        try {
-          if(captureImageResult.getImageData() != null)
-            receivedImageData.add(captureImageResult.getImageData());
-          else if(captureImageResult.getImageUri() != null)
-            receivedImageData.add(FileUtils.readFile(new File(captureImageResult.getImageUri())));
-        } catch(Exception ex) { log. error("Could not get image data from CaptureImageResult", ex); }
-        waitLatch.countDown();
-      }
-
-      @Override
-      public void ocrResult(TextRecognitionResult ocrResult) {
-
-      }
-    });
-
     byte[] sentImageData = getTestImage();
 
-    communicator.sendCaptureImageResult(request, sentImageData, null);
+    communicator.sendCaptureImageResult(new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), sentImageData, null);
 
-    try { waitLatch.await(2, TimeUnit.SECONDS);
-    } catch (Exception ex) { }
+    waitTillListenerHasBeenCalled();
 
-    Assert.assertEquals(1, receivedImageData.size());
-    Assert.assertEquals(sentImageData.length, receivedImageData.get(0).length);
-    Assert.assertArrayEquals(sentImageData, receivedImageData.get(0));
+    CaptureImageResultResponse request = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
+    Assert.assertArrayEquals(sentImageData, request.getResult().getImageData());
   }
 
 
   @Test
   public void stopCaptureImageAndDoOcr_RequestIsReceived() {
+//    communicator.stopCaptureImageAndDoOcr(ocrResponseListener, new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), new TextRecognitionResult(), null);
+//
+//    waitTillListenerHasBeenCalled();
+//
+//    Assert.assertEquals(1, receivedRequests.size());
+//    String calledMethod = new ArrayList<String>(receivedRequests.keySet()).get(0);
+//    Assert.assertEquals(Addresses.OcrResultMethodName, calledMethod);
+//    Assert.assertTrue(TextRecognitionResult.class.equals(receivedRequests.get(calledMethod)));
+
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
@@ -399,31 +443,11 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void notifyRegisteredDeviceConnected(ConnectedDevice connectedDevice) {
-
+      public boolean messageReceived(String methodName, Request request) {
+        return false;
       }
 
-      @Override
-      public void deviceIsStillConnected(ConnectedDevice connectedDevice) {
-
-      }
-
-      @Override
-      public void captureImageResult(CaptureImageResultResponse response) {
-
-      }
-
-      @Override
-      public void ocrResult(OcrResultResponse response) {
-
-      }
-
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-
-      }
-
-      @Override
+//      @Override
       public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
@@ -511,12 +535,11 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void sendOcrResult() {
-    Assert.fail("Yet to implement");
-  }
+    communicator.sendOcrResult(new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), new TextRecognitionResult(), null);
 
-  @Test
-  public void sendCapturedImage() {
-    Assert.fail("Yet to implement");
+    waitTillListenerHasBeenCalled();
+
+    assertThatCorrectMethodHasBeenCalled(Addresses.OcrResultMethodName, OcrResultResponse.class);
   }
 
 
@@ -549,4 +572,51 @@ public class CommunicatorTest extends CommunicationTestBase {
     streamWriter.close();
     pr.destroy();
   }
+
+
+  protected void waitTillListenerHasBeenCalled() {
+    waitTillListenerHasBeenCalled(3);
+  }
+
+  protected void waitTillListenerHasBeenCalled(int maxSecondsToWait) {
+    try { waitLatch.await(maxSecondsToWait, TimeUnit.SECONDS); } catch(Exception ex) { }
+  }
+
+
+  protected Request assertThatCorrectMethodHasBeenCalled(String methodName, Class<? extends Request> requestClass) {
+    Assert.assertEquals(1, receivedRequests.size());
+
+    String calledMethod = new ArrayList<String>(receivedRequests.keySet()).get(0);
+    Assert.assertEquals(methodName, calledMethod);
+
+    Request request = receivedRequests.get(calledMethod);
+    Assert.assertTrue(requestClass.isAssignableFrom(request.getClass()));
+
+    return request;
+  }
+
+  protected boolean isGenericRequest(Request request) {
+    return request.getClass().isAssignableFrom(GenericRequest.class);
+  }
+
+
+  protected MessagesReceiverListener receiverListener = new MessagesReceiverListener() {
+    @Override
+    public void askForDeviceRegistrationResponseReceived(AskForDeviceRegistrationResponseMessage message) {
+
+    }
+
+    @Override
+    public boolean messageReceived(String methodName, Request request) {
+      receivedRequests.put(methodName, request);
+      waitLatch.countDown();
+      return true;
+    }
+
+    @Override
+    public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+
+    }
+  };
+
 }

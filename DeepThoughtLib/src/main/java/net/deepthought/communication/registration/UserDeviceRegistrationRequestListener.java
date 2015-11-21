@@ -1,6 +1,6 @@
 package net.deepthought.communication.registration;
 
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 
 /**
  * Created by ganymed on 21/08/15.

@@ -1,6 +1,8 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.request;
 
 import net.deepthought.communication.ConnectorMessagesCreator;
+import net.deepthought.communication.messages.MultipartPart;
+import net.deepthought.communication.messages.MultipartType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +16,10 @@ public class MultipartRequest extends RequestWithAsynchronousResponse {
   protected List<MultipartPart> parts = null;
 
 
+  protected MultipartRequest() { // for sub classes
+    this("", 0);
+  }
+
   public MultipartRequest(String address, int port) {
     this(address, port, new ArrayList<MultipartPart>());
   }
@@ -26,6 +32,10 @@ public class MultipartRequest extends RequestWithAsynchronousResponse {
     this(getNextMessageId(), address, port, parts);
   }
 
+  public MultipartRequest(int messageId, String address, int port) {
+    this(messageId, address, port, new ArrayList<MultipartPart>());
+  }
+
   public MultipartRequest(int messageId, String address, int port, MultipartPart[] parts) {
     this(messageId, address, port, new ArrayList<MultipartPart>(Arrays.asList(parts)));
   }
@@ -34,14 +44,19 @@ public class MultipartRequest extends RequestWithAsynchronousResponse {
     super(messageId, address, port);
     this.parts = parts;
 
-    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyAddress, MultipartType.Text, address));
-    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyPort, MultipartType.Text, Integer.toString(port)));
-    parts.add(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyMessageId, MultipartType.Text, Integer.toString(messageId)));
+    // TODO: wouldn't it be better to create one part (Host / MultipartInfo) instead of three?
+    addPart(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyAddress, MultipartType.Text, address));
+    addPart(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyPort, MultipartType.Text, Integer.toString(port)));
+    addPart(new MultipartPart<String>(ConnectorMessagesCreator.MultipartKeyMessageId, MultipartType.Text, Integer.toString(messageId)));
   }
 
 
   public List<MultipartPart> getParts() {
     return parts;
+  }
+
+  public boolean addPart(MultipartPart part) {
+    return parts.add(part);
   }
 
 }

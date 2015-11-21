@@ -1,11 +1,11 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.response;
 
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 
 /**
  * Created by ganymed on 23/08/15.
  */
-public class OcrResultResponse extends Request {
+public class OcrResultResponse extends net.deepthought.communication.messages.request.Request {
 
   protected TextRecognitionResult textRecognitionResult;
 

@@ -4,8 +4,8 @@ import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
 import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.messages.Response;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.model.ConnectedDevice;
 
 import java.util.Timer;

@@ -11,7 +11,7 @@ import android.widget.TextView;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.helper.AlertHelper;
 

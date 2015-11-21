@@ -4,6 +4,7 @@ import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
+import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -25,6 +26,7 @@ public interface IDeepThoughtsConnector {
 
   boolean isStarted();
 
+  boolean isRegisteringAllowed();
   boolean isRegistrationServerRunning();
   boolean isSearchRegistrationServersClientRunning();
 
@@ -35,6 +37,7 @@ public interface IDeepThoughtsConnector {
   int getMessageReceiverPort();
 
   Communicator getCommunicator();
+  AsynchronousResponseListenerManager getListenerManager();
 
   RegisteredDevicesManager getRegisteredDevicesManager();
 

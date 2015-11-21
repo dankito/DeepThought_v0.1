@@ -1,4 +1,4 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.request;
 
 import net.deepthought.Application;
 import net.deepthought.communication.NetworkHelper;

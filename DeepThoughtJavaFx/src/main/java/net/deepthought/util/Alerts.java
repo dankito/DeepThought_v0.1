@@ -1,8 +1,8 @@
 package net.deepthought.util;
 
 import net.deepthought.Application;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.controls.utils.FXUtils;

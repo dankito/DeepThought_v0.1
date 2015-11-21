@@ -79,11 +79,16 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
         packetsRespondedTo.add(requestPacket);
         waitForResponseCreationLatch.countDown();
       }
+
+      @Override
+      protected boolean isSelfSentPacket(HostInfo clientInfo) {
+        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
+      }
     };
 
     searcher.startSearchingAsync(null);
 
-    try { waitForResponseCreationLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForResponseCreationLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     searcher.stopSearching();
 
@@ -103,6 +108,11 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
       protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
         receivedPackets.add(packet);
         waitForPacketsLatch.countDown();
+      }
+
+      @Override
+      protected boolean isSelfSentPacket(HostInfo clientInfo) {
+        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
       }
     };
 
@@ -144,7 +154,12 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<ConnectedDevice> connectedDevices = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator);
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+      @Override
+      protected boolean isSelfSentPacket(HostInfo clientInfo) {
+        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
+      }
+    };
 
     searcher.startSearchingAsync(new RegisteredDeviceConnectedListener() {
       @Override
@@ -154,7 +169,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
       }
     });
 
-    try { waitForResponseCreationLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForResponseCreationLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     searcher.stopSearching();
 

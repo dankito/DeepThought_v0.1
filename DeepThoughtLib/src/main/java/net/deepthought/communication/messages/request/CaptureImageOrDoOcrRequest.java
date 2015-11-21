@@ -1,5 +1,7 @@
-package net.deepthought.communication.messages;
+package net.deepthought.communication.messages.request;
 
+import net.deepthought.communication.ConnectorMessagesCreator;
+import net.deepthought.communication.messages.MultipartPart;
 import net.deepthought.communication.model.DoOcrConfiguration;
 
 import java.io.IOException;
@@ -7,13 +9,17 @@ import java.io.IOException;
 /**
  * Created by ganymed on 23/08/15.
  */
-public class CaptureImageOrDoOcrRequest extends RequestWithAsynchronousResponse {
+public class CaptureImageOrDoOcrRequest extends MultipartRequest {
 
   protected boolean captureImage;
   protected boolean doOcr;
 
   protected DoOcrConfiguration configuration = null;
 
+
+  public CaptureImageOrDoOcrRequest() { // for Reflection
+    this("", 0, false);
+  }
 
   public CaptureImageOrDoOcrRequest(String ipAddress, int port, boolean captureImage) {
     this(ipAddress, port, captureImage, false);
@@ -71,4 +77,18 @@ public class CaptureImageOrDoOcrRequest extends RequestWithAsynchronousResponse 
     return configuration.showMessageOnRemoteDeviceWhenProcessingDone();
   }
 
+
+  @Override
+  public boolean addPart(MultipartPart part) {
+    if(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration.equals(part.getPartName()) && part.getData() instanceof DoOcrConfiguration) {
+      this.configuration = (DoOcrConfiguration)part.getData();
+    }
+    else if(ConnectorMessagesCreator.DoOcrMultipartKeyImage.equals(part.getPartName())) {
+      if(part.getData() instanceof String && configuration != null) {
+        configuration.setImageUri((String)part.getData());
+      }
+    }
+
+    return super.addPart(part);
+  }
 }

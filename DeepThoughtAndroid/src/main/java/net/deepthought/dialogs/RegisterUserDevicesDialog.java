@@ -16,11 +16,11 @@ import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.DeviceRegistrationDevicesAdapter;
 import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.AskForDeviceRegistrationResponseMessage;
-import net.deepthought.communication.messages.Request;
-import net.deepthought.communication.messages.Response;
-import net.deepthought.communication.messages.ResponseValue;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.Response;
+import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
@@ -183,7 +183,7 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
     Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
-        if (result.allowsRegistration() && response.getResponseValue() == ResponseValue.Ok) {
+        if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
           AlertHelper.showInfoMessage(getActivity(), getActivity().getString(R.string.device_registration_successfully_registered_device, request.getDevice()));
         }
       }
