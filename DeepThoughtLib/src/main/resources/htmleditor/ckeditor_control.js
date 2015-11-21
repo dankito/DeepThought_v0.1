@@ -57,6 +57,7 @@ function initializeCKEditor() {
 				app.htmlChanged();
 			}
 			else if(editor.undoManager.hasUndo == false) {
+				htmlChanged = false;
 				app.htmlHasBeenReset();
 			}
 		}
