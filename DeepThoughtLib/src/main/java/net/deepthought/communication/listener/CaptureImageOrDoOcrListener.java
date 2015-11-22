@@ -1,6 +1,7 @@
 package net.deepthought.communication.listener;
 
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 
 /**
@@ -8,7 +9,11 @@ import net.deepthought.communication.messages.request.StopRequestWithAsynchronou
  */
 public interface CaptureImageOrDoOcrListener {
 
-  void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request);
+  void captureImage(RequestWithAsynchronousResponse request);
+
+  void captureImageAndDoOcr(RequestWithAsynchronousResponse request);
+
+  void doOcrOnImage(DoOcrOnImageRequest request);
 
   void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request);
 }

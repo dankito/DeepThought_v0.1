@@ -14,9 +14,10 @@ import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesDispatcher;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.Response;
@@ -86,7 +87,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
     // TODO: make configurable
     this.listenerManager = new AsynchronousResponseListenerManager();
-    this.communicator = new Communicator(new MessagesDispatcher(), listenerManager, this, communicatorListener);
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(), listenerManager, messageReceiverPort), this, communicatorListener);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator();
@@ -457,11 +458,17 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       // TODO: is this correct, calling connectedToRegisteredDevice() ?
       return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>)request).getRequestBody());
     }
-    else if(Addresses.StartCaptureImageAndDoOcrMethodName.equals(methodName)) {
-      return handleStartCaptureImageAndDoOcrMessage((CaptureImageOrDoOcrRequest) request);
+    else if(Addresses.StartCaptureImageMethodName.equals(methodName)) {
+      return handleStartCaptureImageMessage((RequestWithAsynchronousResponse) request);
     }
     else if(Addresses.CaptureImageResultMethodName.equals(methodName)) {
       return true;
+    }
+    else if(Addresses.StartCaptureImageAndDoOcrMethodName.equals(methodName)) {
+      return handleStartCaptureImageAndDoOcrMessage((RequestWithAsynchronousResponse) request);
+    }
+    else if(Addresses.DoOcrOnImageMethodName.equals(methodName)) {
+      return handleDoOcrOnImageMessage((DoOcrOnImageRequest) request);
     }
     else if(Addresses.OcrResultMethodName.equals(methodName)) {
       return true;
@@ -473,9 +480,21 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return false;
   }
 
-  protected boolean handleStartCaptureImageAndDoOcrMessage(CaptureImageOrDoOcrRequest request) {
+  protected boolean handleStartCaptureImageMessage(RequestWithAsynchronousResponse request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-      listener.startCaptureImageOrDoOcr(request);
+      listener.captureImage(request);
+    return true;
+  }
+
+  protected boolean handleStartCaptureImageAndDoOcrMessage(RequestWithAsynchronousResponse request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.captureImageAndDoOcr(request);
+    return true;
+  }
+
+  protected boolean handleDoOcrOnImageMessage(DoOcrOnImageRequest request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.doOcrOnImage(request);
     return true;
   }
 

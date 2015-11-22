@@ -22,13 +22,12 @@ import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverview
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
+import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
-import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   // make them static otherwise the will be cleaned up when starting TakePhoto Activity
   protected static FileLink temporaryImageFile = null;
-  protected static CaptureImageOrDoOcrRequest captureImageRequest = null;
+  protected static RequestWithAsynchronousResponse captureImageRequest = null;
 
 
   protected ProgressDialog loadingDataProgressDialog = null;
@@ -413,23 +412,29 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   };
 
   protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+
     @Override
-    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-      if(request.captureImage() == true && request.doOcr() == false)
-        captureImageAndSendToCaller(request);
-      else if(request.captureImage() == true && request.doOcr() == true)
-        captureImageAndDoOcr(request);
-      else if(request.captureImage() == false && request.doOcr() == true)
-        doOcrAndSendToCaller(request);
+    public void captureImage(RequestWithAsynchronousResponse request) {
+      captureImageAndSendToCaller(request);
+    }
+
+    @Override
+    public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
+      captureImageAndDoOcr(request);
+    }
+
+    @Override
+    public void doOcrOnImage(DoOcrOnImageRequest request) {
+      doOcrAndSendToCaller(request);
     }
 
     @Override
     public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
-
+      // TODO: implement
     }
   };
 
-  protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
+  protected void captureImageAndSendToCaller(RequestWithAsynchronousResponse request) {
     temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
     if(temporaryImageFile != null)
       this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller

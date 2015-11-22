@@ -283,7 +283,7 @@ public class MessagesReceiver extends NanoHTTPD {
 //      return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.response.Response.Denied);
 //    }
 //
-//    listener.startCaptureImageOrDoOcr(request);
+//    listener.captureImageAndDoOcr(request);
 //
 //    return createOkResponse();
 //  }

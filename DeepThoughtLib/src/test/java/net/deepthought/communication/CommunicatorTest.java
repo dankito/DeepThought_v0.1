@@ -3,19 +3,16 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
@@ -49,12 +46,6 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   private final static Logger log = LoggerFactory.getLogger(CommunicatorTest.class);
 
-  protected final static String TestDeviceId = "Cuddle";
-
-  protected final static String TestIpAddress = "0.0.0.0";
-
-  protected final static int CommunicatorPort = 54321;
-
   protected final static int TestMessageId = 4711;
 
   protected final static String TestRecognizedText = "Cuddle";
@@ -62,9 +53,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 //  protected Communicator communicator = null;
 
-  protected net.deepthought.communication.messages.MessagesReceiver receiver = null;
-
-  protected ConnectedDevice localHost = null;
+  protected MessagesReceiver receiver = null;
 
   protected CountDownLatch waitLatch = new CountDownLatch(1);
 
@@ -78,7 +67,6 @@ public class CommunicatorTest extends CommunicationTestBase {
 //    communicator = new Communicator(new MessagesDispatcher(), null, null);
     receiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(CommunicatorPort, connector.getListenerManager()), receiverListener);
     receiver.start();
-    localHost = new ConnectedDevice(TestDeviceId, TestIpAddress, CommunicatorPort);
 
     try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
   }
@@ -321,7 +309,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
 //      @Override
-//      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+//      public void captureImageAndDoOcr(CaptureImageOrDoOcrRequest request) {
 //
 //      }
 //
@@ -421,31 +409,6 @@ public class CommunicatorTest extends CommunicationTestBase {
     Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
   }
 
-  @Test
-  public void startCaptureImageAndDoOcr_addCaptureImageOrDoOcrListenerIsCalled() {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        methodCalled.set(true);
-        waitLatch.countDown();
-      }
-
-      @Override
-      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
-
-      }
-    });
-
-    communicator.startCaptureImageAndDoOcr(localHost, null);
-
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
-  }
-
 
 //  @Test
 //  public void stopCaptureImageAndDoOcr_RequestIsReceived() {
@@ -463,7 +426,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
 //      @Override
-//      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+//      public void captureImageAndDoOcr(CaptureImageOrDoOcrRequest request) {
 //
 //      }
 //
@@ -474,7 +437,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //      }
 //    });
 //
-//    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcr(localHost, null);
+//    RequestWithAsynchronousResponse request = communicator.captureImageAndDoOcr(localHost, null);
 //    waitTillListenerHasBeenCalled();
 //
 //    communicator.stopCaptureImageAndDoOcr(request.getMessageId(), localHost, null);
@@ -485,7 +448,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //  @Test
 //  public void stopCaptureImageAndDoOcr_ListenerGetsRemoved() {
-//    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcr(localHost, null);
+//    RequestWithAsynchronousResponse request = communicator.captureImageAndDoOcr(localHost, null);
 //    waitTillListenerHasBeenCalled();
 //    resetWaitLatch();
 //
@@ -564,31 +527,6 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
     Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
-  }
-
-  @Test
-  public void startDoOcrOnImage_addCaptureImageOrDoOcrListenerIsCalled() {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-      @Override
-      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        methodCalled.set(true);
-        waitLatch.countDown();
-      }
-
-      @Override
-      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
-
-      }
-    });
-
-    communicator.startDoOcrOnImage(localHost, new DoOcrConfiguration(new byte[0]), null);
-
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-
-    Assert.assertTrue(methodCalled.get());
   }
 
 

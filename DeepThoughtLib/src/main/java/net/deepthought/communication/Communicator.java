@@ -3,7 +3,6 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.CommunicatorListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
@@ -46,18 +45,21 @@ public class Communicator {
 
   protected AsynchronousResponseListenerManager listenerManager = null;
 
+  protected int messageReceiverPort;
+
   protected IDeepThoughtsConnector connector;
 
   protected CommunicatorListener communicatorListener;
 
   protected Map<AskForDeviceRegistrationRequest, AskForDeviceRegistrationListener> askForDeviceRegistrationListeners = new HashMap<>();
 
-  protected Map<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> captureImageOrDoOcrListeners = new HashMap<>();
 
+  public Communicator(CommunicatorConfig config, IDeepThoughtsConnector connector, CommunicatorListener communicatorListener) {
+    this.dispatcher = config.getDispatcher();
+    this.listenerManager = config.getListenerManager();
+    this.messageReceiverPort = config.getMessageReceiverPort();
 
-  public Communicator(IMessagesDispatcher dispatcher, AsynchronousResponseListenerManager listenerManager, IDeepThoughtsConnector connector, CommunicatorListener communicatorListener) {
-    this.dispatcher = dispatcher;
-    this.listenerManager = listenerManager;
+    // TODO: try to remove
     this.connector = connector;
     this.communicatorListener = communicatorListener;
 
@@ -267,7 +269,7 @@ public class Communicator {
   }
 
   protected int getMessageReceiverPort() {
-    return connector.getMessageReceiverPort();
+    return messageReceiverPort;
   }
 
 
@@ -295,28 +297,8 @@ public class Communicator {
 
     @Override
     public boolean messageReceived(String methodName, Request request) {
-      if(Addresses.OcrResultMethodName.equals(methodName)) {
-        OcrResultResponse response = (OcrResultResponse)request;
-        Integer messageId = response.getRequestMessageId();
-
-        for(RequestWithAsynchronousResponse doOcrRequest : captureImageOrDoOcrListeners.keySet()) {
-          if(messageId.equals(doOcrRequest.getMessageId())) {
-            CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(doOcrRequest);
-            listener.ocrResult(response.getTextRecognitionResult());
-
-            if(response.getTextRecognitionResult().isDone())
-              removeFromCaptureImageOrDoOcrListenersMap(doOcrRequest);
-            break;
-          }
-        }
-      }
-
       return false;
     }
   };
-
-  protected void removeFromCaptureImageOrDoOcrListenersMap(RequestWithAsynchronousResponse request) {
-    captureImageOrDoOcrListeners.remove(request);
-  }
 
 }

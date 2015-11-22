@@ -8,18 +8,19 @@ package net.deepthought;
 
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
-import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.entries.EntriesOverviewControl;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
@@ -913,8 +914,19 @@ public class MainWindowController implements Initializable {
 
 
   protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+
     @Override
-    public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
+    public void captureImage(RequestWithAsynchronousResponse request) {
+      // TODO
+    }
+
+    @Override
+    public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
+      // TODO
+    }
+
+    @Override
+    public void doOcrOnImage(DoOcrOnImageRequest request) {
       // TODO
     }
 
