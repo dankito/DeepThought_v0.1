@@ -366,43 +366,16 @@ public class CommunicatorTest extends CommunicationTestBase {
     Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
   }
 
-//  @Test
-//  public void startCaptureImageAndDoOcr_addCaptureImageOrDoOcrListenerIsCalled() {
-//    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-//    final CountDownLatch waitLatch = new CountDownLatch(1);
-//
-//    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-//      @Override
-//      public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-//        methodCalled.set(true);
-//        waitLatch.countDown();
-//      }
-//
-//      @Override
-//      public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
-//
-//      }
-//    });
-//
-//    communicator.startCaptureImageAndDoOcr(localHost, null);
-//
-//    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-//
-//    Assert.assertTrue(methodCalled.get());
-//  }
-
   @Test
-  public void startCaptureImageAndDoOcr_ServerSendsOcrResult_ServerResponseIsReceived() {
-    final List<TextRecognitionResult> ocrResults = new ArrayList<>();
+  public void startCaptureImageAndDoOcr_addCaptureImageOrDoOcrListenerIsCalled() {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final String recognizedText = "Hyper, hyper";
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
     connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
-
       @Override
       public void startCaptureImageOrDoOcr(CaptureImageOrDoOcrRequest request) {
-        communicator.sendOcrResult(request, TextRecognitionResult.createRecognitionSuccessfulResult(recognizedText), null);
+        methodCalled.set(true);
+        waitLatch.countDown();
       }
 
       @Override
@@ -411,24 +384,11 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), new CaptureImageOrDoOcrResponseListener() {
-      @Override
-      public void captureImageResult(CaptureImageResult captureImageResult) {
+    communicator.startCaptureImageAndDoOcrNew(localHost, null);
 
-      }
-
-      @Override
-      public void ocrResult(TextRecognitionResult ocrResult) {
-        methodCalled.set(true);
-        ocrResults.add(ocrResult);
-        waitLatch.countDown();
-      }
-    });
-
-    try { waitLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
-    Assert.assertEquals(recognizedText, ocrResults.get(0).getRecognizedText());
   }
 
 
@@ -576,7 +536,7 @@ public class CommunicatorTest extends CommunicationTestBase {
         return false;
       }
 
-//      @Override
+      //      @Override
       public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
@@ -588,7 +548,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcrNew(localHost, null);
     communicator.stopCaptureImageAndDoOcr(ocrResponseListener, null);
 
     try { waitLatch.await(3, TimeUnit.SECONDS);
@@ -615,7 +575,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcrNew(localHost, null);
 
     try { waitLatch.await(3, TimeUnit.SECONDS);
     } catch(Exception ex) { }
@@ -639,7 +599,7 @@ public class CommunicatorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()), ocrResponseListener);
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcrNew(localHost, null);
     Assert.assertEquals(1, communicator.captureImageOrDoOcrListeners.size());
 
     try { waitLatch.await(3, TimeUnit.SECONDS);

@@ -147,6 +147,10 @@ public class Communicator {
     return request;
   }
 
+  public void stopCaptureImage(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
+    stopCaptureImageAndDoOcr(listenerToUnset, listener);
+  }
+
   public void respondToCaptureImageRequest(RequestWithAsynchronousResponse request, CaptureImageResult result, final ResponseListener listener) {
     String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
     final CaptureImageResultResponse response = new CaptureImageResultResponse(result, request.getMessageId());
@@ -175,6 +179,36 @@ public class Communicator {
     return request;
   }
 
+  public void stopCaptureImageAndDoOcr(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
+    RequestWithAsynchronousResponse captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
+    removeFromCaptureImageOrDoOcrListenersMap(captureRequest);
+    if(captureRequest == null) {
+      log.error("stopCaptureImageOrDoOcr() has been called but no CaptureImageOrDoOcrRequest has been found for listenerToUnset");
+      return;
+    }
+
+    String address = Addresses.getStopCaptureImageAndDoOcrAddress(captureRequest.getAddress(), captureRequest.getPort());
+    final StopCaptureImageOrDoOcrRequest stopRequest = new StopCaptureImageOrDoOcrRequest(captureRequest.getMessageId());
+
+    dispatcher.sendMessageAsync(address, stopRequest, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(stopRequest, communicatorResponse, listener);
+      }
+    });
+  }
+
+  protected RequestWithAsynchronousResponse findCaptureImageOrDoOcrRequestForListener(CaptureImageOrDoOcrResponseListener listenerToUnset) {
+    RequestWithAsynchronousResponse request = null;
+    for(Map.Entry<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
+      if(entry.getValue() == listenerToUnset) {
+        request = entry.getKey();
+        break;
+      }
+    }
+    return request;
+  }
+
   public void respondToCaptureImageAndDoOcrRequest(RequestWithAsynchronousResponse request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
@@ -187,30 +221,6 @@ public class Communicator {
     });
   }
 
-
-  public void startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
-    startCaptureImageOrDoOcr(deviceToDoTheJob, true, false, listener);
-  }
-
-  public void startCaptureImageAndDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageOrDoOcrResponseListener listener) {
-    startCaptureImageOrDoOcr(deviceToDoTheJob, true, true, listener);
-  }
-
-  protected void startCaptureImageOrDoOcr(ConnectedDevice deviceToDoTheJob, boolean captureImage, boolean doOcr, final CaptureImageOrDoOcrResponseListener listener) {
-    String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final CaptureImageOrDoOcrRequest request = new CaptureImageOrDoOcrRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), captureImage, doOcr);
-
-    if(listener != null)
-      captureImageOrDoOcrListeners.put(request, listener);
-//    listenerManager.addListenerForResponse(request, listener);
-
-    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
-      }
-    });
-  }
 
 
   public void startDoOcr(ConnectedDevice deviceToDoTheJob, File imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone, CaptureImageOrDoOcrResponseListener listener) {
@@ -277,40 +287,6 @@ public class Communicator {
     });
   }
 
-  public void stopCaptureImage(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
-    stopCaptureImageAndDoOcr(listenerToUnset, listener);
-  }
-
-  public void stopCaptureImageAndDoOcr(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
-    RequestWithAsynchronousResponse captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
-    removeFromCaptureImageOrDoOcrListenersMap(captureRequest);
-    if(captureRequest == null) {
-      log.error("stopCaptureImageOrDoOcr() has been called but no CaptureImageOrDoOcrRequest has been found for listenerToUnset");
-      return;
-    }
-
-    String address = Addresses.getStopCaptureImageAndDoOcrAddress(captureRequest.getAddress(), captureRequest.getPort());
-    final StopCaptureImageOrDoOcrRequest stopRequest = new StopCaptureImageOrDoOcrRequest(captureRequest.getMessageId());
-
-    dispatcher.sendMessageAsync(address, stopRequest, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(stopRequest, communicatorResponse, listener);
-      }
-    });
-  }
-
-  protected RequestWithAsynchronousResponse findCaptureImageOrDoOcrRequestForListener(CaptureImageOrDoOcrResponseListener listenerToUnset) {
-    RequestWithAsynchronousResponse request = null;
-    for(Map.Entry<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
-      if(entry.getValue() == listenerToUnset) {
-        request = entry.getKey();
-        break;
-      }
-    }
-    return request;
-  }
-
 
   protected void dispatchResponse(Request request, Response response) {
     dispatchResponse(request, response, null);
@@ -364,21 +340,6 @@ public class Communicator {
 
             if(response.getTextRecognitionResult().isDone())
               removeFromCaptureImageOrDoOcrListenersMap(doOcrRequest);
-            break;
-          }
-        }
-      }
-      else if(Addresses.CaptureImageResultMethodName.equals(methodName)) {
-        CaptureImageResultResponse response = (CaptureImageResultResponse)request;
-        Integer messageId = response.getMessageId();
-
-        for(RequestWithAsynchronousResponse captureImageRequest : captureImageOrDoOcrListeners.keySet()) {
-          if(messageId.equals(captureImageRequest.getMessageId())) {
-            CaptureImageOrDoOcrResponseListener listener = captureImageOrDoOcrListeners.get(captureImageRequest);
-            listener.captureImageResult(response.getResult());
-
-            if(response.getResult().isDone())
-              removeFromCaptureImageOrDoOcrListenersMap(captureImageRequest);
             break;
           }
         }

@@ -1,8 +1,13 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
+import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
+import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
@@ -184,11 +189,10 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     if(connectedDevice.hasCaptureDevice()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageOrDoOcrResponseListener));
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageNew(connectedDevice, captureImageResultListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
-    // TODO: load image which text should be recognized
     if(connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
@@ -199,7 +203,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageOrDoOcrResponseListener));
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcrNew(connectedDevice, captureImageAndDoOcrResultListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
@@ -270,6 +274,24 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
     @Override
     public void ocrResult(final TextRecognitionResult ocrResult) {
+      if(ocrResult.recognitionSuccessful())
+        Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
+      // TODO: show error message (or has it already been shown at this time?)
+    }
+  };
+
+  protected CaptureImageResultListener captureImageResultListener = new CaptureImageResultListener() {
+    @Override
+    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResult result) {
+      if (result.successful())
+        imageSuccessfullyCaptured(result);
+      // TODO: show error message (or has it already been shown at this time?)
+    }
+  };
+
+  protected CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener = new CaptureImageAndDoOcrResultListener() {
+    @Override
+    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, TextRecognitionResult ocrResult) {
       if(ocrResult.recognitionSuccessful())
         Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
       // TODO: show error message (or has it already been shown at this time?)
