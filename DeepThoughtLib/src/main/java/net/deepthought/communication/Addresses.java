@@ -20,11 +20,12 @@ public class Addresses {
   public final static String HeartbeatMethodName = "Heartbeat";
 
   public final static String StartCaptureImageMethodName = "StartCaptureImage";
+  public final static String StopCaptureImageMethodName = "StopCaptureImage";
   public final static String StartCaptureImageAndDoOcrMethodName = "StartCaptureImageAndDoOcr";
+  public final static String StopCaptureImageAndDoOcrMethodName = "StopCaptureImageAndDoOcr";
   public final static String DoOcrOnImageMethodName = "DoOcrOnImage";
   public final static String OcrResultMethodName = "OcrResult";
   public final static String CaptureImageResultMethodName = "CaptureImageResult";
-  public final static String StopCaptureImageAndDoOcrMethodName = "StopCaptureImageAndDoOcr";
 
   public final static List<String> MethodNames;
 
@@ -76,6 +77,10 @@ public class Addresses {
 
   public static String getCaptureImageResultAddress(String host, int port) {
     return createAddress(host, port, CaptureImageResultMethodName);
+  }
+
+  public static String getStopCaptureImageAddress(String host, int port) {
+    return createAddress(host, port, StopCaptureImageMethodName);
   }
 
   public static String getStopCaptureImageAndDoOcrAddress(String host, int port) {

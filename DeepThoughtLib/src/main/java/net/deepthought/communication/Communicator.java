@@ -18,7 +18,6 @@ import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.MultipartRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
@@ -131,7 +130,7 @@ public class Communicator {
   }
 
 
-  public RequestWithAsynchronousResponse startCaptureImageNew(ConnectedDevice deviceToDoTheJob, CaptureImageResultListener listener) {
+  public RequestWithAsynchronousResponse startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageResultListener listener) {
     String address = Addresses.getStartCaptureImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
     final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
 
@@ -147,9 +146,21 @@ public class Communicator {
     return request;
   }
 
-  public void stopCaptureImage(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
-    stopCaptureImageAndDoOcr(listenerToUnset, listener);
-  }
+//  public void stopCaptureImage(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
+//    if(listenerManager.removeListenerForMessageId(messageId) == false) {
+//      log.error("stopCaptureImage() has been called but there was no Listener registered for MessageId " + messageId);
+//    }
+//
+//    String address = Addresses.getStopCaptureImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+//    final StopRequestWithAsynchronousResponse stopRequest = new StopRequestWithAsynchronousResponse(messageId);
+//
+//    dispatcher.sendMessageAsync(address, stopRequest, new CommunicatorResponseListener() {
+//      @Override
+//      public void responseReceived(Response communicatorResponse) {
+//        dispatchResponse(stopRequest, communicatorResponse, listener);
+//      }
+//    });
+//  }
 
   public void respondToCaptureImageRequest(RequestWithAsynchronousResponse request, CaptureImageResult result, final ResponseListener listener) {
     String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
@@ -163,7 +174,8 @@ public class Communicator {
     });
   }
 
-  public RequestWithAsynchronousResponse startCaptureImageAndDoOcrNew(ConnectedDevice deviceToDoTheJob, CaptureImageAndDoOcrResultListener listener) {
+
+  public RequestWithAsynchronousResponse startCaptureImageAndDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageAndDoOcrResultListener listener) {
     String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
     final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
 
@@ -179,35 +191,21 @@ public class Communicator {
     return request;
   }
 
-  public void stopCaptureImageAndDoOcr(CaptureImageOrDoOcrResponseListener listenerToUnset /*important as it otherwise would cause memory leaks*/, final ResponseListener listener) {
-    RequestWithAsynchronousResponse captureRequest = findCaptureImageOrDoOcrRequestForListener(listenerToUnset);
-    removeFromCaptureImageOrDoOcrListenersMap(captureRequest);
-    if(captureRequest == null) {
-      log.error("stopCaptureImageOrDoOcr() has been called but no CaptureImageOrDoOcrRequest has been found for listenerToUnset");
-      return;
-    }
-
-    String address = Addresses.getStopCaptureImageAndDoOcrAddress(captureRequest.getAddress(), captureRequest.getPort());
-    final StopCaptureImageOrDoOcrRequest stopRequest = new StopCaptureImageOrDoOcrRequest(captureRequest.getMessageId());
-
-    dispatcher.sendMessageAsync(address, stopRequest, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(stopRequest, communicatorResponse, listener);
-      }
-    });
-  }
-
-  protected RequestWithAsynchronousResponse findCaptureImageOrDoOcrRequestForListener(CaptureImageOrDoOcrResponseListener listenerToUnset) {
-    RequestWithAsynchronousResponse request = null;
-    for(Map.Entry<RequestWithAsynchronousResponse, CaptureImageOrDoOcrResponseListener> entry : captureImageOrDoOcrListeners.entrySet()) {
-      if(entry.getValue() == listenerToUnset) {
-        request = entry.getKey();
-        break;
-      }
-    }
-    return request;
-  }
+//  public void stopCaptureImageAndDoOcr(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
+//    if(listenerManager.removeListenerForMessageId(messageId) == false) {
+//      log.error("stopCaptureImageOrDoOcr() has been called but there was no Listener registered for MessageId " + messageId);
+//    }
+//
+//    String address = Addresses.getStopCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+//    final StopRequestWithAsynchronousResponse stopRequest = new StopRequestWithAsynchronousResponse(messageId);
+//
+//    dispatcher.sendMessageAsync(address, stopRequest, new CommunicatorResponseListener() {
+//      @Override
+//      public void responseReceived(Response communicatorResponse) {
+//        dispatchResponse(stopRequest, communicatorResponse, listener);
+//      }
+//    });
+//  }
 
   public void respondToCaptureImageAndDoOcrRequest(RequestWithAsynchronousResponse request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());

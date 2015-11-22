@@ -9,7 +9,7 @@ package net.deepthought;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
-import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
@@ -919,7 +919,7 @@ public class MainWindowController implements Initializable {
     }
 
     @Override
-    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+    public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
       // TODO
     }
   };

@@ -6,8 +6,6 @@ import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListene
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.CaptureImageResultResponse;
-import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
@@ -189,7 +187,8 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     if(connectedDevice.hasCaptureDevice()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageNew(connectedDevice, captureImageResultListener));
+      // TODO: store requestMessageId so that Capturing Image process can be stopped
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageResultListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 
@@ -203,7 +202,8 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcrNew(connectedDevice, captureImageAndDoOcrResultListener));
+      // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageAndDoOcrResultListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
 

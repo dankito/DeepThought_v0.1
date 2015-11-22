@@ -49,15 +49,17 @@ public class AsynchronousResponseListenerManager {
     return null;
   }
 
-  public void removeListenerForMessageId(int messageId) {
+  public boolean removeListenerForMessageId(int messageId) {
     RequestWithAsynchronousResponse request = getRequestWithAsynchronousResponseForMessageId(messageId);
     if(request != null) {
-      removeListenerForRequest(request);
+      return removeListenerForRequest(request);
     }
+
+    return false;
   }
 
-  public void removeListenerForRequest(RequestWithAsynchronousResponse request) {
-    asynchronousResponseListeners.remove(request);
+  public boolean removeListenerForRequest(RequestWithAsynchronousResponse request) {
+    return asynchronousResponseListeners.remove(request) != null;
   }
 
 

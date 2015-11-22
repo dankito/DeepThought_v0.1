@@ -26,7 +26,7 @@ import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
-import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    public void stopCaptureImageOrDoOcr(StopCaptureImageOrDoOcrRequest request) {
+    public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
 
     }
   };

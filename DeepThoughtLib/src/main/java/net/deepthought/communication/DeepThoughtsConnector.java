@@ -17,7 +17,7 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
-import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.model.ConnectedDevice;
@@ -467,7 +467,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       return true;
     }
     else if(Addresses.StopCaptureImageAndDoOcrMethodName.equals(methodName)) {
-      return handleStopCaptureImageOrDoOcrMessage((StopCaptureImageOrDoOcrRequest) request);
+      return handleStopCaptureImageOrDoOcrMessage((StopRequestWithAsynchronousResponse) request);
     }
 
     return false;
@@ -479,7 +479,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return true;
   }
 
-  protected boolean handleStopCaptureImageOrDoOcrMessage(StopCaptureImageOrDoOcrRequest request) {
+  protected boolean handleStopCaptureImageOrDoOcrMessage(StopRequestWithAsynchronousResponse request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
       listener.stopCaptureImageOrDoOcr(request);
     return true;
