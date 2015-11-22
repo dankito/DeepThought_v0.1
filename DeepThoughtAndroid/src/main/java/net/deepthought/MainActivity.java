@@ -23,7 +23,9 @@ import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -433,15 +435,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller
   }
 
-  protected void captureImageAndDoOcr(final CaptureImageOrDoOcrRequest request) {
+  protected void captureImageAndDoOcr(final RequestWithAsynchronousResponse request) {
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
       Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
         @Override
         public void textRecognized(TextRecognitionResult result) {
-          Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
+          Application.getDeepThoughtsConnector().getCommunicator().respondToCaptureImageAndDoOcrRequest(request, result, new ResponseListener() {
             @Override
             public void responseReceived(Request request, Response response) {
-              if(response.getResponseCode() == ResponseCode.Error) {
+              if (response.getResponseCode() == ResponseCode.Error) {
                 // TODO: stop process then
               }
             }
@@ -451,15 +453,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   }
 
-  protected void doOcrAndSendToCaller(final CaptureImageOrDoOcrRequest request) {
+  protected void doOcrAndSendToCaller(final DoOcrOnImageRequest request) {
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
       Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(request.getConfiguration(), new RecognizeTextListener() {
         @Override
         public void textRecognized(TextRecognitionResult result) {
-          Application.getDeepThoughtsConnector().getCommunicator().sendOcrResult(request, result, new ResponseListener() {
+          Application.getDeepThoughtsConnector().getCommunicator().respondToDoOcrOnImageRequest(request, result, new ResponseListener() {
             @Override
             public void responseReceived(Request request, Response response) {
-              if(response.getResponseCode() == ResponseCode.Error) {
+              if (response.getResponseCode() == ResponseCode.Error) {
                 // TODO: stop process then
               }
             }

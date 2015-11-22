@@ -12,7 +12,6 @@ import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.IMessagesDispatcher;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
@@ -128,7 +127,7 @@ public class Communicator {
 
   public RequestWithAsynchronousResponse startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageResultListener listener) {
     String address = Addresses.getStartCaptureImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
+    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(getIpAddressToSendResponseTo(), getMessageReceiverPort());
 
     listenerManager.addListenerForResponse(request, listener);
 
@@ -173,7 +172,7 @@ public class Communicator {
 
   public RequestWithAsynchronousResponse startCaptureImageAndDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageAndDoOcrResultListener listener) {
     String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
+    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(getIpAddressToSendResponseTo(), getMessageReceiverPort());
 
     listenerManager.addListenerForResponse(request, listener);
 
@@ -216,9 +215,9 @@ public class Communicator {
   }
 
 
-  public RequestWithAsynchronousResponse startDoOcrOnImage(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final DoOcrOnImageResultListener listener) {
+  public DoOcrOnImageRequest startDoOcrOnImage(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final DoOcrOnImageResultListener listener) {
     String address = Addresses.getDoOcrOnImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final DoOcrOnImageRequest request = new DoOcrOnImageRequest(configuration);
+    final DoOcrOnImageRequest request = new DoOcrOnImageRequest(getIpAddressToSendResponseTo(), getMessageReceiverPort(), configuration);
 
     listenerManager.addListenerForResponse(request, listener);
 
@@ -233,7 +232,7 @@ public class Communicator {
   }
 
 
-  public void sendOcrResult(final CaptureImageOrDoOcrRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
+  public void respondToDoOcrOnImageRequest(final DoOcrOnImageRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
 
@@ -260,6 +259,15 @@ public class Communicator {
         listener.responseReceived(request, response);
       } catch (Exception ex2) { log.error("An error occurred calling method's ResponseListener (so the error certainly is in the listener method)", ex2); }
     }
+  }
+
+
+  protected String getIpAddressToSendResponseTo() {
+    return NetworkHelper.getIPAddressString(true);
+  }
+
+  protected int getMessageReceiverPort() {
+    return connector.getMessageReceiverPort();
   }
 
 

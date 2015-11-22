@@ -2,18 +2,18 @@ package net.deepthought.controls.html;
 
 import net.deepthought.Application;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
+import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
-import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.FileLink;
@@ -252,7 +252,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
       Application.getDeepThoughtsConnector().getCommunicator().startDoOcrOnImage(connectedDevice, configuration, new DoOcrOnImageResultListener() {
         @Override
-        public void responseReceived(DoOcrOnImageRequest doOcrOnImageRequest, TextRecognitionResult result) {
+        public void responseReceived(DoOcrOnImageRequest doOcrOnImageRequest, OcrResultResponse result) {
           receivedOcrResultForImage(connectedDevice, imagesToRecognize, currentImageIndex, result);
         }
       });
@@ -263,7 +263,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     }
   }
 
-  protected void receivedOcrResultForImage(ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex, TextRecognitionResult ocrResult) {
+  protected void receivedOcrResultForImage(ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex, OcrResultResponse ocrResult) {
     ocrResultReceived(ocrResult);
 
     if (ocrResult.isDone() && imagesToRecognize.size() > 0) {
@@ -277,38 +277,24 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     });
   }
 
-  protected CaptureImageOrDoOcrResponseListener captureImageOrDoOcrResponseListener = new CaptureImageOrDoOcrResponseListener() {
-    @Override
-    public void captureImageResult(CaptureImageResult captureImageResult) {
-      if (captureImageResult.successful())
-        imageSuccessfullyCaptured(captureImageResult);
-      // TODO: show error message (or has it already been shown at this time?)
-    }
-
-    @Override
-    public void ocrResult(final TextRecognitionResult ocrResult) {
-      ocrResultReceived(ocrResult);
-    }
-  };
-
-  protected void ocrResultReceived(TextRecognitionResult ocrResult) {
-    if(ocrResult.recognitionSuccessful())
-      Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
+  protected void ocrResultReceived(OcrResultResponse ocrResult) {
+    if(ocrResult.getTextRecognitionResult() != null && ocrResult.getTextRecognitionResult().recognitionSuccessful())
+      Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getTextRecognitionResult().getRecognizedText(), false));
     // TODO: show error message (or has it already been shown at this time?)
   }
 
   protected CaptureImageResultListener captureImageResultListener = new CaptureImageResultListener() {
     @Override
-    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResult result) {
-      if (result.successful())
-        imageSuccessfullyCaptured(result);
+    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResultResponse response) {
+      if (response.getResult() != null && response.getResult().successful())
+        imageSuccessfullyCaptured(response.getResult());
       // TODO: show error message (or has it already been shown at this time?)
     }
   };
 
   protected CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener = new CaptureImageAndDoOcrResultListener() {
     @Override
-    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, TextRecognitionResult ocrResult) {
+    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, OcrResultResponse ocrResult) {
       ocrResultReceived(ocrResult);
       // TODO: show error message (or has it already been shown at this time?)
     }

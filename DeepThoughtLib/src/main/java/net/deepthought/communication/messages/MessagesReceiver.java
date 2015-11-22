@@ -122,18 +122,22 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected void handleResponseToAsynchronousRequest(ResponseToAsynchronousRequest responseToRequest) {
-    int messageId = responseToRequest.getRequestMessageId();
-    AsynchronousResponseListenerManager listenerManager = config.getListenerManager();
+    try {
+      int messageId = responseToRequest.getRequestMessageId();
+      AsynchronousResponseListenerManager listenerManager = config.getListenerManager();
 
-    AsynchronousResponseListener listener = listenerManager.getListenerForMessageId(messageId);
-    RequestWithAsynchronousResponse originalRequest = listenerManager.getRequestWithAsynchronousResponseForMessageId(messageId);
+      AsynchronousResponseListener listener = listenerManager.getListenerForMessageId(messageId);
+      RequestWithAsynchronousResponse originalRequest = listenerManager.getRequestWithAsynchronousResponseForMessageId(messageId);
 
-    if(responseToRequest.isDone()) {
-      listenerManager.removeListenerForMessageId(messageId);
-    }
+      if (responseToRequest.isDone()) {
+        listenerManager.removeListenerForMessageId(messageId);
+      }
 
-    if(listener != null && originalRequest != null) {
-      listener.responseReceived(originalRequest, responseToRequest);
+      if (listener != null && originalRequest != null) {
+        listener.responseReceived(originalRequest, responseToRequest);
+      }
+    } catch(Exception ex) {
+      log.error("Could not handle ResponseToAsynchronousRequest with messageId " + responseToRequest.getRequestMessageId(), ex);
     }
   }
 

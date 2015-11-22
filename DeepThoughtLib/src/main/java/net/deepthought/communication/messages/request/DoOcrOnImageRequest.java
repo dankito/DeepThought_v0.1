@@ -17,8 +17,17 @@ public class DoOcrOnImageRequest extends MultipartRequest {
     // for Reflection
   }
 
-  public DoOcrOnImageRequest(DoOcrConfiguration configuration) {
-    super();
+  public DoOcrOnImageRequest(String address, int port, DoOcrConfiguration configuration) {
+    super(address, port);
+    setConfiguration(configuration);
+  }
+
+  public DoOcrOnImageRequest(int messageId, String address, int port, DoOcrConfiguration configuration) {
+    super(messageId, address, port);
+    setConfiguration(configuration);
+  }
+
+  protected void setConfiguration(DoOcrConfiguration configuration) {
     this.configuration = configuration;
 
     parts.add(new MultipartPart<DoOcrConfiguration>(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration, MultipartType.Text, configuration));

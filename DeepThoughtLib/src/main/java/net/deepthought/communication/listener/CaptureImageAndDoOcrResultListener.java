@@ -7,6 +7,6 @@ import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 /**
  * Created by ganymed on 21/11/15.
  */
-public interface CaptureImageAndDoOcrResultListener extends  AsynchronousResponseListener<RequestWithAsynchronousResponse, TextRecognitionResult> {
+public interface CaptureImageAndDoOcrResultListener extends  AsynchronousResponseListener<RequestWithAsynchronousResponse, OcrResultResponse> {
 
 }
