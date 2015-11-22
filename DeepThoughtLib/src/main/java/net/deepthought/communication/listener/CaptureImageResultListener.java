@@ -6,6 +6,6 @@ import net.deepthought.communication.messages.response.CaptureImageResultRespons
 /**
  * Created by ganymed on 21/11/15.
  */
-public interface CaptureImageResultListener extends  AsynchronousResponseListener<RequestWithAsynchronousResponse, CaptureImageResultResponse> {
+public interface CaptureImageResultListener extends AsynchronousResponseListener<RequestWithAsynchronousResponse, CaptureImageResultResponse> {
 
 }

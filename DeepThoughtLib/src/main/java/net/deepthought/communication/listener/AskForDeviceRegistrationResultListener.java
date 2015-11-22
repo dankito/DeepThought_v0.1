@@ -4,10 +4,8 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 
 /**
- * Created by ganymed on 23/08/15.
+ * Created by ganymed on 20/08/15.
  */
-public interface CommunicatorListener extends ResponseListener {
-
-  void serverAllowedDeviceRegistration(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response);
+public interface AskForDeviceRegistrationResultListener extends AsynchronousResponseListener<AskForDeviceRegistrationRequest, AskForDeviceRegistrationResponse> {
 
 }

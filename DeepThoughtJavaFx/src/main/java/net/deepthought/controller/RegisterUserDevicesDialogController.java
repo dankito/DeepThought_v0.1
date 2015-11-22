@@ -1,10 +1,10 @@
 package net.deepthought.controller;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
@@ -93,7 +93,7 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
     rdbtnSearchForRegistrationServers.selectedProperty().addListener((observable, oldValue, newValue) -> radioButtonSearchForRegistrationServersSelectionChanged(newValue));
 
-    lstvwFoundRegistrationServers.setCellFactory(listView -> new FoundRegistrationServerListCell(askForDeviceRegistrationListener));
+    lstvwFoundRegistrationServers.setCellFactory(listView -> new FoundRegistrationServerListCell(askForDeviceRegistrationResultListener));
 
     contextHelpControl = new ContextHelpControl("context.help.register.user.devices.");
     dialogPane.setRight(contextHelpControl);
@@ -177,19 +177,19 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
   protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
     boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, windowStage);
-    final AskForDeviceRegistrationResponseMessage result;
+    final AskForDeviceRegistrationResponse result;
 
     if(userAllowsDeviceRegistration == false)
-      result = AskForDeviceRegistrationResponseMessage.Deny;
+      result = AskForDeviceRegistrationResponse.Deny;
     else {
-      result = AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+      result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
       // TODO: check if user information differ and if so ask which one to use
     }
 
-    Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
+    Application.getDeepThoughtsConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
-        if(result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
+        if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
           Alerts.showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.device", request.getDevice()),
               Localization.getLocalizedString("alert.title.device.registration.successful"));
         }
@@ -204,9 +204,9 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
     }
   };
 
-  protected AskForDeviceRegistrationListener askForDeviceRegistrationListener = new AskForDeviceRegistrationListener() {
+  protected AskForDeviceRegistrationResultListener askForDeviceRegistrationResultListener = new AskForDeviceRegistrationResultListener() {
     @Override
-    public void serverResponded(final AskForDeviceRegistrationResponseMessage response) {
+    public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
       Platform.runLater(() -> {
         if(response != null) {
           if (response.allowsRegistration())

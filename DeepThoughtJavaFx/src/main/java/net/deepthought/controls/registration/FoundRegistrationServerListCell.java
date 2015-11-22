@@ -1,7 +1,7 @@
 package net.deepthought.controls.registration;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
@@ -25,7 +25,7 @@ import javafx.scene.layout.RowConstraints;
  */
 public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
 
-  protected AskForDeviceRegistrationListener listener = null;
+  protected AskForDeviceRegistrationResultListener listener = null;
 
 
   protected GridPane graphicsPane = new GridPane();
@@ -38,7 +38,7 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
   protected Button btnAskForRegistration = new Button();
 
 
-  public FoundRegistrationServerListCell(AskForDeviceRegistrationListener listener) {
+  public FoundRegistrationServerListCell(AskForDeviceRegistrationResultListener listener) {
     this.listener = listener;
 
     setupGraphics();
@@ -88,7 +88,7 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
   protected void askForRegistration() {
     HostInfo serverInfo = getItem();
     if(serverInfo != null) {
-      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, listener);
+      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), listener);
     }
   }
 

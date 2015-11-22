@@ -14,7 +14,7 @@ public class Addresses {
 
   public final static String AskForDeviceRegistrationMethodName = "AskForDeviceRegistration";
 
-  public final static String SendAskForDeviceRegistrationResponseMethodName = "AskForDeviceRegistrationResponse";
+  public final static String AskForDeviceRegistrationResponseMethodName = "AskForDeviceRegistrationResponse";
 
   public final static String NotifyRemoteWeHaveConnectedMethodName = "DeviceConnected";
   public final static String HeartbeatMethodName = "Heartbeat";
@@ -34,7 +34,7 @@ public class Addresses {
 
 
   static {
-    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, SendAskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
+    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, AskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
         StartCaptureImageMethodName, StopCaptureImageMethodName, CaptureImageResultMethodName, StartCaptureImageAndDoOcrMethodName, StopCaptureImageAndDoOcrMethodName,
         DoOcrOnImageMethodName, OcrResultMethodName, StopDoOcrOnImageMethodName);
   }
@@ -49,8 +49,8 @@ public class Addresses {
     return createAddress(host, port, AskForDeviceRegistrationMethodName);
   }
 
-  public static String getSendAskForDeviceRegistrationResponseAddress(String host, int port) {
-    return createAddress(host, port, SendAskForDeviceRegistrationResponseMethodName);
+  public static String getAskForDeviceRegistrationResponseAddress(String host, int port) {
+    return createAddress(host, port, AskForDeviceRegistrationResponseMethodName);
   }
 
   public static String getNotifyRemoteWeHaveConnectedAddress(String host, int port) {

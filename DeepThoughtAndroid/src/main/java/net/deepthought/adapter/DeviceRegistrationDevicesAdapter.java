@@ -10,8 +10,9 @@ import android.widget.TextView;
 
 import net.deepthought.Application;
 import net.deepthought.R;
-import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.helper.AlertHelper;
 
@@ -120,9 +121,9 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     public void onClick(View view) {
       HostInfo serverInfo = (HostInfo) view.getTag();
 
-      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, new AskForDeviceRegistrationListener() {
+      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), new AskForDeviceRegistrationResultListener() {
         @Override
-        public void serverResponded(final AskForDeviceRegistrationResponseMessage response) {
+        public void responseReceived(AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response) {
           if (response != null) {
             context.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
               @Override
@@ -136,7 +137,7 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     }
   };
 
-  protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponseMessage response) {
+  protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
     if (response.allowsRegistration())
       AlertHelper.showInfoMessage(context, R.string.device_registration_server_allowed_registration);
     else

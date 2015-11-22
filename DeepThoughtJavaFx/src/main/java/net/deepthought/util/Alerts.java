@@ -2,7 +2,7 @@ package net.deepthought.util;
 
 import net.deepthought.Application;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.controls.utils.FXUtils;
@@ -239,7 +239,7 @@ public class Alerts {
         Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
   }
 
-  public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
+  public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
@@ -248,7 +248,7 @@ public class Alerts {
         Localization.getLocalizedString("alert.title.device.registration.successful"));
   }
 
-  public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponseMessage response, Stage windowStage) {
+  public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();

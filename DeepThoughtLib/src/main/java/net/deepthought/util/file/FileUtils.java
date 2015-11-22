@@ -892,11 +892,23 @@ public class FileUtils {
   }
 
   public static File createTempFile(String fileExtension) {
-    String tempDir = Application.getPlatformConfiguration().getTempDir();
+    String tempDir = getTempDir();
 
     File tempFile = new File(tempDir, "temp_" + System.currentTimeMillis() + fileExtension);
     tempFile.deleteOnExit();
 
     return tempFile;
+  }
+
+  public static String getTempDir() {
+    if(Application.getPlatformConfiguration() != null) {
+      return Application.getPlatformConfiguration().getTempDir();
+    }
+
+    File tempDir = new File(System.getProperty("java.io.tmpdir"));
+    if (!tempDir.exists()) {
+      tempDir.mkdirs();
+    }
+    return tempDir.getAbsolutePath();
   }
 }

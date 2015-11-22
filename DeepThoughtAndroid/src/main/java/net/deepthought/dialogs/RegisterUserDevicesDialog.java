@@ -17,7 +17,7 @@ import net.deepthought.R;
 import net.deepthought.adapter.DeviceRegistrationDevicesAdapter;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
@@ -171,16 +171,16 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
   }
 
   protected void sendAskUserIfRegisteringDeviceIsAllowedResponse(final AskForDeviceRegistrationRequest request, boolean userAllowsDeviceRegistration) {
-    final AskForDeviceRegistrationResponseMessage result;
+    final AskForDeviceRegistrationResponse result;
 
     if(userAllowsDeviceRegistration == false)
-      result = AskForDeviceRegistrationResponseMessage.Deny;
+      result = AskForDeviceRegistrationResponse.Deny;
     else {
-      result = AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+      result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
       // TODO: check if user information differ and if so ask which one to use
     }
 
-    Application.getDeepThoughtsConnector().getCommunicator().sendAskForDeviceRegistrationResponse(request, result, new ResponseListener() {
+    Application.getDeepThoughtsConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
         if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {

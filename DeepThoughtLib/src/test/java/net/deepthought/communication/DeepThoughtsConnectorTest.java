@@ -1,18 +1,26 @@
 package net.deepthought.communication;
 
+import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
+import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,6 +29,81 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by ganymed on 19/08/15.
  */
 public class DeepThoughtsConnectorTest extends CommunicationTestBase {
+
+
+  @Test
+  public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+      @Override
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+    });
+
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+  @Test
+  public void askForDeviceRegistration_RegistrationIsProhibitedByServer_RegistrationDeniedResponseIsReceived() {
+    final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+      @Override
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+        communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.Deny, null);
+      }
+    });
+
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
+      @Override
+      public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
+        responses.add(response);
+        waitLatch.countDown();
+      }
+    });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
+
+    Assert.assertFalse(responses.get(0).allowsRegistration());
+  }
+
+  @Test
+  public void askForDeviceRegistration_ServerAllowsRegistration_RegistrationAllowedResponseIsReceived() {
+    final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+      @Override
+      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+        communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true,
+            Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
+      }
+    });
+
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
+      @Override
+      public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
+        responses.add(response);
+        waitLatch.countDown();
+      }
+    });
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+    connector.closeUserDeviceRegistrationServer();
+
+    Assert.assertTrue(responses.get(0).allowsRegistration());
+  }
 
 
   @Test
@@ -244,6 +327,15 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     Assert.assertTrue(methodCalled.get());
   }
 
+
+
+  protected HostInfo createLocalHostServerInfo() {
+    HostInfo hostInfo = HostInfo.fromUserAndDevice(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+    hostInfo.setIpAddress(TestIpAddress);
+    hostInfo.setPort(connector.getMessageReceiverPort());
+
+    return hostInfo;
+  }
 
 
   protected void mockNumberOfRegisteredDevices(IDeepThoughtsConnector connector, int numberOfRegisteredDevices) {

@@ -86,6 +86,7 @@ public class ConnectedDevice {
   }
 
 
+  // TODO: get rid of static method
   public static ConnectedDevice createSelfInstance() {
     return new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getIPAddressString(true),
         Application.getDeepThoughtsConnector().getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());

@@ -1,5 +1,6 @@
 package net.deepthought.communication.connected_device;
 
+import net.deepthought.Application;
 import net.deepthought.communication.CommunicationTestBase;
 import net.deepthought.communication.DeepThoughtsConnector;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
@@ -178,7 +179,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
 
   protected void mockDeviceIsRegistered() {
     RegisteredDevicesManager registeredDevicesManager = Mockito.mock(RegisteredDevicesManager.class);
-    ((DeepThoughtsConnector)connector).setRegisteredDevicesManager(registeredDevicesManager);
+    ((DeepThoughtsConnector) Application.getDeepThoughtsConnector()).setRegisteredDevicesManager(registeredDevicesManager);
     Mockito.when(registeredDevicesManager.isDeviceRegistered(Mockito.any(HostInfo.class))).thenReturn(true);
     Mockito.when(registeredDevicesManager.isDeviceRegistered(Mockito.any(ConnectedDevice.class))).thenReturn(true);
   }

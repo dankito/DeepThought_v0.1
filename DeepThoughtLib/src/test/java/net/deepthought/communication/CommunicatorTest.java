@@ -1,30 +1,34 @@
 package net.deepthought.communication;
 
-import net.deepthought.Application;
-import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
+import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
+import net.deepthought.communication.messages.MessagesDispatcher;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.data.model.Device;
+import net.deepthought.data.model.User;
+import net.deepthought.util.ThreadPool;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,169 +46,146 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class CommunicatorTest extends CommunicationTestBase {
+public class CommunicatorTest {
 
   private final static Logger log = LoggerFactory.getLogger(CommunicatorTest.class);
+
+
+  protected final static String TestDeviceId = "Cuddle";
+
+  protected final static String TestIpAddress = "0.0.0.0";
+
+  protected final static int CommunicatorPort = 54321;
 
   protected final static int TestMessageId = 4711;
 
   protected final static String TestRecognizedText = "Cuddle";
 
 
-//  protected Communicator communicator = null;
+  protected Communicator communicator = null;
 
   protected MessagesReceiver receiver = null;
+
+  protected ConnectedDevice localHost = new ConnectedDevice(TestDeviceId, TestIpAddress, CommunicatorPort);
+
+  protected User localUser = User.createNewLocalUser();
+  protected Device localDevice = new Device("test", "test", "test");
 
   protected CountDownLatch waitLatch = new CountDownLatch(1);
 
   protected Map<String, Request> receivedRequests = new HashMap<>();
 
 
-  @Override
-  public void setup() throws IOException {
-    super.setup();
+  @Before
+  public void setup() throws Exception {
+    localUser.addDevice(localDevice);
 
-//    communicator = new Communicator(new MessagesDispatcher(), null, null);
-    receiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(CommunicatorPort, connector.getListenerManager()), receiverListener);
-    receiver.start();
+    ThreadPool threadPool = new ThreadPool();
+    final AsynchronousResponseListenerManager listenerManager = new AsynchronousResponseListenerManager();
 
-    try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
+    communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, CommunicatorPort), null);
+
+    startMessagesReceiverAsync(threadPool, listenerManager);
+  }
+
+  protected void startMessagesReceiverAsync(ThreadPool threadPool, final AsynchronousResponseListenerManager listenerManager) throws Exception {
+    final List<Exception> caughtExceptionsHolder = new ArrayList<>();
+    final CountDownLatch waitForMessagesReceiverStartUp = new CountDownLatch(1);
+
+    threadPool.runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        receiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(CommunicatorPort, listenerManager), receiverListener);
+        try { receiver.start(); } catch(Exception ex) { caughtExceptionsHolder.add(ex); }
+        try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
+        waitForMessagesReceiverStartUp.countDown();
+      }
+    });
+
+    try { waitForMessagesReceiverStartUp.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+    for(Exception caughtException : caughtExceptionsHolder)
+      throw caughtException;
   }
 
   @After
   public void tearDown() {
     receiver.stop();
-
-    super.tearDown();
   }
 
 
+
   @Test
-  public void askForDeviceRegistration_ListenerMethodAllowDeviceToRegisterGetsCalled() {
-    final AtomicBoolean methodCalled = new AtomicBoolean(false);
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+  public void askForDeviceRegistration_RequestIsReceived() {
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
-      @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        methodCalled.set(true);
-        waitLatch.countDown();
-      }
-    });
+    waitTillListenerHasBeenCalled();
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), null);
-
-    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-    connector.closeUserDeviceRegistrationServer();
-
-    Assert.assertTrue(methodCalled.get());
+    assertThatCorrectMethodHasBeenCalled(Addresses.AskForDeviceRegistrationMethodName, AskForDeviceRegistrationRequest.class);
   }
 
   @Test
-  public void askForDeviceRegistration_ServerResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+  public void respondToAskForDeviceRegistrationRequest_RequestIsReceived() throws IOException {
+    AskForDeviceRegistrationRequest request = communicator.createAskForDeviceRegistrationRequest(localUser, localDevice);
+    request.setAddress(TestIpAddress);
+    request.setPort(CommunicatorPort);
+    communicator.respondToAskForDeviceRegistrationRequest(request, createAskForDeviceRegistrationResponseFromRequest(request), null);
 
-    connector.openUserDeviceRegistrationServer(null);
+    waitTillListenerHasBeenCalled();
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
-      @Override
-      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
-        responses.add(response);
-        waitLatch.countDown();
-      }
-    });
+    AskForDeviceRegistrationResponse response = (AskForDeviceRegistrationResponse)assertThatCorrectMethodHasBeenCalled(Addresses.AskForDeviceRegistrationResponseMethodName, AskForDeviceRegistrationResponse.class);
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    connector.closeUserDeviceRegistrationServer();
-
-    Assert.assertEquals(1, responses.size());
+    Assert.assertEquals(request.getMessageId(), response.getRequestMessageId());
+    Assert.assertNotNull(response.getUser());
+    Assert.assertNotNull(response.getDevice());
+    Assert.assertNotNull(response.getGroup());
+    Assert.assertEquals(true, response.allowsRegistration());
+    Assert.assertEquals(true, response.useServersUserInformation());
   }
 
   @Test
-  public void askForDeviceRegistration_RegistrationIsProhibitedByServer_RegistrationDeniedResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+  public void askForDeviceRegistration_ResponseListenerGetsCalled() throws IOException {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<AskForDeviceRegistrationResponse> receivedResponseHolder = new ArrayList<>();
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
       @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.Deny, null);
+      public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(response);
       }
     });
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new net.deepthought.communication.listener.AskForDeviceRegistrationListener() {
-      @Override
-      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
-        responses.add(response);
-        waitLatch.countDown();
-      }
-    });
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    connector.closeUserDeviceRegistrationServer();
+    communicator.respondToAskForDeviceRegistrationRequest(request, createAskForDeviceRegistrationResponseFromRequest(request), null);
 
-    Assert.assertFalse(responses.get(0).allowsRegistration());
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
   }
 
   @Test
-  public void askForDeviceRegistration_ServerAllowsRegistration_RegistrationAllowedResponseIsReceived() {
-    final List<AskForDeviceRegistrationResponseMessage> responses = new ArrayList<>();
-    final CountDownLatch waitLatch = new CountDownLatch(1);
+  public void askForDeviceRegistration_ResponseListenerGetsRemovedFromListenerManager() throws IOException {
+    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
-      @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true,
-            Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
-      }
-    });
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
-      @Override
-      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
-        responses.add(response);
-        waitLatch.countDown();
-      }
-    });
+    communicator.respondToAskForDeviceRegistrationRequest(request, createAskForDeviceRegistrationResponseFromRequest(request), null);
 
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    connector.closeUserDeviceRegistrationServer();
+    waitTillListenerHasBeenCalled();
 
-    Assert.assertTrue(responses.get(0).allowsRegistration());
-  }
-
-  @Test
-  public void askForDeviceRegistrationDone_ListenerGetsRemoved() {
-    final CountDownLatch waitLatch = new CountDownLatch(1);
-
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
-      @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.createAllowRegistrationResponse(true,
-            Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
-      }
-    });
-
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), new AskForDeviceRegistrationListener() {
-      @Override
-      public void serverResponded(AskForDeviceRegistrationResponseMessage response) {
-        waitLatch.countDown();
-      }
-    });
-
-    Assert.assertEquals(1, communicator.askForDeviceRegistrationListeners.size());
-
-    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    connector.closeUserDeviceRegistrationServer();
-
-    Assert.assertEquals(0, communicator.askForDeviceRegistrationListeners.size());
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
   }
 
 
   @Test
   public void notifyRemoteWeHaveConnected() throws IOException {
-    communicator.notifyRemoteWeHaveConnected(localHost);
+    communicator.notifyRemoteWeHaveConnected(localHost, localHost);
 
     waitTillListenerHasBeenCalled();
 
@@ -214,7 +195,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void sendHeartbeat() throws IOException {
-    communicator.sendHeartbeat(localHost, null);
+    communicator.sendHeartbeat(localHost, localHost, null);
 
     waitTillListenerHasBeenCalled();
 
@@ -531,11 +512,19 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 
   protected HostInfo createLocalHostServerInfo() {
-    HostInfo hostInfo = HostInfo.fromUserAndDevice(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-    hostInfo.setIpAddress(NetworkHelper.getIPAddressString(true));
-    hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
+    HostInfo hostInfo = HostInfo.fromUserAndDevice(localUser, localDevice);
+    hostInfo.setIpAddress(TestIpAddress);
+    hostInfo.setPort(CommunicatorPort);
 
     return hostInfo;
+  }
+
+  protected AskForDeviceRegistrationResponse createAskForDeviceRegistrationResponseFromRequest(AskForDeviceRegistrationRequest request) {
+    AskForDeviceRegistrationResponse response = new AskForDeviceRegistrationResponse(true, true, request.getUser(), request.getGroup(),
+        request.getDevice(), request.getAddress(), request.getPort());
+    response.setRequestMessageId(request.getMessageId());
+
+    return response;
   }
 
 
@@ -586,16 +575,8 @@ public class CommunicatorTest extends CommunicationTestBase {
     return request;
   }
 
-  protected boolean isGenericRequest(Request request) {
-    return request.getClass().isAssignableFrom(GenericRequest.class);
-  }
-
 
   protected MessagesReceiverListener receiverListener = new MessagesReceiverListener() {
-    @Override
-    public void askForDeviceRegistrationResponseReceived(AskForDeviceRegistrationResponseMessage message) {
-
-    }
 
     @Override
     public boolean messageReceived(String methodName, Request request) {
@@ -604,10 +585,6 @@ public class CommunicatorTest extends CommunicationTestBase {
       return true;
     }
 
-    @Override
-    public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-
-    }
   };
 
 }

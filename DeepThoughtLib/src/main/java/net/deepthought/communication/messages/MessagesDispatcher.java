@@ -1,6 +1,5 @@
 package net.deepthought.communication.messages;
 
-import net.deepthought.Application;
 import net.deepthought.communication.CommunicatorResponseListener;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.messages.request.MultipartRequest;
@@ -9,6 +8,7 @@ import net.deepthought.communication.messages.response.Response;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
+import net.deepthought.util.IThreadPool;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,6 +32,14 @@ public class MessagesDispatcher implements IMessagesDispatcher {
   private final static Logger log = LoggerFactory.getLogger(MessagesDispatcher.class);
 
 
+  protected IThreadPool threadPool;
+
+
+  public MessagesDispatcher(IThreadPool threadPool) {
+    this.threadPool = threadPool;
+  }
+
+
   @Override
   public void sendMessageAsync(String address, Request request, CommunicatorResponseListener listener) {
     sendMessageAsync(address, request, Response.class, listener);
@@ -39,7 +47,7 @@ public class MessagesDispatcher implements IMessagesDispatcher {
 
   @Override
   public void sendMessageAsync(final String address, final Request request, final Class<? extends Response> responseClass, final CommunicatorResponseListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         Response response = sendMessage(address, request, responseClass);
@@ -82,7 +90,7 @@ public class MessagesDispatcher implements IMessagesDispatcher {
 
   @Override
   public void sendMultipartMessageAsync(final String address, final MultipartRequest request, final Class<? extends Response> responseClass, final CommunicatorResponseListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         Response response = sendMultipartMessage(address, request, responseClass);

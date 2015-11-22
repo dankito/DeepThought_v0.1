@@ -3,7 +3,7 @@ package net.deepthought.communication.messages;
 import net.deepthought.communication.Addresses;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public abstract class DefaultMessagesReceiverConfig extends MessagesReceiverConf
 
     // TODO: place Method names somewhere else
     allowedMethods.add(new WebMethodConfig(Addresses.AskForDeviceRegistrationMethodName, AskForDeviceRegistrationRequest.class));
-    allowedMethods.add(new WebMethodConfig(Addresses.SendAskForDeviceRegistrationResponseMethodName, AskForDeviceRegistrationResponseMessage.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.AskForDeviceRegistrationResponseMethodName, AskForDeviceRegistrationResponse.class));
     allowedMethods.add(new WebMethodConfig(Addresses.NotifyRemoteWeHaveConnectedMethodName, GenericRequest.class));
     allowedMethods.add(new WebMethodConfig(Addresses.HeartbeatMethodName, GenericRequest.class));
 

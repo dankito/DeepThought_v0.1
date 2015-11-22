@@ -1,12 +1,11 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.CommunicatorListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
-import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.IMessagesDispatcher;
@@ -15,7 +14,7 @@ import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.messages.response.Response;
@@ -25,13 +24,11 @@ import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
+import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by ganymed on 20/08/15.
@@ -47,33 +44,24 @@ public class Communicator {
 
   protected int messageReceiverPort;
 
-  protected IDeepThoughtsConnector connector;
-
   protected CommunicatorListener communicatorListener;
 
-  protected Map<AskForDeviceRegistrationRequest, AskForDeviceRegistrationListener> askForDeviceRegistrationListeners = new HashMap<>();
 
-
-  public Communicator(CommunicatorConfig config, IDeepThoughtsConnector connector, CommunicatorListener communicatorListener) {
+  public Communicator(CommunicatorConfig config, CommunicatorListener communicatorListener) {
     this.dispatcher = config.getDispatcher();
     this.listenerManager = config.getListenerManager();
     this.messageReceiverPort = config.getMessageReceiverPort();
 
     // TODO: try to remove
-    this.connector = connector;
     this.communicatorListener = communicatorListener;
-
-    connector.addMessagesReceiverListener(messagesReceiverListener);
   }
 
 
-  public void askForDeviceRegistration(HostInfo serverInfo, final AskForDeviceRegistrationListener listener) {
+  public AskForDeviceRegistrationRequest askForDeviceRegistration(HostInfo serverInfo, User localUser, Device localDevice, final AskForDeviceRegistrationResultListener listener) {
     String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getIpAddress(), serverInfo.getPort());
 
-    User user = Application.getLoggedOnUser();
-    final AskForDeviceRegistrationRequest request = AskForDeviceRegistrationRequest.fromUserAndDevice(user, Application.getApplication().getLocalDevice());
-    if(listener != null)
-      askForDeviceRegistrationListeners.put(request, listener);
+    final AskForDeviceRegistrationRequest request = createAskForDeviceRegistrationRequest(localUser, localDevice);
+    listenerManager.addListenerForResponse(request, listener);
 
     dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
@@ -83,10 +71,16 @@ public class Communicator {
         dispatchResponse(request, communicatorResponse);
       }
     });
+
+    return request;
   }
 
-  public void sendAskForDeviceRegistrationResponse(final AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponseMessage response, final ResponseListener listener) {
-    String address = Addresses.getSendAskForDeviceRegistrationResponseAddress(request.getAddress(), request.getPort());
+  protected AskForDeviceRegistrationRequest createAskForDeviceRegistrationRequest(User localUser, Device localDevice) {
+    return new AskForDeviceRegistrationRequest(localUser, localDevice, getIpAddressToSendResponseTo(), getMessageReceiverPort());
+  }
+
+  public void respondToAskForDeviceRegistrationRequest(final AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response, final ResponseListener listener) {
+    String address = Addresses.getAskForDeviceRegistrationResponseAddress(request.getAddress(), request.getPort());
     response.setRequestMessageId(request.getMessageId());
 
     dispatcher.sendMessageAsync(address, response, new CommunicatorResponseListener() {
@@ -101,9 +95,12 @@ public class Communicator {
   }
 
   public void notifyRemoteWeHaveConnected(ConnectedDevice connectedDevice) {
+    notifyRemoteWeHaveConnected(connectedDevice, getLocalHostInfo());
+  }
+
+  public void notifyRemoteWeHaveConnected(ConnectedDevice connectedDevice, ConnectedDevice localHost) {
     String address = Addresses.getNotifyRemoteWeHaveConnectedAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
-    ConnectedDevice self = ConnectedDevice.createSelfInstance();
-    final Request request = new GenericRequest<ConnectedDevice>(self);
+    final Request request = new GenericRequest<ConnectedDevice>(localHost);
 
     dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
@@ -114,9 +111,12 @@ public class Communicator {
   }
 
   public void sendHeartbeat(ConnectedDevice connectedDevice, final ResponseListener listener) {
+    sendHeartbeat(connectedDevice, getLocalHostInfo(), listener);
+  }
+
+  public void sendHeartbeat(ConnectedDevice connectedDevice, ConnectedDevice localHost, final ResponseListener listener) {
     String address = Addresses.getHeartbeatAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
-    ConnectedDevice self = ConnectedDevice.createSelfInstance();
-    final Request request = new GenericRequest<ConnectedDevice>(self);
+    final Request request = new GenericRequest<ConnectedDevice>(localHost);
 
     dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
@@ -272,33 +272,11 @@ public class Communicator {
     return messageReceiverPort;
   }
 
-
-  protected MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
-
-    @Override
-    public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-
-    }
-
-    @Override
-    public void askForDeviceRegistrationResponseReceived(AskForDeviceRegistrationResponseMessage message) {
-      Integer messageId = message.getRequestMessageId();
-
-      for(AskForDeviceRegistrationRequest request : askForDeviceRegistrationListeners.keySet()) {
-        if(messageId.equals(request.getMessageId())) {
-          AskForDeviceRegistrationListener listener = askForDeviceRegistrationListeners.get(request);
-          listener.serverResponded(message);
-
-          askForDeviceRegistrationListeners.remove(request);
-          break;
-        }
-      }
-    }
-
-    @Override
-    public boolean messageReceived(String methodName, Request request) {
-      return false;
-    }
-  };
+  protected ConnectedDevice getLocalHostInfo() {
+    // TODO: try to get rid of static method calls
+    // TODO: this is almost the same code as in ConnectedDevice.createSelfInstance() -> merge
+    return new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), getIpAddressToSendResponseTo(),
+        getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());
+  }
 
 }

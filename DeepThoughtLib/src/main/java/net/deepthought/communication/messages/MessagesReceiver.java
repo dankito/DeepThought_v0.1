@@ -1,23 +1,14 @@
 package net.deepthought.communication.messages;
 
-import net.deepthought.Application;
-import net.deepthought.communication.Addresses;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
-import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.communication.listener.AsynchronousResponseListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
-import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.MultipartRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
-import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.messages.response.ResponseToAsynchronousRequest;
-import net.deepthought.communication.model.DoOcrConfiguration;
-import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -51,15 +42,11 @@ public class MessagesReceiver extends NanoHTTPD {
 
   protected MessagesReceiverListener listener;
 
-  protected IDeepThoughtsConnector connector;
-
 
   public MessagesReceiver(MessagesReceiverConfig config, MessagesReceiverListener listener) {
     super(config.getPort());
     this.config = config;
     this.listener = listener;
-
-    this.connector = Application.getDeepThoughtsConnector(); // very bad. If really needed pass it as parameter
   }
 
   public void unsetListener() {
@@ -212,7 +199,7 @@ public class MessagesReceiver extends NanoHTTPD {
 
   protected Object parseTextualMultipartPart(Class dataType, String partFilename) throws IOException {
     String json = FileUtils.readTextFile(new File(partFilename));
-    DeserializationResult<CaptureImageResult> result = JsonIoJsonHelper.parseJsonString(json, dataType);
+    DeserializationResult<?> result = JsonIoJsonHelper.parseJsonString(json, dataType);
     if(result.successful())
       return result.getResult();
 
@@ -228,97 +215,6 @@ public class MessagesReceiver extends NanoHTTPD {
     FileUtils.copyFile(new File(partFilename), tempFile);
     return tempFile.getAbsolutePath();
   }
-
-
-  protected Response respondToRequest(IHTTPSession session, String methodName) {
-    switch(methodName) {
-      // Device Connection Management
-      case Addresses.AskForDeviceRegistrationMethodName:
-        return respondToAskForDeviceRegistrationRequest(session);
-      case Addresses.SendAskForDeviceRegistrationResponseMethodName:
-        return respondToSendAskForDeviceRegistrationResponse(session);
-
-      // Custom methods
-//      case Addresses.StartCaptureImageAndDoOcrMethodName:
-//        return respondToStartCaptureImageAndDoOcrRequest(session);
-//      case Addresses.CaptureImageResultMethodName:
-//        return respondToCaptureImageResultResponse(session);
-//      case Addresses.OcrResultMethodName:
-//        return respondToOcrResultResponse(session);
-//      case Addresses.StopCaptureImageAndDoOcrMethodName:
-//        return respondToStopCaptureImageAndDoOcrRequest(session);
-    }
-
-    return createInvalidUrlResponse();
-  }
-
-
-  protected Response respondToAskForDeviceRegistrationRequest(IHTTPSession session) {
-    AskForDeviceRegistrationRequest request = (AskForDeviceRegistrationRequest) parseSinglePartRequest(session, AskForDeviceRegistrationRequest.class);
-
-    listener.registerDeviceRequestRetrieved(request);
-
-    if(connector.isRegisteringAllowed()) {
-      return createOkResponse();
-    }
-    else
-      return createResponse(Response.Status.FORBIDDEN, net.deepthought.communication.messages.response.Response.Denied);
-  }
-
-  protected Response respondToSendAskForDeviceRegistrationResponse(IHTTPSession session) {
-    AskForDeviceRegistrationResponseMessage message = (AskForDeviceRegistrationResponseMessage) parseSinglePartRequest(session, AskForDeviceRegistrationResponseMessage.class);
-
-    listener.askForDeviceRegistrationResponseReceived(message);
-
-    return createOkResponse();
-  }
-
-
-//  protected Response respondToStartCaptureImageAndDoOcrRequest(IHTTPSession session) {
-//    CaptureImageOrDoOcrRequest request = null;
-//    try {
-//      request = parseStartCaptureImageAndDoOcrRequestBody(session);
-//    } catch(Exception ex) {
-//      log.error("Could not decode StartCaptureImageAndDoOcrRequest Post Body", ex);
-//      return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.response.Response.Denied);
-//    }
-//
-//    listener.captureImageAndDoOcr(request);
-//
-//    return createOkResponse();
-//  }
-//
-//  protected Response respondToCaptureImageResultResponse(IHTTPSession session) {
-//    log.debug("Parsing CaptureImageResultResponse ...");
-//    CaptureImageResultResponse request = null;
-//    try {
-//      request = parseCaptureImageResultResponseRequestBody(session);
-//      log.debug("Parsing done");
-//    } catch(Exception ex) {
-//      log.error("Could not decode CaptureImageResultResponse Post Body", ex);
-//      return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.response.Response.Denied);
-//    }
-//
-//    listener.captureImageResult(request);
-//
-//    return createOkResponse();
-//  }
-//
-//  protected Response respondToOcrResultResponse(IHTTPSession session) {
-//    OcrResultResponse request = (OcrResultResponse) parseSinglePartRequest(session, OcrResultResponse.class);
-//
-//    listener.ocrResult(request);
-//
-//    return createOkResponse();
-//  }
-//
-//  protected Response respondToStopCaptureImageAndDoOcrRequest(IHTTPSession session) {
-//    StopCaptureImageOrDoOcrRequest request = (StopCaptureImageOrDoOcrRequest) parseSinglePartRequest(session, StopCaptureImageOrDoOcrRequest.class);
-//
-//    listener.stopCaptureImageOrDoOcr(request);
-//
-//    return createOkResponse();
-//  }
 
 
   protected Request parseSinglePartRequest(IHTTPSession session, Class<? extends Request> requestClass) {
@@ -352,97 +248,6 @@ public class MessagesReceiver extends NanoHTTPD {
     }
 
     return null;
-  }
-
-  protected CaptureImageOrDoOcrRequest parseStartCaptureImageAndDoOcrRequestBody(IHTTPSession session) throws Exception {
-    if(session.isMultipartMessage() == false) // a CaptureImageOrDoOcrRequest without ImageData. Just a normal Request Body, no Multipart Request Body
-      return (CaptureImageOrDoOcrRequest) parseSinglePartRequest(session, CaptureImageOrDoOcrRequest.class);
-
-    return parseMultiPartStartCaptureImageAndDoOcrRequestBody(session);
-  }
-
-  protected CaptureImageOrDoOcrRequest parseMultiPartStartCaptureImageAndDoOcrRequestBody(IHTTPSession session) throws Exception {
-    Map<String, String> partFiles = parseMultipartRequestBody(session);
-
-    String address = getAddressFromMultipartRequest(partFiles);
-    int port = getPortFromMultipartRequest(partFiles);
-    int messageId = getMessageIdFromMultipartRequest(partFiles);
-
-    DoOcrConfiguration configuration = parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(partFiles);
-
-    return new CaptureImageOrDoOcrRequest(messageId, address, port, configuration);
-  }
-
-  protected DoOcrConfiguration parseConfigurationFromStartCaptureImageAndDoOcrRequestBody(Map<String, String> partFiles) throws IOException {
-    DoOcrConfiguration configuration = null;
-    String imageFileUri = null;
-
-    for(String partName : partFiles.keySet()) {
-      String partFilename = partFiles.get(partName);
-
-      if(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration.equals(partName)) {
-        String json = FileUtils.readTextFile(new File(partFilename));
-        DeserializationResult<DoOcrConfiguration> result = JsonIoJsonHelper.parseJsonString(json, DoOcrConfiguration.class);
-        if(result.successful())
-          configuration = result.getResult();
-      }
-      else if(ConnectorMessagesCreator.DoOcrMultipartKeyImage.equals(partName)) {
-        // as NanoHTTPD deletes all temp file as soon as message is handled (soon after this method returns)
-        // copy Image file to another temp file
-        // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
-        File tempFile = FileUtils.createTempFile();
-        tempFile.deleteOnExit();
-        FileUtils.copyFile(new File(partFilename), tempFile);
-        imageFileUri = tempFile.getAbsolutePath();
-      }
-    }
-
-    if(configuration != null)
-      configuration.setImageUri(imageFileUri);
-
-    return configuration;
-  }
-
-  protected CaptureImageResultResponse parseCaptureImageResultResponseRequestBody(IHTTPSession session) throws Exception {
-    Map<String, String> partFiles = parseMultipartRequestBody(session);
-
-//    String address = getAddressFromMultipartRequest(partFiles);
-//    int port = getPortFromMultipartRequest(partFiles);
-    int messageId = getMessageIdFromMultipartRequest(partFiles);
-
-    CaptureImageResult captureImageResult = parseCaptureImageResultFromCaptureImageResultResponseRequestBody(partFiles);
-
-    return new CaptureImageResultResponse(captureImageResult, messageId);
-  }
-
-  protected CaptureImageResult parseCaptureImageResultFromCaptureImageResultResponseRequestBody(Map<String, String> partFiles) throws IOException {
-    CaptureImageResult captureImageResult = null;
-    String imageFileUri = null;
-
-    for(String partName : partFiles.keySet()) {
-      String partFilename = partFiles.get(partName);
-
-      if(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse.equals(partName)) {
-        String json = FileUtils.readTextFile(new File(partFilename));
-        DeserializationResult<CaptureImageResult> result = JsonIoJsonHelper.parseJsonString(json, CaptureImageResult.class);
-        if(result.successful())
-          captureImageResult = result.getResult();
-      }
-      else if(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage.equals(partName)) {
-        // as NanoHTTPD deletes all temp file as soon as message is handled (soon after this method returns)
-        // copy Image file to another temp file
-        // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
-        File tempFile = FileUtils.createTempFile();
-        tempFile.deleteOnExit();
-        FileUtils.copyFile(new File(partFilename), tempFile);
-        imageFileUri = tempFile.getAbsolutePath();
-      }
-    }
-
-    if(captureImageResult != null)
-      captureImageResult.setImageUri(imageFileUri);
-
-    return captureImageResult;
   }
 
   protected String getAddressFromMultipartRequest(Map<String, String> partFiles) throws IOException {
@@ -481,7 +286,6 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected Map<String, String> parseMultipartRequestBody(IHTTPSession session) throws Exception {
-//    String debug = getMessageBody(session);
     File tempFile = FileUtils.createTempFile(); // TODO: if filename is set, apply it to file
     RandomAccessFile randomAccessFile = new RandomAccessFile(tempFile, "rw");
 

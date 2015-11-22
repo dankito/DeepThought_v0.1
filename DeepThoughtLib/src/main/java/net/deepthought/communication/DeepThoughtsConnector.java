@@ -19,7 +19,7 @@ import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
@@ -87,10 +87,10 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
     // TODO: make configurable
     this.listenerManager = new AsynchronousResponseListenerManager();
-    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(), listenerManager, messageReceiverPort), this, communicatorListener);
+    this.connectorMessagesCreator = new ConnectorMessagesCreator();
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(Application.getThreadPool()), listenerManager, messageReceiverPort), communicatorListener);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
-    this.connectorMessagesCreator = new ConnectorMessagesCreator();
   }
 
 
@@ -391,7 +391,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
 
     @Override
-    public void serverAllowedDeviceRegistration(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponseMessage response) {
+    public void serverAllowedDeviceRegistration(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
       registerDevice(request, response.useServersUserInformation() == false);
     }
   };
@@ -421,27 +421,6 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected MessagesReceiverListener messagesReceiverListener = new MessagesReceiverListener() {
 
     @Override
-    public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
-      if(userDeviceRegistrationRequestListener != null)
-        userDeviceRegistrationRequestListener.registerDeviceRequestRetrieved(request);
-      else // if listener is null it's not possible that the user chooses whether she/he likes to allow register or not -> send a deny directly
-        communicator.sendAskForDeviceRegistrationResponse(request, AskForDeviceRegistrationResponseMessage.Deny, null);
-
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.registerDeviceRequestRetrieved(request);
-    }
-
-    @Override
-    public void askForDeviceRegistrationResponseReceived(AskForDeviceRegistrationResponseMessage message) {
-      if(message.allowsRegistration()) {
-        registerDevice(message, message.useServersUserInformation());
-      }
-
-      for(MessagesReceiverListener listener : messagesReceiverListeners)
-        listener.askForDeviceRegistrationResponseReceived(message);
-    }
-
-    @Override
     public boolean messageReceived(String methodName, Request request) {
       return handleReceivedMessage(methodName, request);
     }
@@ -451,12 +430,18 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     for(MessagesReceiverListener listener : messagesReceiverListeners)
       listener.messageReceived(methodName, request);
 
-    if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
-      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>)request).getRequestBody());
+    if(Addresses.AskForDeviceRegistrationMethodName.equals(methodName)) {
+      return handleAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest) request);
+    }
+    else if(Addresses.AskForDeviceRegistrationResponseMethodName.equals(methodName)) {
+      return handleAskForDeviceRegistrationResponse((AskForDeviceRegistrationResponse) request);
+    }
+    else if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
+      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
     }
     else if(Addresses.HeartbeatMethodName.equals(methodName)) {
       // TODO: is this correct, calling connectedToRegisteredDevice() ?
-      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>)request).getRequestBody());
+      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
     }
     else if(Addresses.StartCaptureImageMethodName.equals(methodName)) {
       return handleStartCaptureImageMessage((RequestWithAsynchronousResponse) request);
@@ -478,6 +463,23 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     }
 
     return false;
+  }
+
+  protected boolean handleAskForDeviceRegistrationRequest(AskForDeviceRegistrationRequest request) {
+    if(userDeviceRegistrationRequestListener != null)
+      userDeviceRegistrationRequestListener.registerDeviceRequestRetrieved(request);
+    else // if listener is null it's not possible that the user chooses whether she/he likes to allow register or not -> send a deny directly
+      communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.Deny, null);
+
+    return true;
+  }
+
+  protected boolean handleAskForDeviceRegistrationResponse(AskForDeviceRegistrationResponse message) {
+    if(message.allowsRegistration()) {
+      registerDevice(message, message.useServersUserInformation());
+    }
+
+    return true;
   }
 
   protected boolean handleStartCaptureImageMessage(RequestWithAsynchronousResponse request) {
