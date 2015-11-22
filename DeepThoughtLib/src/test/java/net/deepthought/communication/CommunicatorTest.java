@@ -10,6 +10,7 @@ import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
@@ -18,6 +19,7 @@ import net.deepthought.communication.messages.response.AskForDeviceRegistrationR
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
@@ -496,15 +498,15 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 
   @Test
-  public void startDoOcr_RequestIsReceived() throws IOException {
+  public void startDoOcrOnImage_RequestIsReceived() throws IOException {
     byte[] imageData = getTestImage();
-    communicator.startDoOcr(localHost, imageData, false, false, null);
+    communicator.startDoOcrOnImage(localHost, new DoOcrConfiguration(imageData), null);
 
     waitTillListenerHasBeenCalled();
 
-    CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
+    DoOcrOnImageRequest request = (DoOcrOnImageRequest)assertThatCorrectMethodHasBeenCalled(Addresses.DoOcrOnImageMethodName, DoOcrOnImageRequest.class);
     Assert.assertNotNull(request.getConfiguration());
-    Assert.assertArrayEquals(imageData, request.readBytesFromImageUri());
+    Assert.assertArrayEquals(imageData, request.getConfiguration().getImageToRecognize());
   }
 
 //  @Test
@@ -529,7 +531,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //    byte[] imageData = getTestImage();
 //
-//    communicator.startDoOcr(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
+//    communicator.startDoOcrOnImage(new ConnectedDevice("unique", NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort()),
 //        imageData, false, false, new CaptureImageOrDoOcrResponseListener() {
 //          @Override
 //          public void captureImageResult(CaptureImageResult captureImageResult) {
@@ -554,7 +556,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //  @Test
 //  public void sendCaptureImageResult_ResultIsReceived() throws IOException {
 //    byte[] imageData = getTestImage();
-//    communicator.startDoOcr(localHost, imageData, false, false, null);
+//    communicator.startDoOcrOnImage(localHost, imageData, false, false, null);
 //
 //    waitTillListenerHasBeenCalled(100);
 //

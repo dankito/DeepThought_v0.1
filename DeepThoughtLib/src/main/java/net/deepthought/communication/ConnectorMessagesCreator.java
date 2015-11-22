@@ -28,6 +28,7 @@ public class ConnectorMessagesCreator {
   public static final String MultipartKeyPort = "port";
   public static final String MultipartKeyMessageId = "message_id";
 
+
   public static final String DoOcrMultipartKeyConfiguration = "configuration";
   public static final String DoOcrMultipartKeyImage = "image";
 

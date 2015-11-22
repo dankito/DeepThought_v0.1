@@ -5,8 +5,11 @@ import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.listener.DoOcrOnImageResultListener;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
@@ -17,7 +20,6 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
-import net.deepthought.util.ObjectHolder;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -234,33 +236,44 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   protected void doOcrForSelectedFiles(final ConnectedDevice connectedDevice, List<File> selectedFiles) {
     // TODO: what if doOcrForSelectedFiles() gets called a second time before first call has finished? Than there exist two parallel imagesToRecognize -> avoid
     final Queue<File> imagesToRecognize = new LinkedList<>(selectedFiles);
-    final int totalAmountOfImages = selectedFiles.size();
     final AtomicInteger currentImageIndex = new AtomicInteger(0);
-    final ObjectHolder<File> currentImage = new ObjectHolder(imagesToRecognize.poll());
-    lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", 0, totalAmountOfImages));
+    lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", 0, imagesToRecognize.size()));
     lblDoOcrProgress.setVisible(true);
 
-    Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, new CaptureImageOrDoOcrResponseListener() {
-      @Override
-      public void captureImageResult(CaptureImageResult captureImageResult) {
+    doOcrOnNextImage(connectedDevice, imagesToRecognize, currentImageIndex);
+  }
 
-      }
+  protected void doOcrOnNextImage(final ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex) {
+    File imageToRecognize = imagesToRecognize.poll();
+    currentImageIndex.incrementAndGet();
 
-      @Override
-      public void ocrResult(TextRecognitionResult ocrResult) {
-        captureImageOrDoOcrResponseListener.ocrResult(ocrResult);
+    try {
+      final DoOcrConfiguration configuration = new DoOcrConfiguration(imageToRecognize, false, false);
 
-        if (ocrResult.isDone() && imagesToRecognize.size() > 0) {
-          currentImage.set(imagesToRecognize.poll());
-          Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, currentImage.get(), false, false, this);
+      Application.getDeepThoughtsConnector().getCommunicator().startDoOcrOnImage(connectedDevice, configuration, new DoOcrOnImageResultListener() {
+        @Override
+        public void responseReceived(DoOcrOnImageRequest doOcrOnImageRequest, TextRecognitionResult result) {
+          receivedOcrResultForImage(connectedDevice, imagesToRecognize, currentImageIndex, result);
         }
+      });
+    } catch(Exception ex) {
+      log.error("Could not read Image file " + imageToRecognize.getAbsolutePath() + " and do OCR on it", ex);
+      doOcrOnNextImage(connectedDevice, imagesToRecognize, currentImageIndex);
+      // TODO: show error message to User
+    }
+  }
 
-        Platform.runLater(() -> {
-        lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", currentImageIndex.incrementAndGet(), totalAmountOfImages));
-          if(imagesToRecognize.size() == 0)
-            lblDoOcrProgress.setVisible(false);
-        });
-      }
+  protected void receivedOcrResultForImage(ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex, TextRecognitionResult ocrResult) {
+    ocrResultReceived(ocrResult);
+
+    if (ocrResult.isDone() && imagesToRecognize.size() > 0) {
+      doOcrOnNextImage(connectedDevice, imagesToRecognize, currentImageIndex);
+    }
+
+    Platform.runLater(() -> {
+      lblDoOcrProgress.setText(Localization.getLocalizedString("count.images.processed", currentImageIndex.get(), imagesToRecognize.size()));
+      if (imagesToRecognize.size() == 0)
+        lblDoOcrProgress.setVisible(false);
     });
   }
 
@@ -274,11 +287,15 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
     @Override
     public void ocrResult(final TextRecognitionResult ocrResult) {
-      if(ocrResult.recognitionSuccessful())
-        Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
-      // TODO: show error message (or has it already been shown at this time?)
+      ocrResultReceived(ocrResult);
     }
   };
+
+  protected void ocrResultReceived(TextRecognitionResult ocrResult) {
+    if(ocrResult.recognitionSuccessful())
+      Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
+    // TODO: show error message (or has it already been shown at this time?)
+  }
 
   protected CaptureImageResultListener captureImageResultListener = new CaptureImageResultListener() {
     @Override
@@ -292,8 +309,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   protected CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener = new CaptureImageAndDoOcrResultListener() {
     @Override
     public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, TextRecognitionResult ocrResult) {
-      if(ocrResult.recognitionSuccessful())
-        Platform.runLater(() -> htmlEditor.setHtml(htmlEditor.getHtml() + ocrResult.getRecognizedText(), false));
+      ocrResultReceived(ocrResult);
       // TODO: show error message (or has it already been shown at this time?)
     }
   };

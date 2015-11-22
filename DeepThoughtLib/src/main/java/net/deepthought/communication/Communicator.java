@@ -6,16 +6,15 @@ import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.CommunicatorListener;
+import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.IMessagesDispatcher;
-import net.deepthought.communication.messages.MultipartPart;
-import net.deepthought.communication.messages.MultipartType;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
-import net.deepthought.communication.messages.request.MultipartRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
@@ -29,13 +28,10 @@ import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.User;
-import net.deepthought.util.Localization;
-import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -220,33 +216,11 @@ public class Communicator {
   }
 
 
+  public RequestWithAsynchronousResponse startDoOcrOnImage(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final DoOcrOnImageResultListener listener) {
+    String address = Addresses.getDoOcrOnImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final DoOcrOnImageRequest request = new DoOcrOnImageRequest(configuration);
 
-  public void startDoOcr(ConnectedDevice deviceToDoTheJob, File imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone, CaptureImageOrDoOcrResponseListener listener) {
-    try {
-      byte[] imageData = FileUtils.readFile(imageToRecognize);
-      startDoOcr(deviceToDoTheJob, imageData, showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone, listener);
-    } catch(Exception ex) {
-      log.error("Could not read Image file " + imageToRecognize.getAbsolutePath(), ex);
-      if(listener != null)
-        listener.ocrResult(TextRecognitionResult.createErrorOccurredResult(Localization.getLocalizedString("could.not.read.file", imageToRecognize.getAbsolutePath(), ex.getLocalizedMessage())));
-    }
-  }
-
-  public void startDoOcr(ConnectedDevice deviceToDoTheJob, byte[] imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone, CaptureImageOrDoOcrResponseListener listener) {
-    startDoOcr(deviceToDoTheJob, new DoOcrConfiguration(imageToRecognize, showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone), listener);
-  }
-
-  public void startDoOcr(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final CaptureImageOrDoOcrResponseListener listener) {
-    String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-
-    byte[] imageData = configuration.getAndResetImageToRecognize();
-    final MultipartRequest request = new MultipartRequest(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
-                                          new MultipartPart<DoOcrConfiguration>(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration, MultipartType.Text, configuration),
-                                          new MultipartPart<byte[]>(ConnectorMessagesCreator.DoOcrMultipartKeyImage, MultipartType.Binary, imageData) });
-
-    if(listener != null)
-      captureImageOrDoOcrListeners.put(request, listener);
-//    listenerManager.addListenerForResponse(request, listener);
+    listenerManager.addListenerForResponse(request, listener);
 
     dispatcher.sendMultipartMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
@@ -254,6 +228,8 @@ public class Communicator {
         dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
       }
     });
+
+    return request;
   }
 
 

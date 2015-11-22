@@ -20,20 +20,23 @@ public class Addresses {
   public final static String HeartbeatMethodName = "Heartbeat";
 
   public final static String StartCaptureImageMethodName = "StartCaptureImage";
+  public final static String CaptureImageResultMethodName = "CaptureImageResult";
   public final static String StopCaptureImageMethodName = "StopCaptureImage";
+
   public final static String StartCaptureImageAndDoOcrMethodName = "StartCaptureImageAndDoOcr";
   public final static String StopCaptureImageAndDoOcrMethodName = "StopCaptureImageAndDoOcr";
+
   public final static String DoOcrOnImageMethodName = "DoOcrOnImage";
   public final static String OcrResultMethodName = "OcrResult";
-  public final static String CaptureImageResultMethodName = "CaptureImageResult";
+  public final static String StopDoOcrOnImageMethodName = "StopDoOcrOnImage";
 
   public final static List<String> MethodNames;
 
 
   static {
     MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, SendAskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
-        StartCaptureImageMethodName, StartCaptureImageAndDoOcrMethodName, DoOcrOnImageMethodName, OcrResultMethodName, CaptureImageResultMethodName,
-        StopCaptureImageAndDoOcrMethodName);
+        StartCaptureImageMethodName, StopCaptureImageMethodName, CaptureImageResultMethodName, StartCaptureImageAndDoOcrMethodName, StopCaptureImageAndDoOcrMethodName,
+        DoOcrOnImageMethodName, OcrResultMethodName, StopDoOcrOnImageMethodName);
   }
 
 
@@ -85,6 +88,10 @@ public class Addresses {
 
   public static String getStopCaptureImageAndDoOcrAddress(String host, int port) {
     return createAddress(host, port, StopCaptureImageAndDoOcrMethodName);
+  }
+
+  public static String getStopDoOcrOnImageMethodNameAddress(String host, int port) {
+    return createAddress(host, port, StopDoOcrOnImageMethodName);
   }
 
   protected static String createAddress(String host, int port, String methodName) {

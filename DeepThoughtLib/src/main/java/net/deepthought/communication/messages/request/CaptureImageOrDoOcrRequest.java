@@ -4,8 +4,6 @@ import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.messages.MultipartPart;
 import net.deepthought.communication.model.DoOcrConfiguration;
 
-import java.io.IOException;
-
 /**
  * Created by ganymed on 23/08/15.
  */
@@ -63,10 +61,6 @@ public class CaptureImageOrDoOcrRequest extends MultipartRequest {
 
   public byte[] getImageToRecognize() {
     return configuration.getImageToRecognize();
-  }
-
-  public byte[] readBytesFromImageUri() throws IOException {
-    return configuration.readBytesFromImageUri();
   }
 
   public boolean showSettingsUi() {
