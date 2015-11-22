@@ -2,7 +2,6 @@ package net.deepthought.communication.messages;
 
 import net.deepthought.communication.Addresses;
 import net.deepthought.communication.ConnectorMessagesCreator;
-import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -33,7 +32,7 @@ public class DeepThoughtMessagesReceiverConfig extends DefaultMessagesReceiverCo
     allowedMethods.add(new WebMethodConfig(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class, getCaptureImageResultMultipartConfig()));
     allowedMethods.add(new WebMethodConfig(Addresses.StopCaptureImageMethodName, StopRequestWithAsynchronousResponse.class));
 
-    allowedMethods.add(new WebMethodConfig(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.StartCaptureImageAndDoOcrMethodName, RequestWithAsynchronousResponse.class));
     allowedMethods.add(new WebMethodConfig(Addresses.StopCaptureImageAndDoOcrMethodName, StopRequestWithAsynchronousResponse.class));
 
     allowedMethods.add(new WebMethodConfig(Addresses.DoOcrOnImageMethodName, DoOcrOnImageRequest.class, getDoOcrOnImageMultipartConfig()));

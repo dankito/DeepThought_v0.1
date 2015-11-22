@@ -6,6 +6,6 @@ import net.deepthought.communication.messages.response.OcrResultResponse;
 /**
  * Created by ganymed on 21/11/15.
  */
-public interface DoOcrOnImageResultListener extends  AsynchronousResponseListener<DoOcrOnImageRequest, OcrResultResponse> {
+public interface DoOcrOnImageResultListener extends AsynchronousResponseListener<DoOcrOnImageRequest, OcrResultResponse> {
 
 }
