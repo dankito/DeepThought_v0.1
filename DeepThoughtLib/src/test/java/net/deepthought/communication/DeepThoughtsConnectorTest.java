@@ -5,20 +5,30 @@ import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.MessagesReceiverListener;
+import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
+import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
+import net.deepthought.communication.messages.MessagesDispatcher;
+import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.data.model.Device;
+import net.deepthought.data.model.User;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -39,8 +49,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
   protected Communicator communicator;
 
 
-  @Before
-  public void setup() throws IOException {
+  @Override
+  public void setup() throws Exception {
+    super.setup();
+
     Application.instantiate(new TestApplicationConfiguration());
     try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
 
@@ -130,6 +142,44 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     connector.closeUserDeviceRegistrationServer();
 
     Assert.assertTrue(responses.get(0).allowsRegistration());
+  }
+
+  @Test
+  public void askForDeviceRegistration_ServerAllowsRegistration_BothDevicesHaveRegisteredOtherEndpoint() throws IOException {
+    final int device2MessagesPort = 43210;
+    final User user2 = User.createNewLocalUser();
+    final Device device2 = new Device("test2", "test2", "test2");
+    AsynchronousResponseListenerManager listenerManager2 = new AsynchronousResponseListenerManager();
+
+    final Communicator communicator2 = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager2, device2MessagesPort,
+        new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(user2, device2, TestIpAddress, device2MessagesPort)), registeredDevicesManager));
+    MessagesReceiver messagesReceiver2 = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(device2MessagesPort, listenerManager2), new MessagesReceiverListener() {
+      @Override
+      public boolean messageReceived(String methodName, Request request) {
+        if(Addresses.AskForDeviceRegistrationMethodName.equals(methodName)) {
+          communicator2.respondToAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest)request, new AskForDeviceRegistrationResponse(true, true,
+              UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()), DeviceInfo.fromDevice(device2), TestIpAddress, device2MessagesPort), null);
+        }
+        return false;
+      }
+    });
+    messagesReceiver2.start();
+    try { Thread.sleep(200); } catch(Exception ex) { }
+
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    communicator.askForDeviceRegistration(new HostInfo(user2.getUniversallyUniqueId(), user2.getUserName(), device2.getUniversallyUniqueId(), device2.getName(),
+        device2.getPlatform(), device2.getOsVersion(), device2.getPlatformArchitecture(), TestIpAddress, device2MessagesPort), loggedOnUser, localDevice, null);
+
+    try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, connector.getRegisteredDevicesManager().getRegisteredDevicesCount());
+    Assert.assertEquals(1, registeredDevicesManager.getRegisteredDevicesCount());
+
+//    Assert.assertEquals(loggedOnUser, registeredDevicesManager.);
+
+    connector.closeUserDeviceRegistrationServer();
+    messagesReceiver2.stop();
   }
 
 

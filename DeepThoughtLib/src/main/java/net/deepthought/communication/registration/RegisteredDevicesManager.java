@@ -11,11 +11,17 @@ import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Group;
 import net.deepthought.data.model.User;
 
+import java.util.Collection;
+
 /**
  * Created by ganymed on 21/08/15.
  */
 public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
+
+  public Collection<Device> getRegisteredDevices() {
+    return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices();
+  }
 
   @Override
   public boolean hasRegisteredDevices() {

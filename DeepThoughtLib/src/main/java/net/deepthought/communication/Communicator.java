@@ -3,7 +3,6 @@ package net.deepthought.communication;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
-import net.deepthought.communication.listener.CommunicatorListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
@@ -21,6 +20,7 @@ import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.registration.IRegisteredDevicesManager;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Device;
@@ -43,19 +43,17 @@ public class Communicator {
 
   protected int messageReceiverPort;
 
-  protected CommunicatorListener communicatorListener;
-
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
+  protected IRegisteredDevicesManager registeredDevicesManager;
 
-  public Communicator(CommunicatorConfig config, CommunicatorListener communicatorListener) {
+
+  public Communicator(CommunicatorConfig config) {
     this.dispatcher = config.getDispatcher();
     this.listenerManager = config.getListenerManager();
     this.messageReceiverPort = config.getMessageReceiverPort();
     this.connectorMessagesCreator = config.getConnectorMessagesCreator();
-
-    // TODO: try to remove
-    this.communicatorListener = communicatorListener;
+    this.registeredDevicesManager = config.getRegisteredDevicesManager();
   }
 
 
@@ -90,8 +88,10 @@ public class Communicator {
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(response, communicatorResponse, listener);
 
-        if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok)
-          communicatorListener.serverAllowedDeviceRegistration(request, response);
+        // TODO: in order to keep Communicator generic try to avoid reference to IRegisteredDevicesManager
+        if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok) {
+          registeredDevicesManager.registerDevice(request, response.useServersUserInformation());
+        }
       }
     });
   }
@@ -254,10 +254,6 @@ public class Communicator {
   }
 
   protected void dispatchResponse(Request request, Response response, ResponseListener listener) {
-    try {
-      communicatorListener.responseReceived(request, response);
-    } catch(Exception ex) { log.error("An error occurred calling Communicator's communicatorListener (so the error certainly is in the listener method)", ex); }
-
     if(listener != null) {
       try {
         listener.responseReceived(request, response);

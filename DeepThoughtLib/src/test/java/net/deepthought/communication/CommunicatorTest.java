@@ -68,7 +68,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     final AsynchronousResponseListenerManager listenerManager = new AsynchronousResponseListenerManager();
 
-    communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, CommunicatorPort, messagesCreator), null);
+    communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, CommunicatorPort, messagesCreator, registeredDevicesManager));
 
     startMessagesReceiverAsync(threadPool, listenerManager);
   }

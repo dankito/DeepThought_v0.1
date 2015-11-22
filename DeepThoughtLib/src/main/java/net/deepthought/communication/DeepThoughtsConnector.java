@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
-import net.deepthought.communication.listener.CommunicatorListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
@@ -20,7 +19,6 @@ import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
@@ -95,7 +93,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.listenerManager = new AsynchronousResponseListenerManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
           NetworkHelper.getIPAddressString(true), messageReceiverPort));
-    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator), communicatorListener);
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
   }
@@ -406,19 +404,6 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return Application.getLoggedOnUser();
   }
 
-
-  protected CommunicatorListener communicatorListener = new CommunicatorListener() {
-
-    @Override
-    public void responseReceived(Request request, Response response) {
-
-    }
-
-    @Override
-    public void serverAllowedDeviceRegistration(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
-      registerDevice(request, response.useServersUserInformation() == false);
-    }
-  };
 
   protected void registerDevice(AskForDeviceRegistrationRequest message, boolean useOtherSidesUserInfo) {
     registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
