@@ -42,12 +42,14 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
   @Before
   public void setup() throws IOException {
     Application.instantiate(new TestApplicationConfiguration());
+    try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
 
     connector = Application.getDeepThoughtsConnector();
     communicator = connector.getCommunicator();
 
     loggedOnUser = Application.getLoggedOnUser();
     localDevice = Application.getApplication().getLocalDevice();
+    localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), TestIpAddress, connector.getMessageReceiverPort());
   }
 
   @After

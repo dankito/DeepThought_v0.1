@@ -94,8 +94,7 @@ public class LookingForRegistrationServersClient {
   }
 
   protected void receivedPacketFromUnregisteredDevice(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses, DatagramPacket packet, HostInfo serverInfo) {
-    boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(packet.getData(), packet.getLength()); // TODO: does packet.getData() contain the same
-    // as buffer?
+    boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(packet.getData(), packet.getLength());
 
     if (isOpenRegistrationServer == true && listener != null) {
       listener.openRegistrationServerFound(serverInfo);
