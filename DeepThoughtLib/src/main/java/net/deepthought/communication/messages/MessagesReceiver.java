@@ -5,14 +5,17 @@ import net.deepthought.communication.Addresses;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.communication.listener.AsynchronousResponseListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.MultipartRequest;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.ResponseCode;
+import net.deepthought.communication.messages.response.ResponseToAsynchronousRequest;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
@@ -104,14 +107,10 @@ public class MessagesReceiver extends NanoHTTPD {
 
   protected Response handleRequest(String methodName, Request request) {
     try {
-//      if(request instanceof RequestWithAsynchronousResponse) {
-//        RequestWithAsynchronousResponse responseToRequest = (RequestWithAsynchronousResponse)request;
-//        int messageId = responseToRequest.getMessageId();
-//        AsynchronousResponseListener listener = config.getListenerManager().getListenerForMessageId(messageId);
-//        if(listener != null) {
-//          listener.responseReceived(responseToRequest, responseToRequest);
-//        }
-//      }
+      if(request instanceof ResponseToAsynchronousRequest) {
+        handleResponseToAsynchronousRequest((ResponseToAsynchronousRequest) request);
+      }
+
       if(listener.messageReceived(methodName, request)) {
         return createOkResponse();
       }
@@ -119,6 +118,22 @@ public class MessagesReceiver extends NanoHTTPD {
       return createResponse(Response.Status.BAD_REQUEST, net.deepthought.communication.messages.response.Response.Denied);
     } catch(Exception ex) {
       return createCouldNotHandleRequestResponse();
+    }
+  }
+
+  protected void handleResponseToAsynchronousRequest(ResponseToAsynchronousRequest responseToRequest) {
+    int messageId = responseToRequest.getRequestMessageId();
+    AsynchronousResponseListenerManager listenerManager = config.getListenerManager();
+
+    AsynchronousResponseListener listener = listenerManager.getListenerForMessageId(messageId);
+    RequestWithAsynchronousResponse originalRequest = listenerManager.getRequestWithAsynchronousResponseForMessageId(messageId);
+
+    if(responseToRequest.isDone()) {
+      listenerManager.removeListenerForMessageId(messageId);
+    }
+
+    if(listener != null && originalRequest != null) {
+      listener.responseReceived(originalRequest, responseToRequest);
     }
   }
 
@@ -429,10 +444,12 @@ public class MessagesReceiver extends NanoHTTPD {
   protected String getAddressFromMultipartRequest(Map<String, String> partFiles) throws IOException {
     if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyAddress)) {
       String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyAddress);
-      return FileUtils.readTextFile(new File(partFilename));
+      if(StringUtils.isNotNullOrEmpty(partFilename)) {
+        return FileUtils.readTextFile(new File(partFilename));
+      }
     }
 
-    return null;
+    return "";
   }
 
   protected int getPortFromMultipartRequest(Map<String, String> partFiles) throws IOException {

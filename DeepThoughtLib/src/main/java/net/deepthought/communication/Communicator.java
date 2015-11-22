@@ -2,7 +2,9 @@ package net.deepthought.communication;
 
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.CommunicatorListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.ResponseListener;
@@ -124,6 +126,63 @@ public class Communicator {
       @Override
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(request, communicatorResponse, listener);
+      }
+    });
+  }
+
+
+  public RequestWithAsynchronousResponse startCaptureImageNew(ConnectedDevice deviceToDoTheJob, CaptureImageResultListener listener) {
+    String address = Addresses.getStartCaptureImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
+
+    listenerManager.addListenerForResponse(request, listener);
+
+    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
+      }
+    });
+
+    return request;
+  }
+
+  public void respondToCaptureImageRequest(RequestWithAsynchronousResponse request, CaptureImageResult result, final ResponseListener listener) {
+    String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
+    final CaptureImageResultResponse response = new CaptureImageResultResponse(result, request.getMessageId());
+
+    dispatcher.sendMultipartMessageAsync(address, response, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(response, communicatorResponse, listener);
+      }
+    });
+  }
+
+  public RequestWithAsynchronousResponse startCaptureImageAndDoOcrNew(ConnectedDevice deviceToDoTheJob, CaptureImageAndDoOcrResultListener listener) {
+    String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort());
+
+    listenerManager.addListenerForResponse(request, listener);
+
+    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
+      }
+    });
+
+    return request;
+  }
+
+  public void respondToCaptureImageAndDoOcrRequest(RequestWithAsynchronousResponse request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
+    String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
+    final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
+
+    dispatcher.sendMessageAsync(address, response, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(response, communicatorResponse, listener);
       }
     });
   }
@@ -296,7 +355,7 @@ public class Communicator {
     public boolean messageReceived(String methodName, Request request) {
       if(Addresses.OcrResultMethodName.equals(methodName)) {
         OcrResultResponse response = (OcrResultResponse)request;
-        Integer messageId = response.getMessageId();
+        Integer messageId = response.getRequestMessageId();
 
         for(RequestWithAsynchronousResponse doOcrRequest : captureImageOrDoOcrListeners.keySet()) {
           if(messageId.equals(doOcrRequest.getMessageId())) {

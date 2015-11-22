@@ -22,6 +22,15 @@ public class TextRecognitionResult {
 
   }
 
+  public TextRecognitionResult(String recognizedText) {
+    this.recognizedText = recognizedText;
+    this.recognitionSuccessful = recognizedText != null;
+  }
+
+  public TextRecognitionResult(String recognizedText, boolean isDone) {
+    this(recognizedText);
+    this.isDone = isDone;
+  }
 
   public boolean isUserCancelled() {
     return isUserCancelled;

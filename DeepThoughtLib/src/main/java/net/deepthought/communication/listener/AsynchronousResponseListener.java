@@ -1,4 +1,4 @@
-package net.deepthought.communication.messages.response;
+package net.deepthought.communication.listener;
 
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 

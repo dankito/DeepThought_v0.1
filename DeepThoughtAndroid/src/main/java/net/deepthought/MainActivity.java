@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected void captureImageAndSendToCaller(CaptureImageOrDoOcrRequest request) {
     temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
     if(temporaryImageFile != null)
-      this.captureImageRequest = request;
+      this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller
   }
 
   protected void captureImageAndDoOcr(final CaptureImageOrDoOcrRequest request) {

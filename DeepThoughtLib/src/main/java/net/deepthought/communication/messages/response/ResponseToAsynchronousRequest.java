@@ -7,4 +7,6 @@ public interface ResponseToAsynchronousRequest {
 
   int getRequestMessageId();
 
+  boolean isDone();
+
 }

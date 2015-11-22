@@ -1,29 +1,26 @@
 package net.deepthought.communication.messages.response;
 
+import net.deepthought.communication.messages.request.Request;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 
 /**
  * Created by ganymed on 23/08/15.
  */
-public class OcrResultResponse extends net.deepthought.communication.messages.request.Request {
+public class OcrResultResponse extends Request implements ResponseToAsynchronousRequest {
 
   protected TextRecognitionResult textRecognitionResult;
 
-  protected int messageId;
+  protected int requestMessageId;
 
 
-  public OcrResultResponse(TextRecognitionResult textRecognitionResult, int messageId) {
+  public OcrResultResponse(TextRecognitionResult textRecognitionResult, int requestMessageId) {
     this.textRecognitionResult = textRecognitionResult;
-    this.messageId = messageId;
+    this.requestMessageId = requestMessageId;
   }
 
 
   public TextRecognitionResult getTextRecognitionResult() {
     return textRecognitionResult;
-  }
-
-  public int getMessageId() {
-    return messageId;
   }
 
 
@@ -32,4 +29,17 @@ public class OcrResultResponse extends net.deepthought.communication.messages.re
     return "" + textRecognitionResult;
   }
 
+  @Override
+  public int getRequestMessageId() {
+    return requestMessageId;
+  }
+
+  @Override
+  public boolean isDone() {
+    if(textRecognitionResult != null) {
+      return textRecognitionResult.isDone();
+    }
+
+    return false;
+  }
 }

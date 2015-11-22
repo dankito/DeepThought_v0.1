@@ -41,6 +41,12 @@ public class CaptureImageResult {
     this.imageData = imageData;
   }
 
+  public CaptureImageResult(byte[] imageData, boolean isDone) {
+    this(imageData);
+    this.isDone = isDone;
+  }
+
+
   public boolean isUserCancelled() {
     return isUserCancelled;
   }

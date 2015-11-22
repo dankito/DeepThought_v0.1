@@ -1,7 +1,7 @@
 package net.deepthought.communication.messages;
 
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.AsynchronousResponseListener;
+import net.deepthought.communication.listener.AsynchronousResponseListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,8 +18,19 @@ public class AsynchronousResponseListenerManager {
     asynchronousResponseListeners.put(request, listener);
   }
 
+
+  public RequestWithAsynchronousResponse getRequestWithAsynchronousResponseForMessageId(int messageId) {
+    for(RequestWithAsynchronousResponse request : asynchronousResponseListeners.keySet()) {
+      if(request.getMessageId() == messageId) {
+        return request;
+      }
+    }
+
+    return null;
+  }
+
   public <TRequest extends RequestWithAsynchronousResponse, TResponse> AsynchronousResponseListener<TRequest, TResponse> getListenerForMessageId(int messageId) {
-    RequestWithAsynchronousResponse request = findRequestWithAsynchronousResponseForMessageId(messageId);
+    RequestWithAsynchronousResponse request = getRequestWithAsynchronousResponseForMessageId(messageId);
     if(request != null) {
       return asynchronousResponseListeners.get(request);
     }
@@ -28,7 +39,7 @@ public class AsynchronousResponseListenerManager {
   }
 
   public <TRequest extends RequestWithAsynchronousResponse, TResponse> AsynchronousResponseListener<TRequest, TResponse> getAndRemoveListenerForMessageId(int messageId) {
-    RequestWithAsynchronousResponse request = findRequestWithAsynchronousResponseForMessageId(messageId);
+    RequestWithAsynchronousResponse request = getRequestWithAsynchronousResponseForMessageId(messageId);
     if(request != null) {
       AsynchronousResponseListener<TRequest, TResponse> listener = asynchronousResponseListeners.get(request);
       removeListenerForRequest(request);
@@ -39,7 +50,7 @@ public class AsynchronousResponseListenerManager {
   }
 
   public void removeListenerForMessageId(int messageId) {
-    RequestWithAsynchronousResponse request = findRequestWithAsynchronousResponseForMessageId(messageId);
+    RequestWithAsynchronousResponse request = getRequestWithAsynchronousResponseForMessageId(messageId);
     if(request != null) {
       removeListenerForRequest(request);
     }
@@ -49,14 +60,9 @@ public class AsynchronousResponseListenerManager {
     asynchronousResponseListeners.remove(request);
   }
 
-  protected RequestWithAsynchronousResponse findRequestWithAsynchronousResponseForMessageId(int messageId) {
-    for(RequestWithAsynchronousResponse request : asynchronousResponseListeners.keySet()) {
-      if(request.getMessageId() == messageId) {
-        return request;
-      }
-    }
 
-    return null;
+  public int getRegisteredListenersCount() {
+    return asynchronousResponseListeners.size();
   }
 
 }

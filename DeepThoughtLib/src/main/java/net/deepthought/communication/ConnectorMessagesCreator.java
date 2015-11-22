@@ -31,6 +31,7 @@ public class ConnectorMessagesCreator {
   public static final String DoOcrMultipartKeyConfiguration = "configuration";
   public static final String DoOcrMultipartKeyImage = "image";
 
+  public static final String CaptureImageResultMultipartKeyRequestMessageId = "request_message_id";
   public static final String CaptureImageResultMultipartKeyResponse = "response";
   public static final String CaptureImageResultMultipartKeyImage = "image";
 

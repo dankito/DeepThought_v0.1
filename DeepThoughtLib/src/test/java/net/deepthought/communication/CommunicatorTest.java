@@ -2,8 +2,10 @@ package net.deepthought.communication;
 
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationListener;
+import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrResponseListener;
+import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesReceiver;
@@ -11,6 +13,7 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponseMessage;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
@@ -51,6 +54,8 @@ public class CommunicatorTest extends CommunicationTestBase {
   protected final static int CommunicatorPort = 54321;
 
   protected final static int TestMessageId = 4711;
+
+  protected final static String TestRecognizedText = "Cuddle";
 
 
 //  protected Communicator communicator = null;
@@ -229,12 +234,136 @@ public class CommunicatorTest extends CommunicationTestBase {
 
 
   @Test
+  public void startCaptureImage_RequestIsReceived() {
+    communicator.startCaptureImageNew(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+
+    assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageMethodName, RequestWithAsynchronousResponse.class);
+  }
+
+  @Test
+  public void respondToCaptureImageRequest_RequestIsReceived() throws IOException {
+    byte[] imageData = getTestImage();
+    RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(TestMessageId, TestIpAddress, CommunicatorPort);
+    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(imageData), null);
+
+    waitTillListenerHasBeenCalled();
+
+    CaptureImageResultResponse response = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertNotNull(response.getResult());
+    Assert.assertArrayEquals(imageData, response.getResult().getImageData());
+  }
+
+  @Test
+  public void startCaptureImage_ResponseListenerGetsCalled() throws IOException {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<CaptureImageResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageNew(localHost, new CaptureImageResultListener() {
+      @Override
+      public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResultResponse captureImageResultResponse) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(captureImageResultResponse);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    byte[] imageData = getTestImage();
+    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(imageData, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+    CaptureImageResultResponse response = receivedResponseHolder.get(0);
+    Assert.assertArrayEquals(imageData, response.getResult().getImageData());
+  }
+
+  @Test
+  public void startCaptureImage_ResponseListenerGetsRemovedFromListenerManager() throws IOException {
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageNew(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(getTestImage(), true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
+  }
+
+
+  @Test
   public void startCaptureImageAndDoOcr_RequestIsReceived() {
-    communicator.startCaptureImageAndDoOcr(localHost, null);
+    communicator.startCaptureImageAndDoOcrNew(localHost, null);
 
-    waitTillListenerHasBeenCalled(100);
+    waitTillListenerHasBeenCalled();
 
-    assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
+    assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, RequestWithAsynchronousResponse.class);
+  }
+
+  @Test
+  public void respondToCaptureImageAndDoOcrRequest_RequestIsReceived() {
+    RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(TestMessageId, TestIpAddress, CommunicatorPort);
+    communicator.respondToCaptureImageAndDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    OcrResultResponse response = (OcrResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.OcrResultMethodName, OcrResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertNotNull(response.getTextRecognitionResult());
+    Assert.assertEquals(TestRecognizedText, response.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startCaptureImageAndDoOcr_ResponseListenerGetsCalled() {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<OcrResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcrNew(localHost, new CaptureImageAndDoOcrResultListener() {
+      @Override
+      public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, OcrResultResponse ocrResultResponse) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(ocrResultResponse);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToCaptureImageAndDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+    OcrResultResponse response = receivedResponseHolder.get(0);
+    Assert.assertEquals(TestRecognizedText, response.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startCaptureImageAndDoOcr_ResponseListenerGetsRemovedFromListenerManager() {
+    RequestWithAsynchronousResponse request = communicator.startCaptureImageAndDoOcrNew(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToCaptureImageAndDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
   }
 
 //  @Test
@@ -308,7 +437,7 @@ public class CommunicatorTest extends CommunicationTestBase {
     byte[] imageData = getTestImage();
     communicator.startDoOcr(localHost, imageData, false, false, null);
 
-    waitTillListenerHasBeenCalled(100);
+    waitTillListenerHasBeenCalled();
 
     CaptureImageOrDoOcrRequest request = (CaptureImageOrDoOcrRequest)assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class);
     Assert.assertNotNull(request.getConfiguration());
@@ -580,6 +709,10 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   protected void waitTillListenerHasBeenCalled(int maxSecondsToWait) {
     try { waitLatch.await(maxSecondsToWait, TimeUnit.SECONDS); } catch(Exception ex) { }
+  }
+
+  protected void resetWaitLatch() {
+    waitLatch = new CountDownLatch(1);
   }
 
 

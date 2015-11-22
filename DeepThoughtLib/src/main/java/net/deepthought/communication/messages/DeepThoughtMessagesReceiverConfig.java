@@ -3,6 +3,7 @@ package net.deepthought.communication.messages;
 import net.deepthought.communication.Addresses;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.messages.request.CaptureImageOrDoOcrRequest;
+import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopCaptureImageOrDoOcrRequest;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
@@ -27,7 +28,9 @@ public class DeepThoughtMessagesReceiverConfig extends DefaultMessagesReceiverCo
   protected List<WebMethodConfig> getDefaultAllowedMethods() {
     List<WebMethodConfig> allowedMethods = super.getDefaultAllowedMethods();
 
-    allowedMethods.add(new WebMethodConfig(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class, getStartCaptureImageAndDoOcrMultipartConfig()));
+    allowedMethods.add(new WebMethodConfig(Addresses.StartCaptureImageMethodName, RequestWithAsynchronousResponse.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.StartCaptureImageAndDoOcrMethodName, CaptureImageOrDoOcrRequest.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.DoOcrOnImageMethodName, RequestWithAsynchronousResponse.class, getDoOcrOnImageMultipartConfig()));
     allowedMethods.add(new WebMethodConfig(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class, getCaptureImageResultMultipartConfig()));
     allowedMethods.add(new WebMethodConfig(Addresses.OcrResultMethodName, OcrResultResponse.class));
     allowedMethods.add(new WebMethodConfig(Addresses.StopCaptureImageAndDoOcrMethodName, StopCaptureImageOrDoOcrRequest.class));
@@ -36,7 +39,7 @@ public class DeepThoughtMessagesReceiverConfig extends DefaultMessagesReceiverCo
   }
 
 
-  protected List<MultipartPart> getStartCaptureImageAndDoOcrMultipartConfig() {
+  protected List<MultipartPart> getDoOcrOnImageMultipartConfig() {
     List<MultipartPart> multipartPartsConfig = new ArrayList<>();
 
     multipartPartsConfig.add(new MultipartPart(ConnectorMessagesCreator.DoOcrMultipartKeyConfiguration, MultipartType.Text, DoOcrConfiguration.class));
@@ -48,6 +51,7 @@ public class DeepThoughtMessagesReceiverConfig extends DefaultMessagesReceiverCo
   protected List<MultipartPart> getCaptureImageResultMultipartConfig() {
     List<MultipartPart> multipartPartsConfig = new ArrayList<>();
 
+    multipartPartsConfig.add(new MultipartPart(ConnectorMessagesCreator.CaptureImageResultMultipartKeyRequestMessageId, MultipartType.Text, Integer.class));
     multipartPartsConfig.add(new MultipartPart(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse, MultipartType.Text, CaptureImageResult.class));
     multipartPartsConfig.add(new MultipartPart(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage, MultipartType.Binary, String.class));
 
