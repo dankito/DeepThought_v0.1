@@ -254,6 +254,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     Assert.assertEquals(TestMessageId, response.getRequestMessageId());
     Assert.assertNotNull(response.getResult());
+    Assert.assertNotNull(response.getResult().getImageUri());
     Assert.assertArrayEquals(imageData, response.getResult().getImageData());
   }
 
@@ -587,30 +588,6 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //    Assert.assertTrue(methodCalled.get());
 //  }
-
-  @Test
-  public void sendCapturedImage_ResultIsReceived() throws IOException {
-    communicator.sendCaptureImageResult(new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), getTestImage(), null);
-
-    waitTillListenerHasBeenCalled();
-
-    CaptureImageResultResponse request = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
-    Assert.assertNotNull(request.getResult());
-    Assert.assertNotNull(request.getResult().getImageUri());
-  }
-
-
-  @Test
-  public void sendCaptureImageResult_ReceivedImageDataIsCorrect() throws IOException {
-    byte[] sentImageData = getTestImage();
-
-    communicator.sendCaptureImageResult(new CaptureImageOrDoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, false, false), sentImageData, null);
-
-    waitTillListenerHasBeenCalled();
-
-    CaptureImageResultResponse request = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
-    Assert.assertArrayEquals(sentImageData, request.getResult().getImageData());
-  }
 
 
   @Test

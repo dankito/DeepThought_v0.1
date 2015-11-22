@@ -257,22 +257,6 @@ public class Communicator {
   }
 
 
-  public void sendCaptureImageResult(final CaptureImageOrDoOcrRequest request, final byte[] imageData, final ResponseListener listener) {
-    String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
-    CaptureImageResult result = new CaptureImageResult(imageData != null && imageData.length > 0);
-
-    final MultipartRequest multiPartResponse = new MultipartRequest(request.getMessageId(), NetworkHelper.getIPAddressString(true), connector.getMessageReceiverPort(), new MultipartPart[] {
-        new MultipartPart<CaptureImageResult>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyResponse, MultipartType.Text, result),
-        new MultipartPart<byte[]>(ConnectorMessagesCreator.CaptureImageResultMultipartKeyImage, MultipartType.Binary, imageData) });
-
-    dispatcher.sendMultipartMessageAsync(address, multiPartResponse, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(multiPartResponse, communicatorResponse, listener);
-      }
-    });
-  }
-
   public void sendOcrResult(final CaptureImageOrDoOcrRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());

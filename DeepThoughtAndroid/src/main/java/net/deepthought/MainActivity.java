@@ -30,6 +30,7 @@ import net.deepthought.communication.messages.request.StopRequestWithAsynchronou
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
@@ -367,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         File imageFile = new File(temporaryImageFile.getUriString());
         try {
           byte[] imageData = FileUtils.readFile(imageFile);
-          Application.getDeepThoughtsConnector().getCommunicator().sendCaptureImageResult(captureImageRequest, imageData, null);
+          Application.getDeepThoughtsConnector().getCommunicator().respondToCaptureImageRequest(captureImageRequest, new CaptureImageResult(imageData, true), null);
         } catch (Exception ex) {
           log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
           // TODO: send error response
