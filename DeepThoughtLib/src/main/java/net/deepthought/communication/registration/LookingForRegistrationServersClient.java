@@ -1,10 +1,10 @@
 package net.deepthought.communication.registration;
 
-import net.deepthought.Application;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,17 +27,23 @@ public class LookingForRegistrationServersClient {
 
   protected ConnectorMessagesCreator messagesCreator;
 
+  protected IRegisteredDevicesManager registeredDevicesManager;
+
+  protected IThreadPool threadPool;
+
   protected DatagramSocket socket = null;
   protected boolean isSocketOpened = false;
 
 
-  public LookingForRegistrationServersClient(ConnectorMessagesCreator messagesCreator) {
+  public LookingForRegistrationServersClient(ConnectorMessagesCreator messagesCreator, IRegisteredDevicesManager registeredDevicesManager, IThreadPool threadPool) {
     this.messagesCreator = messagesCreator;
+    this.registeredDevicesManager = registeredDevicesManager;
+    this.threadPool = threadPool;
   }
 
 
   public void findRegistrationServersAsync(final RegistrationRequestListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         findRegistrationServers(listener);
@@ -79,21 +85,28 @@ public class LookingForRegistrationServersClient {
         serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
       }
 
-      if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(serverInfo) == false) {
-        boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(buffer, packet.getLength());
-
-        if (isOpenRegistrationServer == true && listener != null) {
-          listener.openRegistrationServerFound(serverInfo);
-        }
-
-        InetAddress address = packet.getAddress();
-        if(receivedResponses.containsKey(address) == false)
-          receivedResponses.put(address, new HashMap<String, Set<String>>());
-        if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
-          receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new HashSet<String>());
-        receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
+      if(registeredDevicesManager.isDeviceRegistered(serverInfo) == false) {
+        receivedPacketFromUnregisteredDevice(listener, receivedResponses, packet, serverInfo);
       }
-    } catch(Exception ex) { } // a receive time out (may notify user about that
+    } catch(Exception ex) {
+      log.error("An error occurred trying to receive response from RegistrationServer", ex);
+    } // a receive time out (may notify user about that
+  }
+
+  protected void receivedPacketFromUnregisteredDevice(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses, DatagramPacket packet, HostInfo serverInfo) {
+    boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(packet.getData(), packet.getLength()); // TODO: does packet.getData() contain the same
+    // as buffer?
+
+    if (isOpenRegistrationServer == true && listener != null) {
+      listener.openRegistrationServerFound(serverInfo);
+    }
+
+    InetAddress address = packet.getAddress();
+    if(receivedResponses.containsKey(address) == false)
+      receivedResponses.put(address, new HashMap<String, Set<String>>());
+    if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
+      receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new HashSet<String>());
+    receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
   }
 
   protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {

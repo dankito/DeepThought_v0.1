@@ -5,6 +5,7 @@ import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -25,17 +26,20 @@ public class RegistrationServer {
 
   protected ConnectorMessagesCreator messagesCreator = null;
 
+  protected IThreadPool threadPool;
+
   protected DatagramSocket serverSocket = null;
   protected boolean isSocketOpened = false;
 
 
-  public RegistrationServer(ConnectorMessagesCreator messagesCreator) {
+  public RegistrationServer(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool) {
     this.messagesCreator = messagesCreator;
+    this.threadPool = threadPool;
   }
 
 
   public void startRegistrationServerAsync() {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startRegistrationServer();

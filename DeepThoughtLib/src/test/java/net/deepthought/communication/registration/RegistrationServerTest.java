@@ -18,12 +18,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class RegistrationServerTest extends CommunicationTestBase {
 
+
   @Test
   public void registrationServerIsOpen_ServerGetsFound() {
     final List<DatagramPacket> receivedRequestPackets = new ArrayList<>();
     final CountDownLatch waitForRequestPacketLatch = new CountDownLatch(1);
 
-    RegistrationServer registrationServer = new RegistrationServer(messagesCreator) {
+    RegistrationServer registrationServer = new RegistrationServer(messagesCreator, threadPool) {
       @Override
       protected void respondToRegistrationRequest(DatagramPacket requestPacket) {
         receivedRequestPackets.add(requestPacket);
@@ -32,10 +33,10 @@ public class RegistrationServerTest extends CommunicationTestBase {
     };
     registrationServer.startRegistrationServerAsync();
 
-    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client.findRegistrationServersAsync(null);
 
-    try { waitForRequestPacketLatch.await(100, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForRequestPacketLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, receivedRequestPackets.size());
 
@@ -48,7 +49,7 @@ public class RegistrationServerTest extends CommunicationTestBase {
     final Set<Integer> portsMessagesReceivedFrom = new HashSet<>();
     final CountDownLatch waitForRequestsLatch = new CountDownLatch(1);
 
-    RegistrationServer registrationServer = new RegistrationServer(messagesCreator) {
+    RegistrationServer registrationServer = new RegistrationServer(messagesCreator, threadPool) {
       @Override
       protected void respondToRegistrationRequest(DatagramPacket requestPacket) {
         portsMessagesReceivedFrom.add(requestPacket.getPort());
@@ -58,11 +59,11 @@ public class RegistrationServerTest extends CommunicationTestBase {
     };
     registrationServer.startRegistrationServerAsync();
 
-    LookingForRegistrationServersClient client1 = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client1 = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client1.findRegistrationServersAsync(null);
-    LookingForRegistrationServersClient client2 = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client2 = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client2.findRegistrationServersAsync(null);
-    LookingForRegistrationServersClient client3 = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client3 = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client3.findRegistrationServersAsync(null);
 
     try { waitForRequestsLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }

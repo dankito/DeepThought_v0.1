@@ -1,15 +1,16 @@
 package net.deepthought.communication;
 
-import net.deepthought.Application;
-import net.deepthought.TestApplicationConfiguration;
+import net.deepthought.communication.connected_device.IConnectedDevicesManager;
+import net.deepthought.communication.helper.TestConnectedDevicesManager;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.registration.IRegisteredDevicesManager;
+import net.deepthought.communication.helper.TestRegisteredDevicesManager;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
+import net.deepthought.util.IThreadPool;
+import net.deepthought.util.ThreadPool;
 
-import org.junit.After;
 import org.junit.Before;
-
-import java.io.IOException;
 
 /**
  * Created by ganymed on 20/08/15.
@@ -23,32 +24,30 @@ public class CommunicationTestBase {
   protected final static int CommunicatorPort = 54321;
 
 
-  protected ConnectorMessagesCreator messagesCreator = new ConnectorMessagesCreator();
+  protected ConnectorMessagesCreator messagesCreator;
 
-  protected IDeepThoughtsConnector connector;
+  protected IRegisteredDevicesManager registeredDevicesManager;
 
-  protected Communicator communicator;
+  protected IConnectedDevicesManager connectedDevicesManager;
+
+  protected IThreadPool threadPool;
 
   protected ConnectedDevice localHost = new ConnectedDevice(TestDeviceId, TestIpAddress, CommunicatorPort);
 
-  protected User localUser;
+  protected User loggedOnUser;
   protected Device localDevice;
 
 
   @Before
-  public void setup() throws IOException {
-    Application.instantiate(new TestApplicationConfiguration());
+  public void setup() throws Exception {
+    loggedOnUser = User.createNewLocalUser();
+    localDevice = new Device("test", "test", "test");
+    loggedOnUser.addDevice(localDevice);
 
-    connector = Application.getDeepThoughtsConnector();
-    communicator = connector.getCommunicator();
-
-    localUser = Application.getLoggedOnUser();
-    localDevice = Application.getApplication().getLocalDevice();
-  }
-
-  @After
-  public void tearDown() {
-    Application.shutdown();
+    registeredDevicesManager = new TestRegisteredDevicesManager();
+    connectedDevicesManager = new TestConnectedDevicesManager();
+    messagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(loggedOnUser, localDevice, TestIpAddress, CommunicatorPort));
+    threadPool = new ThreadPool();
   }
 
 }

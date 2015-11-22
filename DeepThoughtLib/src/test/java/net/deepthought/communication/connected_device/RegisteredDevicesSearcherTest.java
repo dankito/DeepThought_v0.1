@@ -1,8 +1,6 @@
 package net.deepthought.communication.connected_device;
 
-import net.deepthought.Application;
 import net.deepthought.communication.CommunicationTestBase;
-import net.deepthought.communication.DeepThoughtsConnector;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
@@ -28,7 +26,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void serverReceivedPacket(byte[] buffer, DatagramPacket packet) {
         receivedPackets.add(packet);
@@ -50,7 +48,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
         packetsRespondedTo.add(requestPacket);
@@ -74,7 +72,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
         packetsRespondedTo.add(requestPacket);
@@ -104,7 +102,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
         receivedPackets.add(packet);
@@ -131,7 +129,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> responsesReceived = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
         responsesReceived.add(packet);
@@ -155,7 +153,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<ConnectedDevice> connectedDevices = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator) {
+    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected boolean isSelfSentPacket(HostInfo clientInfo) {
         return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
@@ -178,8 +176,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
   }
 
   protected void mockDeviceIsRegistered() {
-    RegisteredDevicesManager registeredDevicesManager = Mockito.mock(RegisteredDevicesManager.class);
-    ((DeepThoughtsConnector) Application.getDeepThoughtsConnector()).setRegisteredDevicesManager(registeredDevicesManager);
+    registeredDevicesManager = Mockito.mock(RegisteredDevicesManager.class);
     Mockito.when(registeredDevicesManager.isDeviceRegistered(Mockito.any(HostInfo.class))).thenReturn(true);
     Mockito.when(registeredDevicesManager.isDeviceRegistered(Mockito.any(ConnectedDevice.class))).thenReturn(true);
   }

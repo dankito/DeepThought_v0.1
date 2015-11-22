@@ -27,7 +27,10 @@ import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.RegistrationServer;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.data.model.Device;
+import net.deepthought.data.model.User;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
@@ -51,6 +54,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected int messageReceiverPort;
 
   protected Communicator communicator;
+
+  protected IThreadPool threadPool;
 
   protected AsynchronousResponseListenerManager listenerManager;
 
@@ -86,9 +91,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.messageReceiverPort = messageReceiverPort;
 
     // TODO: make configurable
+    this.threadPool = Application.getThreadPool();
     this.listenerManager = new AsynchronousResponseListenerManager();
-    this.connectorMessagesCreator = new ConnectorMessagesCreator();
-    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(Application.getThreadPool()), listenerManager, messageReceiverPort), communicatorListener);
+    this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
+          NetworkHelper.getIPAddressString(true), messageReceiverPort));
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator), communicatorListener);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
   }
@@ -142,7 +149,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       messagesReceiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(messageReceiverPort, listenerManager), messagesReceiverListener);
       messagesReceiver.start();
 
-      this.messageReceiverPort = messageReceiverPort;
+      setMessageReceiverPort(messageReceiverPort);
     } catch(Exception ex) {
       stopMessagesReceiver();
 
@@ -180,7 +187,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected void startRegisteredDevicesSearcher() {
     stopRegisteredDevicesSearcher();
 
-    registeredDevicesSearcher = new RegisteredDevicesSearcher(connectorMessagesCreator);
+    registeredDevicesSearcher = new RegisteredDevicesSearcher(connectorMessagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, getLoggedOnUser(), getLocalDevice());
     registeredDevicesSearcher.startSearchingAsync(registeredDeviceConnectedListener);
   }
 
@@ -223,7 +230,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
     this.userDeviceRegistrationRequestListener = listener;
 
-    registrationServer = new RegistrationServer(connectorMessagesCreator);
+    registrationServer = new RegistrationServer(connectorMessagesCreator, threadPool);
       registrationServer.startRegistrationServerAsync();
   }
 
@@ -242,7 +249,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     if(isSearchRegistrationServersClientRunning())
       stopSearchingOtherUserDevicesToRegisterAt();
 
-    searchRegistrationServersClient = new LookingForRegistrationServersClient(connectorMessagesCreator);
+    searchRegistrationServersClient = new LookingForRegistrationServersClient(connectorMessagesCreator, registeredDevicesManager, threadPool);
     searchRegistrationServersClient.findRegistrationServersAsync(listener);
   }
 
@@ -263,7 +270,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
     if(device.getDevice() == null)
-      device.setStoredDeviceInstance(); // if it's from a Communicator message locally stored Device instance isn't set yet
+      device.setStoredDeviceInstance(getLoggedOnUser()); // if it's from a Communicator message locally stored Device instance isn't set yet
 
     if(connectedDevicesManager.connectedToDevice(device)) {
       communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
@@ -293,6 +300,14 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   @Override
   public int getMessageReceiverPort() {
     return messageReceiverPort;
+  }
+
+  protected void setMessageReceiverPort(int messageReceiverPort) {
+    this.messageReceiverPort = messageReceiverPort;
+
+    // TODO: what did you learn in Object Orientated Programming?
+    connectorMessagesCreator.config.messageReceiverPort = messageReceiverPort;
+    communicator.setMessageReceiverPort(messageReceiverPort);
   }
 
   @Override
@@ -380,6 +395,15 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   public boolean removeMessagesReceiverListener(MessagesReceiverListener listener) {
     return messagesReceiverListeners.remove(listener);
+  }
+
+
+  protected Device getLocalDevice() {
+    return Application.getApplication().getLocalDevice();
+  }
+
+  protected User getLoggedOnUser() {
+    return Application.getLoggedOnUser();
   }
 
 

@@ -14,18 +14,21 @@ import net.deepthought.data.model.User;
 /**
  * Created by ganymed on 21/08/15.
  */
-public class RegisteredDevicesManager {
+public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
 
+  @Override
   public boolean hasRegisteredDevices() {
     return getRegisteredDevicesCount() > 0;
   }
 
+  @Override
   public int getRegisteredDevicesCount() {
     return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices().size() - 1; // TODO: will there ever be other Devices than User's Devices in his/her own group?
   }
 
 
+  @Override
   public boolean isDeviceRegistered(HostInfo info) {
     User loggedOnUser = Application.getLoggedOnUser();
     if(loggedOnUser.getDevices().size() > 1 && loggedOnUser.getUniversallyUniqueId().equals(info.getUserUniqueId())) {
@@ -38,11 +41,13 @@ public class RegisteredDevicesManager {
     return false;
   }
 
+  @Override
   public boolean isDeviceRegistered(ConnectedDevice device) {
     User loggedOnUser = Application.getLoggedOnUser();
     return device != null && loggedOnUser.containsDevice(device.getDevice());
   }
 
+  @Override
   public boolean registerDevice(AskForDeviceRegistrationRequest response, boolean useOtherSidesUserInfo) { // TODO: after calling this start searching for registered devices
     User loggedOnUser = Application.getLoggedOnUser();
     Device peerDevice = extractDeviceInformation(response);

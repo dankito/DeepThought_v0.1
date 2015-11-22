@@ -1,8 +1,7 @@
 package net.deepthought.communication.model;
 
-import net.deepthought.Application;
-import net.deepthought.communication.NetworkHelper;
 import net.deepthought.data.model.Device;
+import net.deepthought.data.model.User;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +85,8 @@ public class ConnectedDevice {
   }
 
 
-  // TODO: get rid of static method
-  public static ConnectedDevice createSelfInstance() {
-    return new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), NetworkHelper.getIPAddressString(true),
-        Application.getDeepThoughtsConnector().getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());
-  }
-
-  public void setStoredDeviceInstance() {
-    for(Device userDevice : Application.getLoggedOnUser().getDevices()) {
+  public void setStoredDeviceInstance(User loggedOnUser) {
+    for(Device userDevice : loggedOnUser.getDevices()) {
       if(getUniqueDeviceId().equals(userDevice.getUniversallyUniqueId())) {
         setDevice(userDevice);
         return;

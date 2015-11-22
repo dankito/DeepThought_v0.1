@@ -1,6 +1,8 @@
 package net.deepthought.communication.registration;
 
 import net.deepthought.communication.CommunicationTestBase;
+import net.deepthought.communication.ConnectorMessagesCreator;
+import net.deepthought.communication.ConnectorMessagesCreatorConfig;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.model.HostInfo;
 
@@ -17,12 +19,19 @@ import java.util.concurrent.TimeUnit;
  */
 public class LookingForRegistrationServersClientTest extends CommunicationTestBase {
 
+  @Override
+  public void setup() throws Exception {
+    super.setup();
+
+    messagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(loggedOnUser, localDevice, NetworkHelper.getIPAddressString(true), CommunicatorPort));
+  }
+
 
   @Test
   public void noRegistrationServersOpen_ClientReceivesNoResponse() {
     final List<HostInfo> serverResponse = new ArrayList<>();
 
-    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client.findRegistrationServersAsync(new RegistrationRequestListener() {
       @Override
       public void openRegistrationServerFound(HostInfo serverInfo) {
@@ -42,10 +51,10 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
     final List<HostInfo> serverInfos = new ArrayList<>();
     final CountDownLatch waitForResponseLatch = new CountDownLatch(1);
 
-    RegistrationServer registrationServer = new RegistrationServer(messagesCreator);
+    RegistrationServer registrationServer = new RegistrationServer(messagesCreator, threadPool);
     registrationServer.startRegistrationServerAsync();
 
-    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client.findRegistrationServersAsync(new RegistrationRequestListener() {
       @Override
       public void openRegistrationServerFound(HostInfo serverInfo) {
@@ -67,10 +76,10 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
     final List<HostInfo> serverInfos = new ArrayList<>();
     final CountDownLatch waitForResponseLatch = new CountDownLatch(1);
 
-    RegistrationServer registrationServer = new RegistrationServer(messagesCreator);
+    RegistrationServer registrationServer = new RegistrationServer(messagesCreator, threadPool);
     registrationServer.startRegistrationServerAsync();
 
-    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator);
+    LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
     client.findRegistrationServersAsync(new RegistrationRequestListener() {
       @Override
       public void openRegistrationServerFound(HostInfo serverInfo) {
@@ -79,7 +88,7 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
       }
     });
 
-    try { waitForResponseLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForResponseLatch.await(100, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     HostInfo serverInfo = serverInfos.get(0);
     Assert.assertNotNull(serverInfo);

@@ -1,6 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.Application;
+import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
@@ -15,10 +16,13 @@ import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -29,6 +33,27 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by ganymed on 19/08/15.
  */
 public class DeepThoughtsConnectorTest extends CommunicationTestBase {
+
+  protected IDeepThoughtsConnector connector;
+
+  protected Communicator communicator;
+
+
+  @Before
+  public void setup() throws IOException {
+    Application.instantiate(new TestApplicationConfiguration());
+
+    connector = Application.getDeepThoughtsConnector();
+    communicator = connector.getCommunicator();
+
+    loggedOnUser = Application.getLoggedOnUser();
+    localDevice = Application.getApplication().getLocalDevice();
+  }
+
+  @After
+  public void tearDown() {
+    Application.shutdown();
+  }
 
 
   @Test
@@ -44,7 +69,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
     connector.closeUserDeviceRegistrationServer();
@@ -64,7 +89,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, new AskForDeviceRegistrationResultListener() {
       @Override
       public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
         responses.add(response);
@@ -91,7 +116,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, new AskForDeviceRegistrationResultListener() {
       @Override
       public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
         responses.add(response);

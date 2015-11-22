@@ -14,10 +14,13 @@ public class CommunicatorConfig {
 
   protected int messageReceiverPort;
 
-  public CommunicatorConfig(IMessagesDispatcher dispatcher, AsynchronousResponseListenerManager listenerManager, int messageReceiverPort) {
+  protected ConnectorMessagesCreator connectorMessagesCreator;
+
+  public CommunicatorConfig(IMessagesDispatcher dispatcher, AsynchronousResponseListenerManager listenerManager, int messageReceiverPort, ConnectorMessagesCreator connectorMessagesCreator) {
     this.dispatcher = dispatcher;
     this.listenerManager = listenerManager;
     this.messageReceiverPort = messageReceiverPort;
+    this.connectorMessagesCreator = connectorMessagesCreator;
   }
 
 
@@ -33,4 +36,7 @@ public class CommunicatorConfig {
     return messageReceiverPort;
   }
 
+  public ConnectorMessagesCreator getConnectorMessagesCreator() {
+    return connectorMessagesCreator;
+  }
 }

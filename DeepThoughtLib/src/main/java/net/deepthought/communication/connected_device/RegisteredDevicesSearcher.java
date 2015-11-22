@@ -7,7 +7,11 @@ import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.registration.IRegisteredDevicesManager;
+import net.deepthought.data.model.Device;
+import net.deepthought.data.model.User;
 import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.IThreadPool;
 import net.deepthought.util.Localization;
 
 import org.slf4j.Logger;
@@ -29,6 +33,16 @@ public class RegisteredDevicesSearcher {
 
   protected ConnectorMessagesCreator messagesCreator;
 
+  protected IThreadPool threadPool;
+
+  protected IRegisteredDevicesManager registeredDevicesManager;
+
+  protected IConnectedDevicesManager connectedDevicesManager;
+
+  protected User loggedOnUser;
+
+  protected Device localDevice;
+
   protected DatagramSocket serverSocket = null;
   protected boolean isServerSocketOpened = false;
 
@@ -36,8 +50,14 @@ public class RegisteredDevicesSearcher {
   protected boolean isClientSocketOpened = false;
 
 
-  public RegisteredDevicesSearcher(ConnectorMessagesCreator messagesCreator) {
+  public RegisteredDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool, IRegisteredDevicesManager registeredDevicesManager,
+                                   IConnectedDevicesManager connectedDevicesManager, User loggedOnUser, Device localDevice) {
     this.messagesCreator = messagesCreator;
+    this.threadPool = threadPool;
+    this.registeredDevicesManager = registeredDevicesManager;
+    this.connectedDevicesManager = connectedDevicesManager;
+    this.loggedOnUser = loggedOnUser;
+    this.localDevice = localDevice;
   }
 
 
@@ -63,7 +83,7 @@ public class RegisteredDevicesSearcher {
 
 
   protected void startServerAsync() {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startServer();
@@ -118,16 +138,16 @@ public class RegisteredDevicesSearcher {
       if(isSelfSentPacket(clientInfo))
         return;
 
-      if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(clientInfo) == true &&
-          Application.getDeepThoughtsConnector().getConnectedDevicesManager().isConnectedToDevice(clientInfo) == false) {
+      if(registeredDevicesManager.isDeviceRegistered(clientInfo) == true &&
+          connectedDevicesManager.isConnectedToDevice(clientInfo) == false) {
         respondToSearchingForRegisteredDevicesMessage(packet);
       }
     }
   }
 
   protected boolean isSelfSentPacket(HostInfo clientInfo) {
-    return Application.getLoggedOnUser().getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
-        Application.getApplication().getLocalDevice().getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
+    return loggedOnUser.getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
+        localDevice.getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
         clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 
@@ -147,7 +167,7 @@ public class RegisteredDevicesSearcher {
 
 
   protected void startClientAsync(final RegisteredDeviceConnectedListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         startClient(listener);
@@ -192,7 +212,7 @@ public class RegisteredDevicesSearcher {
   protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
     ConnectedDevice serverInfo = messagesCreator.getConnectedDeviceFromMessage(buffer, packet.getLength());
 
-    if(Application.getDeepThoughtsConnector().getRegisteredDevicesManager().isDeviceRegistered(serverInfo) == true) {
+    if(registeredDevicesManager.isDeviceRegistered(serverInfo) == true) {
       registeredDeviceConnected(listener, packet, serverInfo);
     }
   }

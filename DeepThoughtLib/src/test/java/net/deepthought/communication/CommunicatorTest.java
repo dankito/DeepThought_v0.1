@@ -22,13 +22,10 @@ import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
-import net.deepthought.data.model.Device;
-import net.deepthought.data.model.User;
-import net.deepthought.util.ThreadPool;
+import net.deepthought.util.IThreadPool;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,16 +43,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class CommunicatorTest {
+public class CommunicatorTest extends CommunicationTestBase {
 
   private final static Logger log = LoggerFactory.getLogger(CommunicatorTest.class);
 
-
-  protected final static String TestDeviceId = "Cuddle";
-
-  protected final static String TestIpAddress = "0.0.0.0";
-
-  protected final static int CommunicatorPort = 54321;
 
   protected final static int TestMessageId = 4711;
 
@@ -66,29 +57,23 @@ public class CommunicatorTest {
 
   protected MessagesReceiver receiver = null;
 
-  protected ConnectedDevice localHost = new ConnectedDevice(TestDeviceId, TestIpAddress, CommunicatorPort);
-
-  protected User localUser = User.createNewLocalUser();
-  protected Device localDevice = new Device("test", "test", "test");
-
   protected CountDownLatch waitLatch = new CountDownLatch(1);
 
   protected Map<String, Request> receivedRequests = new HashMap<>();
 
 
-  @Before
+  @Override
   public void setup() throws Exception {
-    localUser.addDevice(localDevice);
+    super.setup();
 
-    ThreadPool threadPool = new ThreadPool();
     final AsynchronousResponseListenerManager listenerManager = new AsynchronousResponseListenerManager();
 
-    communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, CommunicatorPort), null);
+    communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, CommunicatorPort, messagesCreator), null);
 
     startMessagesReceiverAsync(threadPool, listenerManager);
   }
 
-  protected void startMessagesReceiverAsync(ThreadPool threadPool, final AsynchronousResponseListenerManager listenerManager) throws Exception {
+  protected void startMessagesReceiverAsync(IThreadPool threadPool, final AsynchronousResponseListenerManager listenerManager) throws Exception {
     final List<Exception> caughtExceptionsHolder = new ArrayList<>();
     final CountDownLatch waitForMessagesReceiverStartUp = new CountDownLatch(1);
 
@@ -116,7 +101,7 @@ public class CommunicatorTest {
 
   @Test
   public void askForDeviceRegistration_RequestIsReceived() {
-    communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
+    communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, null);
 
     waitTillListenerHasBeenCalled();
 
@@ -125,7 +110,7 @@ public class CommunicatorTest {
 
   @Test
   public void respondToAskForDeviceRegistrationRequest_RequestIsReceived() throws IOException {
-    AskForDeviceRegistrationRequest request = communicator.createAskForDeviceRegistrationRequest(localUser, localDevice);
+    AskForDeviceRegistrationRequest request = communicator.createAskForDeviceRegistrationRequest(loggedOnUser, localDevice);
     request.setAddress(TestIpAddress);
     request.setPort(CommunicatorPort);
     communicator.respondToAskForDeviceRegistrationRequest(request, createAskForDeviceRegistrationResponseFromRequest(request), null);
@@ -147,7 +132,7 @@ public class CommunicatorTest {
     final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
     final List<AskForDeviceRegistrationResponse> receivedResponseHolder = new ArrayList<>();
 
-    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, new AskForDeviceRegistrationResultListener() {
+    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, new AskForDeviceRegistrationResultListener() {
       @Override
       public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
         hasResponseBeenReceived.set(true);
@@ -169,7 +154,7 @@ public class CommunicatorTest {
 
   @Test
   public void askForDeviceRegistration_ResponseListenerGetsRemovedFromListenerManager() throws IOException {
-    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), localUser, localDevice, null);
+    AskForDeviceRegistrationRequest request = communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, null);
 
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
@@ -512,7 +497,7 @@ public class CommunicatorTest {
 
 
   protected HostInfo createLocalHostServerInfo() {
-    HostInfo hostInfo = HostInfo.fromUserAndDevice(localUser, localDevice);
+    HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
     hostInfo.setIpAddress(TestIpAddress);
     hostInfo.setPort(CommunicatorPort);
 

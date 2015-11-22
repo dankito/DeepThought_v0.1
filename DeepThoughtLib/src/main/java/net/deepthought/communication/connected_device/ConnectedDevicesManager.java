@@ -10,11 +10,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by ganymed on 22/08/15.
  */
-public class ConnectedDevicesManager {
+public class ConnectedDevicesManager implements IConnectedDevicesManager {
 
   protected List<ConnectedDevice> connectedDevices = new CopyOnWriteArrayList<>();
 
 
+  @Override
   public boolean connectedToDevice(ConnectedDevice device) {
     if(containsDevice(device) == false) {
       return connectedDevices.add(device);
@@ -23,6 +24,7 @@ public class ConnectedDevicesManager {
     return false;
   }
 
+  @Override
   public boolean disconnectedFromDevice(ConnectedDevice device) {
     if(containsDevice(device)) {
       return connectedDevices.remove(device);
@@ -31,6 +33,7 @@ public class ConnectedDevicesManager {
     return false;
   }
 
+  @Override
   public boolean containsDevice(ConnectedDevice device) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
       if(connectedDevice.getUniqueDeviceId().equals(device.getUniqueDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
@@ -41,6 +44,7 @@ public class ConnectedDevicesManager {
   }
 
 
+  @Override
   public boolean isConnectedToDevice(HostInfo hostInfo) {
     for(ConnectedDevice device : connectedDevices) {
       if(device.getUniqueDeviceId().equals(hostInfo.getDeviceUniqueId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
@@ -51,14 +55,17 @@ public class ConnectedDevicesManager {
   }
 
 
+  @Override
   public boolean areDevicesConnected() {
     return getConnectedDevicesCount() > 0;
   }
 
+  @Override
   public int getConnectedDevicesCount() {
     return connectedDevices.size();
   }
 
+  @Override
   public List<ConnectedDevice> getConnectedDevices() {
     return connectedDevices;
   }

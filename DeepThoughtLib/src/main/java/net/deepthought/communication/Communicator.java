@@ -1,6 +1,5 @@
 package net.deepthought.communication;
 
-import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
@@ -46,21 +45,24 @@ public class Communicator {
 
   protected CommunicatorListener communicatorListener;
 
+  protected ConnectorMessagesCreator connectorMessagesCreator;
+
 
   public Communicator(CommunicatorConfig config, CommunicatorListener communicatorListener) {
     this.dispatcher = config.getDispatcher();
     this.listenerManager = config.getListenerManager();
     this.messageReceiverPort = config.getMessageReceiverPort();
+    this.connectorMessagesCreator = config.getConnectorMessagesCreator();
 
     // TODO: try to remove
     this.communicatorListener = communicatorListener;
   }
 
 
-  public AskForDeviceRegistrationRequest askForDeviceRegistration(HostInfo serverInfo, User localUser, Device localDevice, final AskForDeviceRegistrationResultListener listener) {
+  public AskForDeviceRegistrationRequest askForDeviceRegistration(HostInfo serverInfo, User loggedOnUser, Device localDevice, final AskForDeviceRegistrationResultListener listener) {
     String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getIpAddress(), serverInfo.getPort());
 
-    final AskForDeviceRegistrationRequest request = createAskForDeviceRegistrationRequest(localUser, localDevice);
+    final AskForDeviceRegistrationRequest request = createAskForDeviceRegistrationRequest(loggedOnUser, localDevice);
     listenerManager.addListenerForResponse(request, listener);
 
     dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
@@ -75,8 +77,8 @@ public class Communicator {
     return request;
   }
 
-  protected AskForDeviceRegistrationRequest createAskForDeviceRegistrationRequest(User localUser, Device localDevice) {
-    return new AskForDeviceRegistrationRequest(localUser, localDevice, getIpAddressToSendResponseTo(), getMessageReceiverPort());
+  protected AskForDeviceRegistrationRequest createAskForDeviceRegistrationRequest(User loggedOnUser, Device localDevice) {
+    return new AskForDeviceRegistrationRequest(loggedOnUser, localDevice, getIpAddressToSendResponseTo(), getMessageReceiverPort());
   }
 
   public void respondToAskForDeviceRegistrationRequest(final AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response, final ResponseListener listener) {
@@ -272,11 +274,12 @@ public class Communicator {
     return messageReceiverPort;
   }
 
+  protected void setMessageReceiverPort(int messageReceiverPort) {
+    this.messageReceiverPort = messageReceiverPort;
+  }
+
   protected ConnectedDevice getLocalHostInfo() {
-    // TODO: try to get rid of static method calls
-    // TODO: this is almost the same code as in ConnectedDevice.createSelfInstance() -> merge
-    return new ConnectedDevice(Application.getApplication().getLocalDevice().getUniversallyUniqueId(), getIpAddressToSendResponseTo(),
-        getMessageReceiverPort(), Application.getPlatformConfiguration().hasCaptureDevice(), Application.getContentExtractorManager().hasOcrContentExtractors());
+    return connectorMessagesCreator.getLocalHostDevice();
   }
 
 }

@@ -40,6 +40,14 @@ public class ConnectorMessagesCreator {
   private final static Logger log = LoggerFactory.getLogger(ConnectorMessagesCreator.class);
 
 
+  protected ConnectorMessagesCreatorConfig config;
+
+
+  public ConnectorMessagesCreator(ConnectorMessagesCreatorConfig config) {
+    this.config = config;
+  }
+
+
   public byte[] createLookingForRegistrationServerMessage() {
     return createMessage(LookingForRegistrationServerMessageHeader, createHostInfoMessageString());
   }
@@ -91,7 +99,7 @@ public class ConnectorMessagesCreator {
     DeserializationResult<ConnectedDevice> result = JsonIoJsonHelper.parseJsonString(messageBody, ConnectedDevice.class);
     if(result.successful()) {
       ConnectedDevice device = result.getResult();
-      device.setStoredDeviceInstance();
+      device.setStoredDeviceInstance(config.getLoggedOnUser());
 
       return device;
     }
@@ -135,13 +143,13 @@ public class ConnectorMessagesCreator {
   }
 
   protected String createHostInfoMessageString() {
-    return createHostInfoMessageString(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+    return createHostInfoMessageString(config.getLoggedOnUser(), config.getLocalDevice());
   }
 
   protected String createHostInfoMessageString(User loggedOnUser, Device localDevice) {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setIpAddress(NetworkHelper.getIPAddressString(true));
-    hostInfo.setPort(Application.getDeepThoughtsConnector().getMessageReceiverPort());
+    hostInfo.setIpAddress(config.getLocalHostIpAddress());
+    hostInfo.setPort(config.getMessageReceiverPort());
 
     SerializationResult result = JsonIoJsonHelper.generateJsonString(hostInfo);
     if(result.successful()) {
@@ -153,9 +161,23 @@ public class ConnectorMessagesCreator {
   }
 
   protected String createConnectedDeviceMessageString() {
-    ConnectedDevice device = ConnectedDevice.createSelfInstance();
+    ConnectedDevice device = getLocalHostDevice();
 
     return createConnectedDeviceMessageString(device);
+  }
+
+  public ConnectedDevice getLocalHostDevice() {
+    ConnectedDevice localHost = new ConnectedDevice(config.getLocalDevice().getUniversallyUniqueId(), config.getLocalHostIpAddress(), config.getMessageReceiverPort());
+
+    // TODO: try to get rid of static method calls
+    if(Application.getPlatformConfiguration() != null) {
+      localHost.setHasCaptureDevice(Application.getPlatformConfiguration().hasCaptureDevice());
+    }
+    if(Application.getContentExtractorManager() != null) {
+      localHost.setCanDoOcr(Application.getContentExtractorManager().hasOcrContentExtractors());
+    }
+
+    return localHost;
   }
 
   protected String createConnectedDeviceMessageString(ConnectedDevice device) {
