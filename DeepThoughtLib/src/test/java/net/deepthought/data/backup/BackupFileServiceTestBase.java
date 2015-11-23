@@ -52,16 +52,21 @@ public abstract class BackupFileServiceTestBase {
 
   @Before
   public void setup() throws Exception {
-    backupManager = createBackupManager();
-
-    backupFileService = createBackupFileService();
-
-    Application.instantiate(new TestApplicationConfiguration(null, backupManager) {
+    Application.instantiate(new TestApplicationConfiguration() {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
         return BackupFileServiceTestBase.this.createTestEntityManager(configuration);
       }
+
+      @Override
+      public IBackupManager createBackupManager() {
+        return BackupFileServiceTestBase.this.createBackupManager();
+      }
     });
+
+    backupManager = Application.getBackupManager();
+
+    backupFileService = createBackupFileService();
   }
 
   @After

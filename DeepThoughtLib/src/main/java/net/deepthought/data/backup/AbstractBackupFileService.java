@@ -184,12 +184,17 @@ public abstract class AbstractBackupFileService implements IBackupFileService {
     return result;
   }
 
-  protected void restoreDeepThoughtReplaceExisting(DeepThoughtApplication application, RestoreBackupParams params) {
+  protected void restoreDeepThoughtReplaceExisting(final DeepThoughtApplication application, RestoreBackupParams params) {
     BackupFile backup = params.getBackupFile();
     RestoreBackupListener listener = params.getListener();
     log.debug("Called restoreDeepThoughtReplaceExisting() for BackupFile {} with DeepThoughtApplication {}", backup.getFilePath(), application);
 
     Application.getDataManager().replaceExistingDataCollectionWithData(application); // TODO: how to get notified?
+
+    if(listener != null) {
+      RestoreBackupResult result = new RestoreBackupResult(backup, new ArrayList<BaseEntity>() {{ add(application); }}, new ArrayList<BaseEntity>());
+      listener.restoreBackupDone(true, result);
+    }
   }
 
 
