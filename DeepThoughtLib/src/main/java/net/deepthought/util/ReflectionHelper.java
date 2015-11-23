@@ -127,9 +127,9 @@ public class ReflectionHelper {
     return null;
   }
 
-  public static void copyObjectFields(Object copy, Object original) {
-    for(Field field : ReflectionHelper.findAllFieldsInClassHierarchy(original.getClass())) {
-      ReflectionHelper.setFieldValue(copy, field, ReflectionHelper.getFieldValue(original, field));
+  public static void copyObjectFields(Object destination, Object copySource) {
+    for(Field field : ReflectionHelper.findAllFieldsInClassHierarchy(copySource.getClass())) {
+      ReflectionHelper.setFieldValue(destination, field, ReflectionHelper.getFieldValue(copySource, field));
     }
   }
 
@@ -154,7 +154,7 @@ public class ReflectionHelper {
     return null;
   }
 
-  public static boolean setFieldValue(Object object, Field field, Object value) {
+  public static boolean setFieldValue(Object destinationEntity, Field field, Object value) {
     try {
       boolean wasAccessible = true;
       if(field.isAccessible() == false) {
@@ -162,14 +162,14 @@ public class ReflectionHelper {
         field.setAccessible(true);
       }
 
-      field.set(object, value);
+      field.set(destinationEntity, value);
 
       if(wasAccessible == false)
         field.setAccessible(false);
 
       return true;
     } catch(Exception ex) {
-      log.error("Could not set Value " + value + " on Object " + object + " for field " + field);
+      log.error("Could not set Value " + value + " on Object " + destinationEntity + " for field " + field);
     }
 
     return false;

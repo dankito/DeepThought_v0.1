@@ -10,7 +10,7 @@ import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 public class DefaultDataMergerTest extends DefaultDataMergerTestBase {
 
   @Override
-  protected IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
+  protected IEntityManager getEntityManager(EntityManagerConfiguration configuration) throws Exception {
     return new OrmLiteJavaSeEntityManager(configuration);
   }
 
