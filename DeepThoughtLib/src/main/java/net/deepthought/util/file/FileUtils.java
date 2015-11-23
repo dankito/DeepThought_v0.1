@@ -60,6 +60,8 @@ public class FileUtils {
   public final static String CapturedImagesFolderName = "captured";
   public final static String CapturedImagesTempFolderName = "temp";
 
+  public final static File FileOperationFailed = new File("Failed");
+
 
 
   public static void copyFileToDataFolder(final FileLink file, final FileOperationListener listener) {
@@ -241,19 +243,20 @@ public class FileUtils {
   }
 
   public static boolean copyFile(File sourceFile, File destinationFile, FileOperationListener listener) {
-    boolean success = copyFileRecursively(sourceFile, destinationFile, listener);
+    File copiedFile = copyFileRecursively(sourceFile, destinationFile, listener);
+    boolean success = copiedFile != FileOperationFailed;
 
     if (listener != null)
-      listener.fileOperationDone(success, destinationFile);
+      listener.fileOperationDone(success, copiedFile);
 
     return success;
   }
 
-  protected static boolean copyFileRecursively(File sourceFile, File destinationFile, FileOperationListener listener) {
+  protected static File copyFileRecursively(File sourceFile, File destinationFile, FileOperationListener listener) {
     List<File> destinationFileContainer = new ArrayList<>(); // Java doesn't know ref Parameters so i needed to find another way to return a changed File
     destinationFileContainer.add(destinationFile);
     if (isDestinationFileOk(sourceFile, destinationFileContainer, listener) == false)
-      return false;
+      return FileOperationFailed;
 
     destinationFile = destinationFileContainer.get(0); // TODO: in this way destinationFile is not getting passed back to caller!
     boolean success;
@@ -263,7 +266,7 @@ public class FileUtils {
     else
       success = copySingleFile(sourceFile, destinationFile, listener);
 
-    return success;
+    return success ? destinationFile : FileOperationFailed;
   }
 
   protected static boolean copySingleFile(File sourceFile, File destinationFile, FileOperationListener listener) {
@@ -315,7 +318,7 @@ public class FileUtils {
     for (String file : sourceFolder.list()) {
       File sourceFile = new File(sourceFolder, file);
       File destinationFile = new File(destinationFolder, file);
-      success &= copyFileRecursively(sourceFile, destinationFile, listener);
+      success &= copyFileRecursively(sourceFile, destinationFile, listener) != FileOperationFailed;
     }
 
     return success;

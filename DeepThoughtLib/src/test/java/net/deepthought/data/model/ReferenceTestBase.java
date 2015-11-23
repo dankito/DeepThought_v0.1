@@ -171,6 +171,7 @@ public abstract class ReferenceTestBase extends ReferenceBaseTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 

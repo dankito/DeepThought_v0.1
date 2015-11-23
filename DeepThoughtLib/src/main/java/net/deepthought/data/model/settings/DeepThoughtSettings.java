@@ -100,6 +100,7 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   public Category getLastViewedCategory() {
     if(lastViewedCategory == null && lastViewedCategoryId != null)
+      // TODO: how purely designed is this, Mr. dankl, using the EntityManager (and in a static call!) in the data model
       lastViewedCategory = Application.getEntityManager().getEntityById(Category.class, lastViewedCategoryId);
     return lastViewedCategory;
   }

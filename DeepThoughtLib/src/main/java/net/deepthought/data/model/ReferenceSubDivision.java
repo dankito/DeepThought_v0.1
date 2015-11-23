@@ -110,14 +110,19 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
       reference.addSubDivision(this);
 
     for(Entry entry : entriesBackup)
-//      entry.setReference(reference);
-      entry.setReferenceSubDivision(this);
+      entry.setReference(reference);
 
     callPropertyChangedListeners(TableConfig.ReferenceSubDivisionReferenceJoinColumnName, previousValue, reference);
   }
 
   public ReferenceSubDivision getParentSubDivision() {
     return parentSubDivision;
+  }
+
+  protected void setParentSubDivision(ReferenceSubDivision parent) {
+    Object previousValue = this.parentSubDivision;
+    this.parentSubDivision = parent;
+    callPropertyChangedListeners(TableConfig.ReferenceSubDivisionParentSubDivisionJoinColumnName, previousValue, parent);
   }
 
   public boolean hasSubDivisions() {
@@ -129,11 +134,12 @@ public class ReferenceSubDivision extends ReferenceBase implements Comparable<Re
   }
 
   public boolean addSubDivision(ReferenceSubDivision subDivision) {
-    subDivision.parentSubDivision = this;
-    subDivision.subDivisionOrder = subDivisions.size();
+    subDivision.setParentSubDivision(this);
+    subDivision.setSubDivisionOrder(subDivisions.size());
     if(subDivision.reference == null && this.reference != null)
       subDivision.reference = this.reference;
 
+    // TODO: shouldn't this be removed?
     if(subDivision.getDeepThought() == null && this.deepThought != null)
       deepThought.addReferenceSubDivision(subDivision);
 

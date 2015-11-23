@@ -713,10 +713,25 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return settings;
   }
 
+  public String getSettingsString() {
+    maySerializeSettingsToString();
+    return settingsString;
+  }
+
   protected void setSettingsString(String settingsString) {
     Object previousValue = this.settingsString;
     this.settingsString = settingsString;
     callPropertyChangedListeners(TableConfig.DeepThoughtDeepThoughtSettingsColumnName, previousValue, settingsString);
+  }
+
+  protected void maySerializeSettingsToString() {
+    if(settingsHaveChanged == true) {
+      settingsHaveChanged = false;
+      String serializationResult = SettingsBase.serializeSettings(settings);
+      if (serializationResult != null)
+        settingsString = serializationResult; // do not call setSettingsString() as we're right in a Entity Lifecycle method.
+                                              // Calling setSettingsString() would again trigger saving to DB -> infinite loop
+    }
   }
 
 
@@ -753,12 +768,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected void preUpdate() {
     super.preUpdate();
 
-    if(settingsHaveChanged == true) {
-      settingsHaveChanged = false;
-      String serializationResult = SettingsBase.serializeSettings(settings);
-      if (serializationResult != null)
-        settingsString = serializationResult;
-    }
+    maySerializeSettingsToString();
   }
 
   protected transient EntityListener subEntitiesListener = new EntityListener() {

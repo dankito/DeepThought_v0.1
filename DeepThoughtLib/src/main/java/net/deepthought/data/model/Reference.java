@@ -102,12 +102,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
     if(series != null) {
       series.addSerialPart(this); // causes a Stackoverflow
-//      series.serialParts.add(this);
     }
 
     for(Entry entry : entriesBackup)
-//      entry.setSeries(series);
-      entry.setReference(this);
+      entry.setSeries(series);
 
     callPropertyChangedListeners(TableConfig.ReferenceSeriesTitleJoinColumnName, previousValue, series);
   }

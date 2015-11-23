@@ -86,10 +86,6 @@ public class DataHelper {
     entry2.addTag(tag2);
     entry3.addTag(tag1);
 
-//    entry1.addTag(new Tag("Entry 1 Tag"));
-//    entry2.addTag(new Tag("Entry 2 Tag"));
-//    entry3.addTag(new Tag("Entry 3 Tag"));
-
     Person welzer = new Person("Harald", "Welzer");
     Person paech = new Person("Niko", "Paech");
     Person graeber = new Person("David", "Graeber");
@@ -108,17 +104,32 @@ public class DataHelper {
     entry2.addPerson(paech);
     entry3.addPerson(graeber);
 
-    entry1.addAttachedFile(new FileLink("dummy"));
-    entry2.addAttachedFile(new FileLink("dummy"));
-    entry3.addAttachedFile(new FileLink("dummy"));
+    FileLink file1 = new FileLink("dummy1");
+    FileLink file2 = new FileLink("dummy2");
+    FileLink file3 = new FileLink("dummy3");
+    FileLink file4 = new FileLink("dummy4");
+    deepThought.addFile(file1);
+    deepThought.addFile(file2);
+    deepThought.addFile(file3);
+    deepThought.addFile(file4);
 
-    entry1.addNote(new Note("dummy"));
-    entry2.addNote(new Note("dummy"));
-    entry3.addNote(new Note("dummy"));
+    entry1.addAttachedFile(file1);
+    entry2.addAttachedFile(file2);
+    entry3.addAttachedFile(file3);
 
-    entry1.setPreviewImage(new FileLink("dummy"));
-    entry2.setPreviewImage(new FileLink("dummy"));
-    entry3.setPreviewImage(new FileLink("dummy"));
+    entry1.setPreviewImage(file4);
+    entry2.setPreviewImage(file1);
+    entry3.setPreviewImage(file2);
+
+    Note note1 = new Note("dummy1");
+    Note note2 = new Note("dummy2");
+    Note note3 = new Note("dummy3");
+    deepThought.addNote(note1);
+    deepThought.addNote(note2);
+    deepThought.addNote(note3);
+    entry1.addNote(note1);
+    entry2.addNote(note2);
+    entry3.addNote(note3);
 
     deepThought.getSettings().setLastViewedCategory(booksCategory);
     deepThought.getSettings().setLastViewedEntry(entry3);

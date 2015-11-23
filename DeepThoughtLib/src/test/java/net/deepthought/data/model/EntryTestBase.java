@@ -270,13 +270,14 @@ public abstract class EntryTestBase extends DataModelTestBase {
     entry2.addTag(tag2);
     entry2.addTag(tag3);
 
-    // this cannot work right now. Due to caching in static Registry no new Dao is created
+    Application.getEntityManager().close();
+
     IEntityManager newEntityManager = getEntityManager(configuration);
-//    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
-//    Assert.assertEquals(1, queriedDeepThoughts.size());
+    List<DeepThought> queriedDeepThoughts = newEntityManager.getAllEntitiesOfType(DeepThought.class);
+    Assert.assertEquals(1, queriedDeepThoughts.size());
 //
-//    DeepThought queriedDeepThought = queriedDeepThoughts.get(0);
-    DeepThought queriedDeepThought = newEntityManager.getEntityById(DeepThought.class, deepThought.getId());
+    DeepThought queriedDeepThought = queriedDeepThoughts.get(0);
+//    DeepThought queriedDeepThought = newEntityManager.getEntityById(DeepThought.class, deepThought.getId());
     Assert.assertEquals(2, queriedDeepThought.getEntries().size());
     Assert.assertEquals(3, queriedDeepThought.getTags().size());
 

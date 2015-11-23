@@ -150,10 +150,12 @@ public abstract class DeepThoughtListenerTestBase extends DataModelTestBase {
   @Test
   public void removeSubCategoryFromCategory_CategoryUpdatedListenerGetsCalled() throws Exception {
     final Category category = new Category("test");
+    Category subCategory = new Category("sub");
 
     final DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
-    Category subCategory = new Category("sub");
+    deepThought.addCategory(subCategory);
+
     category.addSubCategory(subCategory);
 
     deepThought.addEntityListener(new EntityListener() {

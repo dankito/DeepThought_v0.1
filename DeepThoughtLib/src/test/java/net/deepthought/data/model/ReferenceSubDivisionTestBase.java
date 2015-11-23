@@ -20,6 +20,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 
@@ -35,6 +36,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
     deepThought.addEntry(entry);
 
     reference.addSubDivision(subDivision);
@@ -56,6 +58,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
     deepThought.addEntry(entry);
 
     reference.addSubDivision(subDivision);
@@ -78,6 +81,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 
@@ -95,6 +99,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 
@@ -110,6 +115,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 
@@ -127,6 +133,7 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision);
 
     reference.addSubDivision(subDivision);
 
@@ -147,10 +154,12 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
 
     reference.addSubDivision(parent);
 
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1.1");
+    deepThought.addReferenceSubDivision(subDivision);
     parent.addSubDivision(subDivision);
 
     Assert.assertTrue(doIdsEqual(parent.getId(), getValueFromTable(TableConfig.ReferenceSubDivisionTableName, TableConfig.ReferenceSubDivisionParentSubDivisionJoinColumnName, subDivision.getId())));
@@ -163,10 +172,12 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
 
     reference.addSubDivision(parent);
 
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1.1");
+    deepThought.addReferenceSubDivision(subDivision);
     parent.addSubDivision(subDivision);
 
     Assert.assertEquals(parent, subDivision.getParentSubDivision());
@@ -182,10 +193,12 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
 
     reference.addSubDivision(parent);
 
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1.1");
+    deepThought.addReferenceSubDivision(subDivision);
     parent.addSubDivision(subDivision);
 
     parent.removeSubDivision(subDivision);
@@ -203,10 +216,12 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
 
     reference.addSubDivision(parent);
 
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1.1");
+    deepThought.addReferenceSubDivision(subDivision);
     parent.addSubDivision(subDivision);
 
     parent.removeSubDivision(subDivision);
@@ -223,11 +238,13 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
     deepThought.addEntry(entry);
 
     reference.addSubDivision(parent);
 
     ReferenceSubDivision subDivision = new ReferenceSubDivision("Chapter 1.1");
+    deepThought.addReferenceSubDivision(subDivision);
     parent.addSubDivision(subDivision);
 
     entry.setReferenceSubDivision(subDivision);
@@ -251,9 +268,12 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(parent);
 
     reference.addSubDivision(parent);
 
+    deepThought.addReferenceSubDivision(subDivision1);
+    deepThought.addReferenceSubDivision(subDivision2);
     parent.addSubDivision(subDivision1);
     parent.addSubDivision(subDivision2);
 
@@ -275,6 +295,9 @@ public abstract class ReferenceSubDivisionTestBase extends ReferenceBaseTestBase
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
+    deepThought.addReferenceSubDivision(subDivision1);
+    deepThought.addReferenceSubDivision(subDivision2);
+    deepThought.addReferenceSubDivision(subDivision3);
 
     reference.addSubDivision(parent);
 

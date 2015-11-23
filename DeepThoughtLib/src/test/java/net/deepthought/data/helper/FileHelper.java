@@ -1,10 +1,9 @@
 package net.deepthought.data.helper;
 
-import net.deepthought.util.file.FileUtils;
+import net.deepthought.util.StreamHelper;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 
 /**
  * Created by ganymed on 29/09/15.
@@ -12,9 +11,8 @@ import java.net.URL;
 public class FileHelper {
 
   public static byte[] loadTestImage() throws IOException {
-    URL imageUrl = FileHelper.class.getClassLoader().getResource("test_image.jpg");
-    String imagePath = imageUrl.toExternalForm().replace("file:", "");
-    return FileUtils.readFile(new File(imagePath));
+    InputStream stream = FileHelper.class.getClassLoader().getResourceAsStream("test_image.jpg");
+    return StreamHelper.readBytesFromInputStream(stream);
   }
 
 }

@@ -18,6 +18,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(file);
 
     entry.addAttachedFile(file);
 
@@ -34,6 +35,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(file);
 
     entry.addAttachedFile(file);
 
@@ -50,6 +52,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(file);
 
     entry.addAttachedFile(file);
 
@@ -67,6 +70,7 @@ public abstract class FileLinkTestBase extends DataModelTestBase {
 
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
+    deepThought.addFile(file);
 
     entry.addAttachedFile(file);
 

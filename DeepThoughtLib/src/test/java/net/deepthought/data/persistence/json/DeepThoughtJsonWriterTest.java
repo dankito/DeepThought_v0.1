@@ -108,7 +108,7 @@ public class DeepThoughtJsonWriterTest {
     testBaseEntityCollection(deepThought.getTags(), currentUser, 2);
     testBaseEntityCollection(deepThought.getPersons(), currentUser, 3);
 
-    testBaseEntityCollection(deepThought.getFiles(), currentUser, 6);
+    testBaseEntityCollection(deepThought.getFiles(), currentUser, 4);
     testBaseEntityCollection(deepThought.getBackupFileServiceTypes(), currentUser, 3);
 
     testBaseEntityCollection(deepThought.getNotes(), currentUser, 3);

@@ -253,12 +253,20 @@ public class Device extends UserDataEntity {
 
   public static Device createUserDefaultDevice(User user) {
     String universallyUniqueId = UUID.randomUUID().toString();
-    String platform = Application.getPlatformConfiguration().getPlatformName();
-    if(OsHelper.isRunningOnAndroid())
+
+    String platform = System.getProperty("os.name");
+    String osVersion = System.getProperty("os.version");
+
+    if(Application.getPlatformConfiguration() != null) { // TODO: try to get rid of static method calls
+      osVersion = Application.getPlatformConfiguration().getOsVersionString();
+      platform = Application.getPlatformConfiguration().getPlatformName();
+    }
+
+    if (OsHelper.isRunningOnAndroid())
       platform = "Android";
 
     Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
-        platform, Application.getPlatformConfiguration().getOsVersionString(), System.getProperty("os.arch"));
+        platform, osVersion, System.getProperty("os.arch"));
 
 //    , System.getProperty("os.arch")
 //    userDefaultDevice.setUserRegion(System.getProperty("user.country"));
