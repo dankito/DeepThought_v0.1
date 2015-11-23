@@ -19,6 +19,7 @@ import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import org.junit.Assert;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by ganymed on 01/01/15.
@@ -144,6 +145,10 @@ public class DataHelper {
     return JsonIoJsonHelper.generateJsonString(createTestDeepThought(), true).getSerializationResult();
   }
 
+
+  public static String getLatestDataModelVersionJsonFileContent() throws IOException {
+    return new String(FileHelper.loadResourceFile("DataModelVersion01.json"));
+  }
 
   public static File getLatestDataModelVersionJsonFile() {
     return getDataModelVersion01JsonFile();

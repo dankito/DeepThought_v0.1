@@ -10,9 +10,13 @@ import java.io.InputStream;
  */
 public class FileHelper {
 
-  public static byte[] loadTestImage() throws IOException {
-    InputStream stream = FileHelper.class.getClassLoader().getResourceAsStream("test_image.jpg");
+  public static byte[] loadResourceFile(String filePathInResources) throws IOException {
+    InputStream stream = FileHelper.class.getClassLoader().getResourceAsStream(filePathInResources);
     return StreamHelper.readBytesFromInputStream(stream);
+  }
+
+  public static byte[] loadTestImage() throws IOException {
+    return loadResourceFile("test_image.jpg");
   }
 
 }

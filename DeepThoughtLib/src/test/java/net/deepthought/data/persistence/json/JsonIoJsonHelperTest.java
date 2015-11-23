@@ -9,7 +9,6 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.serializer.SerializationResult;
 import net.deepthought.util.StringUtils;
-import net.deepthought.util.file.FileUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,7 +44,8 @@ public class JsonIoJsonHelperTest {
 
   @Test
   public void deserializeDeepThoughtApplicationFromJson() throws IOException {
-    String json = FileUtils.readTextFile(DataHelper.getLatestDataModelVersionJsonFile());
+//    String json = FileUtils.readTextFile(DataHelper.getLatestDataModelVersionJsonFile());
+    String json = DataHelper.getLatestDataModelVersionJsonFileContent();
     Date startTime = new Date();
 
     DeserializationResult<DeepThoughtApplication> deserializationResult = JsonIoJsonHelper.parseJsonString(json, DeepThoughtApplication.class);
