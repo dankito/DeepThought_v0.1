@@ -46,7 +46,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   protected Set<Entry> subEntries = new HashSet<>();
 
 
-  @Column(name = TableConfig.EntryTitleColumnName, length = 512)
+  @Column(name = TableConfig.EntryTitleColumnName)
   protected String title = "";
 
   //  @Column(name = TableConfig.EntryAbstractColumnName, length = 2048)

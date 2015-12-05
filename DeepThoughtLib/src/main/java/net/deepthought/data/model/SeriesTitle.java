@@ -40,6 +40,9 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
   @Lob
   protected String tableOfContents;
 
+  @Column(name = TableConfig.SeriesTitleIsbnOrIssnColumnName)
+  protected String isbnOrIssn;
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.SeriesTitleDeepThoughtJoinColumnName)
   protected DeepThought deepThought;
@@ -152,6 +155,16 @@ public class SeriesTitle extends ReferenceBase implements Serializable, Comparab
     Object previousValue = this.tableOfContents;
     this.tableOfContents = tableOfContents;
     callPropertyChangedListeners(TableConfig.SeriesTitleTableOfContentsColumnName, previousValue, tableOfContents);
+  }
+
+  public String getIsbnOrIssn() {
+    return isbnOrIssn;
+  }
+
+  public void setIsbnOrIssn(String isbnOrIssn) {
+    Object previousValue = this.isbnOrIssn;
+    this.isbnOrIssn = isbnOrIssn;
+    callPropertyChangedListeners(TableConfig.SeriesTitleIsbnOrIssnColumnName, previousValue, isbnOrIssn);
   }
 
   @Override

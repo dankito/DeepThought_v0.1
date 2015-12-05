@@ -286,6 +286,7 @@ public class TableConfig {
   public final static String ReferenceBaseSubTitleColumnName = "sub_title";
   public final static String ReferenceBaseAbstractColumnName = "abstract";
   public final static String ReferenceBaseOnlineAddressColumnName = "online_address";
+  public final static String ReferenceBaseLastAccessDateColumnName = "last_access_date";
   public final static String ReferenceBaseNotesColumnName = "notes";
   public final static String ReferenceBasePreviewImageJoinColumnName = "preview_image_id";
 
@@ -321,6 +322,7 @@ public class TableConfig {
   public final static String SeriesTitleDiscriminatorValue = "SERIES_TITLE";
 
   public final static String SeriesTitleTableOfContentsColumnName = "table_of_contents";
+  public final static String SeriesTitleIsbnOrIssnColumnName = "isbn_or_issn";
   public final static String SeriesTitleDeepThoughtJoinColumnName = "deep_thought_id";
 
 
@@ -332,7 +334,9 @@ public class TableConfig {
   public final static String ReferenceSeriesTitleJoinColumnName = "series_title_id";
   public final static String ReferenceSeriesTitleOrderColumnName = "series_order";
   public final static String ReferenceTableOfContentsColumnName = "table_of_contents";
+  public final static String ReferenceLengthColumnName = "length";
   public final static String ReferenceIssueOrPublishingDateColumnName = "issue_or_publishing_date";
+  public final static String ReferenceIsbnOrIssnColumnName = "isbn_or_issn";
   public final static String ReferencePublishingDateColumnName = "publishing_date";
   public final static String ReferenceDeepThoughtJoinColumnName = "deep_thought_id";
 

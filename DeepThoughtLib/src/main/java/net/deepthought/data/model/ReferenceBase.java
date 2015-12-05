@@ -4,6 +4,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
@@ -46,11 +49,12 @@ public abstract class ReferenceBase extends UserDataEntity {
   @Column(name = TableConfig.ReferenceBaseAbstractColumnName)
   protected String abstractString;
 
-//  @OneToOne(fetch = FetchType.EAGER)
-//  @JoinColumn(name = TableConfig.ReferenceBaseOnlineAddressColumnName)
-//  protected FileLink onlineAddress;
   @Column(name = TableConfig.ReferenceBaseOnlineAddressColumnName)
   protected String onlineAddress;
+
+  @Column(name = TableConfig.ReferenceBaseLastAccessDateColumnName)
+  @Temporal(TemporalType.TIMESTAMP)
+  protected Date lastAccessDate;
 
   @Column(name = TableConfig.ReferenceBaseNotesColumnName)
   protected String notes;
@@ -134,6 +138,16 @@ public abstract class ReferenceBase extends UserDataEntity {
     Object previousValue = this.onlineAddress;
     this.onlineAddress = onlineAddress;
     callPropertyChangedListeners(TableConfig.ReferenceBaseOnlineAddressColumnName, previousValue, onlineAddress);
+  }
+
+  public Date getLastAccessDate() {
+    return lastAccessDate;
+  }
+
+  public void setLastAccessDate(Date lastAccessDate) {
+    Object previousValue = this.lastAccessDate;
+    this.lastAccessDate = lastAccessDate;
+    callPropertyChangedListeners(TableConfig.ReferenceBaseLastAccessDateColumnName, previousValue, lastAccessDate);
   }
 
   public String getNotes() {

@@ -57,8 +57,14 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Lob
   protected String tableOfContents;
 
+  @Column(name = TableConfig.ReferenceLengthColumnName)
+  protected String length;
+
   @Column(name = TableConfig.ReferenceIssueOrPublishingDateColumnName)
   protected String issueOrPublishingDate;
+
+  @Column(name = TableConfig.ReferenceIsbnOrIssnColumnName)
+  protected String isbnOrIssn;
 
   @Column(name = TableConfig.ReferencePublishingDateColumnName)
   @Temporal(TemporalType.TIMESTAMP)
@@ -224,6 +230,12 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     callPropertyChangedListeners(TableConfig.ReferenceTableOfContentsColumnName, previousValue, tableOfContents);
   }
 
+  public void setLength(String length) {
+    Object previousValue = this.length;
+    this.length = length;
+    callPropertyChangedListeners(TableConfig.ReferenceLengthColumnName, previousValue, length);
+  }
+
   public String getIssueOrPublishingDate() {
     if(StringUtils.isNullOrEmpty(issueOrPublishingDate) && publishingDate != null)
       return formatPublishingDate();
@@ -249,6 +261,16 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     this.publishingDate = publishingDate;
     preview = null;
     callPropertyChangedListeners(TableConfig.ReferencePublishingDateColumnName, previousValue, publishingDate);
+  }
+
+  public String getIsbnOrIssn() {
+    return isbnOrIssn;
+  }
+
+  public void setIsbnOrIssn(String isbnOrIssn) {
+    Object previousValue = this.isbnOrIssn;
+    this.isbnOrIssn = isbnOrIssn;
+    callPropertyChangedListeners(TableConfig.ReferenceIsbnOrIssnColumnName, previousValue, isbnOrIssn);
   }
 
   @Override
