@@ -49,6 +49,9 @@ public abstract class ReferenceBase extends UserDataEntity {
   @Column(name = TableConfig.ReferenceBaseAbstractColumnName)
   protected String abstractString;
 
+  @Column(name = TableConfig.ReferenceBaseLengthColumnName)
+  protected String length;
+
   @Column(name = TableConfig.ReferenceBaseOnlineAddressColumnName)
   protected String onlineAddress;
 
@@ -128,6 +131,16 @@ public abstract class ReferenceBase extends UserDataEntity {
     Object previousValue = this.abstractString;
     this.abstractString = abstractString;
     callPropertyChangedListeners(TableConfig.ReferenceBaseAbstractColumnName, previousValue, abstractString);
+  }
+
+  public String getLength() {
+    return length;
+  }
+
+  public void setLength(String length) {
+    Object previousValue = this.length;
+    this.length = length;
+    callPropertyChangedListeners(TableConfig.ReferenceBaseLengthColumnName, previousValue, length);
   }
 
   public String getOnlineAddress() {

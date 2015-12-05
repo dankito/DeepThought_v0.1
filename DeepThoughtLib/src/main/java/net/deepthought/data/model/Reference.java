@@ -57,9 +57,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   @Lob
   protected String tableOfContents;
 
-  @Column(name = TableConfig.ReferenceLengthColumnName)
-  protected String length;
-
   @Column(name = TableConfig.ReferenceIssueOrPublishingDateColumnName)
   protected String issueOrPublishingDate;
 
@@ -228,12 +225,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     Object previousValue = this.tableOfContents;
     this.tableOfContents = tableOfContents;
     callPropertyChangedListeners(TableConfig.ReferenceTableOfContentsColumnName, previousValue, tableOfContents);
-  }
-
-  public void setLength(String length) {
-    Object previousValue = this.length;
-    this.length = length;
-    callPropertyChangedListeners(TableConfig.ReferenceLengthColumnName, previousValue, length);
   }
 
   public String getIssueOrPublishingDate() {
