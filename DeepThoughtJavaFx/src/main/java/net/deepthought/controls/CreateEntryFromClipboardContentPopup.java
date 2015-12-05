@@ -5,6 +5,7 @@ import net.deepthought.controller.ChildWindowsController;
 import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
@@ -21,6 +22,7 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.InputManager;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.file.enums.ExistingFileHandling;
@@ -41,11 +43,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -64,6 +70,8 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   protected VBox contentPane;
 
   protected VBox optionsPane;
+
+  protected ImageView iconView;
 
   protected Label headerLabel;
 
@@ -110,13 +118,31 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     AnchorPane.setBottomAnchor(hidePopupButton, 4d);
     hidePopupButton.setOnAction(action -> hideThreadSafe());
 
+    iconView = new ImageView();
+    iconView.setFitWidth(16);
+    iconView.setPreserveRatio(true);
+    AnchorPane.setTopAnchor(iconView, 8d);
+    AnchorPane.setLeftAnchor(iconView, 10d);
+    AnchorPane.setBottomAnchor(iconView, 4d);
+
+//    HBox iconHolder = new HBox(iconView);
+//    iconHolder.setMinWidth(20);
+//    iconHolder.setMaxWidth(20);
+//    iconHolder.setMinHeight(20);
+//    FXUtils.setBackgroundToColor(iconHolder, Color.ORANGE);
+//    AnchorPane.setTopAnchor(iconHolder, 8d);
+//    AnchorPane.setLeftAnchor(iconHolder, 10d);
+//    AnchorPane.setBottomAnchor(iconHolder, 4d);
+////    AnchorPane.setRightAnchor(iconHolder, 24d);
+//    HBox.setHgrow(iconView, Priority.ALWAYS);
+
     headerLabel = new Label();
     AnchorPane.setTopAnchor(headerLabel, 8d);
-    AnchorPane.setLeftAnchor(headerLabel, 10d);
+    AnchorPane.setLeftAnchor(headerLabel, 30d);
     AnchorPane.setBottomAnchor(headerLabel, 4d);
     AnchorPane.setRightAnchor(headerLabel, hidePopupButton.getWidth() + 26 + 6); // 26 = hidePopupButton width
 
-    contentPane.getChildren().add(new AnchorPane(headerLabel, hidePopupButton));
+    contentPane.getChildren().add(new AnchorPane(iconView, headerLabel, hidePopupButton));
 
     optionsPane = new VBox();
     contentPane.getChildren().add(optionsPane);
@@ -191,6 +217,13 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   protected void createCreateEntryFromOnlineArticleOptions(ContentExtractOptions contentExtractOptions) {
     final ContentExtractOption contentExtractOption = contentExtractOptions.getContentExtractOptions().get(0);
     final IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)contentExtractOption.getContentExtractor();
+
+    boolean hasIcon = StringUtils.isNotNullOrEmpty(contentExtractor.getIconUrl());
+    if(hasIcon) {
+      iconView.setImage(new Image(contentExtractor.getIconUrl()));
+    }
+    iconView.setVisible(hasIcon);
+    AnchorPane.setLeftAnchor(headerLabel, hasIcon ? 30d : 10d);
 
     headerLabel.setText(Localization.getLocalizedString("ask.create.entry.from.online.article",
         ((IOnlineArticleContentExtractor) contentExtractOptions.getContentExtractOptions().get(0).getContentExtractor()).getSiteBaseUrl())); // TODO: is it always true that  OnlineArticleContentExtractors contain only one IContentExtractor?
