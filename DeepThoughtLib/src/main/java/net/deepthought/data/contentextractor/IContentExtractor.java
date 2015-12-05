@@ -7,10 +7,6 @@ import net.deepthought.plugin.IPlugin;
  */
 public interface IContentExtractor extends IPlugin {
 
-//  boolean canExtractContentFromUrl(URL url);
-//
-//  void extractContentFromUrlAsync(URL url, ExtractContentListener listener);
-
   boolean canCreateEntryFromUrl(String url);
 
   void createEntryFromUrlAsync(String url, CreateEntryListener listener);

@@ -35,6 +35,7 @@ public class FileUtilsTest {
   }
 
 
+
   @Test
   public void copyFile_DestinationFileDoesNotExist_FileGetsCopied() {
     File sourceFile = ensureTestFileExists("source_file.txt");

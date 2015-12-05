@@ -470,7 +470,6 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryReferenceControl.setEntryCreationResult(creationResult);
 
     entryTagsControl.setExpanded(creationResult.getTags().size() == 0);
-    entryCategoriesControl.setExpanded(creationResult.getCategories().size() == 0);
 
     entryReferenceControl.setExpanded(creationResult.isAReferenceSet() == false);
   }

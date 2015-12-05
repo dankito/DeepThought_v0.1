@@ -138,10 +138,6 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
     if(contentExtractOptions.isOnlineArticleContentExtractor())
       showCreateEntryFromOnlineArticleContentExtractorPopup(contentExtractOptions);
-//    else if(contentExtractOptions.isRemoteFileContentExtractor())
-//      showCreateEntryFromRemoteFileContentExtractorPopup(contentExtractOptions);
-//    else if(contentExtractOptions.isLocalFileContentExtractor())
-//      showCreateEntryFromFilePopup(contentExtractOptions);
     else if(contentExtractOptions.isUrl())
       showCreateEntryFromFilePopup(contentExtractOptions);
   }

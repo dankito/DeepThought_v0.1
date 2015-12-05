@@ -118,42 +118,18 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
     HttpResponse response = httpclient.execute(request);
     HttpEntity entity = response.getEntity();
     log.debug("Request Handled for url " + articleUrl + " ?: " + response.getStatusLine());
-    //InputStream in = entity.getContent();
+
     String html = EntityUtils.toString(entity);
     httpclient.getConnectionManager().shutdown();
     cookieStore.clear();
 
     return Jsoup.parse(html, articleUrl);
-
-//    String originalProxyHost = System.getProperty("http.proxyHost");
-//    String originalProxyPort = System.getProperty("http.proxyPort");
-//    System.setProperty("http.proxyHost", "127.0.0.1");  //set proxy host
-//    System.setProperty("http.proxyPort", "8889");  //set proxy port
-//
-//    Connection connection = Jsoup.connect(articleUrl);
-//    connection.header("user-agent", userAgent);
-//    connection.data(data);
-//    connection.method(method);
-//    connection.cookies(new HashMap<String, String>()); // maybe that helps to avoid that Jsoup sends cookies along
-////    CookieHandler cookieHandler = java.net.CookieManager.getDefault();
-////    cookieHandler.get()
-//
-//    Connection.Response response = connection.execute();
-//    System.setProperty("http.proxyHost", originalProxyHost == null ? "" : originalProxyHost);  // unset proxy host
-//    System.setProperty("http.proxyPort", originalProxyPort == null ? "" : originalProxyPort);  // unset proxy port
-//
-//    if(articleUrl.equals(response.url().toString()) == false)
-//      return retrieveOnlineDocument(response.url().toString(), userAgent, data, method);
-//    return response.parse();
   }
 
   protected HttpClient createHttpClient(String userAgent, CookieStore cookieStore) {
     DefaultHttpClient httpclient = new DefaultHttpClient();
     httpclient.getParams().setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
     httpclient.setCookieStore(cookieStore);
-
-//    HttpHost proxy = new HttpHost("127.0.0.1", 8889);
-//    httpclient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
 
     return httpclient;
   }

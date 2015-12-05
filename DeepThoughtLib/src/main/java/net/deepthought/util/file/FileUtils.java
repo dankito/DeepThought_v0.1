@@ -794,16 +794,34 @@ public class FileUtils {
     return false;
   }
 
-  public static boolean isRemoteFile(String url) {
+  public static boolean isOnlineUrl(String url) {
     try {
       URL test = new URL(url);
       String protocol = test.getProtocol();
-      if("ftp".equals(protocol) || protocol.startsWith("http")) { // TODO: check if it's really a file (and not a .asp etc document)
-        return getMimeType(url) != CouldNotDetectMimeType;
-      }
+      return protocol.startsWith("http") || "ftp".equals(protocol);
     } catch(Exception ex) { }
 
     return false;
+  }
+
+  public static boolean isOnlineWebPage(String url) {
+    return isOnlineUrl(url) && isOnlineUrlAWebPage(url);
+  }
+
+  private static boolean isOnlineUrlAWebPage(String url) {
+    // if a http address has less than three '/', no relative path is given at it's the home page
+    if(url.startsWith("http") && StringUtils.getNumberOfOccurrences("/", url) < 3) {
+      return true;
+    }
+
+    String extension = getFileExtension(url).toLowerCase();
+
+    // TODO: for what else extensions to check?
+    return "".equals(extension) || "html".equals(extension) || "htm".equals(extension) || "php".equals(extension) || "asp".equals(extension);
+  }
+
+  public static boolean isRemoteFile(String url) {
+    return isOnlineUrl(url) && isOnlineUrlAWebPage(url) == false;
   }
 
   public static boolean doesFileExist(String file) {
@@ -856,6 +874,27 @@ public class FileUtils {
 
       return result;
     }
+  }
+
+  public static String contactPathElements(String pathElement1, String pathElement2) {
+    String concatenatedPath = pathElement1;
+    if(pathElement1.endsWith("/") == false) {
+      concatenatedPath += "/";
+    }
+
+    if(pathElement2.startsWith("/")) {
+      pathElement2 = pathElement2.substring(1);
+    }
+
+    return concatenatedPath + pathElement2;
+  }
+
+  public static boolean isAbsoluteUrl(String url) {
+    return url.contains("://"); // new File(url).isAbsolute() does not work as it says Urls starting with '/' are absolute
+  }
+
+  public static boolean isRelativeUrl(String url) {
+    return !isAbsoluteUrl(url);
   }
 
 

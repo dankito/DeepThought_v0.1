@@ -1,6 +1,7 @@
 package net.deepthought.plugin;
 
 import net.deepthought.Application;
+import net.deepthought.data.contentextractor.BasicWebPageContentExtractor;
 import net.deepthought.data.contentextractor.IContentExtractor;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -72,6 +73,8 @@ public class DefaultPluginManager implements IPluginManager {
 
     if(staticallyLinkedPlugins != null)
       loadStaticallyLinkedPlugins(staticallyLinkedPlugins);
+
+    loadDefaultPlugins();
   }
 
   protected void loadPluginsFromPluginsFolder() {
@@ -147,6 +150,10 @@ public class DefaultPluginManager implements IPluginManager {
     for(IPlugin plugin : staticallyLinkedPlugins) {
       pluginLoaded(plugin);
     }
+  }
+
+  protected void loadDefaultPlugins() {
+    pluginLoaded(new BasicWebPageContentExtractor());
   }
 
   protected void pluginLoaded(final IPlugin plugin) {
