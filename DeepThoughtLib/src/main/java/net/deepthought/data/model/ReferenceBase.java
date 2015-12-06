@@ -310,6 +310,10 @@ public abstract class ReferenceBase extends UserDataEntity {
   }
 
 
+  public boolean hasPreviewImage() {
+    return previewImage != null;
+  }
+
   public FileLink getPreviewImage() {
     return previewImage;
   }

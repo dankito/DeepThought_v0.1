@@ -63,6 +63,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
@@ -124,20 +125,23 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   @FXML
   protected VBox pnContent;
-
-  @FXML
-  protected Pane paneSeriesTitle;
-
-  @FXML
-  protected Pane paneReference;
-
-  @FXML
-  protected Pane paneSeriesTitleHeader;
   @FXML
   protected ToggleButton btnShowHideSeriesTitlePane;
   @FXML
   protected ToggleButton btnShowHideSearchSeriesTitle;
   protected SearchAndSelectReferenceControl searchAndSelectSeriesTitleControl = null;
+
+  @FXML
+  protected Pane paneSeriesTitle;
+
+  @FXML
+  protected Pane paneSeriesTitleValues;
+
+  @FXML
+  protected ImageView imgvwSeriesTitlePreviewImage;
+
+  @FXML
+  protected Pane paneSeriesTitleHeader;
 
   @FXML
   protected Pane paneSeriesTitleTitle;
@@ -178,6 +182,15 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
   @FXML
+  protected Pane paneReference;
+
+  @FXML
+  protected ImageView imgvwReferencePreviewImage;
+
+  @FXML
+  protected Pane paneReferenceValues;
+
+  @FXML
   protected Pane paneReferenceTitle;
   @FXML
   protected TextField txtfldReferenceTitle;
@@ -212,11 +225,18 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   @FXML
-  protected Pane paneReferenceSubDivision;
-  @FXML
   protected ToggleButton btnShowHideReferenceSubDivisionPane;
   @FXML
   protected Button btnChooseReferenceSubDivisionFieldsToShow;
+
+  @FXML
+  protected Pane paneReferenceSubDivision;
+
+  @FXML
+  protected ImageView imgvwReferenceSubDivisionPreviewImage;
+
+  @FXML
+  protected Pane paneReferenceSubDivisionValues;
 
   @FXML
   protected Pane paneReferenceSubDivisionTitle;
@@ -293,6 +313,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwSeriesTitlePreviewImage);
+
     editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles(), event -> fieldsWithUnsavedSeriesTitleChanges.add
         (FieldWithUnsavedChanges.SeriesTitleAttachedFiles), event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAttachedFiles));
     editedSeriesTitleEmbeddedFiles = new EditedEntitiesHolder<>(seriesTitle.getEmbeddedFiles());
@@ -347,12 +369,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     htmledSeriesTitleAbstract = new CollapsibleHtmlEditor("abstract", seriesTitleAbstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleAbstract);
-    paneSeriesTitle.getChildren().add(3, htmledSeriesTitleAbstract);
+    paneSeriesTitleValues.getChildren().add(3, htmledSeriesTitleAbstract);
     VBox.setMargin(htmledSeriesTitleAbstract, new Insets(6, 0, 0, 0));
 
     htmledSeriesTitleTableOfContents = new CollapsibleHtmlEditor("table.of.contents", seriesTitleTableOfContentsListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleTableOfContents);
-    paneSeriesTitle.getChildren().add(4, htmledSeriesTitleTableOfContents);
+    paneSeriesTitleValues.getChildren().add(4, htmledSeriesTitleTableOfContents);
     VBox.setMargin(htmledSeriesTitleTableOfContents, new Insets(6, 0, 0, 0));
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
@@ -360,14 +382,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     seriesTitlePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     seriesTitlePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitlePersons));
     VBox.setMargin(seriesTitlePersonsControl, new Insets(6, 0, 0, 0));
-    paneSeriesTitle.getChildren().add(5, seriesTitlePersonsControl);
+    paneSeriesTitleValues.getChildren().add(5, seriesTitlePersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
     seriesTitlePersonsControl.setVisible(false);
 
     htmledSeriesTitleNotes = new CollapsibleHtmlEditor("notes", seriesTitleNotesListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleNotes);
-    paneSeriesTitle.getChildren().add(6, htmledSeriesTitleNotes);
+    paneSeriesTitleValues.getChildren().add(6, htmledSeriesTitleNotes);
     VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
 
     seriesTitleFilesControl = new FilesControl(editedSeriesTitleAttachedFiles);
@@ -375,7 +397,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     seriesTitleFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     seriesTitleFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
     seriesTitleFilesControl.setMaxHeight(Double.MAX_VALUE);
-    paneSeriesTitle.getChildren().add(7, seriesTitleFilesControl);
+    paneSeriesTitleValues.getChildren().add(7, seriesTitleFilesControl);
     VBox.setMargin(seriesTitleFilesControl, new Insets(6, 0, 0, 0));
   }
 
@@ -396,6 +418,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferencePreviewImage);
+
     editedReferenceAttachedFiles = new EditedEntitiesHolder<>(reference.getAttachedFiles(), event -> fieldsWithUnsavedReferenceChanges.add
         (FieldWithUnsavedChanges.ReferenceAttachedFiles), event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAttachedFiles));
     editedReferenceEmbeddedFiles = new EditedEntitiesHolder<>(reference.getEmbeddedFiles());
@@ -457,12 +481,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     htmledReferenceAbstract = new CollapsibleHtmlEditor("abstract", referenceAbstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceAbstract);
-    paneReference.getChildren().add(4, htmledReferenceAbstract);
+    paneReferenceValues.getChildren().add(4, htmledReferenceAbstract);
     VBox.setMargin(htmledReferenceAbstract, new Insets(6, 0, 0, 0));
 
     htmledReferenceTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
-    paneReference.getChildren().add(5, htmledReferenceTableOfContents);
+    paneReferenceValues.getChildren().add(5, htmledReferenceTableOfContents);
     VBox.setMargin(htmledReferenceTableOfContents, new Insets(6, 0, 0, 0));
 
     referencePersonsControl = new ReferencePersonsControl();
@@ -470,11 +494,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referencePersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     referencePersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferencePersons));
     VBox.setMargin(referencePersonsControl, new Insets(6, 0, 0, 0));
-    paneReference.getChildren().add(6, referencePersonsControl);
+    paneReferenceValues.getChildren().add(6, referencePersonsControl);
 
     htmledReferenceNotes = new CollapsibleHtmlEditor("notes", referenceNotesListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceNotes);
-    paneReference.getChildren().add(7, htmledReferenceNotes);
+    paneReferenceValues.getChildren().add(7, htmledReferenceNotes);
     VBox.setMargin(htmledReferenceNotes, new Insets(6, 0, 0, 0));
 
     referenceFilesControl = new FilesControl(editedReferenceAttachedFiles);
@@ -482,7 +506,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
     referenceFilesControl.setMaxHeight(Double.MAX_VALUE);
-    paneReference.getChildren().add(8, referenceFilesControl);
+    paneReferenceValues.getChildren().add(8, referenceFilesControl);
     VBox.setMargin(referenceFilesControl, new Insets(6, 0, 0, 0));
   }
 
@@ -510,6 +534,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferenceSubDivisionPreviewImage);
+
     editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles(), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add
         (FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles));
     editedReferenceSubDivisionEmbeddedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getEmbeddedFiles());
@@ -537,7 +563,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
     htmledReferenceSubDivisionAbstract = new CollapsibleHtmlEditor("abstract", referenceSubDivisionAbstractListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionAbstract);
-    paneReferenceSubDivision.getChildren().add(3, htmledReferenceSubDivisionAbstract);
+    paneReferenceSubDivisionValues.getChildren().add(3, htmledReferenceSubDivisionAbstract);
     VBox.setMargin(htmledReferenceSubDivisionAbstract, new Insets(6, 0, 0, 0));
 
     referenceSubDivisionPersonsControl = new ReferenceSubDivisionPersonsControl();
@@ -545,13 +571,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivisionPersonsControl.setPersonAddedEventHandler(event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
     referenceSubDivisionPersonsControl.setPersonRemovedEventHandler(event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionPersons));
     VBox.setMargin(referenceSubDivisionPersonsControl, new Insets(6, 0, 0, 0));
-    paneReferenceSubDivision.getChildren().add(4, referenceSubDivisionPersonsControl);
+    paneReferenceSubDivisionValues.getChildren().add(4, referenceSubDivisionPersonsControl);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
 
     htmledReferenceSubDivisionNotes = new CollapsibleHtmlEditor("notes", referenceSubDivisionNotesListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionNotes);
-    paneReferenceSubDivision.getChildren().add(5, htmledReferenceSubDivisionNotes);
+    paneReferenceSubDivisionValues.getChildren().add(5, htmledReferenceSubDivisionNotes);
     VBox.setMargin(htmledReferenceSubDivisionNotes, new Insets(6, 0, 0, 0));
 
     referenceSubDivisionFilesControl = new FilesControl(editedReferenceSubDivisionAttachedFiles);
@@ -559,7 +585,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivisionFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceSubDivisionFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
     referenceSubDivisionFilesControl.setMaxHeight(Double.MAX_VALUE);
-    paneReferenceSubDivision.getChildren().add(6, referenceSubDivisionFilesControl);
+    paneReferenceSubDivisionValues.getChildren().add(6, referenceSubDivisionFilesControl);
     VBox.setMargin(referenceSubDivisionFilesControl, new Insets(6, 0, 0, 0));
   }
 
@@ -704,12 +730,12 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     // i don't get it: referencePersonsControl never gets removed from Memory, all others in approximately 50 % of all cases
     // TODO: find Memory leaks
     searchAndSelectSeriesTitleControl.cleanUp();
-    paneSeriesTitle.getChildren().remove(searchAndSelectSeriesTitleControl);
+    paneSeriesTitleValues.getChildren().remove(searchAndSelectSeriesTitleControl);
     searchAndSelectSeriesTitleControl = null;
     htmledSeriesTitleTableOfContents.cleanUp();
     htmledSeriesTitleAbstract.cleanUp();
     seriesTitlePersonsControl.cleanUp();
-    paneSeriesTitle.getChildren().remove(seriesTitlePersonsControl);
+    paneSeriesTitleValues.getChildren().remove(seriesTitlePersonsControl);
     seriesTitlePersonsControl = null;
     htmledSeriesTitleNotes.cleanUp();
     seriesTitleFilesControl.cleanUp();
@@ -717,17 +743,17 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     searchAndSelectReferenceControl.cleanUp();
     htmledReferenceAbstract.cleanUp();
     htmledReferenceTableOfContents.cleanUp();
-    paneReference.getChildren().remove(searchAndSelectReferenceControl);
+    paneReferenceValues.getChildren().remove(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl = null;
     referencePersonsControl.cleanUp();
-    paneReference.getChildren().remove(referencePersonsControl);
+    paneReferenceValues.getChildren().remove(referencePersonsControl);
     referencePersonsControl = null;
     htmledReferenceNotes.cleanUp();
     referenceFilesControl.cleanUp();
 
     htmledReferenceSubDivisionAbstract.cleanUp();
     referenceSubDivisionPersonsControl.cleanUp();
-    paneReferenceSubDivision.getChildren().remove(referenceSubDivisionPersonsControl);
+    paneReferenceSubDivisionValues.getChildren().remove(referenceSubDivisionPersonsControl);
     referenceSubDivisionPersonsControl = null;
     htmledReferenceSubDivisionNotes.cleanUp();
     referenceSubDivisionFilesControl.cleanUp();
@@ -931,6 +957,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setSeriesTitleValues(final SeriesTitle seriesTitle) {
+    imgvwSeriesTitlePreviewImage.setVisible(seriesTitle.hasPreviewImage());
+    if(seriesTitle.hasPreviewImage()) {
+      imgvwSeriesTitlePreviewImage.setImage(new Image(seriesTitle.getPreviewImage().getUriString()));
+    }
+
     txtfldSeriesTitleTitle.setText(seriesTitle.getTitle());
     txtfldSeriesTitleSubTitle.setText(seriesTitle.getSubTitle());
 
@@ -950,6 +981,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setReferenceValues(final Reference reference) {
+    imgvwReferencePreviewImage.setVisible(reference.hasPreviewImage());
+    if(reference.hasPreviewImage()) {
+      imgvwReferencePreviewImage.setImage(new Image(reference.getPreviewImage().getUriString()));
+    }
+
     txtfldReferenceTitle.setText(reference.getTitle());
     txtfldReferenceSubTitle.setText(reference.getSubTitle());
 
@@ -974,6 +1010,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setReferenceSubDivisionValues(final ReferenceSubDivision subDivision) {
+    imgvwReferenceSubDivisionPreviewImage.setVisible(subDivision.hasPreviewImage());
+    if(subDivision.hasPreviewImage()) {
+      imgvwReferenceSubDivisionPreviewImage.setImage(new Image(subDivision.getPreviewImage().getUriString()));
+    }
+
     txtfldReferenceSubDivisionTitle.setText(subDivision.getTitle());
     txtfldReferenceSubDivisionSubTitle.setText(subDivision.getSubTitle());
 
