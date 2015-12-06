@@ -27,6 +27,8 @@ import net.deepthought.plugin.DefaultPluginManager;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.IThreadPool;
 import net.deepthought.util.ThreadPool;
+import net.deepthought.util.isbn.IIsbnResolver;
+import net.deepthought.util.isbn.MultiImplementationsIsbnResolver;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -143,6 +145,11 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
   @Override
   public IDeepThoughtsConnector createDeepThoughtsConnector() {
     return new DeepThoughtsConnector();
+  }
+
+  @Override
+  public IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool) {
+    return new MultiImplementationsIsbnResolver(htmlHelper, threadPool);
   }
 
 }

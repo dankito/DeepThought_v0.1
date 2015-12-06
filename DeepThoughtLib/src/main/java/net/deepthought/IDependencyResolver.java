@@ -15,6 +15,7 @@ import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformTools;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.IThreadPool;
+import net.deepthought.util.isbn.IIsbnResolver;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -48,5 +49,7 @@ public interface IDependencyResolver {
   IContentExtractorManager createContentExtractorManager();
 
   IDeepThoughtsConnector createDeepThoughtsConnector();
+
+  IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
 
 }

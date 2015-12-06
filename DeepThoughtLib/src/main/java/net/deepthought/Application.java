@@ -32,6 +32,7 @@ import net.deepthought.util.LogHelper;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
+import net.deepthought.util.isbn.IIsbnResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +86,8 @@ public class Application {
   protected static IContentExtractorManager contentExtractorManager = null;
 
   protected static IDeepThoughtsConnector deepThoughtsConnector = null;
+
+  protected static IIsbnResolver isbnResolver;
 
   protected static boolean isInstantiated = false;
 
@@ -155,6 +158,8 @@ public class Application {
 
       Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
       deepThoughtsConnector.runAsync();
+
+      Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
 
       isInstantiated = true;
       callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated));
@@ -399,6 +404,10 @@ public class Application {
 
   public static IDeepThoughtsConnector getDeepThoughtsConnector() {
     return deepThoughtsConnector;
+  }
+
+  public static IIsbnResolver getIsbnResolver() {
+    return isbnResolver;
   }
 
   public static DeepThoughtApplication getApplication() {
