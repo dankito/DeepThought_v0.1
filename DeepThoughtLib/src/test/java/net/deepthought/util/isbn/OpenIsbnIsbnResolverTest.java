@@ -151,7 +151,7 @@ public class OpenIsbnIsbnResolverTest {
     Assert.assertEquals("9783864902062", reference.getIsbnOrIssn());
     Assert.assertEquals(dateFormat.parse("2014-11-27"), reference.getPublishingDate());
 
-    // OpenIsbn has parsed this badly: this book has 5 authors, OpenIsbn only shows 3, two of them concatenated and then cut
+    // OpenIsbn has parsed this badly: this book has 5 authors, OpenIsbn only shows 3, two of them concatenated and then cut off
     Assert.assertEquals(3, reference.getPersons().size());
 
     Assert.assertNotNull(reference.getPreviewImage());
