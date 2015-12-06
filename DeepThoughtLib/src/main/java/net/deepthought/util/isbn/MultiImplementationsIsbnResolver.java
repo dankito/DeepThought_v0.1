@@ -68,9 +68,10 @@ public class MultiImplementationsIsbnResolver implements IIsbnResolver {
     if(receivedResults.size() == 1) {
       listener.isbnResolvingDone(receivedResults.get(0));
     }
-
-    ResolveIsbnResult bestResult = findBestResult(receivedResults);
-    listener.isbnResolvingDone(bestResult);
+    else {
+      ResolveIsbnResult bestResult = findBestResult(receivedResults);
+      listener.isbnResolvingDone(bestResult);
+    }
   }
 
   protected ResolveIsbnResult findBestResult(List<ResolveIsbnResult> receivedResults) {

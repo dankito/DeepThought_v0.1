@@ -159,6 +159,24 @@ public class OpenIsbnIsbnResolverTest {
     Assert.assertEquals(reference.getTitle(), reference.getPreviewImage().getName());
   }
 
+  @Test
+  public void isbnDoesNotExist_ErrorGetsReturned() {
+    resolver.resolveIsbn("42", new IsbnResolvingListener() {
+      @Override
+      public void isbnResolvingDone(ResolveIsbnResult result) {
+        resultHolder.set(result);
+        waitLatch.countDown();
+      }
+    });
+
+    waitForResult();
+
+    ResolveIsbnResult result = resultHolder.get();
+    Assert.assertFalse(result.isSuccessful());
+    Assert.assertNotNull(result.getError());
+    Assert.assertNull(result.getResolvedReference());
+  }
+
 
   protected void assertResolvingWasSuccessful(ObjectHolder<ResolveIsbnResult> resultHolder) {
     ResolveIsbnResult result = resultHolder.get();

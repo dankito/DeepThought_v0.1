@@ -54,9 +54,11 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
     this.creationResult = creationResult;
 
-    parentReferenceBaseInfo = createParentReferenceBaseInfo(creationResult, referenceBase);
+    if(creationResult != null) {
+      parentReferenceBaseInfo = createParentReferenceBaseInfo(creationResult, referenceBase);
 
-    itemDisplayNameUpdated();
+      itemDisplayNameUpdated();
+    }
   }
 
 

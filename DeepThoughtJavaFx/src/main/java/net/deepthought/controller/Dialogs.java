@@ -381,6 +381,14 @@ public class Dialogs {
   }
 
   protected static void showEditReferenceDialog(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, EntryCreationResult creationResult, final ChildWindowsControllerListener listener) {
+    if(Platform.isFxApplicationThread())
+      showEditReferenceDialogOnUiThread(referenceBase, persistedParentReferenceBase, creationResult, listener);
+    else
+      Platform.runLater(() -> showEditReferenceDialogOnUiThread(referenceBase, persistedParentReferenceBase, creationResult, listener));
+  }
+
+  protected static void showEditReferenceDialogOnUiThread(final ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase, EntryCreationResult creationResult, final
+  ChildWindowsControllerListener listener) {
     try {
       FXMLLoader loader = new FXMLLoader();
       Stage dialogStage = createStageForEntityDialog(loader, "EditReferenceDialog.fxml");

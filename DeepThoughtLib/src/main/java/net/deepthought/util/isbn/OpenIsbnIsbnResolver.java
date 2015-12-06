@@ -5,6 +5,7 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.util.IThreadPool;
+import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Document;
@@ -43,6 +44,10 @@ public class OpenIsbnIsbnResolver extends IsbnResolverBase implements IIsbnResol
   }
 
   protected Reference parseResponseToReference(Document receivedResponse) {
+    if(receivedResponse.title().contains("404 - Page Not Found") || receivedResponse.title().contains("404 - Page Not Found")) {
+      throw new IllegalArgumentException(Localization.getLocalizedString("no.information.found.for.this.isbn"));
+    }
+
     Element body = receivedResponse.body();
 
     String title = parseTitle(body);
