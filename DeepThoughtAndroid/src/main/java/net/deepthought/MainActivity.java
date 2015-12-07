@@ -16,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
@@ -58,10 +61,12 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
 
-  private final static Logger log = LoggerFactory.getLogger(MainActivity.class);
+  private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
 
 
-  protected final static int CaptureImageForConnectPeerRequestCode = 7;
+  protected static final int CaptureImageForConnectPeerRequestCode = 7;
+
+  protected static final int ScanBarCodeRequestCode = 49374;
 
 
   protected static boolean hasDeepThoughtBeenSetup = false;
@@ -196,6 +201,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //      }
 
       initNavigationDrawer();
+
+      scanBarCode();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
     }
@@ -358,6 +365,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       case CaptureImageForConnectPeerRequestCode:
         handleCaptureImageResult(resultCode);
         break;
+      case ScanBarCodeRequestCode: // TODO: is this really always == 49374
+        handleScanBarCodeResult(requestCode, resultCode, data);
+        break;
     }
 
     super.onActivityResult(requestCode, resultCode, data);
@@ -381,6 +391,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     temporaryImageFile = null;
     captureImageRequest = null;
+  }
+
+  protected void handleScanBarCodeResult(int requestCode, int resultCode, Intent data) {
+    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+    if(result != null) {
+      String decodedBarcode = result.getContents();
+      String format = result.getFormatName();
+    }
   }
 
   @Override
@@ -475,6 +493,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       });
     }
   }
+
+  protected void scanBarCode() {
+    new IntentIntegrator(this).setOrientationLocked(false).initiateScan();
+  }
+
 
   @Override
   public void onBackPressed() {
