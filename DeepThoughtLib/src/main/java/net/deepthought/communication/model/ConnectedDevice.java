@@ -73,7 +73,7 @@ public class ConnectedDevice {
     this.canDoOcr = canDoOcr;
   }
 
-  public boolean isCanScanBarcodes() {
+  public boolean canScanBarcodes() {
     return canScanBarcodes;
   }
 
