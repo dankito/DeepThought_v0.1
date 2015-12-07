@@ -520,6 +520,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       seriesTitle.setDeepThought(this);
       seriesTitlesSorted = null;
 
+      mayPersistReferenceBaseRelations(seriesTitle);
+
       callEntityAddedListeners(seriesTitles, seriesTitle);
       return true;
     }
@@ -563,6 +565,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(references.add(reference)) {
       reference.setDeepThought(this);
       referencesSorted = null;
+
+      mayPersistReferenceBaseRelations(reference);
 
       callEntityAddedListeners(references, reference);
       return true;
@@ -609,6 +613,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
   public boolean addReferenceSubDivision(ReferenceSubDivision subDivision) {
     if(referenceSubDivisions.add(subDivision)) {
       subDivision.setDeepThought(this);
+
+      mayPersistReferenceBaseRelations(subDivision);
 
       callEntityAddedListeners(referenceSubDivisions, subDivision);
       return true;
@@ -731,6 +737,78 @@ public class DeepThought extends UserDataEntity implements Serializable {
       if (serializationResult != null)
         settingsString = serializationResult; // do not call setSettingsString() as we're right in a Entity Lifecycle method.
                                               // Calling setSettingsString() would again trigger saving to DB -> infinite loop
+    }
+  }
+
+
+  // TODO: find a better place for persisting ReferenceBase Relations methods
+
+  protected void mayPersistReferenceBaseRelations(ReferenceBase referenceBase) {
+    mayPersistFiles(referenceBase);
+    mayPersistPersons(referenceBase);
+    mayPersistPreviewImage(referenceBase);
+  }
+
+  protected void mayPersistPersons(ReferenceBase referenceBase) {
+    List<Person> unpersistedPersons = new ArrayList<>();
+    List<Person> referenceBasePersons = new ArrayList<>(referenceBase.getPersons()); // make a copy as Collection may gets changed
+
+    for(Person person : referenceBasePersons) {
+      if(person.isPersisted() == false) {
+        unpersistedPersons.add(person);
+        referenceBase.removePerson(person);
+      }
+    }
+
+    for(Person unpersistedPerson : unpersistedPersons) {
+      addPerson(unpersistedPerson);
+      referenceBase.addPerson(unpersistedPerson); // TODO: how to keep correct order of Persons?
+    }
+  }
+
+  protected void mayPersistFiles(ReferenceBase referenceBase) {
+    mayPersistAttachedFiles(referenceBase);
+    mayPersistEmbeddedFiles(referenceBase);
+  }
+
+  protected void mayPersistAttachedFiles(ReferenceBase referenceBase) {
+    List<FileLink> unpersistedFiles = new ArrayList<>();
+    List<FileLink> referenceBaseAttachedFiles = new ArrayList<>(referenceBase.getAttachedFiles()); // make a copy as Collection may gets changed
+
+    for(FileLink file : referenceBaseAttachedFiles) {
+      if(file.isPersisted() == false) {
+        unpersistedFiles.add(file);
+        referenceBase.removeAttachedFile(file);
+      }
+    }
+
+    for(FileLink unpersistedFile : unpersistedFiles) {
+      addFile(unpersistedFile);
+      referenceBase.addAttachedFile(unpersistedFile); // TODO: how to keep correct order of Files?
+    }
+  }
+
+  protected void mayPersistEmbeddedFiles(ReferenceBase referenceBase) {
+    List<FileLink> unpersistedFiles = new ArrayList<>();
+    List<FileLink> referenceBaseEmbeddedFiles = new ArrayList<>(referenceBase.getEmbeddedFiles()); // make a copy as Collection may gets changed
+
+    for(FileLink file : referenceBaseEmbeddedFiles) {
+      if(file.isPersisted() == false) {
+        unpersistedFiles.add(file);
+        referenceBase.removeEmbeddedFile(file);
+      }
+    }
+
+    for(FileLink unpersistedFile : unpersistedFiles) {
+      addFile(unpersistedFile);
+      referenceBase.addEmbeddedFile(unpersistedFile); // TODO: how to keep correct order of Files?
+    }
+  }
+
+  protected void mayPersistPreviewImage(ReferenceBase referenceBase) {
+    FileLink previewImage = referenceBase.getPreviewImage();
+    if(previewImage != null && previewImage.isPersisted() == false) {
+      addFile(previewImage);
     }
   }
 
