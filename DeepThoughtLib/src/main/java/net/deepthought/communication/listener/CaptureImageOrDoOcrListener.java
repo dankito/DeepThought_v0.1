@@ -15,5 +15,7 @@ public interface CaptureImageOrDoOcrListener {
 
   void doOcrOnImage(DoOcrOnImageRequest request);
 
+  void scanBarcode(RequestWithAsynchronousResponse request);
+
   void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request);
 }

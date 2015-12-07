@@ -320,6 +320,11 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
       public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
 
       }
@@ -352,6 +357,11 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 
       @Override
       public void doOcrOnImage(DoOcrOnImageRequest request) {
+
+      }
+
+      @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
 
       }
 
@@ -392,6 +402,11 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
       public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
 
       }
@@ -400,6 +415,47 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     communicator.startDoOcrOnImage(localHost, new DoOcrConfiguration(new byte[0]), null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+  @Test
+  public void startScanBarcode_CaptureImageOrDoOcrListenerGetsCalled() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void captureImage(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void doOcrOnImage(DoOcrOnImageRequest request) {
+
+      }
+
+      @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
+
+      }
+    });
+
+    communicator.startScanBarcode(localHost, null);
+
+    try { waitLatch.await(200, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertTrue(methodCalled.get());
   }

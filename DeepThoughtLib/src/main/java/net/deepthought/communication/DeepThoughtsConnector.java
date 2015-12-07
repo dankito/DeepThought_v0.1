@@ -470,6 +470,15 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     else if(Addresses.StopCaptureImageAndDoOcrMethodName.equals(methodName)) {
       return handleStopCaptureImageOrDoOcrMessage((StopRequestWithAsynchronousResponse) request);
     }
+    else if(Addresses.StartScanBarcodeMethodName.equals(methodName)) {
+      return handleStartScanBarcodeMessage((RequestWithAsynchronousResponse) request);
+    }
+    else if(Addresses.ScanBarcodeResultMethodName.equals(methodName)) {
+      return true;
+    }
+    else if(Addresses.StopScanBarcodeMethodName.equals(methodName)) {
+      return handleStopScanBarcodeMessage((StopRequestWithAsynchronousResponse) request);
+    }
 
     return false;
   }
@@ -509,8 +518,21 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return true;
   }
 
+  protected boolean handleStartScanBarcodeMessage(RequestWithAsynchronousResponse request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.scanBarcode(request);
+    return true;
+  }
+
   protected boolean handleStopCaptureImageOrDoOcrMessage(StopRequestWithAsynchronousResponse request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      listener.stopCaptureImageOrDoOcr(request);
+    return true;
+  }
+
+  protected boolean handleStopScanBarcodeMessage(StopRequestWithAsynchronousResponse request) {
+    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+      // TODO
       listener.stopCaptureImageOrDoOcr(request);
     return true;
   }

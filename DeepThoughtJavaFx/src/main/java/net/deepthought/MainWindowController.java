@@ -931,6 +931,11 @@ public class MainWindowController implements Initializable {
     }
 
     @Override
+    public void scanBarcode(RequestWithAsynchronousResponse request) {
+      // TODO
+    }
+
+    @Override
     public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
       // TODO
     }

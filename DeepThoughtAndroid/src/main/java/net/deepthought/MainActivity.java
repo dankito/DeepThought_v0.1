@@ -447,6 +447,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
+    public void scanBarcode(RequestWithAsynchronousResponse request) {
+      scanBarcode(request);
+    }
+
+    @Override
     public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
       // TODO: implement
     }
