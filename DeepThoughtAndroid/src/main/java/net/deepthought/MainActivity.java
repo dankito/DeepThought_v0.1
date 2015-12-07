@@ -31,6 +31,7 @@ import net.deepthought.communication.messages.request.RequestWithAsynchronousRes
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
+import net.deepthought.communication.messages.response.ScanBarcodeResult;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   // make them static otherwise the will be cleaned up when starting TakePhoto Activity
   protected static FileLink temporaryImageFile = null;
   protected static RequestWithAsynchronousResponse captureImageRequest = null;
+
+  protected static RequestWithAsynchronousResponse scanBarcodeRequest = null;
 
 
   protected ProgressDialog loadingDataProgressDialog = null;
@@ -201,8 +204,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //      }
 
       initNavigationDrawer();
-
-      scanBarCode();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
     }
@@ -394,11 +395,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void handleScanBarCodeResult(int requestCode, int resultCode, Intent data) {
-    IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-    if(result != null) {
-      String decodedBarcode = result.getContents();
-      String format = result.getFormatName();
+    if(scanBarcodeRequest != null) {
+      IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+      if (result != null) {
+        Application.getDeepThoughtsConnector().getCommunicator().respondToScanBarcodeRequest(scanBarcodeRequest,
+            new ScanBarcodeResult(result.getContents(), result.getFormatName()), null);
+      }
     }
+
+    scanBarcodeRequest = null;
   }
 
   @Override
@@ -448,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void scanBarcode(RequestWithAsynchronousResponse request) {
-      scanBarcode(request);
+      MainActivity.this.scanBarCode(request);
     }
 
     @Override
@@ -499,7 +504,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   }
 
-  protected void scanBarCode() {
+  protected void scanBarCode(RequestWithAsynchronousResponse request) {
+    scanBarcodeRequest = request;
+
     new IntentIntegrator(this).setOrientationLocked(false).initiateScan();
   }
 
