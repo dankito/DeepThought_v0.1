@@ -7,6 +7,7 @@ import net.deepthought.communication.messages.request.RequestWithAsynchronousRes
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
+import net.deepthought.communication.messages.response.ScanBarcodeResultResponse;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 
@@ -38,6 +39,10 @@ public class DeepThoughtMessagesReceiverConfig extends DefaultMessagesReceiverCo
     allowedMethods.add(new WebMethodConfig(Addresses.DoOcrOnImageMethodName, DoOcrOnImageRequest.class, getDoOcrOnImageMultipartConfig()));
     allowedMethods.add(new WebMethodConfig(Addresses.OcrResultMethodName, OcrResultResponse.class));
     allowedMethods.add(new WebMethodConfig(Addresses.StopDoOcrOnImageMethodName, StopRequestWithAsynchronousResponse.class));
+
+    allowedMethods.add(new WebMethodConfig(Addresses.StartScanBarcodeMethodName, RequestWithAsynchronousResponse.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.ScanBarcodeResultMethodName, ScanBarcodeResultResponse.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.StopScanBarcodeMethodName, StopRequestWithAsynchronousResponse.class));
 
     return allowedMethods;
   }

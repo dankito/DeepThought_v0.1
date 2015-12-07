@@ -5,6 +5,7 @@ import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.ResponseListener;
+import net.deepthought.communication.listener.ScanBarcodeResultListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.IMessagesDispatcher;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
@@ -17,6 +18,8 @@ import net.deepthought.communication.messages.response.CaptureImageResultRespons
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
+import net.deepthought.communication.messages.response.ScanBarcodeResult;
+import net.deepthought.communication.messages.response.ScanBarcodeResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
@@ -239,6 +242,36 @@ public class Communicator {
   public void respondToDoOcrOnImageRequest(final DoOcrOnImageRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
+
+    dispatcher.sendMessageAsync(address, response, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(response, communicatorResponse, listener);
+      }
+    });
+  }
+
+
+
+  public RequestWithAsynchronousResponse startScanBarcode(ConnectedDevice deviceToDoTheJob, ScanBarcodeResultListener listener) {
+    String address = Addresses.getStartScanBarcodeAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(getIpAddressToSendResponseTo(), getMessageReceiverPort());
+
+    listenerManager.addListenerForResponse(request, listener);
+
+    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
+      }
+    });
+
+    return request;
+  }
+
+  public void respondToScanBarcodeRequest(RequestWithAsynchronousResponse request, ScanBarcodeResult result, final ResponseListener listener) {
+    String address = Addresses.getScanBarcodeResultAddress(request.getAddress(), request.getPort());
+    final ScanBarcodeResultResponse response = new ScanBarcodeResultResponse(result, request.getMessageId());
 
     dispatcher.sendMessageAsync(address, response, new CommunicatorResponseListener() {
       @Override

@@ -30,6 +30,10 @@ public class Addresses {
   public final static String OcrResultMethodName = "OcrResult";
   public final static String StopDoOcrOnImageMethodName = "StopDoOcrOnImage";
 
+  public final static String StartScanBarcodeMethodName = "StartScanBarcode";
+  public final static String ScanBarcodeResultMethodName = "ScanBarcodeResult";
+  public final static String StopScanBarcodeMethodName = "StopScanBarcode";
+
   public final static List<String> MethodNames;
 
 
@@ -93,6 +97,21 @@ public class Addresses {
   public static String getStopDoOcrOnImageMethodNameAddress(String host, int port) {
     return createAddress(host, port, StopDoOcrOnImageMethodName);
   }
+
+
+
+  public static String getStartScanBarcodeAddress(String host, int port) {
+    return createAddress(host, port, StartScanBarcodeMethodName);
+  }
+
+  public static String getScanBarcodeResultAddress(String host, int port) {
+    return createAddress(host, port, ScanBarcodeResultMethodName);
+  }
+
+  public static String getStopScanBarcodeAddress(String host, int port) {
+    return createAddress(host, port, StopScanBarcodeMethodName);
+  }
+
 
   protected static String createAddress(String host, int port, String methodName) {
     String address = HttpPrefix + host;

@@ -5,6 +5,7 @@ import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.DoOcrOnImageResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
+import net.deepthought.communication.listener.ScanBarcodeResultListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesDispatcher;
@@ -17,6 +18,8 @@ import net.deepthought.communication.messages.request.RequestWithAsynchronousRes
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
+import net.deepthought.communication.messages.response.ScanBarcodeResult;
+import net.deepthought.communication.messages.response.ScanBarcodeResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
@@ -159,6 +162,8 @@ public class CommunicatorTest extends CommunicationTestBase {
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
 
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
     communicator.respondToAskForDeviceRegistrationRequest(request, createAskForDeviceRegistrationResponseFromRequest(request), null);
 
     waitTillListenerHasBeenCalled();
@@ -249,6 +254,8 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
 
     communicator.respondToCaptureImageRequest(request, new CaptureImageResult(getTestImage(), true), null);
 
@@ -366,6 +373,8 @@ public class CommunicatorTest extends CommunicationTestBase {
 
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
 
     communicator.respondToCaptureImageAndDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
 
@@ -487,7 +496,90 @@ public class CommunicatorTest extends CommunicationTestBase {
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
 
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
     communicator.respondToDoOcrOnImageRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
+  }
+
+
+
+  @Test
+  public void startScanBarcode_RequestIsReceived() {
+    communicator.startScanBarcode(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+
+    assertThatCorrectMethodHasBeenCalled(Addresses.StartScanBarcodeMethodName, RequestWithAsynchronousResponse.class);
+  }
+
+  @Test
+  public void respondToScanBarcodeRequest_RequestIsReceived() throws IOException {
+    String decodedBarcode = "Cuddle";
+    String barcodeFormat = "QrCode";
+    RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(TestMessageId, TestIpAddress, CommunicatorPort);
+    communicator.respondToScanBarcodeRequest(request, new ScanBarcodeResult(decodedBarcode, barcodeFormat), null);
+
+    waitTillListenerHasBeenCalled();
+
+    ScanBarcodeResultResponse response = (ScanBarcodeResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.ScanBarcodeResultMethodName, ScanBarcodeResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertTrue(response.isDone());
+
+    ScanBarcodeResult result = response.getResult();
+    Assert.assertEquals(decodedBarcode, result.getDecodedBarcode());
+    Assert.assertEquals(barcodeFormat, result.getBarcodeFormat());
+  }
+
+  @Test
+  public void startScanBarcode_ResponseListenerGetsCalled() throws IOException {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<ScanBarcodeResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    RequestWithAsynchronousResponse request = communicator.startScanBarcode(localHost, new ScanBarcodeResultListener() {
+      @Override
+      public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, ScanBarcodeResultResponse captureImageResult) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(captureImageResult);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    String decodedBarcode = "Cuddle";
+    String barcodeFormat = "QrCode";
+    communicator.respondToScanBarcodeRequest(request, new ScanBarcodeResult(decodedBarcode, barcodeFormat), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+
+    ScanBarcodeResultResponse response = receivedResponseHolder.get(0);
+    Assert.assertTrue(response.isDone());
+
+    ScanBarcodeResult result = response.getResult();
+    Assert.assertEquals(decodedBarcode, result.getDecodedBarcode());
+    Assert.assertEquals(barcodeFormat, result.getBarcodeFormat());
+  }
+
+  @Test
+  public void startScanBarcode_ResponseListenerGetsRemovedFromListenerManager() throws IOException {
+    RequestWithAsynchronousResponse request = communicator.startScanBarcode(localHost, null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
+    communicator.respondToScanBarcodeRequest(request, new ScanBarcodeResult("", ""), null);
 
     waitTillListenerHasBeenCalled();
 
