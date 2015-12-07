@@ -193,7 +193,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
     if(title != null && publishingDate != null) {
       ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
-      articleReference.setOnlineAddress(articleUrl);
+      articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
       setArticleReference(creationResult, articleReference, publishingDate);
 
       return articleReference;

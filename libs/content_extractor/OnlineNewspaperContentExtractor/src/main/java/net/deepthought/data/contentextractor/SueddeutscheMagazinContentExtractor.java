@@ -194,7 +194,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
     if(title != null && publishingDate != null) {
       ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
-      articleReference.setOnlineAddress(articleUrl);
+      articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
       setArticleReference(creationResult, articleReference, publishingDate);
 
       return articleReference;

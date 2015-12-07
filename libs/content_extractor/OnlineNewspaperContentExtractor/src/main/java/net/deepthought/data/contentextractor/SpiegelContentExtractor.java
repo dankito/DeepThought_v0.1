@@ -166,7 +166,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
     String publishingDateString = extractPublishingDate(contentElement);
 
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
-    articleReference.setOnlineAddress(articleUrl);
+    articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
 
     setArticleReference(creationResult,articleReference, publishingDateString);
 

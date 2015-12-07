@@ -399,7 +399,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   protected ReferenceSubDivision extractReferenceSubDivisionFromHeaderSection(String articleUrl, Element headerSection) {
     ReferenceSubDivision articleReference = new ReferenceSubDivision();
-    articleReference.setOnlineAddress(articleUrl);
+    articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
 
     for(Element headerSectionChild : headerSection.children()) { // Header section has two children: time containing publishing time and a h2 element contain article title and subtitle
       if(headerSectionChild.tagName().startsWith("h")) {

@@ -126,7 +126,7 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
   protected Reference createReference(EntryCreationResult creationResult, String articleUrl, Element contentElement) {
     Reference articleReference = new Reference(extractTitle(contentElement));
-    articleReference.setOnlineAddress(articleUrl);
+    articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
 
     Element lastModifiedElement = contentElement.getElementById("footer-info-lastmod");
     // TODO: parse last modification date (will be different for every language!)

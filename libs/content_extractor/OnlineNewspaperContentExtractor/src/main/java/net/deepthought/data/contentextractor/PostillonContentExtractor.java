@@ -191,7 +191,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
       Element postTitleElement = getElementByClassAndNodeName(postDivElement, "h3", "post-title");
       if(postTitleElement != null) {
         ReferenceSubDivision articleReference = new ReferenceSubDivision(postTitleElement.text());
-        articleReference.setOnlineAddress(articleUrl);
+        articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
 
         setArticleReference(creationResult, articleReference, parsePostillionDateFormat(articleDate));
 

@@ -130,7 +130,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     }
 
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
-    articleReference.setOnlineAddress(articleUrl);
+    articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
 
     setArticleReference(creationResult, articleReference, publishingDateString);
 

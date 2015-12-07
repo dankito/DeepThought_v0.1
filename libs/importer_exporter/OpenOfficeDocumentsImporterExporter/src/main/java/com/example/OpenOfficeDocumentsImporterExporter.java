@@ -745,7 +745,7 @@ public class OpenOfficeDocumentsImporterExporter {
         Reference reference = findOrCreateReferenceForSeriesTitleToPublishingDate(seriesForUrl, publishingDate);
 
         ReferenceSubDivision article = new ReferenceSubDivision(title, subTitle);
-        article.setOnlineAddress(url);
+        article.setOnlineAddressAndLastAccessToCurrentDateTime(url);
         reference.addSubDivision(article);
         Application.getDeepThought().addReferenceSubDivision(article);
 
@@ -753,7 +753,7 @@ public class OpenOfficeDocumentsImporterExporter {
       }
       else {
         Reference newYouTubeLink = new Reference(title, subTitle);
-        newYouTubeLink.setOnlineAddress(url);
+        newYouTubeLink.setOnlineAddressAndLastAccessToCurrentDateTime(url);
         seriesForUrl.addSerialPart(newYouTubeLink);
         Application.getDeepThought().addReference(newYouTubeLink);
         return newYouTubeLink;
@@ -762,7 +762,7 @@ public class OpenOfficeDocumentsImporterExporter {
 
     Reference newReference = new Reference(title, subTitle);
     newReference.setIssueOrPublishingDate(publishingDate);
-    newReference.setOnlineAddress(url);
+    newReference.setOnlineAddressAndLastAccessToCurrentDateTime(url);
     if(StringUtils.isNullOrEmpty(title) && StringUtils.isNullOrEmpty(subTitle))
       newReference.setTitle(url);
     Application.getDeepThought().addReference(newReference);

@@ -13,9 +13,9 @@ import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.controls.utils.EditedEntitiesHolder;
 import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
@@ -33,9 +33,10 @@ import net.deepthought.data.persistence.db.TableConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -43,10 +44,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -286,13 +284,13 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     boolean isEntryUnPersisted = entry.isPersisted() == false;
 
     if(isSeriesUnPersisted)
-      Application.getDeepThought().addSeriesTitle(entry.getSeries());
+      persistSeriesTitle();
 
     if(isReferenceUnPersisted)
-      Application.getDeepThought().addReference(entry.getReference());
+      persistReference();
 
     if(isReferenceSubDivisionUnPersisted)
-      Application.getDeepThought().addReferenceSubDivision(entry.getReferenceSubDivision());
+      persistReferenceSubDivision();
 
     if(isEntryUnPersisted) // a new entry
       Application.getDeepThought().addEntry(entry);
@@ -393,6 +391,102 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
     btnApplyChanges.setDisable(true);
+  }
+
+  protected void persistSeriesTitle() {
+    SeriesTitle seriesTitle = entry.getSeries();
+    DeepThought deepThought = Application.getDeepThought();
+
+    mayPersistReferenceBaseRelations(seriesTitle, deepThought);
+
+    deepThought.addSeriesTitle(seriesTitle);
+  }
+
+  protected void persistReference() {
+    Reference reference = entry.getReference();
+    DeepThought deepThought = Application.getDeepThought();
+
+    mayPersistReferenceBaseRelations(reference, deepThought);
+
+    deepThought.addReference(reference);
+  }
+
+  protected void persistReferenceSubDivision() {
+    ReferenceSubDivision subDivision = entry.getReferenceSubDivision();
+    DeepThought deepThought = Application.getDeepThought();
+
+    mayPersistReferenceBaseRelations(subDivision, deepThought);
+
+    deepThought.addReferenceSubDivision(subDivision);
+  }
+
+  protected void mayPersistReferenceBaseRelations(ReferenceBase referenceBase, DeepThought deepThought) {
+    mayPersistFiles(deepThought, referenceBase);
+    mayPersistPersons(deepThought, referenceBase);
+    mayPersistPreviewImage(deepThought, referenceBase);
+  }
+
+  protected void mayPersistPersons(DeepThought deepThought, ReferenceBase referenceBase) {
+    List<Person> unpersistedPersons = new ArrayList<>();
+    List<Person> referenceBasePersons = new ArrayList<>(referenceBase.getPersons()); // make a copy as Collection may gets changed
+
+    for(Person person : referenceBasePersons) {
+      if(person.isPersisted() == false) {
+        unpersistedPersons.add(person);
+        referenceBase.removePerson(person);
+      }
+    }
+
+    for(Person unpersistedPerson : unpersistedPersons) {
+      deepThought.addPerson(unpersistedPerson);
+      referenceBase.addPerson(unpersistedPerson); // TODO: how to keep correct order of Persons?
+    }
+  }
+
+  protected void mayPersistFiles(DeepThought deepThought, ReferenceBase referenceBase) {
+    mayPersistAttachedFiles(deepThought, referenceBase);
+    mayPersistEmbeddedFiles(deepThought, referenceBase);
+  }
+
+  protected void mayPersistAttachedFiles(DeepThought deepThought, ReferenceBase referenceBase) {
+    List<FileLink> unpersistedFiles = new ArrayList<>();
+    List<FileLink> referenceBaseAttachedFiles = new ArrayList<>(referenceBase.getAttachedFiles()); // make a copy as Collection may gets changed
+
+    for(FileLink file : referenceBaseAttachedFiles) {
+      if(file.isPersisted() == false) {
+        unpersistedFiles.add(file);
+        referenceBase.removeAttachedFile(file);
+      }
+    }
+
+    for(FileLink unpersistedFile : unpersistedFiles) {
+      deepThought.addFile(unpersistedFile);
+      referenceBase.addAttachedFile(unpersistedFile); // TODO: how to keep correct order of Files?
+    }
+  }
+
+  protected void mayPersistEmbeddedFiles(DeepThought deepThought, ReferenceBase referenceBase) {
+    List<FileLink> unpersistedFiles = new ArrayList<>();
+    List<FileLink> referenceBaseEmbeddedFiles = new ArrayList<>(referenceBase.getEmbeddedFiles()); // make a copy as Collection may gets changed
+
+    for(FileLink file : referenceBaseEmbeddedFiles) {
+      if(file.isPersisted() == false) {
+        unpersistedFiles.add(file);
+        referenceBase.removeEmbeddedFile(file);
+      }
+    }
+
+    for(FileLink unpersistedFile : unpersistedFiles) {
+      deepThought.addFile(unpersistedFile);
+      referenceBase.addEmbeddedFile(unpersistedFile); // TODO: how to keep correct order of Files?
+    }
+  }
+
+  protected void mayPersistPreviewImage(DeepThought deepThought, ReferenceBase referenceBase) {
+    FileLink previewImage = referenceBase.getPreviewImage();
+    if(previewImage != null && previewImage.isPersisted() == false) {
+      deepThought.addFile(previewImage);
+    }
   }
 
 

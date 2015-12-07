@@ -153,6 +153,11 @@ public abstract class ReferenceBase extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.ReferenceBaseOnlineAddressColumnName, previousValue, onlineAddress);
   }
 
+  public void setOnlineAddressAndLastAccessToCurrentDateTime(String onlineAddress) {
+    setOnlineAddress(onlineAddress);
+    setLastAccessDate(new Date());
+  }
+
   public Date getLastAccessDate() {
     return lastAccessDate;
   }
