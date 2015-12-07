@@ -13,12 +13,12 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 import net.deepthought.util.isbn.IsbnResolvingListener;
 import net.deepthought.util.isbn.ResolveIsbnResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
@@ -61,27 +61,38 @@ public class AddReferenceFromIsbnDialog {
   }
 
   protected void waitForAndHandleUserIsbnInput(TextInputDialog dialog) {
-    Optional<String> result = dialog.showAndWait();
+    dialog.setOnCloseRequest(event -> {
+      String enteredIsbn = dialog.getResult();
+      if(StringUtils.isNotNullOrEmpty(enteredIsbn)) {
+        event.consume();
+        getReferenceForIsbn(enteredIsbn, dialog);
+      }
+      else if(listener != null) {
+        listener.isbnResolvingDone(new ResolveIsbnResult(false));
+      }
+    });
 
-    if (result.isPresent()){
-      getReferenceForIsbn(result.get(), dialog);
-    }
-    else if(listener != null) {
-      listener.isbnResolvingDone(new ResolveIsbnResult(false));
-    }
+    dialog.show();
   }
 
   protected void getReferenceForIsbn(final String enteredIsbn, final TextInputDialog askForIsbnDialog) {
     Application.getIsbnResolver().resolveIsbnAsync(enteredIsbn, new IsbnResolvingListener() {
       @Override
       public void isbnResolvingDone(ResolveIsbnResult result) {
-        if (result.isSuccessful()) {
-          showEditReferenceDialog(result);
-        } else {
-          showEnterIsbnDialog(askForIsbnDialog.getOwner(), enteredIsbn, Localization.getLocalizedString("could.not.resolve.isbn", enteredIsbn));
-        }
+        Platform.runLater(() -> retrievedIsbnResolvingResult(result, askForIsbnDialog, enteredIsbn));
       }
     });
+  }
+
+  protected void retrievedIsbnResolvingResult(ResolveIsbnResult result, TextInputDialog askForIsbnDialog, String enteredIsbn) {
+    if (result.isSuccessful()) {
+      askForIsbnDialog.setOnCloseRequest(null);
+      askForIsbnDialog.close();
+      showEditReferenceDialog(result);
+    } else {
+//          showEnterIsbnDialog(askForIsbnDialog.getOwner(), enteredIsbn, Localization.getLocalizedString("could.not.resolve.isbn", enteredIsbn));
+      askForIsbnDialog.setHeaderText(Localization.getLocalizedString("could.not.resolve.isbn", enteredIsbn));
+    }
   }
 
   protected void showEditReferenceDialog(ResolveIsbnResult result) {
