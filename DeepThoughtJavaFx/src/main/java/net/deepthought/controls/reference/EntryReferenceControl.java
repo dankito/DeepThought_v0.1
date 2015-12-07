@@ -25,6 +25,7 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.dialogs.AddReferenceFromIsbnDialog;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -49,7 +49,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -301,42 +300,11 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
   }
 
   protected void handleNewReferenceFromIsbnNumberItemClicked(ActionEvent event) {
-    showEnterIsbnDialog(null, null);
-  }
-
-  protected void showEnterIsbnDialog(final String lastEnteredIsbn, final String lastEnteredIsbnErrorText) {
-    if(Platform.isFxApplicationThread())
-      showEnterIsbnDialogOnUiThread(lastEnteredIsbn, lastEnteredIsbnErrorText);
-    else
-      Platform.runLater(() -> showEnterIsbnDialogOnUiThread(lastEnteredIsbn, lastEnteredIsbnErrorText));
-  }
-
-  protected void showEnterIsbnDialogOnUiThread(String lastEnteredIsbn, String lastEnteredIsbnErrorText) {
-    TextInputDialog dialog = new TextInputDialog(lastEnteredIsbn);
-    dialog.initOwner(getScene().getWindow());
-    dialog.setHeaderText(lastEnteredIsbnErrorText);
-    dialog.setTitle(Localization.getLocalizedString("enter.isbn.dialog.title"));
-    dialog.setContentText(Localization.getLocalizedString("enter.isbn"));
-
-    waitForAndHandleUserIsbnInput(dialog);
-  }
-
-  protected void waitForAndHandleUserIsbnInput(TextInputDialog dialog) {
-    Optional<String> result = dialog.showAndWait();
-    if (result.isPresent()){
-      getReferenceForIsbn(result.get(), dialog);
-    }
-  }
-
-  protected void getReferenceForIsbn(final String enteredIsbn, final TextInputDialog askForIsbnDialog) {
-    Application.getIsbnResolver().resolveIsbnAsync(enteredIsbn, new IsbnResolvingListener() {
+    new AddReferenceFromIsbnDialog().showAsync(getScene().getWindow(), new IsbnResolvingListener() {
       @Override
       public void isbnResolvingDone(ResolveIsbnResult result) {
         if(result.isSuccessful()) {
-          showEditReferenceDialog(result.getResolvedReference());
-        }
-        else {
-          showEnterIsbnDialog(enteredIsbn, Localization.getLocalizedString("could.not.resolve.isbn", enteredIsbn));
+          selectedReferenceBaseChanged(result.getResolvedReference());
         }
       }
     });

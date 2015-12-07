@@ -14,13 +14,17 @@ public class ResolveIsbnResult {
   protected Reference resolvedReference;
 
 
+  public ResolveIsbnResult(boolean successful) {
+    this.successful = successful;
+  }
+
   public ResolveIsbnResult(Exception error) {
-    this.successful = false;
+    this(false);
     this.error = error;
   }
 
   public ResolveIsbnResult(Reference resolvedReference) {
-    this.successful = resolvedReference != null;
+    this(resolvedReference != null);
     this.resolvedReference = resolvedReference;
   }
 
