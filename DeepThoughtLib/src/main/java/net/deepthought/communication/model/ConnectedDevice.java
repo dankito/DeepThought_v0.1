@@ -26,6 +26,8 @@ public class ConnectedDevice {
 
   protected boolean canDoOcr = false;
 
+  protected boolean canScanBarcodes = false;
+
   protected Device device = null;
 
 
@@ -35,10 +37,11 @@ public class ConnectedDevice {
     this.messagesPort = messagesPort;
   }
 
-  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort, boolean hasCaptureDevice, boolean canDoOcr) {
+  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort, boolean hasCaptureDevice, boolean canDoOcr, boolean canScanBarcodes) {
     this(uniqueDeviceId, address, messagesPort);
     this.hasCaptureDevice = hasCaptureDevice;
     this.canDoOcr = canDoOcr;
+    this.canScanBarcodes = canScanBarcodes;
   }
 
 
@@ -68,6 +71,14 @@ public class ConnectedDevice {
 
   public void setCanDoOcr(boolean canDoOcr) {
     this.canDoOcr = canDoOcr;
+  }
+
+  public boolean isCanScanBarcodes() {
+    return canScanBarcodes;
+  }
+
+  public void setCanScanBarcodes(boolean canScanBarcodes) {
+    this.canScanBarcodes = canScanBarcodes;
   }
 
   public Device getDevice() {

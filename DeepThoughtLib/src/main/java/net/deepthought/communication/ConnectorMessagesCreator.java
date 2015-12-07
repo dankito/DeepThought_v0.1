@@ -172,6 +172,7 @@ public class ConnectorMessagesCreator {
     // TODO: try to get rid of static method calls
     if(Application.getPlatformConfiguration() != null) {
       localHost.setHasCaptureDevice(Application.getPlatformConfiguration().hasCaptureDevice());
+      localHost.setCanScanBarcodes(Application.getPlatformConfiguration().canScanBarcodes());
     }
     if(Application.getContentExtractorManager() != null) {
       localHost.setCanDoOcr(Application.getContentExtractorManager().hasOcrContentExtractors());

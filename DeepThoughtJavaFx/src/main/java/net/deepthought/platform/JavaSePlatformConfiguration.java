@@ -37,6 +37,11 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
+  public boolean canScanBarcodes() {
+    return false;
+  }
+
+  @Override
   public String getLineSeparator() {
     return System.lineSeparator();
   }

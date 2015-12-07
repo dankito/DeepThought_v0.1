@@ -56,6 +56,11 @@ public class AndroidPlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
+  public boolean canScanBarcodes() {
+    return hasCaptureDevice();
+  }
+
+  @Override
   public String getLineSeparator() {
     if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(19))
       return System.lineSeparator();

@@ -17,6 +17,8 @@ public interface IPlatformConfiguration {
 
   boolean hasCaptureDevice();
 
+  boolean canScanBarcodes();
+
   String getLineSeparator();
 
   String getTempDir();
