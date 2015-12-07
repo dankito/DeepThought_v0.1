@@ -1,15 +1,7 @@
 package net.deepthought.dialogs;
 
 import net.deepthought.Application;
-import net.deepthought.controller.ChildWindowsController;
-import net.deepthought.controller.ChildWindowsControllerListener;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controller.enums.DialogResult;
-import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Reference;
-import net.deepthought.data.model.ReferenceBase;
-import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.isbn.IsbnResolvingListener;
@@ -17,7 +9,6 @@ import net.deepthought.util.isbn.ResolveIsbnResult;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputDialog;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 /**
@@ -91,52 +82,7 @@ public class AddReferenceFromIsbnDialog {
   }
 
   protected void showEditReferenceDialog(ResolveIsbnResult result) {
-    Dialogs.showEditReferenceDialog(result.getResolvedReference(), new ChildWindowsControllerListener() {
-      @Override
-      public void windowClosing(Stage stage, ChildWindowsController controller) {
-        mayPersistResolvedReferenceAndDispatchResult(controller, result);
-      }
-
-      @Override
-      public void windowClosed(Stage stage, ChildWindowsController controller) {
-
-      }
-    });
-  }
-
-  protected void mayPersistResolvedReferenceAndDispatchResult(ChildWindowsController controller, ResolveIsbnResult result) {
-    if(controller.getDialogResult() == DialogResult.Ok) {
-      persistResolvedReference(result.getResolvedReference());
-    }
-
-    dispatchResult(result, controller);
-  }
-
-  protected void persistResolvedReference(ReferenceBase referenceBase) {
-    if(referenceBase != null && referenceBase.isPersisted() == false) {
-      DeepThought deepThought = Application.getDeepThought();
-
-      if(referenceBase instanceof SeriesTitle) {
-        deepThought.addSeriesTitle((SeriesTitle)referenceBase);
-      }
-      else if(referenceBase instanceof Reference) {
-        deepThought.addReference((Reference)referenceBase);
-      }
-      else if(referenceBase instanceof ReferenceSubDivision) {
-        deepThought.addReferenceSubDivision((ReferenceSubDivision)referenceBase);
-      }
-    }
-  }
-
-  protected void dispatchResult(ResolveIsbnResult result, ChildWindowsController controller) {
-    if(listener != null) {
-      if(controller.getDialogResult() == DialogResult.Ok) {
-        listener.isbnResolvingDone(result);
-      }
-      else {
-        listener.isbnResolvingDone(new ResolveIsbnResult(false));
-      }
-    }
+    Dialogs.showEditReferenceDialogAndPersistOnResultOk(result, listener);
   }
 
 }

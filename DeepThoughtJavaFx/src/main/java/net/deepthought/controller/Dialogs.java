@@ -9,14 +9,20 @@ import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.Category;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.isbn.IsbnResolvingListener;
+import net.deepthought.util.isbn.ResolveIsbnResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -364,6 +370,20 @@ public class Dialogs {
   }
 
 
+  public static void showEditReferenceDialogAndPersistOnResultOk(final ResolveIsbnResult result, final IsbnResolvingListener listener) {
+    showEditReferenceDialog(result.getResolvedReference(), null, new ChildWindowsControllerListener() {
+      @Override
+      public void windowClosing(Stage stage, ChildWindowsController controller) {
+        mayPersistResolvedReferenceAndDispatchResult(result, controller, listener);
+      }
+
+      @Override
+      public void windowClosed(Stage stage, ChildWindowsController controller) {
+
+      }
+    });
+  }
+
   public static void showEditReferenceDialog(EntryCreationResult creationResult) {
     showEditReferenceDialog(null, null, creationResult, null);
   }
@@ -423,6 +443,42 @@ public class Dialogs {
       dialogStage.requestFocus();
     } catch(Exception ex) {
       log.error("Could not load / show EditReferenceDialog", ex);
+    }
+  }
+
+
+  protected static void mayPersistResolvedReferenceAndDispatchResult(ResolveIsbnResult result, ChildWindowsController controller, IsbnResolvingListener listener) {
+    if(controller.getDialogResult() == DialogResult.Ok) {
+      persistResolvedReference(result.getResolvedReference());
+    }
+
+    dispatchResult(result, controller, listener);
+  }
+
+  protected static void persistResolvedReference(ReferenceBase referenceBase) {
+    if(referenceBase != null && referenceBase.isPersisted() == false) {
+      DeepThought deepThought = Application.getDeepThought();
+
+      if(referenceBase instanceof SeriesTitle) {
+        deepThought.addSeriesTitle((SeriesTitle)referenceBase);
+      }
+      else if(referenceBase instanceof Reference) {
+        deepThought.addReference((Reference)referenceBase);
+      }
+      else if(referenceBase instanceof ReferenceSubDivision) {
+        deepThought.addReferenceSubDivision((ReferenceSubDivision)referenceBase);
+      }
+    }
+  }
+
+  protected static void dispatchResult(ResolveIsbnResult result, ChildWindowsController controller, IsbnResolvingListener listener) {
+    if(listener != null) {
+      if(controller.getDialogResult() == DialogResult.Ok) {
+        listener.isbnResolvingDone(result);
+      }
+      else {
+        listener.isbnResolvingDone(new ResolveIsbnResult(false));
+      }
     }
   }
 
