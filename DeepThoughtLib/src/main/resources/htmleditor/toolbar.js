@@ -440,17 +440,32 @@ function groupInsertItems(editor) {
 //        order: 60
 //    };
 
-    items.smiley = {
-        label: editor.lang.smiley.toolbar,
+    items.symbol = {
+        label: editor.lang.symbol.toolbar,
         group: 'insert_group',
-        command: 'smiley',
+        command: 'symbol',
         order: 60
     };
 
-    items.specialchar = {
-        label: editor.lang.specialchar.toolbar,
+    items.eqneditor = {
+        label: editor.lang.eqneditor.toolbar,
         group: 'insert_group',
-        command: 'specialchar',
+        command: 'eqneditorDialog',
+        order: 60
+    };
+
+// TODO: translate
+    items.texzilla = {
+        label: "Insert MathML based on (La)TeX",
+        group: 'insert_group',
+        command: 'texzillaDialog',
+        order: 60
+    };
+
+    items.chart = {
+        label: editor.lang.chart.chart,
+        group: 'insert_group',
+        command: 'chart',
         order: 60
     };
 

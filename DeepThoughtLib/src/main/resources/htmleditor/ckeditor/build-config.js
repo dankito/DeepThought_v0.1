@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/be79b339d8f5fe6c3a4bd4472afd5fcb
+ * (2) http://ckeditor.com/builder/42040f44cbca0fad343f6dbe3482536f
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/be79b339d8f5fe6c3a4bd4472afd5fcb
+ * (3) http://ckeditor.com/builder/download/42040f44cbca0fad343f6dbe3482536f
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -55,6 +55,7 @@ var CKBUILDER_CONFIG = {
 		'basicstyles' : 1,
 		'bidi' : 1,
 		'blockquote' : 1,
+		'chart' : 1,
 		'clipboard' : 1,
 		'colorbutton' : 1,
 		'colordialog' : 1,
@@ -62,6 +63,7 @@ var CKBUILDER_CONFIG = {
 		'dialogadvtab' : 1,
 		'enterkey' : 1,
 		'entities' : 1,
+		'eqneditor' : 1,
 		'filebrowser' : 1,
 		'find' : 1,
 		'floatingspace' : 1,
@@ -70,6 +72,7 @@ var CKBUILDER_CONFIG = {
 		'horizontalrule' : 1,
 		'htmlwriter' : 1,
 		'image' : 1,
+		'imagerotate' : 1,
 		'indentblock' : 1,
 		'indentlist' : 1,
 		'justify' : 1,
@@ -94,10 +97,12 @@ var CKBUILDER_CONFIG = {
 		'sourcearea' : 1,
 		'specialchar' : 1,
 		'stylescombo' : 1,
+		'symbol' : 1,
 		'tab' : 1,
 		'table' : 1,
 		'tableresize' : 1,
 		'tabletools' : 1,
+		'texzilla' : 1,
 		'toolbar' : 1,
 		'undo' : 1,
 		'videodetector' : 1,

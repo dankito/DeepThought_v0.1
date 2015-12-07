@@ -10,7 +10,7 @@ var resetUndoStack = false;
 function initializeCKEditor() {
 
 	CKEDITOR.env.isCompatible = true;
-	CKEDITOR.config.removePlugins = 'elementspath,resize';
+	CKEDITOR.config.removePlugins = 'elementspath,resize,specialchar';
 
 	editor = CKEDITOR.replace( 'editor', {
 	   	top: 0,
