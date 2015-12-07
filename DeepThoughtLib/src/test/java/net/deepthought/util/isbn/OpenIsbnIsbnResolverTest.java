@@ -3,6 +3,7 @@ package net.deepthought.util.isbn;
 import net.deepthought.data.html.JsoupHtmlHelper;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.util.ObjectHolder;
 import net.deepthought.util.ThreadPool;
 
@@ -55,9 +56,13 @@ public class OpenIsbnIsbnResolverTest {
 
     assertResolvingWasSuccessful(resultHolder);
 
-    Reference reference = resultHolder.get().getResolvedReference();
-    Assert.assertEquals("On The Road To Mandalay (Asian Portraits)", reference.getTitle());
-    Assert.assertEquals("284", reference.getLength());
+    ReferenceBase referenceBase = resultHolder.get().getResolvedReference();
+    Assert.assertEquals("On The Road To Mandalay (Asian Portraits)", referenceBase.getTitle());
+    Assert.assertEquals("284", referenceBase.getLength());
+
+    Assert.assertTrue(referenceBase instanceof Reference);
+
+    Reference reference = (Reference)referenceBase;
     Assert.assertEquals("9789748299259", reference.getIsbnOrIssn());
     Assert.assertEquals(dateFormat.parse("2006-08-02"), reference.getPublishingDate());
 
@@ -86,9 +91,13 @@ public class OpenIsbnIsbnResolverTest {
 
     assertResolvingWasSuccessful(resultHolder);
 
-    Reference reference = resultHolder.get().getResolvedReference();
-    Assert.assertEquals("Orbis Romanus. Lateinische Elementargrammatik", reference.getTitle());
-    Assert.assertEquals("125", reference.getLength());
+    ReferenceBase referenceBase = resultHolder.get().getResolvedReference();
+    Assert.assertEquals("Orbis Romanus. Lateinische Elementargrammatik", referenceBase.getTitle());
+    Assert.assertEquals("125", referenceBase.getLength());
+
+    Assert.assertTrue(referenceBase instanceof Reference);
+
+    Reference reference = (Reference)referenceBase;
     Assert.assertEquals("9783140103305", reference.getIsbnOrIssn());
     Assert.assertEquals(dateFormat.parse("1975-01-01"), reference.getPublishingDate());
 
@@ -117,9 +126,13 @@ public class OpenIsbnIsbnResolverTest {
 
     assertResolvingWasSuccessful(resultHolder);
 
-    Reference reference = resultHolder.get().getResolvedReference();
-    Assert.assertEquals("Head First Design Patterns", reference.getTitle());
-    Assert.assertEquals("688", reference.getLength());
+    ReferenceBase referenceBase = resultHolder.get().getResolvedReference();
+    Assert.assertEquals("Head First Design Patterns", referenceBase.getTitle());
+    Assert.assertEquals("688", referenceBase.getLength());
+
+    Assert.assertTrue(referenceBase instanceof Reference);
+
+    Reference reference = (Reference)referenceBase;
     Assert.assertEquals("9780596007126", reference.getIsbnOrIssn());
     Assert.assertEquals(dateFormat.parse("2004-11-01"), reference.getPublishingDate());
 
@@ -145,9 +158,13 @@ public class OpenIsbnIsbnResolverTest {
 
     assertResolvingWasSuccessful(resultHolder);
 
-    Reference reference = resultHolder.get().getResolvedReference();
-    Assert.assertEquals("Vaadin: Der Kompakte Einstieg Für Java-Entwickler (Mit Einem Geleitwort Von Ville Ingmann, Vaadin Advocate)", reference.getTitle());
-    Assert.assertEquals("280", reference.getLength());
+    ReferenceBase referenceBase = resultHolder.get().getResolvedReference();
+    Assert.assertEquals("Vaadin: Der Kompakte Einstieg Für Java-Entwickler (Mit Einem Geleitwort Von Ville Ingmann, Vaadin Advocate)", referenceBase.getTitle());
+    Assert.assertEquals("280", referenceBase.getLength());
+
+    Assert.assertTrue(referenceBase instanceof Reference);
+
+    Reference reference = (Reference)referenceBase;
     Assert.assertEquals("9783864902062", reference.getIsbnOrIssn());
     Assert.assertEquals(dateFormat.parse("2014-11-27"), reference.getPublishingDate());
 

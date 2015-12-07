@@ -1,6 +1,6 @@
 package net.deepthought.util.isbn;
 
-import net.deepthought.data.model.Reference;
+import net.deepthought.data.model.ReferenceBase;
 
 /**
  * Created by ganymed on 05/12/15.
@@ -11,7 +11,7 @@ public class ResolveIsbnResult {
 
   protected Exception error;
 
-  protected Reference resolvedReference;
+  protected ReferenceBase resolvedReference;
 
 
   public ResolveIsbnResult(boolean successful) {
@@ -23,7 +23,7 @@ public class ResolveIsbnResult {
     this.error = error;
   }
 
-  public ResolveIsbnResult(Reference resolvedReference) {
+  public ResolveIsbnResult(ReferenceBase resolvedReference) {
     this(resolvedReference != null);
     this.resolvedReference = resolvedReference;
   }
@@ -37,7 +37,7 @@ public class ResolveIsbnResult {
     return error;
   }
 
-  public Reference getResolvedReference() {
+  public ReferenceBase getResolvedReference() {
     return resolvedReference;
   }
 
