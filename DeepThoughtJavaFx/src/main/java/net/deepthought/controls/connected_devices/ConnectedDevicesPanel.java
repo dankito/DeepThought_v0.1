@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
@@ -30,10 +30,12 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
 
   public ConnectedDevicesPanel() {
-    setupUi();
+    setup();
   }
 
-  protected void setupUi() {
+  protected void setup() {
+    setupUi();
+
     Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
 
     for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices()) {
@@ -41,6 +43,11 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
         addConnectedDeviceIcon(connectedDevice);
     }
   }
+
+  protected void setupUi() {
+    this.setAlignment(Pos.CENTER_LEFT);
+  }
+
 
   protected abstract boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice);
 
@@ -54,7 +61,9 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
-      Platform.runLater(() -> addConnectedDeviceIcon(device));
+      if(checkIfConnectedDeviceShouldBeShown(device)) {
+        Platform.runLater(() -> addConnectedDeviceIcon(device));
+      }
     }
 
     @Override

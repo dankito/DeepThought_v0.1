@@ -10,6 +10,7 @@ import net.deepthought.controller.enums.FieldWithUnsavedChanges;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.NewOrEditButton;
+import net.deepthought.controls.connected_devices.ScanIsbnConnectedDevicesPanel;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
@@ -79,6 +80,8 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
   protected HBox paneSelectedReferenceBase;
   @FXML
   protected NewOrEditButton btnNewOrEditReference;
+
+  protected ScanIsbnConnectedDevicesPanel connectedDevicesPanel;
 
   @FXML
   protected TextField txtfldReferenceIndication;
@@ -241,6 +244,10 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     MenuItem newReferenceFromIsbnNumberItem = new MenuItem(Localization.getLocalizedString("new.reference.from.isbn.number"));
     newReferenceFromIsbnNumberItem.setOnAction(event -> handleNewReferenceFromIsbnNumberItemClicked(event));
     btnNewOrEditReference.getItems().add(newReferenceFromIsbnNumberItem);
+
+    connectedDevicesPanel = new ScanIsbnConnectedDevicesPanel(isbnResolvingListener);
+    titlePane.getChildren().add(3, connectedDevicesPanel);
+    HBox.setMargin(connectedDevicesPanel, new Insets(0, 0, 0, 6));
 
     Label lblIndication = new Label();
     JavaFxLocalization.bindLabeledText(lblIndication, "indication");
@@ -443,6 +450,16 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
 
+    }
+  };
+
+
+  protected IsbnResolvingListener isbnResolvingListener = new IsbnResolvingListener() {
+    @Override
+    public void isbnResolvingDone(ResolveIsbnResult result) {
+      if(result.isSuccessful()) {
+        selectedReferenceBaseChanged(result.getResolvedReference());
+      }
     }
   };
 
