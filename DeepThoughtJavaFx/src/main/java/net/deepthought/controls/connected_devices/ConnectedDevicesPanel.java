@@ -30,11 +30,11 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
 
   public ConnectedDevicesPanel() {
-    setup();
+    init();
   }
 
-  protected void setup() {
-    setupUi();
+  protected void init() {
+    initUi();
 
     Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
 
@@ -44,7 +44,7 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
     }
   }
 
-  protected void setupUi() {
+  protected void initUi() {
     this.setAlignment(Pos.CENTER_LEFT);
   }
 

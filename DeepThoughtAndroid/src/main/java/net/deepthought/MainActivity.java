@@ -361,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       case EditEntryActivity.RequestCode:
         if(resultCode == RESULT_OK && data != null) {
           // Entry has been updated
+          ActivityManager.getInstance().resetEditEntryActivityCachedData();
         }
         break;
       case CaptureImageForConnectPeerRequestCode:

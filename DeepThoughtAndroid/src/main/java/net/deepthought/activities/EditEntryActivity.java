@@ -212,8 +212,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       setTextViewEditEntryTags();
     }
-
-    ActivityManager.getInstance().resetEditEntryActivityCachedData();
   }
 
   @Override

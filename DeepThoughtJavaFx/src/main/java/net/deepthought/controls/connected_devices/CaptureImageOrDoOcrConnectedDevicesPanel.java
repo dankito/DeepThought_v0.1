@@ -45,17 +45,16 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   public CaptureImageOrDoOcrConnectedDevicesPanel(CaptureImageResultListener captureImageResultListener, CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener) {
     this.captureImageResultListener = captureImageResultListener;
     this.captureImageAndDoOcrResultListener = captureImageAndDoOcrResultListener;
+
+    initLabelDoOcrProgress();
   }
 
 
-  @Override
-  protected void setupUi() {
+  protected void initLabelDoOcrProgress() {
     lblDoOcrProgress = new Label();
     lblDoOcrProgress.setVisible(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblDoOcrProgress);
-    this.getChildren().add(lblDoOcrProgress);
-
-    super.setupUi();
+    this.getChildren().add(0, lblDoOcrProgress);
   }
 
   protected boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice) {

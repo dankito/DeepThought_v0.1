@@ -63,8 +63,6 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     ListView lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
-
-    ActivityManager.getInstance().resetShowArticlesOverviewActivityCachedData();
   }
 
 
