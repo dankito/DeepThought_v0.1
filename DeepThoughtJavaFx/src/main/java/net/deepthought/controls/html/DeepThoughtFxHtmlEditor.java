@@ -64,7 +64,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
     loadCKEditor();
 
-    testEvents();
+//    testEvents();
   }
 
   protected void loadCKEditor() {
@@ -114,6 +114,13 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
 
   protected void testEvents() {
+    engine.locationProperty().addListener(new ChangeListener<String>() {
+      @Override
+      public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+      }
+    });
+
     engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
       @Override
       public void handle(WebEvent<String> event) {
