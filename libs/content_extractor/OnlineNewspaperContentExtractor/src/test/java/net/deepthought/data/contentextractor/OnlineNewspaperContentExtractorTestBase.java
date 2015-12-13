@@ -66,7 +66,7 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
 
     Assert.assertNotNull(result.getReference());
     Assert.assertNotNull(result.getReference().getIssueOrPublishingDate());
-    Assert.assertNotNull(result.getReference().getPublishingDate());
+//    Assert.assertNotNull(result.getReference().getPublishingDate()); // can be null e.g. for Sueddeutsche Magazin: issue 32/2015 cannot be parsed to a Date
 
     Assert.assertNotNull(result.getReferenceSubDivision());
     Assert.assertTrue(StringUtils.isNotNullOrEmpty(result.getReferenceSubDivision().getTitle()));

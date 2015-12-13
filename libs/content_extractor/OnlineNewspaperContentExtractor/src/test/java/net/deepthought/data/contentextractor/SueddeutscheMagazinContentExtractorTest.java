@@ -44,4 +44,11 @@ public class SueddeutscheMagazinContentExtractorTest extends GermanOnlineNewspap
     testImportedArticleValues(creationResult, 7815, "04.09.2015", "Der britische Komponist Max Richter steht vor einer besonderen Uraufführung", "»Ein Pausenknopf für das Leben«",
         "Der britische Komponist Max Richter steht vor einer besonderen Uraufführung: Sein neuestes Werk »Sleep« dauert acht Stunden, im Zuschauerraum stehen 500 Feldbetten. Denn es ist zum Einschlafen.");
   }
+
+  @Test
+  public void freiehitIstKapitalistischerMainstream_DateGetsExtractedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43404/Freiheit-ist-kapitalistischer-Mainstream");
+    testImportedArticleValues(creationResult, 11962, "32/2015", "Cornelia Koppetsch im Interview", "»Freiheit ist kapitalistischer Mainstream«",
+        "Die Mittelschicht schafft sich ab, Bildungsabschlüsse verlieren an Wert, und der Neoliberalismus vereinnahmt selbst diejenigen, die ihn bekämpfen sollten – beste Voraussetzungen, um das ganze Gesellschaftssystem ins Wanken zu bringen, meint die Soziologin Cornelia Koppetsch.");
+  }
 }

@@ -342,8 +342,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
         } else if (issueOrPublishingDate.length() == 7) { // month and year - separated by any sign - are set
           try {
             int month = Integer.parseInt(issueOrPublishingDate.substring(0, 2)) - 1;
-            int year = Integer.parseInt(issueOrPublishingDate.substring(3, 7)) - 1900;
-            return new Date(year, month, 1);
+            if(month < 12) {
+              int year = Integer.parseInt(issueOrPublishingDate.substring(3, 7)) - 1900;
+              return new Date(year, month, 1);
+            }
           } catch (Exception ex2) {
           }
         } else { // if String has been set by DatePicker control
