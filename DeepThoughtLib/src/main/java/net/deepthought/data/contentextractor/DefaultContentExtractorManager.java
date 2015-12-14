@@ -24,6 +24,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
 
   public DefaultContentExtractorManager() {
+    contentExtractors.add(new BasicWebPageContentExtractor());
 //    addContentExtractor(new DefaultLocalFileContentExtractor());
 //    addContentExtractor(new RemoteFileContentExtractor());
   }
@@ -95,26 +96,21 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
   protected ContentExtractOptions createContentExtractOptionsFromUrls(List<String> urls) {
     for(String url : urls) {
+      // TODO: what about the remaining urls if a previous one succeeds?
       for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
         if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-          ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, false);
-          contentExtractOptions.addContentExtractOption(new ContentExtractOption(onlineArticleContentExtractor, url, true));
-          return contentExtractOptions;
+          return onlineArticleContentExtractor.createExtractOptionsForUrl(url);
         }
       }
 
-      if(isAttachableFile(url)) {
-        ContentExtractOptions contentExtractOptions = new ContentExtractOptions(url, canSetFileAsEntryContent(url));
-        for(IOcrContentExtractor textContentExtractor : ocrContentExtractors) {
-          if(textContentExtractor.canCreateEntryFromUrl(url))
-            contentExtractOptions.addContentExtractOption(new ContentExtractOption(textContentExtractor, url, true));
+      for(IContentExtractor contentExtractor : contentExtractors) {
+        if(contentExtractor.canCreateEntryFromUrl(url)) {
+          return contentExtractor.createExtractOptionsForUrl(url);
         }
-
-        return contentExtractOptions; // TODO: what about other files / urls if one of the first files already succeed?
       }
     }
 
-    return null;
+    return new ContentExtractOptions();
   }
 
   protected boolean isAttachableFile(String url) {

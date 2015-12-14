@@ -7,6 +7,7 @@ import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.SeriesTitle;
+import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtractorBase {
+public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtractorBase implements IPlugin {
 
   private final static Logger log = LoggerFactory.getLogger(WikipediaOnlineContentExtractor.class);
 
@@ -48,6 +49,21 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
   @Override
   public String getIconUrl() {
     return null; // TODO
+  }
+
+
+  @Override
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    ContentExtractOptions options = new ContentExtractOptions(url, getSiteBaseUrl());
+
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "create.entry.from.online.article", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        listener.extractingContentDone(createEntryFromArticle(option.getUrl()));
+      }
+    }));
+
+    return options;
   }
 
   @Override

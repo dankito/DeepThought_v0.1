@@ -17,17 +17,14 @@ public class InputManager {
     return instance;
   }
 
-  protected KeyCombination createEntryFromClipboardDirectlyAddEntryKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN);
 
-  protected KeyCombination createEntryFromClipboardViewNewEntryFirstKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+  protected KeyCombination firstContentExtractOptionKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
 
-  protected KeyCombination createEntryFromClipboardSetAsEntryContentKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN);
+  protected KeyCombination secondContentExtractOptionKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN);
 
-  protected KeyCombination createEntryFromClipboardAddAsFileAttachmentKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN);
+  protected KeyCombination thirdContentExtractOptionKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
-  protected KeyCombination createEntryFromClipboardTryToExtractTextKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
-
-  protected KeyCombination createEntryFromClipboardAddAsFileAttachmentAndTryToExtractTextKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN,
+  protected KeyCombination forthContentExtractOptionKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.SHORTCUT_DOWN,
       KeyCombination.SHIFT_DOWN, KeyCombination.ALT_DOWN);
 
 
@@ -35,27 +32,20 @@ public class InputManager {
 
   }
 
-  public KeyCombination getCreateEntryFromClipboardDirectlyAddEntryKeyCombination() {
-    return createEntryFromClipboardDirectlyAddEntryKeyCombination;
+
+  public KeyCombination getFirstContentExtractOptionKeyCombination() {
+    return firstContentExtractOptionKeyCombination;
   }
 
-  public KeyCombination getCreateEntryFromClipboardViewNewEntryFirstKeyCombination() {
-    return createEntryFromClipboardViewNewEntryFirstKeyCombination;
+  public KeyCombination getSecondContentExtractOptionKeyCombination() {
+    return secondContentExtractOptionKeyCombination;
   }
 
-  public KeyCombination getCreateEntryFromClipboardSetAsEntryContentKeyCombination() {
-    return createEntryFromClipboardSetAsEntryContentKeyCombination;
+  public KeyCombination getThirdContentExtractOptionKeyCombination() {
+    return thirdContentExtractOptionKeyCombination;
   }
 
-  public KeyCombination getCreateEntryFromClipboardAddAsFileAttachmentKeyCombination() {
-    return createEntryFromClipboardAddAsFileAttachmentKeyCombination;
-  }
-
-  public KeyCombination getCreateEntryFromClipboardTryToExtractTextKeyCombination() {
-    return createEntryFromClipboardTryToExtractTextKeyCombination;
-  }
-
-  public KeyCombination getCreateEntryFromClipboardAddAsFileAttachmentAndTryToExtractTextKeyCombination() {
-    return createEntryFromClipboardAddAsFileAttachmentAndTryToExtractTextKeyCombination;
+  public KeyCombination getForthContentExtractOptionKeyCombination() {
+    return forthContentExtractOptionKeyCombination;
   }
 }

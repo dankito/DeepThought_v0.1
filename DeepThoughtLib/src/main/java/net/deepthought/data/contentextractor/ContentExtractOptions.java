@@ -1,6 +1,5 @@
 package net.deepthought.data.contentextractor;
 
-import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 import net.deepthought.util.file.FileUtils;
 
 import java.util.ArrayList;
@@ -17,6 +16,8 @@ public class ContentExtractOptions {
 
   protected boolean isUrl = false;
 
+  protected String sourceShortName = null;
+
   protected boolean canSetFileAsEntryContent = false;
 
 
@@ -25,12 +26,17 @@ public class ContentExtractOptions {
   }
 
   public ContentExtractOptions(String url) {
-    this.source = url;
-    this.isUrl = true;
+    this(url, false);
+  }
+
+  public ContentExtractOptions(String url, String sourceShortName) {
+    this(url);
+    this.sourceShortName = sourceShortName;
   }
 
   public ContentExtractOptions(String url, boolean canSetFileAsEntryContent) {
-    this(url);
+    this.source = url;
+    this.isUrl = true;
     this.canSetFileAsEntryContent = canSetFileAsEntryContent;
   }
 
@@ -64,135 +70,23 @@ public class ContentExtractOptions {
     return isLocalFile() || isRemoteFile();
   }
 
-  public boolean isLocalFileContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof ILocalFileContentExtractor &&
-          contentExtractOption.getContentExtractor() instanceof IRemoteFileContentExtractor == false)
-        return true;
-    }
-
-    return false;
-  }
-
-  public ILocalFileContentExtractor getLocalFileContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof ILocalFileContentExtractor &&
-          contentExtractOption.getContentExtractor() instanceof IRemoteFileContentExtractor == false)
-        return (ILocalFileContentExtractor)contentExtractOption.getContentExtractor();
-    }
-
-    return null;
-  }
-
-  public boolean isRemoteFileContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof IRemoteFileContentExtractor)
-        return true;
-    }
-
-    return false;
-  }
-
-  public IRemoteFileContentExtractor getRemoteFileContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof IRemoteFileContentExtractor)
-        return (IRemoteFileContentExtractor)contentExtractOption.getContentExtractor();
-    }
-
-    return null;
-  }
-
-  public boolean isOnlineArticleContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof IOnlineArticleContentExtractor)
-        return true;
-    }
-
-    return false;
-  }
-
-  public boolean isTextContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof IOcrContentExtractor)
-        return true;
-    }
-
-    return false;
-  }
-
-  public IOcrContentExtractor getTextContentExtractor() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.getContentExtractor() instanceof IOcrContentExtractor)
-        return (IOcrContentExtractor)contentExtractOption.getContentExtractor();
-    }
-
-    return null;
-  }
-
-
-  public boolean canExtractText() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.canExtractText())
-        return true;
-    }
-
-    return false;
-  }
-
-  public ContentExtractOption getExtractTextOption() {
-    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-      if(contentExtractOption.canExtractText())
-        return contentExtractOption;
-    }
-
-    return null;
-  }
-
-  public boolean canAttachFileToEntry() {
-//    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-//      if(contentExtractOption.canAttachFileToEntry())
-//        return true;
-//    }
-//
-//    return false;
-
-    return isUrl();
-  }
-
-//  public ContentExtractOption getAttachFileToEntryOption() {
-//    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-//      if(contentExtractOption.canAttachFileToEntry())
-//        return contentExtractOption;
-//    }
-//
-//    return null;
-//  }
-
-  public boolean canSetFileAsEntryContent() {
-//    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-//      if(contentExtractOption.canSetFileAsEntryContent())
-//        return true;
-//    }
-//
-//    return false;
-
-    return canSetFileAsEntryContent;
-  }
-
-//  public ContentExtractOption getSetFileAsEntryContentOption() {
-//    for(ContentExtractOption contentExtractOption : contentExtractOptions) {
-//      if(contentExtractOption.canSetFileAsEntryContent())
-//        return contentExtractOption;
-//    }
-//
-//    return null;
-//  }
-
   public Object getSource() {
 //    if(contentExtractOptions.size() > 0)
 //      return contentExtractOptions.get(0).getSource();
 //    return null;
     return source;
+  }
+
+  public String getSourceShortName() {
+    if(sourceShortName == null) {
+      return source.toString();
+    }
+
+    return sourceShortName;
+  }
+
+  public void setSourceShortName(String sourceShortName) {
+    this.sourceShortName = sourceShortName;
   }
 
   public boolean isUrl() {

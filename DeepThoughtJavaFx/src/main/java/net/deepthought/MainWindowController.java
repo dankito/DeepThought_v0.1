@@ -14,7 +14,9 @@ import net.deepthought.communication.messages.request.StopRequestWithAsynchronou
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.CreateEntryFromClipboardContentPopup;
+import net.deepthought.controls.clipboard.ContentExtractOptionForUi;
+import net.deepthought.controls.clipboard.ContentExtractOptionForUiCreator;
+import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
@@ -115,6 +117,8 @@ public class MainWindowController implements Initializable {
   protected DeepThought deepThought = null;
 
   protected CreateEntryFromClipboardContentPopup createEntryFromClipboardContentPopup;
+
+  protected ContentExtractOptionForUiCreator contentExtractOptionForUiCreator = null;
 
   protected CategoryTreeItem selectedCategoryTreeItem = null;
 
@@ -675,59 +679,22 @@ public class MainWindowController implements Initializable {
   }
 
   protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
-    if(contentExtractOptions.isOnlineArticleContentExtractor())
-      createOnlineArticleClipboardMenuItems(contentExtractOptions);
-//    else if(contentExtractOptions.isRemoteFileContentExtractor())
-//      createRemoteFileClipboardMenuItems(contentExtractOptions);
-//    else if(contentExtractOptions.isLocalFileContentExtractor())
-//      createLocalFileClipboardMenuItems(contentExtractOptions);
-    else if(contentExtractOptions.isUrl())
-      createLocalFileClipboardMenuItems(contentExtractOptions);
+    List<ContentExtractOptionForUi> options = contentExtractOptionForUiCreator.createOptions(contentExtractOptions);
+
+    for(ContentExtractOptionForUi option : options) {
+      addClipboardMenuItem(option);
+    }
   }
 
-  protected void createOnlineArticleClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
-    final ContentExtractOption contentExtractOption = contentExtractOptions.getContentExtractOptions().get(0);
-    final IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)contentExtractOption.getContentExtractor();
+  protected void addClipboardMenuItem(final ContentExtractOptionForUi option) {
+    final MenuItem optionMenu = new MenuItem(option.getDisplayName());
+    if(option.getShortCut() != null) {
+      optionMenu.setAccelerator(option.getShortCut());
+    }
 
-    addClipboardMenuItem(contentExtractOptions, "create.entry.from.online.article.option.directly.add.entry", InputManager.getInstance().getCreateEntryFromClipboardDirectlyAddEntryKeyCombination(),
-        options -> createEntryFromClipboardContentPopup.directlyAddEntryFromOnlineArticle(contentExtractOption, contentExtractor));
-    addClipboardMenuItem(contentExtractOptions, "create.entry.from.online.article.option.view.new.entry.first", InputManager.getInstance().getCreateEntryFromClipboardViewNewEntryFirstKeyCombination(),
-        options -> createEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst(contentExtractOption, contentExtractor));
-  }
-
-  protected void createRemoteFileClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
-
-  }
-
-  protected void createLocalFileClipboardMenuItems(ContentExtractOptions contentExtractOptions) {
-    if(contentExtractOptions.canSetFileAsEntryContent())
-      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.set.as.entry.content",
-        InputManager.getInstance().getCreateEntryFromClipboardSetAsEntryContentKeyCombination(), options -> createEntryFromClipboardContentPopup.copyFileToDataFolderAndSetAsEntryContent(options));
-
-    if(contentExtractOptions.canAttachFileToEntry())
-      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.add.as.file.attachment",
-        InputManager.getInstance().getCreateEntryFromClipboardAddAsFileAttachmentKeyCombination(), options -> createEntryFromClipboardContentPopup.attachFileToEntry(options));
-
-    if(contentExtractOptions.canExtractText())
-      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.try.to.extract.text.from.it",
-        InputManager.getInstance().getCreateEntryFromClipboardTryToExtractTextKeyCombination(), options -> createEntryFromClipboardContentPopup.tryToExtractText(options));
-
-    if(contentExtractOptions.canAttachFileToEntry() && contentExtractOptions.canExtractText())
-      addClipboardMenuItem(contentExtractOptions, "create.entry.from.local.file.option.add.as.file.attachment.and.try.to.extract.text.from.it",
-        InputManager.getInstance().getCreateEntryFromClipboardAddAsFileAttachmentAndTryToExtractTextKeyCombination(), options -> createEntryFromClipboardContentPopup.attachFileToEntryAndTryToExtractText(options));
-  }
-
-  protected void addClipboardMenuItem(final ContentExtractOptions contentExtractOptions, String optionNameResourceKey, KeyCombination optionKeyCombination,
-                                      final OptionInvokedListener listener) {
-    final MenuItem optionMenu = new MenuItem(Localization.getLocalizedString(optionNameResourceKey));
-//    if(optionKeyCombination != null)
-    optionMenu.setAccelerator(optionKeyCombination);
     mnitmFileClipboard.getItems().add(optionMenu);
 
-    optionMenu.setOnAction(action -> {
-      if (listener != null)
-        listener.optionInvoked(contentExtractOptions);
-    });
+    optionMenu.setOnAction(action -> option.runAction(null));
   }
 
 
@@ -814,6 +781,7 @@ public class MainWindowController implements Initializable {
     this.stage = stage;
 
     this.createEntryFromClipboardContentPopup = new CreateEntryFromClipboardContentPopup(stage);
+    this.contentExtractOptionForUiCreator = new ContentExtractOptionForUiCreator(stage);
 
     stage.setOnHiding(new EventHandler<WindowEvent>() {
       @Override

@@ -8,17 +8,6 @@ import net.deepthought.util.file.FileUtils;
 public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
 
 
-  @Override
-  public int getSupportedPluginSystemVersion() {
-    return 1;
-  }
-
-  @Override
-  public String getPluginVersion() {
-    return "0.1";
-  }
-
-  @Override
   public String getName() {
     return Localization.getLocalizedString("remote.file.content.extractor");
   }
@@ -49,7 +38,12 @@ public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return false;
+    return canDownloadFile(url);
+  }
+
+  @Override
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    return null;
   }
 
   @Override
@@ -57,7 +51,8 @@ public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
 
   }
 
-  @Override
+  // TODO: move this logic to a better place
+//  @Override
   public ContentExtractOption canCreateEntryFromClipboardContent(ClipboardContent clipboardContent) {
     if(clipboardContent.hasUrl()) {
       if(canDownloadFile(clipboardContent.getUrl()))
@@ -71,8 +66,4 @@ public class RemoteFileContentExtractor implements IRemoteFileContentExtractor {
     return ContentExtractOption.CanNotExtractContent;
   }
 
-  @Override
-  public void createEntryFromClipboardContentAsync(ContentExtractOption contentExtractOption, CreateEntryListener listener) {
-
-  }
 }

@@ -1,18 +1,14 @@
 package net.deepthought.data.contentextractor;
 
-import net.deepthought.plugin.IPlugin;
-
 /**
  * Created by ganymed on 15/01/15.
  */
-public interface IContentExtractor extends IPlugin {
+public interface IContentExtractor {
 
   boolean canCreateEntryFromUrl(String url);
 
+  ContentExtractOptions createExtractOptionsForUrl(String url);
+
   void createEntryFromUrlAsync(String url, CreateEntryListener listener);
-
-  ContentExtractOption canCreateEntryFromClipboardContent(ClipboardContent clipboardContent);
-
-  void createEntryFromClipboardContentAsync(ContentExtractOption contentExtractOption, CreateEntryListener listener);
 
 }

@@ -1,5 +1,8 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.util.Localization;
+import net.deepthought.util.file.FileUtils;
+
 import java.io.File;
 
 import javafx.scene.image.Image;
@@ -25,6 +28,10 @@ public class ContentExtractOption {
   protected boolean isUrl = false;
   protected boolean isImage = false;
 
+  protected String translatedOptionName;
+
+  protected ExtractContentAction action;
+
 
   protected ContentExtractOption() {
     this(null, "", false, false, false);
@@ -32,6 +39,13 @@ public class ContentExtractOption {
 
   public ContentExtractOption(IContentExtractor contentExtractor, Object source, boolean canCreateEntryFromUrl) {
     this(contentExtractor, source, canCreateEntryFromUrl, false, false);
+  }
+
+  public ContentExtractOption(IContentExtractor contentExtractor, Object source, boolean canCreateEntryFromUrl, String optionNameResourceKey, ExtractContentAction action) {
+    this(contentExtractor, source, canCreateEntryFromUrl);
+
+    this.translatedOptionName = Localization.getLocalizedString(optionNameResourceKey);
+    this.action = action;
   }
 
   public ContentExtractOption(IContentExtractor contentExtractor, Object source, boolean canCreateEntryFromUrl, boolean canAttachFileToEntry, boolean canSetFileAsEntryContent) {
@@ -89,6 +103,42 @@ public class ContentExtractOption {
 
   public boolean isImage() {
     return isImage;
+  }
+
+
+  public boolean isLocalFile() {
+    return isUrl() && FileUtils.isLocalFile(getUrl());
+  }
+
+  public boolean isRemoteFile() {
+    return isUrl() && FileUtils.isRemoteFile(getUrl());
+  }
+
+  public boolean isFile() {
+    return isLocalFile() || isRemoteFile();
+  }
+
+  public String getTranslatedOptionName() {
+    return translatedOptionName;
+  }
+
+  public void setTranslatedOptionName(String translatedOptionName) {
+    this.translatedOptionName = translatedOptionName;
+  }
+
+  public ExtractContentAction getAction() {
+    return action;
+  }
+
+  public void setAction(ExtractContentAction action) {
+    this.action = action;
+  }
+
+
+  public void runAction(ExtractContentActionResultListener listener) {
+    if(action != null) {
+      action.runExtraction(this, listener);
+    }
   }
 
 

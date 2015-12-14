@@ -5,6 +5,8 @@ import net.deepthought.data.contentextractor.ocr.OcrContentExtractorBase;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
 
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -33,14 +35,33 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
 
 
   @Override
-  protected void createEntryFromUrl(String url, CreateEntryListener listener) {
-    if(listener != null)
-      listener.entryCreated(new EntryCreationResult(url, new Entry(url)));
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    ContentExtractOptions options = new ContentExtractOptions(url, getName());
+
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.text", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        if(listener != null) {
+          EntryCreationResult result = tryToExtractText(option.getUrl());
+          listener.extractingContentDone(result);
+        }
+      }
+    }));
+
+    return options;
   }
 
+
   @Override
-  protected void createEntryFromClipboardContent(ContentExtractOption contentExtractOption, CreateEntryListener listener) {
-    String extractedText = contentExtractOption.getUrl();
+  protected void createEntryFromUrl(String url, CreateEntryListener listener) {
+    if(listener != null) {
+      EntryCreationResult result = tryToExtractText(url);
+      listener.entryCreated(result);
+    }
+  }
+
+  private EntryCreationResult tryToExtractText(String url) {
+    String extractedText = url;
 
     TesseractOCRConfig config = new TesseractOCRConfig();
 //Needed if tesseract is not on system path
@@ -57,23 +78,21 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
     TesseractOCRParser parser = parseContext.get(TesseractOCRParser.class);
     parser = new TesseractOCRParser();
     try {
-      String url = contentExtractOption.getUrl(); // TODO: remove again, is now integrated in ContentExtractOptions
       if(url.startsWith("file:"))
         url = url.substring("file:".length());
       parser.parse(new FileInputStream(url), contentHandler, metadata, parseContext);
 
       extractedText = writer.toString();
+
+      return new EntryCreationResult(url, new Entry(extractedText));
     } catch(Exception ex) {
       String message = ex.getMessage();
+      return new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("error.could.not.extract.text.from.file"), ex));
     }
-
-    if(listener != null)
-      listener.entryCreated(new EntryCreationResult(contentExtractOption.getSource(), new Entry(extractedText)));
   }
 
   @Override
   protected void recognizeText(DoOcrConfiguration configuration, RecognizeTextListener listener) {
     listener.textRecognized(TextRecognitionResult.createErrorOccurredResult("Not implemented yet"));
   }
-
 }

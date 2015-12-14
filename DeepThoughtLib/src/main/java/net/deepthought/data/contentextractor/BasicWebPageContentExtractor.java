@@ -3,12 +3,15 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
+import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>Simply downloads a Web Page's HTML code.</p>
@@ -20,6 +23,9 @@ import org.jsoup.nodes.Element;
  * Created by ganymed on 05/12/15.
  */
 public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorBase implements IOnlineArticleContentExtractor {
+
+  private static final Logger log = LoggerFactory.getLogger(BasicWebPageContentExtractor.class);
+
 
   protected String lastPositivelyCheckedUrl = null;
 
@@ -50,21 +56,9 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
     this.iconUrlOfLastPositivelyCheckedUrl = FileUtils.contactPathElements(baseUrlOfLastPositivelyCheckedUrl, "favicon.ico");
   }
 
-  @Override
-  public int getSupportedPluginSystemVersion() {
-    return 1;
-  }
-
-  @Override
   public String getName() {
     return Localization.getLocalizedString("web.page.content.extractor");
   }
-
-  @Override
-  public String getPluginVersion() {
-    return "0.1";
-  }
-
 
   @Override
   public String getSiteBaseUrl() {
@@ -96,6 +90,62 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
     }
 
     return isOnlineWebPage;
+  }
+
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    ContentExtractOptions options = new ContentExtractOptions(url, getSiteBaseUrl());
+
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.extract.whole.web.page", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        setWebPageAsEntryContent(option, listener);
+      }
+    }));
+
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.extract.plain.text.only", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        setWebPagePlainTextAsEntryContent(option, listener);
+      }
+    }));
+
+    return options;
+  }
+
+  protected void setWebPageAsEntryContent(ContentExtractOption option, ExtractContentActionResultListener listener) {
+    EntryCreationResult result = createEntryCreationResultFromPageHtml(option.getUrl());
+    dispatchResult(result, listener);
+  }
+
+  protected EntryCreationResult createEntryCreationResultFromPageHtml(String webPageUrl) {
+    try {
+      Document document = retrieveOnlineDocument(webPageUrl);
+      return parseHtmlToEntry(webPageUrl, document);
+    } catch(Exception ex) {
+      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
+      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
+    }
+  }
+
+  protected void setWebPagePlainTextAsEntryContent(ContentExtractOption option, ExtractContentActionResultListener listener) {
+    EntryCreationResult result = createEntryCreationResultFromPagePlainText(option.getUrl());
+    dispatchResult(result, listener);
+  }
+
+  protected EntryCreationResult createEntryCreationResultFromPagePlainText(String webPageUrl) {
+    try {
+      Document document = retrieveOnlineDocument(webPageUrl);
+      return new EntryCreationResult(webPageUrl, new Entry(document.body().text()));
+    } catch(Exception ex) {
+      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
+      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
+    }
+  }
+
+  protected void dispatchResult(EntryCreationResult result, ExtractContentActionResultListener listener) {
+    if(listener != null) {
+      listener.extractingContentDone(result);
+    }
   }
 
 

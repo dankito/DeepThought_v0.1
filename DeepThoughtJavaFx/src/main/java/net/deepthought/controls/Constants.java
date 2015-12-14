@@ -66,7 +66,7 @@ public class Constants {
 
 
   public final static Color ClipboardContentPopupBackgroundColor = Color.LIGHTSKYBLUE.deriveColor(0, 1.0, 1.0, 0.95);
-  protected final static Background ClipboardContentPopupBackground = new Background(new BackgroundFill(ClipboardContentPopupBackgroundColor, new CornerRadii(8), new Insets(0)));
+  public final static Background ClipboardContentPopupBackground = new Background(new BackgroundFill(ClipboardContentPopupBackgroundColor, new CornerRadii(8), new Insets(0)));
 
-  protected final static Background ClipboardContentPopupOptionMouseOverBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(0)));
+  public final static Background ClipboardContentPopupOptionMouseOverBackground = new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(0)));
 }

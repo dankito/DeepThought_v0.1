@@ -51,29 +51,6 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
       listener.entryCreated(createEntryFromArticle(url));
   }
 
-  @Override
-  public ContentExtractOption canCreateEntryFromClipboardContent(ClipboardContent clipboardContent) {
-    if(clipboardContent.hasUrl()) {
-      if(canCreateEntryFromUrl(clipboardContent.getUrl()))
-        return new ContentExtractOption(this, clipboardContent.getUrl(), true);
-    }
-    else if(clipboardContent.hasString()) {
-      if(canCreateEntryFromUrl(clipboardContent.getString()))
-        return new ContentExtractOption(this, clipboardContent.getString(), true);
-    }
-
-    return ContentExtractOption.CanNotExtractContent;
-  }
-
-  @Override
-  public void createEntryFromClipboardContentAsync(ContentExtractOption contentExtractOption, CreateEntryListener listener) {
-    if(contentExtractOption.isUrl())
-      createEntryFromUrlAsync(contentExtractOption.getUrl(), listener);
-    else if(listener != null)
-      listener.entryCreated(new EntryCreationResult(contentExtractOption, new DeepThoughtError(Localization.getLocalizedString("can.not.create.entry.from.clipboard.content"))));
-
-  }
-
 
   public EntryCreationResult createEntryFromArticle(String articleUrl) {
     try {

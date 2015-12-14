@@ -8,6 +8,7 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Localization;
 import net.deepthought.util.StringUtils;
 
@@ -23,7 +24,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleContentExtractorBase {
+public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleContentExtractorBase implements IPlugin {
 
   public final static String DefaultUserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0";
 
@@ -36,6 +37,22 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   public String getIconUrl() {
     return IOnlineArticleContentExtractor.NoIcon;
   }
+
+
+  @Override
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    ContentExtractOptions options = new ContentExtractOptions(url, getSiteBaseUrl());
+
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "create.entry.from.online.article", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        listener.extractingContentDone(createEntryFromArticle(option.getUrl()));
+      }
+    }));
+
+    return options;
+  }
+
 
   public boolean hasArticlesOverview() {
     return false;
