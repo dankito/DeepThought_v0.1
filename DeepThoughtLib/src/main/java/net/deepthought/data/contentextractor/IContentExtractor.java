@@ -9,6 +9,4 @@ public interface IContentExtractor {
 
   ContentExtractOptions createExtractOptionsForUrl(String url);
 
-  void createEntryFromUrlAsync(String url, CreateEntryListener listener);
-
 }

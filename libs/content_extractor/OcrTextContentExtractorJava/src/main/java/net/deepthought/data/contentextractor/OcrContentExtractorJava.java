@@ -52,14 +52,6 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
   }
 
 
-  @Override
-  protected void createEntryFromUrl(String url, CreateEntryListener listener) {
-    if(listener != null) {
-      EntryCreationResult result = tryToExtractText(url);
-      listener.entryCreated(result);
-    }
-  }
-
   private EntryCreationResult tryToExtractText(String url) {
     String extractedText = url;
 
@@ -86,8 +78,7 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
 
       return new EntryCreationResult(url, new Entry(extractedText));
     } catch(Exception ex) {
-      String message = ex.getMessage();
-      return new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("error.could.not.extract.text.from.file"), ex));
+      return new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("error.could.not.extract.text.from.file", url), ex));
     }
   }
 

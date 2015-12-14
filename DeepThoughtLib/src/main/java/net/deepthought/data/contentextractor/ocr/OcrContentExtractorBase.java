@@ -2,7 +2,6 @@ package net.deepthought.data.contentextractor.ocr;
 
 import net.deepthought.Application;
 import net.deepthought.communication.model.DoOcrConfiguration;
-import net.deepthought.data.contentextractor.CreateEntryListener;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
@@ -30,20 +29,6 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor, I
   @Override
   public boolean canCreateEntryFromUrl(String url) {
     return FileUtils.isImageFile(FileUtils.getMimeType(url));
-  }
-
-  @Override
-  public void createEntryFromUrlAsync(final String url, final CreateEntryListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        createEntryFromUrl(url, listener);
-      }
-    });
-  }
-
-  protected void createEntryFromUrl(String url, CreateEntryListener listener) {
-
   }
 
 

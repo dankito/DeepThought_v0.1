@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor.file;
 
 import net.deepthought.Application;
+import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.CreateEntryListener;
@@ -8,9 +9,15 @@ import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ExtractContentAction;
 import net.deepthought.data.contentextractor.ExtractContentActionResultListener;
 import net.deepthought.data.contentextractor.IContentExtractor;
+import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
+import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.FileLink;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
+
+import java.io.File;
 
 /**
  * Created by ganymed on 14/12/15.
@@ -131,13 +138,22 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
     tryToExtractTextFromFile(getAndMayAdjustUrlFromOption(option), listener);
   }
 
-  protected void tryToExtractTextFromFile(String url, CreateEntryListener listener) {
-    Application.getContentExtractorManager().getPreferredOcrContentExtractor().createEntryFromUrlAsync(url, listener);
+  protected void tryToExtractTextFromFile(final String url, final CreateEntryListener listener) {
+    try {
+      Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(new DoOcrConfiguration(new File(url), false), new RecognizeTextListener() {
+        @Override
+        public void textRecognized(TextRecognitionResult result) {
+          if(result.recognitionSuccessful()) {
+            listener.entryCreated(new EntryCreationResult(url, new Entry(result.getRecognizedText())));
+          }
+          else {
+            listener.entryCreated(new EntryCreationResult(url, new DeepThoughtError(result.getErrorMessage())));
+          }
+        }
+      });
+    } catch(Exception ex) {
+      listener.entryCreated(new EntryCreationResult(url, new DeepThoughtError(Localization.getLocalizedString("error.could.not.extract.text.from.file", url), ex)));
+    }
   }
 
-
-  @Override
-  public void createEntryFromUrlAsync(String url, CreateEntryListener listener) {
-
-  }
 }

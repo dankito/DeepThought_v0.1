@@ -14,6 +14,8 @@ public interface IOnlineArticleContentExtractor extends IContentExtractor {
 
   String getIconUrl();
 
+  void createEntryFromUrlAsync(String url, CreateEntryListener listener);
+
   boolean hasArticlesOverview();
 
   void getArticlesOverviewAsync(ArticlesOverviewListener listener);
