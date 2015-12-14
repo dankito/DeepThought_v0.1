@@ -29,10 +29,6 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
   }
 
 
-//  @Override
-//  public Collection<IContentExtractor> getContentExtractors() {
-//    return contentExtractors;
-//  }
 
   @Override
   public boolean addContentExtractor(IContentExtractor contentExtractor) {
@@ -59,19 +55,8 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
     return onlineArticleContentExtractors.add(contentExtractor);
   }
 
-//  public List<IContentExtractor> getContentExtractorsForUrl(String url) {
-//    List<IContentExtractor> contentExtractorsForUrl = new ArrayList<>();
-//
-//    for(IContentExtractor contentExtractor : getContentExtractors()) {
-//      if(contentExtractor.canCreateEntryFromUrl(url))
-//        contentExtractorsForUrl.add(contentExtractor);
-//    }
-//
-//    return contentExtractorsForUrl;
-//  }
 
   public ContentExtractOptions getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent) {
-
     if(clipboardContent.hasImage()) {
       // TODO:
 //      Image image = clipboardContent.getImage();
@@ -79,26 +64,36 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
       return new ContentExtractOptions();
     }
 
+    List<String> urls = getUrlsFromClipboardContent(clipboardContent);
+
+    if(urls.size() > 0) {
+      return createContentExtractOptionsFromUrls(urls);
+    }
+
+    ContentExtractOptions contentExtractOptions = new ContentExtractOptions();
+
+    return contentExtractOptions;
+  }
+
+  protected List<String> getUrlsFromClipboardContent(ClipboardContent clipboardContent) {
     List<String> urls = new ArrayList<>();
 
     if(clipboardContent.hasFiles()) {
       for(File file : clipboardContent.getFiles()) {
         urls.add(file.getAbsolutePath());
-//        String filePath = file.getAbsolutePath();
-//        if(canAttachFileToEntry(filePath) || canSetFileAsEntryContent(filePath) || canCreateEntryFromUrl(filePath)) {
-//          return new ContentExtractOption(this, filePath, canCreateEntryFromUrl(filePath), canAttachFileToEntry(filePath), canSetFileAsEntryContent(filePath));
-//        }
       }
     }
-    else if(clipboardContent.hasUrl())
+    else if(clipboardContent.hasUrl()) {
       urls.add(clipboardContent.getUrl());
-//      return canExtractContentFromFilePath(clipboardContent.getUrl());
+    }
     else if(clipboardContent.hasString()) {
       if(StringUtils.isNotNullOrEmpty(clipboardContent.getString()))
         urls.add(clipboardContent.getString());
-//      return canExtractContentFromFilePath(clipboardContent.getString());
     }
+    return urls;
+  }
 
+  protected ContentExtractOptions createContentExtractOptionsFromUrls(List<String> urls) {
     for(String url : urls) {
       for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
         if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
@@ -115,25 +110,20 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
             contentExtractOptions.addContentExtractOption(new ContentExtractOption(textContentExtractor, url, true));
         }
 
-        return contentExtractOptions; // TODO: what about other files if one of the first files already succeed?
+        return contentExtractOptions; // TODO: what about other files / urls if one of the first files already succeed?
       }
     }
 
-    ContentExtractOptions contentExtractOptions = new ContentExtractOptions();
-
-//    for(IContentExtractor contentExtractor : getContentExtractors()) {
-//      ContentExtractOption contentExtractOption = contentExtractor.canCreateEntryFromClipboardContent(clipboardContent);
-//      if(contentExtractOption != ContentExtractOption.CanNotExtractContent)
-//        contentExtractOptions.addContentExtractOption(contentExtractOption);
-//    }
-
-    return contentExtractOptions;
+    return null;
   }
 
   protected boolean isAttachableFile(String url) {
     return FileUtils.isLocalFile(url) || FileUtils.isRemoteFile(url);
   }
 
+  /**
+   * Checks if CKEditor can display this file type.
+   */
   protected boolean canSetFileAsEntryContent(String url) {
 //    return FileUtils.isImageFile(FileUtils.getMimeType(url));
     String mimeType = FileUtils.getMimeType(url);

@@ -9,11 +9,7 @@ import java.util.List;
  */
 public interface IContentExtractorManager {
 
-//  Collection<IContentExtractor> getContentExtractors();
-
   boolean addContentExtractor(IContentExtractor contentExtractor);
-
-//  List<IContentExtractor> getContentExtractorsForUrl(String url);
 
   ContentExtractOptions getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent);
 
