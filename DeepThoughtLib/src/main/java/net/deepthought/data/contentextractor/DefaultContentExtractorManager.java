@@ -25,7 +25,7 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
 
   public DefaultContentExtractorManager() {
     contentExtractors.add(new BasicWebPageContentExtractor());
-//    addContentExtractor(new DefaultLocalFileContentExtractor());
+    contentExtractors.add(new LocalFileContentExtractor());
 //    addContentExtractor(new RemoteFileContentExtractor());
   }
 

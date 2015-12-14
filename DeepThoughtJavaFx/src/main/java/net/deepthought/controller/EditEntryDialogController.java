@@ -470,6 +470,15 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryTagsControl.setExpanded(creationResult.getTags().size() == 0);
 
     entryReferenceControl.setExpanded(creationResult.isAReferenceSet() == false);
+
+    for(FileLink embeddedFile : creationResult.getEmbeddedFiles()) {
+      editedEmbeddedFiles.addEntityToEntry(embeddedFile);
+    }
+
+    for(FileLink attachedFile : creationResult.getAttachedFiles()) {
+      editedAttachedFiles.addEntityToEntry(attachedFile);
+    }
+    filesControl.setVisible(creationResult.getAttachedFiles().size() > 0);
   }
 
 

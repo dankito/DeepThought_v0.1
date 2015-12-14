@@ -559,6 +559,10 @@ public class FileUtils {
     return mimeType.startsWith("image");
   }
 
+  public static boolean isImageFileSuitableForHtmlEditor(String mimeType) {
+    return isImageFile(mimeType);
+  }
+
   public static boolean isAudioFile(FileLink file) {
     return isAudioFile(getMimeType(file));
   }

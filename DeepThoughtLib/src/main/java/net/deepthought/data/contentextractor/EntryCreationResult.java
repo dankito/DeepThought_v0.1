@@ -136,12 +136,20 @@ public class EntryCreationResult {
     return extractedAttachedFiles;
   }
 
+  public boolean addAttachedFile(FileLink fileAttachment) {
+    return extractedAttachedFiles.add(fileAttachment);
+  }
+
   public void setAttachedFiles(List<FileLink> attachedFiles) {
     this.extractedAttachedFiles = attachedFiles;
   }
 
   public List<FileLink> getEmbeddedFiles() {
     return extractedEmbeddedFiles;
+  }
+
+  public boolean addEmbeddedFile(FileLink file) {
+    return extractedEmbeddedFiles.add(file);
   }
 
   public void setEmbeddedFiles(List<FileLink> embeddedFiles) {

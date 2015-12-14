@@ -38,7 +38,7 @@ public class OcrContentExtractorJava extends OcrContentExtractorBase {
   public ContentExtractOptions createExtractOptionsForUrl(String url) {
     ContentExtractOptions options = new ContentExtractOptions(url, getName());
 
-    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.text", new ExtractContentAction() {
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.text.from.file", new ExtractContentAction() {
       @Override
       public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
         if(listener != null) {
