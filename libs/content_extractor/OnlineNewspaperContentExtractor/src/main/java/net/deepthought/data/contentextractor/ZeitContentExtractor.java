@@ -5,6 +5,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
+import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -52,14 +53,14 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
   }
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
-    String multiPageArticleArticleOnOnePageUrl = getArticleOnOnePageUrlForMultiPageArticles(document);
-    if(multiPageArticleArticleOnOnePageUrl != null)
-      return createEntryFromArticle(multiPageArticleArticleOnOnePageUrl);
-
     try {
-      Element articleBodyElement = getElementByClassAndNodeName(document.body(), "div", "article-body");
+      Element articleBodyElement = document.body().select("article").first();
       if(articleBodyElement == null)
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html")));
+
+      String multiPageArticleArticleOnOnePageUrl = getArticleOnOnePageUrlForMultiPageArticles(articleBodyElement);
+      if(multiPageArticleArticleOnOnePageUrl != null)
+        return createEntryFromArticle(multiPageArticleArticleOnOnePageUrl);
 
       Entry articleEntry = createEntry(articleBodyElement);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
@@ -75,58 +76,36 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     }
   }
 
-  protected String getArticleOnOnePageUrlForMultiPageArticles(Document document) {
-    Elements articleOnOnePageElements = document.body().getElementsByAttributeValue("title", "Auf einer Seite");
-    if(articleOnOnePageElements.size() > 0) {
-      for(Element articleOnOnePageElement : articleOnOnePageElements) {
-        if("a".equals(articleOnOnePageElement.nodeName()))
-          return articleOnOnePageElement.attr("href");
-      }
+  protected String getArticleOnOnePageUrlForMultiPageArticles(Element articleBodyElement) {
+    Element articleTocOnesieElement = articleBodyElement.select(".article-toc__onesie").first();
+    if(articleTocOnesieElement != null) {
+      if("a".equals(articleTocOnesieElement.nodeName()))
+        return articleTocOnesieElement.attr("href");
     }
 
     return null;
   }
 
   protected Entry createEntry(Element articleBodyElement) {
-    String abstractString = getElementOwnTextByClassAndNodeName(articleBodyElement, "p", "excerpt");
+    String abstractString = articleBodyElement.select("div.summary").text();
 
-    Element elementBeforeContent = getElementByClassAndNodeName(articleBodyElement, "div", "zol_inarticletools");
-    if(elementBeforeContent == null)
-      elementBeforeContent = getElementByClassAndNodeName(articleBodyElement, "div", "articlemeta-clear");
-    if(elementBeforeContent == null)
-      elementBeforeContent = getElementByClassAndNodeName(articleBodyElement, "div", "articlemeta");
-
-    int contentStartElementIndex = articleBodyElement.children().indexOf(elementBeforeContent) + 1;
-    String content = extractContentFromArticleBodyChildren(articleBodyElement, contentStartElementIndex);
+    String content = "";
+    for(Element articleElement : articleBodyElement.select("p.article__item")) { // articleBodyElement.select("p .paragraph .article__item")
+      content += articleElement.outerHtml();
+    }
 
     return new Entry(content, abstractString);
   }
 
-  protected String extractContentFromArticleBodyChildren(Element articleBodyElement, int contentStartElementIndex) {
-    String content = "";
-
-    for(int i = contentStartElementIndex; i < articleBodyElement.children().size(); i++) {
-      Element contentParagraph = articleBodyElement.child(i);
-
-      // TODO: filter <p><em>..</em></p> elements? (like: Haben Sie Informationen zu diesem Thema?)
-      if("p".equals(contentParagraph.nodeName()) || ("div".equals(contentParagraph.nodeName()) && "block".equals(contentParagraph.className())))
-        content += contentParagraph.outerHtml();
-    }
-
-    return content;
-  }
-
   protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element articleBodyElement) {
-    String title = getElementOwnTextByClassAndNodeName(articleBodyElement, "span", "title");
+    String title = articleBodyElement.select(".article-heading__title").text();
 
-    String subTitle = getElementOwnTextByClassAndNodeName(articleBodyElement, "span", "supertitle");
+    String subTitle = articleBodyElement.select(".article-heading__kicker").text();
 
     String publishingDateString = "";
-    Element articleDateTimeElement = getElementByClassAndNodeName(articleBodyElement, "span", "articlemeta-datetime");
+    Element articleDateTimeElement = articleBodyElement.select(".metadata__date").first();
     if(articleDateTimeElement != null) {
-      Date publishingDate = parseZeitDateTimeFormat(articleDateTimeElement.html());
-      if(publishingDate != null)
-        publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
+      publishingDateString = parseDate(articleDateTimeElement);
     }
 
     ReferenceSubDivision articleReference = new ReferenceSubDivision(title, subTitle);
@@ -137,7 +116,24 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
     return articleReference;
   }
 
+
   protected DateFormat zeitDateTimeFormat = new SimpleDateFormat("dd. MMMMM yyyy HH:mm", Locale.GERMAN);
+
+  protected String parseDate(Element articleDateTimeElement) {
+    String publishingDateString = "";
+
+    if(articleDateTimeElement.hasAttr("datetime")) {
+      publishingDateString = parseIsoDateTimeString(articleDateTimeElement, publishingDateString);
+    }
+
+    if(StringUtils.isNullOrEmpty(publishingDateString)) {
+      Date publishingDate = parseZeitDateTimeFormat(articleDateTimeElement.text());
+      if (publishingDate != null)
+        publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
+    }
+
+    return publishingDateString;
+  }
 
   protected Date parseZeitDateTimeFormat(String articleDateTime) {
     articleDateTime = articleDateTime.replace("&nbsp;", "");

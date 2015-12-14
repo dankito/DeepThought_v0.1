@@ -21,6 +21,7 @@ import java.io.File;
 import java.net.URL;
 import java.security.CodeSource;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -173,10 +174,6 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return "";
   }
 
-  protected String formatDateToDeepThoughtDateString(Date parsedDate) {
-    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
-  }
-
   protected String tryToManuallyLoadIcon(Class classInJarWithIcon, String iconName) {
     try {
       CodeSource source = classInJarWithIcon.getProtectionDomain().getCodeSource();
@@ -192,6 +189,29 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     } catch(Exception ex2) { }
 
     return IOnlineArticleContentExtractor.NoIcon;
+  }
+
+
+  protected DateFormat isoDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+  protected String parseIsoDateTimeString(Element articleDateTimeElement, String publishingDateString) {
+    try {
+      String isoDateString = articleDateTimeElement.attr("datetime");
+      if(':' == isoDateString.charAt(isoDateString.length() - 3)) { // remove colon from time zone, Java DateFormat is not able to parse it
+        isoDateString = isoDateString.substring(0, isoDateString.length() - 3) + isoDateString.substring(isoDateString.length() - 2);
+      }
+
+      Date publishingDate = isoDateTimeFormat.parse(isoDateString);
+      if (publishingDate != null) {
+        publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
+      }
+    } catch(Exception ex) { }
+    return publishingDateString;
+  }
+
+
+  protected String formatDateToDeepThoughtDateString(Date parsedDate) {
+    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
   }
 
 }
