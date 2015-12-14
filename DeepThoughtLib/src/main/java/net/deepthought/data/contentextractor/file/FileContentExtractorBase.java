@@ -35,6 +35,10 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
     return options;
   }
 
+  protected String getAndMayAdjustUrlFromOption(ContentExtractOption option) {
+    return option.getUrl();
+  }
+
   protected ContentExtractOption createAttachFileToEntryOption(String url) {
     return new ContentExtractOption(this, url, true, "content.extractor.attach.file.to.entry", new ExtractContentAction() {
       @Override
@@ -46,7 +50,7 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
   }
 
   protected EntryCreationResult attachFileToNewEntry(ContentExtractOption option) {
-    return attachFileToNewEntry(option.getUrl());
+    return attachFileToNewEntry(getAndMayAdjustUrlFromOption(option));
   }
 
   protected EntryCreationResult attachFileToNewEntry(String url) {
@@ -73,7 +77,7 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
   }
 
   protected EntryCreationResult setFileAsEntryContent(ContentExtractOption option) {
-    return setFileAsEntryContent(option.getUrl());
+    return setFileAsEntryContent(getAndMayAdjustUrlFromOption(option));
   }
 
   protected EntryCreationResult setFileAsEntryContent(String url) {
@@ -115,7 +119,7 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
         tryToExtractTextFromFile(option, new CreateEntryListener() {
           @Override
           public void entryCreated(EntryCreationResult creationResult) {
-            creationResult.addAttachedFile(new FileLink(option.getUrl()));
+            creationResult.addAttachedFile(new FileLink(getAndMayAdjustUrlFromOption(option)));
             listener.extractingContentDone(creationResult);
           }
         });
@@ -124,7 +128,7 @@ public abstract class FileContentExtractorBase implements IContentExtractor {
   }
 
   protected void tryToExtractTextFromFile(ContentExtractOption option, CreateEntryListener listener) {
-    tryToExtractTextFromFile(option.getUrl(), listener);
+    tryToExtractTextFromFile(getAndMayAdjustUrlFromOption(option), listener);
   }
 
   protected void tryToExtractTextFromFile(String url, CreateEntryListener listener) {

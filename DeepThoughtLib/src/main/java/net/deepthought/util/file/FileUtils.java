@@ -439,6 +439,30 @@ public class FileUtils {
     return tmp;
   }
 
+  public static File findUniqueFileNameInUserDataFolderForUrl(String url) {
+    return findUniqueFileNameInUserDataFolderForFile(new File(url));
+  }
+
+  public static File findUniqueFileNameInUserDataFolderForFile(File file) {
+    String fileName = getFileName(file.getAbsolutePath());
+    String extension = getFileExtension(file.getAbsolutePath());
+
+    String directory = getUserDataFolderForFile(file);
+
+    int counter = 2;
+    File tmp = new File(directory, fileName + "." + extension);
+
+    while(tmp.exists()) {
+      tmp = new File(directory, fileName + "(" + counter++ + ")" + "." + extension);
+    }
+
+    return tmp;
+  }
+
+
+  public static String getUserDataFolderForFile(File file) {
+    return getUserDataFolderForFile(new FileLink(file.getAbsolutePath()));
+  }
 
   public static String getUserDataFolderForFile(FileLink file) {
     return getUserDataFolderForFile(file.getFileType());
@@ -449,7 +473,7 @@ public class FileUtils {
 
     if(fileDataFolder != Application.CouldNotGetDataFolderPath) {
       try {
-        File tmp = new File(fileDataFolder, getFileUserDataSubFolder(fileType));
+        File tmp = new File(fileDataFolder, getUserDataSubFolderForFile(fileType));
 
         if (tmp.exists() == false)
           tmp.mkdirs();
@@ -484,7 +508,7 @@ public class FileUtils {
     return userDataFolder;
   }
 
-  public static String getFileUserDataSubFolder(FileType fileType) {
+  public static String getUserDataSubFolderForFile(FileType fileType) {
     String resourceKey = fileType.getNameResourceKey();
 
     if("file.type.document".equals(resourceKey))

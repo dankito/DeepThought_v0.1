@@ -94,8 +94,11 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
     this.uriString = uriString;
     callPropertyChangedListeners(TableConfig.FileLinkUriColumnName, previousValue, uriString);
 
-    if(StringUtils.isNullOrEmpty(name))
+    if(StringUtils.isNullOrEmpty(name)) {
       setName(FileUtils.getFileNameIncludingExtension(uriString));
+    }
+
+    determineFileType(uriString);
   }
 
   public String getName() {
@@ -124,6 +127,10 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
 
   public void setFileType(FileType fileType) {
     this.fileType = fileType;
+  }
+
+  protected void determineFileType(String uriString) {
+    setFileType(FileUtils.getFileType(uriString));
   }
 
   public String getDescription() {

@@ -8,7 +8,7 @@ import net.deepthought.data.backup.DefaultBackupManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.DefaultDataComparer;
 import net.deepthought.data.compare.IDataComparer;
-import net.deepthought.data.contentextractor.DefaultContentExtractorManager;
+import net.deepthought.data.contentextractor.ContentExtractorManager;
 import net.deepthought.data.contentextractor.IContentExtractorManager;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.NoOpFileDownloader;
@@ -139,7 +139,7 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
 
   @Override
   public IContentExtractorManager createContentExtractorManager() {
-    return new DefaultContentExtractorManager();
+    return new ContentExtractorManager();
   }
 
   @Override

@@ -5,8 +5,8 @@ package net.deepthought.data.download;
  */
 public interface IFileDownloader {
 
-  public boolean canDownloadUrl(String url);
+  boolean canDownloadUrl(String url);
 
-  public void downloadAsync(final DownloadConfig config, final DownloadListener listener);
+  void downloadAsync(final DownloadConfig config, final DownloadListener listener);
 
 }

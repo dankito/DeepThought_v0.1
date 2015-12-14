@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.Application;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
@@ -135,9 +136,14 @@ public class ContentExtractOption {
   }
 
 
-  public void runAction(ExtractContentActionResultListener listener) {
+  public void runAction(final ExtractContentActionResultListener listener) {
     if(action != null) {
-      action.runExtraction(this, listener);
+      Application.getThreadPool().runTaskAsync(new Runnable() {
+        @Override
+        public void run() {
+          action.runExtraction(ContentExtractOption.this, listener);
+        }
+      });
     }
   }
 

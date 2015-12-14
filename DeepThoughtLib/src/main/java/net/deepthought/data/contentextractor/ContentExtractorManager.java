@@ -1,5 +1,7 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.file.LocalFileContentExtractor;
+import net.deepthought.data.contentextractor.file.RemoteFileContentExtractor;
 import net.deepthought.data.contentextractor.ocr.IOcrContentExtractor;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
@@ -12,7 +14,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * Created by ganymed on 24/04/15.
  */
-public class DefaultContentExtractorManager implements IContentExtractorManager {
+public class ContentExtractorManager implements IContentExtractorManager {
 
   protected List<IContentExtractor> contentExtractors = new CopyOnWriteArrayList<>();
 
@@ -23,10 +25,10 @@ public class DefaultContentExtractorManager implements IContentExtractorManager 
   protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractorsWithArticleOverview = new CopyOnWriteArrayList<>();
 
 
-  public DefaultContentExtractorManager() {
+  public ContentExtractorManager() {
     contentExtractors.add(new BasicWebPageContentExtractor());
     contentExtractors.add(new LocalFileContentExtractor());
-//    addContentExtractor(new RemoteFileContentExtractor());
+    contentExtractors.add(new RemoteFileContentExtractor());
   }
 
 

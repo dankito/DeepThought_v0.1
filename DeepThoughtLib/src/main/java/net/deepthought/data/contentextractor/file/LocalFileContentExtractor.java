@@ -1,6 +1,5 @@
-package net.deepthought.data.contentextractor;
+package net.deepthought.data.contentextractor.file;
 
-import net.deepthought.data.contentextractor.file.FileContentExtractorBase;
 import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
@@ -143,39 +142,6 @@ public class LocalFileContentExtractor extends FileContentExtractorBase {
 //    });
 //  }
 //
-//
-//  protected interface DownloadToTempFileResult {
-//    public void completed(boolean successful, File tempFile);
-//  }
-//
-//  protected void downloadToTempFile(final String url, final DownloadToTempFileResult result) {
-//    try {
-//      final File tempFile = File.createTempFile("DeepThoughtDownload_" + FileUtils.getFileName(url), FileUtils.getFileExtension(url));
-//      Application.getDownloader().downloadAsync(new DownloadConfig(url, tempFile.getAbsolutePath()), new DownloadListener() {
-//        @Override
-//        public void progress(DownloadConfig download, float percentage) {
-//
-//        }
-//
-//        @Override
-//        public void downloadCompleted(DownloadConfig download, boolean successful, DeepThoughtError error) {
-//          if(successful == false) {
-//            log.error("Could not download file " + url + ": " + error);
-//            // TODO: notify user
-//          }
-//
-//          if(result != null)
-//            result.completed(successful, tempFile);
-//        }
-//      });
-//    } catch(Exception ex) {
-//      log.error("Could not download file " + url, ex);
-//      // TODO: notify user
-//
-//      if(result != null)
-//        result.completed(false, null);
-//    }
-//  }
 
 
   @Override
