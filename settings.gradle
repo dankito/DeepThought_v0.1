@@ -14,7 +14,7 @@ include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
 include ':OpenOfficeDocumentsImporterExporter'
-include ':YouTubeAndVimeoContentExtractor'
+include ':YouTubeAndVimeoDownloader'
 //include ':JavaFxControls'
 //include ':VideoDownloader'
 //include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
@@ -47,7 +47,7 @@ project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
 project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
 
-project(':YouTubeAndVimeoContentExtractor').projectDir = new File('libs/content_extractor/YouTubeAndVimeoContentExtractor')
+project(':YouTubeAndVimeoDownloader').projectDir = new File('libs/content_extractor/YouTubeAndVimeoDownloader')
 
 //project(':JavaFxControls').projectDir = new File('libs/controls/JavaFxControls')
 

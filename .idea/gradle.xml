@@ -15,7 +15,7 @@
             <option value="$PROJECT_DIR$/libs/content_extractor/OcrTextContentExtractorJava" />
             <option value="$PROJECT_DIR$/libs/content_extractor/OnlineNewspaperContentExtractor" />
             <option value="$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor" />
-            <option value="$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoContentExtractor" />
+            <option value="$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoDownloader" />
             <option value="$PROJECT_DIR$/libs/downloader/WGetFileDownloader" />
             <option value="$PROJECT_DIR$/libs/importer_exporter/OpenOfficeDocumentsImporterExporter" />
             <option value="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter" />

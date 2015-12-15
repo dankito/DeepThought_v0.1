@@ -18,7 +18,7 @@
       <module fileurl="file://$PROJECT_DIR$/libs/downloader/WGetFileDownloader/WGetFileDownloader.iml" filepath="$PROJECT_DIR$/libs/downloader/WGetFileDownloader/WGetFileDownloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoContentExtractor/YouTubeAndVimeoContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoContentExtractor/YouTubeAndVimeoContentExtractor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoDownloader/YouTubeAndVimeoDownloader.iml" filepath="$PROJECT_DIR$/libs/content_extractor/YouTubeAndVimeoDownloader/YouTubeAndVimeoDownloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" filepath="$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" />
