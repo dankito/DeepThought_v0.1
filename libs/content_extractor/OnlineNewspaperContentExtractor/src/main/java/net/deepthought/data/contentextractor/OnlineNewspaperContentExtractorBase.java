@@ -194,14 +194,25 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
   protected DateFormat isoDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-  protected String parseIsoDateTimeString(Element articleDateTimeElement, String publishingDateString) {
+  protected DateFormat isoDateTimeFormatWithoutTimezone = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+  protected String parseIsoDateTimeString(String isoDateTimeString, String publishingDateString) {
     try {
-      String isoDateString = articleDateTimeElement.attr("datetime");
-      if(':' == isoDateString.charAt(isoDateString.length() - 3)) { // remove colon from time zone, Java DateFormat is not able to parse it
-        isoDateString = isoDateString.substring(0, isoDateString.length() - 3) + isoDateString.substring(isoDateString.length() - 2);
+      if(':' == isoDateTimeString.charAt(isoDateTimeString.length() - 3)) { // remove colon from time zone, Java DateFormat is not able to parse it
+        isoDateTimeString = isoDateTimeString.substring(0, isoDateTimeString.length() - 3) + isoDateTimeString.substring(isoDateTimeString.length() - 2);
       }
 
-      Date publishingDate = isoDateTimeFormat.parse(isoDateString);
+      Date publishingDate = isoDateTimeFormat.parse(isoDateTimeString);
+      if (publishingDate != null) {
+        publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
+      }
+    } catch(Exception ex) { }
+    return publishingDateString;
+  }
+
+  protected String parseIsoDateTimeWithoutTimezoneStringWithoutTimezone(String isoDateTimeString , String publishingDateString) {
+    try {
+      Date publishingDate = isoDateTimeFormatWithoutTimezone.parse(isoDateTimeString);
       if (publishingDate != null) {
         publishingDateString = formatDateToDeepThoughtDateString(publishingDate);
       }
