@@ -37,7 +37,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importSoVermeidenSieFehlerImTestamentArticle() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/geld/richtig-vererben-so-vermeiden-sie-fehler-im-testament-1.2406029");
-      testImportedArticleValues(creationResult, 4803, "14.04.2015", "So vermeiden Sie Fehler im Testament", "Richtig vererben",
+      testImportedArticleValues(creationResult, 4565, "14.04.2015", "So vermeiden Sie Fehler im Testament", "Richtig vererben",
           "Streit ums Erbe entsteht oft dann, wenn der letzte Wille des Erblassers nicht eindeutig oder am Ende gar unwirksam formuliert ist. Die " +
               "häufigsten Fehler beim Verfassen eines Testaments - und wie man den Nachkommen das Erben erleichtert.");
   }
@@ -84,7 +84,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithImages() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/muenchen/ebersberg/schloss-falkenberg-wo-der-pappenheimer-wohnte-1.2517879");
-    testImportedArticleValues(creationResult, 9928, "18.06.2015", "Wo der Pappenheimer wohnte", "Schloss Falkenberg",
+    testImportedArticleValues(creationResult, 9822, "18.06.2015", "Wo der Pappenheimer wohnte", "Schloss Falkenberg",
         "Die Wittelsbacher ließen im frühen zwölften Jahrhundert in Falkenberg eine Burg errichten, auf deren Ruinen das spätere Schloss entstand. In den 436 Jahren seines Bestehens wurde das Schloss insgesamt 18 Mal verkauft, alleine zwölf Mal in den vergangenen 200 Jahren, nur acht Mal wurde es vererbt Viele Münchner kennen heute den Biergarten, nicht aber das Schloss.");
 
     Assert.assertEquals(2, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
@@ -111,7 +111,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importArticleWithInlineImageGalleryAndContent() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/muenchen/stellwerk-in-tuessling-abschied-von-der-eisenbahn-nostalgie-1.2527297");
-    testImportedArticleValues(creationResult, 8964, "19.06.2015", "Abschied von der Eisenbahn-Nostalgie", "Stellwerk in Tüssling",
+    testImportedArticleValues(creationResult, 8859, "19.06.2015", "Abschied von der Eisenbahn-Nostalgie", "Stellwerk in Tüssling",
             "In einem Stellwerk in Tüßling werden Weichen und Signale noch per Hand gesteuert: Züge nach Mühldorf und Freilassing leitet ein Fahrdienstleister mit Hebeln und Drahtseilen. " +
             "Auch während der Fahrt mit einem ganz normalen Zug kann man dort Einblicke in die Historie der Eisenbahn erleben: Einige Streckenabschnitte funktionieren schon mit moderner Technik. " +
             "2016 sollen Stellwerk und Weichenwärterhäuschen abgerissen werden - die Modernisierung wird vor allem von den Industriebetrieben im bayerischen Chemiedreieck gefordert.");
@@ -122,7 +122,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void checkIfImportingWrongAbstractBugHasBeenFixed() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/jahre-wiener-kongress-europa-feiernd-neu-ausgekungelt-1.2135536");
-    testImportedArticleValues(creationResult, 12427, "18.09.2014", "Europa feiernd neu ausgekungelt", "200 Jahre Wiener Kongress",
+    testImportedArticleValues(creationResult, 12213, "18.09.2014", "Europa feiernd neu ausgekungelt", "200 Jahre Wiener Kongress",
         "Am 18. September 1814 beginnen die Gegner Napoleons in Wien, Europa neu zu ordnen. Der Machtpoker gleicht einer Riesenparty, sorgt für kuriose Amouren und führt zu Entscheidungen, die teilweise 200 Jahre später nachwirken.");
 
     Assert.assertEquals(4, StringUtils.getNumberOfOccurrences("<img ", creationResult.getCreatedEntry().getContent()));
@@ -131,7 +131,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void testImportArticleUrlWithReducedEqualsTrue() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/bayern/verbraucherschutz-aufklaerung-verzoegert-1.2525447?reduced=true");
-    testImportedArticleValues(creationResult, 4812, "17.06.2015", "\"Dieser Skandal sollte vertuscht werden\"", "Affäre um Bayern-Ei",
+    testImportedArticleValues(creationResult, 4616, "17.06.2015", "\"Dieser Skandal sollte vertuscht werden\"", "Affäre um Bayern-Ei",
         "Die SPD wirft der bayerischen Verbraucherschutzministerin Ulrike Scharf schwere Versäumnisse im Skandal um die Firma Bayern-Ei vor. Ein Skandal sollte vertuscht werden, meint die Opposition. Die Ministerin weist die Vorwürfe zurück, auch ihr Amtsvorgänger Huber sieht keine Versäumnisse der Behörden.");
 
     Assert.assertFalse(creationResult.getReferenceSubDivision().getOnlineAddress().contains("reduced=true"));
@@ -156,7 +156,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   @Test
   public void importKarteDerSchandeArticle() {
     EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/politik/gewalt-gegen-asylbewerber-karte-der-schande-1.2625987");
-    testImportedArticleValues(creationResult, 4038, "02.09.2015", "Karte der Schande", "Gewalt gegen Asylbewerber",
+    testImportedArticleValues(creationResult, 4178, "02.09.2015", "Karte der Schande", "Gewalt gegen Asylbewerber",
         "In allen Teilen Deutschlands kommt es zu Anschlägen und Delikten gegen Asylbewerber und Flüchtlingsheime. Doch offenbar tauchen gar nicht alle Taten in der offiziellen Statistik auf.");
   }
 
@@ -186,6 +186,13 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   }
 
   @Test
+  public void importWandererVonFluechtlingenBewirtet_AdditionalContentIsNotImported() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/bayern/oberfranken-wanderer-halten-fluechtlingsheim-fuer-gasthof-und-werden-bewirtet-1.2789250");
+    testImportedArticleValues(creationResult, 4495, "18.12.2015", "Wanderer halten Flüchtlingsheim für Gasthof - und werden bewirtet", "Oberfranken",
+        "Kawa Suliman serviert Brot und Marmelade, syrische Art. Es dauert eine Weile, bis die Touristen ihren Irrtum bemerken.");
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
     EntryCreationResult zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     EntryCreationResult one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");
@@ -202,7 +209,7 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
 
     // now check if the 10 + 1th article has been imported correctly
     Assert.assertFalse(eleven.getCreatedEntry().getContentAsPlainText().endsWith(" ..."));
-    testImportedArticleValues(eleven, 8888, "19.06.2015", "Wenn eine Frau so viel kostet wie eine Flasche Wasser", "Ausbeutung durch UN-Blauhelme",
+    testImportedArticleValues(eleven, 8680, "19.06.2015", "Wenn eine Frau so viel kostet wie eine Flasche Wasser", "Ausbeutung durch UN-Blauhelme",
         "Ein UN-Bericht zeigt, dass die Praxis, dass Blauhelmsoldaten Frauen und Kinder im Tausch gegen Waren zum Sex nötigen, weiter verbreitet ist, als bisher angenommen wurde. Viele Experten sind sich einig, dass es sich dabei auch um ein strukturelles Problem der UN-Friedensmissionen handelt. Bislang bleiben viele Vergehen folgenlos für die Täter. Aktivisten und Frauenrechtlerinnen fordern eine konsequentere Strafverfolgung der Blauhelmsoldaten.");
   }
 

@@ -176,8 +176,13 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
           content += bodyChild.outerHtml();
       }
       else if("figure".equals(bodyChild.tagName())) {
-        if(bodyChild.hasClass("gallery") /*&& bodyChild.hasClass("inline")*/)
-          content += parseInlineImageGallery(bodyChild);
+        if(bodyChild.hasClass("gallery")) {
+          // not checking for class 'inline' would cause articles like http://www.sueddeutsche.de/bayern/oberfranken-wanderer-halten-fluechtlingsheim-fuer-gasthof-und-werden-bewirtet-1.2789250
+          // loading the next article
+          if(bodyChild.hasClass("inline")) {
+            content += parseInlineImageGallery(bodyChild);
+          }
+        }
         else
           content += extractImageFromFigureNode(bodyChild);
       }
