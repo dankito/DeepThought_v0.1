@@ -1,6 +1,8 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
@@ -16,7 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -98,19 +102,19 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   protected void adjustLinkUrls(Element articleElement) {
     for(Element elementWithSrcAttribute : articleElement.select("[src]")) {
       String src = elementWithSrcAttribute.attr("src");
-      src = makeLinkAbsolute(src, "http://www.heise.de");
+      src = makeLinkAbsolute(src);
       elementWithSrcAttribute.attr("src", src);
     }
 
     for(Element elementWithHrefAttribute : articleElement.select("[href]")) {
       String href = elementWithHrefAttribute.attr("href");
-      href = makeLinkAbsolute(href, "http://www.heise.de");
+      href = makeLinkAbsolute(href);
       elementWithHrefAttribute.attr("href", href);
     }
 
     for(Element elementWithHrefAttribute : articleElement.select("[data-zoom-src]")) {
       String href = elementWithHrefAttribute.attr("data-zoom-src");
-      href = makeLinkAbsolute(href, "http://www.heise.de");
+      href = makeLinkAbsolute(href);
       elementWithHrefAttribute.attr("data-zoom-src", href);
     }
   }
@@ -121,7 +125,11 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
     }
   }
 
-  private String makeLinkAbsolute(String link, String baseUrl) {
+  protected String makeLinkAbsolute(String link) {
+    return makeLinkAbsolute(link, "http://www.heise.de");
+  }
+
+  protected String makeLinkAbsolute(String link, String baseUrl) {
     if(link.startsWith("//")) {
       return "http:" + link;
     }
@@ -205,5 +213,109 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
         creationResult.addTag(Application.getDeepThought().findOrCreateTagForName(child.ownText()));
       }
     }
+  }
+
+
+  @Override
+  public boolean hasArticlesOverview() {
+    return true;
+  }
+
+  @Override
+  protected void getArticlesOverview(ArticlesOverviewListener listener) {
+    extractArticlesOverviewFromFrontPage(listener);
+  }
+
+
+  protected void extractArticlesOverviewFromFrontPage(ArticlesOverviewListener listener) {
+    try {
+      Document frontPage = retrieveOnlineDocument("http://www.heise.de");
+      extractArticlesOverviewItemsFromFrontPage(frontPage, listener);
+    } catch(Exception ex) {
+      log.error("Could not retrieve HTML code of Heise.de front page", ex);
+    }
+  }
+
+  protected void extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+    extractTopTeaserItems(frontPage, overviewItems);
+    listener.overviewItemsRetrieved(this, overviewItems, false);
+
+    List<ArticlesOverviewItem> indexItems = new ArrayList<>();
+    extractIndexItems(frontPage, indexItems);
+    listener.overviewItemsRetrieved(this, indexItems, true);
+  }
+
+  protected void extractTopTeaserItems(Document frontPage, List<ArticlesOverviewItem> overviewItems) {
+    for(Element teaserItem : frontPage.body().select(".topteaser_master")) {
+      createOverviewItemFromTeaserItem(overviewItems, teaserItem);
+    }
+  }
+
+  protected void createOverviewItemFromTeaserItem(List<ArticlesOverviewItem> overviewItems, Element teaserItem) {
+    if(teaserItem.children().size() == 1 && "a".equals(teaserItem.child(0).tagName())) {
+      overviewItems.add(createOverviewItemFromTeaserAnchorElement(teaserItem.child(0)));
+    }
+    else {
+      createOverviewItemsFromMultipleElements(overviewItems, teaserItem);
+    }
+  }
+
+  protected void createOverviewItemsFromMultipleElements(List<ArticlesOverviewItem> overviewItems, Element teaserItemWithMultipleElements) {
+    for(Element teaserItemAnchor : teaserItemWithMultipleElements.select(".multiple a")) {
+      overviewItems.add(createOverviewItemFromTeaserAnchorElement(teaserItemAnchor));
+    }
+  }
+
+  protected ArticlesOverviewItem createOverviewItemFromTeaserAnchorElement(Element teaserItemAnchor) {
+    String url = teaserItemAnchor.attr("href");
+    url = makeLinkAbsolute(url);
+    String subTitle = teaserItemAnchor.select("b.dachzeile").text();
+    String title = teaserItemAnchor.select("h2").text();
+    String summary = teaserItemAnchor.select("p").text();
+    Element previewImageElement = teaserItemAnchor.select("div.img_clip img").first();
+    String previewImageUrl = (previewImageElement != null && previewImageElement.hasAttr("src")) ?
+        previewImageElement.attr("src") : "";
+    previewImageUrl = makeLinkAbsolute(previewImageUrl);
+
+    return new ArticlesOverviewItem(this, url, summary, title, subTitle, previewImageUrl);
+  }
+
+
+  protected void extractIndexItems(Document frontPage, List<ArticlesOverviewItem> overviewItems) {
+    Element indexListElement = frontPage.body().select(".indexlist").first();
+    if(indexListElement != null) {
+      for(Element indexItem : indexListElement.select(".indexlist_item")) {
+        overviewItems.add(createOverviewItemFromIndexListItem(indexItem));
+      }
+    }
+  }
+
+  protected ArticlesOverviewItem createOverviewItemFromIndexListItem(Element indexItem) {
+    Element indexListAnchor = indexItem.select("a.indexlist_text").first();
+    if(indexListAnchor != null) {
+      return createOverviewItemFromIndexListAnchor(indexListAnchor, indexItem.select("header h3").text());
+    }
+
+    return null;
+  }
+
+  protected ArticlesOverviewItem createOverviewItemFromIndexListAnchor(Element indexListAnchor, String title) {
+    String url = indexListAnchor.attr("href");
+    url = makeLinkAbsolute(url);
+    String summary = indexListAnchor.select("p").text();
+
+    Element previewImageElement = indexListAnchor.select("figure img").first();
+    String previewImageUrl = (previewImageElement != null && previewImageElement.hasAttr("src")) ? previewImageElement.attr("src") : "";
+    previewImageUrl = makeLinkAbsolute(previewImageUrl);
+
+    String subTitle = "";
+    if(title.contains(":")) {
+      int indexOfColon = title.indexOf(':');
+      subTitle = title.substring(0, indexOfColon).trim();
+      title = title.substring(indexOfColon + 1).trim();
+    }
+
+    return new ArticlesOverviewItem(this, url, summary, title, subTitle, previewImageUrl);
   }
 }
