@@ -30,6 +30,8 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   private final static Logger log = LoggerFactory.getLogger(HeiseContentExtractor.class);
 
+  protected static final String LogoFileName = "heise_online_logo.png";
+
 
   @Override
   public int getSupportedPluginSystemVersion() {
@@ -51,6 +53,12 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   public String getSiteBaseUrl() {
     return "heise.de";
   }
+
+  @Override
+  public String getIconUrl() {
+    return tryToLoadIconFile(LogoFileName);
+  }
+
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {

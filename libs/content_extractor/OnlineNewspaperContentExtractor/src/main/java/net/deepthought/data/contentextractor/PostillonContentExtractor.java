@@ -15,7 +15,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,18 +55,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
   @Override
   public String getIconUrl() {
-    try {
-      URL url = PostillonContentExtractor.class.getClassLoader().getResource(LogoFileName);
-      return url.toExternalForm();
-    } catch(Exception ex) {
-      String logoFile = tryToManuallyLoadIcon(PostillonContentExtractor.class, LogoFileName);
-      if (logoFile != IOnlineArticleContentExtractor.NoIcon)
-        return logoFile;
-      else
-        log.error("Could not load " + LogoFileName + " from Resources", ex);
-    }
-
-    return super.getIconUrl();
+    return tryToLoadIconFile(LogoFileName);
   }
 
   @Override

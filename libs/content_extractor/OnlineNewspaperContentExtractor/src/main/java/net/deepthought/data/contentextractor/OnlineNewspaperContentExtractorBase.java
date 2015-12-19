@@ -39,6 +39,22 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return IOnlineArticleContentExtractor.NoIcon;
   }
 
+  protected String tryToLoadIconFile(String logoFilename) {
+    try {
+      URL url = SueddeutscheContentExtractorBase.class.getClassLoader().getResource(logoFilename);
+      return url.toExternalForm();
+      //return url.toString();
+    } catch(Exception ex) {
+      String iconFile = tryToManuallyLoadIcon(SueddeutscheContentExtractorBase.class, logoFilename);
+      if (iconFile != IOnlineArticleContentExtractor.NoIcon)
+        return iconFile;
+      else
+        log.error("Could not load " + logoFilename + " from Resources", ex);
+    }
+
+    return getIconUrl();
+  }
+
 
   @Override
   public ContentExtractOptions createExtractOptionsForUrl(String url) {
