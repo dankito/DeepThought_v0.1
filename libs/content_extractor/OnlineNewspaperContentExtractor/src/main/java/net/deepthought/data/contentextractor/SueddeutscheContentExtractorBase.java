@@ -9,6 +9,8 @@ public abstract class SueddeutscheContentExtractorBase extends OnlineNewspaperCo
 
   private final static Logger log = LoggerFactory.getLogger(SueddeutscheContentExtractorBase.class);
 
+  protected static final String LogoFileName = "sz_logo.png";
+
   @Override
   public String getNewspaperName() {
     return "SZ";
@@ -17,15 +19,15 @@ public abstract class SueddeutscheContentExtractorBase extends OnlineNewspaperCo
   @Override
   public String getIconUrl() {
     try {
-      URL url = SueddeutscheContentExtractorBase.class.getClassLoader().getResource("sz_icon.png");
+      URL url = SueddeutscheContentExtractorBase.class.getClassLoader().getResource(LogoFileName);
       return url.toExternalForm();
       //return url.toString();
     } catch(Exception ex) {
-      String iconFile = tryToManuallyLoadIcon(SueddeutscheContentExtractorBase.class, "sz_icon.png");
+      String iconFile = tryToManuallyLoadIcon(SueddeutscheContentExtractorBase.class, LogoFileName);
       if (iconFile != IOnlineArticleContentExtractor.NoIcon)
         return iconFile;
       else
-        log.error("Could not load sz_icon.png from Resources", ex);
+        log.error("Could not load " + LogoFileName + " from Resources", ex);
     }
 
     return super.getIconUrl();

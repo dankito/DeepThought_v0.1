@@ -30,6 +30,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
   private final static Logger log = LoggerFactory.getLogger(PostillonContentExtractor.class);
 
+  protected static final String LogoFileName = "der-postillon_logo.png";
 
 
   @Override
@@ -56,14 +57,14 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
   @Override
   public String getIconUrl() {
     try {
-      URL url = PostillonContentExtractor.class.getClassLoader().getResource("der-postillon_icon.png");
+      URL url = PostillonContentExtractor.class.getClassLoader().getResource(LogoFileName);
       return url.toExternalForm();
     } catch(Exception ex) {
-      String iconFile = tryToManuallyLoadIcon(PostillonContentExtractor.class, "der-postillon_icon.png");
-      if (iconFile != IOnlineArticleContentExtractor.NoIcon)
-        return iconFile;
+      String logoFile = tryToManuallyLoadIcon(PostillonContentExtractor.class, LogoFileName);
+      if (logoFile != IOnlineArticleContentExtractor.NoIcon)
+        return logoFile;
       else
-        log.error("Could not load der-postillon_icon.png from Resources", ex);
+        log.error("Could not load " + LogoFileName + " from Resources", ex);
     }
 
     return super.getIconUrl();
