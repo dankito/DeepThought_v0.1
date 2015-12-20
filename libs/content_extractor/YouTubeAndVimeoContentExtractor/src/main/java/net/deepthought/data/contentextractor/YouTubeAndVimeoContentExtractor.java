@@ -44,8 +44,25 @@ public class YouTubeAndVimeoContentExtractor implements IContentExtractor, IPlug
   }
 
   public ContentExtractOptions createExtractOptionsForUrl(String url) {
-    AvailableFormats formats = downloader.getAvailableFormats(url);
+    String adjustedUrl = mayAdjustUrl(url);
+    AvailableFormats formats = downloader.getAvailableFormats(adjustedUrl);
+    formats.setUrl(url);
+
     return getContentExtractOptionsFromAvailableFormats(formats);
+  }
+
+  protected String mayAdjustUrl(String url) {
+    String adjustedUrl = url;
+
+    if(adjustedUrl.contains("youtube.com/v/")) {
+      adjustedUrl = adjustedUrl.replace("youtube.com/v/", "youtube.com/watch?v=");
+    }
+
+    if(adjustedUrl.contains("youtu.be/")) {
+      adjustedUrl = adjustedUrl.replace("youtu.be/", "youtube.com/watch?v=");
+    }
+
+    return adjustedUrl;
   }
 
   protected ContentExtractOptions getContentExtractOptionsFromAvailableFormats(final AvailableFormats formats) {
