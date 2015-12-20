@@ -28,6 +28,9 @@ public class ContentExtractorManager implements IContentExtractorManager {
   protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractorsWithArticleOverview = new CopyOnWriteArrayList<>();
 
 
+  protected ContentExtractOptions lastExtractedContentExtractOptions = new ContentExtractOptions();
+
+
   public ContentExtractorManager() {
     contentExtractors.add(new BasicWebPageContentExtractor());
     contentExtractors.add(new LocalFileContentExtractor());
@@ -66,23 +69,30 @@ public class ContentExtractorManager implements IContentExtractorManager {
   }
 
 
-  public void getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener) {
+  public void getContentExtractorOptionsForClipboardContentAsync(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener) {
     if(clipboardContent.hasImage()) {
       // TODO:
 //      Image image = clipboardContent.getImage();
 //      return new ContentExtractOption(this, image, false, true, true);
-      listener.contentExtractorOptionsRetrieved(new ContentExtractOptions());
+      storeAndDispatchCreatedContentExtractOptions(new ContentExtractOptions(), listener);
+      return;
     }
 
     List<String> urls = getUrlsFromClipboardContent(clipboardContent);
 
     if(urls.size() > 0) {
       createContentExtractOptionsFromUrls(urls, listener);
+      return;
     }
 
     ContentExtractOptions contentExtractOptions = new ContentExtractOptions();
 
-    listener.contentExtractorOptionsRetrieved(contentExtractOptions);
+   storeAndDispatchCreatedContentExtractOptions(contentExtractOptions, listener);
+  }
+
+  protected void storeAndDispatchCreatedContentExtractOptions(ContentExtractOptions options, GetContentExtractorOptionsListener listener) {
+    this.lastExtractedContentExtractOptions = options;
+    listener.contentExtractorOptionsRetrieved(options);
   }
 
   protected List<String> getUrlsFromClipboardContent(ClipboardContent clipboardContent) {
@@ -108,14 +118,14 @@ public class ContentExtractorManager implements IContentExtractorManager {
       // TODO: what about the remaining urls if a previous one succeeds?
       for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
         if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-          listener.contentExtractorOptionsRetrieved(onlineArticleContentExtractor.createExtractOptionsForUrl(url));
+          storeAndDispatchCreatedContentExtractOptions(onlineArticleContentExtractor.createExtractOptionsForUrl(url), listener);
           return;
         }
       }
 
       for(IContentExtractor contentExtractor : contentExtractors) {
         if(contentExtractor.canCreateEntryFromUrl(url)) {
-          listener.contentExtractorOptionsRetrieved(contentExtractor.createExtractOptionsForUrl(url));
+          storeAndDispatchCreatedContentExtractOptions(contentExtractor.createExtractOptionsForUrl(url), listener);
           return;
         }
       }
@@ -164,4 +174,8 @@ public class ContentExtractorManager implements IContentExtractorManager {
     return onlineArticleContentExtractorsWithArticleOverview;
   }
 
+  @Override
+  public ContentExtractOptions getLastExtractedContentExtractOptions() {
+    return lastExtractedContentExtractOptions;
+  }
 }

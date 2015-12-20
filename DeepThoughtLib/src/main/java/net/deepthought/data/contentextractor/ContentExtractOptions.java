@@ -102,4 +102,11 @@ public class ContentExtractOptions {
     }
     return "";
   }
+
+
+  @Override
+  public String toString() {
+    return getUrl() + " (" + getContentExtractOptionsSize() + " ContentExtractOptions)";
+  }
+
 }

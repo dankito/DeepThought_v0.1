@@ -105,9 +105,9 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected void checkIfEntryCanBeCreatedFromClipboardContent() {
     ClipboardContent clipboardContent = new JavaFxClipboardContent(Clipboard.getSystemClipboard());
-    Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContent(clipboardContent, contentExtractOptions -> {
-      if(contentExtractOptions.hasContentExtractOptions()) {
-        if(contentExtractOptions.getSource().equals(sourceOfLastShownPopup) == false) {
+    Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContentAsync(clipboardContent, contentExtractOptions -> {
+      if (contentExtractOptions.hasContentExtractOptions()) {
+        if (contentExtractOptions.getSource().equals(sourceOfLastShownPopup) == false) {
           sourceOfLastShownPopup = contentExtractOptions.getSource();
           showCreateEntryFromClipboardContentPopupThreadSafe(contentExtractOptions);
         }

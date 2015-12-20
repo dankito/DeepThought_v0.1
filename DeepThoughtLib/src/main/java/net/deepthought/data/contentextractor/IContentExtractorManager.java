@@ -11,7 +11,7 @@ public interface IContentExtractorManager {
 
   boolean addContentExtractor(IContentExtractor contentExtractor);
 
-  void getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener);
+  void getContentExtractorOptionsForClipboardContentAsync(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener);
 
   boolean hasOcrContentExtractors();
 
@@ -25,4 +25,5 @@ public interface IContentExtractorManager {
 
    List<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview();
 
+  ContentExtractOptions getLastExtractedContentExtractOptions();
 }

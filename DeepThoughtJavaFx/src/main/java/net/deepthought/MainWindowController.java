@@ -23,10 +23,8 @@ import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
 import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
-import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -89,7 +87,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -663,19 +660,7 @@ public class MainWindowController implements Initializable {
 
   @FXML
   public void handleMainMenuFileShowing(Event event) {
-    ClipboardContent clipboardContent = new JavaFxClipboardContent(Clipboard.getSystemClipboard());
-    Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContent(clipboardContent, contentExtractOptions -> {
-        setMenuFileClipboardThreadSafe(contentExtractOptions);
-    });
-  }
-
-  protected void setMenuFileClipboardThreadSafe(ContentExtractOptions contentExtractOptions) {
-    if(Platform.isFxApplicationThread()) {
-      setMenuFileClipboard(contentExtractOptions);
-    }
-    else {
-      Platform.runLater(() -> setMenuFileClipboard(contentExtractOptions));
-    }
+    setMenuFileClipboard(Application.getContentExtractorManager().getLastExtractedContentExtractOptions());
   }
 
   protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
