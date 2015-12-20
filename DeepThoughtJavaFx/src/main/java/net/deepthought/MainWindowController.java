@@ -7,16 +7,15 @@
 package net.deepthought;
 
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
-import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
-import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.clipboard.ContentExtractOptionForUi;
 import net.deepthought.controls.clipboard.ContentExtractOptionForUiCreator;
 import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
+import net.deepthought.controls.connected_devices.ConnectedDevicesPanel;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
@@ -28,7 +27,6 @@ import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.SettingsChangedListener;
@@ -41,7 +39,6 @@ import net.deepthought.platform.JavaSeApplicationConfiguration;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -55,9 +52,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -70,7 +65,6 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -90,7 +84,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -145,13 +138,13 @@ public class MainWindowController implements Initializable {
   protected MenuButton btnOnlineArticleExtractors;
 
   @FXML
-  protected Pane statusBar;
+  protected GridPane statusBar;
   @FXML
   protected Label statusLabel;
   @FXML
   protected Label statusLabelCountEntries;
-  @FXML
-  protected Pane pnConnectedDevices;
+
+  protected ConnectedDevicesPanel pnConnectedDevices;
 
 
   @FXML
@@ -237,10 +230,10 @@ public class MainWindowController implements Initializable {
       }
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
-      Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
+      pnConnectedDevices = new ConnectedDevicesPanel();
+      statusBar.add(pnConnectedDevices, 2, 0);
+
       Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
-      for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices())
-        addConnectedDeviceIcon(connectedDevice);
     }
   }
 
@@ -822,57 +815,6 @@ public class MainWindowController implements Initializable {
       }
     }
   };
-
-
-  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
-
-    @Override
-    public void registeredDeviceConnected(ConnectedDevice device) {
-      Platform.runLater(() -> addConnectedDeviceIcon(device));
-    }
-
-    @Override
-    public void registeredDeviceDisconnected(ConnectedDevice device) {
-      Platform.runLater(() -> removeConnectedDeviceIcon(device));
-    }
-  };
-
-  protected Map<String, Node> connectedDeviceIcons = new HashMap<>();
-
-  protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
-    if(connectedDeviceIcons.containsKey(connectedDevice.getUniqueDeviceId()))
-      return;
-
-    Device device = connectedDevice.getDevice();
-    if(device == null)
-      return;
-
-    String iconPath = IconManager.getInstance().getIconForOperatingSystem(device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
-    ImageView icon = new ImageView(iconPath);
-    icon.setPreserveRatio(true);
-    icon.setFitHeight(24);
-    icon.maxHeight(24);
-//    icon.setUserData(connectedDevice);
-
-//    pnConnectedDevices.getChildren().add(icon);
-//    HBox.setMargin(icon, new Insets(0, 4, 0, 0));
-
-    Label label = new Label(null, icon);
-    label.setUserData(connectedDevice);
-    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
-        connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
-
-    pnConnectedDevices.getChildren().add(label);
-    HBox.setMargin(label, new Insets(0, 4, 0, 0));
-    connectedDeviceIcons.put(connectedDevice.getUniqueDeviceId(), label);
-  }
-
-  protected void removeConnectedDeviceIcon(ConnectedDevice device) {
-    if(connectedDeviceIcons.containsKey(device.getUniqueDeviceId())) {
-      Node icon = connectedDeviceIcons.remove(device.getUniqueDeviceId());
-      pnConnectedDevices.getChildren().remove(icon);
-    }
-  }
 
 
   protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {

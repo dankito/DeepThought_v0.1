@@ -29,7 +29,6 @@
          <children>
             <Label fx:id="statusLabelCountEntries" prefWidth="100.0" textAlignment="RIGHT" GridPane.columnIndex="1" GridPane.valignment="CENTER" />
             <Label fx:id="statusLabel" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER" />
-            <HBox fx:id="pnConnectedDevices" alignment="CENTER_RIGHT" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES" />
          </children>
       </GridPane>
    </bottom>

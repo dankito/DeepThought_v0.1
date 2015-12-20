@@ -11,6 +11,9 @@ import net.deepthought.util.JavaFxLocalization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -24,9 +27,12 @@ import javafx.scene.layout.HBox;
 /**
  * Created by ganymed on 07/12/15.
  */
-public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
+public class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
   private static final Logger log = LoggerFactory.getLogger(ConnectedDevicesPanel.class);
+
+
+  protected Map<String, Node> connectedDeviceIcons = new HashMap<>();
 
 
   public ConnectedDevicesPanel() {
@@ -49,7 +55,10 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
   }
 
 
-  protected abstract boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice);
+  protected boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice) {
+    // maybe overwritten in subclass to filter devices
+    return true;
+  }
 
   @Override
   public void cleanUp() {
@@ -73,6 +82,9 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
   };
 
   protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
+    if(connectedDeviceIcons.containsKey(connectedDevice.getUniqueDeviceId()))
+      return;
+
     Device device = connectedDevice.getDevice();
     if(device == null) { // TODO: how can that ever happen?
       log.error("Got a ConnectedDevice " + connectedDevice + ", but its Device property is null");
@@ -97,6 +109,8 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
       createConnectedDeviceContextMenu(connectedDevice, label);
       event.consume();
     });
+
+    connectedDeviceIcons.put(connectedDevice.getUniqueDeviceId(), label);
   }
 
   protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, Node icon) {
@@ -107,15 +121,22 @@ public abstract class ConnectedDevicesPanel extends HBox implements ICleanUp {
     contextMenu.show(icon, Side.BOTTOM, 0, 0);
   }
 
-  protected abstract void addItemsToConnectedDeviceContextMenu(ConnectedDevice connectedDevice, ContextMenu contextMenu);
+  protected void addItemsToConnectedDeviceContextMenu(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    // maybe overwritten in subclass
+  }
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
-    for(Node node : this.getChildren()) {
-      if(/*node instanceof ImageView &&*/ device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in  registeredDeviceConnected event
-        this.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
-        break;
-      }
+    if(connectedDeviceIcons.containsKey(device.getUniqueDeviceId())) {
+      Node icon = connectedDeviceIcons.remove(device.getUniqueDeviceId());
+      getChildren().remove(icon);
     }
+
+//    for(Node node : this.getChildren()) {
+//      if(/*node instanceof ImageView &&*/ device.equals(node.getUserData())) { // TODO: will this ever return true as ConnectedDevice instance should be a different one than in  registeredDeviceConnected event
+//        this.getChildren().remove(node); // TODO: will foreach loop throw exception immediately or at next iteration (which would be ok than; but must be that way)
+//        break;
+//      }
+//    }
   }
 
 }
