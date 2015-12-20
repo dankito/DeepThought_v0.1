@@ -1,12 +1,11 @@
 package net.deepthought.controls.clipboard;
 
-import net.deepthought.Application;
+import net.deepthought.clipboard.ClipboardContentChangedListener;
+import net.deepthought.clipboard.IClipboardWatcher;
 import net.deepthought.controls.Constants;
-import net.deepthought.data.contentextractor.ClipboardContent;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ExtractContentActionResultListener;
-import net.deepthought.data.contentextractor.JavaFxClipboardContent;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.util.Localization;
 
@@ -16,8 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
@@ -25,7 +22,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.PopupControl;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -47,6 +43,8 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected Stage stageToShowIn = null;
 
+  protected IClipboardWatcher clipboardWatcher = null;
+
   protected VBox contentPane;
 
   protected VBox optionsPane;
@@ -55,23 +53,15 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
   protected Button hidePopupButton;
 
-  protected Object sourceOfLastShownPopup = null;
 
-
-  public CreateEntryFromClipboardContentPopup(Stage stageToShowIn) {
+  public CreateEntryFromClipboardContentPopup(Stage stageToShowIn, IClipboardWatcher clipboardWatcher) {
     this.stageToShowIn = stageToShowIn;
+    this.clipboardWatcher = clipboardWatcher;
     this.uiOptionsCreator = new ContentExtractOptionForUiCreator(stageToShowIn);
 
     createPopupFrame();
 
-    stageToShowIn.focusedProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        if (newValue == true) { // Window got focused
-          checkIfEntryCanBeCreatedFromClipboardContent();
-        }
-      }
-    });
+    clipboardWatcher.addClipboardContentChangedExternallyListener(clipboardContentChangedExternallyListener);
   }
 
 
@@ -103,18 +93,6 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     contentPane.getChildren().add(optionsPane);
   }
 
-  protected void checkIfEntryCanBeCreatedFromClipboardContent() {
-    ClipboardContent clipboardContent = new JavaFxClipboardContent(Clipboard.getSystemClipboard());
-    Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContentAsync(clipboardContent, contentExtractOptions -> {
-      if (contentExtractOptions.hasContentExtractOptions()) {
-        if (contentExtractOptions.getSource().equals(sourceOfLastShownPopup) == false) {
-          sourceOfLastShownPopup = contentExtractOptions.getSource();
-          showCreateEntryFromClipboardContentPopupThreadSafe(contentExtractOptions);
-        }
-      }
-    });
-  }
-
   protected void showCreateEntryFromClipboardContentPopupThreadSafe(final ContentExtractOptions contentExtractOptions) {
     if(Platform.isFxApplicationThread()) {
       showCreateEntryFromClipboardContentPopup(contentExtractOptions);
@@ -125,15 +103,17 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
   }
 
   protected void showCreateEntryFromClipboardContentPopup(ContentExtractOptions contentExtractOptions) {
-    optionsPane.getChildren().clear();
-
-    showPopupForContentExtractOptions(contentExtractOptions);
-  }
-
-  protected void showPopupForContentExtractOptions(final ContentExtractOptions contentExtractOptions) {
     if(isShowing())
       hideThreadSafe();
 
+    optionsPane.getChildren().clear();
+
+    if(contentExtractOptions.hasContentExtractOptions()) {
+      showPopupForContentExtractOptions(contentExtractOptions);
+    }
+  }
+
+  protected void showPopupForContentExtractOptions(final ContentExtractOptions contentExtractOptions) {
     List<ContentExtractOptionForUi> uiOptions = uiOptionsCreator.createOptions(contentExtractOptions);
     addContentExtractOptionsToPopup(contentExtractOptions, uiOptions);
 
@@ -220,5 +200,13 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
 
     return optionLink;
   }
+
+
+  protected ClipboardContentChangedListener clipboardContentChangedExternallyListener = new ClipboardContentChangedListener() {
+    @Override
+    public void clipboardContentChanged(ContentExtractOptions contentExtractOptions) {
+      showCreateEntryFromClipboardContentPopupThreadSafe(contentExtractOptions);
+    }
+  };
 
 }

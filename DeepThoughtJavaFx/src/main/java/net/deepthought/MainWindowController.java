@@ -6,6 +6,9 @@
 
 package net.deepthought;
 
+import net.deepthought.clipboard.ClipboardContentChangedListener;
+import net.deepthought.clipboard.IClipboardWatcher;
+import net.deepthought.clipboard.JavaFxClipboardWatcher;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
 import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
@@ -101,6 +104,8 @@ public class MainWindowController implements Initializable {
   protected Stage stage = null;
 
   protected DeepThought deepThought = null;
+
+  protected IClipboardWatcher clipboardWatcher = null;
 
   protected CreateEntryFromClipboardContentPopup createEntryFromClipboardContentPopup;
 
@@ -376,8 +381,9 @@ public class MainWindowController implements Initializable {
       openedWindow.close();
     }
 
-    entriesOverviewControl.cleanUp();
     DeepThoughtFxHtmlEditorPool.getInstance().cleanUp();
+    entriesOverviewControl.cleanUp();
+    pnConnectedDevices.cleanUp();
   }
 
   private void setStatusLabelText(final String statusText) {
@@ -665,9 +671,13 @@ public class MainWindowController implements Initializable {
   }
 
 
-  @FXML
-  public void handleMainMenuFileShowing(Event event) {
-    setMenuFileClipboard(Application.getContentExtractorManager().getLastExtractedContentExtractOptions());
+  protected void setMenuFileClipboardThreadSafe(ContentExtractOptions contentExtractOptions) {
+    if(Platform.isFxApplicationThread()) {
+      setMenuFileClipboard(contentExtractOptions);
+    }
+    else {
+      Platform.runLater(() -> setMenuFileClipboard(contentExtractOptions));
+    }
   }
 
   protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
@@ -777,20 +787,14 @@ public class MainWindowController implements Initializable {
   public void setStage(Stage stage) {
     this.stage = stage;
 
-    this.createEntryFromClipboardContentPopup = new CreateEntryFromClipboardContentPopup(stage);
+    clipboardWatcher = new JavaFxClipboardWatcher(stage, clipboardContentChangedExternallyListener);
+    this.createEntryFromClipboardContentPopup = new CreateEntryFromClipboardContentPopup(stage, clipboardWatcher);
     this.contentExtractOptionForUiCreator = new ContentExtractOptionForUiCreator(stage);
 
     stage.setOnHiding(new EventHandler<WindowEvent>() {
       @Override
       public void handle(WindowEvent event) {
         windowClosing();
-      }
-    });
-
-    stage.focusedProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        mnitmFileClipboard.getItems().clear();
       }
     });
   }
@@ -813,6 +817,13 @@ public class MainWindowController implements Initializable {
         chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
         chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
       }
+    }
+  };
+
+  protected ClipboardContentChangedListener clipboardContentChangedExternallyListener = new ClipboardContentChangedListener() {
+    @Override
+    public void clipboardContentChanged(ContentExtractOptions contentExtractOptions) {
+      setMenuFileClipboardThreadSafe(contentExtractOptions);
     }
   };
 

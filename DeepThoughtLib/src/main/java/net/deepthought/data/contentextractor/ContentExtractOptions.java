@@ -22,7 +22,7 @@ public class ContentExtractOptions {
 
 
   public ContentExtractOptions() {
-
+    this("");
   }
 
   public ContentExtractOptions(String url) {
@@ -46,7 +46,7 @@ public class ContentExtractOptions {
   }
 
   public boolean hasContentExtractOptions() {
-    return source != null || contentExtractOptions.size() > 0;
+    return contentExtractOptions.size() > 0;
   }
 
   public int getContentExtractOptionsSize() {

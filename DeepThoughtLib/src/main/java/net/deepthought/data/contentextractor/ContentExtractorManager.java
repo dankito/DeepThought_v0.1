@@ -28,9 +28,6 @@ public class ContentExtractorManager implements IContentExtractorManager {
   protected List<IOnlineArticleContentExtractor> onlineArticleContentExtractorsWithArticleOverview = new CopyOnWriteArrayList<>();
 
 
-  protected ContentExtractOptions lastExtractedContentExtractOptions = new ContentExtractOptions();
-
-
   public ContentExtractorManager() {
     contentExtractors.add(new BasicWebPageContentExtractor());
     contentExtractors.add(new LocalFileContentExtractor());
@@ -69,12 +66,12 @@ public class ContentExtractorManager implements IContentExtractorManager {
   }
 
 
-  public void getContentExtractorOptionsForClipboardContentAsync(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener) {
+  public void getContentExtractorOptionsForClipboardContentAsync(net.deepthought.clipboard.ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener) {
     if(clipboardContent.hasImage()) {
       // TODO:
 //      Image image = clipboardContent.getImage();
 //      return new ContentExtractOption(this, image, false, true, true);
-      storeAndDispatchCreatedContentExtractOptions(new ContentExtractOptions(), listener);
+      dispatchCreatedContentExtractOptions(new ContentExtractOptions(), listener);
       return;
     }
 
@@ -87,15 +84,14 @@ public class ContentExtractorManager implements IContentExtractorManager {
 
     ContentExtractOptions contentExtractOptions = new ContentExtractOptions();
 
-   storeAndDispatchCreatedContentExtractOptions(contentExtractOptions, listener);
+   dispatchCreatedContentExtractOptions(contentExtractOptions, listener);
   }
 
-  protected void storeAndDispatchCreatedContentExtractOptions(ContentExtractOptions options, GetContentExtractorOptionsListener listener) {
-    this.lastExtractedContentExtractOptions = options;
+  protected void dispatchCreatedContentExtractOptions(ContentExtractOptions options, GetContentExtractorOptionsListener listener) {
     listener.contentExtractorOptionsRetrieved(options);
   }
 
-  protected List<String> getUrlsFromClipboardContent(ClipboardContent clipboardContent) {
+  protected List<String> getUrlsFromClipboardContent(net.deepthought.clipboard.ClipboardContent clipboardContent) {
     List<String> urls = new ArrayList<>();
 
     if(clipboardContent.hasFiles()) {
@@ -118,18 +114,20 @@ public class ContentExtractorManager implements IContentExtractorManager {
       // TODO: what about the remaining urls if a previous one succeeds?
       for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
         if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-          storeAndDispatchCreatedContentExtractOptions(onlineArticleContentExtractor.createExtractOptionsForUrl(url), listener);
+          dispatchCreatedContentExtractOptions(onlineArticleContentExtractor.createExtractOptionsForUrl(url), listener);
           return;
         }
       }
 
       for(IContentExtractor contentExtractor : contentExtractors) {
         if(contentExtractor.canCreateEntryFromUrl(url)) {
-          storeAndDispatchCreatedContentExtractOptions(contentExtractor.createExtractOptionsForUrl(url), listener);
+          dispatchCreatedContentExtractOptions(contentExtractor.createExtractOptionsForUrl(url), listener);
           return;
         }
       }
     }
+
+    dispatchCreatedContentExtractOptions(new ContentExtractOptions(), listener); // no ContentExtractor found for Clipboard Content
   }
 
   protected boolean isAttachableFile(String url) {
@@ -172,10 +170,5 @@ public class ContentExtractorManager implements IContentExtractorManager {
 
   public List<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview() {
     return onlineArticleContentExtractorsWithArticleOverview;
-  }
-
-  @Override
-  public ContentExtractOptions getLastExtractedContentExtractOptions() {
-    return lastExtractedContentExtractOptions;
   }
 }

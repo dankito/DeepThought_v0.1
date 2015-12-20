@@ -97,9 +97,9 @@
                   </MenuButton>
                   <MenuBar GridPane.hgrow="ALWAYS">
                     <menus>
-                      <Menu fx:id="mnitmFile" mnemonicParsing="false" onShowing="#handleMainMenuFileShowing" text="%file">
+                      <Menu fx:id="mnitmFile" mnemonicParsing="false" text="%file">
                         <items>
-                              <Menu fx:id="mnitmFileClipboard" mnemonicParsing="false" text="%clipboard" />
+                              <Menu fx:id="mnitmFileClipboard" disable="true" mnemonicParsing="false" text="%clipboard" />
                               <SeparatorMenuItem mnemonicParsing="false" />
                           <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
                                  <accelerator>

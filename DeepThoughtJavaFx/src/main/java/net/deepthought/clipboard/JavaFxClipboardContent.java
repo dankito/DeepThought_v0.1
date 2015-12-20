@@ -1,4 +1,4 @@
-package net.deepthought.data.contentextractor;
+package net.deepthought.clipboard;
 
 import java.io.File;
 import java.util.List;

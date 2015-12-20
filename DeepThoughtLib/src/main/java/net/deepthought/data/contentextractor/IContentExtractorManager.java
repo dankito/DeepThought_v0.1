@@ -11,7 +11,7 @@ public interface IContentExtractorManager {
 
   boolean addContentExtractor(IContentExtractor contentExtractor);
 
-  void getContentExtractorOptionsForClipboardContentAsync(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener);
+  void getContentExtractorOptionsForClipboardContentAsync(net.deepthought.clipboard.ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener);
 
   boolean hasOcrContentExtractors();
 
@@ -24,6 +24,4 @@ public interface IContentExtractorManager {
   boolean hasOnlineArticleContentExtractorsWithArticleOverview();
 
    List<IOnlineArticleContentExtractor> getOnlineArticleContentExtractorsWithArticleOverview();
-
-  ContentExtractOptions getLastExtractedContentExtractOptions();
 }
