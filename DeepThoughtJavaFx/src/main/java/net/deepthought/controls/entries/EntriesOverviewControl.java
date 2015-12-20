@@ -192,6 +192,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     // replace normal TextField txtfldSearchEntries with a SearchTextField (with a cross to clear selection)
     hboxEntriesBar.getChildren().remove(txtfldSearchEntries);
     txtfldSearchEntries = (CustomTextField) TextFields.createClearableTextField();
+    txtfldSearchEntries.setId("txtfldSearchEntries");
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchEntries, "search.entries.prompt.text");
     hboxEntriesBar.getChildren().add(1, txtfldSearchEntries);
     HBox.setHgrow(txtfldSearchEntries, Priority.ALWAYS);

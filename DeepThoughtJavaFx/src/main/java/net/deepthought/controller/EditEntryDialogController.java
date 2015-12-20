@@ -129,6 +129,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     abstractListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
+    htmledAbstract.setId("htmledAbstract");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
     contentPane.getChildren().add(0, htmledAbstract);
@@ -137,6 +138,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     contentListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
     htmledContent = new CollapsibleHtmlEditor("content", contentListener);
+    htmledContent.setId("htmledContent");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
     contentPane.getChildren().add(1, htmledContent);
     VBox.setVgrow(htmledContent, Priority.ALWAYS);
@@ -297,12 +299,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void saveEditedFieldsOnEntry() {
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract)) {
+    if(hasAbstractChanged()) {
       entry.setAbstract(abstractListener.handleEditedEmbeddedFiles(entry.getAbstract(), htmledAbstract.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
-    if(fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent)) {
+    if(hasContentChanged()) {
       entry.setContent(contentListener.handleEditedEmbeddedFiles(entry.getContent(), htmledContent.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
@@ -391,6 +393,16 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
     btnApplyChanges.setDisable(true);
+  }
+
+  protected boolean hasAbstractChanged() {
+    return fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryAbstract) ||
+        entry.getAbstract().equals(htmledAbstract.getHtml()) == false;
+  }
+
+  protected boolean hasContentChanged() {
+    return fieldsWithUnsavedChanges.contains(FieldWithUnsavedChanges.EntryContent) ||
+        entry.getContent().equals(htmledContent.getHtml()) == false;
   }
 
 
