@@ -181,6 +181,8 @@ public class MainWindowController implements Initializable {
 
   protected EntriesOverviewControl entriesOverviewControl;
 
+  protected boolean hasContentPaneDividerBeenSetForTheFirstTime = false;
+
 
 
   @Override
@@ -543,11 +545,23 @@ public class MainWindowController implements Initializable {
 //    contentPane.setDividerPositions(0.26);
 
     contentPane.getDividers().get(0).positionProperty().addListener(((observableValue, oldValue, newValue) -> {
-      if (deepThought != null) {
+      contentPaneDividerPositionChanged(newValue);
+    }));
+  }
+
+  protected void contentPaneDividerPositionChanged(Number newValue) {
+    if (deepThought != null) {
+      if(hasContentPaneDividerBeenSetForTheFirstTime == false) {
+        hasContentPaneDividerBeenSetForTheFirstTime = true;
+
+        double dividerPosition = deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition() / stage.getWidth();
+        contentPane.setDividerPosition(0, dividerPosition);
+      }
+      else {
         double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
         deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
       }
-    }));
+    }
   }
 
   @FXML
@@ -777,16 +791,6 @@ public class MainWindowController implements Initializable {
       @Override
       public void handle(WindowEvent event) {
         windowClosing();
-      }
-    });
-
-    stage.widthProperty().addListener(new ChangeListener<Number>() {
-      @Override
-      public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-        if (deepThought != null) {
-          double dividerPosition = deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition() / newValue.doubleValue();
-          contentPane.setDividerPosition(0, dividerPosition);
-        }
       }
     });
 
