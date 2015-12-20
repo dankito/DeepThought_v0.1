@@ -4,10 +4,10 @@ import net.deepthought.Application;
 import net.deepthought.MainWindowController;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.tag.IDisplayedTagsChangedListener;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -18,9 +18,9 @@ import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
-import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -247,6 +246,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       deepThought.getSettings().getLastViewedTag().removeEntityListener(selectedTagListener);
 
     deepThought.getSettings().setLastViewedTag(selectedTag);
+    tblvwTags.getSelectionModel().select(selectedTag);
 
     btnRemoveSelectedTag.setDisable(selectedTag == null || selectedTag instanceof SystemTag);
 
@@ -428,6 +428,11 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
 //    tableViewTagsItems.setUnderlyingCollection(tags);
     tableViewTagsItems = new LazyLoadingObservableList<>(tags);
     tblvwTags.setItems(tableViewTagsItems);
+
+    if(tags == allTagsSearchResult) {
+      setSelectedTagToAllEntriesSystemTag();
+      callDisplayedTagsChangedListeners(TagsSearchResults.EmptySearchResults);
+    }
   }
 
   protected void selectTagAccordingToSearchResult(TagsSearchResults results) {
