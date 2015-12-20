@@ -381,9 +381,15 @@ public class MainWindowController implements Initializable {
       openedWindow.close();
     }
 
+    cleanUp();
+  }
+
+  protected void cleanUp() {
     DeepThoughtFxHtmlEditorPool.getInstance().cleanUp();
     entriesOverviewControl.cleanUp();
+    createEntryFromClipboardContentPopup.cleanUp();
     pnConnectedDevices.cleanUp();
+    clipboardWatcher.removeClipboardContentChangedExternallyListener(clipboardContentChangedExternallyListener);
   }
 
   private void setStatusLabelText(final String statusText) {

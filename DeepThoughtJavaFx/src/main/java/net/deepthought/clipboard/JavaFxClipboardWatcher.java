@@ -60,4 +60,10 @@ public class JavaFxClipboardWatcher implements IClipboardWatcher {
   public boolean addClipboardContentChangedExternallyListener(ClipboardContentChangedListener listener) {
     return clipboardContentChangedExternallyListeners.add(listener);
   }
+
+  @Override
+  public boolean removeClipboardContentChangedExternallyListener(ClipboardContentChangedListener listener) {
+    return clipboardContentChangedExternallyListeners.remove(listener);
+  }
+
 }

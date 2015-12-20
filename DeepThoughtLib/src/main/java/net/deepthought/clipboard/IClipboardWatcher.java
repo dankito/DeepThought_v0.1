@@ -7,4 +7,6 @@ public interface IClipboardWatcher {
 
   boolean addClipboardContentChangedExternallyListener(ClipboardContentChangedListener listener);
 
+  boolean removeClipboardContentChangedExternallyListener(ClipboardContentChangedListener listener);
+
 }

@@ -3,6 +3,7 @@ package net.deepthought.controls.clipboard;
 import net.deepthought.clipboard.ClipboardContentChangedListener;
 import net.deepthought.clipboard.IClipboardWatcher;
 import net.deepthought.controls.Constants;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ExtractContentActionResultListener;
@@ -34,7 +35,7 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 25/04/15.
  */
-public class CreateEntryFromClipboardContentPopup extends PopupControl {
+public class CreateEntryFromClipboardContentPopup extends PopupControl implements ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(CreateEntryFromClipboardContentPopup.class);
 
@@ -62,6 +63,12 @@ public class CreateEntryFromClipboardContentPopup extends PopupControl {
     createPopupFrame();
 
     clipboardWatcher.addClipboardContentChangedExternallyListener(clipboardContentChangedExternallyListener);
+  }
+
+  @Override
+  public void cleanUp() {
+    clipboardWatcher.removeClipboardContentChangedExternallyListener(clipboardContentChangedExternallyListener);
+    uiOptionsCreator = null;
   }
 
 
