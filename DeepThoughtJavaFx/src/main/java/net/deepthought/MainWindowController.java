@@ -24,11 +24,9 @@ import net.deepthought.controls.tabcategories.CategoryTreeItem;
 import net.deepthought.controls.tabtags.TabTagsControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ClipboardContent;
-import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.JavaFxClipboardContent;
-import net.deepthought.data.contentextractor.OptionInvokedListener;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -46,7 +44,6 @@ import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IconManager;
-import net.deepthought.util.InputManager;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 import net.deepthought.util.Notification;
@@ -94,7 +91,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -668,21 +664,30 @@ public class MainWindowController implements Initializable {
   @FXML
   public void handleMainMenuFileShowing(Event event) {
     ClipboardContent clipboardContent = new JavaFxClipboardContent(Clipboard.getSystemClipboard());
-    ContentExtractOptions contentExtractOptions = Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContent(clipboardContent);
+    Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContent(clipboardContent, contentExtractOptions -> {
+        setMenuFileClipboardThreadSafe(contentExtractOptions);
+    });
+  }
 
-    mnitmFileClipboard.getItems().clear();
-    mnitmFileClipboard.setDisable(contentExtractOptions.hasContentExtractOptions() == false);
-
-    if(contentExtractOptions.hasContentExtractOptions()) {
+  protected void setMenuFileClipboardThreadSafe(ContentExtractOptions contentExtractOptions) {
+    if(Platform.isFxApplicationThread()) {
       setMenuFileClipboard(contentExtractOptions);
+    }
+    else {
+      Platform.runLater(() -> setMenuFileClipboard(contentExtractOptions));
     }
   }
 
   protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
-    List<ContentExtractOptionForUi> options = contentExtractOptionForUiCreator.createOptions(contentExtractOptions);
+    mnitmFileClipboard.getItems().clear();
+    mnitmFileClipboard.setDisable(contentExtractOptions.hasContentExtractOptions() == false);
 
-    for(ContentExtractOptionForUi option : options) {
-      addClipboardMenuItem(option);
+    if (contentExtractOptions.hasContentExtractOptions()) {
+      List<ContentExtractOptionForUi> options = contentExtractOptionForUiCreator.createOptions(contentExtractOptions);
+
+      for (ContentExtractOptionForUi option : options) {
+        addClipboardMenuItem(option);
+      }
     }
   }
 

@@ -6,6 +6,8 @@ import com.github.axet.wget.info.DownloadInfo.Part;
 import com.github.axet.wget.info.ex.DownloadMultipartError;
 
 import net.deepthought.Application;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -70,12 +72,9 @@ public class WGetFileDownloader implements IFileDownloader {
             ee.printStackTrace();
         }
       }
-    } catch (RuntimeException e) {
-      log.error("Could not download " + config.getUrl(), e);
-      throw e;
     } catch (Exception e) {
       log.error("Could not download " + config.getUrl(), e);
-      throw new RuntimeException(e);
+      listener.downloadCompleted(config, false, new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", config.getUrl()), e));
     }
   }
 
@@ -120,7 +119,9 @@ public class WGetFileDownloader implements IFileDownloader {
               }
             }
 
-            log.debug(String.format("%.2f %s", info.getCount() / (float) info.getLength(), parts));
+            if(info.getLength() != null && info.getLength() > 0) {
+              log.debug(String.format("%.2f %s", info.getCount() / (float) info.getLength(), parts));
+            }
           }
           break;
         default:

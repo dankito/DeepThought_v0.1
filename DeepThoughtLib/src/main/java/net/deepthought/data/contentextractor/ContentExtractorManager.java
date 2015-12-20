@@ -66,23 +66,23 @@ public class ContentExtractorManager implements IContentExtractorManager {
   }
 
 
-  public ContentExtractOptions getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent) {
+  public void getContentExtractorOptionsForClipboardContent(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener) {
     if(clipboardContent.hasImage()) {
       // TODO:
 //      Image image = clipboardContent.getImage();
 //      return new ContentExtractOption(this, image, false, true, true);
-      return new ContentExtractOptions();
+      listener.contentExtractorOptionsRetrieved(new ContentExtractOptions());
     }
 
     List<String> urls = getUrlsFromClipboardContent(clipboardContent);
 
     if(urls.size() > 0) {
-      return createContentExtractOptionsFromUrls(urls);
+      createContentExtractOptionsFromUrls(urls, listener);
     }
 
     ContentExtractOptions contentExtractOptions = new ContentExtractOptions();
 
-    return contentExtractOptions;
+    listener.contentExtractorOptionsRetrieved(contentExtractOptions);
   }
 
   protected List<String> getUrlsFromClipboardContent(ClipboardContent clipboardContent) {
@@ -103,23 +103,23 @@ public class ContentExtractorManager implements IContentExtractorManager {
     return urls;
   }
 
-  protected ContentExtractOptions createContentExtractOptionsFromUrls(List<String> urls) {
+  protected void createContentExtractOptionsFromUrls(List<String> urls, GetContentExtractorOptionsListener listener) {
     for(String url : urls) {
       // TODO: what about the remaining urls if a previous one succeeds?
       for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
         if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-          return onlineArticleContentExtractor.createExtractOptionsForUrl(url);
+          listener.contentExtractorOptionsRetrieved(onlineArticleContentExtractor.createExtractOptionsForUrl(url));
+          return;
         }
       }
 
       for(IContentExtractor contentExtractor : contentExtractors) {
         if(contentExtractor.canCreateEntryFromUrl(url)) {
-          return contentExtractor.createExtractOptionsForUrl(url);
+          listener.contentExtractorOptionsRetrieved(contentExtractor.createExtractOptionsForUrl(url));
+          return;
         }
       }
     }
-
-    return new ContentExtractOptions();
   }
 
   protected boolean isAttachableFile(String url) {

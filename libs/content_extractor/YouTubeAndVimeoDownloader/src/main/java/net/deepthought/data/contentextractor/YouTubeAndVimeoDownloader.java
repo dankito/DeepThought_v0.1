@@ -195,8 +195,6 @@ public class YouTubeAndVimeoDownloader {
       vget.download(parser, config.getStop(), notify);
 
 //      Application.getDownloader().downloadAsync(config, listener);
-    } catch (RuntimeException e) {
-      listener.downloadCompleted(config, false, new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", config.getUrl()), e));
     } catch (Exception e) {
       listener.downloadCompleted(config, false, new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", config.getUrl()), e));
     }
@@ -269,8 +267,10 @@ public class YouTubeAndVimeoDownloader {
               }
             }
 
-            log.debug(String.format("%s %.2f %s", videoInfo.getState(),
-                downloadInfo.getCount() / (float) downloadInfo.getLength(), parts));
+            if(downloadInfo.getLength() != null && downloadInfo.getLength() > 0) {
+              log.debug(String.format("%s %.2f %s", videoInfo.getState(),
+                  downloadInfo.getCount() / (float) downloadInfo.getLength(), parts));
+            }
           }
           break;
         case DONE:
