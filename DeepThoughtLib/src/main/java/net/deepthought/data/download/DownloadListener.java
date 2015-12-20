@@ -7,8 +7,8 @@ import net.deepthought.util.DeepThoughtError;
  */
 public interface DownloadListener {
 
-  public void progress(DownloadConfig download, float percentage);
+  void progress(DownloadConfig download, float percentage);
 
-  public void downloadCompleted(DownloadConfig download, boolean successful, DeepThoughtError error);
+  void downloadCompleted(DownloadConfig download, boolean successful, DeepThoughtError error);
 
 }

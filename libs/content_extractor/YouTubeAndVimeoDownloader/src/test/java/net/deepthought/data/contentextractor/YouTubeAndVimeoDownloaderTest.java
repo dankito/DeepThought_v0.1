@@ -1,10 +1,20 @@
 package net.deepthought.data.contentextractor;
 
+import com.github.axet.vget.VGet;
+import com.github.axet.vget.info.VGetParser;
+import com.github.axet.vget.info.VideoInfo;
+
 import net.deepthought.data.contentextractor.model.AvailableFormats;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.net.URL;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by ganymed on 26/04/15.
@@ -39,6 +49,34 @@ public class YouTubeAndVimeoDownloaderTest {
 
     Assert.assertEquals(url, formats.getUrl());
     Assert.assertEquals(2, formats.getFormats().size());
+  }
+
+  @Test
+  public void downloadVideo() {
+    try {
+      URL url = new URL("https://www.youtube.com/watch?v=uoq6_2xnQeY");
+      VGetParser parser = VGet.parser(url);
+      final VideoInfo info = parser.info(url);
+
+      VGet vget = new VGet(info, new File(System.getProperty("java.io.tmpdir")));
+
+      final CountDownLatch waitLatch = new CountDownLatch(1);
+
+      vget.download(parser, new AtomicBoolean(false), new Runnable() {
+        @Override
+        public void run() {
+          if(info.getState() == VideoInfo.States.DONE || info.getState() == VideoInfo.States.ERROR || info.getState() == VideoInfo.States.RETRYING) {
+            waitLatch.countDown();
+          }
+        }
+      });
+
+      try { waitLatch.await(20, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+      Assert.assertEquals(VideoInfo.States.DONE, info.getState());
+    } catch(Exception ex) {
+      Assert.fail("Should not thrown an Exception. Exception thrown: " + ex);
+    }
   }
 
 }

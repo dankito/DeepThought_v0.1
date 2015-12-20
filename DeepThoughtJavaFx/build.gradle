@@ -19,6 +19,7 @@ dependencies {
     compile project(':WGetFileDownloader')
 
 //    compile project(':OnlineNewspaperContentExtractor')
+//    compile project(':YouTubeAndVimeoContentExtractor')
 //    compile project(':OpenOfficeDocumentsImporterExporter')
 
     compile 'org.controlsfx:controlsfx:8.20.8'

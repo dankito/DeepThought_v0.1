@@ -28,6 +28,10 @@ public class DownloadConfig {
     return destinationFileName;
   }
 
+  public void setDestinationFileName(String destinationFileName) {
+    this.destinationFileName = destinationFileName;
+  }
+
   public AtomicBoolean getStop() {
     return stop;
   }

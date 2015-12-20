@@ -61,7 +61,8 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
     return new ArrayList<>();
 //    return Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
-//        new PostillonContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()});
+//        new PostillonContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor(),
+//        new YouTubeAndVimeoContentExtractor()});
   }
 
   @Override

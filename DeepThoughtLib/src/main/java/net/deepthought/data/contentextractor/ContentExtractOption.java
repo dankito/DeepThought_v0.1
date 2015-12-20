@@ -1,7 +1,8 @@
 package net.deepthought.data.contentextractor;
 
-import net.deepthought.Application;
+import net.deepthought.data.contentextractor.model.AvailableFormat;
 import net.deepthought.util.Localization;
+import net.deepthought.util.ThreadHelper;
 import net.deepthought.util.file.FileUtils;
 
 import java.io.File;
@@ -58,6 +59,10 @@ public class ContentExtractOption {
     this.canSetFileAsEntryContent = canSetFileAsEntryContent;
   }
 
+  public ContentExtractOption(IContentExtractor contentExtractor, AvailableFormat availableFormat, ExtractContentAction action) {
+    this(contentExtractor, availableFormat.getUrl(), true, availableFormat.getDescription(), action);
+  }
+
 
   public IContentExtractor getContentExtractor() {
     return contentExtractor;
@@ -70,8 +75,9 @@ public class ContentExtractOption {
   public void setSource(Object source) {
     this.source = source;
 
-    if(source instanceof Image)
+    if(source instanceof Image) {
       isImage = true;
+    }
     else if(source instanceof String) {
       try {
         new File((String)source).toURI(); // check if source can be parsed to an URI
@@ -138,7 +144,7 @@ public class ContentExtractOption {
 
   public void runAction(final ExtractContentActionResultListener listener) {
     if(action != null) {
-      Application.getThreadPool().runTaskAsync(new Runnable() {
+      ThreadHelper.runTaskAsync(new Runnable() {
         @Override
         public void run() {
           action.runExtraction(ContentExtractOption.this, listener);

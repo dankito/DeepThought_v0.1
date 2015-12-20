@@ -9,7 +9,6 @@ import com.github.axet.vget.vhs.YouTubeParser;
 import com.github.axet.vget.vhs.YoutubeInfo;
 import com.github.axet.wget.info.DownloadInfo;
 
-import net.deepthought.Application;
 import net.deepthought.data.contentextractor.model.AudioQuality;
 import net.deepthought.data.contentextractor.model.AvailableFormat;
 import net.deepthought.data.contentextractor.model.AvailableFormats;
@@ -17,6 +16,10 @@ import net.deepthought.data.contentextractor.model.Container;
 import net.deepthought.data.contentextractor.model.Encoding;
 import net.deepthought.data.contentextractor.model.VideoQuality;
 import net.deepthought.data.download.DownloadConfig;
+import net.deepthought.data.download.DownloadListener;
+import net.deepthought.util.DeepThoughtError;
+import net.deepthought.util.Localization;
+import net.deepthought.util.ThreadHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,8 +163,8 @@ public class YouTubeAndVimeoDownloader {
   }
 
 
-  public void downloadAsync(final DownloadConfig config, final Object listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+  public void downloadAsync(final DownloadConfig config, final DownloadListener listener) {
+    ThreadHelper.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         download(config, listener);
@@ -169,68 +172,84 @@ public class YouTubeAndVimeoDownloader {
     });
   }
 
-  protected void download(DownloadConfig config, Object listener) {
+  protected void download(DownloadConfig config, DownloadListener listener) {
     try {
 //      VideoInfo info = getVideoInfo(config.getUrl());
       URL url = new URL(config.getUrl());
       VGetParser parser = VGet.parser(url);
       VideoInfo info = parser.info(url);
+//      VideoInfo info = new VideoInfo(url);
 
       VGet vget = new VGet(info, new File(config.getDestinationFileName()));
 
-      Runnable notify = new DownloadThread(info);
+      Runnable notify = new DownloadThread(vget, info, config, listener);
 
-      // [OPTIONAL] call v.extract() only if you d like to get video title
-      // or download url link
-      // before start download. or just skip it.
-      vget.extract(parser, config.getStop(), notify);
-
-      log.debug("Title: " + info.getTitle());
-      log.debug("Download URL: " + info.getInfo().getSource());
+//      // [OPTIONAL] call v.extract() only if you d like to get video title
+//      // or download url link
+//      // before start download. or just skip it.
+//      vget.extract(parser, config.getStop(), notify);
+//
+//      log.debug("Title: " + info.getTitle());
+//      log.debug("Download URL: " + info.getInfo().getSource());
 
       vget.download(parser, config.getStop(), notify);
+
+//      Application.getDownloader().downloadAsync(config, listener);
     } catch (RuntimeException e) {
-      throw e;
+      listener.downloadCompleted(config, false, new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", config.getUrl()), e));
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      listener.downloadCompleted(config, false, new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", config.getUrl()), e));
     }
   }
 
   protected class DownloadThread implements Runnable {
 
+    protected VGet vget;
+
     protected VideoInfo info;
+
+    protected DownloadConfig downloadConfig;
+
+    protected DownloadListener listener;
 
     protected long last;
 
 
-    public DownloadThread(VideoInfo info) {
+    public DownloadThread(VGet vget, VideoInfo info, DownloadConfig config, DownloadListener listener) {
+      this.vget = vget;
       this.info = info;
+      this.downloadConfig = config;
+      this.listener = listener;
     }
 
 
     @Override
     public void run() {
-      VideoInfo i1 = info;
-      DownloadInfo i2 = i1.getInfo();
+      VideoInfo videoInfo = info;
+      DownloadInfo downloadInfo = videoInfo.getInfo();
 
       // notify app or save download state
       // you can extract information from DownloadInfo info;
-      switch (i1.getState()) {
+      switch (videoInfo.getState()) {
         case EXTRACTING:
         case EXTRACTING_DONE:
-        case DONE:
-          if (i1 instanceof YoutubeInfo) {
-            YoutubeInfo i = (YoutubeInfo) i1;
-            log.debug(i1.getState() + " " + i.getVideoQuality());
-          } else if (i1 instanceof VimeoInfo) {
-            VimeoInfo i = (VimeoInfo) i1;
-            log.debug(i1.getState() + " " + i.getVideoQuality());
+          if (videoInfo instanceof YoutubeInfo) {
+            YoutubeInfo i = (YoutubeInfo) videoInfo;
+            log.debug(videoInfo.getState() + " " + i.getVideoQuality());
+          } else if (videoInfo instanceof VimeoInfo) {
+            VimeoInfo i = (VimeoInfo) videoInfo;
+            log.debug(videoInfo.getState() + " " + i.getVideoQuality());
           } else {
             log.debug("downloading unknown quality");
           }
           break;
         case RETRYING:
-          log.debug(i1.getState() + " " + i1.getDelay());
+          log.debug(videoInfo.getState() + " " + videoInfo.getDelay());
+          if(videoInfo.getDelay() == 0) {
+            downloadConfig.stopDownload();
+            listener.downloadCompleted(downloadConfig, false,
+                new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", info.getWeb().toExternalForm())));
+          }
           break;
         case DOWNLOADING:
           long now = System.currentTimeMillis();
@@ -239,7 +258,7 @@ public class YouTubeAndVimeoDownloader {
 
             String parts = "";
 
-            List<DownloadInfo.Part> pp = i2.getParts();
+            List<DownloadInfo.Part> pp = downloadInfo.getParts();
             if (pp != null) {
               // multipart download
               for (DownloadInfo.Part p : pp) {
@@ -250,9 +269,18 @@ public class YouTubeAndVimeoDownloader {
               }
             }
 
-            log.debug(String.format("%s %.2f %s", i1.getState(),
-                i2.getCount() / (float) i2.getLength(), parts));
+            log.debug(String.format("%s %.2f %s", videoInfo.getState(),
+                downloadInfo.getCount() / (float) downloadInfo.getLength(), parts));
           }
+          break;
+        case DONE:
+          // TODO: can be removed (as well as vget field) as soon as we set the destination filename and not VGet
+          downloadConfig.setDestinationFileName(vget.getTarget().getAbsolutePath());
+          listener.downloadCompleted(downloadConfig, true, null);
+          break;
+        case ERROR:
+          listener.downloadCompleted(downloadConfig, false,
+              new DeepThoughtError(Localization.getLocalizedString("error.could.not.download.file", info.getWeb().toExternalForm())));
           break;
         default:
           break;

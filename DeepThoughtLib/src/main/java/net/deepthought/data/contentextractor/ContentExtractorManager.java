@@ -16,6 +16,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ContentExtractorManager implements IContentExtractorManager {
 
+  protected static final int CountDefaultContentExtractors = 3;
+
+
   protected List<IContentExtractor> contentExtractors = new CopyOnWriteArrayList<>();
 
   protected List<IOcrContentExtractor> ocrContentExtractors = new CopyOnWriteArrayList<>();
@@ -40,8 +43,12 @@ public class ContentExtractorManager implements IContentExtractorManager {
     if(contentExtractor instanceof IOnlineArticleContentExtractor)
       return addOnlineArticleContentExtractor((IOnlineArticleContentExtractor) contentExtractor);
 
-    if(contentExtractor instanceof IOcrContentExtractor == false && contentExtractor instanceof IOnlineArticleContentExtractor == false)
-      return contentExtractors.add(contentExtractor);
+    if(contentExtractor instanceof IOcrContentExtractor == false && contentExtractor instanceof IOnlineArticleContentExtractor == false) {
+      // add before default ContentExtractors
+      // TODO: implement Priority property in IContentExtractor
+      contentExtractors.add(contentExtractors.size() - CountDefaultContentExtractors, contentExtractor);
+      return true;
+    }
 
     return false;
   }

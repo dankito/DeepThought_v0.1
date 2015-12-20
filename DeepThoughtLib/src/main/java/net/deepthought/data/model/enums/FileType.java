@@ -88,9 +88,21 @@ public class FileType extends ExtensibleEnumeration {
   protected static FileType imageFileType = null;
 
   public static FileType getImageFileType() {
+    return getFileTypeForResourceKey("file.type.image");
+  }
+
+  public static FileType getVideoFileType() {
+    return getFileTypeForResourceKey("file.type.video");
+  }
+
+  public static FileType getAudioFileType() {
+    return getFileTypeForResourceKey("file.type.audio");
+  }
+
+  protected static FileType getFileTypeForResourceKey(String resourceKey) {
     if(imageFileType == null && Application.getDeepThought() != null) { // TODO: bad solution as then FileLink's FileType stays null
       for(FileType fileType : Application.getDeepThought().getFileTypes()) {
-        if("file.type.image".equals(fileType.nameResourceKey)) {
+        if(resourceKey.equals(fileType.nameResourceKey)) {
           imageFileType = fileType;
           break;
         }

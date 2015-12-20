@@ -8,9 +8,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 
 import net.deepthought.communication.model.DoOcrConfiguration;
-import net.deepthought.data.contentextractor.ClipboardContent;
-import net.deepthought.data.contentextractor.ContentExtractOption;
-import net.deepthought.data.contentextractor.CreateEntryListener;
+import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.ocr.OcrContentExtractorBase;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.model.FileLink;
@@ -66,18 +64,8 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
   }
 
   @Override
-  public void createEntryFromUrl(String url, CreateEntryListener listener) {
-
-  }
-
-  @Override
-  public ContentExtractOption canCreateEntryFromClipboardContent(ClipboardContent clipboardContent) {
-    return ContentExtractOption.CanNotExtractContent;
-  }
-
-  @Override
-  public void createEntryFromClipboardContent(ContentExtractOption contentExtractOption, CreateEntryListener listener) {
-
+  public ContentExtractOptions createExtractOptionsForUrl(String url) {
+    return null;
   }
 
   @Override
