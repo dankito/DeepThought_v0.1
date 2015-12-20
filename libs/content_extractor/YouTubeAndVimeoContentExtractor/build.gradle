@@ -8,3 +8,18 @@ dependencies {
     // to include test helper classes from DeepThoughtLib
     testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
 }
+
+
+def version = '0.1 Beta'
+def title = 'YouTube and Vimeo ContentExtractor Plugin for DeepThought'
+
+// create a single Jar with all dependencies. Taken from: http://www.mkyong.com/gradle/gradle-create-a-jar-file-with-dependencies/
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': title,
+                'Implementation-Version': version
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
