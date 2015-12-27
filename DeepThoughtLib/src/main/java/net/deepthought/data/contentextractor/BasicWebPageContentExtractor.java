@@ -1,5 +1,10 @@
 package net.deepthought.data.contentextractor;
 
+import com.kohlschutter.boilerpipe.BoilerpipeProcessingException;
+import com.kohlschutter.boilerpipe.extractors.CanolaExtractor;
+import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
+import com.kohlschutter.boilerpipe.sax.HTMLHighlighter;
+
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
@@ -12,6 +17,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URL;
 
 /**
  * <p>Simply downloads a Web Page's HTML code.</p>
@@ -102,6 +109,13 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
       }
     }));
 
+    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.important.web.page.parts", new ExtractContentAction() {
+      @Override
+      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+        setWebPageAsEntryContentTryToRemoveClutter(option, listener);
+      }
+    }));
+
     options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.extract.plain.text.only", new ExtractContentAction() {
       @Override
       public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
@@ -127,6 +141,33 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
     }
   }
 
+  protected void setWebPageAsEntryContentTryToRemoveClutter(ContentExtractOption option, ExtractContentActionResultListener listener) {
+    EntryCreationResult result = createEntryCreationResultFromPageHtmlTryToRemoveClutter(option.getUrl());
+    dispatchResult(result, listener);
+  }
+
+  protected EntryCreationResult createEntryCreationResultFromPageHtmlTryToRemoveClutter(String webPageUrl) {
+    try {
+      HTMLHighlighter htmlExtractor = HTMLHighlighter.newExtractingInstance();
+      ExtractorBase extractor = CanolaExtractor.INSTANCE;
+      String content = htmlExtractor.process(new URL(webPageUrl), extractor);
+
+      return createEntryCreationResultFromPageHtmlString(webPageUrl, content);
+    } catch(Exception ex) {
+      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
+      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
+    }
+  }
+
+  private EntryCreationResult createEntryCreationResultFromPageHtmlString(String webPageUrl, String content) {
+    Entry entry = new Entry(content);
+    EntryCreationResult result = new EntryCreationResult(webPageUrl, entry);
+
+    result.setReference(createReferenceForUrl(webPageUrl)); // TODO: try to get WebPage's title
+
+    return result;
+  }
+
   protected void setWebPagePlainTextAsEntryContent(ContentExtractOption option, ExtractContentActionResultListener listener) {
     EntryCreationResult result = createEntryCreationResultFromPagePlainText(option.getUrl());
     dispatchResult(result, listener);
@@ -135,11 +176,28 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
   protected EntryCreationResult createEntryCreationResultFromPagePlainText(String webPageUrl) {
     try {
       Document document = retrieveOnlineDocument(webPageUrl);
-      return new EntryCreationResult(webPageUrl, new Entry(document.body().text()));
+//      String content = document.body().text();
+      String content = getPlainTextFromDocument(document);
+
+      EntryCreationResult result = new EntryCreationResult(webPageUrl, new Entry(content));
+      result.setReference(createReferenceForUrl(webPageUrl, document.title()));
+
+      return result;
     } catch(Exception ex) {
       log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
       return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
     }
+  }
+
+  protected String getPlainTextFromDocument(Document document) throws BoilerpipeProcessingException {
+    String plainText = CanolaExtractor.INSTANCE.getText(document.outerHtml());
+    String formattedPlainText = "";
+
+    for(String paragraph : plainText.split("\n")) {
+      formattedPlainText += "<p>" + paragraph + "</p>";
+    }
+
+    return formattedPlainText;
   }
 
   protected void dispatchResult(EntryCreationResult result, ExtractContentActionResultListener listener) {
@@ -153,13 +211,22 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     Entry entry = new Entry(makeRelativeUrlsAbsolute(document).outerHtml());
 
-    Reference reference = new Reference(document.title());
-    reference.setOnlineAddress(articleUrl);
-    reference.setLastAccessDate(reference.getCreatedOn());
+    Reference reference = createReferenceForUrl(articleUrl, document.title());
 
     EntryCreationResult result = new EntryCreationResult(articleUrl, entry);
     result.setReference(reference);
     return result;
+  }
+
+  protected Reference createReferenceForUrl(String articleUrl) {
+    return createReferenceForUrl(articleUrl, articleUrl);
+  }
+
+  protected Reference createReferenceForUrl(String articleUrl, String title) {
+    Reference reference = new Reference(title);
+    reference.setOnlineAddress(articleUrl);
+    reference.setLastAccessDate(reference.getCreatedOn());
+    return reference;
   }
 
   protected Document makeRelativeUrlsAbsolute(Document document) {

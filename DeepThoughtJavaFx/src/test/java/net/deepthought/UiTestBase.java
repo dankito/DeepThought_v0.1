@@ -21,6 +21,8 @@ import javafx.stage.Stage;
  */
 public abstract class UiTestBase extends ApplicationTest {
 
+  protected static final String TestFolder = "data/uitests";
+
   protected static final int CountDefaultEntries = 20;
 
 
@@ -29,6 +31,8 @@ public abstract class UiTestBase extends ApplicationTest {
 
   @Override
   public void start(Stage stage) throws Exception {
+//    System.setProperty("user.dir", new File(TestFolder).getAbsolutePath());
+
     setupStage(stage);
   }
 

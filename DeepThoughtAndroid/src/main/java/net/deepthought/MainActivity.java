@@ -444,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
-      captureImageAndDoOcr(request);
+      MainActivity.this.captureImageAndDoOcr(request);
     }
 
     @Override

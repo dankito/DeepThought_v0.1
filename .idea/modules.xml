@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/AndroidOrmLiteEntityManager/AndroidOrmLiteEntityManager.iml" filepath="$PROJECT_DIR$/libs/persistence/database/AndroidOrmLiteEntityManager/AndroidOrmLiteEntityManager.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/Boilerpipe/Boilerpipe.iml" filepath="$PROJECT_DIR$/libs/content_extractor/Boilerpipe/Boilerpipe.iml" />
       <module fileurl="file://$PROJECT_DIR$/DeepThought.iml" filepath="$PROJECT_DIR$/DeepThought.iml" />
       <module fileurl="file://$PROJECT_DIR$/DeepThoughtAndroid/DeepThoughtAndroid.iml" filepath="$PROJECT_DIR$/DeepThoughtAndroid/DeepThoughtAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/os/DeepThoughtAndroidLib/DeepThoughtAndroidLib.iml" filepath="$PROJECT_DIR$/libs/os/DeepThoughtAndroidLib/DeepThoughtAndroidLib.iml" />

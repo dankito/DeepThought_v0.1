@@ -9,6 +9,7 @@ include ':json-io', ':DeepThoughtJson-io'
 include ':LuceneSearchEngine'
 include ':WGetFileDownloader'
 include ':commons-lang'
+include ':Boilerpipe'
 include ':OcrTextContentExtractorJava'
 include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
@@ -41,6 +42,8 @@ project(':LuceneSearchEngine').projectDir = new File('libs/search/LuceneSearchEn
 project(':WGetFileDownloader').projectDir = new File('libs/downloader/WGetFileDownloader')
 
 project(':commons-lang').projectDir = new File('libs/utils/commons-lang')
+
+project(':Boilerpipe').projectDir = new File('libs/content_extractor/Boilerpipe')
 
 project(':OcrTextContentExtractorJava').projectDir = new File('libs/content_extractor/OcrTextContentExtractorJava')
 

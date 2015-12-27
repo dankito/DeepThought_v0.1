@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+dependencies {
+//    compile fileTree(include: ['*.jar'], dir: 'libs')
+
+    compile 'net.sourceforge.nekohtml:nekohtml:1.9.13'
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+}
