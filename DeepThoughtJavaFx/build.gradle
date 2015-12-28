@@ -83,6 +83,21 @@ tasks.withType(Checkstyle) {
 }
 
 
+apply plugin: 'findbugs'
+
+tasks.withType(FindBugs) {
+    group = "Reporting"
+    ignoreFailures = true
+    reportLevel = 'low'
+
+    reports {
+        // FindBugs tasks can only have one report enabled
+        xml.enabled true
+        html.enabled false
+    }
+}
+
+
 
 apply plugin: 'jdepend'
 
