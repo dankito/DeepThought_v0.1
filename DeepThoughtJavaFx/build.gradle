@@ -58,7 +58,9 @@ task fatJar(type: Jar) {
 apply plugin: 'pmd'
 
 tasks.withType(Pmd) {
+    group = "Reporting"
     ignoreFailures = true
+
     ruleSets = ["java-basic", "java-braces", "java-clone", "java-coupling",
                 "java-design", "java-naming", "java-strings"]
 }
@@ -68,6 +70,8 @@ tasks.withType(Pmd) {
 apply plugin: 'jdepend'
 
 tasks.withType(JDepend) {
+    group = "Reporting"
+
     reports {
         xml.enabled true
     }
