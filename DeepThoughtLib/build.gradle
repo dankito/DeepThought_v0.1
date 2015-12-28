@@ -89,7 +89,8 @@ apply plugin: 'pmd'
 
 tasks.withType(Pmd) {
     ignoreFailures = true
-    ruleSets = [ "basic", "strings" ]
+    ruleSets = ["java-basic", "java-braces", "java-clone", "java-coupling",
+                "java-design", "java-naming", "java-strings"]
 }
 
 
@@ -104,28 +105,52 @@ tasks.withType(JDepend) {
 
 apply plugin: "jacoco"
 
-jacoco {
-    toolVersion = "0.7.5.201505241946"
-}
-
-//jacocoTestReport {
-//    reports {
-//        html.enabled true
-//        xml.enabled true
-//        csv.enabled false
-//    }
+//jacoco {
+//    toolVersion = "0.7.5.201505241946"
 //}
 
-task jacocoTestReportAfterTests(type: JacocoReport, dependsOn: "test") {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
-
-    reports {
-        xml.enabled = true
-        html.enabled = true
+test {
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpFile = file("$buildDir/jacoco/classpathdumps")
     }
 }
+
+jacocoTestReport {
+    dependsOn test
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+
+    reports {
+        xml{
+            enabled true
+            destination "${buildDir}/reports/jacoco/jacoco.xml"
+        }
+        csv.enabled false
+        html{
+            enabled true
+            destination "${buildDir}/jacocoHtml"
+        }
+    }
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+}
+
+//task jacocoTestReportAfterTests(type: JacocoReport, dependsOn: "test") {
+//    group = "Reporting"
+//    description = "Generate Jacoco coverage reports after running tests."
+//
+//    executionData = files('build/jacoco/unitTest.exec')
+//    sourceDirectories = files('src/main/java')
+//    classDirectories = files('build/classes/main')
+//
+//    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+//
+//    reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//}
 
 
 apply plugin: 'sonar-runner'

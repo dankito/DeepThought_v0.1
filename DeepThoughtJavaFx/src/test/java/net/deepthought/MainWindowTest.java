@@ -2,6 +2,7 @@ package net.deepthought;
 
 import net.deepthought.data.model.Entry;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Created by ganymed on 20/12/15.
  */
+@Ignore
 public class MainWindowTest extends UiTestBase {
 
   @Test

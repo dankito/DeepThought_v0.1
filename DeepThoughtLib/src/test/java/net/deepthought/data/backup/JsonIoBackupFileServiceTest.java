@@ -4,9 +4,12 @@ import net.deepthought.data.helper.MockEntityManager;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 
+import org.junit.Ignore;
+
 /**
  * Created by ganymed on 01/01/15.
  */
+@Ignore
 public class JsonIoBackupFileServiceTest extends BackupFileServiceTestBase {
 
   @Override

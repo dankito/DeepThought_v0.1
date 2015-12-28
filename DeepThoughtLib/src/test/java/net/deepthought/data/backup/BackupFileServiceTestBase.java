@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import java.util.Set;
 /**
  * Created by ganymed on 05/01/15.
  */
+@Ignore
 public abstract class BackupFileServiceTestBase {
 
   protected IBackupManager backupManager = null;
