@@ -120,6 +120,10 @@ jacocoTestReport {
 //}
 
 
-apply plugin: 'sonar-runner'
+
+apply plugin: "org.sonarqube"
+
+project.tasks["sonarqube"].dependsOn pmdMain, jdependMain, jacocoTestReport
+project.tasks["sonarqube"].group "Reporting"
 
 
