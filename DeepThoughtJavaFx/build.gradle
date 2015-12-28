@@ -66,6 +66,23 @@ tasks.withType(Pmd) {
 }
 
 
+apply plugin: 'checkstyle'
+
+checkstyle {
+    toolVersion = "5.9"
+}
+
+tasks.withType(Checkstyle) {
+    group = "Reporting"
+    ignoreFailures = true
+
+    configFile = new File('../config/checkstyle/checkstyle_checks.xml')
+    configProperties = [
+            "checkstyle.suppressions.file" : "../config/checkstyle/suppressions.xml"
+    ]
+}
+
+
 
 apply plugin: 'jdepend'
 
