@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.Application;
+import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Localization;
 import net.deepthought.util.OsHelper;
@@ -27,6 +28,18 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   static {
     if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
       CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE)); // maybe it helps so that Sueddeutsche cookies don't get set
+  }
+
+
+  protected IHtmlHelper htmlHelper = null;
+
+
+  public OnlineArticleContentExtractorBase() {
+    this(Application.getHtmlHelper());
+  }
+
+  public OnlineArticleContentExtractorBase(IHtmlHelper htmlHelper) {
+    this.htmlHelper = htmlHelper;
   }
 
 
@@ -63,11 +76,11 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   }
 
   protected Document retrieveOnlineDocument(String articleUrl) throws IOException {
-    return Application.getHtmlHelper().retrieveOnlineDocument(articleUrl);
+    return htmlHelper.retrieveOnlineDocument(articleUrl);
   }
 
   protected Document retrieveOnlineDocument(String articleUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException {
-    return Application.getHtmlHelper().retrieveOnlineDocument(articleUrl, userAgent, data, method);
+    return htmlHelper.retrieveOnlineDocument(articleUrl, userAgent, data, method);
   }
 
   protected abstract EntryCreationResult parseHtmlToEntry(String articleUrl, Document document);

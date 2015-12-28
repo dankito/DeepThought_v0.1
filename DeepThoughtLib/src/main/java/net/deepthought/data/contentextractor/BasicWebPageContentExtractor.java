@@ -6,6 +6,7 @@ import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.sax.HTMLHighlighter;
 
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.util.DeepThoughtError;
@@ -62,6 +63,16 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
   public void setIconUrlForLastPositivelyCheckedUrl(String baseUrlOfLastPositivelyCheckedUrl) {
     this.iconUrlOfLastPositivelyCheckedUrl = FileUtils.contactPathElements(baseUrlOfLastPositivelyCheckedUrl, "favicon.ico");
   }
+
+
+  public BasicWebPageContentExtractor() {
+
+  }
+
+  public BasicWebPageContentExtractor(IHtmlHelper htmlHelper) {
+    super(htmlHelper);
+  }
+
 
   public String getName() {
     return Localization.getLocalizedString("web.page.content.extractor");

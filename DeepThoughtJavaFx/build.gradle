@@ -29,6 +29,11 @@ dependencies {
 
     testCompile "org.testfx:testfx-core:4.0.+"
     testCompile "org.testfx:testfx-junit:4.0.+"
+
+    // if you have Java 8_u20 installed you can use Monocle from Maven
+//    testCompile "org.testfx:openjfx-monocle:1.8.0_20"
+    // otherwise it has to be compiled manually as View introduced a new abstract method
+//    testCompile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 mainClassName = 'net.deepthought.DeepThoughtFx'
@@ -48,3 +53,55 @@ task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
+
+
+apply plugin: 'pmd'
+
+tasks.withType(Pmd) {
+    ignoreFailures = true
+    //ruleSets = [ "basic", "strings" ]
+}
+
+
+
+apply plugin: 'jdepend'
+
+tasks.withType(JDepend) {
+    reports {
+        xml.enabled true
+    }
+}
+
+
+
+apply plugin: "jacoco"
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+jacocoTestReport {
+    group = "Reporting"
+
+    reports {
+        html.enabled true
+        xml.enabled true
+        csv.enabled false
+    }
+}
+
+task jacocoTestReportAfterTests(type: JacocoReport, dependsOn: "test") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+
+apply plugin: 'sonar-runner'
+
+

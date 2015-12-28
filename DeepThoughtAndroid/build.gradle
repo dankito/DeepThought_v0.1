@@ -90,3 +90,39 @@ dependencies {
     compile 'com.journeyapps:zxing-android-embedded:3.0.3@aar'
     compile 'com.google.zxing:core:3.2.0'
 }
+
+
+//apply plugin: 'jacoco'
+//  jacoco {
+//    toolVersion = "0.7.1.201405082137"
+//}
+//  def coverageSourceDirs = [
+//        'src/main/java/com/app/authentication',
+//        'src/main/java/com/app/model',
+//        'src/main/java/com/app/net',
+//        'src/main/java/com/app/provider',
+//        'src/main/java/com/app/service',
+//        'src/main/java/com/app/text',
+//        'src/main/java/com/app/util'
+//]
+//  task jacocoTestReport(type: JacocoReport, dependsOn: "connectedAndroidTest") {
+//    group = "Reporting"
+//    description = "Generates Jacoco coverage reports"
+//      reports {
+//        xml.enabled = true
+//        html.enabled = true
+//    }
+//      classDirectories = fileTree(
+//            dir: 'build/intermediates/classes',
+//            excludes: ['**/R.class',
+//'**/R$*.class',
+//'**/BuildConfig.*',
+//'**/Manifest*.*',
+//'**/*Activity*.*',
+//'**/*Fragment*.*'
+//]
+//)
+//sourceDirectories = files(coverageSourceDirs)
+//additionalSourceDirs = files(coverageSourceDirs)
+//executionData = files('build/jacoco/connectedAndroidTest.exec')
+//}

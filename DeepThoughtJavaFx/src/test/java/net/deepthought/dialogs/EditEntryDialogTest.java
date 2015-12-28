@@ -4,8 +4,6 @@ import net.deepthought.UiTestBase;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.data.model.Entry;
 
-import org.junit.Test;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,7 +19,7 @@ public class EditEntryDialogTest extends UiTestBase {
   protected static final String EntryContent = "A great Person of our times";
 
 
-  @Test
+//  @Test
   public void createNewEntry_EntryGetsCorrectlyAddedToDeepThought() {
     navigateToNewEditEntryDialog();
 

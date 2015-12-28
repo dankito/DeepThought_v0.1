@@ -1,5 +1,6 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.html.JsoupHtmlHelper;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 
@@ -18,7 +19,7 @@ public class BasicWebPageContentExtractorTest {
 
   @Before
   public void setup() {
-    webPageContentExtractor = new BasicWebPageContentExtractor();
+    webPageContentExtractor = new BasicWebPageContentExtractor(new JsoupHtmlHelper());
   }
 
 

@@ -4,6 +4,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.util.JavaFxLocalization;
 
+import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.IOException;
@@ -21,12 +22,41 @@ import javafx.stage.Stage;
  */
 public abstract class UiTestBase extends ApplicationTest {
 
+  /**
+   * <p>Copied from {@link .ApplicationLauncherImpl}</p>
+   * <p>
+   *   Used for running in headless Environments.<br />
+   *
+   * </p>
+   */
+  private static final String PROPERTY_TESTFX_HEADLESS = "testfx.headless";
+
   protected static final String TestFolder = "data/uitests";
 
   protected static final int CountDefaultEntries = 20;
 
 
   protected DeepThought deepThought = null;
+
+
+  @BeforeClass
+  public static void changeToHeadless() {
+    if(testHeadless()) {
+      setToHeadless();
+    }
+  }
+
+  protected static boolean testHeadless() {
+    return false;
+  }
+
+  protected static void setToHeadless() {
+    System.setProperty("glass.platform", "Monocle");
+    System.setProperty("monocle.platform", "Headless");
+    System.setProperty("prism.order", "sw");
+
+    System.setProperty(PROPERTY_TESTFX_HEADLESS, "true");
+  }
 
 
   @Override
