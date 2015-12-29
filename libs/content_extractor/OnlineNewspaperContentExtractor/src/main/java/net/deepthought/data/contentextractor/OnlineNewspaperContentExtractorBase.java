@@ -71,6 +71,17 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   }
 
 
+  protected String makeLinkAbsolute(String link, String baseUrl) {
+    if(link.startsWith("//")) {
+      return "http:" + link;
+    }
+    else if(link.startsWith("/")) {
+      return baseUrl + link;
+    }
+
+    return link;
+  }
+
   public boolean hasArticlesOverview() {
     return false;
   }

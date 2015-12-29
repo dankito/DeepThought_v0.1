@@ -135,6 +135,9 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
         content += child.outerHtml();
       }
+      else if("div".equals(child.nodeName()) && ((Element)child).hasClass("text-image-container")) {
+        content += extractImageElement((Element)child);
+      }
     }
 
     content += parseContentOfNextPage(artikelElement);
@@ -144,6 +147,21 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
       content = content.substring(0, content.length() - 4).trim();
 
     return content;
+  }
+
+  protected String extractImageElement(Element textImageContainer) {
+    Elements imgElements = textImageContainer.select("img");
+
+    for(Element imgElement : imgElements) {
+      String absoluteImageSource = makeLinkAbsolute(imgElement.attr("src"));
+      imgElement.attr("src", absoluteImageSource);
+    }
+
+    return textImageContainer.outerHtml();
+  }
+
+  protected String makeLinkAbsolute(String link) {
+    return makeLinkAbsolute(link, "http://sz-magazin.sueddeutsche.de");
   }
 
   protected String parseContentOfNextPage(Element artikelElement) {

@@ -137,17 +137,6 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
     return makeLinkAbsolute(link, "http://www.heise.de");
   }
 
-  protected String makeLinkAbsolute(String link, String baseUrl) {
-    if(link.startsWith("//")) {
-      return "http:" + link;
-    }
-    else if(link.startsWith("/")) {
-      return baseUrl + link;
-    }
-
-    return link;
-  }
-
   protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element articleElement) {
     String title = articleElement.select(".news_headline").text();
     String subTitle = "";

@@ -24,9 +24,9 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
 
   @Before
   public void setup() {
-    contentExtractor = createOnlineNewspaperContentExtractor();
-
     Application.instantiate(new TestApplicationConfiguration());
+
+    contentExtractor = createOnlineNewspaperContentExtractor();
   }
 
   @After
