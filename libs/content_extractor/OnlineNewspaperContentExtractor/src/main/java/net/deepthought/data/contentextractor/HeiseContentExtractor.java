@@ -98,13 +98,31 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
     adjustSourceElements(meldungWrapperElement);
 
     // if it doesn't have any class (= normal article paragraph) or has class subheading (= Sub Heading)
+    // TODO: implement Image Gallery Extraction
+//    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), h3.subheading, .yt-video-container, div.gallery")) {
     for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), h3.subheading, .yt-video-container")) {
-      if(StringUtils.isNotNullOrEmpty(paragraphElement.text()) || "div".equals(paragraphElement.tagName())) {
+      if(paragraphElement.hasClass("gallery")) {
+        content += extractImageGallery(paragraphElement);
+      }
+      else if(StringUtils.isNotNullOrEmpty(paragraphElement.text()) || "div".equals(paragraphElement.tagName())) {
         content += paragraphElement.outerHtml();
       }
     }
 
     return new Entry(content, abstractString);
+  }
+
+  protected String extractImageGallery(Element imageGalleryElement) {
+    String content = "<div>";
+    content+= imageGalleryElement.select("h2").outerHtml();
+
+    content+= extractAllImagesOfGallery(imageGalleryElement);
+
+    return content + "</div>";
+  }
+
+  protected String extractAllImagesOfGallery(Element imageGalleryElement) {
+    return "";
   }
 
   protected void adjustLinkUrls(Element articleElement) {

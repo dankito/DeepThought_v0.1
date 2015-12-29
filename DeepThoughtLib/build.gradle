@@ -192,5 +192,5 @@ jacocoTestReport {
 
 apply plugin: "org.sonarqube"
 
-project.tasks["sonarqube"].dependsOn pmdMain, jdependMain, jacocoTestReport
+project.tasks["sonarqube"].dependsOn pmdMain, checkstyleMain, findbugsMain, jdependMain, jacocoTestReport
 project.tasks["sonarqube"].group "Reporting"

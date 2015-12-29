@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -59,10 +60,13 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
 
   @Override
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
-    return new ArrayList<>();
-//    return Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
-//        new PostillonContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor(),
-//        new YouTubeAndVimeoContentExtractor()});
+    List<IPlugin> staticPlugins = new ArrayList<>();
+
+//    staticPlugins.addAll(Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
+//        new PostillonContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()}));
+//    staticPlugins.add(new YouTubeAndVimeoContentExtractor());
+
+    return staticPlugins;
   }
 
   @Override

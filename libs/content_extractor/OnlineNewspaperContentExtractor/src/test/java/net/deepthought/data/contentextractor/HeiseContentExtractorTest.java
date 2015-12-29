@@ -49,6 +49,13 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
         "Mit der geeigneten Technik kann man große Teile des Spektrums scannen und Funkverkehr aufspüren – vom Boden aus fehlt aber das, was in großen Höhen gefunkt wird, zum Beispiel von Drohnen zu Satelliten.");
   }
 
+  @Test
+  public void importArticleContainingImageGallery() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/newsticker/meldung/heise-Foto-Galerie-Das-sind-die-Top-50-des-Jahres-2015-3044404.html");
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+  }
+
 
   @Test
   public void testGetArticlesOverview() {
