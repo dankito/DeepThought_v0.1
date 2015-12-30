@@ -29,6 +29,13 @@ public class ScanIsbnConnectedDevicesPanel extends ConnectedDevicesPanel {
 
 
   @Override
+  public void cleanUp() {
+    this.listener = null;
+
+    super.cleanUp();
+  }
+
+  @Override
   protected boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice) {
     return connectedDevice.canScanBarcodes();
   }

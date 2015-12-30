@@ -189,6 +189,8 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
 
     fieldChangedEvents.clear();
     clearCurrentReferenceLabel();
+
+    connectedDevicesPanel.cleanUp();
   }
 
   protected void deepThoughtChanged(DeepThought newDeepThought) {

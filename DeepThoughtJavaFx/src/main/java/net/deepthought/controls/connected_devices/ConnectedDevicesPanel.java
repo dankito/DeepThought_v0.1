@@ -62,6 +62,9 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
   @Override
   public void cleanUp() {
+    connectedDeviceIcons.clear();
+    getChildren().clear();
+
     if(Application.getDeepThoughtsConnector() != null) {
       Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
     }
