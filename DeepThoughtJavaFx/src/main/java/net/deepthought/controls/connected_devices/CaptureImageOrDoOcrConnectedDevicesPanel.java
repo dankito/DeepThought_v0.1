@@ -50,6 +50,14 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   }
 
 
+  @Override
+  public void cleanUp() {
+    this.captureImageResultListener = null;
+    this.captureImageAndDoOcrResultListener = null;
+
+    super.cleanUp();
+  }
+
   protected void initLabelDoOcrProgress() {
     lblDoOcrProgress = new Label();
     lblDoOcrProgress.setVisible(false);

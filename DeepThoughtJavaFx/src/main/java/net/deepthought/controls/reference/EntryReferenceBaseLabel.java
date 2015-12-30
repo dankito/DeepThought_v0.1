@@ -92,6 +92,8 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
     if(referenceBase != null)
       referenceBase.removeEntityListener(referenceBaseListener);
+
+    this.creationResult = null;
   }
 
   @Override
