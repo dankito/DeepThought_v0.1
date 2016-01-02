@@ -277,7 +277,7 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   }
 
   protected void createOverviewItemsFromMultipleElements(List<ArticlesOverviewItem> overviewItems, Element teaserItemWithMultipleElements) {
-    for(Element teaserItemAnchor : teaserItemWithMultipleElements.select(".multiple a")) {
+    for(Element teaserItemAnchor : teaserItemWithMultipleElements.select(".multiple a.the_content_url")) {
       overviewItems.add(createOverviewItemFromTeaserAnchorElement(teaserItemAnchor));
     }
   }

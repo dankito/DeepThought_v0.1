@@ -77,7 +77,7 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
       }
     });
 
-    try { getArticlesOverviewLatch.await(100, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { getArticlesOverviewLatch.await(10, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, partialItemsExtractionCall.get());
     Assert.assertTrue(allItems.size() > 10);
