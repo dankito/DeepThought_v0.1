@@ -1,6 +1,7 @@
 package net.deepthought.data.contentextractor.preview;
 
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+import net.deepthought.util.StringUtils;
 
 /**
  * Created by ganymed on 17/07/15.
@@ -95,7 +96,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasPreviewImageUrl() {
-    return previewImageUrl != null;
+    return StringUtils.isNotNullOrEmpty(previewImageUrl);
   }
 
   public String getPreviewImageUrl() {
