@@ -153,6 +153,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     // replace normal TextField txtfldSearchTags with a SearchTextField (with a cross to clear selection)
     hboxTagsBar.getChildren().remove(txtfldSearchTags);
     txtfldSearchTags = (CustomTextField) TextFields.createClearableTextField();
+    txtfldSearchTags.setId("txtfldSearchTags");
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchTags, "search.tags.prompt.text");
     hboxTagsBar.getChildren().add(1, txtfldSearchTags);
     HBox.setHgrow(txtfldSearchTags, Priority.ALWAYS);
@@ -186,8 +187,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     tblvwTags.setItems(tableViewTagsItems);
 
     tblvwTags.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.DELETE)
+      if (event.getCode() == KeyCode.DELETE) {
         removeSelectedTags();
+      }
+      else if(event.getCode() == KeyCode.F2) {
+        tblvwTags.edit(tblvwTags.getSelectionModel().getSelectedIndex(), clmnTagName);
+      }
     });
 
     clmnTagName.setCellFactory(new Callback<TableColumn<Tag, String>, TableCell<Tag, String>>() {

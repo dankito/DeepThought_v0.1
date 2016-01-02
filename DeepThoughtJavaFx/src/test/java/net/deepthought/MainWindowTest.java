@@ -20,6 +20,9 @@ import static org.hamcrest.core.Is.is;
 @Ignore
 public class MainWindowTest extends UiTestBase {
 
+
+  /*      EntriesOverviewTests      */
+
   @Test
   public void searchEntries_ResultListHasCorrectSize() {
     TableView<Entry> tblvwEntries = getMainWindowTableViewEntries();
@@ -33,4 +36,5 @@ public class MainWindowTest extends UiTestBase {
 
     assertThat(86, is(tblvwEntries.getItems().size()));
   }
+
 }

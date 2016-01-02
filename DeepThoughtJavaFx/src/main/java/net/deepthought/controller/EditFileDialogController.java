@@ -230,10 +230,14 @@ public class EditFileDialogController extends EntityDialogFrameController implem
 
   @Override
   protected void closeDialog() {
-//    if(person != null)
-//      person.removePersonListener(personListener);
+    cleanUp();
 
     super.closeDialog();
+  }
+
+  protected void cleanUp() {
+    //    if(person != null)
+//      person.removePersonListener(personListener);
   }
 
   @Override

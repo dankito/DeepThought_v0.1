@@ -9,6 +9,7 @@ import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.Alerts;
+import net.deepthought.util.Localization;
 
 import java.util.Collection;
 
@@ -111,7 +112,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   protected ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
-    MenuItem renameTagMenuItem = new MenuItem("Rename");
+    MenuItem renameTagMenuItem = new MenuItem(Localization.getLocalizedString("rename"));
     contextMenu.getItems().add(renameTagMenuItem);
 
     renameTagMenuItem.setOnAction((event) -> {
@@ -120,7 +121,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem deleteTagMenuItem = new MenuItem("Delete");
+    MenuItem deleteTagMenuItem = new MenuItem(Localization.getLocalizedString("delete"));
     contextMenu.getItems().add(deleteTagMenuItem);
 
     deleteTagMenuItem.setOnAction((event) -> {

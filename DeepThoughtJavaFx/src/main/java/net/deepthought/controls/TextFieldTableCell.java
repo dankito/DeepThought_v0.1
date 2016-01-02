@@ -117,6 +117,7 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
 
   protected void createTextField() {
     textField = new TextField(getItemEditingTextFieldText());
+    textField.setId("txtfldEditCell");
     textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent t) {

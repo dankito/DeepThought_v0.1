@@ -46,11 +46,6 @@ public class EditEntryDialogTest extends UiTestBase {
     sleep(2, TimeUnit.SECONDS);
   }
 
-  protected void clickOk() {
-    clickOn("#btnOk");
-    sleep(2, TimeUnit.SECONDS);
-  }
-
   protected CollapsibleHtmlEditor getHtmlEditorEntryAbstract() {
     return lookup("#htmledAbstract").queryFirst();
   }
