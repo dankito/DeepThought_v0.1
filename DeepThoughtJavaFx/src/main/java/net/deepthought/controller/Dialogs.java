@@ -2,6 +2,7 @@ package net.deepthought.controller;
 
 import net.deepthought.Application;
 import net.deepthought.controller.enums.DialogResult;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
@@ -685,6 +686,16 @@ public class Dialogs {
     JavaFxLocalization.bindStageTitle(stage, windowTitle);
 
     return stage;
+  }
+
+  public static void cleanUpAndCloseToolWindowStage(Stage toolWindowStage) {
+    if(toolWindowStage.getScene().getRoot() instanceof ICleanUp) {
+      ((ICleanUp)toolWindowStage.getScene().getRoot()).cleanUp();
+    }
+
+    // TODO: remove listeners which have been applied in FXUtils.applyWindowSettingsAndListenToChanges() ?
+
+    toolWindowStage.close();
   }
 
 

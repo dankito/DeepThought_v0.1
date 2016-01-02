@@ -70,6 +70,8 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
 
   protected SearchAndSelectTagsControl searchAndSelectTagsControl = null;
 
+  protected Stage toolWindowSearchTags = null;
+
 
   public EntryTagsControl() {
     this(null);
@@ -116,6 +118,11 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     clearEntryTagLabels();
 
     searchAndSelectTagsControl.cleanUp();
+
+    if(toolWindowSearchTags != null) {
+      Dialogs.cleanUpAndCloseToolWindowStage(toolWindowSearchTags);
+      toolWindowSearchTags = null;
+    }
 
     tagAddedEventHandler = null;
     tagRemovedEventHandler = null;
@@ -289,8 +296,6 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     searchAndSelectTagsControl.setMinHeight(height);
     searchAndSelectTagsControl.setMaxHeight(height);
   }
-
-  protected Stage toolWindowSearchTags = null;
 
   protected void btnShowHideSearchTagsToolWindowIsSelectedChanged(Boolean isSelected) {
     if(isSelected == false)
