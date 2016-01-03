@@ -1,8 +1,7 @@
 package net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
-import net.deepthought.Application;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.TextFieldTableCell;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.ui.SystemTag;
@@ -23,7 +22,6 @@ import javafx.scene.input.ContextMenuEvent;
 /**
  * Created by ganymed on 27/12/14.
  */
-//public class TagNameTableCell extends TableCell<Tag, String> {
 public class TagNameTableCell extends TextFieldTableCell<Tag> {
 
   protected Tag tag = null;
@@ -136,39 +134,17 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
   }
 
-  protected void deleteTag(Tag tag) {
-    Application.getDeepThought().removeTag(tag);
-  }
-
 
   protected EntityListener tagListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(Platform.isFxApplicationThread())
-        tagUpdated();
-      else {
-        Platform.runLater(new Runnable() {
-          @Override
-          public void run() {
-            tagUpdated();
-          }
-        });
-      }
+      callTagUpdatedThreadSafe();
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collectionHolder.equals(tag)) {
-        if(Platform.isFxApplicationThread())
-          tagUpdated();
-        else {
-          Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-              tagUpdated();
-            }
-          });
-        }
+        callTagUpdatedThreadSafe();
       }
     }
 
@@ -180,18 +156,18 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(collection == tag.getEntries()) {
-        if(Platform.isFxApplicationThread())
-          tagUpdated();
-        else {
-          Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-              tagUpdated();
-            }
-          });
-        }
+        callTagUpdatedThreadSafe();
       }
     }
   };
+
+  protected void callTagUpdatedThreadSafe() {
+    if(Platform.isFxApplicationThread()) {
+      tagUpdated();
+    }
+    else {
+      Platform.runLater(() -> tagUpdated());
+    }
+  }
 
 }
