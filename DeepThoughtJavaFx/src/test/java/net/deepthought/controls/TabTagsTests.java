@@ -144,7 +144,7 @@ public class TabTagsTests extends UiTestBase {
     quickFilterTags(NewTagName);
     assertThat(getTagsInTableViewTags().size(), is(0));
 
-    resetQuickFilterTags();
+    clearQuickFilterTags();
     assertThat(getTagsInTableViewTags().contains(newTag), is(false));
   }
 
@@ -261,7 +261,7 @@ public class TabTagsTests extends UiTestBase {
     quickFilterTags(NewTagRenamedName);
     assertThat(getTagsInTableViewTags().size(), is(1));
 
-    resetQuickFilterTags();
+    clearQuickFilterTags();
     assertThat(getTagsInTableViewTags().contains(tag), is(true));
 
     assertThat(deepThought.containsTag(tag), is(true));
@@ -290,7 +290,7 @@ public class TabTagsTests extends UiTestBase {
     sleep(1, TimeUnit.SECONDS);
     assertThat(getMainWindowTableViewEntriesItems().size(), is(1));
 
-    resetQuickFilterTags();
+    clearQuickFilterTags();
     assertThat(getTagsInTableViewTags().size(), is(4));
     assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
 
@@ -335,6 +335,31 @@ public class TabTagsTests extends UiTestBase {
   }
 
 
+  /*      Check if after clearing Filter SystemTag AllEntries is selected    */
+
+  @Test
+  public void clearQuickFilter_SystemTagAllEntriesIsSelected() {
+    quickFilterTags(NewTagName);
+    sleep(1, TimeUnit.SECONDS);
+
+    clearQuickFilterTags();
+
+    Tag selectedTag = getTableViewTags().getSelectionModel().getSelectedItem();
+    assertThat(selectedTag, is(deepThought.AllEntriesSystemTag()));
+  }
+
+  @Test
+  public void clearTagsFilter_SystemTagAllEntriesIsSelected() {
+    filterTags(FilterForThreeTags);
+    sleep(1, TimeUnit.SECONDS);
+
+    removeTagsFilter();
+
+    Tag selectedTag = getTableViewTags().getSelectionModel().getSelectedItem();
+    assertThat(selectedTag, is(deepThought.AllEntriesSystemTag()));
+  }
+
+
 
   protected void assertTagWithNewTagNameDoesNotExist() {
     sleep(2, TimeUnit.SECONDS);
@@ -342,7 +367,7 @@ public class TabTagsTests extends UiTestBase {
     deleteAllTagsWithName(NewTagName);
     deleteAllTagsWithName(NewTagRenamedName);
 
-    resetQuickFilterTags();
+    clearQuickFilterTags();
   }
 
   protected void deleteAllTagsWithName(String name) {
@@ -396,7 +421,7 @@ public class TabTagsTests extends UiTestBase {
     sleep(2, TimeUnit.SECONDS);
   }
 
-  protected void resetQuickFilterTags() {
+  protected void clearQuickFilterTags() {
     getTextFieldSearchTags().setText("");
     sleep(2, TimeUnit.SECONDS);
   }
@@ -411,7 +436,7 @@ public class TabTagsTests extends UiTestBase {
 
   protected void removeTagsFilter() {
     clickButtonRemoveTagsFilter();
-    resetQuickFilterTags();
+    clearQuickFilterTags();
   }
 
   protected TextField getTextFieldSearchTags() {
