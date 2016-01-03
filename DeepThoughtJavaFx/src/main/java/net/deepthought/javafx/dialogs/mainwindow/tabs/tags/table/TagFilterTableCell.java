@@ -1,9 +1,10 @@
-package net.deepthought.javafx.dialogs.mainwindow.tabs.tags;
+package net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.search.specific.TagsSearchResults;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ITagsFilter;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableSet;

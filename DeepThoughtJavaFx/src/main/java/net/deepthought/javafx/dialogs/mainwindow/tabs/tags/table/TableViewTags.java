@@ -1,9 +1,11 @@
-package net.deepthought.javafx.dialogs.mainwindow.tabs.tags;
+package net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ISelectedTagsController;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ITagsFilter;
 import net.deepthought.util.JavaFxLocalization;
 
 import java.util.Collection;

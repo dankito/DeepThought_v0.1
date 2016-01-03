@@ -1,4 +1,4 @@
-package net.deepthought.javafx.dialogs.mainwindow.tabs.tags;
+package net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
 import net.deepthought.Application;
 import net.deepthought.controls.utils.FXUtils;
@@ -8,6 +8,7 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.TagsSearchResults;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ITagsFilter;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.Localization;
 

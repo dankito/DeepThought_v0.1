@@ -94,7 +94,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 //  @FXML
 //  protected TableView<Tag> tblvwTags;
 
-  protected TableViewTags tblvwTags;
+  protected net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags tblvwTags;
 
 
 
@@ -162,7 +162,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     btnAddTag.setTextFill(Constants.AddEntityButtonTextColor);
     JavaFxLocalization.bindControlToolTip(btnAddTag, "add.new.tag.tool.tip");
 
-    tblvwTags = new TableViewTags(this, this);
+    tblvwTags = new net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags(this, this);
     VBox.setVgrow(tblvwTags, Priority.ALWAYS);
     layoutRoot.getChildren().add(tblvwTags);
 
