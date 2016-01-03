@@ -97,7 +97,7 @@ public class EditTagDialogController extends EntityDialogFrameController impleme
   protected EntityListener tagListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
+      // TODO: later on, when a Tag can be edited with this Dialog, react to Tag changes
     }
 
     @Override

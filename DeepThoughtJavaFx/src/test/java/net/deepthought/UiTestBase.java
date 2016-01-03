@@ -125,6 +125,16 @@ public abstract class UiTestBase extends ApplicationTest {
     sleep(2, TimeUnit.SECONDS);
   }
 
+  protected void clickApply() {
+    clickOn("#btnApplyChanges");
+    sleep(2, TimeUnit.SECONDS);
+  }
+
+  protected void clickCancel() {
+    clickOn("#btnCancel");
+    sleep(2, TimeUnit.SECONDS);
+  }
+
   protected void focusNode(Node node) {
     final CountDownLatch waitLatch = new CountDownLatch(1);
     Platform.runLater(() -> {

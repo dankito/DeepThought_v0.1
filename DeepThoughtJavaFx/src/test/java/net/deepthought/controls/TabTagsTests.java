@@ -45,12 +45,53 @@ public class TabTagsTests extends UiTestBase {
   /*        Create Tag          */
 
   @Test
-  public void createTag_TagGetsAddedCorrectly() {
+  public void createTag_PressOk_TagGetsAddedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
     int countDefaultTags = deepThought.countTags();
 
-    createNewTagViaUi();
+    showEditTagDialogAndFillWithTestData();
+    clickOk();
 
+    assertThat(isEditTagDialogVisible(), is(false));
+    Tag newTag = assertThatTagHasBeenCreated(countDefaultTags);
+
+    deepThought.removeTag(newTag); // clean up again
+  }
+
+  @Test
+  public void createTag_PressApply_TagGetsAddedCorrectly() {
+    assertTagWithNewTagNameDoesNotExist();
+    int countDefaultTags = deepThought.countTags();
+
+    showEditTagDialogAndFillWithTestData();
+    clickApply();
+
+    assertThat(isEditTagDialogVisible(), is(true));
+    Tag newTag = assertThatTagHasBeenCreated(countDefaultTags);
+
+    clickOk();
+    assertThat(isEditTagDialogVisible(), is(false));
+
+    deepThought.removeTag(newTag); // clean up again
+  }
+
+  @Test
+  public void createTag_PressCancel_NoTagGetsAdded() {
+    assertTagWithNewTagNameDoesNotExist();
+    int countDefaultTags = deepThought.countTags();
+
+    showEditTagDialogAndFillWithTestData();
+    clickCancel();
+
+    assertThat(isEditTagDialogVisible(), is(false));
+    assertThat(deepThought.countTags(), is(countDefaultTags));
+
+    quickFilterTags(NewTagName);
+    assertThat(getTagsInTableViewTags().size(), is(0));
+  }
+
+
+  protected Tag assertThatTagHasBeenCreated(int countDefaultTags) {
     assertThat(deepThought.countTags(), is(countDefaultTags + 1));
 
     ObservableList<Tag> filteredTags = getTagsInTableViewTags();
@@ -66,7 +107,7 @@ public class TabTagsTests extends UiTestBase {
     assertThat(newTag.getDescription(), is(NewTagDescription));
     assertThat(deepThought.containsTag(newTag), is(true));
 
-    deepThought.removeTag(newTag); // clean up again
+    return newTag;
   }
 
 
@@ -459,7 +500,7 @@ public class TabTagsTests extends UiTestBase {
     }
   }
 
-  protected void createNewTagViaUi() {
+  protected void showEditTagDialogAndFillWithTestData() {
     clickButtonAddTag();
 
     TextField txtfldName = getTextFieldName();
@@ -467,6 +508,10 @@ public class TabTagsTests extends UiTestBase {
 
     TextField txtfldDescription = getTextFieldDescription();
     txtfldDescription.setText(NewTagDescription);
+  }
+
+  protected void createNewTagViaUi() {
+    showEditTagDialogAndFillWithTestData();
 
     clickOk();
   }
@@ -550,6 +595,10 @@ public class TabTagsTests extends UiTestBase {
 
 
   /*       EditTagDialogController       */
+
+  protected boolean isEditTagDialogVisible() {
+    return getTextFieldName() != null;
+  }
 
   protected TextField getTextFieldName() {
     return lookup("#txtfldName").queryFirst();
