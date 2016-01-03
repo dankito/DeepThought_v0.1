@@ -122,7 +122,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanU
     graphicPane.getChildren().add(isEntryInCategoryCheckBox);
     isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
 
-    categoryNameLabel.setMaxWidth(Double.MAX_VALUE);
+    categoryNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(categoryNameLabel);
 
     HBox.setHgrow(categoryNameLabel, Priority.ALWAYS);
@@ -287,7 +287,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanU
 
     HBox.setHgrow(txtfldEditCategoryName, Priority.ALWAYS);
     HBox.setMargin(txtfldEditCategoryName, new Insets(0, 6, 0, 6));
-    txtfldEditCategoryName.setMaxWidth(Double.MAX_VALUE);
+    txtfldEditCategoryName.setMaxWidth(FXUtils.SizeMaxValue);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditCategoryName);
     graphicPane.getChildren().add(1, txtfldEditCategoryName);
 

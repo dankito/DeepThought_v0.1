@@ -1,6 +1,7 @@
 package net.deepthought.controls.file.cells;
 
 import net.deepthought.controller.Dialogs;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.JavaFxLocalization;
@@ -93,7 +94,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
 
 //    graphicPane.getChildren().add(isOnEntityCheckBox);
 
-    fileNameLabel.setMaxWidth(Double.MAX_VALUE);
+    fileNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(fileNameLabel);
 
     entryFileOptionsButtonsPane.setAlignment(Pos.CENTER_LEFT);

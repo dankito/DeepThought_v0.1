@@ -114,6 +114,11 @@ public class JavaFxLocalization {
         () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
+  public static void bindTableColumnText(TableColumnBase tableColumn, final String key, final Object... formatArguments) {
+    tableColumn.textProperty().bind(Bindings.createStringBinding(
+        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+  }
+
   public static void bindControlToolTip(Control control, String key, Object... formatArguments) {
     control.setTooltip(createBoundTooltip(key, formatArguments));
   }

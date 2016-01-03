@@ -14,6 +14,7 @@ import net.deepthought.controls.connected_devices.ScanIsbnConnectedDevicesPanel;
 import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.controls.event.FieldChangedEvent;
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
@@ -211,7 +212,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     setupTitle();
 
     searchAndSelectReferenceControl = new SearchAndSelectReferenceControl(ReferenceBaseType.All, this);
-    searchAndSelectReferenceControl.setMaxHeight(Double.MAX_VALUE);
+    searchAndSelectReferenceControl.setMaxHeight(FXUtils.SizeMaxValue);
     setContent(searchAndSelectReferenceControl);
   }
 
@@ -220,7 +221,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setMinHeight(32);
     titlePane.setMaxHeight(32);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 
     Label lblReference = new Label();
     JavaFxLocalization.bindLabeledText(lblReference, "reference");
@@ -233,7 +234,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     paneSelectedReferenceBase = new HBox();
     paneSelectedReferenceBase.setAlignment(Pos.CENTER_LEFT);
     paneSelectedReferenceBase.setMinWidth(100);
-    paneSelectedReferenceBase.setMaxWidth(Double.MAX_VALUE);
+    paneSelectedReferenceBase.setMaxWidth(FXUtils.SizeMaxValue);
     titlePane.getChildren().add(paneSelectedReferenceBase);
 
     btnNewOrEditReference = new NewOrEditButton();

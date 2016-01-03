@@ -31,12 +31,12 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   }
 
 
-  public TagFilterTableCell(TabTagsControl tabTagsControl) {
-    this.tagsFilter = tabTagsControl.tagsFilter;
-    tagsFilter.addListener((SetChangeListener<Tag>) (change) -> tagsFilterChanged(change)); // TODO: remove listeners in ICleanableControl implementation
+  public TagFilterTableCell(ITagsFilter tagsFilter) {
+    this.tagsFilter = tagsFilter.getTagsFilter();
+    this.tagsFilter.addListener((SetChangeListener<Tag>) (change) -> tagsFilterChanged(change)); // TODO: remove listeners in ICleanableControl implementation
 
-    this.lastTagsSearchResults = tabTagsControl.lastTagsSearchResults;
-    tabTagsControl.addDisplayedTagsChangedListener(results -> {
+    this.lastTagsSearchResults = tagsFilter.getLastTagsSearchResults();
+    tagsFilter.addDisplayedTagsChangedListener(results -> {
       lastTagsSearchResults = results;
       setCellBackgroundColor();
     });

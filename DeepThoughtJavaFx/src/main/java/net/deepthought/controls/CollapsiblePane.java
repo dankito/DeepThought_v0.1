@@ -150,8 +150,8 @@ public class CollapsiblePane extends VBox {
   }
 
   protected void setupPane() {
-    setMaxHeight(Double.MAX_VALUE);
-    setMaxWidth(Double.MAX_VALUE);
+    setMaxHeight(FXUtils.SizeMaxValue);
+    setMaxWidth(FXUtils.SizeMaxValue);
 
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setFillHeight(true);
@@ -217,7 +217,7 @@ public class CollapsiblePane extends VBox {
       getContent().setVisible(isExpanded());
 
     if(isExpanded()) {
-      setMaxHeight(Double.MAX_VALUE);
+      setMaxHeight(FXUtils.SizeMaxValue);
       expandButton.setText(ExpandedText);
     }
     else {

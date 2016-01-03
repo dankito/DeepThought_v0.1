@@ -169,14 +169,14 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     contentPane.setMinHeight(ContentPaneMinHeight);
     contentPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
     contentPane.setMaxHeight(Region.USE_PREF_SIZE);
-    contentPane.setMaxWidth(Double.MAX_VALUE);
+    contentPane.setMaxWidth(FXUtils.SizeMaxValue);
     contentPane.setPadding(new Insets(6, 0, 0, 0));
 
     clmFileName = new TreeTableColumn<>();
     JavaFxLocalization.bindTableColumnBaseText(clmFileName, "name");
     clmFileName.setMinWidth(Region.USE_PREF_SIZE);
     clmFileName.setPrefWidth(280);
-    clmFileName.setMaxWidth(Double.MAX_VALUE);
+    clmFileName.setMaxWidth(FXUtils.SizeMaxValue);
 
 //    clmFileName.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
 //        new ReadOnlyStringWrapper(p.getValue().getValue().getName()));
@@ -191,7 +191,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     JavaFxLocalization.bindTableColumnBaseText(clmFileUri, "uri");
     clmFileUri.setMinWidth(Region.USE_PREF_SIZE);
     clmFileUri.setPrefWidth(600);
-    clmFileUri.setMaxWidth(Double.MAX_VALUE);
+    clmFileUri.setMaxWidth(FXUtils.SizeMaxValue);
 
 //    clmFileUri.setCellValueFactory((TreeTableColumn.CellDataFeatures<FileLink, String> p) ->
 //        new ReadOnlyStringWrapper(p.getValue().getValue().getUriString()));
@@ -210,7 +210,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     trtblvwFiles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
     trtblvwFiles.setMinHeight(150);
-    trtblvwFiles.setMaxHeight(Double.MAX_VALUE);
+    trtblvwFiles.setMaxHeight(FXUtils.SizeMaxValue);
 
     trtblvwFiles.setOnKeyPressed(event -> {
       if(event.getCode() == KeyCode.ENTER) {
@@ -232,7 +232,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     searchAndSelectFilesControl = new SearchAndSelectFilesControl(editedFiles);
 //    searchAndSelectFilesControl.setPrefHeight(250);
 //    searchAndSelectFilesControl.setMaxHeight(200);
-    searchAndSelectFilesControl.setMaxHeight(Double.MAX_VALUE);
+    searchAndSelectFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
 
     searchAndSelectFilesControl.paneSearchFiles.visibleProperty().bind(btnShowHideSearchPane.selectedProperty());
 
@@ -246,8 +246,8 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
 //    titlePane.setMinHeight(22);
-    titlePane.setMaxHeight(Double.MAX_VALUE);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 
     Label lblFiles = new Label();
     JavaFxLocalization.bindLabeledText(lblFiles, "files");
@@ -258,7 +258,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     HBox.setMargin(lblFiles, new Insets(0, 6, 0, 0));
 
     pnSelectedFilesPreview = new FlowPane();
-    pnSelectedFilesPreview.setMaxWidth(Double.MAX_VALUE);
+    pnSelectedFilesPreview.setMaxWidth(FXUtils.SizeMaxValue);
     pnSelectedFilesPreview.setVgap(2);
     pnSelectedFilesPreview.setAlignment(Pos.CENTER_LEFT);
     titlePane.getChildren().add(pnSelectedFilesPreview);

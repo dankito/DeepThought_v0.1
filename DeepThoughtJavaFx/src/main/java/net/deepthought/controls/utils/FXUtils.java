@@ -47,6 +47,8 @@ public class FXUtils {
 
   public final static String HtmlEditorDefaultText = "<html dir=\"ltr\"><head></head><body contenteditable=\"true\"></body></html>";
 
+  public static final Double SizeMaxValue = Double.MAX_VALUE;
+
 
   private final static Logger log = LoggerFactory.getLogger(FXUtils.class);
 

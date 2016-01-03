@@ -2,6 +2,7 @@ package net.deepthought.controls.person;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
@@ -123,7 +124,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanUp {
     }
 
     personDisplayNameLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
-    personDisplayNameLabel.setMaxWidth(Double.MAX_VALUE);
+    personDisplayNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(personDisplayNameLabel);
 
     HBox.setHgrow(personDisplayNameLabel, Priority.ALWAYS);

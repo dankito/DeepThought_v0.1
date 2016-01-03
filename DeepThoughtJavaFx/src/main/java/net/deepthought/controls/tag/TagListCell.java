@@ -120,7 +120,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
     graphicPane.getChildren().add(chkbxIsTagSelected);
 
     lblTagName.setTextOverrun(OverrunStyle.ELLIPSIS);
-    lblTagName.setMaxWidth(Double.MAX_VALUE);
+    lblTagName.setMaxWidth(FXUtils.SizeMaxValue);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblTagName);
     graphicPane.getChildren().add(lblTagName);
     HBox.setHgrow(lblTagName, Priority.ALWAYS);
@@ -246,7 +246,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
 
     HBox.setHgrow(txtfldEditTagName, Priority.ALWAYS);
     HBox.setMargin(txtfldEditTagName, new Insets(0, 6, 0, 6));
-    txtfldEditTagName.setMaxWidth(Double.MAX_VALUE);
+    txtfldEditTagName.setMaxWidth(FXUtils.SizeMaxValue);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditTagName);
     graphicPane.getChildren().add(1, txtfldEditTagName);
 

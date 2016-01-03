@@ -3,6 +3,7 @@ package net.deepthought.controls.registration;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.JavaFxLocalization;
 
@@ -71,11 +72,11 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
 
     lblUserInfo.setMinHeight(26);
     lblUserInfo.setMaxHeight(26);
-    lblUserInfo.setMaxWidth(Double.MAX_VALUE);
+    lblUserInfo.setMaxWidth(FXUtils.SizeMaxValue);
 
     lblDeviceInfo.setMinHeight(26);
     lblDeviceInfo.setMaxHeight(26);
-    lblDeviceInfo.setMaxWidth(Double.MAX_VALUE);
+    lblDeviceInfo.setMaxWidth(FXUtils.SizeMaxValue);
 
     JavaFxLocalization.bindLabeledText(btnAskForRegistration, "ask.for.registration");
     btnAskForRegistration.setMinHeight(35);

@@ -271,7 +271,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
     htmledEntryContent = new DeepThoughtFxHtmlEditor(entryContentListener);
     htmledEntryContent.setMinHeight(250);
-    htmledEntryContent.setMaxHeight(Double.MAX_VALUE);
+    htmledEntryContent.setMaxHeight(FXUtils.SizeMaxValue);
     VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
 
     pnQuickEditEntry.getChildren().remove(pnQuickEditEntry.getChildren().size() - 1); // remove HtmlEditor set in JavaFX Scene Builder

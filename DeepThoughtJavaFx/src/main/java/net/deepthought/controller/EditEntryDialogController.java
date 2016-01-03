@@ -170,7 +170,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     filesControl = new FilesControl(editedAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
-    filesControl.setMaxHeight(Double.MAX_VALUE);
+    filesControl.setMaxHeight(FXUtils.SizeMaxValue);
     contentPane.getChildren().add(6, filesControl);
     VBox.setVgrow(filesControl, Priority.SOMETIMES);
     VBox.setMargin(filesControl, new Insets(6, 0, 0, 0));

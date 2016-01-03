@@ -145,7 +145,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
     GridPane.setMargin(itemTextLinesPane, new Insets(0, 0, 0, 6));
 
     itemTextLinesPane.setPrefHeight(VBox.USE_COMPUTED_SIZE);
-    itemTextLinesPane.setMaxHeight(Double.MAX_VALUE);
+    itemTextLinesPane.setMaxHeight(FXUtils.SizeMaxValue);
     itemTextLinesPane.setAlignment(Pos.TOP_LEFT);
 
     itemTextLinesPane.getChildren().add(lblItemSubTitle);

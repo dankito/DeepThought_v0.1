@@ -114,7 +114,7 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     searchAndSelectPersonsControl = new SearchAndSelectPersonsControl(this);
 //    searchAndSelectPersonsControl.setPrefHeight(250);
 //    searchAndSelectPersonsControl.setMaxHeight(200);
-    searchAndSelectPersonsControl.setMaxHeight(Double.MAX_VALUE);
+    searchAndSelectPersonsControl.setMaxHeight(FXUtils.SizeMaxValue);
     this.setContent(searchAndSelectPersonsControl);
   }
 
@@ -122,8 +122,8 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
 //    titlePane.setMinHeight(22);
-    titlePane.setMaxHeight(Double.MAX_VALUE);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 
     Label lblPersons = new Label();
     JavaFxLocalization.bindLabeledText(lblPersons, "persons");
@@ -134,7 +134,7 @@ public abstract class PersonsControl extends CollapsiblePane implements IEditedE
     HBox.setMargin(lblPersons, new Insets(0, 6, 0, 0));
 
     pnSelectedPersonsPreview = new FlowPane();
-    pnSelectedPersonsPreview.setMaxWidth(Double.MAX_VALUE);
+    pnSelectedPersonsPreview.setMaxWidth(FXUtils.SizeMaxValue);
     pnSelectedPersonsPreview.setVgap(2);
     pnSelectedPersonsPreview.setAlignment(Pos.CENTER_LEFT);
     titlePane.getChildren().add(pnSelectedPersonsPreview);

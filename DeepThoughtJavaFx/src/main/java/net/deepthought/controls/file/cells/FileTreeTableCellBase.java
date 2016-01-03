@@ -1,7 +1,7 @@
 package net.deepthought.controls.file.cells;
 
 import net.deepthought.controller.Dialogs;
-import net.deepthought.controls.event.IMouseAndKeyEventReceiver;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.Localization;
@@ -9,8 +9,6 @@ import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -24,9 +22,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -75,7 +70,7 @@ public abstract class FileTreeTableCellBase extends TreeTableCell<FileLink, Stri
     setAlignment(Pos.BASELINE_LEFT);
 
     graphicPane.setAlignment(Pos.CENTER_LEFT);
-    cellLabel.setMaxWidth(Double.MAX_VALUE);
+    cellLabel.setMaxWidth(FXUtils.SizeMaxValue);
 
     graphicPane.getChildren().add(cellLabel);
     HBox.setHgrow(cellLabel, Priority.ALWAYS);

@@ -401,10 +401,11 @@ public class TabTagsTests extends UiTestBase {
     sleep(2, TimeUnit.SECONDS);
   }
 
-  protected void filterTags(String tagsQuickFilter) {
-    TextField txtfldSearchTags = getTextFieldSearchTags();
-    txtfldSearchTags.setText(tagsQuickFilter);
-    pressAndReleaseKeyOnNode(txtfldSearchTags, KeyCode.ENTER);
+  protected void filterTags(String tagsFilter) {
+    quickFilterTags(tagsFilter);
+    sleep(2, TimeUnit.SECONDS);
+
+    pressAndReleaseKeyOnNode(getTextFieldSearchTags(), KeyCode.ENTER);
     sleep(2, TimeUnit.SECONDS);
   }
 

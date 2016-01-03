@@ -9,6 +9,7 @@ import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.connected_devices.CaptureImageOrDoOcrConnectedDevicesPanel;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
@@ -68,7 +69,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
 
   protected void setupControl(String title, IHtmlEditorListener listener) {
     htmlEditor = DeepThoughtFxHtmlEditorPool.getInstance().getHtmlEditor(listener);
-    htmlEditor.setMaxHeight(Double.MAX_VALUE);
+    htmlEditor.setMaxHeight(FXUtils.SizeMaxValue);
     setContent(htmlEditor);
 
     setupTitle(title);
@@ -78,11 +79,11 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     GridPane titlePane = new GridPane();
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
     titlePane.setMaxHeight(22);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 
     titlePane.getRowConstraints().add(new RowConstraints(22, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, VPos.CENTER, true));
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.LEFT, false));
-    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Double.MAX_VALUE, Priority.ALWAYS, HPos.LEFT, true));
+    titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, FXUtils.SizeMaxValue, Priority.ALWAYS, HPos.LEFT, true));
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.RIGHT, false));
     titlePane.getColumnConstraints().add(new ColumnConstraints(USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE, Priority.ALWAYS, HPos.RIGHT, false));
 

@@ -100,7 +100,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
     referencePreviewLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
-    referencePreviewLabel.setMaxWidth(Double.MAX_VALUE);
+    referencePreviewLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(referencePreviewLabel);
     HBox.setHgrow(referencePreviewLabel, Priority.ALWAYS);
     HBox.setMargin(referencePreviewLabel, new Insets(0, 6, 0, 0));
@@ -108,7 +108,7 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnAddReferenceOrReferenceSubDivisionToReferenceBase);
     btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMinWidth(100);
     btnAddReferenceOrReferenceSubDivisionToReferenceBase.setPrefWidth(Region.USE_COMPUTED_SIZE);
-    btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMaxWidth(Double.MAX_VALUE);
+    btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(btnAddReferenceOrReferenceSubDivisionToReferenceBase);
     HBox.setMargin(btnAddReferenceOrReferenceSubDivisionToReferenceBase, new Insets(0, 6, 0, 0));
 

@@ -174,10 +174,10 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setPrefWidth(USE_COMPUTED_SIZE);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
 //    titlePane.setMinHeight(USE_PREF_SIZE);
-    titlePane.setMaxHeight(Double.MAX_VALUE);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
 
     lblCategories = new Label();
     JavaFxLocalization.bindLabeledText(lblCategories, "categories");
@@ -223,8 +223,8 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
     trvwCategories.setMinHeight(230);
 //    trvwCategories.setMinHeight(268); // as long as there's not search bar, reise TreeView's min height to fit with EntryTag's Control height
-    trvwCategories.setMaxHeight(Double.MAX_VALUE);
-    trvwCategories.setMaxWidth(Double.MAX_VALUE);
+    trvwCategories.setMaxHeight(FXUtils.SizeMaxValue);
+    trvwCategories.setMaxWidth(FXUtils.SizeMaxValue);
     trvwCategories.setShowRoot(false);
     trvwCategories.setEditable(true);
 

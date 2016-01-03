@@ -373,16 +373,16 @@ public class Alerts {
     Label contentLabel = new Label(content);
     contentLabel.setWrapText(true);
     contentLabel.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    contentLabel.setMaxHeight(Double.MAX_VALUE);
+    contentLabel.setMaxHeight(FXUtils.SizeMaxValue);
     contentLabel.setMaxWidth(maxWidth);
 
     VBox contentPane = new VBox(contentLabel);
     contentPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    contentPane.setMaxHeight(Double.MAX_VALUE);
+    contentPane.setMaxHeight(FXUtils.SizeMaxValue);
     VBox.setVgrow(contentLabel, Priority.ALWAYS);
 
     alert.getDialogPane().setPrefHeight(Region.USE_COMPUTED_SIZE);
-    alert.getDialogPane().setMaxHeight(Double.MAX_VALUE);
+    alert.getDialogPane().setMaxHeight(FXUtils.SizeMaxValue);
     alert.getDialogPane().setMaxWidth(maxWidth);
     alert.getDialogPane().setContent(contentPane);
   }
@@ -399,13 +399,13 @@ public class Alerts {
     textArea.setEditable(false);
     textArea.setWrapText(true);
 
-    textArea.setMaxWidth(Double.MAX_VALUE);
-    textArea.setMaxHeight(Double.MAX_VALUE);
+    textArea.setMaxWidth(FXUtils.SizeMaxValue);
+    textArea.setMaxHeight(FXUtils.SizeMaxValue);
     GridPane.setVgrow(textArea, Priority.ALWAYS);
     GridPane.setHgrow(textArea, Priority.ALWAYS);
 
     GridPane expContent = new GridPane();
-    expContent.setMaxWidth(Double.MAX_VALUE);
+    expContent.setMaxWidth(FXUtils.SizeMaxValue);
     expContent.add(label, 0, 0);
     expContent.add(textArea, 0, 1);
 

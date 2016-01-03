@@ -396,7 +396,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
     seriesTitleFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     seriesTitleFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    seriesTitleFilesControl.setMaxHeight(Double.MAX_VALUE);
+    seriesTitleFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneSeriesTitleValues.getChildren().add(7, seriesTitleFilesControl);
     VBox.setMargin(seriesTitleFilesControl, new Insets(6, 0, 0, 0));
   }
@@ -505,7 +505,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceFilesControl);
     referenceFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    referenceFilesControl.setMaxHeight(Double.MAX_VALUE);
+    referenceFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneReferenceValues.getChildren().add(8, referenceFilesControl);
     VBox.setMargin(referenceFilesControl, new Insets(6, 0, 0, 0));
   }
@@ -584,7 +584,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionFilesControl);
     referenceSubDivisionFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceSubDivisionFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    referenceSubDivisionFilesControl.setMaxHeight(Double.MAX_VALUE);
+    referenceSubDivisionFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneReferenceSubDivisionValues.getChildren().add(6, referenceSubDivisionFilesControl);
     VBox.setMargin(referenceSubDivisionFilesControl, new Insets(6, 0, 0, 0));
   }

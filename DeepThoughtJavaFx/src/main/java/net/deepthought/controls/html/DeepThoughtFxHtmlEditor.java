@@ -1,6 +1,7 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.controls.ICleanUp;
+import net.deepthought.controls.utils.FXUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +51,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   protected void setupHtmlEditor() {
     setMinHeight(200);
     setPrefHeight(Region.USE_COMPUTED_SIZE);
-    setMaxHeight(Double.MAX_VALUE);
+    setMaxHeight(FXUtils.SizeMaxValue);
     webView.setMinHeight(200);
     webView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    webView.setMaxHeight(Double.MAX_VALUE);
+    webView.setMaxHeight(FXUtils.SizeMaxValue);
 
     this.getChildren().add(webView);
     HBox.setHgrow(webView, Priority.ALWAYS);

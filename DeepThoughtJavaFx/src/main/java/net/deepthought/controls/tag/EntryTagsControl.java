@@ -148,7 +148,7 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
 //    searchAndSelectTagsControl.setPrefHeight(250);
 //    searchAndSelectTagsControl.setMaxHeight(200);
-    searchAndSelectTagsControl.setMaxHeight(Double.MAX_VALUE);
+    searchAndSelectTagsControl.setMaxHeight(FXUtils.SizeMaxValue);
     this.setContent(searchAndSelectTagsControl);
 
     showEntryTags();
@@ -158,10 +158,10 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setPrefWidth(USE_COMPUTED_SIZE);
-    titlePane.setMaxWidth(Double.MAX_VALUE);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
 //    titlePane.setMinHeight(USE_PREF_SIZE);
-    titlePane.setMaxHeight(Double.MAX_VALUE);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
 
     btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
