@@ -1,4 +1,4 @@
-package net.deepthought.controls.tabcategories;
+package net.deepthought.javafx.mainwindow.tabs.categories;
 
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.TextFieldTreeCell;

@@ -1,4 +1,4 @@
-package net.deepthought.controls.tabcategories;
+package net.deepthought.javafx.mainwindow.tabs.categories;
 
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
