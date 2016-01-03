@@ -3,9 +3,6 @@ package net.deepthought.controls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -109,7 +106,6 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
   }
 
   protected void showCellInNotEditingState() {
-    //    setGraphic(getTreeItem().getGraphic());
     setGraphic(null);
     setText(getItemTextRepresentation());
   }
@@ -122,32 +118,28 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
   protected void createTextField() {
     textField = new TextField(getItemEditingTextFieldText());
     textField.setId("txtfldEditCell");
-    textField.setOnKeyReleased(new EventHandler<KeyEvent>() {
-      @Override
-      public void handle(KeyEvent t) {
-        if (t.getCode() == KeyCode.ENTER) {
-          if(textField.getText().equals(getItemEditingTextFieldText()) == false)
-            editingItemDone(textField.getText(), getItemEditingTextFieldText());
+    textField.setOnKeyReleased(event -> handleKeyReleased(event));
 
-          // throws an exception!
-//          commitEdit(getItem());
-          // as a workaround a call cancelEdit() and tell item manually to update itself
-          cancelEdit();
-          updateItem(getItem(), getItemTextRepresentation().isEmpty());
-        }
-        else if (t.getCode() == KeyCode.ESCAPE) {
-          cancelEdit();
-        }
+    textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue == false) {
+        cancelEdit();
       }
     });
+  }
 
-    textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-      @Override
-      public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-        if(newValue == false)
-          cancelEdit();
-      }
-    });
+  protected void handleKeyReleased(KeyEvent event) {
+    if (event.getCode() == KeyCode.ENTER) {
+      if(textField.getText().equals(getItemEditingTextFieldText()) == false)
+        editingItemDone(textField.getText(), getItemEditingTextFieldText());
+
+      // commitEdit(getItem()); throws an exception!
+      // as a workaround a call cancelEdit() and tell item manually to update itself
+      cancelEdit();
+      updateItem(getItem(), getItemTextRepresentation().isEmpty());
+    }
+    else if (event.getCode() == KeyCode.ESCAPE) {
+      cancelEdit();
+    }
   }
 
 }
