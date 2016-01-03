@@ -2,6 +2,7 @@ package net.deepthought.controls;
 
 import net.deepthought.UiTestBase;
 import net.deepthought.data.model.Tag;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -35,6 +37,9 @@ public class TabTagsTests extends UiTestBase {
   protected static final String FilterForThreeTags = "münchen,flüchtlinge,csu";
   protected static final String FilterForFourTagsIncludingANotExistingOne = "münchen,flüchtlinge,halleluja,csu";
   protected static final String FilterForThreeTermsIncludingThreeAmbiguousResults = "münchen,flüchtling,csu";
+
+  protected static final String FilterSingleTag = "münchen";
+  protected static final int CountOtherTagsOnEntriesWithSingleTagFilter = 149;
 
 
   /*        Create Tag          */
@@ -335,6 +340,48 @@ public class TabTagsTests extends UiTestBase {
   }
 
 
+  /*      Click CheckBox 'Filter' on a Tag    */
+
+  @Test
+  public void clickCheckBoxFilterOnATag_FilterGetsApplied() {
+    int countDefaultTags = deepThought.countTags();
+
+    quickFilterTags(FilterSingleTag);
+    sleep(4, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(1));
+    Tag singleSelectedTag = getTagsInTableViewTags().get(0);
+
+    // Click CheckBox of Tag to Filter this Tag
+    getCheckBoxFilterTag().setSelected(true);
+    sleep(1, TimeUnit.SECONDS);
+
+    TabTagsControl tabTags = getTabTags();
+    assertThat(tabTags.getTagsFilter().size(), is(1));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(true));
+
+    clearQuickFilterTags();
+    sleep(2, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(CountOtherTagsOnEntriesWithSingleTagFilter));
+
+    quickFilterTags(FilterSingleTag);
+    sleep(2, TimeUnit.SECONDS);
+
+    // now unselect CheckBox again
+    getCheckBoxFilterTag().setSelected(false);
+    sleep(1, TimeUnit.SECONDS);
+
+    assertThat(tabTags.getTagsFilter().size(), is(0));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(false));
+
+    clearQuickFilterTags();
+    sleep(2, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
+  }
+
+
   /*      Check if after clearing Filter SystemTag AllEntries is selected    */
 
   @Test
@@ -439,6 +486,10 @@ public class TabTagsTests extends UiTestBase {
     clearQuickFilterTags();
   }
 
+  protected TabTagsControl getTabTags() {
+    return lookup("#tabTags").queryFirst();
+  }
+
   protected TextField getTextFieldSearchTags() {
     return lookup("#txtfldSearchTags").queryFirst();
   }
@@ -453,6 +504,10 @@ public class TabTagsTests extends UiTestBase {
 
   protected ObservableList<Tag> getTagsInTableViewTags() {
     return getTableViewTags().getItems();
+  }
+
+  protected CheckBox getCheckBoxFilterTag() {
+    return lookup("#chkbxFilterTag").queryFirst();
   }
 
   protected TextField getTextFieldEditCell() {

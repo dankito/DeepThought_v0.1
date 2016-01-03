@@ -53,6 +53,8 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   }
 
   protected void setupCheckBox() {
+    checkBox.setId("chkbxFilterTag");
+
     checkBox.setMinWidth(15);
     checkBox.setMaxWidth(15);
     checkBox.setAlignment(Pos.CENTER);

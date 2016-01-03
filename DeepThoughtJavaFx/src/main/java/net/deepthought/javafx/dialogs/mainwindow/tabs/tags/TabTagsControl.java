@@ -111,6 +111,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   protected void setupControl() {
+    this.setId("tabTags");
     this.setPrefWidth(315.0);
 
     setupTagsFilterPanel();
