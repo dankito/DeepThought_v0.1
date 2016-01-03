@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 import javafx.collections.ObservableList;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -31,6 +32,12 @@ public class TabTagsTests extends UiTestBase {
   protected static final String NewTagRenamedName = "New_Tag_Renamed";
   protected static final String NewTagRenamedDescription = "New_Tag_Renamed_Description";
 
+  protected static final String FilterForThreeTags = "münchen,flüchtlinge,csu";
+  protected static final String FilterForFourTagsIncludingANotExistingOne = "münchen,flüchtlinge,halleluja,csu";
+  protected static final String FilterForThreeTermsIncludingThreeAmbiguousResults = "münchen,flüchtling,csu";
+
+
+  /*        Create Tag          */
 
   @Test
   public void createTag_TagGetsAddedCorrectly() {
@@ -57,6 +64,8 @@ public class TabTagsTests extends UiTestBase {
     deepThought.removeTag(newTag); // clean up again
   }
 
+
+  /*        Delete Tag        */
 
   @Test
   public void removeTagByButton_TagGetsRemovedCorrectly() {
@@ -139,6 +148,8 @@ public class TabTagsTests extends UiTestBase {
     assertThat(getTagsInTableViewTags().contains(newTag), is(false));
   }
 
+
+  /*        Rename Tag        */
 
   @Test
   public void renameTagViaF2KeyPress_TagGetsRenamedCorrectly() {
@@ -258,6 +269,73 @@ public class TabTagsTests extends UiTestBase {
   }
 
 
+  /*      Filter Tags       */
+
+  @Test
+  public void filterThreeTags_OnlyTheseThreeTagsAreShown() {
+    Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
+
+    int countDefaultTags = deepThought.countTags();
+
+    filterTags(FilterForThreeTags);
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
+
+    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
+    assertThat(filteredTags.size(), is(3));
+
+    TableView<Tag> tblvwTags = getTableViewTags();
+    Tag firstResult = filteredTags.get(0);
+    tblvwTags.getSelectionModel().select(firstResult);
+    sleep(1, TimeUnit.SECONDS);
+    assertThat(getMainWindowTableViewEntriesItems().size(), is(1));
+
+    resetQuickFilterTags();
+    assertThat(getTagsInTableViewTags().size(), is(4));
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
+
+    removeTagsFilter();
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
+    assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
+  }
+
+  @Test
+  public void filterFourTagsIncludingOneNotExistingOne_OnlyThreeTagsAreShown() {
+    Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
+    int countDefaultTags = deepThought.countTags();
+
+    filterTags(FilterForFourTagsIncludingANotExistingOne);
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
+
+    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
+    assertThat(filteredTags.size(), is(3));
+
+    removeTagsFilter();
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
+    assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
+  }
+
+  @Test
+  public void filterThreeTagsIncludingThreeAmbiguousOnes_FiveTagsAreShown() {
+    Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
+    int countDefaultTags = deepThought.countTags();
+
+    quickFilterTags(FilterForThreeTermsIncludingThreeAmbiguousResults);
+    sleep(2, TimeUnit.SECONDS);
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
+    assertThat(getTagsInTableViewTags().size(), is(5));
+
+    filterTags(FilterForThreeTermsIncludingThreeAmbiguousResults);
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
+    assertThat(getTagsInTableViewTags().size(), is(0));
+
+    removeTagsFilter();
+    assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
+    assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
+  }
+
+
+
   protected void assertTagWithNewTagNameDoesNotExist() {
     sleep(2, TimeUnit.SECONDS);
 
@@ -307,6 +385,12 @@ public class TabTagsTests extends UiTestBase {
     sleep(1, TimeUnit.SECONDS);
   }
 
+  protected void clickButtonRemoveTagsFilter() {
+    clickOn("#btnRemoveTagsFilter");
+
+    sleep(1, TimeUnit.SECONDS);
+  }
+
   protected void quickFilterTags(String tagsQuickFilter) {
     getTextFieldSearchTags().setText(tagsQuickFilter);
     sleep(2, TimeUnit.SECONDS);
@@ -317,8 +401,24 @@ public class TabTagsTests extends UiTestBase {
     sleep(2, TimeUnit.SECONDS);
   }
 
+  protected void filterTags(String tagsQuickFilter) {
+    TextField txtfldSearchTags = getTextFieldSearchTags();
+    txtfldSearchTags.setText(tagsQuickFilter);
+    pressAndReleaseKeyOnNode(txtfldSearchTags, KeyCode.ENTER);
+    sleep(2, TimeUnit.SECONDS);
+  }
+
+  protected void removeTagsFilter() {
+    clickButtonRemoveTagsFilter();
+    resetQuickFilterTags();
+  }
+
   protected TextField getTextFieldSearchTags() {
     return lookup("#txtfldSearchTags").queryFirst();
+  }
+
+  protected Button getButtonRemoveTagsFilter() {
+    return lookup("#btnRemoveTagsFilter").queryFirst();
   }
 
   protected TableView<Tag> getTableViewTags() {

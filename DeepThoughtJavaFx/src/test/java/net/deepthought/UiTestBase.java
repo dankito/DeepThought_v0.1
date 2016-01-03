@@ -13,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -165,6 +166,10 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected TableView<Entry> getMainWindowTableViewEntries() {
     return lookup("#tblvwEntries").queryFirst();
+  }
+
+  protected ObservableList<Entry> getMainWindowTableViewEntriesItems() {
+    return getMainWindowTableViewEntries().getItems();
   }
 
   protected TextField getMainWindowTextFieldSearchEntriesEntries() {
