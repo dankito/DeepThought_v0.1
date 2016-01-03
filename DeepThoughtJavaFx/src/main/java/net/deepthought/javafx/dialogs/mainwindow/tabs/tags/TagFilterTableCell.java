@@ -1,4 +1,4 @@
-package net.deepthought.javafx.mainwindow.tabs.tags;
+package net.deepthought.javafx.dialogs.mainwindow.tabs.tags;
 
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;

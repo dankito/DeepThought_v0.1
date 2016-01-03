@@ -1,7 +1,7 @@
 package net.deepthought.controls.entries;
 
 import net.deepthought.Application;
-import net.deepthought.MainWindowController;
+import net.deepthought.javafx.dialogs.mainwindow.MainWindowController;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ICleanUp;

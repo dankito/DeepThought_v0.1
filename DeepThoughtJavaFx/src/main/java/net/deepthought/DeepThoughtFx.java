@@ -49,7 +49,7 @@ public class DeepThoughtFx extends Application {
       stage.setScene(scene);
       JavaFxLocalization.bindStageTitle(stage, "main.window.title");
 
-      MainWindowController controller = (MainWindowController)loader.getController();
+      net.deepthought.javafx.dialogs.mainwindow.MainWindowController controller = (net.deepthought.javafx.dialogs.mainwindow.MainWindowController)loader.getController();
       controller.setStage(stage);
 
       stage.show();

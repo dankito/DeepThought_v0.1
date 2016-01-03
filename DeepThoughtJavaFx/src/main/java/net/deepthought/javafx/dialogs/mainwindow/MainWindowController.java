@@ -4,8 +4,9 @@
  * and open the template in the editor.
  */
 
-package net.deepthought;
+package net.deepthought.javafx.dialogs.mainwindow;
 
+import net.deepthought.Application;
 import net.deepthought.clipboard.ClipboardContentChangedListener;
 import net.deepthought.clipboard.IClipboardWatcher;
 import net.deepthought.clipboard.JavaFxClipboardWatcher;
@@ -21,9 +22,9 @@ import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.connected_devices.ConnectedDevicesPanel;
 import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
-import net.deepthought.javafx.mainwindow.tabs.categories.CategoryTreeCell;
-import net.deepthought.javafx.mainwindow.tabs.categories.CategoryTreeItem;
-import net.deepthought.javafx.mainwindow.tabs.tags.TabTagsControl;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;

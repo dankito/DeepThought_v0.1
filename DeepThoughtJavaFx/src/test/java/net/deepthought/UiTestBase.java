@@ -113,7 +113,7 @@ public abstract class UiTestBase extends ApplicationTest {
     Parent root = loader.load();
     JavaFxLocalization.resolveResourceKeys(root);
 
-    MainWindowController controller = loader.getController();
+    net.deepthought.javafx.dialogs.mainwindow.MainWindowController controller = loader.getController();
     controller.setStage(stage);
 
     return root;
