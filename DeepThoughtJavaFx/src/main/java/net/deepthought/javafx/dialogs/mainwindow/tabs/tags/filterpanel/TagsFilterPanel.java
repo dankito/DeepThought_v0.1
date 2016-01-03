@@ -70,8 +70,10 @@ public class TagsFilterPanel extends HBox {
     HBox.setHgrow(txtfldSearchTags, Priority.ALWAYS);
     txtfldSearchTags.setMinWidth(60);
     txtfldSearchTags.setPrefWidth(Region.USE_COMPUTED_SIZE);
+
     txtfldSearchTags.textProperty().addListener((observable, oldValue, newValue) -> tagsFilter.searchTags());
     txtfldSearchTags.setOnAction(event -> tagsFilter.toggleCurrentTagsTagsFilter());
+
     txtfldSearchTags.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.ESCAPE)
         txtfldSearchTags.clear();

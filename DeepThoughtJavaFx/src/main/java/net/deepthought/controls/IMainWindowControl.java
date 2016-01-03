@@ -7,8 +7,8 @@ import net.deepthought.data.model.DeepThought;
  */
 public interface IMainWindowControl {
 
-  public void deepThoughtChanged(DeepThought newDeepThought);
+  void deepThoughtChanged(DeepThought newDeepThought);
 
-  public void clearData();
+  void clearData();
 
 }

@@ -12,7 +12,6 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
@@ -36,7 +35,6 @@ import java.util.TreeSet;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
@@ -46,6 +44,8 @@ import javafx.scene.layout.VBox;
 public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFilter, ISelectedTagsController {
 
   private final static Logger log = LoggerFactory.getLogger(TabTagsControl.class);
+
+  protected static final HashSet<Entry> EntriesToShowIfNoTagIsSelected = new HashSet<>();
 
 
   protected Entry entry = null;
@@ -58,7 +58,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected TagsSearch tagsSearch = null;
   protected TagsSearchResults lastTagsSearchResults = TagsSearchResults.EmptySearchResults;
   protected Collection<Tag> allTagsSearchResult = null;
+
   protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult = null;
+
   protected List<IDisplayedTagsChangedListener> displayedTagsChangedListeners = new ArrayList<>();
 
   protected ObservableSet<Tag> tagsFilter = FXCollections.observableSet();
@@ -85,10 +87,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     if(newDeepThought != null) {
       this.systemTags = Arrays.asList(new Tag[] { deepThought.AllEntriesSystemTag(), deepThought.EntriesWithoutTagsSystemTag() });
-//      showAllTagsInListViewTags(deepThought);
 
       if (deepThought.getSettings().getLastViewedTag() != null) {
-        tblvwTags.selectTag(deepThought.getSettings().getLastViewedTag());
+        setSelectedTag(deepThought.getSettings().getLastViewedTag());
       } else {
         tblvwTags.selectTagAtIndex(0);
       }
@@ -96,8 +97,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     allTagsSearchResult = null;
 
-    if(Application.isInstantiated() == true) // Application not instantiated yet -> searchForAllTags() will then be called in applicationInstantiated()
+    if(Application.isInstantiated()) { // Application not instantiated yet -> searchForAllTags() will then be called in applicationInstantiated()
       searchForAllTags();
+    }
   }
 
   public void applicationInstantiated() {
@@ -128,13 +130,8 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     tblvwTags = new TableViewTags(this, this);
     VBox.setVgrow(tblvwTags, Priority.ALWAYS);
     this.getChildren().add(tblvwTags);
-
-    tblvwTags.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.DELETE) {
-        removeSelectedTags();
-      }
-    });
   }
+
 
   public void setSelectedTagToAllEntriesSystemTag() {
     selectedTagChanged(deepThought.AllEntriesSystemTag());
@@ -148,12 +145,13 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       deepThought.getSettings().getLastViewedTag().removeEntityListener(selectedTagListener);
 
     deepThought.getSettings().setLastViewedTag(selectedTag);
-    tblvwTags.selectTag(selectedTag);
+    setSelectedTag(selectedTag);
 
     filterPanel.disableButtonRemoveSelectedTag(selectedTag == null || selectedTag instanceof SystemTag);
 
-    if(selectedTag != null)
+    if(selectedTag != null) {
       selectedTag.addEntityListener(selectedTagListener);
+    }
 
     showEntriesForSelectedTag(selectedTag);
   }
@@ -163,28 +161,33 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     if(tag != null) {
       if (isTagsFilterApplied() && lastFilterTagsResult != null) {
-
-        Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
-        for (Entry tagEntry : tag.getEntries()) {
-          if (lastFilterTagsResult.getEntriesHavingFilteredTags().contains(tagEntry))
-            filteredEntriesWithThisTag.add(tagEntry);
-        }
-
-        mainWindowController.showEntries(filteredEntriesWithThisTag); // TODO: here can may be a problem when Entries are search. How to know about this filter?
+        showEntriesForSelectedTagWithAppliedTagsFilter(tag);
       }
-      else
+      else {
         mainWindowController.showEntries(tag.getEntries());
+      }
     }
-    else
-      mainWindowController.showEntries(new HashSet<Entry>());
+    else {
+      mainWindowController.showEntries(EntriesToShowIfNoTagIsSelected);
+    }
+  }
+
+  protected void showEntriesForSelectedTagWithAppliedTagsFilter(Tag tag) {
+    Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
+    for (Entry tagEntry : tag.getEntries()) {
+      if (lastFilterTagsResult.getEntriesHavingFilteredTags().contains(tagEntry))
+        filteredEntriesWithThisTag.add(tagEntry);
+    }
+
+    mainWindowController.showEntries(filteredEntriesWithThisTag); // TODO: here can may be a problem when Entries are search. How to know about this filter?
   }
 
 
-  public void searchForAllTags() {
+  protected void searchForAllTags() {
     searchTags(TagsSearch.EmptySearchTerm);
   }
 
-  public void researchTagsWithLastSearchTerm() {
+  protected void researchTagsWithLastSearchTerm() {
     searchTags(lastSearchTerm);
   }
 
@@ -193,7 +196,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     searchTags(filterPanel.getTagsSearchText());
   }
 
-  public void searchTags(String searchTerm) {
+  protected void searchTags(String searchTerm) {
     this.lastSearchTerm = searchTerm;
 
     if(isTagsFilterApplied())
@@ -202,22 +205,23 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       if (tagsSearch != null && tagsSearch.isCompleted() == false)
         tagsSearch.interrupt();
 
-      lastSearchTerm = searchTerm;
-      lastFilterTagsResult = null;
+      doSearchTags(searchTerm);
+    }
+  }
 
-      if(StringUtils.isNullOrEmpty(filterPanel.getTagsSearchText()) && allTagsSearchResult != null) {
-        setTableViewTagsItems(allTagsSearchResult);
-      }
-      else {
-        tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
-          @Override
-          public void completed(TagsSearchResults results) {
-            Platform.runLater(() -> searchTagsCompleted(results));
-          }
-        });
+  protected void doSearchTags(String searchTerm) {
+    lastSearchTerm = searchTerm;
+    lastFilterTagsResult = null;
 
-        Application.getSearchEngine().searchTags(tagsSearch);
-      }
+    if(StringUtils.isNullOrEmpty(filterPanel.getTagsSearchText()) && allTagsSearchResult != null) {
+      setTableViewTagsItems(allTagsSearchResult);
+    }
+    else {
+      tagsSearch = new TagsSearch(searchTerm, results -> {
+        Platform.runLater(() -> searchTagsCompleted(results));
+      });
+
+      Application.getSearchEngine().searchTags(tagsSearch);
     }
   }
 
@@ -225,14 +229,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     lastTagsSearchResults = results;
 
     if(results.hasEmptySearchTerm()) {
-      allTagsSearchResult = new CombinedLazyLoadingList<Tag>(systemTags, results.getRelevantMatchesSorted());
+      allTagsSearchResult = new CombinedLazyLoadingList<>(systemTags, results.getRelevantMatchesSorted());
       setTableViewTagsItems(allTagsSearchResult);
-      setSelectedTagToAllEntriesSystemTag();
     }
-    else
+    else {
       setTableViewTagsItems(results);
-
-    callDisplayedTagsChangedListeners(results);
+    }
   }
 
   protected boolean isTagsFilterApplied() {
@@ -244,17 +246,16 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   protected void filterTags(final Tag tagToSelect) {
-    if(isTagsFilterApplied() == false)
+    if(isTagsFilterApplied() == false) {
       researchTagsWithLastSearchTerm();
+    }
     else {
-      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
-        @Override
-        public void completed(FindAllEntriesHavingTheseTagsResult results) {
-          lastFilterTagsResult = results;
-          setTableViewTagsItems(results.getTagsOnEntriesContainingFilteredTags());
+      Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, results -> {
+        lastFilterTagsResult = results;
+        setTableViewTagsItems(results.getTagsOnEntriesContainingFilteredTags());
 
-          if(tagToSelect != null)
-            tblvwTags.selectTag(tagToSelect);
+        if(tagToSelect != null) {
+          setSelectedTag(tagToSelect);
         }
       });
     }
@@ -298,16 +299,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   @Override
-  public void setTagFilterState(Tag tag, Boolean filterTag) {
-    if(filterTag == true)
-      addTagToTagFilter(tag);
-    else
-      removeTagFromTagFilter(tag);
-
-    setButtonRemoveTagsFilterDisabledState();
-  }
-
-  @Override
   public void removeSelectedTags() {
     List<Tag> selectedTags = new ArrayList<>(tblvwTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing the first one SelectionModel gets cleared
     for(Tag selectedTag : selectedTags) {
@@ -317,6 +308,16 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
 
+  @Override
+  public void setTagFilterState(Tag tag, Boolean filterTag) {
+    if(filterTag)
+      addTagToTagFilter(tag);
+    else
+      removeTagFromTagFilter(tag);
+
+    setButtonRemoveTagsFilterDisabledState();
+  }
+
   protected void addTagToTagFilter(Tag tag) {
     if(tagsFilter.contains(tag))
       return;
@@ -324,7 +325,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     tagsFilter.add(tag);
     filterTags(tag);
 
-    tblvwTags.selectTag(tag);
+    setSelectedTag(tag);
   }
 
   protected void removeTagFromTagFilter(Tag tag) {
@@ -334,14 +335,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     tagsFilter.remove(tag);
     filterTags(tag);
 
-    tblvwTags.selectTag(tag);
-  }
-
-  protected void showLastSearchResult() {
-    if(lastTagsSearchResults.hasEmptySearchTerm() && allTagsSearchResult != null)
-      setTableViewTagsItems(allTagsSearchResult);
-    else
-      setTableViewTagsItems(lastTagsSearchResults);
+    setSelectedTag(tag);
   }
 
   protected void setTableViewTagsItems(TagsSearchResults results) {
@@ -371,17 +365,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       setSelectedTag(results.getLastResult().getSingleMatch());
     else {
       if (results.getRelevantMatchesSorted().size() == 1)
-        setSelectedTag(new ArrayList<Tag>(results.getRelevantMatchesSorted()).get(0));
+        setSelectedTag(new ArrayList<>(results.getRelevantMatchesSorted()).get(0));
       else if (results.getLastResult().getAllMatches().size() == 1)
-        setSelectedTag(new ArrayList<Tag>(results.getLastResult().getAllMatches()).get(0));
-      // don't do this, isMatch() starts loading all search results
-//      else if (results.isMatch(selectedTag))
-//        setSelectedTag(selectedTag);
+        setSelectedTag(new ArrayList<>(results.getLastResult().getAllMatches()).get(0));
     }
   }
 
   protected void setSelectedTag(Tag tagToSelect) {
-    tblvwTags.getSelectionModel().select(tagToSelect);
+    tblvwTags.selectTag(tagToSelect);
   }
 
 
@@ -419,23 +410,17 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
     public void entityCreated(BaseEntity entity) {
-      if(entity instanceof Tag) {
-        updateTags();
-      }
+      checkIfTagsHaveToBeUpdated(entity);
     }
 
     @Override
     public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      if(entity instanceof Tag) {
-        updateTags();
-      }
+      checkIfTagsHaveToBeUpdated(entity);
     }
 
     @Override
     public void entityDeleted(BaseEntity entity) {
-      if(entity instanceof Tag) {
-        updateTags();
-      }
+      checkIfTagsHaveToBeUpdated(entity);
     }
 
     @Override
@@ -448,6 +433,12 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     }
   };
+
+  protected void checkIfTagsHaveToBeUpdated(BaseEntity entity) {
+    if(entity instanceof Tag) {
+      updateTags();
+    }
+  }
 
   protected EntityListener selectedTagListener = new EntityListener() {
     @Override
@@ -457,19 +448,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      Tag selectedTag = tblvwTags.getSelectionModel().getSelectedItem();
-//      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
-//          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
-//      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && tblvwTags.getSelectionModel().getSelectedItem() != null &&
-//          collection == tblvwTags.getSelectionModel().getSelectedItem().getEntries()) {
-//      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
-//          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
-      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == ((Tag)collectionHolder).getEntries()) {
-        if(tblvwTags.getTagsSize() > 0) {
-          filterTags();
-        }
-        showEntriesForSelectedTag((Tag)collectionHolder);
-      }
+      checkIfTagsHaveToBeUpdated((Tag) collectionHolder, collection);
     }
 
     @Override
@@ -479,14 +458,17 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-//      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && deepThought.getSettings().getLastViewedTag() != null &&
-//          collection == deepThought.getSettings().getLastViewedTag().getEntries()) {
-      if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == ((Tag)collectionHolder).getEntries()) {
-        if(tblvwTags.getTagsSize() > 0) {
-          filterTags();
-        }
-        showEntriesForSelectedTag((Tag)collectionHolder);
-      }
+      checkIfTagsHaveToBeUpdated((Tag) collectionHolder, collection);
     }
   };
+
+  protected void checkIfTagsHaveToBeUpdated(Tag collectionHolder, Collection<? extends BaseEntity> collection) {
+    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == collectionHolder.getEntries()) {
+      if(tblvwTags.getTagsSize() > 0) {
+        filterTags();
+      }
+
+      showEntriesForSelectedTag(collectionHolder);
+    }
+  }
 }

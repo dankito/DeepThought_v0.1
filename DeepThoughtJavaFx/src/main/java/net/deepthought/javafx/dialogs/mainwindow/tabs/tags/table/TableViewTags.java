@@ -61,7 +61,10 @@ public class TableViewTags extends TableView<Tag> {
     this.getSelectionModel().selectedItemProperty().addListener(tableViewTagsSelectedItemChangedListener);
 
     this.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.F2) {
+      if (event.getCode() == KeyCode.DELETE) {
+        selectedTagsController.removeSelectedTags();
+      }
+      else if (event.getCode() == KeyCode.F2) {
         this.edit(this.getSelectionModel().getSelectedIndex(), clmnTagName);
       }
     });
