@@ -57,12 +57,7 @@ public class TableViewTags extends TableView<Tag> {
     setColumnResizePolicy(CONSTRAINED_RESIZE_POLICY);
 
     // TODO: isn't this setting listener twice?
-    this.selectionModelProperty().addListener(new ChangeListener<TableViewSelectionModel<Tag>>() {
-      @Override
-      public void changed(ObservableValue<? extends TableViewSelectionModel<Tag>> observable, TableViewSelectionModel<Tag> oldValue, TableViewSelectionModel<Tag> newValue) {
-        getSelectionModel().selectedItemProperty().addListener(tableViewTagsSelectedItemChangedListener);
-      }
-    });
+    this.selectionModelProperty().addListener((observable, oldValue, newValue) -> getSelectionModel().selectedItemProperty().addListener(tableViewTagsSelectedItemChangedListener));
     this.getSelectionModel().selectedItemProperty().addListener(tableViewTagsSelectedItemChangedListener);
 
     this.setOnKeyReleased(event -> {
