@@ -12,16 +12,12 @@ import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.util.Callback;
 
 /**
  * Created by ganymed on 03/01/16.
@@ -38,7 +34,6 @@ public class TableViewTags extends TableView<Tag> {
   protected ISelectedTagsController selectedTagsController;
 
   protected LazyLoadingObservableList<Tag> tableViewTagsItems = null;
-  protected ObservableList<TagFilterTableCell> tagFilterTableCells = FXCollections.observableArrayList();
 
 
   public TableViewTags(ITagsFilter tagsFilter, ISelectedTagsController selectedTagsController) {
@@ -94,12 +89,7 @@ public class TableViewTags extends TableView<Tag> {
     clmnTagName.setPrefWidth(80);
     clmnTagName.setMaxWidth(FXUtils.SizeMaxValue);
 
-    clmnTagName.setCellFactory(new Callback<TableColumn<Tag, String>, TableCell<Tag, String>>() {
-      @Override
-      public TableCell<Tag, String> call(TableColumn<Tag, String> param) {
-        return new TagNameTableCell(tagsFilter);
-      }
-    });
+    clmnTagName.setCellFactory(param -> new TagNameTableCell(tagsFilter));
   }
 
   protected void setupColumnTagFilter() {
@@ -118,22 +108,7 @@ public class TableViewTags extends TableView<Tag> {
     JavaFxLocalization.bindControlToolTip(columnFilterGraphicLabel, "filter.tags.tool.tip");
     clmnTagFilter.setGraphic(columnFilterGraphicLabel);
 
-    clmnTagFilter.setCellFactory(new Callback<TableColumn<Tag, Boolean>, TableCell<Tag, Boolean>>() {
-      @Override
-      public TableCell<Tag, Boolean> call(TableColumn<Tag, Boolean> param) {
-        final TagFilterTableCell cell = new TagFilterTableCell(tagsFilter);
-        tagFilterTableCells.add(cell);
-
-        cell.isFilteredProperty().addListener(new ChangeListener<Boolean>() {
-          @Override
-          public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-            tagsFilter.setTagFilterState(cell.getTag(), newValue);
-          }
-        });
-
-        return cell;
-      }
-    });
+    clmnTagFilter.setCellFactory(param -> new TagFilterTableCell(tagsFilter));
   }
 
 
