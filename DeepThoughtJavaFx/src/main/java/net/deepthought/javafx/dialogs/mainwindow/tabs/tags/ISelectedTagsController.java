@@ -9,4 +9,6 @@ public interface ISelectedTagsController {
 
   void selectedTagChanged(Tag selectedTag);
 
+  void removeSelectedTags();
+
 }

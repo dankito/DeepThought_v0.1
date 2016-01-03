@@ -11,11 +11,17 @@ import javafx.collections.ObservableSet;
  */
 public interface ITagsFilter {
 
+  void searchTags();
+
+  void setTagFilterState(Tag tag, Boolean filterTag);
+
+  void toggleCurrentTagsTagsFilter();
+
+  void clearTagFilter();
+
   ObservableSet<Tag> getTagsFilter();
 
   TagsSearchResults getLastTagsSearchResults();
-
-  void setTagFilterState(Tag tag, Boolean filterTag);
 
   boolean addDisplayedTagsChangedListener(IDisplayedTagsChangedListener listener);
 

@@ -1,11 +1,8 @@
 package net.deepthought.javafx.dialogs.mainwindow.tabs.tags;
 
 import net.deepthought.Application;
-import net.deepthought.controller.Dialogs;
-import net.deepthought.controls.Constants;
 import net.deepthought.controls.IMainWindowControl;
 import net.deepthought.controls.tag.IDisplayedTagsChangedListener;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
@@ -20,12 +17,11 @@ import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.javafx.dialogs.mainwindow.MainWindowController;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.filterpanel.TagsFilterPanel;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
 
-import org.controlsfx.control.textfield.CustomTextField;
-import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,16 +36,8 @@ import java.util.TreeSet;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
@@ -78,23 +66,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
   protected MainWindowController mainWindowController;
 
-  @FXML
-  protected VBox layoutRoot;
+  protected TagsFilterPanel filterPanel;
 
-  @FXML
-  protected HBox hboxTagsBar;
-  @FXML
-  protected TextField txtfldSearchTags;
-  @FXML
-  protected Button btnRemoveTagsFilter;
-  @FXML
-  protected Button btnRemoveSelectedTag;
-  @FXML
-  protected Button btnAddTag;
-//  @FXML
-//  protected TableView<Tag> tblvwTags;
-
-  protected net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags tblvwTags;
+  protected TableViewTags tblvwTags;
 
 
 
@@ -102,8 +76,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     this.mainWindowController = mainWindowController;
     deepThought = Application.getDeepThought();
 
-    if(FXUtils.loadControl(this, "TabTagsControl"))
-      setupControl();
+    setupControl();
   }
 
   public void deepThoughtChanged(DeepThought newDeepThought) {
@@ -138,33 +111,22 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   protected void setupControl() {
-    // replace normal TextField txtfldSearchTags with a SearchTextField (with a cross to clear selection)
-    hboxTagsBar.getChildren().remove(txtfldSearchTags);
-    txtfldSearchTags = (CustomTextField) TextFields.createClearableTextField();
-    txtfldSearchTags.setId("txtfldSearchTags");
-    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchTags, "search.tags.prompt.text");
-    hboxTagsBar.getChildren().add(1, txtfldSearchTags);
-    HBox.setHgrow(txtfldSearchTags, Priority.ALWAYS);
-    txtfldSearchTags.setMinWidth(60);
-    txtfldSearchTags.setPrefWidth(Region.USE_COMPUTED_SIZE);
-    txtfldSearchTags.textProperty().addListener((observable, oldValue, newValue) -> searchTags());
-    txtfldSearchTags.setOnAction(event -> toggleCurrentTagsTagsFilter());
-    txtfldSearchTags.setOnKeyReleased(event -> {
-      if (event.getCode() == KeyCode.ESCAPE)
-        txtfldSearchTags.clear();
-    });
+    this.setPrefWidth(315.0);
 
-    btnRemoveTagsFilter.setGraphic(new ImageView(Constants.FilterDeleteIconPath));
-    JavaFxLocalization.bindControlToolTip(btnRemoveTagsFilter, "button.remove.tags.filter.tool.tip");
+    setupTagsFilterPanel();
 
-    btnRemoveSelectedTag.setTextFill(Constants.RemoveEntityButtonTextColor);
-    JavaFxLocalization.bindControlToolTip(btnRemoveSelectedTag, "delete.selected.tags.tool.tip");
-    btnAddTag.setTextFill(Constants.AddEntityButtonTextColor);
-    JavaFxLocalization.bindControlToolTip(btnAddTag, "add.new.tag.tool.tip");
+    setupTableViewTags();
+  }
 
-    tblvwTags = new net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags(this, this);
+  protected void setupTagsFilterPanel() {
+    filterPanel = new TagsFilterPanel(this, this);
+    this.getChildren().add(filterPanel);
+  }
+
+  protected void setupTableViewTags() {
+    tblvwTags = new TableViewTags(this, this);
     VBox.setVgrow(tblvwTags, Priority.ALWAYS);
-    layoutRoot.getChildren().add(tblvwTags);
+    this.getChildren().add(tblvwTags);
 
     tblvwTags.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.DELETE) {
@@ -187,7 +149,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     deepThought.getSettings().setLastViewedTag(selectedTag);
     tblvwTags.selectTag(selectedTag);
 
-    btnRemoveSelectedTag.setDisable(selectedTag == null || selectedTag instanceof SystemTag);
+    filterPanel.disableButtonRemoveSelectedTag(selectedTag == null || selectedTag instanceof SystemTag);
 
     if(selectedTag != null)
       selectedTag.addEntityListener(selectedTagListener);
@@ -225,8 +187,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     searchTags(lastSearchTerm);
   }
 
+  @Override
   public void searchTags() {
-    searchTags(txtfldSearchTags.getText());
+    searchTags(filterPanel.getTagsSearchText());
   }
 
   public void searchTags(String searchTerm) {
@@ -241,7 +204,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       lastSearchTerm = searchTerm;
       lastFilterTagsResult = null;
 
-      if(StringUtils.isNullOrEmpty(txtfldSearchTags.getText()) && allTagsSearchResult != null) {
+      if(StringUtils.isNullOrEmpty(filterPanel.getTagsSearchText()) && allTagsSearchResult != null) {
         setTableViewTagsItems(allTagsSearchResult);
       }
       else {
@@ -296,8 +259,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     }
   }
 
-  protected void toggleCurrentTagsTagsFilter() {
-    if(StringUtils.isNullOrEmpty(txtfldSearchTags.getText())) // toggling all Tags is really not that senseful
+  @Override
+  public void toggleCurrentTagsTagsFilter() {
+    if(StringUtils.isNullOrEmpty(filterPanel.getTagsSearchText())) // toggling all Tags is really not that senseful
       return;
 
     if(tblvwTags.getTagsSize() == 0)
@@ -321,16 +285,18 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   protected void setButtonRemoveTagsFilterDisabledState() {
-    btnRemoveTagsFilter.setDisable(isTagsFilterApplied() == false);
+    filterPanel.disableButtonRemoveTagsFilter(isTagsFilterApplied() == false);
   }
 
-  protected void clearTagFilter() {
+  @Override
+  public void clearTagFilter() {
     tagsFilter.clear();
     lastFilterTagsResult = null;
     setButtonRemoveTagsFilterDisabledState();
     searchTags();
   }
 
+  @Override
   public void setTagFilterState(Tag tag, Boolean filterTag) {
     if(filterTag == true)
       addTagToTagFilter(tag);
@@ -338,6 +304,15 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       removeTagFromTagFilter(tag);
 
     setButtonRemoveTagsFilterDisabledState();
+  }
+
+  @Override
+  public void removeSelectedTags() {
+    List<Tag> selectedTags = new ArrayList<>(tblvwTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing the first one SelectionModel gets cleared
+    for(Tag selectedTag : selectedTags) {
+      if(selectedTag instanceof SystemTag == false)
+        Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(deepThought, selectedTag);
+    }
   }
 
 
@@ -437,39 +412,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   @Override
   public TagsSearchResults getLastTagsSearchResults() {
     return lastTagsSearchResults;
-  }
-
-
-  @FXML
-  protected void handleButtonRemoveTagsFilterAction(ActionEvent event) {
-    clearTagFilter();
-  }
-
-  @FXML
-  protected void handleButtonRemoveSelectedTagsAction(ActionEvent event) {
-    removeSelectedTags();
-  }
-
-  protected void removeSelectedTags() {
-    List<Tag> selectedTags = new ArrayList<>(tblvwTags.getSelectionModel().getSelectedItems()); // make a copy as when multiple Tags are selected after removing the first one SelectionModel gets cleared
-    for(Tag selectedTag : selectedTags) {
-      if(selectedTag instanceof SystemTag == false)
-        Alerts.deleteTagWithUserConfirmationIfIsSetOnEntries(deepThought, selectedTag);
-    }
-  }
-
-  @FXML
-  protected void handleButtonAddTagAction(ActionEvent event) {
-    addNewTag();
-  }
-
-  protected void addNewTag() {
-    Point2D buttonCoordinates = FXUtils.getNodeScreenCoordinates(btnAddTag);
-
-    final double centerX = buttonCoordinates.getX() + btnAddTag.getWidth() / 2;
-    final double y = buttonCoordinates.getY() + btnAddTag.getHeight() + 6;
-
-    Dialogs.showEditTagDialog(new Tag(), centerX, y, getScene().getWindow(), true);
   }
 
 

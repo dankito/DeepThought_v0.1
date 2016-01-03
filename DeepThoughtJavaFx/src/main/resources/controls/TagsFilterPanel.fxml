@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import org.controlsfx.control.*?>
+<?import org.controlsfx.control.textfield.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<fx:root fx:id="hboxTagsBar" type="javafx.scene.layout.HBox" alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label maxWidth="-Infinity" minWidth="-Infinity" text="%search">
+            <HBox.margin>
+                <Insets right="6.0" />
+            </HBox.margin></Label>
+        <CustomTextField fx:id="txtfldSearchTags" minWidth="70.0" prefColumnCount="0" promptText="%search.tags.prompt.text" HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnRemoveTagsFilter" alignment="CENTER" contentDisplay="GRAPHIC_ONLY" disable="true" maxHeight="30.0" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleButtonRemoveTagsFilterAction" prefWidth="30.0" HBox.hgrow="NEVER">
+            <HBox.margin>
+                <Insets left="6.0" />
+            </HBox.margin>
+        </Button>
+        <Button fx:id="btnRemoveSelectedTag" alignment="CENTER" contentDisplay="TEXT_ONLY" disable="true" maxHeight="30.0" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleButtonRemoveSelectedTagsAction" prefWidth="30.0" text="-" textAlignment="CENTER" textFill="#b90909" HBox.hgrow="NEVER">
+            <HBox.margin>
+                <Insets left="6.0" />
+            </HBox.margin>
+       <font>
+          <Font name="System Bold" size="13.0" />
+       </font>
+        </Button>
+        <Button fx:id="btnAddTag" alignment="CENTER" contentDisplay="TEXT_ONLY" maxHeight="30.0" maxWidth="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#handleButtonAddTagAction" prefWidth="30.0" text="+" textAlignment="CENTER" textFill="#068606" HBox.hgrow="NEVER">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+            <HBox.margin>
+                <Insets left="6.0" />
+            </HBox.margin>
+        </Button>
+    </children>
+</fx:root>
