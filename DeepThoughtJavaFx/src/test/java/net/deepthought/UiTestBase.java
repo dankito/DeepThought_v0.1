@@ -19,6 +19,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -87,6 +88,8 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected void setupMainStage(Stage stage) throws Exception {
     setupStage(stage, "dialogs/MainWindow.fxml", 1150, 620);
+
+    deepThought = Application.getDeepThought();
   }
 
   protected void setupStage(Stage stage, String fxmlFilePath) throws Exception {
@@ -102,8 +105,6 @@ public abstract class UiTestBase extends ApplicationTest {
     stage.toFront();
 
     sleep(5, TimeUnit.SECONDS); // give Stage some time to initialize
-
-    deepThought = Application.getDeepThought();
   }
 
   protected Parent loadFxml(Stage stage, String fxmlFilePath) throws IOException {
@@ -134,6 +135,34 @@ public abstract class UiTestBase extends ApplicationTest {
     clickOn("#btnCancel");
     sleep(2, TimeUnit.SECONDS);
   }
+
+
+  protected boolean isAnAlertVisible() {
+    return lookup(".alert").queryAll().size() > 0;
+  }
+
+  protected Button getAlertDefaultButton() {
+    return lookup(".alert .button").lookup((Node node) -> {
+      return ((Button) node).isDefaultButton();
+    }).queryFirst();
+  }
+
+  protected void clickAlertDefaultButton() {
+    clickOn(getAlertDefaultButton());
+    sleep(1, TimeUnit.SECONDS);
+  }
+
+  protected Button getAlertCancelButton() {
+    return lookup(".alert .button").lookup((Node node) -> {
+      return ((Button) node).isCancelButton();
+    }).queryFirst();
+  }
+
+  protected void clickAlertCancelButton() {
+    clickOn(getAlertCancelButton());
+    sleep(1, TimeUnit.SECONDS);
+  }
+
 
   protected void focusNode(Node node) {
     final CountDownLatch waitLatch = new CountDownLatch(1);
