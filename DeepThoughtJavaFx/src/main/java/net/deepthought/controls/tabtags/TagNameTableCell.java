@@ -82,9 +82,9 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
   }
 
   @Override
-  public void startEdit() {
+  public void reallyStartEdit() {
     if(tag instanceof SystemTag == false)
-      super.startEdit();
+      super.reallyStartEdit();
   }
 
   @Override
@@ -116,7 +116,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     contextMenu.getItems().add(renameTagMenuItem);
 
     renameTagMenuItem.setOnAction((event) -> {
-      startEdit();
+      reallyStartEdit();
     });
 
     contextMenu.getItems().add(new SeparatorMenuItem());

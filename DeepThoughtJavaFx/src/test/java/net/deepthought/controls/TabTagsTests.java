@@ -12,9 +12,11 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 /**
@@ -209,6 +211,28 @@ public class TabTagsTests extends UiTestBase {
 //    deepThought.removeTag(newTag);
 //  }
 
+  @Test
+  public void selectAndThanClickOnTag_TableViewDoesNotChangeToEditView() {
+    assertTagWithNewTagNameDoesNotExist();
+
+    createNewTagViaUi();
+
+    quickFilterTags(NewTagName);
+    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
+    Tag newTag = filteredTags.get(0);
+
+    TableView<Tag> tblvwTags = getTableViewTags();
+    tblvwTags.getSelectionModel().select(newTag);
+
+    clickOnCoordinateInNode(tblvwTags, 2, 40 + 2, MouseButton.PRIMARY); // 40 for Table header
+    sleep(1, TimeUnit.SECONDS);
+
+    TextField txtfldEditCell = getTextFieldEditCell();
+    assertThat(txtfldEditCell, nullValue());
+
+    deepThought.removeTag(newTag);
+  }
+
 
   protected void assertThatTagHasBeenRenamed(Tag tag) {
     assertThatTagHasBeenRenamed(tag, false);
@@ -247,6 +271,12 @@ public class TabTagsTests extends UiTestBase {
     quickFilterTags(name);
     ObservableList<Tag> tagsWithNewTagName = getTagsInTableViewTags();
 
+    while(tagsWithNewTagName.size() > 100) { // filter result hasn't been displayed yet, still all Tags are shown -> wait some more time
+      sleep(1, TimeUnit.SECONDS);
+      quickFilterTags(name);
+      tagsWithNewTagName = getTagsInTableViewTags();
+    }
+
     for(Tag tag : tagsWithNewTagName) {
       deepThought.removeTag(tag);
     }
@@ -279,12 +309,12 @@ public class TabTagsTests extends UiTestBase {
 
   protected void quickFilterTags(String tagsQuickFilter) {
     getTextFieldSearchTags().setText(tagsQuickFilter);
-    sleep(1, TimeUnit.SECONDS);
+    sleep(2, TimeUnit.SECONDS);
   }
 
   protected void resetQuickFilterTags() {
     getTextFieldSearchTags().setText("");
-    sleep(1, TimeUnit.SECONDS);
+    sleep(2, TimeUnit.SECONDS);
   }
 
   protected TextField getTextFieldSearchTags() {

@@ -50,6 +50,10 @@ public abstract class TextFieldTableCell<T> extends TableCell<T, String> {
 
   @Override
   public void startEdit() {
+    // avoid that a Click on a selected Cell starts editing
+  }
+
+  protected void reallyStartEdit() {
     super.startEdit();
 
     if(editingStarted == true) // there must be a Bug in JavaFX: startEdit() is called twice, on real start and on committing -> filter out second call

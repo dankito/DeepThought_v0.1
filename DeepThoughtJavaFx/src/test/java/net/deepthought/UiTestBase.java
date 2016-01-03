@@ -100,7 +100,7 @@ public abstract class UiTestBase extends ApplicationTest {
     stage.show();
     stage.toFront();
 
-    sleep(4, TimeUnit.SECONDS); // give Stage some time to initialize
+    sleep(5, TimeUnit.SECONDS); // give Stage some time to initialize
 
     deepThought = Application.getDeepThought();
   }

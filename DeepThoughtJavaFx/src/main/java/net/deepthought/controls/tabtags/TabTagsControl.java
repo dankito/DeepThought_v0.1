@@ -45,8 +45,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
+import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -56,6 +58,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -192,6 +195,14 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
       }
       else if(event.getCode() == KeyCode.F2) {
         tblvwTags.edit(tblvwTags.getSelectionModel().getSelectedIndex(), clmnTagName);
+      }
+    });
+
+    tblvwTags.setOnMouseReleased(event -> {
+      if(event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
+        Node debug = event.getPickResult().getIntersectedNode();
+        EventTarget debug2 = event.getTarget();
+        if(debug == debug2) { }
       }
     });
 
