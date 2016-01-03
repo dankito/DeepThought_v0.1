@@ -381,6 +381,33 @@ public class TabTagsTests extends UiTestBase {
     assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
   }
 
+  @Test
+  public void clickCheckBoxFilterOnATag_PressButtonRemoveTagsFilter_FilterGetsRemoved() {
+    int countDefaultTags = deepThought.countTags();
+
+    quickFilterTags(FilterSingleTag);
+    sleep(4, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(1));
+    Tag singleSelectedTag = getTagsInTableViewTags().get(0);
+
+    // Click CheckBox of Tag to Filter this Tag
+    getCheckBoxFilterTag().setSelected(true);
+    sleep(1, TimeUnit.SECONDS);
+
+    TabTagsControl tabTags = getTabTags();
+    assertThat(tabTags.getTagsFilter().size(), is(1));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(true));
+
+    clickButtonRemoveTagsFilter();
+    clearQuickFilterTags();
+    sleep(2, TimeUnit.SECONDS);
+
+    assertThat(tabTags.getTagsFilter().size(), is(0));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(false));
+    assertThat(getTagsInTableViewTags().size(), is(countDefaultTags));
+  }
+
 
   /*      Check if after clearing Filter SystemTag AllEntries is selected    */
 
