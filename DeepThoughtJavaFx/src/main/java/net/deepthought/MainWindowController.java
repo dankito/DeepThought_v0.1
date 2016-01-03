@@ -23,7 +23,7 @@ import net.deepthought.controls.entries.EntriesOverviewControl;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.tabcategories.CategoryTreeCell;
 import net.deepthought.controls.tabcategories.CategoryTreeItem;
-import net.deepthought.controls.tabtags.TabTagsControl;
+import net.deepthought.javafx.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;

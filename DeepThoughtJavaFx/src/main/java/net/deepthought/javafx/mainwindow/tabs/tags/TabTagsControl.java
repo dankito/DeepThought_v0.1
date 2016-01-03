@@ -1,4 +1,4 @@
-package net.deepthought.controls.tabtags;
+package net.deepthought.javafx.mainwindow.tabs.tags;
 
 import net.deepthought.Application;
 import net.deepthought.MainWindowController;
@@ -189,8 +189,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl {
     tblvwTags.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.DELETE) {
         removeSelectedTags();
-      }
-      else if(event.getCode() == KeyCode.F2) {
+      } else if (event.getCode() == KeyCode.F2) {
         tblvwTags.edit(tblvwTags.getSelectionModel().getSelectedIndex(), clmnTagName);
       }
     });
