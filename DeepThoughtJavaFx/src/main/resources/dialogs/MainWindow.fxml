@@ -95,9 +95,9 @@
                       <MenuItem mnemonicParsing="false" text="Action 2" />
                     </items>
                   </MenuButton>
-                  <MenuBar GridPane.hgrow="ALWAYS">
+                  <MenuBar fx:id="mainMenu" GridPane.hgrow="ALWAYS">
                     <menus>
-                      <Menu fx:id="mnitmFile" mnemonicParsing="false" text="%file">
+                      <Menu fx:id="mnitmmnitmMainMenuViewFile" mnemonicParsing="false" text="%file">
                         <items>
                               <Menu fx:id="mnitmFileClipboard" disable="true" mnemonicParsing="false" text="%clipboard" />
                               <SeparatorMenuItem mnemonicParsing="false" />
@@ -109,7 +109,7 @@
                         </items>
                       </Menu>
                       <Menu mnemonicParsing="false" text="%edit" visible="false" />
-                        <Menu mnemonicParsing="false" text="%view">
+                        <Menu fx:id="mnitmMainMenuView" mnemonicParsing="false" text="%view">
                           <items>
                               <Menu mnemonicParsing="false" text="%dialogs.fields.display">
                                 <items>
@@ -122,7 +122,7 @@
                               <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />
                           </items>
                         </Menu>
-                        <Menu fx:id="mnitmMainMenuWindow1" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
+                        <Menu fx:id="mnitmMainMenuTools" mnemonicParsing="false" onShowing="#handleMainMenuWindowShowing" text="%tools">
                            <items>
                               <Menu fx:id="mnitmToolsLanguage" mnemonicParsing="false" text="%language">
                                 <items>

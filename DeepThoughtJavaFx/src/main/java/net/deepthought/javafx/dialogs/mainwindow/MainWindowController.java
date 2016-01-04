@@ -119,7 +119,7 @@ public class MainWindowController implements Initializable {
   GridPane grdpnMainMenu;
 
   @FXML
-  protected Menu mnitmFile;
+  protected Menu mnitmMainMenuFile;
   @FXML
   protected Menu mnitmFileClipboard;
   @FXML
@@ -526,7 +526,7 @@ public class MainWindowController implements Initializable {
       tbpnOverview.getTabs().remove(tabCategories);
     else tbpnOverview.getTabs().add(0, tabCategories);
 
-    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories)
+    if(showCategories == false && deepThought.getSettings().getLastSelectedTab() == SelectedTab.Categories)
       tbpnOverview.getSelectionModel().select(tabTags);
   }
 
@@ -809,23 +809,36 @@ public class MainWindowController implements Initializable {
   protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      if(setting == Setting.UserDeviceShowQuickEditEntryPane)
-        entriesOverviewControl.showPaneQuickEditEntryChanged((boolean) newValue);
-      else if(setting == Setting.UserDeviceShowCategories) {
-        showCategoriesChanged((boolean) newValue);
-      }
-      else if(setting == Setting.UserDeviceDialogFieldsDisplay) {
-        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
-        chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
-
-        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
-        chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
-
-        chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
-        chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
-      }
+      reactToUserDeviceSettingsChangedThreadSafe(setting, (boolean) newValue);
     }
   };
+
+  protected void reactToUserDeviceSettingsChangedThreadSafe(Setting setting, boolean newValue) {
+    if(Platform.isFxApplicationThread()){
+      reactToUserDeviceSettingsChanged(setting, newValue);
+    }
+    else {
+      Platform.runLater(() -> reactToUserDeviceSettingsChanged(setting, newValue));
+    }
+  }
+
+  protected void reactToUserDeviceSettingsChanged(Setting setting, boolean newValue) {
+    if(setting == Setting.UserDeviceShowQuickEditEntryPane)
+      entriesOverviewControl.showPaneQuickEditEntryChanged(newValue);
+    else if(setting == Setting.UserDeviceShowCategories) {
+      showCategoriesChanged(newValue);
+    }
+    else if(setting == Setting.UserDeviceDialogFieldsDisplay) {
+      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+      chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+
+      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
+      chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
+
+      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+      chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+    }
+  }
 
   protected ClipboardContentChangedListener clipboardContentChangedExternallyListener = new ClipboardContentChangedListener() {
     @Override

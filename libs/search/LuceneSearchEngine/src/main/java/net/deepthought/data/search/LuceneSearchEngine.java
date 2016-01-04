@@ -927,7 +927,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     try {
       entriesHavingFilteredTags.addAll(getBaseEntitiesFromQuery(Entry.class, query, FieldName.EntryId));
       for(Entry resultEntry : entriesHavingFilteredTags)
-        tagsOnEntriesContainingFilteredTags.addAll(resultEntry.getTags());
+        tagsOnEntriesContainingFilteredTags.addAll(resultEntry.getTags()); // TODO: this is really bad as in this way all Entries of entriesHavingFilteredTags get loaded
 
       if(tagNamesToFilterFor != null && tagNamesToFilterFor.length > 0)
         tagsOnEntriesContainingFilteredTags = filterTagsOnEntriesContainingFilteredTagsWithSearchTerm(tagsOnEntriesContainingFilteredTags, tagNamesToFilterFor);

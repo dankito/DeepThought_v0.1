@@ -5,6 +5,7 @@ import com.sun.javafx.scene.control.skin.ContextMenuContent;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
 
 import org.junit.BeforeClass;
@@ -110,7 +111,7 @@ public abstract class UiTestBase extends ApplicationTest {
     stage.show();
     stage.toFront();
 
-    sleep(3, TimeUnit.SECONDS); // give Stage some time to initialize
+    sleep(5, TimeUnit.SECONDS); // give Stage some time to initialize
   }
 
   protected Parent loadFxml(Stage stage, String fxmlFilePath) throws IOException {
@@ -252,6 +253,15 @@ public abstract class UiTestBase extends ApplicationTest {
     }
 
     return null;
+  }
+
+
+  protected TabTagsControl getTabTags() {
+    return lookup("#tabTags").queryFirst();
+  }
+
+  protected Node getTabCategories() {
+    return lookup("#tabCategories").queryFirst();
   }
 
 

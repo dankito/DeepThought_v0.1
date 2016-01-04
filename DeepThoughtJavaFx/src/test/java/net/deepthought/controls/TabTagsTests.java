@@ -564,7 +564,7 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void filterTagByCheckBox_FilterThreeOtherTags_AllFourTagsAreFiltered() {
     quickFilterTags(OtherTagAvailableForFilterForThreeTags);
-    sleep(2, TimeUnit.SECONDS);
+    sleep(4, TimeUnit.SECONDS);
 
     // Click CheckBox of Tag to Filter this Tag
     getCheckBoxFilterTag().setSelected(true);
@@ -713,10 +713,6 @@ public class TabTagsTests extends UiTestBase {
   protected void removeTagsFilter() {
     clickButtonRemoveTagsFilter();
     clearQuickFilterTags();
-  }
-
-  protected TabTagsControl getTabTags() {
-    return lookup("#tabTags").queryFirst();
   }
 
   protected TextField getTextFieldSearchTags() {
