@@ -10,6 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javafx.collections.ObservableList;
@@ -41,6 +42,7 @@ public class TabTagsTests extends UiTestBase {
   protected static final String NewTagRenamedDescription = "New_Tag_Renamed_Description";
 
   protected static final String FilterForThreeTags = "münchen,flüchtlinge,csu";
+  protected static final String OtherTagAvailableForFilterForThreeTags = "süddeutsche";
   protected static final String FilterForFourTagsIncludingANotExistingOne = "münchen,flüchtlinge,halleluja,csu";
   protected static final String FilterForThreeTermsIncludingThreeAmbiguousResults = "münchen,flüchtling,csu";
 
@@ -536,6 +538,52 @@ public class TabTagsTests extends UiTestBase {
     assertThat(getTagsInTableViewTags().size(), is(CountDefaultTags));
   }
 
+  @Test
+  public void filterThreeTags_FilterAnotherTagByCheckBox_AllFourTagsAreFiltered() {
+    filterTags(FilterForThreeTags);
+    sleep(2, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(3));
+
+    quickFilterTags(OtherTagAvailableForFilterForThreeTags);
+    Tag singleSelectedTag = getTagsInTableViewTags().get(0);
+
+    // Click CheckBox of Tag to Filter this Tag
+    getCheckBoxFilterTag().setSelected(true);
+    sleep(1, TimeUnit.SECONDS);
+
+    clearQuickFilterTags();
+
+    assertThat(getTagsInTableViewTags().size(), is(4));
+
+    TabTagsControl tabTags = getTabTags();
+    assertThat(tabTags.getTagsFilter().size(), is(4));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(true));
+  }
+
+  @Test
+  public void filterTagByCheckBox_FilterThreeOtherTags_AllFourTagsAreFiltered() {
+    quickFilterTags(OtherTagAvailableForFilterForThreeTags);
+    sleep(2, TimeUnit.SECONDS);
+
+    // Click CheckBox of Tag to Filter this Tag
+    getCheckBoxFilterTag().setSelected(true);
+    Tag singleSelectedTag = getTagsInTableViewTags().get(0);
+    sleep(1, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(1));
+
+    filterTags(FilterForThreeTags);
+    clearQuickFilterTags();
+    sleep(1, TimeUnit.SECONDS);
+
+    assertThat(getTagsInTableViewTags().size(), is(4));
+
+    TabTagsControl tabTags = getTabTags();
+    assertThat(tabTags.getTagsFilter().size(), is(4));
+    assertThat(tabTags.getTagsFilter().contains(singleSelectedTag), is(true));
+  }
+
 
   /*      Check if after clearing Filter SystemTag AllEntries is selected    */
 
@@ -693,6 +741,10 @@ public class TabTagsTests extends UiTestBase {
 
   protected CheckBox getCheckBoxFilterTag() {
     return lookup("#chkbxFilterTag").queryFirst();
+  }
+
+  protected Set<CheckBox> getAllCheckBoxesFilterTag() {
+    return lookup("#chkbxFilterTag").queryAll();
   }
 
   protected TextField getTextFieldEditCell() {
