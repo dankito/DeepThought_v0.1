@@ -112,6 +112,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     ContextMenu contextMenu = new ContextMenu();
 
     MenuItem renameTagMenuItem = new MenuItem(Localization.getLocalizedString("rename"));
+    renameTagMenuItem.setId("mnitmRename");
     contextMenu.getItems().add(renameTagMenuItem);
 
     renameTagMenuItem.setOnAction((event) -> {

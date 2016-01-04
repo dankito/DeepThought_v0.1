@@ -1,5 +1,7 @@
 package net.deepthought;
 
+import com.sun.javafx.scene.control.skin.ContextMenuContent;
+
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
@@ -9,6 +11,8 @@ import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +24,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -191,15 +197,55 @@ public abstract class UiTestBase extends ApplicationTest {
     clickOnCoordinateInNode(node, coordinateInNodeX, coordinateInNodeY, MouseButton.SECONDARY);
   }
 
-  protected void showContextMenuInNodeAndSelectItem(Node node, double coordinateInNodeX, double coordinateInNodeY) {
+  protected void showContextMenuInNode(Node node, double coordinateInNodeX, double coordinateInNodeY) {
     rightClickOnCoordinateInNode(node, coordinateInNodeX, coordinateInNodeY);
+    sleep(1, TimeUnit.SECONDS);
   }
 
   protected void showContextMenuInNodeAndSelectItem(Node node, double coordinateInNodeX, double coordinateInNodeY, int numberOfItemToSelect) {
-    rightClickOnCoordinateInNode(node, coordinateInNodeX, coordinateInNodeY);
+    showContextMenuInNode(node, coordinateInNodeX, coordinateInNodeY);
 
     moveBy(10, 10 + numberOfItemToSelect * 30); // TODO: is 30 really MenuItem's height?
     clickOn(MouseButton.PRIMARY);
+  }
+
+  protected boolean isAContextMenuShowing() {
+    return findContextMenu() != null;
+  }
+
+  protected ContextMenu findContextMenu() {
+    List<Node> lookupResult = new ArrayList<>(lookup(".context-menu").queryAll());
+    int size = lookupResult.size();
+    int index = 0;
+
+    while(index < size) { // per ContextMenu a PopupControl.CSSBridge (which is protected) and a ContextMenuContent is returned
+      Node node = lookupResult.get(index);
+      if(node instanceof ContextMenuContent) {
+        return (ContextMenu)((ContextMenuContent) node).getStyleableParent();
+      }
+
+      index++;
+    }
+
+    return findContextMenuViaMenuItems();
+  }
+
+  /**
+   * Another way to find a ContextMenu: Search for classes context-menu -> menu-item and then get ContextMenu from MenuItem
+   * @return
+   */
+  protected ContextMenu findContextMenuViaMenuItems() {
+    List<Node> debug = new ArrayList<>(lookup(".context-menu .menu-item").queryAll());
+    if(debug.size() > 0) {
+      if(debug.get(0) instanceof ContextMenuContent.MenuItemContainer) {
+        MenuItem item = ((ContextMenuContent.MenuItemContainer)debug.get(0)).getItem();
+        if(item.getParentPopup() instanceof ContextMenu) {
+          return (ContextMenu)item.getParentPopup();
+        }
+      }
+    }
+
+    return null;
   }
 
 

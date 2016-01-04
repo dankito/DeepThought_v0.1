@@ -3,6 +3,7 @@ package net.deepthought.controls;
 import net.deepthought.UiTestBase;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 
 import org.junit.Ignore;
@@ -30,6 +31,8 @@ import static org.hamcrest.core.Is.is;
  */
 @Ignore
 public class TabTagsTests extends UiTestBase {
+
+  protected static final int CountSystemTags = 2;
 
   protected static final String NewTagName = "New_Tag_Name";
   protected static final String NewTagDescription = "New_Tag_Description";
@@ -366,6 +369,39 @@ public class TabTagsTests extends UiTestBase {
   }
 
 
+  /*      System Tags       */
+
+  @Test
+  public void testSystemTags() {
+    sleep(3, TimeUnit.SECONDS);
+    TableView<Tag> tblvwTags = getTableViewTags();
+    ObservableList<Tag> allTags = getTagsInTableViewTags();
+
+    for(int i = 0; i < CountSystemTags; i++) {
+      Tag systemTag = allTags.get(i);
+      assertThat(systemTag instanceof SystemTag, is(true));
+
+      tblvwTags.getSelectionModel().clearSelection();
+      tblvwTags.getSelectionModel().select(systemTag);
+
+      // SystemTags cannot be deleted and have no ContextMenu
+      assertThat(getButtonRemoveSelectedTag().isDisabled(), is(true));
+
+      showContextMenuInNode(getTableViewTags(), 2, 40 + 2 + i * 20); // 40 for Table header
+      assertThat(isAContextMenuShowing(), is(false));
+    }
+
+    // simply enter any filter term -> no SystemTags may be shown
+    quickFilterTags("a");
+    allTags = getTagsInTableViewTags();
+
+    for(int i = 0; i < CountSystemTags; i++) {
+      Tag tag = allTags.get(i);
+      assertThat(tag instanceof SystemTag, is(false));
+    }
+  }
+
+
   /*      Filter Tags       */
 
   @Test
@@ -641,6 +677,10 @@ public class TabTagsTests extends UiTestBase {
 
   protected Button getButtonRemoveTagsFilter() {
     return lookup("#btnRemoveTagsFilter").queryFirst();
+  }
+
+  protected Button getButtonRemoveSelectedTag() {
+    return lookup("#btnRemoveSelectedTag").queryFirst();
   }
 
   protected TableView<Tag> getTableViewTags() {
