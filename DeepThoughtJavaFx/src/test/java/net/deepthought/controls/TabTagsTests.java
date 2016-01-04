@@ -208,7 +208,7 @@ public class TabTagsTests extends UiTestBase {
 
     getTableViewTags().getSelectionModel().select(newTag);
 
-    showContextMenuInNodeAndSelectItem(getTableViewTags(), 2, 40 + 2, 1); // 40 for Table header
+    showContextMenuInNodeAndSelectItemById(getTableViewTags(), 2, 40 + 2, "mnitmDelete"); // 40 for Table header
     sleep(1, TimeUnit.SECONDS);
 
     assertThatTagHasBeenDeleted(CountDefaultTags, newTag);
@@ -220,7 +220,7 @@ public class TabTagsTests extends UiTestBase {
 
     Tag newTag = createAndSelectTestTagAndAddTestEntry();
 
-    showContextMenuInNodeAndSelectItem(getTableViewTags(), 2, 40 + 2, 1); // 40 for Table header
+    showContextMenuInNodeAndSelectItemById(getTableViewTags(), 2, 40 + 2, "mnitmDelete"); // 40 for Table header
     sleep(1, TimeUnit.SECONDS);
 
     assertThatTagGetsDeletedByAlertDefaultButton(newTag);
@@ -289,7 +289,7 @@ public class TabTagsTests extends UiTestBase {
     TableView<Tag> tblvwTags = getTableViewTags();
     tblvwTags.getSelectionModel().select(newTag);
 
-    showContextMenuInNodeAndSelectItem(tblvwTags, 2, 40 + 2, 0); // 40 for Table header
+    showContextMenuInNodeAndSelectItemById(tblvwTags, 2, 40 + 2, "mnitmRename"); // 40 for Table header
     sleep(1, TimeUnit.SECONDS);
 
     setTextFieldEditCellToValue(NewTagRenamedName);

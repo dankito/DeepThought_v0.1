@@ -110,7 +110,7 @@ public abstract class UiTestBase extends ApplicationTest {
     stage.show();
     stage.toFront();
 
-    sleep(5, TimeUnit.SECONDS); // give Stage some time to initialize
+    sleep(3, TimeUnit.SECONDS); // give Stage some time to initialize
   }
 
   protected Parent loadFxml(Stage stage, String fxmlFilePath) throws IOException {
@@ -202,10 +202,16 @@ public abstract class UiTestBase extends ApplicationTest {
     sleep(1, TimeUnit.SECONDS);
   }
 
-  protected void showContextMenuInNodeAndSelectItem(Node node, double coordinateInNodeX, double coordinateInNodeY, int numberOfItemToSelect) {
+  protected void showContextMenuInNodeAndSelectItemById(Node node, double coordinateInNodeX, double coordinateInNodeY, String menuItemId) {
     showContextMenuInNode(node, coordinateInNodeX, coordinateInNodeY);
 
-    moveBy(10, 10 + numberOfItemToSelect * 30); // TODO: is 30 really MenuItem's height?
+    clickOn(".context-menu #" + menuItemId);
+  }
+
+  protected void showContextMenuInNodeAndSelectItem(Node node, double coordinateInNodeX, double coordinateInNodeY, int indexOfItemToSelect) {
+    showContextMenuInNode(node, coordinateInNodeX, coordinateInNodeY);
+
+    moveBy(10, 10 + indexOfItemToSelect * 30); // TODO: is 30 really MenuItem's height?
     clickOn(MouseButton.PRIMARY);
   }
 

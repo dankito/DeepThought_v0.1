@@ -122,6 +122,7 @@ public class TagNameTableCell extends TextFieldTableCell<Tag> {
     contextMenu.getItems().add(new SeparatorMenuItem());
 
     MenuItem deleteTagMenuItem = new MenuItem(Localization.getLocalizedString("delete"));
+    deleteTagMenuItem.setId("mnitmDelete");
     contextMenu.getItems().add(deleteTagMenuItem);
 
     deleteTagMenuItem.setOnAction((event) -> {
