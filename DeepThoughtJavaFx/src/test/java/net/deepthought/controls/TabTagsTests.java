@@ -135,13 +135,8 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void removeTagByButton_TagGetsRemovedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     getTableViewTags().getSelectionModel().select(newTag);
     clickButtonRemoveSelectedTag();
@@ -156,13 +151,8 @@ public class TabTagsTests extends UiTestBase {
     Tag newTag = createAndSelectTestTagAndAddTestEntry();
 
     clickButtonRemoveSelectedTag();
-    assertThat(isAnAlertVisible(), is(true));
 
-    clickAlertDefaultButton();
-    assertThat(isAnAlertVisible(), is(false));
-
-    assertThatTagHasBeenDeleted(CountDefaultTags, newTag);
-    assertThat(testEntry.hasTag(newTag), is(false));
+    assertThatTagGetsDeletedByAlertDefaultButton(newTag);
   }
 
   @Test
@@ -187,13 +177,8 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void removeTagByPressingDeleteKey_TagGetsRemovedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     getTableViewTags().getSelectionModel().select(newTag);
     pressAndReleaseKeyOnNode(getTableViewTags(), KeyCode.DELETE);
@@ -202,15 +187,21 @@ public class TabTagsTests extends UiTestBase {
   }
 
   @Test
+  public void removeTagWithEntriesByPressingDeleteKey_AlertDefaultButtonIsPressed_TagGetsRemovedCorrectly() {
+    assertTagWithNewTagNameDoesNotExist();
+
+    Tag newTag = createAndSelectTestTagAndAddTestEntry();
+
+    pressAndReleaseKeyOnNode(getTableViewTags(), KeyCode.DELETE);
+
+    assertThatTagGetsDeletedByAlertDefaultButton(newTag);
+  }
+
+  @Test
   public void removeTagViaContextMenu_TagGetsRemovedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     getTableViewTags().getSelectionModel().select(newTag);
 
@@ -221,15 +212,22 @@ public class TabTagsTests extends UiTestBase {
   }
 
   @Test
+  public void removeTagWithEntriesViaContextMenu_AlertDefaultButtonIsPressed_TagGetsRemovedCorrectly() {
+    assertTagWithNewTagNameDoesNotExist();
+
+    Tag newTag = createAndSelectTestTagAndAddTestEntry();
+
+    showContextMenuInNodeAndSelectItem(getTableViewTags(), 2, 40 + 2, 1); // 40 for Table header
+    sleep(1, TimeUnit.SECONDS);
+
+    assertThatTagGetsDeletedByAlertDefaultButton(newTag);
+  }
+
+  @Test
   public void removeTagViaDeepThought_TagIsNotInTableViewTagsAnymore() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     deepThought.removeTag(newTag);
 
@@ -249,6 +247,16 @@ public class TabTagsTests extends UiTestBase {
     assertThat(getTagsInTableViewTags().contains(newTag), is(false));
   }
 
+  protected void assertThatTagGetsDeletedByAlertDefaultButton(Tag newTag) {
+    assertThat(isAnAlertVisible(), is(true));
+
+    clickAlertDefaultButton();
+    assertThat(isAnAlertVisible(), is(false));
+
+    assertThatTagHasBeenDeleted(CountDefaultTags, newTag);
+    assertThat(testEntry.hasTag(newTag), is(false));
+  }
+
 
   /*        Rename Tag        */
 
@@ -256,11 +264,7 @@ public class TabTagsTests extends UiTestBase {
   public void renameTagViaF2KeyPress_TagGetsRenamedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     TableView<Tag> tblvwTags = getTableViewTags();
     tblvwTags.getSelectionModel().select(newTag);
@@ -277,11 +281,7 @@ public class TabTagsTests extends UiTestBase {
   public void renameTagViaContextMenu_TagGetsRenamedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     TableView<Tag> tblvwTags = getTableViewTags();
     tblvwTags.getSelectionModel().select(newTag);
@@ -327,11 +327,7 @@ public class TabTagsTests extends UiTestBase {
   public void selectAndThanClickOnTag_TableViewDoesNotChangeToEditView() {
     assertTagWithNewTagNameDoesNotExist();
 
-    createNewTagViaUi();
-
-    quickFilterTags(NewTagName);
-    ObservableList<Tag> filteredTags = getTagsInTableViewTags();
-    Tag newTag = filteredTags.get(0);
+    Tag newTag = createAndSelectTestTag();
 
     TableView<Tag> tblvwTags = getTableViewTags();
     tblvwTags.getSelectionModel().select(newTag);
