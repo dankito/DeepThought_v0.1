@@ -313,18 +313,23 @@ public class MainWindowController implements Initializable {
     clearAllData();
 
     if(deepThought != null) {
-      DeepThoughtSettings settings = deepThought.getSettings();
+      applyNewDeepThoughtSettings(deepThought);
+    }
+  }
 
-      trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
-      selectedCategoryChanged(deepThought.getTopLevelCategory());
+  protected void applyNewDeepThoughtSettings(DeepThought deepThought) {
+    DeepThoughtSettings settings = deepThought.getSettings();
 
-      tabTagsControl.deepThoughtChanged(deepThought);
-      entriesOverviewControl.deepThoughtChanged(deepThought);
+    trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
+    selectedCategoryChanged(deepThought.getTopLevelCategory());
 
-      FXUtils.applyWindowSettingsAndListenToChanges(stage, settings.getMainWindowSettings());
-      setSelectedTab(settings.getLastSelectedTab());
+    tabTagsControl.deepThoughtChanged(deepThought);
+    entriesOverviewControl.deepThoughtChanged(deepThought);
 
-      userDeviceSettingsChanged(); // TODO: isn't this redundant with selecting Tab and current category?
+    FXUtils.applyWindowSettingsAndListenToChanges(stage, settings.getMainWindowSettings());
+    setSelectedTab(settings.getLastSelectedTab());
+
+    applyUserDeviceSettings(); // TODO: isn't this redundant with selecting Tab and current category?
 
 //    if(deepThought.getLastViewedCategory() != null)
 //      trvwCategories.getSelectionModel().(deepThought.getLastViewedCategory());
@@ -335,10 +340,9 @@ public class MainWindowController implements Initializable {
 //        entry.setEntryIndex(length - i);
 //        ((DefaultDataManager)Application.dataManager).entityUpdated(entry);
 //      }
-    }
   }
 
-  protected void userDeviceSettingsChanged() {
+  protected void applyUserDeviceSettings() {
     Application.getSettings().addSettingsChangedListener(userDeviceSettingsChangedListener);
 
     UserDeviceSettings settings = Application.getSettings();
@@ -346,20 +350,36 @@ public class MainWindowController implements Initializable {
     showCategoriesChanged(settings.showCategories());
     entriesOverviewControl.showPaneQuickEditEntryChanged(settings.showEntryQuickEditPane());
 
+    setMenuItemViewDialogsFieldsDisplayShowImportantOnesWithoutInvokingListener(settings.getDialogsFieldsDisplay());
+
+    setMenuItemViewDialogsFieldsDisplayShowAllWithoutInvokingListener(settings.getDialogsFieldsDisplay());
+
+    setMenuItemViewShowCategoriesWithoutInvokingListener(settings.showCategories());
+
+    setMenuItemViewShowQuickEditEntryPaneWithoutInvokingListener(settings.showEntryQuickEditPane());
+  }
+
+  protected void setMenuItemViewDialogsFieldsDisplayShowImportantOnesWithoutInvokingListener(DialogsFieldsDisplay dialogsFieldsDisplay) {
     chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
-    chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(settings.getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
+    chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(dialogsFieldsDisplay == DialogsFieldsDisplay.ImportantOnes);
     chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
+  }
 
+  protected void setMenuItemViewDialogsFieldsDisplayShowAllWithoutInvokingListener(DialogsFieldsDisplay dialogsFieldsDisplay) {
     chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
-    chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(settings.getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
+    chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(dialogsFieldsDisplay == DialogsFieldsDisplay.All);
     chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+  }
 
+  protected void setMenuItemViewShowCategoriesWithoutInvokingListener(boolean showCategories) {
     chkmnitmViewShowCategories.selectedProperty().removeListener(checkMenuItemViewShowCategoriesSelectedChangeListener);
-    chkmnitmViewShowCategories.setSelected(settings.showCategories());
+    chkmnitmViewShowCategories.setSelected(showCategories);
     chkmnitmViewShowCategories.selectedProperty().addListener(checkMenuItemViewShowCategoriesSelectedChangeListener);
+  }
 
+  protected void setMenuItemViewShowQuickEditEntryPaneWithoutInvokingListener(boolean showEntryQuickEditPane) {
     chkmnitmViewShowQuickEditEntryPane.selectedProperty().removeListener(checkMenuItemViewShowQuickEditEntrySelectedChangeListener);
-    chkmnitmViewShowQuickEditEntryPane.setSelected(settings.showEntryQuickEditPane());
+    chkmnitmViewShowQuickEditEntryPane.setSelected(showEntryQuickEditPane);
     chkmnitmViewShowQuickEditEntryPane.selectedProperty().addListener(checkMenuItemViewShowQuickEditEntrySelectedChangeListener);
   }
 
@@ -613,14 +633,14 @@ public class MainWindowController implements Initializable {
   protected ChangeListener<Boolean> checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener = new ChangeListener<Boolean>() {
     @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.ShowImportantOnes);
+      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.ImportantOnes);
     }
   };
 
   protected ChangeListener<Boolean> checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener = new ChangeListener<Boolean>() {
     @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.ShowAll);
+      Application.getSettings().setDialogsFieldsDisplay(DialogsFieldsDisplay.All);
     }
   };
 
@@ -809,11 +829,11 @@ public class MainWindowController implements Initializable {
   protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      reactToUserDeviceSettingsChangedThreadSafe(setting, (boolean) newValue);
+      reactToUserDeviceSettingsChangedThreadSafe(setting, newValue);
     }
   };
 
-  protected void reactToUserDeviceSettingsChangedThreadSafe(Setting setting, boolean newValue) {
+  protected void reactToUserDeviceSettingsChangedThreadSafe(Setting setting, Object newValue) {
     if(Platform.isFxApplicationThread()){
       reactToUserDeviceSettingsChanged(setting, newValue);
     }
@@ -822,21 +842,25 @@ public class MainWindowController implements Initializable {
     }
   }
 
-  protected void reactToUserDeviceSettingsChanged(Setting setting, boolean newValue) {
-    if(setting == Setting.UserDeviceShowQuickEditEntryPane)
-      entriesOverviewControl.showPaneQuickEditEntryChanged(newValue);
+  protected void reactToUserDeviceSettingsChanged(Setting setting, Object newValue) {
+    if(setting == Setting.UserDeviceShowQuickEditEntryPane) {
+      boolean showQuickEditEntryPane = (boolean)newValue;
+      entriesOverviewControl.showPaneQuickEditEntryChanged(showQuickEditEntryPane);
+      if(chkmnitmViewShowQuickEditEntryPane.isSelected() != showQuickEditEntryPane) {
+        setMenuItemViewShowQuickEditEntryPaneWithoutInvokingListener(showQuickEditEntryPane);
+      }
+    }
     else if(setting == Setting.UserDeviceShowCategories) {
-      showCategoriesChanged(newValue);
+      boolean showCategories = (boolean)newValue;
+      showCategoriesChanged(showCategories);
+      if(chkmnitmViewShowCategories.isSelected() != showCategories) {
+        setMenuItemViewShowCategoriesWithoutInvokingListener(showCategories);
+      }
     }
     else if(setting == Setting.UserDeviceDialogFieldsDisplay) {
-      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
-      chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
-
-      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowImportantOnes);
-      chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(Application.getLoggedOnUser().getSettings().getDialogsFieldsDisplay() == DialogsFieldsDisplay.ShowAll);
-
-      chkmnitmViewDialogsFieldsDisplayShowImportantOnes.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowImportantOnesSelectedChangeListener);
-      chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+      DialogsFieldsDisplay dialogsFieldsDisplay = (DialogsFieldsDisplay)newValue;
+      setMenuItemViewDialogsFieldsDisplayShowImportantOnesWithoutInvokingListener(dialogsFieldsDisplay);
+      setMenuItemViewDialogsFieldsDisplayShowAllWithoutInvokingListener(dialogsFieldsDisplay);
     }
   }
 

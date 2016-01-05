@@ -111,7 +111,7 @@
                       <Menu mnemonicParsing="false" text="%edit" visible="false" />
                         <Menu fx:id="mnitmMainMenuView" mnemonicParsing="false" text="%view">
                           <items>
-                              <Menu mnemonicParsing="false" text="%dialogs.fields.display">
+                              <Menu fx:id="mnitmViewDialogsFieldsDisplay" mnemonicParsing="false" text="%dialogs.fields.display">
                                 <items>
                                     <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowImportantOnes" mnemonicParsing="false" text="%dialogs.fields.display.show.important.ones" />
                                     <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowAll" mnemonicParsing="false" text="%dialogs.fields.display.show.all" />

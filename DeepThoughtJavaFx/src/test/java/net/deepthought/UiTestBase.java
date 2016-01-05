@@ -2,14 +2,22 @@ package net.deepthought;
 
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 
+import net.deepthought.controls.categories.EntryCategoriesControl;
+import net.deepthought.controls.file.FilesControl;
+import net.deepthought.controls.html.CollapsibleHtmlEditor;
+import net.deepthought.controls.person.EntryPersonsControl;
+import net.deepthought.controls.reference.EntryReferenceControl;
+import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.Localization;
 
 import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
+import org.testfx.service.finder.WindowFinder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +35,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -56,6 +65,8 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected DeepThought deepThought = null;
 
+  protected WindowFinder windowFinder = null;
+
 
   @BeforeClass
   public static void changeToHeadless() {
@@ -83,6 +94,8 @@ public abstract class UiTestBase extends ApplicationTest {
 
     this.stage = stage;
     setupMainStage(stage);
+
+    windowFinder = robotContext().getWindowFinder();
   }
 
   @Override
@@ -256,12 +269,35 @@ public abstract class UiTestBase extends ApplicationTest {
   }
 
 
+  private Stage getWindowWithTitle(String titleRegex) {
+    return (Stage)windowFinder.window(titleRegex);
+//    return (Stage)windowFinder.listOrderedWindows().stream().filter(window -> titleRegex.equals(((Stage)window).getTitle())).findFirst().get()
+  }
+
+  protected void activateWindow(Stage window) {
+    Platform.runLater(() -> { // it's important to call toFront() on UI thread
+      window.toFront();
+      window.requestFocus();
+    });
+    sleep(1, TimeUnit.SECONDS);
+  }
+
+  protected Stage getMainWindow() {
+    return getWindowWithTitle("PrimaryStageApplication");
+  }
+
+
   protected TabTagsControl getTabTags() {
     return lookup("#tabTags").queryFirst();
   }
 
   protected Node getTabCategories() {
     return lookup("#tabCategories").queryFirst();
+  }
+
+  protected boolean isTabCategoriesVisible() {
+    Node tabCategories = getTabCategories();
+    return tabCategories != null && tabCategories.isVisible();
   }
 
 
@@ -275,6 +311,90 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected TextField getMainWindowTextFieldSearchEntriesEntries() {
     return lookup("#txtfldSearchEntries").queryFirst();
+  }
+
+  protected ScrollPane getQuickEditEntryScrollPane() {
+    return lookup("#pnQuickEditEntryScrollPane").queryFirst();
+  }
+
+  protected boolean isEntryQuickEditPaneVisible() {
+    Node quickEditEntryScrollPane = getQuickEditEntryScrollPane();
+    return quickEditEntryScrollPane != null && quickEditEntryScrollPane.isVisible();
+  }
+
+
+  protected void navigateToNewEditEntryDialog() {
+    clickOn("#btnAddEntry");
+
+    sleep(2, TimeUnit.SECONDS);
+  }
+
+  protected Stage getEditEntryDialog() {
+    return getWindowWithTitle(Localization.getLocalizedString("create.entry"));
+  }
+
+
+  protected CollapsibleHtmlEditor getEntryDialogHtmlEditorAbstract() {
+    return lookup("#htmledAbstract").queryFirst();
+  }
+
+  protected boolean isEntryDialogHtmlEditorAbstractVisible() {
+    CollapsibleHtmlEditor htmlEditorAbstract = getEntryDialogHtmlEditorAbstract();
+    return htmlEditorAbstract != null && htmlEditorAbstract.isVisible();
+  }
+
+  protected CollapsibleHtmlEditor getEntryDialogHtmlEditorContent() {
+    return lookup("#htmledContent").queryFirst();
+  }
+
+  protected boolean isEntryDialogHtmlEditorContentVisible() {
+    CollapsibleHtmlEditor htmlEditorContent = getEntryDialogHtmlEditorContent();
+    return htmlEditorContent != null && htmlEditorContent.isVisible();
+  }
+
+  protected EntryTagsControl getEntryDialogTagsControl() {
+    return lookup("#editEntryDialogTagsControl").queryFirst();
+  }
+
+  protected boolean isEntryDialogTagsControlVisible() {
+    EntryTagsControl entryTagsControl = getEntryDialogTagsControl();
+    return entryTagsControl != null && entryTagsControl.isVisible();
+  }
+
+  protected EntryCategoriesControl getEntryDialogCategoriesControl() {
+    return lookup("#editEntryDialogCategoriesControl").queryFirst();
+  }
+
+  protected boolean isEntryDialogCategoriesControlVisible() {
+    EntryCategoriesControl entryCategoriesControl = getEntryDialogCategoriesControl();
+    return entryCategoriesControl != null && entryCategoriesControl.isVisible();
+  }
+
+  protected EntryReferenceControl getEntryDialogReferenceControl() {
+    return lookup("#editEntryDialogReferenceControl").queryFirst();
+  }
+
+  protected boolean isEntryDialogReferenceControlVisible() {
+    EntryReferenceControl entryReferenceControl = getEntryDialogReferenceControl();
+    return entryReferenceControl != null && entryReferenceControl.isVisible();
+  }
+
+  protected EntryPersonsControl getEntryDialogPersonsControl() {
+    return lookup("#editEntryDialogPersonsControl").queryFirst();
+  }
+
+  protected boolean isEntryDialogPersonsControlVisible() {
+    EntryPersonsControl entryPersonsControl = getEntryDialogPersonsControl();
+    return entryPersonsControl != null && entryPersonsControl.isVisible();
+  }
+
+  protected FilesControl getEntryDialogFilesControl() {
+    return lookup("#editEntryDialogFilesControl").queryFirst();
+  }
+
+  protected boolean isEntryDialogFilesControlVisible() {
+    FilesControl filesControl = getEntryDialogFilesControl();
+    return filesControl != null && filesControl.isVisible();
   }
 
 }

@@ -26,7 +26,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
   protected int maxBackupsToKeep = 7;
 
-  protected DialogsFieldsDisplay dialogsFieldsDisplay = DialogsFieldsDisplay.ShowImportantOnes;
+  protected DialogsFieldsDisplay dialogsFieldsDisplay = DialogsFieldsDisplay.ImportantOnes;
 
   protected boolean showCategories = false;
 

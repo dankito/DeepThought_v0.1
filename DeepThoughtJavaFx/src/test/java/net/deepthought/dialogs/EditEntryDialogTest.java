@@ -5,7 +5,6 @@ import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.data.model.Entry;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -23,11 +22,11 @@ public class EditEntryDialogTest extends UiTestBase {
   public void createNewEntry_EntryGetsCorrectlyAddedToDeepThought() {
     navigateToNewEditEntryDialog();
 
-    CollapsibleHtmlEditor htmledAbstract = getHtmlEditorEntryAbstract();
+    CollapsibleHtmlEditor htmledAbstract = getEntryDialogHtmlEditorAbstract();
     htmledAbstract.setExpanded(true);
     htmledAbstract.setHtml(EntryAbstract);
 
-    CollapsibleHtmlEditor htmledContent = getHtmlEditorEntryContent();
+    CollapsibleHtmlEditor htmledContent = getEntryDialogHtmlEditorContent();
     htmledContent.setHtml(EntryContent);
 
     clickOk();
@@ -37,21 +36,6 @@ public class EditEntryDialogTest extends UiTestBase {
 
     assertThat(createdEntry.getAbstractAsPlainText(), is(EntryAbstract));
     assertThat(createdEntry.getContentAsPlainText(), is(EntryContent));
-  }
-
-
-  protected void navigateToNewEditEntryDialog() {
-    clickOn("#btnAddEntry");
-
-    sleep(2, TimeUnit.SECONDS);
-  }
-
-  protected CollapsibleHtmlEditor getHtmlEditorEntryAbstract() {
-    return lookup("#htmledAbstract").queryFirst();
-  }
-
-  protected CollapsibleHtmlEditor getHtmlEditorEntryContent() {
-    return lookup("#htmledContent").queryFirst();
   }
 
 }

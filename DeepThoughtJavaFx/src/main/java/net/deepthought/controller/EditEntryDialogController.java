@@ -147,6 +147,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     setupTagsAndCategoriesControl();
 
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
+    entryReferenceControl.setId("editEntryDialogReferenceControl");
     entryReferenceControl.setExpanded(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
     contentPane.getChildren().add(4, entryReferenceControl);
@@ -154,6 +155,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
 
     entryPersonsControl = new EntryPersonsControl(entry);
+    entryPersonsControl.setId("editEntryDialogPersonsControl");
     entryPersonsControl.setExpanded(false);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
@@ -168,6 +170,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     // implemented
 
     filesControl = new FilesControl(editedAttachedFiles);
+    filesControl.setId("editEntryDialogFilesControl");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
     filesControl.setMaxHeight(FXUtils.SizeMaxValue);
@@ -179,6 +182,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   protected void setupTagsAndCategoriesControl() {
     // TODO: replace entry by IEditedEntitiesHolder<Tags> so that Dialog controls edited tags -> if a Tag is removed which is in creationResult, it can be removed from creationResult as well (also Categories, ...)
     entryTagsControl = new EntryTagsControl(entry);
+    entryTagsControl.setId("editEntryDialogTagsControl");
     entryTagsControl.setTagAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setMinWidth(150);
@@ -190,6 +194,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     contentPane.getChildren().add(2, entryTagsControl);
 
     entryCategoriesControl = new EntryCategoriesControl(entry);
+    entryCategoriesControl.setId("editEntryDialogCategoriesControl");
     entryCategoriesControl.setCategoryAddedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setMinWidth(150);
@@ -204,11 +209,11 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
-    entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
-    filesControl.setVisible(entry.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.ShowAll);
+    entryReferenceControl.setVisible(entry.isAReferenceSet() || (creationResult != null && creationResult.isAReferenceSet()) || dialogsFieldsDisplay == DialogsFieldsDisplay.All);
+    entryPersonsControl.setVisible(entry.hasPersons() || (creationResult != null && creationResult.hasPersons()) || dialogsFieldsDisplay == DialogsFieldsDisplay.All);
+    filesControl.setVisible(entry.hasAttachedFiles() || dialogsFieldsDisplay == DialogsFieldsDisplay.All);
 
-    setButtonChooseFieldsToShowVisibility(dialogsFieldsDisplay != DialogsFieldsDisplay.ShowAll && (entryReferenceControl.isVisible() == false ||
+    setButtonChooseFieldsToShowVisibility(dialogsFieldsDisplay != DialogsFieldsDisplay.All && (entryReferenceControl.isVisible() == false ||
         entryPersonsControl.isVisible() == false || filesControl.isVisible() == false));
 
     setCategoriesPaneVisibility();

@@ -5,7 +5,7 @@ package net.deepthought.data.model.settings.enums;
  */
 public enum DialogsFieldsDisplay {
 
-  ShowImportantOnes,
-  ShowAll
+  ImportantOnes,
+  All
 
 }
