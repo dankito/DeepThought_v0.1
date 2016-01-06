@@ -279,6 +279,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
     btnAddFile.setOnAction(event -> handleButtonAddFileAction(event));
 
     btnShowHideSearchPane = new ToggleButton();
+    btnShowHideSearchPane.setId("btnShowHideSearchPane");
     btnShowHideSearchPane.setMinHeight(24);
     btnShowHideSearchPane.setMaxHeight(24);
     btnShowHideSearchPane.setMinWidth(24);

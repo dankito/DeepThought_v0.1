@@ -259,6 +259,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     pnSearchCategories.setManaged(false);
 
     txtfldSearchCategories = TextFields.createClearableTextField();
+    txtfldSearchCategories.setId("txtfldSearchCategories");
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchCategories, "search.categories.prompt.text");
     pnSearchCategories.getChildren().add(txtfldSearchCategories);
     txtfldSearchCategories.setOnKeyReleased(event -> {
@@ -270,6 +271,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     HBox.setHgrow(txtfldSearchCategories, Priority.ALWAYS);
 
     btnCreateCategory = new Button();
+    btnCreateCategory.setId("btnCreateCategory");
     btnCreateCategory.setOnAction(event -> handleButtonCreateCategoryAction(event));
     pnSearchCategories.getChildren().add(btnCreateCategory);
     JavaFxLocalization.bindLabeledText(btnCreateCategory, "new...");

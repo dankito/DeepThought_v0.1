@@ -143,6 +143,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
     // replace normal TextField txtfldSearchCategories with a SearchTextField (with a cross to clear selection)
     pnSearchTags.getChildren().remove(txtfldSearchTags);
     txtfldSearchTags = TextFields.createClearableTextField();
+    txtfldSearchTags.setId("txtfldSearchTags");
     pnSearchTags.getChildren().add(0, txtfldSearchTags);
     HBox.setHgrow(txtfldSearchTags, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchTags, "search.tags.prompt.text");

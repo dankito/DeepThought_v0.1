@@ -135,6 +135,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanUp {
     // replace normal TextField txtfldSearchForFiles with a SearchTextField (with a cross to clear selection)
     paneSearchForReference.getChildren().remove(txtfldSearchForReference);
     txtfldSearchForReference = (CustomTextField) TextFields.createClearableTextField();
+    txtfldSearchForReference.setId("txtfldSearchForReference");
     paneSearchForReference.getChildren().add(1, txtfldSearchForReference);
     HBox.setHgrow(txtfldSearchForReference, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForReference, "search.reference.prompt.text");

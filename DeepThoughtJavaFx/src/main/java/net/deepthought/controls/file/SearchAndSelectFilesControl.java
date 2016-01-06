@@ -153,6 +153,7 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
 
   protected void setupControl() {
     txtfldSearchForFiles = (CustomTextField) TextFields.createClearableTextField();
+    txtfldSearchForFiles.setId("txtfldSearchForFiles");
     paneSearchBar.getChildren().add(1, txtfldSearchForFiles);
     HBox.setHgrow(txtfldSearchForFiles, Priority.ALWAYS);
     JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchForFiles, "search.files.prompt.text");

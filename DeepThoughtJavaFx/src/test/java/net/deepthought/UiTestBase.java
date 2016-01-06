@@ -2,6 +2,7 @@ package net.deepthought;
 
 import com.sun.javafx.scene.control.skin.ContextMenuContent;
 
+import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.categories.EntryCategoriesControl;
 import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
@@ -9,8 +10,11 @@ import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
 import net.deepthought.controls.tag.EntryTagsControl;
 import net.deepthought.controls.utils.FXUtils;
+import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Person;
+import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
@@ -35,10 +39,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
@@ -207,6 +214,13 @@ public abstract class UiTestBase extends ApplicationTest {
     moveTo(rowPoint.getX() + coordinateInNodeX, rowPoint.getY() + coordinateInNodeY);
 
     clickOn(button);
+  }
+
+  protected void doubleClickOnCoordinateInNode(Node node, double coordinateInNodeX, double coordinateInNodeY, MouseButton button) {
+    Point2D rowPoint = FXUtils.getNodeScreenCoordinates(node);
+    moveTo(rowPoint.getX() + coordinateInNodeX, rowPoint.getY() + coordinateInNodeY);
+
+    doubleClickOn(button);
   }
 
   protected void rightClickOnCoordinateInNode(Node node, double coordinateInNodeX, double coordinateInNodeY) {
@@ -392,6 +406,10 @@ public abstract class UiTestBase extends ApplicationTest {
     return entryTagsControl != null && entryTagsControl.isVisible();
   }
 
+  protected TextField getSearchAndSelectTagsControlSearchTextBox() {
+    return lookup("#editEntryDialogTagsControl #txtfldSearchTags").queryFirst();
+  }
+
   protected EntryCategoriesControl getEntryDialogCategoriesControl() {
     return lookup("#editEntryDialogCategoriesControl").queryFirst();
   }
@@ -399,6 +417,18 @@ public abstract class UiTestBase extends ApplicationTest {
   protected boolean isEntryDialogCategoriesControlVisible() {
     EntryCategoriesControl entryCategoriesControl = getEntryDialogCategoriesControl();
     return entryCategoriesControl != null && entryCategoriesControl.isVisible();
+  }
+
+  protected Button getEntryDialogCategoriesControlCreateCategoryButton() {
+    return lookup("#btnCreateCategory").queryFirst();
+  }
+
+  protected TextField getEntryDialogCategoriesControlSearchTextBox() {
+    return lookup("#txtfldSearchCategories").queryFirst();
+  }
+
+  protected TreeView<Category> getEntryDialogCategoriesControlTreeViewCategories() {
+    return lookup("#trvwCategories").queryFirst();
   }
 
   protected EntryReferenceControl getEntryDialogReferenceControl() {
@@ -410,6 +440,18 @@ public abstract class UiTestBase extends ApplicationTest {
     return entryReferenceControl != null && entryReferenceControl.isVisible();
   }
 
+  protected NewOrEditButton getEntryDialogReferenceControlNewOrEditButton() {
+    return lookup("#btnNewOrEditReference").queryFirst();
+  }
+
+  protected TextField getSearchAndSelectReferenceControlSearchTextBox() {
+    return lookup("#txtfldSearchForReference").queryFirst();
+  }
+
+  protected ListView<ReferenceBase> getSearchAndSelectReferenceControlListViewReferences() {
+    return lookup("#lstvwReferences").queryFirst();
+  }
+
   protected EntryPersonsControl getEntryDialogPersonsControl() {
     return lookup("#editEntryDialogPersonsControl").queryFirst();
   }
@@ -419,6 +461,14 @@ public abstract class UiTestBase extends ApplicationTest {
     return entryPersonsControl != null && entryPersonsControl.isVisible();
   }
 
+  protected TextField getSearchAndSelectPersonControlSearchTextBox() {
+    return lookup("#txtfldSearchForPerson").queryFirst();
+  }
+
+  protected ListView<Person> getSearchAndSelectPersonControlListViewPersons() {
+    return lookup("#lstvwPersons").queryFirst();
+  }
+
   protected FilesControl getEntryDialogFilesControl() {
     return lookup("#editEntryDialogFilesControl").queryFirst();
   }
@@ -426,6 +476,14 @@ public abstract class UiTestBase extends ApplicationTest {
   protected boolean isEntryDialogFilesControlVisible() {
     FilesControl filesControl = getEntryDialogFilesControl();
     return filesControl != null && filesControl.isVisible();
+  }
+
+  protected ToggleButton getEntryDialogFilesControlShowHideSearchPaneButton() {
+    return lookup("#btnShowHideSearchPane").queryFirst();
+  }
+
+  protected TextField getSearchAndSelectFilesControlSearchTextBox() {
+    return lookup("#txtfldSearchForFiles").queryFirst();
   }
 
 }

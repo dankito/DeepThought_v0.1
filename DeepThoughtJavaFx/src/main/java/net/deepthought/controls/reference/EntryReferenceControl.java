@@ -238,6 +238,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     titlePane.getChildren().add(paneSelectedReferenceBase);
 
     btnNewOrEditReference = new NewOrEditButton();
+    btnNewOrEditReference.setId("btnNewOrEditReference");
     btnNewOrEditReference.setOnAction(event -> handleButtonEditOrNewReferenceAction(event));
     btnNewOrEditReference.setOnNewMenuItemEventActionHandler(event -> handleMenuItemNewReferenceAction(event));
     titlePane.getChildren().add(2, btnNewOrEditReference);
