@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
+import javafx.scene.input.MouseButton;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -75,11 +76,12 @@ public class EditEntryDialogTest extends UiTestBase {
 
   protected void fillEditEntryDialogWithTestData() {
     CollapsibleHtmlEditor htmledAbstract = getEntryDialogHtmlEditorAbstract();
-    Platform.runLater(() -> htmledAbstract.setExpanded(true));
-    htmledAbstract.setHtml(EntryAbstract);
+    focusEditingAreaOfHtmlEditor(htmledAbstract);
+    write(EntryAbstract);
 
     CollapsibleHtmlEditor htmledContent = getEntryDialogHtmlEditorContent();
-    htmledContent.setHtml(EntryContent);
+    focusEditingAreaOfHtmlEditor(htmledContent);
+    write(EntryContent);
   }
 
   protected void assertThatEntryDataHasBeenSetCorrectly(Entry createdEntry) {

@@ -271,6 +271,17 @@ public abstract class UiTestBase extends ApplicationTest {
   }
 
 
+  protected void focusEditingAreaOfHtmlEditor(CollapsibleHtmlEditor htmledAbstract) {
+    Platform.runLater(() -> htmledAbstract.setExpanded(true));
+    sleep(500, TimeUnit.MILLISECONDS);
+
+    moveTo(htmledAbstract);
+    moveBy(40, 40); // move to Editing Area
+
+    clickOn(MouseButton.PRIMARY);
+  }
+
+
   private Stage getWindowWithTitle(String titleRegex) {
     return (Stage)windowFinder.window(titleRegex);
 //    return (Stage)windowFinder.listOrderedWindows().stream().filter(window -> titleRegex.equals(((Stage)window).getTitle())).findFirst().get()
