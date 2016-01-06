@@ -13,6 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -170,6 +171,22 @@ public class MainWindowTest extends UiTestBase {
     assertThat(isEntryDialogReferenceControlVisible(), is(true));
     assertThat(isEntryDialogPersonsControlVisible(), is(true));
     assertThat(isEntryDialogFilesControlVisible(), is(true));
+  }
+
+
+  /*      File Menu tests           */
+
+  @Test
+  public void pressQuitMenuItem_ApplicationGetsClosed() {
+    clickOn("#mnitmMainMenuViewFile").sleep(200);
+    moveBy(0, 20);
+    clickOn("#mnitmMainMenuViewFile #mnitmFileQuit").sleep(3, TimeUnit.SECONDS);
+
+
+    assertThat(Application.isInstantiated(), is(false));
+    assertThat(Application.getApplication(), nullValue());
+
+    assertThat(isMainWindowVisible(), is(false));
   }
 
 

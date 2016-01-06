@@ -22,6 +22,7 @@ import org.testfx.service.finder.WindowFinder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -58,7 +59,7 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected static final String TestFolder = "data/uitests";
 
-  protected static final int CountDefaultEntries = 20;
+  protected static int CountDefaultEntries = 20;
 
 
   protected Stage stage;
@@ -110,6 +111,7 @@ public abstract class UiTestBase extends ApplicationTest {
     setupStage(stage, "dialogs/MainWindow.fxml", 1150, 620);
 
     deepThought = Application.getDeepThought();
+    CountDefaultEntries = deepThought.countEntries();
   }
 
   protected void setupStage(Stage stage, String fxmlFilePath) throws Exception {
@@ -286,6 +288,15 @@ public abstract class UiTestBase extends ApplicationTest {
     return getWindowWithTitle("PrimaryStageApplication");
   }
 
+  protected boolean isMainWindowVisible() {
+    try {
+      Stage mainWindow = getMainWindow();
+      return mainWindow != null && mainWindow.isShowing();
+    } catch(NoSuchElementException ex) { }
+
+    return false;
+  }
+
 
   protected TabTagsControl getTabTags() {
     return lookup("#tabTags").queryFirst();
@@ -331,6 +342,15 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected Stage getEditEntryDialog() {
     return getWindowWithTitle(Localization.getLocalizedString("create.entry"));
+  }
+
+  protected boolean isEditEntryDialogVisible() {
+    try {
+      Stage editEntryDialog = getEditEntryDialog();
+      return editEntryDialog != null && editEntryDialog.isShowing();
+    } catch(NoSuchElementException ex) { }
+
+    return false;
   }
 
 

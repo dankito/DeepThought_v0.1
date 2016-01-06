@@ -97,11 +97,11 @@
                   </MenuButton>
                   <MenuBar fx:id="mainMenu" GridPane.hgrow="ALWAYS">
                     <menus>
-                      <Menu fx:id="mnitmmnitmMainMenuViewFile" mnemonicParsing="false" text="%file">
+                      <Menu fx:id="mnitmMainMenuViewFile" mnemonicParsing="false" text="%file">
                         <items>
                               <Menu fx:id="mnitmFileClipboard" disable="true" mnemonicParsing="false" text="%clipboard" />
                               <SeparatorMenuItem mnemonicParsing="false" />
-                          <MenuItem mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
+                          <MenuItem fx:id="mnitmFileQuit" mnemonicParsing="false" onAction="#handleMenuItemFileCloseAction" text="%quit">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                  </accelerator>
