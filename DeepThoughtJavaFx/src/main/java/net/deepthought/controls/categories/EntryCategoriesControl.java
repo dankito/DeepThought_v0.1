@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
@@ -280,6 +281,15 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     VBox.setMargin(pnSearchCategories, new Insets(6, 0, 0, 0));
   }
 
+  protected void showEntryCategoriesThreadSafe() {
+    if(Platform.isFxApplicationThread()) {
+      showEntryCategories();
+    }
+    else {
+      Platform.runLater(() -> showEntryCategories());
+    }
+  }
+
   protected void showEntryCategories() {
     clearEntryCategoryLabels();
 
@@ -507,9 +517,9 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(addedEntity instanceof Category)
-        editedEntryCategories.add((Category)addedEntity);
-      showEntryCategories();
+      if(addedEntity instanceof Category) {
+        handleCategoryAddedToEntryThreadSafe((Category) addedEntity);
+      }
     }
 
     @Override
@@ -519,11 +529,39 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(removedEntity instanceof Category)
-        editedEntryCategories.remove((Category)removedEntity);
-      showEntryCategories();
+      if(removedEntity instanceof Category) {
+        handleCategoryRemovedFromEntryThreadSafe((Category) removedEntity);
+      }
     }
   };
+
+  protected void handleCategoryAddedToEntryThreadSafe(final Category addedEntity) {
+    if(Platform.isFxApplicationThread()) {
+      handleCategoryAddedToEntry(addedEntity);
+    }
+    else {
+      Platform.runLater(() -> handleCategoryAddedToEntry(addedEntity));
+    }
+  }
+
+  protected void handleCategoryAddedToEntry(Category addedEntity) {
+    editedEntryCategories.add(addedEntity);
+    showEntryCategories();
+  }
+
+  protected void handleCategoryRemovedFromEntryThreadSafe(final Category removedEntity) {
+    if(Platform.isFxApplicationThread()) {
+      handleCategoryRemovedFromEntry(removedEntity);
+    }
+    else {
+      Platform.runLater(() -> handleCategoryRemovedFromEntry(removedEntity));
+    }
+  }
+
+  protected void handleCategoryRemovedFromEntry(Category removedEntity) {
+    editedEntryCategories.remove(removedEntity);
+    showEntryCategories();
+  }
 
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
@@ -540,8 +578,9 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
 //      checkIfCategoriesHaveBeenUpdated(collectionHolder, updatedEntity);
 
-      if(updatedEntity instanceof Category && entry != null && ((Category)updatedEntity).getEntries().contains(entry))
-        showEntryCategories();
+      if(updatedEntity instanceof Category && entry != null && ((Category)updatedEntity).getEntries().contains(entry)) {
+        showEntryCategoriesThreadSafe();
+      }
     }
 
     @Override

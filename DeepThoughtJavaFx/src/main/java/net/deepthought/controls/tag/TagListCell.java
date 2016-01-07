@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
@@ -195,6 +196,15 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
     tagUpdated();
   }
 
+  protected void tagUpdatedThreadSafe() {
+    if(Platform.isFxApplicationThread()) {
+      tagUpdated();
+    }
+    else {
+      Platform.runLater(() -> tagUpdated());
+    }
+  }
+
   protected void tagUpdated() {
     updateItem(tag, tag == null);
   }
@@ -347,22 +357,22 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
   protected EntityListener tagListener = new EntityListener() {
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      tagUpdated();
+      tagUpdatedThreadSafe();
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      tagUpdated();
+      tagUpdatedThreadSafe();
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      tagUpdated();
+      tagUpdatedThreadSafe();
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      tagUpdated();
+      tagUpdatedThreadSafe();
     }
   };
 

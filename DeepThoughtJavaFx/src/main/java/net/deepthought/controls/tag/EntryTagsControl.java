@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.event.EventHandler;
@@ -192,6 +193,15 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     setTitle(titlePane);
   }
 
+  protected void showEntryTagsThreadSafe() {
+    if(Platform.isFxApplicationThread()) {
+      showEntryTags();
+    }
+    else {
+      Platform.runLater(() -> showEntryTags());
+    }
+  }
+
   protected void showEntryTags() {
     clearEntryTagLabels();
 
@@ -242,6 +252,10 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     editedTags.add(tag);
   }
 
+  protected void removeTagFromEditedTags(Tag tag) {
+    editedTags.remove(tag);
+  }
+
   public void removeEntityFromEntry(Tag entity) {
     if(addedTags.contains(entity)) {
       addedTags.remove(entity);
@@ -249,7 +263,7 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
       removedTags.add(entity);
     }
 
-    editedTags.remove(entity);
+    removeTagFromEditedTags(entity);
 
     showEntryTags();
     fireTagRemovedEvent(entity);
@@ -323,9 +337,9 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(addedEntity instanceof Tag)
-        addTagToEditedTags((Tag) addedEntity);
-      showEntryTags();
+      if(addedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought addedEntity is not a Tag?
+        handleEntityAddedToEntryThreadSafe(addedEntity);
+      }
     }
 
     @Override
@@ -335,11 +349,39 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(removedEntity instanceof Tag)
-        editedTags.remove((Tag)removedEntity);
-      showEntryTags();
+      if(removedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought removedEntity is not a Tag?
+        handleEntityRemovedFromEntryThreadSafe(removedEntity);
+      }
     }
   };
+
+  protected void handleEntityAddedToEntryThreadSafe(final BaseEntity addedEntity) {
+    if(Platform.isFxApplicationThread()) {
+      handleEntityAddedToEntry(addedEntity);
+    }
+    else {
+      Platform.runLater(() -> handleEntityAddedToEntry(addedEntity));
+    }
+  }
+
+  protected void handleEntityAddedToEntry(BaseEntity addedEntity) {
+    addTagToEditedTags((Tag) addedEntity);
+    showEntryTags();
+  }
+
+  protected void handleEntityRemovedFromEntryThreadSafe(BaseEntity removedEntity) {
+    if(Platform.isFxApplicationThread()) {
+      handleEntityRemovedFromEntry(removedEntity);
+    }
+    else {
+      Platform.runLater(() -> handleEntityRemovedFromEntry(removedEntity));
+    }
+  }
+
+  protected void handleEntityRemovedFromEntry(BaseEntity removedEntity) {
+    removeTagFromEditedTags((Tag) removedEntity);
+    showEntryTags();
+  }
 
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
@@ -354,8 +396,9 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity))
-        showEntryTags();
+      if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity)) {
+        showEntryTagsThreadSafe();
+      }
     }
 
     @Override
@@ -363,8 +406,9 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
       if(collectionHolder instanceof DeepThought && removedEntity instanceof Tag) {
         Tag tag = (Tag)removedEntity;
 
-        if(editedTags.contains(tag))
-          removeEntityFromEntry(tag);
+        if(editedTags.contains(tag)) {
+          Platform.runLater(() -> removeEntityFromEntry(tag));
+        }
       }
     }
   };

@@ -15,6 +15,7 @@ import net.deepthought.data.model.ReferenceBase;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -59,10 +60,12 @@ public class EditEntryDialogTest extends UiTestBase {
     Entry createdEntry = ((List<Entry>)deepThought.getEntries()).get(0); // TODO: get Entry by tblvwEntries
 
     assertThat(createdEntry.isPersisted(), is(true));
-    deepThought.removeEntry(createdEntry); // clean up
 
     assertThat(isEditEntryDialogVisible(), is(false));
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
+
+    // TODO: move to a List createdEntries which then gets cleaned up in a @After method
+    deepThought.removeEntry(createdEntry); // clean up
   }
 
 
@@ -78,10 +81,11 @@ public class EditEntryDialogTest extends UiTestBase {
     Entry createdEntry = ((List<Entry>)deepThought.getEntries()).get(0); // TODO: get Entry by tblvwEntries
 
     assertThat(createdEntry.isPersisted(), is(true));
-    deepThought.removeEntry(createdEntry); // clean up
 
     assertThat(isEditEntryDialogVisible(), is(true));
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
+
+    deepThought.removeEntry(createdEntry); // clean up
   }
 
   @Test
@@ -184,7 +188,7 @@ public class EditEntryDialogTest extends UiTestBase {
     clickOn(txtfldSearchForFiles);
 
     Platform.runLater(() -> txtfldSearchForFiles.setText(ExistingFile));
-    sleep(2, TimeUnit.SECONDS);
+    //sleep(2, TimeUnit.SECONDS);
   }
 
   protected void fillEditEntryDialogWithTestDataAndCreateNewEntities() {
@@ -201,13 +205,18 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThat(createdEntry.getContentAsPlainText(), is(EntryContent));
 
     assertThat(createdEntry.getTags().size(), is(3));
-    String debug = createdEntry.getTagsPreview();
-//    assertThat(createdEntry.getTagsPreview(), is(""));
+    assertThat(createdEntry.getTagsPreview(), is("CSU, Flüchtlinge, München"));
+
+    assertThat(createdEntry.getCategories().size(), is(2)); // TODO: test if correct Categories have been added
 
     assertThat(createdEntry.getSeries(), notNullValue());
     assertThat(createdEntry.getSeries().getTitle(), is("agora42"));
     assertThat(createdEntry.getReference(), nullValue());
     assertThat(createdEntry.getReferenceSubDivision(), nullValue());
+
+    List<Person> persons = new ArrayList<>(createdEntry.getPersons());
+    assertThat(persons.size(), is(1));
+    assertThat(persons.get(0).getLastName(), is("Augustinus"));
   }
 
 }

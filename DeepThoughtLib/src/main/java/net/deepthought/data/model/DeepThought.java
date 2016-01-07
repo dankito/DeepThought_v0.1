@@ -251,6 +251,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       for(Tag tag : new ArrayList<>(entry.getTags()))
         entry.removeTag(tag);
 
+      // TODO: now all data, like References, Persons, Files, ... get removed!
+
       callEntityRemovedListeners(entries, entry);
       return true;
     }
