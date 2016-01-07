@@ -193,15 +193,6 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     setTitle(titlePane);
   }
 
-  protected void showEntryTagsThreadSafe() {
-    if(Platform.isFxApplicationThread()) {
-      showEntryTags();
-    }
-    else {
-      Platform.runLater(() -> showEntryTags());
-    }
-  }
-
   protected void showEntryTags() {
     clearEntryTagLabels();
 
@@ -338,7 +329,7 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought addedEntity is not a Tag?
-        handleEntityAddedToEntryThreadSafe(addedEntity);
+        FXUtils.runOnUiThread(() -> handleEntityAddedToEntry(addedEntity));
       }
     }
 
@@ -350,32 +341,14 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought removedEntity is not a Tag?
-        handleEntityRemovedFromEntryThreadSafe(removedEntity);
+        FXUtils.runOnUiThread(() -> handleEntityRemovedFromEntry(removedEntity));
       }
     }
   };
 
-  protected void handleEntityAddedToEntryThreadSafe(final BaseEntity addedEntity) {
-    if(Platform.isFxApplicationThread()) {
-      handleEntityAddedToEntry(addedEntity);
-    }
-    else {
-      Platform.runLater(() -> handleEntityAddedToEntry(addedEntity));
-    }
-  }
-
   protected void handleEntityAddedToEntry(BaseEntity addedEntity) {
     addTagToEditedTags((Tag) addedEntity);
     showEntryTags();
-  }
-
-  protected void handleEntityRemovedFromEntryThreadSafe(BaseEntity removedEntity) {
-    if(Platform.isFxApplicationThread()) {
-      handleEntityRemovedFromEntry(removedEntity);
-    }
-    else {
-      Platform.runLater(() -> handleEntityRemovedFromEntry(removedEntity));
-    }
   }
 
   protected void handleEntityRemovedFromEntry(BaseEntity removedEntity) {
@@ -397,7 +370,7 @@ public class EntryTagsControl extends CollapsiblePane implements net.deepthought
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity)) {
-        showEntryTagsThreadSafe();
+        FXUtils.runOnUiThread(() -> showEntryTags());
       }
     }
 

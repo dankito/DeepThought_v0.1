@@ -355,10 +355,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
   }
 
   protected void resetListViewAllTagsItemsThreadSafe(final DeepThought deepThought) {
-    if(Platform.isFxApplicationThread())
-      resetListViewAllTagsItems(deepThought);
-    else
-      Platform.runLater(() -> resetListViewAllTagsItems(deepThought));
+    FXUtils.runOnUiThread(() -> resetListViewAllTagsItems(deepThought));
   }
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {

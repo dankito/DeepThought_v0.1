@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.css.Styleable;
 import javafx.fxml.FXMLLoader;
@@ -52,6 +53,15 @@ public class FXUtils {
 
   private final static Logger log = LoggerFactory.getLogger(FXUtils.class);
 
+
+  public static void runOnUiThread(Runnable runnable) {
+    if(Platform.isFxApplicationThread()) {
+      runnable.run();
+    }
+    else {
+      Platform.runLater(runnable);
+    }
+  }
 
   public static void ensureNodeOnlyUsesSpaceIfVisible(Node node) {
     node.managedProperty().bind(node.visibleProperty());

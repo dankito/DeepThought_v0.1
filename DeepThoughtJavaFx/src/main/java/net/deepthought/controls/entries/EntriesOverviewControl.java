@@ -369,10 +369,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   }
 
   protected void selectedEntryChanged(final Entry selectedEntry) {
-    if(Platform.isFxApplicationThread())
-      selectedEntryChangedOnUiThread(selectedEntry);
-    else
-      Platform.runLater(() -> selectedEntryChangedOnUiThread(selectedEntry));
+    FXUtils.runOnUiThread(() -> selectedEntryChangedOnUiThread(selectedEntry));
   }
 
   protected void selectedEntryChangedOnUiThread(Entry selectedEntry) {
@@ -557,7 +554,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
       tableViewEntriesItems.setUnderlyingCollection(unfilteredCurrentEntriesToShow);
     else {
       lastEntriesSearch = new EntriesSearch(txtfldSearchEntries.getText(), tglbtnSearchEntriesContent.isSelected(), tglbtnSearchEntriesAbstract.isSelected(), (results) -> {
-        Platform.runLater(() -> {
+        FXUtils.runOnUiThread(() -> {
           tblvwEntries.getSelectionModel().clearSelection();
           tableViewEntriesItems.setUnderlyingCollection(results);
         });

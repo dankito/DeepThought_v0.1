@@ -1,5 +1,6 @@
 package net.deepthought.controls.entries;
 
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.EntityListener;
@@ -59,10 +60,7 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
   }
 
   protected void entryUpdated(final Entry entry) {
-    if(Platform.isFxApplicationThread())
-      entryUpdatedOnUiThread(entry);
-    else
-      Platform.runLater(() -> entryUpdatedOnUiThread(entry));
+    FXUtils.runOnUiThread(() -> entryUpdatedOnUiThread(entry));
   }
 
   protected void entryUpdatedOnUiThread(Entry entry) {

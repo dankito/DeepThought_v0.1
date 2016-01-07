@@ -183,10 +183,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   @Override
   public void executeScript(final String javaScript, final ExecuteJavaScriptResultListener listener) {
-    if(Platform.isFxApplicationThread())
-      executeScriptOnUiThread(javaScript, listener);
-    else
-      Platform.runLater(() -> executeScriptOnUiThread(javaScript, listener));
+    FXUtils.runOnUiThread(() -> executeScriptOnUiThread(javaScript, listener));
   }
 
   public void executeScriptOnUiThread(String javaScript, ExecuteJavaScriptResultListener listener) {

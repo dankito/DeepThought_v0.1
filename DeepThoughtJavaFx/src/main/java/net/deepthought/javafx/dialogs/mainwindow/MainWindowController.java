@@ -194,7 +194,7 @@ public class MainWindowController implements Initializable {
 
       @Override
       public void notification(Notification notification) {
-        notifyUserThreadSafe(notification);
+        FXUtils.runOnUiThread(() -> notifyUser(notification));
       }
     });
 
@@ -213,13 +213,6 @@ public class MainWindowController implements Initializable {
         mnitmMainMenuWindow.setDisable(Dialogs.getOpenedChildWindows().isEmpty());
       }
     });
-  }
-
-  protected void notifyUserThreadSafe(Notification notification) {
-    if(Platform.isFxApplicationThread())
-      notifyUser(notification);
-    else
-      Platform.runLater(() -> notifyUser(notification));
   }
 
   protected void notifyUser(Notification notification) {
@@ -292,11 +285,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void deepThoughtChangedThreadSafe(final DeepThought deepThought) {
-    if(Platform.isFxApplicationThread())
-      deepThoughtChanged(deepThought);
-    else {
-      Platform.runLater(() -> deepThoughtChanged(deepThought));
-    }
+    FXUtils.runOnUiThread(() -> deepThoughtChanged(deepThought));
   }
 
   protected void deepThoughtChanged(DeepThought deepThought) {
@@ -413,16 +402,7 @@ public class MainWindowController implements Initializable {
   }
 
   private void setStatusLabelText(final String statusText) {
-    if(Platform.isFxApplicationThread())
-      statusLabel.setText(statusText);
-    else {
-      Platform.runLater(new Runnable() {
-        @Override
-        public void run() {
-          statusLabel.setText(statusText);
-        }
-      });
-    }
+    FXUtils.runOnUiThread(() -> statusLabel.setText(statusText));
   }
 
   protected void setupControls() {
@@ -697,15 +677,6 @@ public class MainWindowController implements Initializable {
   }
 
 
-  protected void setMenuFileClipboardThreadSafe(ContentExtractOptions contentExtractOptions) {
-    if(Platform.isFxApplicationThread()) {
-      setMenuFileClipboard(contentExtractOptions);
-    }
-    else {
-      Platform.runLater(() -> setMenuFileClipboard(contentExtractOptions));
-    }
-  }
-
   protected void setMenuFileClipboard(ContentExtractOptions contentExtractOptions) {
     mnitmFileClipboard.getItems().clear();
     mnitmFileClipboard.setDisable(contentExtractOptions.hasContentExtractOptions() == false);
@@ -828,18 +799,9 @@ public class MainWindowController implements Initializable {
   protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {
     @Override
     public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-      reactToUserDeviceSettingsChangedThreadSafe(setting, newValue);
+      FXUtils.runOnUiThread(() -> reactToUserDeviceSettingsChanged(setting, newValue));
     }
   };
-
-  protected void reactToUserDeviceSettingsChangedThreadSafe(Setting setting, Object newValue) {
-    if(Platform.isFxApplicationThread()){
-      reactToUserDeviceSettingsChanged(setting, newValue);
-    }
-    else {
-      Platform.runLater(() -> reactToUserDeviceSettingsChanged(setting, newValue));
-    }
-  }
 
   protected void reactToUserDeviceSettingsChanged(Setting setting, Object newValue) {
     if(setting == Setting.UserDeviceShowQuickEditEntryPane) {
@@ -865,8 +827,8 @@ public class MainWindowController implements Initializable {
 
   protected ClipboardContentChangedListener clipboardContentChangedExternallyListener = new ClipboardContentChangedListener() {
     @Override
-    public void clipboardContentChanged(ContentExtractOptions contentExtractOptions) {
-      setMenuFileClipboardThreadSafe(contentExtractOptions);
+    public void clipboardContentChanged(final ContentExtractOptions contentExtractOptions) {
+      FXUtils.runOnUiThread(() -> setMenuFileClipboard(contentExtractOptions));
     }
   };
 

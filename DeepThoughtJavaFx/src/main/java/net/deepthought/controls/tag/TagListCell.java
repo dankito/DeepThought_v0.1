@@ -197,12 +197,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
   }
 
   protected void tagUpdatedThreadSafe() {
-    if(Platform.isFxApplicationThread()) {
-      tagUpdated();
-    }
-    else {
-      Platform.runLater(() -> tagUpdated());
-    }
+    FXUtils.runOnUiThread(() -> tagUpdated());
   }
 
   protected void tagUpdated() {

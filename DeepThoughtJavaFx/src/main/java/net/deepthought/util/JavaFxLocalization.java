@@ -1,6 +1,7 @@
 package net.deepthought.util;
 
 import net.deepthought.Application;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.enums.ApplicationLanguage;
@@ -62,7 +63,7 @@ public class JavaFxLocalization {
   public static void setLocale(Locale locale) {
     Localization.setLanguageLocale(locale);
 
-    Platform.runLater(() -> localeProperty().set(locale));
+    FXUtils.runOnUiThread(() -> localeProperty().set(locale));
   }
 
   public static void setLocaleForLanguage(ApplicationLanguage language) {

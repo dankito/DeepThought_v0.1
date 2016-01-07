@@ -281,15 +281,6 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     VBox.setMargin(pnSearchCategories, new Insets(6, 0, 0, 0));
   }
 
-  protected void showEntryCategoriesThreadSafe() {
-    if(Platform.isFxApplicationThread()) {
-      showEntryCategories();
-    }
-    else {
-      Platform.runLater(() -> showEntryCategories());
-    }
-  }
-
   protected void showEntryCategories() {
     clearEntryCategoryLabels();
 
@@ -518,7 +509,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Category) {
-        handleCategoryAddedToEntryThreadSafe((Category) addedEntity);
+        FXUtils.runOnUiThread(() -> handleCategoryAddedToEntry((Category) addedEntity));
       }
     }
 
@@ -530,32 +521,14 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Category) {
-        handleCategoryRemovedFromEntryThreadSafe((Category) removedEntity);
+        FXUtils.runOnUiThread(() -> handleCategoryRemovedFromEntry((Category) removedEntity));
       }
     }
   };
 
-  protected void handleCategoryAddedToEntryThreadSafe(final Category addedEntity) {
-    if(Platform.isFxApplicationThread()) {
-      handleCategoryAddedToEntry(addedEntity);
-    }
-    else {
-      Platform.runLater(() -> handleCategoryAddedToEntry(addedEntity));
-    }
-  }
-
   protected void handleCategoryAddedToEntry(Category addedEntity) {
     editedEntryCategories.add(addedEntity);
     showEntryCategories();
-  }
-
-  protected void handleCategoryRemovedFromEntryThreadSafe(final Category removedEntity) {
-    if(Platform.isFxApplicationThread()) {
-      handleCategoryRemovedFromEntry(removedEntity);
-    }
-    else {
-      Platform.runLater(() -> handleCategoryRemovedFromEntry(removedEntity));
-    }
   }
 
   protected void handleCategoryRemovedFromEntry(Category removedEntity) {
@@ -579,7 +552,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
 //      checkIfCategoriesHaveBeenUpdated(collectionHolder, updatedEntity);
 
       if(updatedEntity instanceof Category && entry != null && ((Category)updatedEntity).getEntries().contains(entry)) {
-        showEntryCategoriesThreadSafe();
+        FXUtils.runOnUiThread(() -> showEntryCategories());
       }
     }
 

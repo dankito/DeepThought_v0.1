@@ -1,5 +1,7 @@
 package net.deepthought.controls;
 
+import net.deepthought.controls.utils.FXUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +79,8 @@ public class LazyLoadingObservableList<T> extends ObservableListBase<T> implemen
 
 
   public void setUnderlyingCollection(final Collection<T> underlyingCollection) {
-    if(Platform.isFxApplicationThread()) // simply make sure that collection is set (or better: endChange() ) is called on UI Thread (otherwise a IllegalStateException would be thrown)
-      setUnderlyingCollectionOnUiThread(underlyingCollection);
-    else
-      Platform.runLater(() -> setUnderlyingCollectionOnUiThread(underlyingCollection));
+    // simply make sure that collection is set (or better: endChange() ) is called on UI Thread (otherwise a IllegalStateException would be thrown)
+    FXUtils.runOnUiThread(() -> setUnderlyingCollectionOnUiThread(underlyingCollection));
   }
 
   protected void setUnderlyingCollectionOnUiThread(Collection<T> underlyingCollection) {
