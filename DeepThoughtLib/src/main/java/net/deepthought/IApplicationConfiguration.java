@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Created by ganymed on 15/08/15.
  */
-public interface IApplicationConfiguration extends IDependencyResolver {
+public interface IApplicationConfiguration<THtmlEditor> extends IDependencyResolver<THtmlEditor> {
 
   IPlatformConfiguration getPlatformConfiguration();
 

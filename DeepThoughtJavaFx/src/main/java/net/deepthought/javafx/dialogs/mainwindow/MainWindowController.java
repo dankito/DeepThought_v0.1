@@ -406,7 +406,6 @@ public class MainWindowController implements Initializable {
   }
 
   protected void cleanUp() {
-    DeepThoughtFxHtmlEditorPool.getInstance().cleanUp();
     entriesOverviewControl.cleanUp();
     createEntryFromClipboardContentPopup.cleanUp();
     pnConnectedDevices.cleanUp();

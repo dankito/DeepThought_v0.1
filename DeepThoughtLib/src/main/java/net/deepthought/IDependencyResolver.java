@@ -1,6 +1,7 @@
 package net.deepthought;
 
 import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -20,7 +21,7 @@ import net.deepthought.util.isbn.IIsbnResolver;
 /**
  * Created by ganymed on 05/01/15.
  */
-public interface IDependencyResolver {
+public interface IDependencyResolver<THtmlEditor> {
 
   IThreadPool createThreadPool();
 
@@ -51,5 +52,7 @@ public interface IDependencyResolver {
   IDeepThoughtsConnector createDeepThoughtsConnector();
 
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
+
+  IHtmlEditorPool<THtmlEditor> createHtmlEditorPool();
 
 }

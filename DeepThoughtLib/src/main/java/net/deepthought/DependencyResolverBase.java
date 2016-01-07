@@ -2,6 +2,7 @@ package net.deepthought;
 
 import net.deepthought.communication.DeepThoughtsConnector;
 import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.DefaultBackupManager;
@@ -33,7 +34,7 @@ import net.deepthought.util.isbn.MultiImplementationsIsbnResolver;
 /**
  * Created by ganymed on 05/01/15.
  */
-public abstract class DependencyResolverBase implements IDependencyResolver {
+public abstract class DependencyResolverBase<THtmlEditor> implements IDependencyResolver<THtmlEditor> {
 
   protected IEntityManager entityManager = null;
 
@@ -150,6 +151,11 @@ public abstract class DependencyResolverBase implements IDependencyResolver {
   @Override
   public IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool) {
     return new MultiImplementationsIsbnResolver(htmlHelper, threadPool);
+  }
+
+  @Override
+  public IHtmlEditorPool createHtmlEditorPool() {
+    return null;
   }
 
 }

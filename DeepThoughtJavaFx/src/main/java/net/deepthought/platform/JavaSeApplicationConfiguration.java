@@ -2,6 +2,9 @@ package net.deepthought.platform;
 
 import net.deepthought.DependencyResolverBase;
 import net.deepthought.IApplicationConfiguration;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
+import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
+import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -24,7 +27,7 @@ import java.util.List;
 /**
  * Created by ganymed on 22/08/15.
  */
-public class JavaSeApplicationConfiguration extends DependencyResolverBase implements IApplicationConfiguration {
+public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepThoughtFxHtmlEditor> implements IApplicationConfiguration<DeepThoughtFxHtmlEditor> {
 
   private final static Logger log = LoggerFactory.getLogger(JavaSeApplicationConfiguration.class);
 
@@ -98,6 +101,11 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase imple
   @Override
   public ILanguageDetector createLanguageDetector() {
     return new LanguageDetector();
+  }
+
+  @Override
+  public IHtmlEditorPool createHtmlEditorPool() {
+    return new DeepThoughtFxHtmlEditorPool();
   }
 
 }

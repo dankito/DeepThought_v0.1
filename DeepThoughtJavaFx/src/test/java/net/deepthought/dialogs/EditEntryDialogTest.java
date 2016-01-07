@@ -51,6 +51,7 @@ public class EditEntryDialogTest extends UiTestBase {
 
   @Test
   public void openEditEntryDialog_PressOk_EntryGetsCorrectlyAddedToDeepThought() {
+    sleep(3, TimeUnit.SECONDS);
     navigateToNewEditEntryDialog();
     fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
 
@@ -71,9 +72,9 @@ public class EditEntryDialogTest extends UiTestBase {
 
   @Test
   public void openEditEntryDialog_PressApply_EntryGetsCorrectlyAddedToDeepThought() {
+    sleep(3, TimeUnit.SECONDS);
     navigateToNewEditEntryDialog();
     fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
-    sleep(4, TimeUnit.SECONDS);
 
     clickApply();
 

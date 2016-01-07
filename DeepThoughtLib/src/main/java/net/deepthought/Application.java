@@ -2,6 +2,7 @@ package net.deepthought;
 
 import net.deepthought.communication.IDeepThoughtsConnector;
 import net.deepthought.controls.html.HtmlEditor;
+import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
 import net.deepthought.data.compare.IDataComparer;
@@ -89,6 +90,8 @@ public class Application {
 
   protected static IIsbnResolver isbnResolver;
 
+  protected static IHtmlEditorPool htmlEditorPool;
+
   protected static boolean isInstantiated = false;
 
   protected static boolean hasOnlyReadOnlyAccess = false;
@@ -160,6 +163,8 @@ public class Application {
       deepThoughtsConnector.runAsync();
 
       Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
+
+      Application.htmlEditorPool = dependencyResolver.createHtmlEditorPool();
 
       isInstantiated = true;
       callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated));
@@ -279,6 +284,13 @@ public class Application {
       deepThoughtsConnector.shutDown();
       deepThoughtsConnector = null;
     }
+
+    isbnResolver = null;
+
+    if(htmlEditorPool != null) {
+      htmlEditorPool.cleanUp();
+    }
+    htmlEditorPool = null;
 
     listeners.clear();
 
@@ -408,6 +420,10 @@ public class Application {
 
   public static IIsbnResolver getIsbnResolver() {
     return isbnResolver;
+  }
+
+  public static IHtmlEditorPool getHtmlEditorPool() {
+    return htmlEditorPool;
   }
 
   public static DeepThoughtApplication getApplication() {
