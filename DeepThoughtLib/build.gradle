@@ -49,7 +49,7 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.12'
     compile project(':json-io')
     compile project(':commons-lang')
-    compile project(':Boilerpipe')
+//    compile project(':Boilerpipe')
 
     compile 'org.eclipse.persistence:javax.persistence:2.1.0'
     compile 'com.norconex.language:langdetect:1.3.0'
