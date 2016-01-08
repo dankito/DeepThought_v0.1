@@ -58,4 +58,12 @@ public class SueddeutscheMagazinContentExtractorTest extends GermanOnlineNewspap
     testImportedArticleValues(creationResult, 11855, "52/2015", "Selbst gemalte Bilder von Flüchtlingskindern", "»Ich bin die Letzte, ganz links auf dem Bild«",
         "Unter den 800.000 Flüchtlingen, die Deutschland in diesem Jahr erreicht haben, sind etwa 270.000 Kinder. Wir haben sechs von ihnen gebeten, von ihrer Flucht zu erzählen - und dazu ein Bild zu malen.");
   }
+
+  @Test
+  public void unfaelleBeimBegruessen_BildGalleryGetsExtractedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43797/Na-Servus");
+    testImportedArticleValues(creationResult, 11855, "52/2015", "Selbst gemalte Bilder von Flüchtlingskindern", "»Ich bin die Letzte, ganz links auf dem Bild«",
+        "Unter den 800.000 Flüchtlingen, die Deutschland in diesem Jahr erreicht haben, sind etwa 270.000 Kinder. Wir haben sechs von ihnen gebeten, von ihrer Flucht zu erzählen - und dazu ein Bild zu malen.");
+  }
+
 }
