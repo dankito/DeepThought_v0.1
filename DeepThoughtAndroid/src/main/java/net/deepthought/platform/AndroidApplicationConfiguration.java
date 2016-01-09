@@ -7,6 +7,7 @@ import net.deepthought.IApplicationConfiguration;
 import net.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
 import net.deepthought.data.AndroidDataManager;
 import net.deepthought.data.IDataManager;
+import net.deepthought.data.contentextractor.HeiseContentExtractor;
 import net.deepthought.data.contentextractor.PostillonContentExtractor;
 import net.deepthought.data.contentextractor.SpiegelContentExtractor;
 import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
@@ -76,7 +77,7 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
 //    return new ArrayList<>();
     return Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
-        new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()});
+        new HeiseContentExtractor(), new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()});
   }
 
   @Override
