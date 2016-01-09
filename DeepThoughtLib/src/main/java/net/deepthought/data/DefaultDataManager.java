@@ -263,7 +263,6 @@ public class DefaultDataManager implements IDataManager {
   public void lazyLoadedEntityMapped(BaseEntity entity) {
     log.info("Entity mapped: {}", entity);
     entity.addEntityListener(entityListener);
-//    try { throw new Exception("Show me the Call Stack"); } catch (Exception ex) { log.error("", ex); }
   }
 
   protected EntityListener entityListener = new EntityListener() {

@@ -1,5 +1,6 @@
 package net.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
+import net.deepthought.Application;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.LazyLoadingObservableList;
 import net.deepthought.controls.utils.FXUtils;
@@ -63,8 +64,7 @@ public class TableViewTags extends TableView<Tag> {
     this.setOnKeyReleased(event -> {
       if (event.getCode() == KeyCode.DELETE) {
         selectedTagsController.removeSelectedTags();
-      }
-      else if (event.getCode() == KeyCode.F2) {
+      } else if (event.getCode() == KeyCode.F2) {
         this.edit(this.getSelectionModel().getSelectedIndex(), clmnTagName);
       }
     });
@@ -121,7 +121,20 @@ public class TableViewTags extends TableView<Tag> {
   }
 
   public void selectTag(Tag tag) {
-    getSelectionModel().select(tag);
+    if(tag == null) {
+      getSelectionModel().clearSelection();
+    }
+    else if(Application.getDeepThought() != null) {
+      if(tag == Application.getDeepThought().AllEntriesSystemTag()) {
+        getSelectionModel().select(0);
+      }
+      else if(tag == Application.getDeepThought().EntriesWithoutTagsSystemTag()) {
+        getSelectionModel().select(1);
+      }
+      else {
+        getSelectionModel().select(tag);
+      }
+    }
   }
 
   public void selectTagAtIndex(int index) {
