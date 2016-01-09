@@ -234,7 +234,7 @@ public class FilesControl extends CollapsiblePane implements ICleanUp {
 //    searchAndSelectFilesControl.setMaxHeight(200);
     searchAndSelectFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
 
-    searchAndSelectFilesControl.paneSearchFiles.visibleProperty().bind(btnShowHideSearchPane.selectedProperty());
+    btnShowHideSearchPane.selectedProperty().addListener((observable, oldValue, newValue) -> searchAndSelectFilesControl.setSearchPaneVisibility(newValue));
 
     contentPane.getChildren().add(searchAndSelectFilesControl);
     VBox.setMargin(searchAndSelectFilesControl, new Insets(8, 0, 0, 0));

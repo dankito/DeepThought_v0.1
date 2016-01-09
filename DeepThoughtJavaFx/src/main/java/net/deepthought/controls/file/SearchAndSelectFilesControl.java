@@ -194,14 +194,13 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
     trtblvwSearchResults.setOnKeyPressed(event -> {
       if (event.getCode() == KeyCode.ENTER) {
         enterPressedOrFilesDoubleClicked(event);
-      }
-      else if (event.getCode() == KeyCode.DELETE) {
+      } else if (event.getCode() == KeyCode.DELETE) {
         deleteSelectedFiles();
         event.consume();
       }
     });
     trtblvwSearchResults.setOnMouseClicked(event -> {
-      if(event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
+      if (event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY) {
         enterPressedOrFilesDoubleClicked(event);
       }
     });
@@ -211,11 +210,13 @@ public class SearchAndSelectFilesControl extends VBox implements IMouseAndKeyEve
 
     setSearchPaneVisibility(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSearchFiles);
-
-    resetListViewSearchResultsItems();
   }
 
   public void setSearchPaneVisibility(boolean isVisible) {
+    if(isVisible && lastFilesSearch == null) { // paneSearchFiles gets shown for the first time -> load / search files
+      searchFiles();
+    }
+
     paneSearchFiles.setVisible(isVisible);
   }
 

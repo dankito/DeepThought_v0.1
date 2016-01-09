@@ -7,9 +7,13 @@ import net.deepthought.data.model.FileLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javafx.collections.ObservableList;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.TreeItem;
 
@@ -25,14 +29,12 @@ public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanUp {
 
   protected Map<FileLink, FileTreeItem> mapFileToItem = new HashMap<>();
 
+  protected boolean haveChildrenBeenCreated = false;
+
 
   public FileRootTreeItem(IEditedEntitiesHolder<FileLink> editedFiles) {
     this.editedFiles = editedFiles;
     editedFiles.getEditedEntities().addListener(entryListener);
-
-    for(FileLink file : editedFiles.getEditedEntities()) {
-      addFileToChildren(file);
-    }
 
     setExpanded(true);
   }
@@ -45,15 +47,46 @@ public class FileRootTreeItem extends TreeItem<FileLink> implements ICleanUp {
     }
   }
 
-  protected void addFileToChildren(FileLink file) {
+
+  @Override
+  public boolean isLeaf() {
+    return false;
+  }
+
+  @Override
+  public ObservableList<TreeItem<FileLink>> getChildren() {
+    if(haveChildrenBeenCreated == false) {
+      haveChildrenBeenCreated = true;
+      super.getChildren().addAll(createChildren());
+    }
+
+    return super.getChildren();
+  }
+
+  protected Collection<? extends TreeItem<FileLink>> createChildren() {
+    List<FileTreeItem> children = new ArrayList<>();
+
+    for(FileLink file : editedFiles.getEditedEntities()) {
+      children.add(createFileTreeItem(file));
+    }
+
+    return children;
+  }
+
+
+  protected FileTreeItem createFileTreeItem(FileLink file) {
     FileTreeItem item = new FileTreeItem(file);
     mapFileToItem.put(file, item);
-    getChildren().add(item);
+    return item;
+  }
+
+  protected void addFileToChildren(FileLink file) {
+    super.getChildren().add(createFileTreeItem(file));
   }
 
   protected void removeFileFromChildren(FileLink file) {
     if(mapFileToItem.containsKey(file))
-      getChildren().remove(mapFileToItem.get(file));
+      super.getChildren().remove(mapFileToItem.get(file));
   }
 
 
