@@ -1122,7 +1122,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if (cachedTags.containsKey(name))
       return cachedTags.get(name);
 
-    for (Tag tag : getTags()) {
+    for (Tag tag : getTags()) { // TODO: remove this as in this way all Tags get loaded from DB
       if (name.equals(tag.getName())) {
         cachedTags.put(name, tag);
         return tag;

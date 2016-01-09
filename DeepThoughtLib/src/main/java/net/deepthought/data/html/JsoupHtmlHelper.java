@@ -142,15 +142,24 @@ public class JsoupHtmlHelper implements IHtmlHelper {
       elementData.setWidth(Integer.parseInt(imgElement.attr(ImageElementData.WidthAttributeName)));
     if(imgElement.hasAttr(ImageElementData.HeightAttributeName))
       elementData.setHeight(Integer.parseInt(imgElement.attr(ImageElementData.HeightAttributeName)));
+    tryToExtractOriginalImgElementHtmlCode(html, imgElement, elementData);
 
+
+    return elementData;
+  }
+
+  protected void tryToExtractOriginalImgElementHtmlCode(String html, Element imgElement, ImageElementData elementData) {
     // there is a bug in JSoup: calling imgElement.outerHtml() returns not real Element's Html. In this case <img> element ends with ' />', but outerHtml() returns '>'
     String outerHtml = imgElement.outerHtml();
     int startIndex = html.indexOf(outerHtml.substring(0, outerHtml.length() - 4));
-    int endIndex = html.indexOf(">", startIndex + 1) + 1;
+    String debug = outerHtml.substring(0, outerHtml.length() - 4);
 
-    String elementHtml = html.substring(startIndex, endIndex);
-    elementData.setOriginalImgElementHtmlCode(elementHtml);
+    // TODO: sometimes the substring for startIndex cannot be found (even on - in my eyes - two identical <img> elements) -> find reason
+    if(startIndex >= 0) {
+      int endIndex = html.indexOf(">", startIndex + 1) + 1;
 
-    return elementData;
+      String elementHtml = html.substring(startIndex, endIndex);
+      elementData.setOriginalImgElementHtmlCode(elementHtml);
+    }
   }
 }
