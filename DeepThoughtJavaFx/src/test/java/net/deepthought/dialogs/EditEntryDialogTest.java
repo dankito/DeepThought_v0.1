@@ -6,8 +6,6 @@ import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.person.EntryPersonsControl;
 import net.deepthought.controls.reference.EntryReferenceControl;
-import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
@@ -20,11 +18,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
-import javafx.geometry.Point2D;
 import javafx.geometry.VerticalDirection;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 
@@ -66,7 +62,7 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
 
     // TODO: move to a List createdEntries which then gets cleaned up in a @After method
-    deepThought.removeEntry(createdEntry); // clean up
+    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry); // clean up
   }
 
 
@@ -86,7 +82,7 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThat(isEditEntryDialogVisible(), is(true));
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
 
-    deepThought.removeEntry(createdEntry); // clean up
+    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry); // clean up
   }
 
   @Test
@@ -138,6 +134,7 @@ public class EditEntryDialogTest extends UiTestBase {
     sleep(1, TimeUnit.SECONDS);
 
 
+    // TODO: set a ReferenceSubDivision
     final EntryReferenceControl referenceControl = getEntryDialogReferenceControl();
     Platform.runLater(() -> referenceControl.setVisible(true));
     sleep(500);
@@ -174,6 +171,7 @@ public class EditEntryDialogTest extends UiTestBase {
     doubleClickOnCoordinateInNode(lstvwPersons, 2, 2, MouseButton.PRIMARY);
     sleep(1, TimeUnit.SECONDS);
 
+    // TODO: set a File
     final FilesControl filesControl = getEntryDialogFilesControl();
     Platform.runLater(() -> {
       filesControl.setVisible(true);
@@ -190,6 +188,8 @@ public class EditEntryDialogTest extends UiTestBase {
 
     Platform.runLater(() -> txtfldSearchForFiles.setText(ExistingFile));
     //sleep(2, TimeUnit.SECONDS);
+
+    // TODO: add Notes, LinkGroups, a PreviewImage, Language, Sub Entries and a Content with Embedded Images
   }
 
   protected void fillEditEntryDialogWithTestDataAndCreateNewEntities() {

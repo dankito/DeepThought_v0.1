@@ -241,23 +241,66 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   public boolean removeEntry(Entry entry) {
     if(entries.remove(entry)) {
-      entry.setDeepThought(null);
-      if(entry.getParentEntry() != null)
-        entry.getParentEntry().removeSubEntry(entry);
-
-      for(Category category : new ArrayList<>(entry.getCategories()))
-        entry.removeCategory(category);
-
-      for(Tag tag : new ArrayList<>(entry.getTags()))
-        entry.removeTag(tag);
-
-      // TODO: now all data, like References, Persons, Files, ... get removed!
+      removeAllRelationsFromEntry(entry);
 
       callEntityRemovedListeners(entries, entry);
       return true;
     }
 
     return false;
+  }
+
+  protected void removeAllRelationsFromEntry(Entry entry) {
+    entry.setDeepThought(null);
+
+    if(entry.getParentEntry() != null) {
+      entry.getParentEntry().removeSubEntry(entry);
+    }
+    for(Entry subEntry : new ArrayList<>(entry.getSubEntries())) {
+      entry.removeSubEntry(subEntry);
+    }
+
+    for(Category category : new ArrayList<>(entry.getCategories())) {
+      entry.removeCategory(category);
+    }
+
+    for(Tag tag : new ArrayList<>(entry.getTags()))
+      entry.removeTag(tag);
+
+    if(entry.getReferenceSubDivision() != null) {
+      entry.setReferenceSubDivision(null);
+    }
+    if(entry.getReference() != null) {
+      entry.setReference(null);
+    }
+    if(entry.getSeries() != null) {
+      entry.setSeries(null);
+    }
+
+    for(Person person : new ArrayList<>(entry.getPersons())) {
+      entry.removePerson(person);
+    }
+
+    for(Note note : new ArrayList<>(entry.getNotes())) {
+      entry.removeNote(note);
+    }
+    for(EntriesLinkGroup linkGroup : new ArrayList<>(entry.getLinkGroups())) {
+      entry.removeLinkGroup(linkGroup);
+    }
+
+    for(FileLink attachedFile : new ArrayList<>(entry.getAttachedFiles())) {
+      entry.removeAttachedFile(attachedFile);
+    }
+    for(FileLink embeddedFile : new ArrayList<>(entry.getEmbeddedFiles())) {
+      entry.removeEmbeddedFile(embeddedFile);
+    }
+    if(entry.getPreviewImage() != null) {
+      entry.setPreviewImage(null);
+    }
+
+    if(entry.getLanguage() != null) {
+      entry.setLanguage(null);
+    }
   }
 
   public boolean containsEntry(Entry entry) {

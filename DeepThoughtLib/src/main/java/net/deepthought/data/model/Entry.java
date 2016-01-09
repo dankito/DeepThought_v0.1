@@ -659,6 +659,10 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
+  public boolean hasLinkGroups() {
+    return getLinkGroups().size() == 0;
+  }
+
   public Set<EntriesLinkGroup> getLinkGroups() {
     return linkGroups;
   }

@@ -15,6 +15,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
@@ -49,6 +50,10 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
+
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Created by ganymed on 20/12/15.
@@ -484,6 +489,45 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected TextField getSearchAndSelectFilesControlSearchTextBox() {
     return lookup("#txtfldSearchForFiles").queryFirst();
+  }
+
+
+  /*          Clean up        */
+
+  protected void removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(BaseEntity entity) {
+    if(entity instanceof Entry) {
+      removeEntryAndAssertItGotCleanedUpWell((Entry) entity);
+    }
+  }
+
+  protected void removeEntryAndAssertItGotCleanedUpWell(Entry entry) {
+    deepThought.removeEntry(entry);
+
+    assertEntryGotCleanedUpWell(entry);
+  }
+
+  protected void assertEntryGotCleanedUpWell(Entry entry) {
+    // check if all related entities have been removed properly
+    assertThat(entry.hasTags(), is(false));
+    assertThat(entry.hasCategories(), is(false));
+
+    assertThat(entry.getParentEntry(), nullValue());
+    assertThat(entry.hasSubEntries(), is(false));
+
+    assertThat(entry.getSeries(), nullValue());
+    assertThat(entry.getReference(), nullValue());
+    assertThat(entry.getReferenceSubDivision(), nullValue());
+
+    assertThat(entry.hasPersons(), is(false));
+    assertThat(entry.hasNotes(), is(false));
+    assertThat(entry.hasLinkGroups(), is(false));
+
+    assertThat(entry.hasAttachedFiles(), is(false));
+    assertThat(entry.hasEmbeddedFiles(), is(false));
+    assertThat(entry.getPreviewImage(), nullValue());
+
+    assertThat(entry.getLanguage(), nullValue());
+    assertThat(entry.getDeepThought(), nullValue());
   }
 
 }
