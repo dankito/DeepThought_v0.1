@@ -54,15 +54,17 @@ public class EditEntryDialogTest extends UiTestBase {
     clickOk();
 
     assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
-    Entry createdEntry = ((List<Entry>)deepThought.getEntries()).get(0); // TODO: get Entry by tblvwEntries
+
+    Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
+    createdEntities.add(createdEntry);
 
     assertThat(createdEntry.isPersisted(), is(true));
 
     assertThat(isEditEntryDialogVisible(), is(false));
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
 
-    // TODO: move to a List createdEntries which then gets cleaned up in a @After method
-    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry); // clean up
+    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry);
+    createdEntities.remove(createdEntry);
   }
 
 
@@ -75,14 +77,17 @@ public class EditEntryDialogTest extends UiTestBase {
     clickApply();
 
     assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
-    Entry createdEntry = ((List<Entry>)deepThought.getEntries()).get(0); // TODO: get Entry by tblvwEntries
+
+    Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
+    createdEntities.add(createdEntry);
 
     assertThat(createdEntry.isPersisted(), is(true));
 
     assertThat(isEditEntryDialogVisible(), is(true));
     assertThatEntryDataHasBeenSetCorrectly(createdEntry);
 
-    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry); // clean up
+    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry);
+    createdEntities.remove(createdEntry);
   }
 
   @Test

@@ -20,6 +20,7 @@ import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
 import net.deepthought.util.Localization;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.service.finder.WindowFinder;
@@ -81,6 +82,9 @@ public abstract class UiTestBase extends ApplicationTest {
   protected WindowFinder windowFinder = null;
 
 
+  protected List<BaseEntity> createdEntities = new ArrayList<>();
+
+
   @BeforeClass
   public static void changeToHeadless() {
     if(testHeadless()) {
@@ -109,6 +113,17 @@ public abstract class UiTestBase extends ApplicationTest {
     setupMainStage(stage);
 
     windowFinder = robotContext().getWindowFinder();
+  }
+
+  @After
+  public void deleteCreatedEntities() {
+    for(BaseEntity createdEntity : createdEntities) {
+      removeEntityFromDeepThought(createdEntity);
+    }
+
+    for(BaseEntity createdEntity : createdEntities) {
+      assertEntityGotCleanedUpWell(createdEntity);
+    }
   }
 
   @Override
@@ -495,15 +510,20 @@ public abstract class UiTestBase extends ApplicationTest {
   /*          Clean up        */
 
   protected void removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(BaseEntity entity) {
+    removeEntityFromDeepThought(entity);
+    assertEntityGotCleanedUpWell(entity);
+  }
+
+  protected void removeEntityFromDeepThought(BaseEntity entity) {
     if(entity instanceof Entry) {
-      removeEntryAndAssertItGotCleanedUpWell((Entry) entity);
+      deepThought.removeEntry((Entry) entity);
     }
   }
 
-  protected void removeEntryAndAssertItGotCleanedUpWell(Entry entry) {
-    deepThought.removeEntry(entry);
-
-    assertEntryGotCleanedUpWell(entry);
+  protected void assertEntityGotCleanedUpWell(BaseEntity entity) {
+    if(entity instanceof Entry) {
+      assertEntryGotCleanedUpWell((Entry)entity);
+    }
   }
 
   protected void assertEntryGotCleanedUpWell(Entry entry) {
