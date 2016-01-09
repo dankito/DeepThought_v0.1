@@ -157,3 +157,10 @@ function setHtml(html, shouldResetUndoStack) {
 	editor.setData(html);
 	htmlChanged = false;
 }
+
+// for Android versions pre API 19: there was no built in function to get result of a JavaScript execution
+function androidGetHtml() {
+	if(typeof android !== 'undefined') {
+		android.responseToGetHtml(CKEDITOR.instances.editor.getData());
+	}
+}

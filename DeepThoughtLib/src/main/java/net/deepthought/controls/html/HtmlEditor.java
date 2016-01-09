@@ -40,6 +40,8 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   protected static final String CKEditorInstanceName = "CKEDITOR.instances.editor";
 
+  public static final String JavaScriptCommandGetHtml = "CKEDITOR.instances.editor.getData()";
+
 
   protected static String unzippedHtmlEditorFilePath = null;
 
@@ -103,7 +105,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
       final List<Object> htmlHolder = new ArrayList<>();
       final CountDownLatch waitForAsyncResponseLatch = new CountDownLatch(1);
 
-      scriptExecutor.executeScript("CKEDITOR.instances.editor.getData()", new ExecuteJavaScriptResultListener() {
+      scriptExecutor.executeScript(JavaScriptCommandGetHtml, new ExecuteJavaScriptResultListener() {
         @Override
         public void scriptExecuted(Object result) {
           htmlHolder.add(result);
@@ -111,7 +113,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
         }
       });
 
-      try { waitForAsyncResponseLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+      try { waitForAsyncResponseLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
 
       if(htmlHolder.size() > 0 && htmlHolder.get(0) instanceof String) {
         return htmlHolder.get(0).toString();
@@ -255,7 +257,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();

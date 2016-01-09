@@ -3,6 +3,7 @@ package net.deepthought.controls.html;
 import android.app.Activity;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ganymed on 26/09/15.
@@ -75,8 +78,12 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     });
 
     // crashes in Emulator, and only in the Emulator, for Android 2.3
-    if(Application.getPlatformConfiguration().isRunningInEmulator() == false || (OsHelper.isRunningOnAndroidApiLevel(9) == false && OsHelper.isRunningOnAndroidApiLevel(10) == false))
+    if(Application.getPlatformConfiguration().isRunningInEmulator() == false || (OsHelper.isRunningOnAndroidApiLevel(9) == false && OsHelper.isRunningOnAndroidApiLevel(10) == false)) {
       addJavascriptInterface(this, "app"); // has to be set already here otherwise loaded event will not be recognized
+      if(OsHelper.isRunningOnAndroidAtLeastOfApiLevel(19) == false) { // before Android 19 there was no way to get automatically informed of JavaScript results -> use this as workaround
+        addJavascriptInterface(this, "android");
+      }
+    }
     loadUrl(htmlEditor.getHtmlEditorPath());
   }
 
@@ -133,25 +140,68 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   protected void executeScriptOnUiThread(final String javaScript, final ExecuteJavaScriptResultListener listener) {
     try {
-      loadUrl("javascript:" + javaScript);
+      if(OsHelper.isRunningOnAndroidAtLeastOfApiLevel(19)) {
+        executeScriptOnUiThreadForAndroid19AndAbove(javaScript, listener);
+      }
+      else {
+        executeScriptOnUiThreadForAndroidPre19(javaScript, listener);
+      }
 
-      // evaluateJavascript() only works on API 19 and newer!
-//      evaluateJavascript(javaScript, new ValueCallback<String>() {
-//        @Override
-//        public void onReceiveValue(String value) {
-//          if(listener != null)
-//            listener.scriptExecuted(value);
-//        }
-//      });
     } catch(Exception ex) {
       log.error("Could not evaluate JavaScript " + javaScript, ex);
     }
   }
 
+  private void executeScriptOnUiThreadForAndroid19AndAbove(String javaScript, final ExecuteJavaScriptResultListener listener) {
+    // evaluateJavascript() only works on API 19 and newer!
+      evaluateJavascript(javaScript, new ValueCallback<String>() {
+        @Override
+        public void onReceiveValue(String value) {
+          if(listener != null)
+            listener.scriptExecuted(value);
+        }
+      });
+  }
+
+  protected void executeScriptOnUiThreadForAndroidPre19(String javaScript, ExecuteJavaScriptResultListener listener) {
+    if(listener == null) { // no response is needed
+      loadUrl("javascript:" + javaScript);
+    }
+    else {
+      if(javaScript == HtmlEditor.JavaScriptCommandGetHtml) {
+        listenerForGetHtml = listener;
+        waitForGetHtmlResponseLatch = new CountDownLatch(1);
+
+        loadUrl("javascript:androidGetHtml()");
+
+        // i really hate writing this code as method runs on UI thread and in worst case UI thread gets then blocked
+        try { waitForGetHtmlResponseLatch.await(500, TimeUnit.MILLISECONDS); } catch(Exception ex) { }
+        listenerForGetHtml = null;
+      }
+      else {
+        log.error("An unknown JavaScript command with result has been executed, add handling for it in AndroidHtmlEditor");
+      }
+    }
+  }
+
+
+  /*  Response handling as Android pre 19 doesn't support getting result of executed JavaScript    */
+
+  protected ExecuteJavaScriptResultListener listenerForGetHtml = null;
+  protected CountDownLatch waitForGetHtmlResponseLatch = null;
+
+  @JavascriptInterface
+  public void responseToGetHtml(String htmlData) {
+    if(listenerForGetHtml != null) {
+      listenerForGetHtml.scriptExecuted(htmlData);
+    }
+  }
+
+
   @Override
   public void setJavaScriptMember(String name, IJavaScriptBridge member) {
     // since Android Api 17 all methods callable from JavaScript must be annotated with @JavascriptInterface, an Android specific annotation
-    // -> HtmlEditor cannot know this annotation, so we save the member instance, let the method call on ourself and then pass the method call on to the member
+    // -> HtmlEditor cannot know this annotation, so we save the member instance, let the method call on ourselves and then pass the method call on to the member
     javaScriptBridgesToCall.add(member);
   }
 

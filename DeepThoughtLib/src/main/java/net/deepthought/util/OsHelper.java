@@ -18,11 +18,15 @@ public class OsHelper {
   }
 
   public static boolean isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(int minimumApiLevel) {
-    return isRunningOnAndroid() == false || Application.getPlatformConfiguration().getOsVersion() >= minimumApiLevel;
+    return isRunningOnAndroid() == false || isRunningOnAndroidAtLeastOfApiLevel(minimumApiLevel);
   }
 
   public static boolean isRunningOnAndroidApiLevel(int apiLevel) {
     return isRunningOnAndroid() == true && Application.getPlatformConfiguration().getOsVersion() == apiLevel;
+  }
+
+  public static boolean isRunningOnAndroidAtLeastOfApiLevel(int minimumApiLevel) {
+    return isRunningOnAndroid() == true && Application.getPlatformConfiguration().getOsVersion() >= minimumApiLevel;
   }
 
   private static Boolean determineIfIsRunningOnAndroid() {
