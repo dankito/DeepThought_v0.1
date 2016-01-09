@@ -152,15 +152,15 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     }
   }
 
-  private void executeScriptOnUiThreadForAndroid19AndAbove(String javaScript, final ExecuteJavaScriptResultListener listener) {
+  protected void executeScriptOnUiThreadForAndroid19AndAbove(String javaScript, final ExecuteJavaScriptResultListener listener) {
     // evaluateJavascript() only works on API 19 and newer!
-      evaluateJavascript(javaScript, new ValueCallback<String>() {
-        @Override
-        public void onReceiveValue(String value) {
-          if(listener != null)
-            listener.scriptExecuted(value);
-        }
-      });
+    evaluateJavascript(javaScript, new ValueCallback<String>() {
+      @Override
+      public void onReceiveValue(String value) {
+        if (listener != null)
+          listener.scriptExecuted(value);
+      }
+    });
   }
 
   protected void executeScriptOnUiThreadForAndroidPre19(String javaScript, ExecuteJavaScriptResultListener listener) {
@@ -168,6 +168,8 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       loadUrl("javascript:" + javaScript);
     }
     else {
+      // as via loadUrl() we cannot execute JavaScript and wait for its result ->
+      // for each JavaScript Method create an extra responseToXyz method (like responseToGetHtml() below) in ckeditor_control.js, with it then call to tell us result
       if(javaScript == HtmlEditor.JavaScriptCommandGetHtml) {
         listenerForGetHtml = listener;
         waitForGetHtmlResponseLatch = new CountDownLatch(1);

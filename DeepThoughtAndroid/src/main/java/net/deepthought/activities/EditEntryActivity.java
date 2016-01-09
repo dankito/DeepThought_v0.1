@@ -239,8 +239,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     int id = item.getItemId();
 
     if(id == android.R.id.home) {
-      saveEntryIfNeeded();
-      finish();
+      saveEntryAndCloseActivity();
       return true;
     }
     else if (id == R.id.mnitmActionCancel) {
@@ -367,8 +366,19 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntryAndCloseActivity() {
-    saveEntryIfNeeded();
-    finish();
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        saveEntryIfNeeded();
+
+        runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            finish();
+          }
+        });
+      }
+    }).start();
   }
 
   @Override
@@ -387,13 +397,25 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       saveEntry();
   }
 
+  protected void saveEntryAsync() {
+    new Thread(new Runnable() {
+      @Override
+      public void run() {
+        saveEntry();
+      }
+    }).start();
+  }
+
   protected void saveEntry() {
     // TODO: only save changed fields
-    entry.setAbstract(abstractHtmlEditor.getHtml());
-    entry.setContent(contentHtmlEditor.getHtml());
+    String abstractString = abstractHtmlEditor.getHtml();
+    String content = contentHtmlEditor.getHtml();
+
+    entry.setAbstract(abstractString);
+    entry.setContent(content);
 
     if(entryCreationResult != null) {
-      entryCreationResult.saveCreatedEntities(abstractHtmlEditor.getHtml(), contentHtmlEditor.getHtml());
+      entryCreationResult.saveCreatedEntities(abstractString, content);
     }
 
     if(entry.isPersisted() == false) // a new Entry

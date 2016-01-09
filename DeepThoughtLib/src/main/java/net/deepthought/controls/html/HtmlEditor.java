@@ -3,6 +3,8 @@ package net.deepthought.controls.html;
 import net.deepthought.Application;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.html.ImageElementData;
+import net.deepthought.util.ObjectHolder;
+import net.deepthought.util.OsHelper;
 import net.deepthought.util.file.FileUtils;
 
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -11,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Timer;
@@ -102,27 +103,55 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   protected String getHtmlAsyncViaJavaScript() {
     try {
-      final List<Object> htmlHolder = new ArrayList<>();
+      final ObjectHolder<Object> htmlHolder = new ObjectHolder<>();
       final CountDownLatch waitForAsyncResponseLatch = new CountDownLatch(1);
 
-      scriptExecutor.executeScript(JavaScriptCommandGetHtml, new ExecuteJavaScriptResultListener() {
-        @Override
-        public void scriptExecuted(Object result) {
-          htmlHolder.add(result);
-          waitForAsyncResponseLatch.countDown();
-        }
-      });
+      // TODO: this code is really ugly: As for Android Version 19 and above this method has to run on a different thread than the UI thread (otherwise the call to
+      // evaluateScript() would block), but for JavaFX this method must run on UI thread an no new Thread may be created
+      if(OsHelper.isRunningOnAndroid() == false) {
+        getHtmlViaJavaScript(htmlHolder, waitForAsyncResponseLatch);
+      }
+      else {
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            getHtmlViaJavaScript(htmlHolder, waitForAsyncResponseLatch);
+          }
+        }).start();
+      }
 
       try { waitForAsyncResponseLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
 
-      if(htmlHolder.size() > 0 && htmlHolder.get(0) instanceof String) {
-        return htmlHolder.get(0).toString();
+      if(htmlHolder.get() != null) {
+        return getUnescapedResponse(htmlHolder.get());
       }
     } catch(Exception ex) {
       log.error("Could not get HtmlEditor's html text", ex);
     }
 
     return "";
+  }
+
+  protected void getHtmlViaJavaScript(final ObjectHolder<Object> htmlHolder, final CountDownLatch waitForAsyncResponseLatch) {
+    scriptExecutor.executeScript(JavaScriptCommandGetHtml, new ExecuteJavaScriptResultListener() {
+      @Override
+      public void scriptExecuted(Object result) {
+        htmlHolder.set(result);
+        waitForAsyncResponseLatch.countDown();
+      }
+    });
+  }
+
+  private String getUnescapedResponse(Object response) {
+    String responseAsString = response instanceof String ? (String)response : response.toString();
+
+    if(responseAsString.startsWith("\"") && responseAsString.endsWith("\\n\"")) {
+      responseAsString = responseAsString.substring(1, responseAsString.length() - 3);
+
+      responseAsString = StringEscapeUtils.unescapeEcmaScript(responseAsString);
+    }
+
+    return responseAsString;
   }
 
   public void setHtml(String html) {
