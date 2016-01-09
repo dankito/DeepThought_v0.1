@@ -114,6 +114,8 @@ public class MainWindowController implements Initializable {
 
   protected CategoryTreeItem selectedCategoryTreeItem = null;
 
+  protected boolean hasTabCategoriesBeenLoadedYet = false;
+
 
   @FXML
   GridPane grdpnMainMenu;
@@ -309,7 +311,6 @@ public class MainWindowController implements Initializable {
   protected void applyNewDeepThoughtSettings(DeepThought deepThought) {
     DeepThoughtSettings settings = deepThought.getSettings();
 
-    trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
     selectedCategoryChanged(deepThought.getTopLevelCategory());
 
     tabTagsControl.deepThoughtChanged(deepThought);
@@ -448,6 +449,12 @@ public class MainWindowController implements Initializable {
     else if(selectedTab == tabCategories) {
       deepThought.getSettings().setLastSelectedTab(SelectedTab.Categories);
       selectedCategoryChanged(deepThought.getSettings().getLastViewedCategory());
+
+      if(hasTabCategoriesBeenLoadedYet == false) {
+        hasTabCategoriesBeenLoadedYet = true;
+        // create Categories TreeItems at the first time TabCategories is selected as otherwise they may get created without ever being used
+        trvwCategories.setRoot(new CategoryTreeItem(deepThought.getTopLevelCategory()));
+      }
     }
 
 

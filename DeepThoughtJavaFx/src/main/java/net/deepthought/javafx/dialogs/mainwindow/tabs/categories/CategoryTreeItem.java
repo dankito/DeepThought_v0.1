@@ -50,24 +50,26 @@ public class CategoryTreeItem extends TreeItem<Category> {
 
   @Override
   public boolean isLeaf() {
-    return category.getSubCategories().size() == 0;
+    return category.hasSubCategories() == false;
   }
 
   @Override
   public synchronized ObservableList<TreeItem<Category>> getChildren() {
     if(haveChildrenBeenLoaded == false) {
-      ObservableList<TreeItem<Category>> children = super.getChildren();
-      List<TreeItem<Category>> items = new ArrayList<>();
-      for(Category subCategory : category.getSubCategories()) {
-        items.add(new CategoryTreeItem(subCategory));
-      }
-
+      super.getChildren().clear();
+      super.getChildren().addAll(createSubItems());
       haveChildrenBeenLoaded = true;
-      children.clear();
-      children.addAll(items);
     }
 
     return super.getChildren(); // even in case haveChildrenBeenLoaded has been false, do some sorting, ... in parent's method
+  }
+
+  protected List<TreeItem<Category>> createSubItems() {
+    List<TreeItem<Category>> items = new ArrayList<>();
+    for(Category subCategory : category.getSubCategories()) {
+      items.add(new CategoryTreeItem(subCategory));
+    }
+    return items;
   }
 
 
