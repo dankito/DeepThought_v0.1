@@ -1,5 +1,6 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntryPersonListener;
@@ -47,16 +48,12 @@ public class EntryPersonsControl extends PersonsControl {
   protected EntryPersonListener entryPersonListener = new EntryPersonListener() {
     @Override
     public void personAdded(Entry entry, Person addedPerson) {
-      if(entry.equals(EntryPersonsControl.this.entry) == false)
-        log.warn("This should never be the case, EntryPersonListener's entry parameter {} doesn't equal member variable entry {}", entry, EntryPersonsControl.this.entry);
-      setEntityPersons(entry.getPersons());
+      FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
     }
 
     @Override
     public void personRemoved(Entry entry, Person removedPerson) {
-      if(entry.equals(EntryPersonsControl.this.entry) == false)
-        log.warn("This should never be the case, EntryPersonListener's entry parameter {} doesn't equal member variable entry {}", entry, EntryPersonsControl.this.entry);
-      setEntityPersons(entry.getPersons());
+      FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
 
     }
   };

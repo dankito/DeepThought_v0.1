@@ -1,5 +1,6 @@
 package net.deepthought.controls.person;
 
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.listener.EntityListener;
@@ -60,8 +61,9 @@ public class ReferencePersonsControl extends PersonsControl {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == reference.getReferenceBasePersonAssociations())
-        setEntityPersons(reference.getPersons());
+      if(collection == reference.getReferenceBasePersonAssociations()) {
+        FXUtils.runOnUiThread(() -> setEntityPersons(reference.getPersons()));
+      }
     }
 
     @Override
@@ -71,8 +73,9 @@ public class ReferencePersonsControl extends PersonsControl {
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == reference.getReferenceBasePersonAssociations())
-        setEntityPersons(reference.getPersons());
+      if(collection == reference.getReferenceBasePersonAssociations()) {
+        FXUtils.runOnUiThread(() -> setEntityPersons(reference.getPersons()));
+      }
     }
   };
 
