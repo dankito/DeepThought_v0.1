@@ -47,53 +47,30 @@ public class EditEntryDialogTest extends UiTestBase {
 
   @Test
   public void openEditEntryDialog_PressOk_EntryGetsCorrectlyAddedToDeepThought() {
-    sleep(3, TimeUnit.SECONDS);
-    navigateToNewEditEntryDialog();
-    fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
+    addTestEntities_ThenPressOk(false);
+  }
+
+  protected void addTestEntities_ThenPressOk(boolean createNewEntities) {
+    fillEditEntryDialogWithTestData(createNewEntities);
 
     clickOk();
 
-    assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
-
-    Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
-    createdEntities.add(createdEntry);
-
-    assertThat(createdEntry.isPersisted(), is(true));
-
-    assertThat(isEditEntryDialogVisible(), is(false));
-    assertThatEntryDataHasBeenSetCorrectly(createdEntry);
-
-    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry);
-    createdEntities.remove(createdEntry);
+    assertThatEntryGotPersistedCorrectly(false);
   }
 
 
   @Test
   public void openEditEntryDialog_PressApply_EntryGetsCorrectlyAddedToDeepThought() {
-    sleep(3, TimeUnit.SECONDS);
-    navigateToNewEditEntryDialog();
-    fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
+    fillEditEntryDialogWithTestData(false);
 
     clickApply();
 
-    assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
-
-    Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
-    createdEntities.add(createdEntry);
-
-    assertThat(createdEntry.isPersisted(), is(true));
-
-    assertThat(isEditEntryDialogVisible(), is(true));
-    assertThatEntryDataHasBeenSetCorrectly(createdEntry);
-
-    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry);
-    createdEntities.remove(createdEntry);
+    assertThatEntryGotPersistedCorrectly(true);
   }
 
   @Test
   public void openEditEntryDialog_PressCancel_NoEntryGetsAddedToDeepThought() {
-    navigateToNewEditEntryDialog();
-    fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
+    fillEditEntryDialogWithTestData(false);
 
     clickCancel();
 
@@ -101,6 +78,34 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThat(deepThought.countEntries(), is(CountDefaultEntries));
   }
 
+
+  protected void assertThatEntryGotPersistedCorrectly(boolean shouldEditEntryDialogBeVisible) {
+    assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
+
+    Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
+    createdEntities.add(createdEntry);
+
+    assertThat(createdEntry.isPersisted(), is(true));
+
+    assertThat(isEditEntryDialogVisible(), is(shouldEditEntryDialogBeVisible));
+    assertThatEntryDataHasBeenSetCorrectly(createdEntry);
+
+    removeEntityFromDeepThoughtAndAssertItGotCleanedUpWell(createdEntry);
+    createdEntities.remove(createdEntry);
+  }
+
+
+  protected void fillEditEntryDialogWithTestData(boolean createNewEntities) {
+    sleep(3, TimeUnit.SECONDS);
+    navigateToNewEditEntryDialog();
+
+    if(createNewEntities) {
+      fillEditEntryDialogWithTestDataAndCreateNewEntities();
+    }
+    else {
+      fillEditEntryDialogWithTestDataWithoutCreatingNewEntities();
+    }
+  }
 
   protected void fillEditEntryDialogWithTestDataWithoutCreatingNewEntities() {
     CollapsibleHtmlEditor htmledAbstract = getEntryDialogHtmlEditorAbstract();
