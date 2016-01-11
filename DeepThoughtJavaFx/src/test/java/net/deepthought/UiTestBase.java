@@ -14,9 +14,15 @@ import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.FileLink;
+import net.deepthought.data.model.Note;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
@@ -33,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -148,7 +153,7 @@ public abstract class UiTestBase extends ApplicationTest {
 
     // Bug in IntelliJ (only on Linux?): Created Window doesn't get selected but stays in Background. Pressing Alt+Tab twice brings it to the foreground
 //    push(KeyCode.ALT, KeyCode.TAB);
-//    sleep(500);
+//    sleep(100);
 //    push(KeyCode.ALT, KeyCode.TAB);
 
     deepThought = Application.getDeepThought();
@@ -167,7 +172,7 @@ public abstract class UiTestBase extends ApplicationTest {
     stage.show();
     stage.toFront();
 
-    sleep(5, TimeUnit.SECONDS); // give Stage some time to initialize
+    sleep(3, TimeUnit.SECONDS); // give Stage some time to initialize
   }
 
   protected Parent loadFxml(Stage stage, String fxmlFilePath) throws IOException {
@@ -624,11 +629,65 @@ public abstract class UiTestBase extends ApplicationTest {
     if(entity instanceof Entry) {
       deepThought.removeEntry((Entry) entity);
     }
+    else if(entity instanceof Tag) {
+      deepThought.removeTag((Tag)entity);
+    }
+    else if(entity instanceof Category) {
+      deepThought.removeCategory((Category) entity);
+    }
+    else if(entity instanceof SeriesTitle) {
+      deepThought.removeSeriesTitle((SeriesTitle) entity);
+    }
+    else if(entity instanceof Reference) {
+      deepThought.removeReference((Reference) entity);
+    }
+    else if(entity instanceof ReferenceSubDivision) {
+      deepThought.removeReferenceSubDivision((ReferenceSubDivision) entity);
+    }
+    else if(entity instanceof Person) {
+      deepThought.removePerson((Person) entity);
+    }
+    else if(entity instanceof FileLink) {
+      deepThought.removeFile((FileLink) entity);
+    }
+    else if(entity instanceof Language) {
+      deepThought.removeLanguage((Language) entity);
+    }
+    else if(entity instanceof Note) {
+      deepThought.removeNote((Note) entity);
+    }
   }
 
   protected void assertEntityGotCleanedUpWell(BaseEntity entity) {
     if(entity instanceof Entry) {
-      assertEntryGotCleanedUpWell((Entry)entity);
+      assertEntryGotCleanedUpWell((Entry) entity);
+    }
+    else if(entity instanceof Tag) {
+      assertTagGotCleanedUpWell((Tag) entity);
+    }
+    else if(entity instanceof Category) {
+      assertCategoryGotCleanedUpWell((Category)entity);
+    }
+    else if(entity instanceof SeriesTitle) {
+      assertSeriesTitleGotCleanedUpWell((SeriesTitle)entity);
+    }
+    else if(entity instanceof Reference) {
+      assertReferenceGotCleanedUpWell((Reference)entity);
+    }
+    else if(entity instanceof ReferenceSubDivision) {
+      assertReferenceSubDivisionGotCleanedUpWell((ReferenceSubDivision)entity);
+    }
+    else if(entity instanceof Person) {
+      assertPersonGotCleanedUpWell((Person)entity);
+    }
+    else if(entity instanceof FileLink) {
+      assertFileGotCleanedUpWell((FileLink)entity);
+    }
+    else if(entity instanceof Language) {
+      assertLanguageGotCleanedUpWell((Language)entity);
+    }
+    else if(entity instanceof Note) {
+      assertNoteGotCleanedUpWell((Note)entity);
     }
   }
 
@@ -654,6 +713,103 @@ public abstract class UiTestBase extends ApplicationTest {
 
     assertThat(entry.getLanguage(), nullValue());
     assertThat(entry.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(entry);
+  }
+
+  protected void assertTagGotCleanedUpWell(Tag tag) {
+    assertThat(tag.getEntries().size(), is(0));
+    assertThat(tag.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(tag);
+  }
+
+  protected void assertCategoryGotCleanedUpWell(Category category) {
+    assertThat(category.getEntries().size(), is(0));
+    assertThat(category.getParentCategory(), nullValue());
+    assertThat(category.getSubCategories().size(), is(0));
+    assertThat(category.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(category);
+  }
+
+  protected void assertSeriesTitleGotCleanedUpWell(SeriesTitle series) {
+    assertThat(series.getEntries().size(), is(0));
+    assertThat(series.getSerialParts().size(), is(0));
+    assertThat(series.getSerialPartsSorted().size(), is(0));
+    assertThat(series.getDeepThought(), nullValue());
+
+    assertReferenceBaseGotCleanedUpWell(series);
+  }
+
+  protected void assertReferenceGotCleanedUpWell(Reference reference) {
+    assertThat(reference.getEntries().size(), is(0));
+    assertThat(reference.getSubDivisions().size(), is(0));
+    assertThat(reference.getSubDivisionsSorted().size(), is(0));
+
+    assertThat(reference.getSeries(), nullValue());
+    assertThat(reference.getDeepThought(), nullValue());
+
+    assertReferenceBaseGotCleanedUpWell(reference);
+  }
+
+  protected void assertReferenceSubDivisionGotCleanedUpWell(ReferenceSubDivision subDivision) {
+    assertThat(subDivision.getEntries().size(), is(0));
+    assertThat(subDivision.getSubDivisions().size(), is(0));
+
+    assertThat(subDivision.getParentSubDivision(), nullValue());
+    assertThat(subDivision.getReference(), nullValue());
+    assertThat(subDivision.getDeepThought(), nullValue());
+
+    assertReferenceBaseGotCleanedUpWell(subDivision);
+  }
+
+  protected void assertReferenceBaseGotCleanedUpWell(ReferenceBase referenceBase) {
+    assertThat(referenceBase.getPersons().size(), is(0));
+    assertThat(referenceBase.getAttachedFiles().size(), is(0));
+    assertThat(referenceBase.getEmbeddedFiles().size(), is(0));
+    assertThat(referenceBase.getPreviewImage(), nullValue());
+
+    assertReferenceBaseGotCleanedUpWell(referenceBase);
+  }
+
+  protected void assertPersonGotCleanedUpWell(Person person) {
+    assertThat(person.getAssociatedEntries().size(), is(0));
+    assertThat(person.getAssociatedSeries().size(), is(0));
+    assertThat(person.getAssociatedReferences().size(), is(0));
+    assertThat(person.getAssociatedReferenceSubDivisions().size(), is(0));
+    assertThat(person.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(person);
+  }
+
+  protected void assertFileGotCleanedUpWell(FileLink file) {
+    assertThat(file.getEntriesAttachedTo().size(), is(0));
+    assertThat(file.getEntriesEmbeddedIn().size(), is(0));
+
+    assertThat(file.getReferenceBasesAttachedTo().size(), is(0));
+    assertThat(file.getReferenceBasesEmbeddedIn().size(), is(0));
+
+    assertThat(file.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(file);
+  }
+
+  protected void assertLanguageGotCleanedUpWell(Language language) {
+    assertThat(language.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(language);
+  }
+
+  protected void assertNoteGotCleanedUpWell(Note note) {
+    assertThat(note.getEntry(), nullValue());
+    assertThat(note.getDeepThought(), nullValue());
+
+    assertBaseEntityGotCleanedUpWell(note);
+  }
+
+  protected void assertBaseEntityGotCleanedUpWell(BaseEntity entity) {
+    assertThat(entity.isDeleted(), is(true));
   }
 
 }

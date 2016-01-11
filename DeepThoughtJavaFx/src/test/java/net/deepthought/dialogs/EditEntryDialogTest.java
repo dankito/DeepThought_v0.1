@@ -147,6 +147,10 @@ public class EditEntryDialogTest extends UiTestBase {
     EntryCategoriesControl categoriesControl = moveToCategoriesControl();
     addExistingCategories();
 
+    moveTo(getEntryDialogCategoriesControlAddTopLevelCategoryButton());
+    moveBy(20, 0);
+    sleep(100);
+
 
     // TODO: set a ReferenceSubDivision
     TextField txtfldSearchForReference = moveToEntryReferenceControlSearchTextBox();
@@ -212,12 +216,16 @@ public class EditEntryDialogTest extends UiTestBase {
     addExistingCategories();
     createNewCategories();
 
+    moveTo(getEntryDialogCategoriesControlAddTopLevelCategoryButton());
+    moveBy(20, 0);
+    sleep(100);
 
-//    moveToEntryReferenceControlSearchTextBox();
-//
-//    clickOn(getEntryDialogReferenceControlNewOrEditButton());
-//    sleep(2, TimeUnit.SECONDS);
-//    clickCancel();
+
+    moveToEntryReferenceControlSearchTextBox();
+
+    clickOn(getEntryDialogReferenceControlNewOrEditButton());
+    sleep(2, TimeUnit.SECONDS);
+    clickCancel();
   }
 
 
