@@ -119,6 +119,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
     graphicPane.getChildren().add(chkbxIsTagSelected);
+    chkbxIsTagSelected.setId("chkbxIsTagSelected");
 
     lblTagName.setTextOverrun(OverrunStyle.ELLIPSIS);
     lblTagName.setMaxWidth(FXUtils.SizeMaxValue);

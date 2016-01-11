@@ -4,6 +4,7 @@ import com.sun.javafx.scene.control.skin.ContextMenuContent;
 
 import net.deepthought.controls.NewOrEditButton;
 import net.deepthought.controls.categories.EntryCategoriesControl;
+import net.deepthought.controls.categories.EntryCategoryTreeCell;
 import net.deepthought.controls.file.FilesControl;
 import net.deepthought.controls.html.CollapsibleHtmlEditor;
 import net.deepthought.controls.person.EntryPersonsControl;
@@ -15,6 +16,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.ReferenceBase;
+import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.util.JavaFxLocalization;
@@ -22,6 +24,8 @@ import net.deepthought.util.Localization;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testfx.framework.junit.ApplicationTest;
 import org.testfx.service.finder.WindowFinder;
 
@@ -29,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -40,6 +45,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -47,6 +53,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -60,6 +67,8 @@ import static org.hamcrest.core.Is.is;
  * Created by ganymed on 20/12/15.
  */
 public abstract class UiTestBase extends ApplicationTest {
+
+  private static final Logger log = LoggerFactory.getLogger(UiTestBase.class);
 
   /**
    * <p>Copied from {@link .ApplicationLauncherImpl}</p>
@@ -136,6 +145,11 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected void setupMainStage(Stage stage) throws Exception {
     setupStage(stage, "dialogs/MainWindow.fxml", 1150, 620);
+
+    // Bug in IntelliJ (only on Linux?): Created Window doesn't get selected but stays in Background. Pressing Alt+Tab twice brings it to the foreground
+//    push(KeyCode.ALT, KeyCode.TAB);
+//    sleep(500);
+//    push(KeyCode.ALT, KeyCode.TAB);
 
     deepThought = Application.getDeepThought();
     CountDefaultEntries = deepThought.countEntries();
@@ -255,6 +269,10 @@ public abstract class UiTestBase extends ApplicationTest {
   protected void showContextMenuInNodeAndSelectItemById(Node node, double coordinateInNodeX, double coordinateInNodeY, String menuItemId) {
     showContextMenuInNode(node, coordinateInNodeX, coordinateInNodeY);
 
+    clickOnContextMenuItemWithId(menuItemId);
+  }
+
+  protected void clickOnContextMenuItemWithId(String menuItemId) {
     clickOn(".context-menu #" + menuItemId);
   }
 
@@ -305,6 +323,13 @@ public abstract class UiTestBase extends ApplicationTest {
   }
 
 
+  protected void scrollToTreeViewItem(TreeView treeView, TreeItem item) {
+    treeView.getSelectionModel().clearSelection();
+    treeView.getSelectionModel().select(item);
+    treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+  }
+
+
   protected void focusEditingAreaOfHtmlEditor(CollapsibleHtmlEditor htmledAbstract) {
     Platform.runLater(() -> htmledAbstract.setExpanded(true));
     sleep(500, TimeUnit.MILLISECONDS);
@@ -316,9 +341,13 @@ public abstract class UiTestBase extends ApplicationTest {
   }
 
 
-  private Stage getWindowWithTitle(String titleRegex) {
-    return (Stage)windowFinder.window(titleRegex);
-//    return (Stage)windowFinder.listOrderedWindows().stream().filter(window -> titleRegex.equals(((Stage)window).getTitle())).findFirst().get()
+  private Stage getWindowWithTitle(final String titleRegex) {
+    try {
+//      return (Stage) windowFinder.window(titleRegex);
+    return (Stage)windowFinder.listOrderedWindows().stream().filter(window -> ((Stage) window).getTitle().contains(titleRegex)).findFirst().get();
+    } catch(Exception ex) { log.error("Could not find Window with titleRegex " + titleRegex, ex); }
+
+    return null;
   }
 
   protected void activateWindow(Stage window) {
@@ -417,6 +446,9 @@ public abstract class UiTestBase extends ApplicationTest {
     return htmlEditorContent != null && htmlEditorContent.isVisible();
   }
 
+
+  /*      EditEntryDialog EntryTagsControl       */
+
   protected EntryTagsControl getEntryDialogTagsControl() {
     return lookup("#editEntryDialogTagsControl").queryFirst();
   }
@@ -430,6 +462,21 @@ public abstract class UiTestBase extends ApplicationTest {
     return lookup("#editEntryDialogTagsControl #txtfldSearchTags").queryFirst();
   }
 
+  protected Button getSearchAndSelectTagsControlCreateTagButton() {
+    return lookup("#editEntryDialogTagsControl #btnCreateTag").queryFirst();
+  }
+
+  protected ListView<Tag> getSearchAndSelectTagsControlListViewTags() {
+    return lookup("#lstvwTags").queryFirst();
+  }
+
+  protected CheckBox getSearchAndSelectTagsControlListViewTagsCheckBoxIsTagSelected() {
+    return lookup("#lstvwTags #chkbxIsTagSelected").queryFirst();
+  }
+
+
+  /*      EditEntryDialog EntryCategoriesControl       */
+
   protected EntryCategoriesControl getEntryDialogCategoriesControl() {
     return lookup("#editEntryDialogCategoriesControl").queryFirst();
   }
@@ -439,17 +486,40 @@ public abstract class UiTestBase extends ApplicationTest {
     return entryCategoriesControl != null && entryCategoriesControl.isVisible();
   }
 
-  protected Button getEntryDialogCategoriesControlCreateCategoryButton() {
-    return lookup("#btnCreateCategory").queryFirst();
+  protected Button getEntryDialogCategoriesControlAddTopLevelCategoryButton() {
+    return lookup("#btnAddTopLevelCategory").queryFirst();
   }
 
-  protected TextField getEntryDialogCategoriesControlSearchTextBox() {
-    return lookup("#txtfldSearchCategories").queryFirst();
-  }
+//  protected TextField getEntryDialogCategoriesControlSearchTextBox() {
+//    return lookup("#txtfldSearchCategories").queryFirst();
+//  }
+//
+//  protected Button getEntryDialogCategoriesControlCreateCategoryButton() {
+//    return lookup("#editEntryDialogCategoriesControl #trvwCategories #btnCreateCategory").queryFirst();
+//  }
 
   protected TreeView<Category> getEntryDialogCategoriesControlTreeViewCategories() {
-    return lookup("#trvwCategories").queryFirst();
+    return lookup("#editEntryDialogCategoriesControl #trvwCategories").queryFirst();
   }
+
+  protected CheckBox getEntryDialogCategoriesControlTreeItemIsEntryInCategoryCheckBox() {
+    return lookup("#editEntryDialogCategoriesControl #trvwCategories #isEntryInCategoryCheckBox").queryFirst();
+  }
+
+  protected Button getEntryDialogCategoriesControlTreeItemAddSubCategoryButton() {
+    return lookup("#editEntryDialogCategoriesControl #trvwCategories #addSubCategoryToCategoryButton").queryFirst();
+  }
+
+  protected Button getEntryDialogCategoriesControlTreeItemAddSubCategoryButtonForItem(TreeItem<Category> item) {
+    Category categoryToFind = item.getValue();
+
+    return from(getEntryDialogCategoriesControlTreeViewCategories()).lookup(".cell").lookup((EntryCategoryTreeCell cell) -> {
+      return categoryToFind.equals(cell.getItem());
+    }).lookup("#addSubCategoryToCategoryButton").queryFirst();
+  }
+
+
+  /*      EditEntryDialog EntryReferenceControl       */
 
   protected EntryReferenceControl getEntryDialogReferenceControl() {
     return lookup("#editEntryDialogReferenceControl").queryFirst();
@@ -504,6 +574,42 @@ public abstract class UiTestBase extends ApplicationTest {
 
   protected TextField getSearchAndSelectFilesControlSearchTextBox() {
     return lookup("#txtfldSearchForFiles").queryFirst();
+  }
+
+
+  /*      EditCategoryDialog      */
+
+  protected Stage getEditCategoryDialog() {
+    Stage stage = getWindowWithTitle(Localization.getLocalizedString("create.category"));
+
+    if(stage == null) {
+      String editCategoryTitle = Localization.getLocalizedString("edit.category");
+      editCategoryTitle = editCategoryTitle.substring(0, editCategoryTitle.length() - 3);
+      stage = getWindowWithTitle(editCategoryTitle);
+    }
+
+    return stage;
+  }
+
+  protected boolean isEditCategoryDialogVisible() {
+    try {
+      Stage editCategoryDialog = getEditCategoryDialog();
+      return editCategoryDialog != null && editCategoryDialog.isShowing();
+    } catch(NoSuchElementException ex) { }
+
+    return false;
+  }
+
+  protected TextField getEditCategoryDialogNameTextBox() {
+    return from(getEditCategoryDialog().getScene().getRoot()).lookup("#txtfldName").queryFirst();
+  }
+
+  protected TextField getEditCategoryDialogDescriptionTextBox() {
+    return from(getEditCategoryDialog().getScene().getRoot()).lookup("#txtfldDescription").queryFirst();
+  }
+
+  protected Button getEditCategoryDialogOkButton() {
+    return from(getEditCategoryDialog().getScene().getRoot()).lookup("#btnOk").queryFirst();
   }
 
 

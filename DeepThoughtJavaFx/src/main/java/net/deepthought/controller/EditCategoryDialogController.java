@@ -72,6 +72,11 @@ public class EditCategoryDialogController extends EntityDialogFrameController im
   }
 
   @Override
+  protected String getEntityPreview() {
+    return category.getName();
+  }
+
+  @Override
   protected void closeDialog() {
     if(category != null)
       category.removeEntityListener(categoryListener);

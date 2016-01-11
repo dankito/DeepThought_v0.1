@@ -198,6 +198,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     HBox.setHgrow(pnSelectedCategoriesPreview, Priority.ALWAYS);
 
     btnAddTopLevelCategory = new Button();
+    btnAddTopLevelCategory.setId("btnAddTopLevelCategory");
     btnAddTopLevelCategory.setMinHeight(24);
     btnAddTopLevelCategory.setMaxHeight(24);
     btnAddTopLevelCategory.setMinWidth(24);
@@ -222,6 +223,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements IEditedEn
     setupPaneSearchCategories();
 
     trvwCategories = new TreeView<Category>(new TopLevelCategoryTreeItem());
+    trvwCategories.setId("trvwCategories");
     trvwCategories.setMinHeight(230);
 //    trvwCategories.setMinHeight(268); // as long as there's not search bar, reise TreeView's min height to fit with EntryTag's Control height
     trvwCategories.setMaxHeight(FXUtils.SizeMaxValue);

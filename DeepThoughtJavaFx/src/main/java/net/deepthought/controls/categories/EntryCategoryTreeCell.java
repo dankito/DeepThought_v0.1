@@ -120,8 +120,10 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanU
     graphicPane.setMaxHeight(height);
 
     graphicPane.getChildren().add(isEntryInCategoryCheckBox);
+    isEntryInCategoryCheckBox.setId("isEntryInCategoryCheckBox");
     isEntryInCategoryCheckBox.selectedProperty().addListener(checkBoxIsEntryInCategoryChangeListener);
 
+    categoryNameLabel.setId("categoryNameLabel");
     categoryNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(categoryNameLabel);
 
@@ -133,6 +135,7 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanU
     graphicPane.getChildren().add(categoryOptionsButtonsPane);
 
     addSubCategoryToCategoryButton.setText("+");
+    addSubCategoryToCategoryButton.setId("addSubCategoryToCategoryButton");
     addSubCategoryToCategoryButton.setTextFill(Constants.AddEntityButtonTextColor);
     addSubCategoryToCategoryButton.setFont(new Font(9.5));
     addSubCategoryToCategoryButton.setMinWidth(height);
@@ -357,26 +360,28 @@ public class EntryCategoryTreeCell extends TreeCell<Category> implements ICleanU
   protected ContextMenu createContextMenu() {
     ContextMenu contextMenu = new ContextMenu();
 
-    MenuItem editTagItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(editTagItem, "edit...");
-    editTagItem.setOnAction(actionEvent -> {
-      if(category != null)
+    MenuItem editCategoryItem = new MenuItem();
+    editCategoryItem.setId("mnitmEditCategory");
+    JavaFxLocalization.bindMenuItemText(editCategoryItem, "edit...");
+    editCategoryItem.setOnAction(actionEvent -> {
+      if (category != null)
         Dialogs.showEditCategoryDialog(category, getScene().getWindow(), true);
     });
-    contextMenu.getItems().add(editTagItem);
+    contextMenu.getItems().add(editCategoryItem);
 
     contextMenu.getItems().add(new SeparatorMenuItem());
 
-    MenuItem deleteTagItem = new MenuItem();
-    JavaFxLocalization.bindMenuItemText(deleteTagItem, "delete");
-    deleteTagItem.setOnAction(event -> {
-      if(category != null)
-        if(Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(category)) {
-          if(editedCategoriesHolder.containsEditedEntity(category))
+    MenuItem deleteCategoryItem = new MenuItem();
+    deleteCategoryItem.setId("mnitmDeleteCategory");
+    JavaFxLocalization.bindMenuItemText(deleteCategoryItem, "delete");
+    deleteCategoryItem.setOnAction(event -> {
+      if (category != null)
+        if (Alerts.deleteCategoryWithUserConfirmationIfHasSubCategoriesOrEntries(category)) {
+          if (editedCategoriesHolder.containsEditedEntity(category))
             editedCategoriesHolder.removeEntityFromEntry(category);
         }
     });
-    contextMenu.getItems().add(deleteTagItem);
+    contextMenu.getItems().add(deleteCategoryItem);
 
     return contextMenu;
   }
