@@ -5,6 +5,14 @@ import net.deepthought.IApplicationConfiguration;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.html.IHtmlEditorPool;
+import net.deepthought.data.contentextractor.DerFreitagContentExtractor;
+import net.deepthought.data.contentextractor.HeiseContentExtractor;
+import net.deepthought.data.contentextractor.PostillonContentExtractor;
+import net.deepthought.data.contentextractor.SpiegelContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
+import net.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
+import net.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -21,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,7 +75,7 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
     List<IPlugin> staticPlugins = new ArrayList<>();
 
 //    staticPlugins.addAll(Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
-//        new PostillonContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()}));
+//        new PostillonContentExtractor(), new DerFreitagContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()}));
 //    staticPlugins.add(new YouTubeAndVimeoContentExtractor());
 
     return staticPlugins;

@@ -235,9 +235,17 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   public void setIssueOrPublishingDate(String issueOrPublishingDate) {
     Object previousValue = this.issueOrPublishingDate;
+    if(publishingDateEqualsIssueOrPublishingDate(this.issueOrPublishingDate)) {
+      this.publishingDate = null;
+    }
+
     this.issueOrPublishingDate = issueOrPublishingDate;
     preview = null;
-    setPublishingDate(tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate));
+
+    if(publishingDate == null) {
+      setPublishingDate(tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate));
+    }
+
     callPropertyChangedListeners(TableConfig.ReferenceIssueOrPublishingDateColumnName, previousValue, issueOrPublishingDate);
   }
 
@@ -252,6 +260,17 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     this.publishingDate = publishingDate;
     preview = null;
     callPropertyChangedListeners(TableConfig.ReferencePublishingDateColumnName, previousValue, publishingDate);
+  }
+
+  protected boolean publishingDateEqualsIssueOrPublishingDate(String issueOrPublishingDate) {
+    if(publishingDate != null) {
+      Date parsedDate = tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate);
+      if (parsedDate != null && parsedDate.equals(this.publishingDate)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public String getIsbnOrIssn() {
@@ -342,8 +361,17 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
         } else if (issueOrPublishingDate.length() == 7) { // month and year - separated by any sign - are set
           try {
             int month = Integer.parseInt(issueOrPublishingDate.substring(0, 2)) - 1;
-            if(month < 12) {
+            if(month < 12) { // TODO: how to get if its a week or a month?
               int year = Integer.parseInt(issueOrPublishingDate.substring(3, 7)) - 1900;
+              return new Date(year, month, 1);
+            }
+          } catch (Exception ex2) {
+          }
+        }else if (issueOrPublishingDate.length() == 5) { // may month and short year (only two figures) - separated by any sign - are set
+          try {
+            int month = Integer.parseInt(issueOrPublishingDate.substring(0, 2)) - 1;
+            if(month < 12) {
+              int year = Integer.parseInt(issueOrPublishingDate.substring(3, 5)) - 1900;
               return new Date(year, month, 1);
             }
           } catch (Exception ex2) {

@@ -49,6 +49,11 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
   }
 
   @Override
+  protected String getUrlPrefixForMakingRelativeLinkAbsolute(String relativeUrl) {
+    return "http://sz-magazin.sueddeutsche.de";
+  }
+
+  @Override
   public boolean canCreateEntryFromUrl(String url) {
     return url.startsWith("http://sz-magazin.sueddeutsche.de/") || url.startsWith("https://sz-magazin.sueddeutsche.de/");
   }
@@ -158,10 +163,6 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
     }
 
     return textImageContainer.outerHtml();
-  }
-
-  protected String makeLinkAbsolute(String link) {
-    return makeLinkAbsolute(link, "http://sz-magazin.sueddeutsche.de");
   }
 
   protected String parseContentOfNextPage(Element artikelElement) {

@@ -8,6 +8,7 @@ import net.deepthought.util.OsHelper;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,5 +85,59 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   }
 
   protected abstract EntryCreationResult parseHtmlToEntry(String articleUrl, Document document);
+
+
+  /**
+   * May be overwritten in sub classes.
+   * Should return the URL prefix (like http://<domain>) to make a relative URL absolute
+   */
+  protected String getUrlPrefixForMakingRelativeLinkAbsolute(String relativeUrl) {
+    return "";
+  }
+
+
+  protected void adjustLinkUrls(Element articleElement) {
+    for(Element elementWithSrcAttribute : articleElement.select("[src]")) {
+      String src = elementWithSrcAttribute.attr("src");
+      src = makeLinkAbsolute(src);
+      elementWithSrcAttribute.attr("src", src);
+    }
+
+    for(Element elementWithHrefAttribute : articleElement.select("[href]")) {
+      String href = elementWithHrefAttribute.attr("href");
+      href = makeLinkAbsolute(href);
+      elementWithHrefAttribute.attr("href", href);
+    }
+
+    for(Element elementWithHrefAttribute : articleElement.select("[data-zoom-src]")) {
+      String href = elementWithHrefAttribute.attr("data-zoom-src");
+      href = makeLinkAbsolute(href);
+      elementWithHrefAttribute.attr("data-zoom-src", href);
+    }
+  }
+
+  protected void adjustSourceElements(Element articleElement) {
+    for(Element sourceElement : articleElement.select("span.source")) {
+      sourceElement.parent().appendChild(new Element(org.jsoup.parser.Tag.valueOf("br"), articleElement.baseUri()));
+    }
+  }
+
+  /**
+   * Override {@link #getUrlPrefixForMakingRelativeLinkAbsolute(String)} so that method gets the URL prefix for making link absolute.
+   */
+  protected String makeLinkAbsolute(String link) {
+    return makeLinkAbsolute(link, getUrlPrefixForMakingRelativeLinkAbsolute(link));
+  }
+
+  protected String makeLinkAbsolute(String link, String baseUrl) {
+    if(link.startsWith("//")) {
+      return "http:" + link;
+    }
+    else if(link.startsWith("/")) {
+      return baseUrl + link;
+    }
+
+    return link;
+  }
 
 }
