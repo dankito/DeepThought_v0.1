@@ -23,6 +23,7 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
+import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.deepthought.data.persistence.db.BaseEntity;
@@ -30,6 +31,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
+import net.deepthought.util.localization.LanguageChangedListener;
 import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
@@ -264,16 +266,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   @Override
-  protected void notificationReceived(Notification notification) {
-    super.notificationReceived(notification);
-
-    if(notification.getType() == NotificationType.LanguageChanged) {
-      dtpckReferencePublishingDate.setChronology(Chronology.ofLocale(Localization.getLanguageLocale()));
-      setReferenceIssueTextFieldToDateSelectedInDatePicker();
-    }
-  }
-
-  @Override
   public void initialize(URL location, ResourceBundle resources) {
     super.initialize(location, resources);
 
@@ -295,6 +287,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         btnApplyChanges.setDisable(hasUnsavedChanges() == false);
       }
     });
+
+    Localization.addLanguageChangedListener(languageChangedListener);
   }
 
   protected void setupControls() {
@@ -752,6 +746,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivisionPersonsControl = null;
     htmledReferenceSubDivisionNotes.cleanUp();
     referenceSubDivisionFilesControl.cleanUp();
+
+    Localization.removeLanguageChangedListener(languageChangedListener);
   }
 
   protected void saveEditedFieldsOnSeriesTitle() {
@@ -1496,5 +1492,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     htmledReferenceSubDivisionNotes.setHtml(newValue);
     fieldsWithUnsavedReferenceSubDivisionChanges.remove(FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
   }
+
+
+  protected LanguageChangedListener languageChangedListener = new LanguageChangedListener() {
+    @Override
+    public void languageChanged(ApplicationLanguage newLanguage) {
+      dtpckReferencePublishingDate.setChronology(Chronology.ofLocale(Localization.getLanguageLocale()));
+      setReferenceIssueTextFieldToDateSelectedInDatePicker();
+    }
+  };
 
 }
