@@ -8,9 +8,11 @@ import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.ClipboardHelper;
+import net.deepthought.util.localization.LanguageChangedListener;
 import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
@@ -41,7 +43,10 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
   public EntryReferenceBaseLabel(ReferenceBase referenceBase, EventHandler<CollectionItemLabelEvent> onButtonRemoveItemFromCollectionEventHandler) {
     super(onButtonRemoveItemFromCollectionEventHandler);
     this.referenceBase = referenceBase;
+
     referenceBase.addEntityListener(referenceBaseListener);
+
+    Localization.addLanguageChangedListener(languageChangedListener);
 
     this.setOnMousePressed(event -> onMousePressedOrReleased(event));
     this.setOnMouseReleased(event -> onMousePressedOrReleased(event));
@@ -90,10 +95,13 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
   public void cleanUp() {
     super.cleanUp();
 
-    if(referenceBase != null)
+    if(referenceBase != null) {
       referenceBase.removeEntityListener(referenceBaseListener);
+    }
 
     this.creationResult = null;
+
+    Localization.removeLanguageChangedListener(languageChangedListener);
   }
 
   @Override
@@ -215,5 +223,21 @@ public class EntryReferenceBaseLabel extends CollectionItemLabel {
 
     }
   };
+
+
+  protected LanguageChangedListener languageChangedListener = new LanguageChangedListener() {
+    @Override
+    public void languageChanged(ApplicationLanguage newLanguage) {
+      EntryReferenceBaseLabel.this.languageChanged();
+    }
+  };
+
+  protected void languageChanged() {
+    if(referenceBase instanceof Reference) { // right now only Reference has a Locale dependent preview (when displaying Dates)
+      ((Reference)referenceBase).resetPreview();
+    }
+
+    itemDisplayNameUpdated();
+  }
 
 }
