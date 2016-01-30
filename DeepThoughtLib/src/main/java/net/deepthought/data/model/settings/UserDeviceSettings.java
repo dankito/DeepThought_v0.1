@@ -3,6 +3,7 @@ package net.deepthought.data.model.settings;
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.ReferencesDisplay;
 import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.util.localization.Localization;
 
@@ -27,6 +28,8 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
   protected int maxBackupsToKeep = 7;
 
   protected DialogsFieldsDisplay dialogsFieldsDisplay = DialogsFieldsDisplay.ImportantOnes;
+
+  protected ReferencesDisplay referencesDisplay = ReferencesDisplay.ShowOnlyReference;
 
   protected boolean showCategories = false;
 
@@ -96,6 +99,16 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
     Object previousValue = this.dialogsFieldsDisplay;
     this.dialogsFieldsDisplay = dialogsFieldsDisplay;
     callSettingsChangedListeners(Setting.UserDeviceDialogFieldsDisplay, previousValue, dialogsFieldsDisplay);
+  }
+
+  public ReferencesDisplay getReferencesDisplay() {
+    return referencesDisplay;
+  }
+
+  public void setReferencesDisplay(ReferencesDisplay referencesDisplay) {
+    Object previousValue = this.referencesDisplay;
+    this.referencesDisplay = referencesDisplay;
+    callSettingsChangedListeners(Setting.UserDeviceReferencesDisplay, previousValue, referencesDisplay);
   }
 
   public boolean showCategories() {

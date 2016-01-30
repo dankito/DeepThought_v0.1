@@ -10,6 +10,7 @@ public enum Setting {
   UserDeviceAutoSaveChangesAfterMilliseconds,
   UserDeviceMaxBackupsToKeep,
   UserDeviceDialogFieldsDisplay,
+  UserDeviceReferencesDisplay,
   UserDeviceShowCategories,
   UserDeviceShowQuickEditEntryPane,
 
