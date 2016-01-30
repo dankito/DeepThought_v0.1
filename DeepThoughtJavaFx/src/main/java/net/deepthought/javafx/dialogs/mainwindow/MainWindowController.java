@@ -21,6 +21,7 @@ import net.deepthought.controls.clipboard.ContentExtractOptionForUiCreator;
 import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.connected_devices.ConnectedDevicesPanel;
 import net.deepthought.controls.entries.EntriesOverviewControl;
+import net.deepthought.data.model.settings.enums.ReferencesDisplay;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
@@ -131,6 +132,10 @@ public class MainWindowController implements Initializable {
   protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowImportantOnes;
   @FXML
   protected CheckMenuItem chkmnitmViewDialogsFieldsDisplayShowAll;
+  @FXML
+  protected CheckMenuItem chkmnitmViewReferencesDisplayShowOnlyReference;
+  @FXML
+  protected CheckMenuItem chkmnitmViewReferencesDisplayShowAll;
   @FXML
   protected CheckMenuItem chkmnitmViewShowCategories;
   @FXML
@@ -339,8 +344,10 @@ public class MainWindowController implements Initializable {
     entriesOverviewControl.showPaneQuickEditEntryChanged(settings.showEntryQuickEditPane());
 
     setMenuItemViewDialogsFieldsDisplayShowImportantOnesWithoutInvokingListener(settings.getDialogsFieldsDisplay());
-
     setMenuItemViewDialogsFieldsDisplayShowAllWithoutInvokingListener(settings.getDialogsFieldsDisplay());
+
+    setMenuItemViewReferencesDisplayShowOnlyReferenceWithoutInvokingListener(settings.getReferencesDisplay());
+    setMenuItemViewReferencesDisplayShowAllWithoutInvokingListener(settings.getReferencesDisplay());
 
     setMenuItemViewShowCategoriesWithoutInvokingListener(settings.showCategories());
 
@@ -357,6 +364,18 @@ public class MainWindowController implements Initializable {
     chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
     chkmnitmViewDialogsFieldsDisplayShowAll.setSelected(dialogsFieldsDisplay == DialogsFieldsDisplay.All);
     chkmnitmViewDialogsFieldsDisplayShowAll.selectedProperty().addListener(checkMenuItemViewDialogsFieldsDisplayShowAllSelectedChangeListener);
+  }
+
+  protected void setMenuItemViewReferencesDisplayShowOnlyReferenceWithoutInvokingListener(ReferencesDisplay referencesDisplay) {
+    chkmnitmViewReferencesDisplayShowOnlyReference.selectedProperty().removeListener(checkMenuItemViewReferencesDisplayShowOnlyReferenceSelectedChangeListener);
+    chkmnitmViewReferencesDisplayShowOnlyReference.setSelected(referencesDisplay == ReferencesDisplay.ShowOnlyReference);
+    chkmnitmViewReferencesDisplayShowOnlyReference.selectedProperty().addListener(checkMenuItemViewReferencesDisplayShowOnlyReferenceSelectedChangeListener);
+  }
+
+  protected void setMenuItemViewReferencesDisplayShowAllWithoutInvokingListener(ReferencesDisplay referencesDisplay) {
+    chkmnitmViewReferencesDisplayShowAll.selectedProperty().removeListener(checkMenuItemViewReferencesDisplayShowAllSelectedChangeListener);
+    chkmnitmViewReferencesDisplayShowAll.setSelected(referencesDisplay == ReferencesDisplay.ShowAll);
+    chkmnitmViewReferencesDisplayShowAll.selectedProperty().addListener(checkMenuItemViewReferencesDisplayShowAllSelectedChangeListener);
   }
 
   protected void setMenuItemViewShowCategoriesWithoutInvokingListener(boolean showCategories) {
@@ -628,6 +647,20 @@ public class MainWindowController implements Initializable {
     }
   };
 
+  protected ChangeListener<Boolean> checkMenuItemViewReferencesDisplayShowOnlyReferenceSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setReferencesDisplay(ReferencesDisplay.ShowOnlyReference);
+    }
+  };
+
+  protected ChangeListener<Boolean> checkMenuItemViewReferencesDisplayShowAllSelectedChangeListener = new ChangeListener<Boolean>() {
+    @Override
+    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+      Application.getSettings().setReferencesDisplay(ReferencesDisplay.ShowAll);
+    }
+  };
+
   protected ChangeListener<Boolean> checkMenuItemViewShowCategoriesSelectedChangeListener = new ChangeListener<Boolean>() {
     @Override
     public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -827,6 +860,11 @@ public class MainWindowController implements Initializable {
       DialogsFieldsDisplay dialogsFieldsDisplay = (DialogsFieldsDisplay)newValue;
       setMenuItemViewDialogsFieldsDisplayShowImportantOnesWithoutInvokingListener(dialogsFieldsDisplay);
       setMenuItemViewDialogsFieldsDisplayShowAllWithoutInvokingListener(dialogsFieldsDisplay);
+    }
+    else if(setting == Setting.UserDeviceReferencesDisplay) {
+      ReferencesDisplay referencesDisplay = (ReferencesDisplay)newValue;
+      setMenuItemViewReferencesDisplayShowOnlyReferenceWithoutInvokingListener(referencesDisplay);
+      setMenuItemViewReferencesDisplayShowAllWithoutInvokingListener(referencesDisplay);
     }
   }
 

@@ -117,6 +117,12 @@
                                     <CheckMenuItem fx:id="chkmnitmViewDialogsFieldsDisplayShowAll" mnemonicParsing="false" text="%dialogs.fields.display.show.all" />
                                 </items>
                               </Menu>
+                              <Menu fx:id="mnitmViewReferencesDisplay" mnemonicParsing="false" text="%references.display">
+                                <items>
+                                    <CheckMenuItem fx:id="chkmnitmViewReferencesDisplayShowOnlyReference" mnemonicParsing="false" text="%references.display.show.only.reference" />
+                                    <CheckMenuItem fx:id="chkmnitmViewReferencesDisplayShowAll" mnemonicParsing="false" text="%references.display.show.all" />
+                                </items>
+                              </Menu>
                               <SeparatorMenuItem mnemonicParsing="false" />
                               <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" />
                               <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />

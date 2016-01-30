@@ -25,7 +25,11 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 import net.deepthought.data.model.listener.EntityListener;
+import net.deepthought.data.model.listener.SettingsChangedListener;
+import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.ReferencesDisplay;
+import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.ReferenceBaseType;
@@ -58,6 +62,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
@@ -183,6 +188,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   @FXML
   protected ToggleButton btnShowHideSearchReference;
   protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
+
+  @FXML
+  protected Label lblReferenceHintText;
 
   @FXML
   protected Pane paneReferenceFields;
@@ -311,6 +319,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwSeriesTitlePreviewImage);
 
     editedSeriesTitleAttachedFiles = new EditedEntitiesHolder<>(seriesTitle.getAttachedFiles(), event -> fieldsWithUnsavedSeriesTitleChanges.add
@@ -369,11 +379,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleAbstract);
     paneSeriesTitleValues.getChildren().add(3, htmledSeriesTitleAbstract);
     VBox.setMargin(htmledSeriesTitleAbstract, new Insets(6, 0, 0, 0));
+    htmledSeriesTitleAbstract.setExpanded(false);
 
     htmledSeriesTitleTableOfContents = new CollapsibleHtmlEditor("table.of.contents", seriesTitleTableOfContentsListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleTableOfContents);
     paneSeriesTitleValues.getChildren().add(4, htmledSeriesTitleTableOfContents);
     VBox.setMargin(htmledSeriesTitleTableOfContents, new Insets(6, 0, 0, 0));
+    htmledSeriesTitleTableOfContents.setExpanded(false);
 
     seriesTitlePersonsControl = new SeriesTitlePersonsControl();
     seriesTitlePersonsControl.setExpanded(true);
@@ -389,6 +401,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleNotes);
     paneSeriesTitleValues.getChildren().add(6, htmledSeriesTitleNotes);
     VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
+    htmledSeriesTitleNotes.setExpanded(false);
 
     seriesTitleFilesControl = new FilesControl(editedSeriesTitleAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
@@ -425,6 +438,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceAbstract);
     referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
     referenceNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
+
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnShowHideReferencePane);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceHintText);
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceFields);
     paneReferenceFields.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
@@ -481,11 +497,13 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceAbstract);
     paneReferenceValues.getChildren().add(4, htmledReferenceAbstract);
     VBox.setMargin(htmledReferenceAbstract, new Insets(6, 0, 0, 0));
+    htmledReferenceAbstract.setExpanded(false);
 
     htmledReferenceTableOfContents = new CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
     paneReferenceValues.getChildren().add(5, htmledReferenceTableOfContents);
     VBox.setMargin(htmledReferenceTableOfContents, new Insets(6, 0, 0, 0));
+    htmledReferenceTableOfContents.setExpanded(false);
 
     referencePersonsControl = new ReferencePersonsControl();
     referencePersonsControl.setExpanded(false);
@@ -498,6 +516,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceNotes);
     paneReferenceValues.getChildren().add(7, htmledReferenceNotes);
     VBox.setMargin(htmledReferenceNotes, new Insets(6, 0, 0, 0));
+    htmledReferenceNotes.setExpanded(false);
 
     referenceFilesControl = new FilesControl(editedReferenceAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceFilesControl);
@@ -532,6 +551,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferenceSubDivisionPreviewImage);
 
     editedReferenceSubDivisionAttachedFiles = new EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles(), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add
@@ -563,6 +584,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionAbstract);
     paneReferenceSubDivisionValues.getChildren().add(3, htmledReferenceSubDivisionAbstract);
     VBox.setMargin(htmledReferenceSubDivisionAbstract, new Insets(6, 0, 0, 0));
+    htmledReferenceSubDivisionAbstract.setExpanded(false);
 
     referenceSubDivisionPersonsControl = new ReferenceSubDivisionPersonsControl();
     referenceSubDivisionPersonsControl.setExpanded(true);
@@ -577,6 +599,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionNotes);
     paneReferenceSubDivisionValues.getChildren().add(5, htmledReferenceSubDivisionNotes);
     VBox.setMargin(htmledReferenceSubDivisionNotes, new Insets(6, 0, 0, 0));
+    htmledReferenceSubDivisionNotes.setExpanded(false);
 
     referenceSubDivisionFilesControl = new FilesControl(editedReferenceSubDivisionAttachedFiles);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionFilesControl);
@@ -587,6 +610,17 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     VBox.setMargin(referenceSubDivisionFilesControl, new Insets(6, 0, 0, 0));
   }
 
+
+  protected void referencesDisplayChanged(ReferencesDisplay referencesDisplay) {
+    boolean showAllReferenceTypes = referencesDisplay == ReferencesDisplay.ShowAll;
+
+    paneSeriesTitle.setVisible(showAllReferenceTypes);
+
+    btnShowHideReferencePane.setVisible(showAllReferenceTypes);
+    lblReferenceHintText.setVisible(showAllReferenceTypes);
+
+    paneReferenceSubDivision.setVisible(showAllReferenceTypes);
+  }
 
   protected void dialogFieldsDisplayChanged(DialogsFieldsDisplay dialogsFieldsDisplay) {
     btnChooseSeriesTitleFieldsToShow.setVisible(dialogsFieldsDisplay != DialogsFieldsDisplay.All);
@@ -720,6 +754,10 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivision.removeEntityListener(referenceSubDivisionListener);
 
     cleanUpControls();
+
+    if(Application.getSettings() != null) {
+      Application.getSettings().removeSettingsChangedListener(userSettingsChanged);
+    }
 
     super.closeDialog();
   }
@@ -977,7 +1015,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     fieldsWithUnsavedSeriesTitleChanges.clear();
 
     seriesTitle.addEntityListener(seriesTitleListener);
-    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
   protected void setReferenceValues(final Reference reference) {
@@ -1006,7 +1043,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     fieldsWithUnsavedReferenceChanges.clear();
 
     reference.addEntityListener(referenceListener);
-    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
   protected void setReferenceSubDivisionValues(final ReferenceSubDivision subDivision) {
@@ -1031,7 +1067,6 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     fieldsWithUnsavedReferenceSubDivisionChanges.clear();
 
     subDivision.addEntityListener(referenceSubDivisionListener);
-    dialogFieldsDisplayChanged(Application.getSettings().getDialogsFieldsDisplay());
   }
 
 
@@ -1217,6 +1252,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     setReferenceValues(reference);
     setReferenceSubDivisionValues(referenceSubDivision);
 
+    applyUserSettings();
+
     if(seriesTitle.isPersisted())
       btnShowHideSeriesTitlePane.setSelected(true);
     if(reference.isPersisted())
@@ -1225,6 +1262,15 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       btnShowHideReferenceSubDivisionPane.setSelected(true);
 
     FXUtils.focusNode(nodeToFocus);
+  }
+
+  protected void applyUserSettings() {
+    UserDeviceSettings settings = Application.getSettings();
+
+    referencesDisplayChanged(settings.getReferencesDisplay());
+    dialogFieldsDisplayChanged(settings.getDialogsFieldsDisplay());
+
+    settings.addSettingsChangedListener(userSettingsChanged);
   }
 
   protected Node setReferenceBases(ReferenceBase referenceBase, ReferenceBase persistedParentReferenceBase) {
@@ -1508,6 +1554,18 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     public void languageChanged(ApplicationLanguage newLanguage) {
       dtpckReferencePublishingDate.setChronology(Chronology.ofLocale(Localization.getLanguageLocale()));
       setReferenceIssueTextFieldToDateSelectedInDatePicker();
+    }
+  };
+
+  protected SettingsChangedListener userSettingsChanged = new SettingsChangedListener() {
+    @Override
+    public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
+      if(setting == Setting.UserDeviceDialogFieldsDisplay && newValue instanceof DialogsFieldsDisplay) {
+        dialogFieldsDisplayChanged((DialogsFieldsDisplay)newValue);
+      }
+      else if(setting == Setting.UserDeviceReferencesDisplay && newValue instanceof ReferencesDisplay) {
+        referencesDisplayChanged((ReferencesDisplay)newValue);
+      }
     }
   };
 

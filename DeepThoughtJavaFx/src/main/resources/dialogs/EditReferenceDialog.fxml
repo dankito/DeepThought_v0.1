@@ -116,7 +116,7 @@
                                                 <Font name="System Bold" size="15.0" />
                                              </font>
                                           </Label>
-                                          <Label text="%reference.prompt.text">
+                                          <Label fx:id="lblReferenceHintText" text="%reference.prompt.text">
                                              <HBox.margin>
                                                 <Insets left="6.0" />
                                              </HBox.margin>
