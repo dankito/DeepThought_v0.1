@@ -14,248 +14,260 @@
                <content>
                   <VBox fx:id="pnContent">
                      <children>
-                        <AnchorPane fx:id="paneSeriesTitleHeader">
-                           <children>
-                              <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <ToggleButton fx:id="btnShowHideSeriesTitlePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" text="▼">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ToggleButton>
-                                    <ToggleButton fx:id="btnShowHideSearchSeriesTitle" contentDisplay="GRAPHIC_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ToggleButton>
-                                    <Label minWidth="60.0" prefHeight="40.0" text="%series.title">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="%series.title.prompt.text">
-                                       <HBox.margin>
-                                          <Insets left="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                              <Button fx:id="btnChooseSeriesTitleFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                        </AnchorPane>
-            <HBox fx:id="paneSeriesTitle">
+            <VBox fx:id="paneSeriesTitle">
                <children>
-                  <ImageView fx:id="imgvwSeriesTitlePreviewImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
-                     <HBox.margin>
-                        <Insets right="6.0" />
-                     </HBox.margin>
-                  </ImageView>
-                              <VBox fx:id="paneSeriesTitleValues" HBox.hgrow="ALWAYS">
+                              <AnchorPane fx:id="paneSeriesTitleHeader">
                                  <children>
-                                    <HBox fx:id="paneSeriesTitleTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="138.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%series.title.title" />
-                                          <TextField fx:id="txtfldSeriesTitleTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneSeriesTitleSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
-                                          <TextField fx:id="txtfldSeriesTitleSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneSeriesTitleOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefWidth="135.0" text="%online.address">
-                                             <HBox.margin>
-                                                <Insets />
-                                             </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="txtfldSeriesTitleOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-               </children>
-            </HBox>
-                        <AnchorPane>
-                           <children>
-                              <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <ToggleButton fx:id="btnShowHideReferencePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" selected="true" text="▼">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ToggleButton>
-                                    <ToggleButton fx:id="btnShowHideSearchReference" contentDisplay="GRAPHIC_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ToggleButton>
-                                    <Label minWidth="60.0" text="%reference">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                    </Label>
-                                    <Label text="%reference.prompt.text">
-                                       <HBox.margin>
-                                          <Insets left="6.0" />
-                                       </HBox.margin>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                              <Button fx:id="btnChooseReferenceFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="12.0" />
-                           </VBox.margin>
-                        </AnchorPane>
-            <HBox fx:id="paneReference">
-               <children>
-                  <ImageView fx:id="imgvwReferencePreviewImage" fitHeight="183.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
-                     <HBox.margin>
-                        <Insets right="6.0" />
-                     </HBox.margin>
-                  </ImageView>
-                              <VBox fx:id="paneReferenceValues" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <HBox fx:id="paneReferenceTitle" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%reference.title" />
-                                          <TextField fx:id="txtfldReferenceTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneReferenceSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
-                                          <TextField fx:id="txtfldReferenceSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneReferencePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefWidth="200.0" text="%issue.or.publishing.date">
+                                          <ToggleButton fx:id="btnShowHideSeriesTitlePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" text="▼">
                                              <HBox.margin>
                                                 <Insets right="6.0" />
                                              </HBox.margin>
-                                          </Label>
-                                          <TextField fx:id="txtfldReferenceIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                          <DatePicker fx:id="dtpckReferencePublishingDate" editable="false" maxWidth="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="0.0" showWeekNumbers="true" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneReferenceOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefWidth="135.0" text="%online.address">
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="btnShowHideSearchSeriesTitle" contentDisplay="GRAPHIC_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false">
                                              <HBox.margin>
-                                                <Insets />
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
+                                          <Label minWidth="60.0" prefHeight="40.0" text="%series.title">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%series.title.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <TextField fx:id="txtfldReferenceOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                        </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
                                     </HBox>
-                                 </children>
-                              </VBox>
-               </children>
-            </HBox>
-                        <AnchorPane>
-                           <children>
-                              <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
-                                 <children>
-                                    <ToggleButton fx:id="btnShowHideReferenceSubDivisionPane" contentDisplay="TEXT_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" text="▼">
-                                       <HBox.margin>
-                                          <Insets right="6.0" />
-                                       </HBox.margin>
-                                    </ToggleButton>
-                                    <Label text="%reference.sub.division">
+                                    <Button fx:id="btnChooseSeriesTitleFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseSeriesTitleFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <font>
                                           <Font name="System Bold" size="15.0" />
                                        </font>
-                                    </Label>
-                                    <Label text="%reference.sub.division.prompt.text">
-                                       <HBox.margin>
-                                          <Insets left="6.0" />
-                                       </HBox.margin>
-                                    </Label>
+                                    </Button>
                                  </children>
-                              </HBox>
-                              <Button fx:id="btnChooseReferenceSubDivisionFieldsToShow" focusTraversable="false" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
-                              </Button>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="12.0" />
-                           </VBox.margin>
-                        </AnchorPane>
-            <HBox fx:id="paneReferenceSubDivision">
+                              </AnchorPane>
+                  <HBox fx:id="paneSeriesTitleFields">
+                     <children>
+                        <ImageView fx:id="imgvwSeriesTitlePreviewImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <HBox.margin>
+                              <Insets right="6.0" />
+                           </HBox.margin>
+                        </ImageView>
+                                    <VBox fx:id="paneSeriesTitleValues" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox fx:id="paneSeriesTitleTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%series.title.title" />
+                                                <TextField fx:id="txtfldSeriesTitleTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneSeriesTitleSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
+                                                <TextField fx:id="txtfldSeriesTitleSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneSeriesTitleOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefWidth="135.0" text="%online.address">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField fx:id="txtfldSeriesTitleOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox fx:id="paneReferenceFields">
                <children>
-                  <ImageView fx:id="imgvwReferenceSubDivisionPreviewImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                              <VBox fx:id="paneReferenceSubDivisionValues" HBox.hgrow="ALWAYS">
+                              <AnchorPane>
                                  <children>
-                                    <HBox fx:id="paneReferenceSubDivisionTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%reference.sub.division.title" />
-                                          <TextField fx:id="txtfldReferenceSubDivisionTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneReferenceSubDivisionSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
-                                          <TextField fx:id="txtfldReferenceSubDivisionSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox fx:id="paneReferenceSubDivisionOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
-                                       <children>
-                                          <Label prefWidth="135.0" text="%online.address">
+                                          <ToggleButton fx:id="btnShowHideReferencePane" contentDisplay="TEXT_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="28.0" selected="true" text="▼">
                                              <HBox.margin>
-                                                <Insets />
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
+                                          <ToggleButton fx:id="btnShowHideSearchReference" contentDisplay="GRAPHIC_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
+                                          <Label minWidth="60.0" text="%reference">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%reference.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
                                              </HBox.margin>
                                           </Label>
-                                          <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
                                        </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
                                     </HBox>
+                                    <Button fx:id="btnChooseReferenceFieldsToShow" focusTraversable="false" maxHeight="40.0" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
                                  </children>
-                              </VBox>
+                                 <VBox.margin>
+                                    <Insets top="12.0" />
+                                 </VBox.margin>
+                              </AnchorPane>
+                  <HBox fx:id="paneReferenceFields">
+                     <children>
+                        <ImageView fx:id="imgvwReferencePreviewImage" fitHeight="183.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+                           <HBox.margin>
+                              <Insets right="6.0" />
+                           </HBox.margin>
+                        </ImageView>
+                                    <VBox fx:id="paneReferenceValues" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox fx:id="paneReferenceTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%reference.title" />
+                                                <TextField fx:id="txtfldReferenceTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneReferenceSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
+                                                <TextField fx:id="txtfldReferenceSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneReferencePublishingDate" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefWidth="200.0" text="%issue.or.publishing.date">
+                                                   <HBox.margin>
+                                                      <Insets right="6.0" />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField fx:id="txtfldReferenceIssueOrPublishingDate" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                                <DatePicker fx:id="dtpckReferencePublishingDate" editable="false" maxWidth="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="0.0" showWeekNumbers="true" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneReferenceOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefWidth="135.0" text="%online.address">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField fx:id="txtfldReferenceOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
+            </VBox>
+            <VBox fx:id="paneReferenceSubDivision">
+               <children>
+                              <AnchorPane>
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <ToggleButton fx:id="btnShowHideReferenceSubDivisionPane" contentDisplay="TEXT_ONLY" maxHeight="28.0" maxWidth="28.0" minHeight="28.0" minWidth="28.0" mnemonicParsing="false" text="▼">
+                                             <HBox.margin>
+                                                <Insets right="6.0" />
+                                             </HBox.margin>
+                                          </ToggleButton>
+                                          <Label text="%reference.sub.division">
+                                             <font>
+                                                <Font name="System Bold" size="15.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="%reference.sub.division.prompt.text">
+                                             <HBox.margin>
+                                                <Insets left="6.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="btnChooseReferenceSubDivisionFieldsToShow" focusTraversable="false" minHeight="40.0" minWidth="60.0" mnemonicParsing="false" onAction="#handleButtonChooseReferenceSubDivisionFieldsToShowAction" text="+" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Button>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="12.0" />
+                                 </VBox.margin>
+                              </AnchorPane>
+                  <HBox fx:id="paneReferenceSubDivisionFields">
+                     <children>
+                        <ImageView fx:id="imgvwReferenceSubDivisionPreviewImage" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+                                    <VBox fx:id="paneReferenceSubDivisionValues" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox fx:id="paneReferenceSubDivisionTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%reference.sub.division.title" />
+                                                <TextField fx:id="txtfldReferenceSubDivisionTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneReferenceSubDivisionSubTitle" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefHeight="40.0" prefWidth="135.0" text="%subtitle" />
+                                                <TextField fx:id="txtfldReferenceSubDivisionSubTitle" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox fx:id="paneReferenceSubDivisionOnlineAddress" alignment="CENTER_LEFT" prefHeight="40.0">
+                                             <children>
+                                                <Label prefWidth="135.0" text="%online.address">
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </Label>
+                                                <TextField fx:id="txtfldReferenceSubDivisionOnlineAddress" prefHeight="35.0" HBox.hgrow="ALWAYS" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
                      </children>
                   </VBox>
                </content>

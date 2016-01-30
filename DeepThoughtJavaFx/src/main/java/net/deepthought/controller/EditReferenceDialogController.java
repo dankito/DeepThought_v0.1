@@ -33,8 +33,6 @@ import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
 import net.deepthought.util.localization.LanguageChangedListener;
 import net.deepthought.util.localization.Localization;
-import net.deepthought.util.Notification;
-import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
@@ -122,6 +120,11 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
   @FXML
   protected VBox pnContent;
+
+
+  @FXML
+  protected Pane paneSeriesTitle;
+
   @FXML
   protected ToggleButton btnShowHideSeriesTitlePane;
   @FXML
@@ -129,7 +132,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected SearchAndSelectReferenceControl searchAndSelectSeriesTitleControl = null;
 
   @FXML
-  protected Pane paneSeriesTitle;
+  protected Pane paneSeriesTitleFields;
 
   @FXML
   protected Pane paneSeriesTitleValues;
@@ -170,6 +173,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   @FXML
+  protected Pane paneReference;
+
+  @FXML
   protected Button btnChooseReferenceFieldsToShow;
 
   @FXML
@@ -179,7 +185,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected SearchAndSelectReferenceControl searchAndSelectReferenceControl = null;
 
   @FXML
-  protected Pane paneReference;
+  protected Pane paneReferenceFields;
 
   @FXML
   protected ImageView imgvwReferencePreviewImage;
@@ -222,12 +228,15 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   @FXML
+  protected Pane paneReferenceSubDivision;
+
+  @FXML
   protected ToggleButton btnShowHideReferenceSubDivisionPane;
   @FXML
   protected Button btnChooseReferenceSubDivisionFieldsToShow;
 
   @FXML
-  protected Pane paneReferenceSubDivision;
+  protected Pane paneReferenceSubDivisionFields;
 
   @FXML
   protected ImageView imgvwReferenceSubDivisionPreviewImage;
@@ -312,8 +321,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
     seriesTitleNotesListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleNotes);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
-    paneSeriesTitle.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleFields);
+    paneSeriesTitleFields.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
 
     btnShowHideSeriesTitlePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideSeriesTitlePaneText());
     setButtonShowHideSeriesTitlePaneText();
@@ -417,8 +426,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
     referenceNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReference);
-    paneReference.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceFields);
+    paneReferenceFields.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
 
     btnShowHideReferencePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferencePaneText());
     setButtonShowHideReferencePaneText();
@@ -532,8 +541,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
 
-    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
-    paneReferenceSubDivision.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionFields);
+    paneReferenceSubDivisionFields.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
 
     btnShowHideReferenceSubDivisionPane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferenceSubDivisionPaneText());
     setButtonShowHideReferenceSubDivisionPaneText();
@@ -1244,7 +1253,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         if(this.seriesTitle == null)
           setToNewSeries();
         nodeToFocus = txtfldReferenceTitle;
-        paneReferenceSubDivision.setVisible(false);
+        paneReferenceSubDivisionFields.setVisible(false);
       }
       else {
         setToNewReference();
@@ -1252,8 +1261,8 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
         if(referenceBase instanceof SeriesTitle) {
           this.seriesTitle = (SeriesTitle) referenceBase;
-          paneReferenceSubDivision.setVisible(false);
-          paneReference.setVisible(false);
+          paneReferenceSubDivisionFields.setVisible(false);
+          paneReferenceFields.setVisible(false);
           nodeToFocus = txtfldSeriesTitleTitle;
         }
         else // a new Reference should be created
