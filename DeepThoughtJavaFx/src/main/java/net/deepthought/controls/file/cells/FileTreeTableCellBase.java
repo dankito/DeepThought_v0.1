@@ -4,7 +4,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;

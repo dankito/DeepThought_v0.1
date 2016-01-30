@@ -17,7 +17,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;

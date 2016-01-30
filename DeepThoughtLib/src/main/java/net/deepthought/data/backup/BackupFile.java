@@ -2,7 +2,7 @@ package net.deepthought.data.backup;
 
 import net.deepthought.Application;
 import net.deepthought.data.model.enums.BackupFileServiceType;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.io.File;
 import java.text.DateFormat;

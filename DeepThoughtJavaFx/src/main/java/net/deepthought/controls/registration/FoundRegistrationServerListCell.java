@@ -5,7 +5,7 @@ import net.deepthought.communication.listener.AskForDeviceRegistrationResultList
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.IconManager;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;

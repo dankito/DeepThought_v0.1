@@ -1,7 +1,7 @@
 package net.deepthought.controls.clipboard;
 
 import net.deepthought.data.contentextractor.*;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import javafx.scene.input.KeyCombination;
 

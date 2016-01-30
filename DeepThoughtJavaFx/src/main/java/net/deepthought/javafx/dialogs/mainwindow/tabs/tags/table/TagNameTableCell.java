@@ -9,7 +9,7 @@ import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ITagsFilter;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 

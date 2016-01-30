@@ -4,7 +4,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -27,7 +27,7 @@ import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.helper.AlertHelper;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFragment {

@@ -5,7 +5,7 @@ import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Reference;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileUtils;
 

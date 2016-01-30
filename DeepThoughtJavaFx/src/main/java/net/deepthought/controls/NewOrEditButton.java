@@ -1,7 +1,7 @@
 package net.deepthought.controls;
 
 import net.deepthought.controls.event.NewOrEditButtonMenuActionEvent;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

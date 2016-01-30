@@ -7,7 +7,7 @@ import net.deepthought.data.model.Person;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.ClipboardHelper;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 

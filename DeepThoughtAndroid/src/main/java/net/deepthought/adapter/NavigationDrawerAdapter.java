@@ -8,7 +8,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import net.deepthought.R;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 /**
  * Created by renard on 28/12/13.

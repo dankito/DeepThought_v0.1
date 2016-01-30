@@ -7,7 +7,7 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Document;

@@ -1,9 +1,6 @@
-package net.deepthought.util;
+package net.deepthought.util.localization;
 
-import net.deepthought.Application;
 import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.data.listener.ApplicationListener;
-import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.enums.ApplicationLanguage;
 
 import org.slf4j.Logger;
@@ -12,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -48,7 +44,12 @@ public class JavaFxLocalization {
   private final static Logger log = LoggerFactory.getLogger(JavaFxLocalization.class);
 
 
-  public final static ResourceBundle Resources = new AvoidFxmlLoaderTranslatesResourceKeysResourceBundle(Localization.getStringsResourceBundle());
+  static {
+    Localization.addLanguageChangedListener(language -> setLocale(Localization.getLanguageLocale()));
+  }
+
+
+  public final static ResourceBundle Resources = new AvoidFxmlLoaderTranslatesResourceKeysResourceBundle(net.deepthought.util.localization.Localization.getStringsResourceBundle());
 
   private final static ObjectProperty<Locale> locale = new SimpleObjectProperty<>(Locale.getDefault());
 
@@ -61,8 +62,6 @@ public class JavaFxLocalization {
   }
 
   public static void setLocale(Locale locale) {
-    Localization.setLanguageLocale(locale);
-
     FXUtils.runOnUiThread(() -> localeProperty().set(locale));
   }
 
@@ -75,49 +74,29 @@ public class JavaFxLocalization {
   }
 
 
-  static {
-    Application.addApplicationListener(new ApplicationListener() {
-      @Override
-      public void deepThoughtChanged(DeepThought deepThought) {
-
-      }
-
-      @Override
-      public void notification(Notification notification) {
-        if(notification.getType() == NotificationType.LanguageChanged) {
-          if(notification.getParameter() instanceof ApplicationLanguage)
-            setLocaleForLanguage((ApplicationLanguage)notification.getParameter());
-          else
-            setLocale(Localization.getLanguageLocale());
-        }
-      }
-    });
-  }
-
-
   public static void bindLabeledText(Labeled labeled, final String key, final Object... formatArguments) {
     labeled.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindMenuItemText(MenuItem menuItem, final String key, final Object... formatArguments) {
     menuItem.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindTableColumnBaseText(TableColumnBase column, final String key, final Object... formatArguments) {
     column.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindTabText(Tab tab, final String key, final Object... formatArguments) {
     tab.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindTableColumnText(TableColumnBase tableColumn, final String key, final Object... formatArguments) {
     tableColumn.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindControlToolTip(Control control, String key, Object... formatArguments) {
@@ -128,18 +107,18 @@ public class JavaFxLocalization {
   public static Tooltip createBoundTooltip(final String key, final Object[] formatArguments) {
     Tooltip tooltip = new Tooltip();
     tooltip.textProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
     return tooltip ;
   }
 
   public static void bindTextInputControlPromptText(TextInputControl control, final String key, final Object... formatArguments) {
     control.promptTextProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
   public static void bindStageTitle(Stage stage, final String key, final Object... formatArguments) {
     stage.titleProperty().bind(Bindings.createStringBinding(
-        () -> Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
+        () -> net.deepthought.util.localization.Localization.getLocalizedString(key, formatArguments), JavaFxLocalization.localeProperty()));
   }
 
 

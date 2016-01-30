@@ -13,7 +13,7 @@ import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

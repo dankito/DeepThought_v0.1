@@ -1,4 +1,4 @@
-package net.deepthought.util;
+package net.deepthought.util.localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,7 +5,7 @@ import net.deepthought.controls.event.CollectionItemLabelEvent;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import java.util.Collection;
 

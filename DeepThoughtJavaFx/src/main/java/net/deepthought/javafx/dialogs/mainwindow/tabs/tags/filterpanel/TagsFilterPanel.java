@@ -6,7 +6,7 @@ import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Tag;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ISelectedTagsController;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.ITagsFilter;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;

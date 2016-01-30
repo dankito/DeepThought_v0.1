@@ -1,6 +1,7 @@
-package net.deepthought.util;
+package net.deepthought.util.localization;
 
 import net.deepthought.data.model.enums.ApplicationLanguage;
+import net.deepthought.util.OsHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -29,6 +32,8 @@ public class Localization {
 
   protected static ResourceBundle StringsResourceBundle = null;
 
+  protected static List<LanguageChangedListener> languageChangedListeners = new ArrayList<>();
+
 
   public static Locale getLanguageLocale() {
     return LanguageLocale;
@@ -40,15 +45,20 @@ public class Localization {
     StringsResourceBundle = ResourceBundle.getBundle(StringsResourceBundleName, LanguageLocale, new UTF8Control());
   }
 
-  public static void setLanguageLocale(ApplicationLanguage language) {
+  public static void setLanguage(ApplicationLanguage language) {
     try {
-      if(language != null && language.getLanguageKey().equals(LanguageLocale.getLanguage()) == false) {
-//      setLanguageLocale(Locale.forLanguageTag(language.getLanguageKey())); // crashes on older Androids
-        setLanguageLocale(new Locale(language.getLanguageKey()));
+      if(hasLanguageChanged(language)) {
+        setLanguageLocale(new Locale(language.getLanguageKey())); // Locale.forLanguageTag(language.getLanguageKey()) crashes on older Androids
+
+        callLanguageChangeListeners(language);
       }
     } catch(Exception ex) {
       log.error("Could not find Locale for ApplicationLanguage's LanguageKey " + language.getLanguageKey() + " of ApplicationLanguage " + language.getName(), ex);
     }
+  }
+
+  protected static boolean hasLanguageChanged(ApplicationLanguage language) {
+    return language != null && language.getLanguageKey().equals(LanguageLocale.getLanguage()) == false;
   }
 
   public static ResourceBundle getStringsResourceBundle() {
@@ -80,6 +90,22 @@ public class Localization {
 
   public static String getLocalizedString(String resourceKey, Object... formatArguments) {
     return String.format(getLocalizedString(resourceKey), formatArguments);
+  }
+
+
+
+  public static boolean addLanguageChangedListener(LanguageChangedListener listener) {
+    return languageChangedListeners.add(listener);
+  }
+
+  public static boolean removeLanguageChangedListener(LanguageChangedListener listener) {
+    return languageChangedListeners.remove(listener);
+  }
+
+  protected static void callLanguageChangeListeners(ApplicationLanguage newLanguage) {
+    for(LanguageChangedListener listener : languageChangedListeners) {
+      listener.languageChanged(newLanguage);
+    }
   }
 
 

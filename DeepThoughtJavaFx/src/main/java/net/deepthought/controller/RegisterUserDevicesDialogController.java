@@ -17,8 +17,8 @@ import net.deepthought.controls.ContextHelpControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.registration.FoundRegistrationServerListCell;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

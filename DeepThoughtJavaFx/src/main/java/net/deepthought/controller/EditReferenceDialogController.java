@@ -30,7 +30,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DateConvertUtils;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.StringUtils;

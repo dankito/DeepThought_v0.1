@@ -5,7 +5,7 @@ import net.deepthought.controls.CollectionItemLabel;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 

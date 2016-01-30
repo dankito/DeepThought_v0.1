@@ -5,7 +5,7 @@ import net.deepthought.data.contentextractor.ContentExtractOption;
 import net.deepthought.data.download.DownloadConfig;
 import net.deepthought.data.download.DownloadListener;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.ObjectHolder;
 import net.deepthought.util.file.FileUtils;
 

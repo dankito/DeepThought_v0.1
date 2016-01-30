@@ -21,7 +21,7 @@ import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.isbn.IsbnResolvingListener;
 import net.deepthought.util.isbn.ResolveIsbnResult;
 

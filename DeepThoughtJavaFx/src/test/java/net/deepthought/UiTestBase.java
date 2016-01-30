@@ -25,8 +25,8 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.enums.Language;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.junit.After;
 import org.junit.BeforeClass;

@@ -24,13 +24,22 @@ import java.io.File;
  */
 public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
 
-  public final static String INTENT_KEY_CAPTURE_IMAGE = "CaptureImage";
+  public final static String INTENT_KEY_RECOGNITION_SOURCE = "RecognitionSource";
+
+  public final static String RECOGNITION_SOURCE_RECOGNIZE_FROM_URI = "RecognizeFromUri";
+
+  public final static String RECOGNITION_SOURCE_CAPTURE_IMAGE = "CaptureImage";
+
+  public final static String RECOGNITION_SOURCE_GET_FROM_GALLERY = "GetFromGallery";
+
+  public final static String RECOGNITION_SOURCE_ASK_USER = "AskUser";
+
+
 
   public final static String INTENT_KEY_IMAGE_TO_RECOGNIZE_URI = "ImageUri";
 
   public final static String INTENT_KEY_SHOW_SETTINGS_UI = "ShowSettingsUi";
 
-  public final static String INTENT_KEY_SHOW_MESSAGE_ON_REMOTE_DEVICE_WHEN_PROCESSING_DONE = "ShowMessageOnRemoteDeviceWhenProcessingDone";
 
 
   private final static Logger log = LoggerFactory.getLogger(OcrContentExtractorAndroid.class);
@@ -88,14 +97,16 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
   protected void recognizeText(DoOcrConfiguration configuration, RecognizeTextListener listener) {
     try {
       Intent intent = createIntentToStartOcrPlugin(true, configuration.showSettingsUi(), listener);
-      intent.putExtra(INTENT_KEY_SHOW_MESSAGE_ON_REMOTE_DEVICE_WHEN_PROCESSING_DONE, configuration.showMessageOnRemoteDeviceWhenProcessingDone());
 
       Uri imageUri = Uri.parse(configuration.getImageUri());
-      if(imageUri == null && configuration.getImageToRecognize() != null)
+      if(imageUri == null && configuration.getImageToRecognize() != null) {
         imageUri = saveImageToTempFile(configuration);
+      }
 
-      if(imageUri != null)
+      if(imageUri != null) {
+        intent.putExtra(INTENT_KEY_RECOGNITION_SOURCE, RECOGNITION_SOURCE_RECOGNIZE_FROM_URI);
         intent.putExtra(INTENT_KEY_IMAGE_TO_RECOGNIZE_URI, imageUri.toString());
+      }
 
       context.startActivity(intent);
     } catch(Exception ex) {
@@ -111,7 +122,13 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
     intent.setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-    intent.putExtra(INTENT_KEY_CAPTURE_IMAGE, captureImage);
+    if(captureImage) {
+      intent.putExtra(INTENT_KEY_RECOGNITION_SOURCE, RECOGNITION_SOURCE_CAPTURE_IMAGE);
+    }
+    else {
+      intent.putExtra(INTENT_KEY_RECOGNITION_SOURCE, RECOGNITION_SOURCE_GET_FROM_GALLERY);
+    }
+
     intent.putExtra(INTENT_KEY_SHOW_SETTINGS_UI, showSettingsUi);
 
     return intent;

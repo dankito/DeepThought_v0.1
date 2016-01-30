@@ -7,7 +7,7 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.enums.FileType;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;

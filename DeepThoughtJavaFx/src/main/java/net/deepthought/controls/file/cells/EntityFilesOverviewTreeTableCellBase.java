@@ -2,15 +2,10 @@ package net.deepthought.controls.file.cells;
 
 import net.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
-import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 
 /**
  * Created by ganymed on 24/09/15.

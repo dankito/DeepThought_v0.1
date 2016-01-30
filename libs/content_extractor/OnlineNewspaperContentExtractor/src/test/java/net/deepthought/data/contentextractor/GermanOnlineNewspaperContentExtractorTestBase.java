@@ -1,6 +1,6 @@
 package net.deepthought.data.contentextractor;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.junit.Before;
 

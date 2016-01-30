@@ -5,7 +5,7 @@ import net.deepthought.data.model.FileLink;
 import net.deepthought.data.model.Person;
 import net.deepthought.data.model.Reference;
 import net.deepthought.util.IThreadPool;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Document;

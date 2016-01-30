@@ -6,7 +6,7 @@ import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

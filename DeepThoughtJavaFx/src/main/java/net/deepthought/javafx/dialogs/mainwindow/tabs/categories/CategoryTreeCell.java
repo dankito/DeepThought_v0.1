@@ -4,7 +4,7 @@ import net.deepthought.controller.Dialogs;
 import net.deepthought.controls.TextFieldTreeCell;
 import net.deepthought.data.model.Category;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;

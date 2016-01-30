@@ -8,7 +8,7 @@ import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.ExtractContentActionResultListener;
 import net.deepthought.data.contentextractor.OptionInvokedListener;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

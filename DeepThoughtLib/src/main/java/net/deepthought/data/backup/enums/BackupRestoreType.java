@@ -1,6 +1,6 @@
 package net.deepthought.data.backup.enums;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 03/01/15.

@@ -14,10 +14,7 @@ import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.DeepThoughtApplication;
 import net.deepthought.data.model.User;
-import net.deepthought.data.model.enums.ApplicationLanguage;
-import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
-import net.deepthought.data.model.settings.enums.Setting;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.search.ISearchEngine;
@@ -28,12 +25,12 @@ import net.deepthought.platform.IPreferencesStore;
 import net.deepthought.plugin.IPluginManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
-import net.deepthought.util.Localization;
 import net.deepthought.util.LogHelper;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.isbn.IIsbnResolver;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,16 +208,6 @@ public class Application {
       Application.dataManager = dependencyResolver.createDataManager(Application.entityManager);
       Application.dataManager.addApplicationListener(dataManagerListener);
       Application.dataManager.retrieveDeepThoughtApplication();
-
-      UserDeviceSettings userSettings = Application.dataManager.getLoggedOnUser().getSettings();
-      notifyUser(new Notification(NotificationType.LanguageChanged, userSettings.getLanguage()));
-      userSettings.addSettingsChangedListener(new SettingsChangedListener() {
-        @Override
-        public void settingsChanged(Setting setting, Object previousValue, Object newValue) {
-          if (setting == Setting.UserDeviceLanguage)
-            notifyUser(new Notification(NotificationType.LanguageChanged, (ApplicationLanguage)newValue));
-        }
-      });
     } catch(Exception ex) {
       log.error("Could not retrieve data", ex);
       callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.a.severe.error.occurred.retrieving.data"), ex, true,

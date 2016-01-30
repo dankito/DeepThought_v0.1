@@ -19,7 +19,7 @@ import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;

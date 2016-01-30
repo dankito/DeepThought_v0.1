@@ -8,7 +8,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.settings.ColumnSettings;
 import net.deepthought.data.model.settings.WindowSettings;
 import net.deepthought.data.search.specific.TagsSearchResults;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

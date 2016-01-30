@@ -3,7 +3,7 @@ package net.deepthought.controls.backup;
 import net.deepthought.Application;
 import net.deepthought.controller.RestoreBackupDialogController;
 import net.deepthought.data.backup.RestoreBackupStepResult;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

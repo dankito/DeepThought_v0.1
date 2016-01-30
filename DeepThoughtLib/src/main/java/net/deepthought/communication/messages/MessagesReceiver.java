@@ -198,7 +198,7 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected Object parseTextualMultipartPart(Class dataType, String partFilename) throws IOException {
-    String json = FileUtils.readTextFile(new File(partFilename));
+    String json = readPartContent(partFilename);
     DeserializationResult<?> result = JsonIoJsonHelper.parseJsonString(json, dataType);
     if(result.successful())
       return result.getResult();
@@ -254,7 +254,7 @@ public class MessagesReceiver extends NanoHTTPD {
     if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyAddress)) {
       String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyAddress);
       if(StringUtils.isNotNullOrEmpty(partFilename)) {
-        return FileUtils.readTextFile(new File(partFilename));
+        return readPartContent(partFilename);
       }
     }
 
@@ -265,7 +265,7 @@ public class MessagesReceiver extends NanoHTTPD {
     if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyPort)) {
       String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyPort);
 
-      String portString = FileUtils.readTextFile(new File(partFilename));
+      String portString = readPartContent(partFilename);
       if(StringUtils.isNotNullOrEmpty(portString))
         return Integer.parseInt(portString);
     }
@@ -277,12 +277,22 @@ public class MessagesReceiver extends NanoHTTPD {
     if(partFiles.containsKey(ConnectorMessagesCreator.MultipartKeyMessageId)) {
       String partFilename = partFiles.get(ConnectorMessagesCreator.MultipartKeyMessageId);
 
-      String portString = FileUtils.readTextFile(new File(partFilename));
-      if(StringUtils.isNotNullOrEmpty(portString))
-        return Integer.parseInt(portString);
+      String messageIdString = readPartContent(partFilename);
+      if(StringUtils.isNotNullOrEmpty(messageIdString))
+        return Integer.parseInt(messageIdString);
     }
 
     return -1;
+  }
+
+  protected String readPartContent(String partFilename) throws IOException {
+    String partContent = FileUtils.readTextFile(new File(partFilename));
+
+    if(partContent != null && partContent.startsWith("\n")) {
+      partContent = partContent.substring(1);
+    }
+
+    return partContent;
   }
 
   protected Map<String, String> parseMultipartRequestBody(IHTTPSession session) throws Exception {

@@ -9,7 +9,7 @@ import net.deepthought.data.compare.DataCompareResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.db.BaseEntity;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.ReflectionHelper;
 

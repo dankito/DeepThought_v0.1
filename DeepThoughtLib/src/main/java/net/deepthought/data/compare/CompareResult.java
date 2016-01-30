@@ -1,6 +1,6 @@
 package net.deepthought.data.compare;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 10/01/15.

@@ -7,7 +7,7 @@ import android.content.pm.ResolveInfo;
 
 import net.deepthought.Application;
 import net.deepthought.plugin.ocr.OcrContentExtractorAndroid;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 

@@ -9,8 +9,8 @@ import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

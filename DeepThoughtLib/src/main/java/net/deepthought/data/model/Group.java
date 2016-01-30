@@ -2,7 +2,7 @@ package net.deepthought.data.model;
 
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.util.HashSet;
 import java.util.Set;

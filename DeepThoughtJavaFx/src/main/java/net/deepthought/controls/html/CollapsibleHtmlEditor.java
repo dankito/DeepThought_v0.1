@@ -13,7 +13,7 @@ import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;

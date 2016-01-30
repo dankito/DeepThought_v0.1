@@ -4,7 +4,7 @@ import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.util.ClipboardHelper;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

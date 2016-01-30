@@ -3,7 +3,7 @@ package net.deepthought.data.model.enums;
 import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import javax.persistence.Column;

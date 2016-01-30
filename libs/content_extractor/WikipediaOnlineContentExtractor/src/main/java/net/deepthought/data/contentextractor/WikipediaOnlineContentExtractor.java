@@ -9,7 +9,7 @@ import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

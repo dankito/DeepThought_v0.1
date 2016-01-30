@@ -11,7 +11,7 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.ClipboardHelper;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import java.util.Collection;

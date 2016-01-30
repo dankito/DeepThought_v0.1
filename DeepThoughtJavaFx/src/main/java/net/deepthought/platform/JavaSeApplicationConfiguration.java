@@ -5,14 +5,6 @@ import net.deepthought.IApplicationConfiguration;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.controls.html.IHtmlEditorPool;
-import net.deepthought.data.contentextractor.DerFreitagContentExtractor;
-import net.deepthought.data.contentextractor.HeiseContentExtractor;
-import net.deepthought.data.contentextractor.PostillonContentExtractor;
-import net.deepthought.data.contentextractor.SpiegelContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
-import net.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.deepthought.data.download.IFileDownloader;
 import net.deepthought.data.download.WGetFileDownloader;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
@@ -24,12 +16,13 @@ import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.language.LanguageDetector;
 import net.deepthought.plugin.IPlugin;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,6 +45,8 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
     this.preferencesStore = new JavaSePreferencesStore();
     this.platformConfiguration = new JavaSePlatformConfiguration();
     this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder(), preferencesStore.getDatabaseDataModelVersion());
+
+    JavaFxLocalization.setLocale(Localization.getLanguageLocale());
   }
 
 
@@ -116,5 +111,6 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   public IHtmlEditorPool createHtmlEditorPool() {
     return new DeepThoughtFxHtmlEditorPool();
   }
+
 
 }

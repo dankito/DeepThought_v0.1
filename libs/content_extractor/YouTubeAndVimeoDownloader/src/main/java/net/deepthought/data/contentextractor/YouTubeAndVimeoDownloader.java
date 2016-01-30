@@ -18,7 +18,7 @@ import net.deepthought.data.contentextractor.model.VideoQuality;
 import net.deepthought.data.download.DownloadConfig;
 import net.deepthought.data.download.DownloadListener;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.ThreadHelper;
 
 import org.slf4j.Logger;

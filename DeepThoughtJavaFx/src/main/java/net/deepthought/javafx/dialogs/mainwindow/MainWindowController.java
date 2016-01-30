@@ -21,7 +21,6 @@ import net.deepthought.controls.clipboard.ContentExtractOptionForUiCreator;
 import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.connected_devices.ConnectedDevicesPanel;
 import net.deepthought.controls.entries.EntriesOverviewControl;
-import net.deepthought.controls.html.DeepThoughtFxHtmlEditorPool;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
 import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
@@ -43,8 +42,8 @@ import net.deepthought.platform.JavaSeApplicationConfiguration;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 
@@ -59,7 +58,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -709,9 +707,9 @@ public class MainWindowController implements Initializable {
   }
 
 
-  protected void handleMenuToolsLanguageShowing(Event event) {
+  protected void handleMenuToolsLanguageShowing(Event event) { // TODO: why setting items on each showing, not once and then only react to language changes?
     mnitmToolsLanguage.getItems().clear();
-    ApplicationLanguage currentLanguage = Application.getLoggedOnUser().getSettings().getLanguage();
+    ApplicationLanguage currentLanguage = Application.getSettings().getLanguage();
 
     for(final ApplicationLanguage language : Application.getApplication().getApplicationLanguages()) {
       CheckMenuItem languageItem = new CheckMenuItem();
@@ -724,7 +722,7 @@ public class MainWindowController implements Initializable {
   }
 
   protected void applicationLanguageChanged(ApplicationLanguage language) {
-    Application.getLoggedOnUser().getSettings().setLanguage(language);
+    Application.getSettings().setLanguage(language);
   }
 
   @FXML

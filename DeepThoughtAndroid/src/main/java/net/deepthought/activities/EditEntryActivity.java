@@ -340,8 +340,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void addContentFromOcr() {
-    if(Application.getContentExtractorManager().hasOcrContentExtractors() == false)
+    if(Application.getContentExtractorManager().hasOcrContentExtractors() == false) {
       return;
+    }
 
     Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
       @Override

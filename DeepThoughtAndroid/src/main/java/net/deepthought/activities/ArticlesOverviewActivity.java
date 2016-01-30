@@ -17,7 +17,7 @@ import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.helper.AlertHelper;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 25/09/15.

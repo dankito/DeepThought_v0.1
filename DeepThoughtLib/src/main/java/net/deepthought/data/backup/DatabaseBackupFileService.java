@@ -12,7 +12,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.file.FileNameSuggestion;
 import net.deepthought.util.file.FileUtils;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.file.enums.ExistingFileHandling;
 import net.deepthought.util.file.listener.FileOperationListener;
 

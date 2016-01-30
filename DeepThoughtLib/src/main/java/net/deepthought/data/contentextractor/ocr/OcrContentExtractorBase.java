@@ -3,7 +3,7 @@ package net.deepthought.data.contentextractor.ocr;
 import net.deepthought.Application;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.plugin.IPlugin;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.file.FileUtils;
 
 /**

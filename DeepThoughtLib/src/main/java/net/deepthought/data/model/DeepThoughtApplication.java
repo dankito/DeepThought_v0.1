@@ -5,7 +5,7 @@ import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.io.Serializable;
 import java.util.Collection;

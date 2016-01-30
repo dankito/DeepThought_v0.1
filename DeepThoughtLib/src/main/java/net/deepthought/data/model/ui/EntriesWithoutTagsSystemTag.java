@@ -6,7 +6,7 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.listener.EntityListener;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.search.SearchCompletedListener;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 import java.util.List;

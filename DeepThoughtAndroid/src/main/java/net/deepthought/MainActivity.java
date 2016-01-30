@@ -47,7 +47,7 @@ import net.deepthought.fragments.SearchFragment;
 import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;

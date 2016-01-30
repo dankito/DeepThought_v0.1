@@ -4,7 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import org.jsoup.nodes.Document;

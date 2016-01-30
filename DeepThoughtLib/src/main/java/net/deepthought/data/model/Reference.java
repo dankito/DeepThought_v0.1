@@ -1,7 +1,7 @@
 package net.deepthought.data.model;
 
 import net.deepthought.data.persistence.db.TableConfig;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 
 import java.text.DateFormat;

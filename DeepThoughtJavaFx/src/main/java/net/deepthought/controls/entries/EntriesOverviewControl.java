@@ -27,7 +27,7 @@ import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.search.specific.EntriesSearch;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.StringUtils;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -40,7 +40,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

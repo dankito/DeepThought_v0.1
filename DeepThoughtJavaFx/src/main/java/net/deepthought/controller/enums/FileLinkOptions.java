@@ -1,6 +1,6 @@
 package net.deepthought.controller.enums;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 01/01/15.

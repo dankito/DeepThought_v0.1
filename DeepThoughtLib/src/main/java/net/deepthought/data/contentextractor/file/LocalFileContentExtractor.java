@@ -1,6 +1,6 @@
 package net.deepthought.data.contentextractor.file;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.file.FileUtils;
 
 /**

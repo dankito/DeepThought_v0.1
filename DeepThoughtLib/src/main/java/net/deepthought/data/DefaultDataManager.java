@@ -20,7 +20,7 @@ import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.db.AssociationEntity;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.file.FileUtils;
 
@@ -109,6 +109,7 @@ public class DefaultDataManager implements IDataManager {
         application = applicationsQueryResult.get(0);
 //        setCurrentDeepThoughtApplication(application);
         loggedOnUser = application.getLastLoggedOnUser();
+        setLoggedOnUser(application);
 
         // TODO: what to return if user was already logged on but autoLogOn is set to false?
         if (application.autoLogOnLastLoggedOnUser()) {
@@ -128,7 +129,7 @@ public class DefaultDataManager implements IDataManager {
   protected DeepThought createAndPersistDefaultDeepThought() {
     application = DeepThoughtApplication.createApplication();
 //    setCurrentDeepThoughtApplication(application);
-    loggedOnUser = application.getLastLoggedOnUser();
+    setLoggedOnUser(application);
 
     DeepThought newDeepThought = loggedOnUser.getLastViewedDeepThought();
 
@@ -168,12 +169,21 @@ public class DefaultDataManager implements IDataManager {
       this.application.addEntityListener(entityListener);
   }
 
+  protected void setLoggedOnUser(DeepThoughtApplication application) {
+    loggedOnUser = application.getLastLoggedOnUser();
+
+    if(loggedOnUser != null) {
+      Localization.setLanguage(loggedOnUser.getSettings().getLanguage());
+    }
+  }
+
   protected void setCurrentDeepThought(DeepThought deepThought) {
     if(currentDeepThought != null)
       deepThought.removeEntityListener(entityListener);
 
     currentDeepThought = deepThought;
 
+    // TODO: why is it not added anymore to DeepThought?
 //    if(currentDeepThought != null)
 //      deepThought.addEntityListener(entityListener);
 

@@ -1,7 +1,7 @@
 package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.model.AvailableFormat;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.ThreadHelper;
 import net.deepthought.util.file.FileUtils;
 

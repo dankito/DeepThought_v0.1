@@ -6,8 +6,8 @@ import net.deepthought.communication.messages.response.ScanBarcodeResultResponse
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controller.Dialogs;
 import net.deepthought.util.Alerts;
-import net.deepthought.util.JavaFxLocalization;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.isbn.IsbnResolvingListener;
 import net.deepthought.util.isbn.ResolveIsbnResult;
 

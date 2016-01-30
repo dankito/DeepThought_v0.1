@@ -7,7 +7,7 @@ import com.github.axet.wget.info.ex.DownloadMultipartError;
 
 import net.deepthought.Application;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;

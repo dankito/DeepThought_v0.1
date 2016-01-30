@@ -3,7 +3,7 @@ package net.deepthought.data.contentextractor;
 import net.deepthought.Application;
 import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.OsHelper;
 
 import org.jsoup.Connection;

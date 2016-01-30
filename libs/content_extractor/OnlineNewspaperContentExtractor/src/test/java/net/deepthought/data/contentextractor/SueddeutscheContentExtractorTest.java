@@ -193,6 +193,11 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   }
 
   @Test
+  public void abstractUndReferenzWerdenNichtSauberImportiert() {
+    // http://www.sueddeutsche.de/news/politik/migration-auch-in-deutschland-muessen-fluechtlinge-bargeld-abgeben-dpa.urn-newsml-dpa-com-20090101-160121-99-95764
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
     EntryCreationResult zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     EntryCreationResult one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");

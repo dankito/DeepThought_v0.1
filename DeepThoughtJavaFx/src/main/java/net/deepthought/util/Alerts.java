@@ -55,8 +55,8 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteTagWithEntriesAlert(Tag tag) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.tag.is.set.on.entries", tag.getName(), tag.getEntries().size()),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
@@ -77,8 +77,8 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteCategoryWithSubCategoriesOrEntries(Category category) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.category.contains.entries.or.sub.categories", category.getName(), category.getName()),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
@@ -99,8 +99,8 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeletePersonWithEntriesAlert(Person person) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.person.is.set.on.entries", person.getNameRepresentation(), person.getAssociatedEntries().size()),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
@@ -129,9 +129,9 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteSeriesTitleWithEntriesOrSerialPartsAlert(SeriesTitle series) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.series.title.contains.entries.or.serial.parts", series.getTextRepresentation(),
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.series.title.contains.entries.or.serial.parts", series.getTextRepresentation(),
             series.getEntries().size(), series.getSerialParts().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
   public static boolean deleteReferenceWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, Reference reference) {
@@ -147,9 +147,9 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteReferenceWithEntriesOrSubDivisionsAlert(Reference reference) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.reference.contains.entries.or.sub.divisions", reference.getTextRepresentation(),
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.reference.contains.entries.or.sub.divisions", reference.getTextRepresentation(),
             reference.getEntries().size(), reference.getSubDivisions().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
   public static boolean deleteReferenceSubDivisionWithUserConfirmationIfHasEntriesOrSubDivisions(DeepThought deepThought, ReferenceSubDivision subDivision) {
@@ -165,9 +165,9 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteReferenceSubDivisionWithEntriesOrSubDivisionsAlert(ReferenceSubDivision subDivision) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.reference.sub.division.contains.entries.or.sub.divisions", subDivision.getTextRepresentation(),
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.reference.sub.division.contains.entries.or.sub.divisions", subDivision.getTextRepresentation(),
             subDivision.getEntries().size(), subDivision.getSubDivisions().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
@@ -188,35 +188,35 @@ public class Alerts {
   }
 
   public static boolean showConfirmDeleteFileWithEntriesOrReferenceBasesAlert(FileLink file) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.file.link.contains.entries.or.reference.bases", file.getTextRepresentation(),
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.file.link.contains.entries.or.reference.bases", file.getTextRepresentation(),
             file.getEntriesAttachedTo().size() + file.getEntriesEmbeddedIn().size(), file.getReferenceBasesAttachedTo().size() + file.getReferenceBasesEmbeddedIn().size()),
-        Localization.getLocalizedString("alert.title.confirm.delete"));
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.confirm.delete"));
   }
 
 
   public static boolean askUserIfEditedSeriesTitleShouldBeSaved(SeriesTitle seriesTitle) {
-    return askUserIfEditedReferenceBaseShouldBeSaved(seriesTitle.getTextRepresentation(), Localization.getLocalizedString("series.title"));
+    return askUserIfEditedReferenceBaseShouldBeSaved(seriesTitle.getTextRepresentation(), net.deepthought.util.localization.Localization.getLocalizedString("series.title"));
   }
 
   public static boolean askUserIfEditedReferenceShouldBeSaved(Reference reference) {
-    return askUserIfEditedReferenceBaseShouldBeSaved(reference.getPreview(), Localization.getLocalizedString("reference"));
+    return askUserIfEditedReferenceBaseShouldBeSaved(reference.getPreview(), net.deepthought.util.localization.Localization.getLocalizedString("reference"));
   }
 
   protected static boolean askUserIfEditedReferenceBaseShouldBeSaved(String referenceBasePreview, String localizedReferenceBaseName) {
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.ask.save.entity", localizedReferenceBaseName, referenceBasePreview),
-        Localization.getLocalizedString("alert.title.should.edited.data.be.saved"));
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.ask.save.entity", localizedReferenceBaseName, referenceBasePreview),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.should.edited.data.be.saved"));
   }
 
   // TODO: merge with that ones above
   public static ButtonType askUserIfEditedEntityShouldBeSaved(Stage owner, String entityNameResourceKey) {
-    String translatedEntityName = Localization.getLocalizedString(entityNameResourceKey);
+    String translatedEntityName = net.deepthought.util.localization.Localization.getLocalizedString(entityNameResourceKey);
 
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     if(owner != null)
       alert.initOwner(owner);
 
-    alert.setTitle(Localization.getLocalizedString("alert.title.entity.contains.unsaved.changes", translatedEntityName));
-    setAlertContent(alert, Localization.getLocalizedString("alert.message.entity.contains.unsaved.changes", translatedEntityName));
+    alert.setTitle(net.deepthought.util.localization.Localization.getLocalizedString("alert.title.entity.contains.unsaved.changes", translatedEntityName));
+    setAlertContent(alert, net.deepthought.util.localization.Localization.getLocalizedString("alert.message.entity.contains.unsaved.changes", translatedEntityName));
     alert.setHeaderText(null);
 
     alert.getButtonTypes().clear();
@@ -236,8 +236,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    return showConfirmationDialog(Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())),
-        Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
   }
 
   public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
@@ -245,8 +245,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())),
-        Localization.getLocalizedString("alert.title.device.registration.successful"));
+    showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())),
+        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.device.registration.successful"));
   }
 
   public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
@@ -254,8 +254,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    showInfoMessage(windowStage, Localization.getLocalizedString("alert.title.device.registration.denied"),
-                                 Localization.getLocalizedString("alert.message.server.denied.device.registration"));
+    showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.title.device.registration.denied"),
+                                 net.deepthought.util.localization.Localization.getLocalizedString("alert.message.server.denied.device.registration"));
   }
 
   protected static String extractUserInfoString(UserInfo user) {
@@ -317,7 +317,7 @@ public class Alerts {
   public static void showErrorMessage(final Stage owner, DeepThoughtError error) {
     String title = error.getNotificationMessageTitle();
     if(error.getNotificationMessageTitle() == null)
-      title = Localization.getLocalizedString("alert.message.title.error.occurred");
+      title = net.deepthought.util.localization.Localization.getLocalizedString("alert.message.title.error.occurred");
 
     showErrorMessage(owner, error, title);
   }
@@ -327,8 +327,8 @@ public class Alerts {
 
     if(error.isSevere()) {
       if(StringUtils.isNullOrEmpty(alertTitle))
-        alertTitle = Localization.getLocalizedString("alert.message.title.severe.error.occurred");
-      message = Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage());
+        alertTitle = net.deepthought.util.localization.Localization.getLocalizedString("alert.message.title.severe.error.occurred");
+      message = net.deepthought.util.localization.Localization.getLocalizedString("alert.message.message.severe.error.occurred", error.getNotificationMessage());
     }
 
     showErrorMessage(owner, message, alertTitle, error.getException());

@@ -2,7 +2,7 @@ package net.deepthought.dialogs;
 
 import net.deepthought.Application;
 import net.deepthought.controller.Dialogs;
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.isbn.IsbnResolvingListener;
 import net.deepthought.util.isbn.ResolveIsbnResult;

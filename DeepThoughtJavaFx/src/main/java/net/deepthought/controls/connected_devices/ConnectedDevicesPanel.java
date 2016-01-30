@@ -6,7 +6,7 @@ import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Device;
 import net.deepthought.util.IconManager;
-import net.deepthought.util.JavaFxLocalization;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -2,7 +2,7 @@ package net.deepthought.controls;
 
 import com.sun.webkit.WebPage;
 
-import net.deepthought.util.Localization;
+import net.deepthought.util.localization.Localization;
 
 import org.w3c.dom.Document;
 
