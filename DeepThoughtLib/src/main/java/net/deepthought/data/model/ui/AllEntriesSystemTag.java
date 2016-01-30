@@ -17,7 +17,7 @@ public class AllEntriesSystemTag extends SystemTag {
 
 
   public AllEntriesSystemTag(DeepThought deepThought) {
-    super(deepThought, Localization.getLocalizedString("system.tag.all.entries")); // TODO: this will not react on Language change
+    super(deepThought);
 
     deepThought.addEntityListener(deepThoughtListener);
     this.filteredEntries = deepThought.getEntries();
@@ -57,4 +57,8 @@ public class AllEntriesSystemTag extends SystemTag {
     }
   };
 
+  @Override
+  protected String getSystemTagName() {
+    return Localization.getLocalizedString("system.tag.all.entries");
+  }
 }

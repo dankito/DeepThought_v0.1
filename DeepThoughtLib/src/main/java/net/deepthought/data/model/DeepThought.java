@@ -56,14 +56,16 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected transient EntriesWithoutTagsSystemTag entriesWithoutTagsSystemTag = null;
 
   public AllEntriesSystemTag AllEntriesSystemTag() {
-    if(allEntriesSystemTag == null)
+    if(allEntriesSystemTag == null) {
       allEntriesSystemTag = new AllEntriesSystemTag(this);
+    }
     return allEntriesSystemTag;
   }
 
   public final EntriesWithoutTagsSystemTag EntriesWithoutTagsSystemTag() {
-    if(entriesWithoutTagsSystemTag == null)
+    if(entriesWithoutTagsSystemTag == null) {
       entriesWithoutTagsSystemTag = new EntriesWithoutTagsSystemTag(this);
+    }
     return entriesWithoutTagsSystemTag;
   }
 
