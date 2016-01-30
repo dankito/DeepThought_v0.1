@@ -125,15 +125,16 @@ public class TableViewTags extends TableView<Tag> {
       getSelectionModel().clearSelection();
     }
     else if(Application.getDeepThought() != null) {
-      if(tag == Application.getDeepThought().AllEntriesSystemTag()) {
-        getSelectionModel().select(0);
-      }
-      else if(tag == Application.getDeepThought().EntriesWithoutTagsSystemTag()) {
-        getSelectionModel().select(1);
-      }
-      else {
+      // i don't know what happened, but after a Java update getSelectionModel().select(0) throws an Exception
+//      if(tag == Application.getDeepThought().AllEntriesSystemTag()) {
+//        getSelectionModel().select(0);
+//      }
+//      else if(tag == Application.getDeepThought().EntriesWithoutTagsSystemTag()) {
+//        getSelectionModel().select(1);
+//      }
+//      else {
         getSelectionModel().select(tag);
-      }
+//      }
     }
   }
 
