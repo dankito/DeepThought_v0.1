@@ -101,7 +101,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
       this.series.removeSerialPart(this);
 
     this.series = series;
-    preview = null;
+    resetPreview();
 
     if(series != null) {
       series.addSerialPart(this); // causes a Stackoverflow
@@ -213,7 +213,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   @Override
   public void setTitle(String title) {
-    preview = null;
+    resetPreview();
     super.setTitle(title);
   }
 
@@ -240,7 +240,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     }
 
     this.issueOrPublishingDate = issueOrPublishingDate;
-    preview = null;
+    resetPreview();
 
     if(publishingDate == null) {
       setPublishingDate(tryToParseIssueOrPublishingDateToDate(issueOrPublishingDate));
@@ -258,7 +258,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
   public void setPublishingDate(Date publishingDate) {
     Object previousValue = this.publishingDate;
     this.publishingDate = publishingDate;
-    preview = null;
+    resetPreview();
     callPropertyChangedListeners(TableConfig.ReferencePublishingDateColumnName, previousValue, publishingDate);
   }
 
@@ -334,6 +334,10 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
     }
 
     return preview;
+  }
+
+  public void resetPreview() {
+    preview = null;
   }
 
 

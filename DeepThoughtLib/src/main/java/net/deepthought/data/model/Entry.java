@@ -264,7 +264,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     this.series = series;
-    referencePreview = null;
+    resetReferencePreview();
 
     if(series != null) {
       series.addEntry(this);
@@ -295,7 +295,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     this.reference = reference;
-    referencePreview = null;
+    resetReferencePreview();
 
     if(reference != null) {
       reference.addEntry(this);
@@ -326,7 +326,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.referenceSubDivision.removeEntry(this);
 
     this.referenceSubDivision = referenceSubDivision;
-    referencePreview = null;
+    resetReferencePreview();
 
     if(referenceSubDivision != null) {
       referenceSubDivision.addEntry(this);
@@ -878,8 +878,9 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   @Transient
   public String getReferencePreview() {
-    if(referencePreview == null)
+    if(referencePreview == null) {
       referencePreview = determineReferencePreview();
+    }
 
     return referencePreview;
   }
@@ -887,14 +888,25 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @Transient
   protected String determineReferencePreview() {
     if(referenceSubDivision != null /*&& (referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getNewsPaperArticleCategory() ||
-        referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getMagazineArticleCategory() || referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getArticleCategory())*/)
+        referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getMagazineArticleCategory() || referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getArticleCategory())*/) {
       return referenceSubDivision.getTextRepresentation();
-    else if(reference != null)
+    }
+    else if(reference != null) {
       return reference.getTextRepresentation();
-    else if(series != null)
+    }
+    else if(series != null) {
       return series.getTextRepresentation();
+    }
 
     return "";
+  }
+
+  public void resetReferencePreview() {
+    referencePreview = null;
+
+    if(reference != null) { // only Reference has a Date (and therefore Language) dependent preview right now
+      reference.resetPreview();
+    }
   }
 
   @Transient

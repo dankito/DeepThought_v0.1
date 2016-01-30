@@ -18,7 +18,6 @@ public abstract class SystemTag extends Tag implements ICleanUp {
 
   protected Collection<Entry> filteredEntries = new HashSet<>();
 
-  // TODO: in this way name doesn't get translated when Application Language changes
   public SystemTag(DeepThought deepThought) {
     this.deepThought = deepThought;
     this.name = getSystemTagName();
@@ -29,7 +28,7 @@ public abstract class SystemTag extends Tag implements ICleanUp {
   protected abstract String getSystemTagName();
 
   @Override
-  public void cleanUp() {
+  public void cleanUp() { // TODO: not called right now
     Localization.removeLanguageChangedListener(languageChangedListener);
   }
 
