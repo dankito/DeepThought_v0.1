@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 
 import net.deepthought.Application;
+import net.deepthought.plugin.ocr.Constants;
 import net.deepthought.plugin.ocr.OcrContentExtractorAndroid;
 import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
@@ -25,8 +26,6 @@ import dalvik.system.DexFile;
  * Created by ganymed on 17/08/15.
  */
 public class AndroidPluginManager extends DefaultPluginManager {
-
-  public final static String TextContentExtractorPluginIntentName = "com.renard.plugin.TextFairyPlugin";
 
 
   private final static Logger log = LoggerFactory.getLogger(AndroidPluginManager.class);
@@ -71,10 +70,7 @@ public class AndroidPluginManager extends DefaultPluginManager {
 
   protected void checkIfOcrContentExtractorPluginIsInstalled() {
     try {
-      PackageManager packageManager = context.getPackageManager();
-      Intent textContentExtractorsIntent = new Intent(TextContentExtractorPluginIntentName);
-      List<ResolveInfo> textContentExtractors = packageManager.queryIntentActivities(textContentExtractorsIntent, 0);
-      log.info("Found " + textContentExtractors.size() + " OcrContentExtractor plugins");
+      List<ResolveInfo> textContentExtractors = findTextFairyApp();
 
       for (ResolveInfo resolveInfo : textContentExtractors) {
         if(resolveInfo.activityInfo != null) {
@@ -85,5 +81,15 @@ public class AndroidPluginManager extends DefaultPluginManager {
         }
       }
     } catch(Exception ex) { log.error("Could not load OcrContentExtractor plugins", ex); }
+  }
+
+  protected List<ResolveInfo> findTextFairyApp() {
+    PackageManager packageManager = context.getPackageManager();
+    Intent textContentExtractorsIntent = new Intent(Constants.TEXT_CONTENT_EXTRACTOR_PLUGIN_INTENT_NAME);
+
+    List<ResolveInfo> textContentExtractors = packageManager.queryIntentActivities(textContentExtractorsIntent, 0);
+    log.info("Found " + textContentExtractors.size() + " OcrContentExtractor plugins");
+
+    return textContentExtractors;
   }
 }

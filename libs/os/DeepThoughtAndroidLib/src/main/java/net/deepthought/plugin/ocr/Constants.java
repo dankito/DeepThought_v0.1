@@ -5,6 +5,9 @@ package net.deepthought.plugin.ocr;
  */
 public class Constants {
 
+  public final static String TEXT_CONTENT_EXTRACTOR_PLUGIN_INTENT_NAME = "com.renard.plugin.TextFairyPlugin";
+
+
   public final static String INTENT_KEY_RECOGNITION_SOURCE = "RecognitionSource";
 
   public final static String RECOGNITION_SOURCE_RECOGNIZE_FROM_URI = "RecognizeFromUri";
