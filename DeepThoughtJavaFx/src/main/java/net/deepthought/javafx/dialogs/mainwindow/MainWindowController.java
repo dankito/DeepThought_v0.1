@@ -11,7 +11,7 @@ import net.deepthought.clipboard.ClipboardContentChangedListener;
 import net.deepthought.clipboard.IClipboardWatcher;
 import net.deepthought.clipboard.JavaFxClipboardWatcher;
 import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
-import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.controller.Dialogs;
@@ -884,12 +884,7 @@ public class MainWindowController implements Initializable {
     }
 
     @Override
-    public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
-      // TODO
-    }
-
-    @Override
-    public void doOcrOnImage(DoOcrOnImageRequest request) {
+    public void doOcrOnImage(DoOcrRequest request) {
       // TODO
     }
 

@@ -16,6 +16,8 @@ public class DoOcrConfiguration {
   private final static Logger log = LoggerFactory.getLogger(DoOcrConfiguration.class);
 
 
+  protected OcrSource source = OcrSource.AskUser;
+
   protected byte[] imageToRecognize = null;
 
   protected String imageUri = null;
@@ -24,6 +26,10 @@ public class DoOcrConfiguration {
 
   protected boolean showMessageOnRemoteDeviceWhenProcessingDone = false;
 
+
+  public DoOcrConfiguration(OcrSource source) {
+    this.source = source;
+  }
 
 
   public DoOcrConfiguration(byte[] imageToRecognize) {
@@ -35,6 +41,7 @@ public class DoOcrConfiguration {
   }
 
   public DoOcrConfiguration(byte[] imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone) {
+    this(OcrSource.RecognizeFromUri);
     this.imageToRecognize = imageToRecognize;
     this.showSettingsUi = showSettingsUi;
     this.showMessageOnRemoteDeviceWhenProcessingDone = showMessageOnRemoteDeviceWhenProcessingDone;
@@ -48,6 +55,14 @@ public class DoOcrConfiguration {
     this(readImageFile(imageToRecognize), showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone);
   }
 
+
+  public OcrSource getSource() {
+    return source;
+  }
+
+  public boolean hasImageToRecognize() {
+    return this.imageToRecognize != null;
+  }
 
   public void setImageToRecognize(File imageToRecognize) throws IOException {
     this.imageToRecognize = readImageFile(imageToRecognize);
@@ -63,7 +78,7 @@ public class DoOcrConfiguration {
   }
 
   public byte[] getAndResetImageToRecognize() {
-    byte[] backup = imageToRecognize;
+    byte[] backup = getImageToRecognize();
     this.imageToRecognize = null;
     return backup;
   }

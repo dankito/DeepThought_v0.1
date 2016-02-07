@@ -3,6 +3,8 @@ package net.deepthought.controls.html;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
+import net.deepthought.communication.listener.OcrResultListener;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.CaptureImageResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
@@ -13,8 +15,8 @@ import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
-import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.file.FileUtils;
+import net.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,9 +117,9 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     }
   };
 
-  protected CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener = new CaptureImageAndDoOcrResultListener() {
+  protected OcrResultListener captureImageAndDoOcrResultListener = new OcrResultListener() {
     @Override
-    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, OcrResultResponse ocrResult) {
+    public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse ocrResult) {
       ocrResultReceived(ocrResult);
       // TODO: show error message (or has it already been shown at this time?)
     }

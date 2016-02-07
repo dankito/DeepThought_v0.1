@@ -27,6 +27,8 @@ import net.deepthought.AndroidHelper;
 import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.EntryTagsAdapter;
+import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.communication.model.OcrSource;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.html.AndroidHtmlEditor;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
@@ -344,7 +346,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return;
     }
 
-    Application.getContentExtractorManager().getPreferredOcrContentExtractor().captureImagesAndRecognizeTextAsync(new RecognizeTextListener() {
+    Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(new DoOcrConfiguration(OcrSource.CaptureImage), new RecognizeTextListener() {
       @Override
       public void textRecognized(TextRecognitionResult result) {
         EditEntryActivity.this.textRecognized(result);

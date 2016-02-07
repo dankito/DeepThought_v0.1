@@ -12,6 +12,4 @@ public interface IOcrContentExtractor extends IContentExtractor {
 
   boolean canCaptureImage();
 
-  void captureImagesAndRecognizeTextAsync(RecognizeTextListener listener);
-
 }

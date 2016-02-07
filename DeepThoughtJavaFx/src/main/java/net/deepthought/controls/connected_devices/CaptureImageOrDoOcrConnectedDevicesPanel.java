@@ -3,11 +3,12 @@ package net.deepthought.controls.connected_devices;
 import net.deepthought.Application;
 import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
-import net.deepthought.communication.listener.DoOcrOnImageResultListener;
-import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.listener.OcrResultListener;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.communication.model.OcrSource;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.localization.Localization;
@@ -37,14 +38,14 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
 
   protected CaptureImageResultListener captureImageResultListener = null;
 
-  protected CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener = null;
+  protected OcrResultListener ocrResultListener = null;
 
   protected Label lblDoOcrProgress = null;
 
 
-  public CaptureImageOrDoOcrConnectedDevicesPanel(CaptureImageResultListener captureImageResultListener, CaptureImageAndDoOcrResultListener captureImageAndDoOcrResultListener) {
+  public CaptureImageOrDoOcrConnectedDevicesPanel(CaptureImageResultListener captureImageResultListener, OcrResultListener ocrResultListener) {
     this.captureImageResultListener = captureImageResultListener;
-    this.captureImageAndDoOcrResultListener = captureImageAndDoOcrResultListener;
+    this.ocrResultListener = ocrResultListener;
 
     initLabelDoOcrProgress();
   }
@@ -53,7 +54,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   @Override
   public void cleanUp() {
     this.captureImageResultListener = null;
-    this.captureImageAndDoOcrResultListener = null;
+    this.ocrResultListener = null;
 
     super.cleanUp();
   }
@@ -89,7 +90,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
       MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
       JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
       // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImageAndDoOcr(connectedDevice, captureImageAndDoOcrResultListener));
+      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
       contextMenu.getItems().add(captureImageMenuItem);
     }
   }
@@ -124,10 +125,10 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     try {
       final DoOcrConfiguration configuration = new DoOcrConfiguration(imageToRecognize, false, false);
 
-      Application.getDeepThoughtsConnector().getCommunicator().startDoOcrOnImage(connectedDevice, configuration, new DoOcrOnImageResultListener() {
+      Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, configuration, new OcrResultListener() {
         @Override
-        public void responseReceived(DoOcrOnImageRequest doOcrOnImageRequest, OcrResultResponse result) {
-          receivedOcrResultForImage(doOcrOnImageRequest, connectedDevice, imagesToRecognize, currentImageIndex, result);
+        public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse result) {
+          receivedOcrResultForImage(doOcrRequest, connectedDevice, imagesToRecognize, currentImageIndex, result);
         }
       });
     } catch(Exception ex) {
@@ -137,8 +138,8 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     }
   }
 
-  protected void receivedOcrResultForImage(DoOcrOnImageRequest doOcrOnImageRequest, ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex, OcrResultResponse ocrResult) {
-    captureImageAndDoOcrResultListener.responseReceived(doOcrOnImageRequest, ocrResult);
+  protected void receivedOcrResultForImage(DoOcrRequest doOcrRequest, ConnectedDevice connectedDevice, final Queue<File> imagesToRecognize, final AtomicInteger currentImageIndex, OcrResultResponse ocrResult) {
+    ocrResultListener.responseReceived(doOcrRequest, ocrResult);
 
     if (ocrResult.isDone() && imagesToRecognize.size() > 0) {
       doOcrOnNextImage(connectedDevice, imagesToRecognize, currentImageIndex);

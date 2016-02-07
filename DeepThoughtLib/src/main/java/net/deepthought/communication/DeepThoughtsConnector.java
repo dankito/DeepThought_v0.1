@@ -13,7 +13,7 @@ import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesDispatcher;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
@@ -458,17 +458,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     else if(Addresses.CaptureImageResultMethodName.equals(methodName)) {
       return true;
     }
-    else if(Addresses.StartCaptureImageAndDoOcrMethodName.equals(methodName)) {
-      return handleStartCaptureImageAndDoOcrMessage((RequestWithAsynchronousResponse) request);
-    }
     else if(Addresses.DoOcrOnImageMethodName.equals(methodName)) {
-      return handleDoOcrOnImageMessage((DoOcrOnImageRequest) request);
+      return handleDoOcrOnImageMessage((DoOcrRequest) request);
     }
     else if(Addresses.OcrResultMethodName.equals(methodName)) {
       return true;
-    }
-    else if(Addresses.StopCaptureImageAndDoOcrMethodName.equals(methodName)) {
-      return handleStopCaptureImageOrDoOcrMessage((StopRequestWithAsynchronousResponse) request);
     }
     else if(Addresses.StartScanBarcodeMethodName.equals(methodName)) {
       return handleStartScanBarcodeMessage((RequestWithAsynchronousResponse) request);
@@ -506,13 +500,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return true;
   }
 
-  protected boolean handleStartCaptureImageAndDoOcrMessage(RequestWithAsynchronousResponse request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-      listener.captureImageAndDoOcr(request);
-    return true;
-  }
-
-  protected boolean handleDoOcrOnImageMessage(DoOcrOnImageRequest request) {
+  protected boolean handleDoOcrOnImageMessage(DoOcrRequest request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
       listener.doOcrOnImage(request);
     return true;
@@ -521,12 +509,6 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected boolean handleStartScanBarcodeMessage(RequestWithAsynchronousResponse request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
       listener.scanBarcode(request);
-    return true;
-  }
-
-  protected boolean handleStopCaptureImageOrDoOcrMessage(StopRequestWithAsynchronousResponse request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-      listener.stopCaptureImageOrDoOcr(request);
     return true;
   }
 

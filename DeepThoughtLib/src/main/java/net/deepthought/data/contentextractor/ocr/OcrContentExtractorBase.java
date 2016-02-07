@@ -50,18 +50,4 @@ public abstract class OcrContentExtractorBase implements IOcrContentExtractor, I
     return false;
   }
 
-  @Override
-  public void captureImagesAndRecognizeTextAsync(final RecognizeTextListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        captureImagesAndRecognizeText(listener);
-      }
-    });
-  }
-
-  protected void captureImagesAndRecognizeText(RecognizeTextListener listener) {
-
-  }
-
 }

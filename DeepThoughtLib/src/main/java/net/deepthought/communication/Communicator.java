@@ -1,15 +1,14 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
-import net.deepthought.communication.listener.DoOcrOnImageResultListener;
+import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.listener.ScanBarcodeResultListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.IMessagesDispatcher;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
@@ -177,13 +176,13 @@ public class Communicator {
   }
 
 
-  public RequestWithAsynchronousResponse startCaptureImageAndDoOcr(ConnectedDevice deviceToDoTheJob, CaptureImageAndDoOcrResultListener listener) {
-    String address = Addresses.getStartCaptureImageAndDoOcrAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(getIpAddressToSendResponseTo(), getMessageReceiverPort());
+  public DoOcrRequest startDoOcr(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final OcrResultListener listener) {
+    String address = Addresses.getDoOcrOnImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final DoOcrRequest request = new DoOcrRequest(getIpAddressToSendResponseTo(), getMessageReceiverPort(), configuration);
 
     listenerManager.addListenerForResponse(request, listener);
 
-    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+    dispatcher.sendMultipartMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
@@ -193,7 +192,7 @@ public class Communicator {
     return request;
   }
 
-//  public void stopCaptureImageAndDoOcr(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
+//  public void stopDoOcr(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
 //    if(listenerManager.removeListenerForMessageId(messageId) == false) {
 //      log.error("stopCaptureImageOrDoOcr() has been called but there was no Listener registered for MessageId " + messageId);
 //    }
@@ -209,37 +208,8 @@ public class Communicator {
 //    });
 //  }
 
-  public void respondToCaptureImageAndDoOcrRequest(RequestWithAsynchronousResponse request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
-    String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
-    final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
 
-    dispatcher.sendMessageAsync(address, response, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(response, communicatorResponse, listener);
-      }
-    });
-  }
-
-
-  public DoOcrOnImageRequest startDoOcrOnImage(ConnectedDevice deviceToDoTheJob, DoOcrConfiguration configuration, final DoOcrOnImageResultListener listener) {
-    String address = Addresses.getDoOcrOnImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final DoOcrOnImageRequest request = new DoOcrOnImageRequest(getIpAddressToSendResponseTo(), getMessageReceiverPort(), configuration);
-
-    listenerManager.addListenerForResponse(request, listener);
-
-    dispatcher.sendMultipartMessageAsync(address, request, new CommunicatorResponseListener() {
-      @Override
-      public void responseReceived(Response communicatorResponse) {
-        dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
-      }
-    });
-
-    return request;
-  }
-
-
-  public void respondToDoOcrOnImageRequest(final DoOcrOnImageRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
+  public void respondToDoOcrRequest(final DoOcrRequest request, final TextRecognitionResult ocrResult, final ResponseListener listener) {
     String address = Addresses.getOcrResultAddress(request.getAddress(), request.getPort());
     final OcrResultResponse response = new OcrResultResponse(ocrResult, request.getMessageId());
 

@@ -11,7 +11,7 @@ import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesDispatcher;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.request.DoOcrOnImageRequest;
+import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -21,6 +21,7 @@ import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.OcrSource;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
@@ -310,12 +311,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
-
-      }
-
-      @Override
-      public void doOcrOnImage(DoOcrOnImageRequest request) {
+      public void doOcrOnImage(DoOcrRequest request) {
 
       }
 
@@ -350,14 +346,9 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
+      public void doOcrOnImage(DoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
-      }
-
-      @Override
-      public void doOcrOnImage(DoOcrOnImageRequest request) {
-
       }
 
       @Override
@@ -371,7 +362,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImageAndDoOcr(localHost, null);
+    communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.CaptureImage), null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -391,12 +382,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
-
-      }
-
-      @Override
-      public void doOcrOnImage(DoOcrOnImageRequest request) {
+      public void doOcrOnImage(DoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
@@ -412,7 +398,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startDoOcrOnImage(localHost, new DoOcrConfiguration(new byte[0]), null);
+    communicator.startDoOcr(localHost, new DoOcrConfiguration(new byte[0]), null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -432,12 +418,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void captureImageAndDoOcr(RequestWithAsynchronousResponse request) {
-
-      }
-
-      @Override
-      public void doOcrOnImage(DoOcrOnImageRequest request) {
+      public void doOcrOnImage(DoOcrRequest request) {
 
       }
 
