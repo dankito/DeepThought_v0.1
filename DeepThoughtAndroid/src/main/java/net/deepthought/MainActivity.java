@@ -443,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
 
     @Override
-    public void doOcrOnImage(DoOcrRequest request) {
+    public void doOcr(DoOcrRequest request) {
       doOcrAndSendToCaller(request);
     }
 

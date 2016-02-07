@@ -311,7 +311,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void doOcrOnImage(DoOcrRequest request) {
+      public void doOcr(DoOcrRequest request) {
 
       }
 
@@ -346,7 +346,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void doOcrOnImage(DoOcrRequest request) {
+      public void doOcr(DoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
@@ -382,7 +382,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void doOcrOnImage(DoOcrRequest request) {
+      public void doOcr(DoOcrRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
@@ -418,7 +418,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
 
       @Override
-      public void doOcrOnImage(DoOcrRequest request) {
+      public void doOcr(DoOcrRequest request) {
 
       }
 

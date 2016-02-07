@@ -884,7 +884,7 @@ public class MainWindowController implements Initializable {
     }
 
     @Override
-    public void doOcrOnImage(DoOcrRequest request) {
+    public void doOcr(DoOcrRequest request) {
       // TODO
     }
 

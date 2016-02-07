@@ -502,7 +502,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected boolean handleDoOcrOnImageMessage(DoOcrRequest request) {
     for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-      listener.doOcrOnImage(request);
+      listener.doOcr(request);
     return true;
   }
 

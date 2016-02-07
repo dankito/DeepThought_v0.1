@@ -1,7 +1,6 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.CaptureImageAndDoOcrResultListener;
 import net.deepthought.communication.listener.CaptureImageResultListener;
 import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
