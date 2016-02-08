@@ -376,6 +376,186 @@ public class CommunicatorTest extends CommunicationTestBase {
   }
 
 
+
+  @Test
+  public void respondToSelectRemoteImageAndDoOcrRequest_RequestIsReceived() {
+    DoOcrRequest request = new DoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice));
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    OcrResultResponse response = (OcrResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.OcrResultMethodName, OcrResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertNotNull(response.getTextRecognitionResult());
+    Assert.assertEquals(TestRecognizedText, response.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startSelectRemoteImageAndDoOcr_ResponseListenerGetsCalled() {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<OcrResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), new OcrResultListener() {
+      @Override
+      public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse ocrResult) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(ocrResult);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+    OcrResultResponse result = receivedResponseHolder.get(0);
+    Assert.assertEquals(TestRecognizedText, result.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startSelectRemoteImageAndDoOcr_ResponseListenerGetsRemovedFromListenerManager() {
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
+  }
+
+
+
+  @Test
+  public void respondToRecognizeFromUriRequest_RequestIsReceived() {
+    DoOcrRequest request = new DoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, new DoOcrConfiguration(OcrSource.RecognizeFromUri));
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    OcrResultResponse response = (OcrResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.OcrResultMethodName, OcrResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertNotNull(response.getTextRecognitionResult());
+    Assert.assertEquals(TestRecognizedText, response.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startRecognizeFromUri_ResponseListenerGetsCalled() {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<OcrResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.RecognizeFromUri), new OcrResultListener() {
+      @Override
+      public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse ocrResult) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(ocrResult);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+    OcrResultResponse result = receivedResponseHolder.get(0);
+    Assert.assertEquals(TestRecognizedText, result.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startRecognizeFromUri_ResponseListenerGetsRemovedFromListenerManager() {
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.RecognizeFromUri), null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
+  }
+
+
+
+  @Test
+  public void respondToAskUserForSourceAndDoOcrRequest_RequestIsReceived() {
+    DoOcrRequest request = new DoOcrRequest(TestMessageId, TestIpAddress, CommunicatorPort, new DoOcrConfiguration(OcrSource.AskUser));
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    OcrResultResponse response = (OcrResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.OcrResultMethodName, OcrResultResponse.class);
+
+    Assert.assertEquals(TestMessageId, response.getRequestMessageId());
+    Assert.assertNotNull(response.getTextRecognitionResult());
+    Assert.assertEquals(TestRecognizedText, response.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startAskUserForSourceAndDoOcr_ResponseListenerGetsCalled() {
+    final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
+    final List<OcrResultResponse> receivedResponseHolder = new ArrayList<>();
+
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.AskUser), new OcrResultListener() {
+      @Override
+      public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse ocrResult) {
+        hasResponseBeenReceived.set(true);
+        receivedResponseHolder.add(ocrResult);
+      }
+    });
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertEquals(2, receivedRequests.size());
+    Assert.assertTrue(hasResponseBeenReceived.get());
+    Assert.assertEquals(1, receivedResponseHolder.size());
+    OcrResultResponse result = receivedResponseHolder.get(0);
+    Assert.assertEquals(TestRecognizedText, result.getTextRecognitionResult().getRecognizedText());
+  }
+
+  @Test
+  public void startAskUserForSourceAndDoOcr_ResponseListenerGetsRemovedFromListenerManager() {
+    DoOcrRequest request = communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.AskUser), null);
+
+    waitTillListenerHasBeenCalled();
+    resetWaitLatch();
+
+    Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
+
+    communicator.respondToDoOcrRequest(request, new TextRecognitionResult(TestRecognizedText, true), null);
+
+    waitTillListenerHasBeenCalled();
+
+    Assert.assertNull(communicator.listenerManager.getAndRemoveListenerForMessageId(request.getMessageId()));
+    Assert.assertEquals(0, communicator.listenerManager.getRegisteredListenersCount());
+  }
+
+
 //  @Test
 //  public void stopCaptureImageAndDoOcr_RequestIsReceived() {
 //    communicator.stopCaptureImageAndDoOcr(TestMessageId, localHost, null);

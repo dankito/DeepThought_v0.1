@@ -369,8 +369,120 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     Assert.assertTrue(methodCalled.get());
   }
 
+
   @Test
-  public void startDoOcrOnImage_CaptureImageOrDoOcrListenerGetsCalled() {
+  public void startSelectRemoteImageAndDoOcr_CaptureImageOrDoOcrListenerGetsCalled() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void captureImage(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void doOcr(DoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
+
+      }
+    });
+
+    communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+
+  @Test
+  public void startRecognizeFromUri_CaptureImageOrDoOcrListenerGetsCalled() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void captureImage(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void doOcr(DoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
+
+      }
+    });
+
+    communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.RecognizeFromUri), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+
+  @Test
+  public void startAskUserForSourceAndDoOcr_CaptureImageOrDoOcrListenerGetsCalled() {
+    final AtomicBoolean methodCalled = new AtomicBoolean(false);
+    final CountDownLatch waitLatch = new CountDownLatch(1);
+
+    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+
+      @Override
+      public void captureImage(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void doOcr(DoOcrRequest request) {
+        methodCalled.set(true);
+        waitLatch.countDown();
+      }
+
+      @Override
+      public void scanBarcode(RequestWithAsynchronousResponse request) {
+
+      }
+
+      @Override
+      public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
+
+      }
+    });
+
+    communicator.startDoOcr(localHost, new DoOcrConfiguration(OcrSource.AskUser), null);
+
+    try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Assert.assertTrue(methodCalled.get());
+  }
+
+
+  @Test
+  public void startDoOcrOnLocalImage_CaptureImageOrDoOcrListenerGetsCalled() {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
@@ -404,6 +516,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 
     Assert.assertTrue(methodCalled.get());
   }
+
 
   @Test
   public void startScanBarcode_CaptureImageOrDoOcrListenerGetsCalled() {
