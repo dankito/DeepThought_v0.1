@@ -34,19 +34,19 @@ public class StartTextFairyOcrIntent extends Intent {
 
   protected void setConfiguration(DoOcrConfiguration configuration) {
     if(configuration.getSource() == OcrSource.CaptureImage) {
-      putExtra(Constants.INTENT_KEY_RECOGNITION_SOURCE, Constants.RECOGNITION_SOURCE_CAPTURE_IMAGE);
+      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_CAPTURE_IMAGE);
     }
     else if(configuration.getSource() == OcrSource.ChoseImageFromGallery) {
-      putExtra(Constants.INTENT_KEY_RECOGNITION_SOURCE, Constants.RECOGNITION_SOURCE_GET_FROM_GALLERY);
+      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_GET_FROM_GALLERY);
     }
     else if(configuration.getSource() == OcrSource.RecognizeFromUri) {
       setImageUri(configuration);
     }
     else {
-      putExtra(Constants.INTENT_KEY_RECOGNITION_SOURCE, Constants.RECOGNITION_SOURCE_ASK_USER);
+      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_ASK_USER);
     }
 
-    putExtra(Constants.INTENT_KEY_SHOW_SETTINGS_UI, configuration.showSettingsUi());
+    putExtra(Constants.SHOW_SETTINGS_UI_EXTRA_NAME, configuration.showSettingsUi());
 
   }
 
@@ -57,8 +57,8 @@ public class StartTextFairyOcrIntent extends Intent {
     }
 
     if(imageUri != null) {
-      putExtra(Constants.INTENT_KEY_RECOGNITION_SOURCE, Constants.RECOGNITION_SOURCE_RECOGNIZE_FROM_URI);
-      putExtra(Constants.INTENT_KEY_IMAGE_TO_RECOGNIZE_URI, imageUri.toString());
+      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_RECOGNIZE_FROM_URI);
+      putExtra(Constants.IMAGE_TO_RECOGNIZE_URI_EXTRA_NAME, imageUri.toString());
     }
     else {
       // TODO: what if imageUri is null? We should cancel the process right here

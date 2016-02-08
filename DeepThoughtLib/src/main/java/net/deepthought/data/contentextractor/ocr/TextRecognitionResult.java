@@ -101,13 +101,6 @@ public class TextRecognitionResult {
     return result;
   }
 
-  public static TextRecognitionResult createUserCancelledResult() {
-    TextRecognitionResult result = new TextRecognitionResult();
-    result.setIsUserCancelled(true);
-
-    return result;
-  }
-
   public static TextRecognitionResult createErrorOccurredResult(String errorMessage) {
     TextRecognitionResult result = new TextRecognitionResult();
     result.setRecognitionSuccessful(false);

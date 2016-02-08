@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
+import net.deepthought.communication.model.OcrSource;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 
@@ -15,18 +16,6 @@ import org.slf4j.LoggerFactory;
  * Created by ganymed on 18/08/15.
  */
 public class OcrResultBroadcastReceiver extends BroadcastReceiver {
-
-  public final static String SEND_OCR_RESULT_INTENT_ACTION = "TextFairyOcrResult";
-
-  public final static String IS_USER_CANCELLED_OCR_RESULT_EXTRA_NAME = "UserCancelled";
-  public final static String RECOGNITION_SUCCESSFUL_OCR_RESULT_EXTRA_NAME = "RecognitionSuccessful";
-  public final static String ERROR_MESSAGE_OCR_RESULT_EXTRA_NAME = "ErrorMessage";
-
-  public final static String ACCURACY_OCR_RESULT_EXTRA_NAME = "Accuracy";
-  public final static String IS_DONE_OCR_RESULT_EXTRA_NAME = "IsDone";
-
-  public final static String HOCR_OCR_RESULT_EXTRA_NAME = "HOCR";
-  public final static String UTF8_OCR_RESULT_EXTRA_NAME = "Utf8";
 
 
   private final static Logger log = LoggerFactory.getLogger(OcrResultBroadcastReceiver.class);
@@ -48,7 +37,7 @@ public class OcrResultBroadcastReceiver extends BroadcastReceiver {
 
   protected void createIntentFilter(Context context) {
     try {
-      ocrResultIntentFilter = new IntentFilter(SEND_OCR_RESULT_INTENT_ACTION);
+      ocrResultIntentFilter = new IntentFilter(Constants.SEND_OCR_RESULT_INTENT_ACTION);
 //      ocrResultIntentFilter.addDataType("text/plain");
 
       context.registerReceiver(this, ocrResultIntentFilter);
@@ -64,27 +53,45 @@ public class OcrResultBroadcastReceiver extends BroadcastReceiver {
   }
 
   protected TextRecognitionResult createRecognitionResult(Intent intent) {
-    if(intent.hasExtra(IS_USER_CANCELLED_OCR_RESULT_EXTRA_NAME)) {
-      context.unregisterReceiver(this);
-      return TextRecognitionResult.createUserCancelledResult();
-    }
-    else if(intent.hasExtra(IS_DONE_OCR_RESULT_EXTRA_NAME)) {
+    if(intent.hasExtra(Constants.IS_DONE_OCR_RESULT_EXTRA_NAME)) {
       context.unregisterReceiver(this);
       return TextRecognitionResult.createRecognitionProcessDoneResult();
     }
 
-    boolean recognitionSuccessful = intent.getBooleanExtra(RECOGNITION_SUCCESSFUL_OCR_RESULT_EXTRA_NAME, false);
+    boolean recognitionSuccessful = intent.getBooleanExtra(Constants.RECOGNITION_SUCCESSFUL_OCR_RESULT_EXTRA_NAME, false);
 
     if(recognitionSuccessful == false)
-      return TextRecognitionResult.createErrorOccurredResult(intent.getStringExtra(ERROR_MESSAGE_OCR_RESULT_EXTRA_NAME));
+      return TextRecognitionResult.createErrorOccurredResult(intent.getStringExtra(Constants.ERROR_MESSAGE_OCR_RESULT_EXTRA_NAME));
     else {
-      float accuracy = intent.getFloatExtra(ACCURACY_OCR_RESULT_EXTRA_NAME, 0f);
-      boolean isDone = intent.getBooleanExtra(IS_DONE_OCR_RESULT_EXTRA_NAME, false);
-
-      String hocr = intent.getStringExtra(HOCR_OCR_RESULT_EXTRA_NAME);
-      String utf8String = intent.getStringExtra(UTF8_OCR_RESULT_EXTRA_NAME);
-
-      return TextRecognitionResult.createRecognitionSuccessfulResult(utf8String, accuracy, isDone);
+      return createRecognitionSuccessfulResult(intent);
     }
+  }
+
+  protected TextRecognitionResult createRecognitionSuccessfulResult(Intent intent) {
+    float accuracy = intent.getFloatExtra(Constants.ACCURACY_OCR_RESULT_EXTRA_NAME, 0f);
+    boolean isDone = intent.getBooleanExtra(Constants.IS_DONE_OCR_RESULT_EXTRA_NAME, false);
+
+    String hocr = intent.getStringExtra(Constants.HOCR_OCR_RESULT_EXTRA_NAME);
+    String utf8String = intent.getStringExtra(Constants.UTF8_OCR_RESULT_EXTRA_NAME);
+
+    String ocrSourceString = intent.getStringExtra(Constants.OCR_SOURCE_EXTRA_NAME);
+    OcrSource ocrSource = getOcrSourceFromString(ocrSourceString);
+    String ocrSourceUri = intent.getStringExtra(Constants.OCR_SOURCE_URI_EXTRA_NAME);
+
+    return TextRecognitionResult.createRecognitionSuccessfulResult(utf8String, accuracy, isDone);
+  }
+
+  protected OcrSource getOcrSourceFromString(String ocrSourceString) {
+    if(Constants.OCR_SOURCE_CAPTURE_IMAGE.equals(ocrSourceString)) {
+      return OcrSource.CaptureImage;
+    }
+    else if(Constants.OCR_SOURCE_GET_FROM_GALLERY.equals(ocrSourceString)) {
+      return OcrSource.ChoseImageFromGallery;
+    }
+    else if(Constants.OCR_SOURCE_RECOGNIZE_FROM_URI.equals(ocrSourceString)) {
+      return OcrSource.RecognizeFromUri;
+    }
+
+    return OcrSource.AskUser;
   }
 }
