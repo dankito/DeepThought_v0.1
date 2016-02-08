@@ -22,9 +22,12 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
 /**
@@ -62,7 +65,10 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     lblDoOcrProgress = new Label();
     lblDoOcrProgress.setVisible(false);
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblDoOcrProgress);
+
     this.getChildren().add(0, lblDoOcrProgress);
+
+    HBox.setMargin(lblDoOcrProgress, new Insets(0, 6, 0, 0));
   }
 
   protected boolean checkIfConnectedDeviceShouldBeShown(ConnectedDevice connectedDevice) {
@@ -79,19 +85,39 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     }
 
     if(connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "do.ocr");
-      captureImageMenuItem.setOnAction(event -> selectImagesForOcr(connectedDevice));
-      contextMenu.getItems().add(captureImageMenuItem);
-    }
+      contextMenu.getItems().add(new SeparatorMenuItem());
 
-    if(connectedDevice.hasCaptureDevice() && connectedDevice.canDoOcr()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image.and.do.ocr");
-      // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
-      contextMenu.getItems().add(captureImageMenuItem);
+      addSelectLocalImageAndDoOcrMenuItem(connectedDevice, contextMenu);
+
+      if(connectedDevice.hasCaptureDevice()) {
+        addCaptureImageAndDoOcrMenuItem(connectedDevice, contextMenu);
+      }
+
+      addChooseRemoteImageAndDoOcrMenuItem(connectedDevice, contextMenu);
     }
+  }
+
+  protected void addSelectLocalImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    MenuItem selectLocalImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(selectLocalImageAndDoOcrMenuItem, "select.local.image.and.do.ocr");
+    selectLocalImageAndDoOcrMenuItem.setOnAction(event -> selectImagesForOcr(connectedDevice));
+    contextMenu.getItems().add(selectLocalImageAndDoOcrMenuItem);
+  }
+
+  protected void addCaptureImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    MenuItem captureImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(captureImageAndDoOcrMenuItem, "capture.image.and.do.ocr");
+    // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
+    captureImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
+    contextMenu.getItems().add(captureImageAndDoOcrMenuItem);
+  }
+
+  protected void addChooseRemoteImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    MenuItem chooseRemoteImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(chooseRemoteImageAndDoOcrMenuItem, "chose.remote.image.and.do.ocr");
+    // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
+    chooseRemoteImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), ocrResultListener));
+    contextMenu.getItems().add(chooseRemoteImageAndDoOcrMenuItem);
   }
 
 

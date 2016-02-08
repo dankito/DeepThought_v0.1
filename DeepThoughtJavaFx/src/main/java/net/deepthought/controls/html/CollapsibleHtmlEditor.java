@@ -94,7 +94,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
       titlePane.add(lblTitle, 0, 0);
     }
 
-    connectedDevicesPanel = new CaptureImageOrDoOcrConnectedDevicesPanel(captureImageResultListener, captureImageAndDoOcrResultListener);
+    connectedDevicesPanel = new CaptureImageOrDoOcrConnectedDevicesPanel(captureImageResultListener, ocrResultListener);
     titlePane.add(connectedDevicesPanel, 3, 0);
 
     setTitle(titlePane);
@@ -116,7 +116,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     }
   };
 
-  protected OcrResultListener captureImageAndDoOcrResultListener = new OcrResultListener() {
+  protected OcrResultListener ocrResultListener = new OcrResultListener() {
     @Override
     public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse ocrResult) {
       ocrResultReceived(ocrResult);
