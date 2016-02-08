@@ -6,7 +6,7 @@ package net.deepthought.communication.model;
 public enum OcrSource {
 
   CaptureImage,
-  ChoseImageFromGallery,
+  SelectAnExistingImageOnDevice,
   RecognizeFromUri,
   AskUser
 

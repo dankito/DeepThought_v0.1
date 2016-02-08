@@ -38,8 +38,8 @@ public class StartTextFairyOcrIntent extends Intent {
     if(configuration.getSource() == OcrSource.CaptureImage) {
       putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_CAPTURE_IMAGE);
     }
-    else if(configuration.getSource() == OcrSource.ChoseImageFromGallery) {
-      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_GET_FROM_GALLERY);
+    else if(configuration.getSource() == OcrSource.SelectAnExistingImageOnDevice) {
+      putExtra(Constants.OCR_SOURCE_EXTRA_NAME, Constants.OCR_SOURCE_SELECT_AN_EXISTING_IMAGE_FROM_DEVICE);
     }
     else if(configuration.getSource() == OcrSource.RecognizeFromUri) {
       setImageUri(configuration);

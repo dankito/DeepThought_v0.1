@@ -19,7 +19,7 @@ public class Constants {
 
   public final static String OCR_SOURCE_CAPTURE_IMAGE = "CaptureImage";
 
-  public final static String OCR_SOURCE_GET_FROM_GALLERY = "GetFromGallery";
+  public final static String OCR_SOURCE_SELECT_AN_EXISTING_IMAGE_FROM_DEVICE = "SelectAnExistingImageFromDevice";
 
   public final static String OCR_SOURCE_ASK_USER = "AskUser";
 

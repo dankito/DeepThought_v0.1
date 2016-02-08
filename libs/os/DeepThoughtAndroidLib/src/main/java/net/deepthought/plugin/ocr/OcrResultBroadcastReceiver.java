@@ -92,8 +92,8 @@ public class OcrResultBroadcastReceiver extends BroadcastReceiver {
     if(Constants.OCR_SOURCE_CAPTURE_IMAGE.equals(ocrSourceString)) {
       return OcrSource.CaptureImage;
     }
-    else if(Constants.OCR_SOURCE_GET_FROM_GALLERY.equals(ocrSourceString)) {
-      return OcrSource.ChoseImageFromGallery;
+    else if(Constants.OCR_SOURCE_SELECT_AN_EXISTING_IMAGE_FROM_DEVICE.equals(ocrSourceString)) {
+      return OcrSource.SelectAnExistingImageOnDevice;
     }
     else if(Constants.OCR_SOURCE_RECOGNIZE_FROM_URI.equals(ocrSourceString)) {
       return OcrSource.RecognizeFromUri;
