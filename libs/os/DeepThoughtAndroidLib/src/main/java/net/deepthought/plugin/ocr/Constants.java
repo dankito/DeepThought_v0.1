@@ -8,6 +8,11 @@ public class Constants {
   public final static String TEXT_CONTENT_EXTRACTOR_PLUGIN_INTENT_NAME = "com.renard.plugin.TextFairyPlugin";
 
 
+  public final static String CALLING_APPLICATION_PACKAGE_NAME_EXTRA_NAME = "CallingApplicationPackageName";
+
+  public final static String CALLING_APPLICATION_PACKAGE_NAME = "net.deepthought";
+
+
   public final static String OCR_SOURCE_EXTRA_NAME = "OcrSource";
 
   public final static String OCR_SOURCE_RECOGNIZE_FROM_URI = "RecognizeFromUri";

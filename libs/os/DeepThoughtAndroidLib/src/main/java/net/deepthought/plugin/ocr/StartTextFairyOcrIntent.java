@@ -29,6 +29,8 @@ public class StartTextFairyOcrIntent extends Intent {
     setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
     setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
+    putExtra(Constants.CALLING_APPLICATION_PACKAGE_NAME_EXTRA_NAME, Constants.CALLING_APPLICATION_PACKAGE_NAME);
+
     setConfiguration(configuration);
   }
 
@@ -68,7 +70,12 @@ public class StartTextFairyOcrIntent extends Intent {
   protected Uri saveImageToTempFile(DoOcrConfiguration configuration) {
     if(configuration.getImageToRecognize() != null) {
       try {
-        File tempFile = File.createTempFile("image_for_ocr_", ".image");
+        String fileExtension = ".jpg";
+        if(configuration.getImageUri() != null) {
+          fileExtension = FileUtils.getFileExtension(configuration.getImageUri());
+        }
+
+        File tempFile = File.createTempFile("image_for_ocr_", fileExtension);
         tempFile.deleteOnExit();
         FileUtils.writeToFile(configuration.getImageToRecognize(), new FileLink(tempFile.getAbsolutePath()));
 

@@ -38,7 +38,6 @@ public class OcrResultBroadcastReceiver extends BroadcastReceiver {
   protected void createIntentFilter(Context context) {
     try {
       ocrResultIntentFilter = new IntentFilter(Constants.SEND_OCR_RESULT_INTENT_ACTION);
-//      ocrResultIntentFilter.addDataType("text/plain");
 
       context.registerReceiver(this, ocrResultIntentFilter);
     } catch(Exception ex) {
@@ -53,11 +52,19 @@ public class OcrResultBroadcastReceiver extends BroadcastReceiver {
   }
 
   protected TextRecognitionResult createRecognitionResult(Intent intent) {
-    if(intent.hasExtra(Constants.IS_DONE_OCR_RESULT_EXTRA_NAME)) {
+    if(isProcessDone(intent)) {
       context.unregisterReceiver(this);
       return TextRecognitionResult.createRecognitionProcessDoneResult();
     }
 
+    return createSuccessfulOrErrorRecognitionResult(intent);
+  }
+
+  protected boolean isProcessDone(Intent intent) {
+    return intent.hasExtra(Constants.IS_DONE_OCR_RESULT_EXTRA_NAME);
+  }
+
+  protected TextRecognitionResult createSuccessfulOrErrorRecognitionResult(Intent intent) {
     boolean recognitionSuccessful = intent.getBooleanExtra(Constants.RECOGNITION_SUCCESSFUL_OCR_RESULT_EXTRA_NAME, false);
 
     if(recognitionSuccessful == false)
