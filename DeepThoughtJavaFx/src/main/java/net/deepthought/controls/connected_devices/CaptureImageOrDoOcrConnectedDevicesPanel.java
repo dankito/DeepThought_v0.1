@@ -148,7 +148,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     currentImageIndex.incrementAndGet();
 
     try {
-      final DoOcrConfiguration configuration = new DoOcrConfiguration(imageToRecognize, false, false);
+      final DoOcrConfiguration configuration = new DoOcrConfiguration(imageToRecognize, true);
 
       Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, configuration, new OcrResultListener() {
         @Override

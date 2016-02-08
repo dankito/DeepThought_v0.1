@@ -24,8 +24,6 @@ public class DoOcrConfiguration {
 
   protected boolean showSettingsUi = true;
 
-  protected boolean showMessageOnRemoteDeviceWhenProcessingDone = false;
-
 
   public DoOcrConfiguration(OcrSource source) {
     this.source = source;
@@ -37,22 +35,15 @@ public class DoOcrConfiguration {
   }
 
   public DoOcrConfiguration(byte[] imageToRecognize, boolean showSettingsUi) {
-    this(imageToRecognize, showSettingsUi, false);
-  }
-
-  public DoOcrConfiguration(byte[] imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone) {
     this(OcrSource.RecognizeFromUri);
     this.imageToRecognize = imageToRecognize;
     this.showSettingsUi = showSettingsUi;
-    this.showMessageOnRemoteDeviceWhenProcessingDone = showMessageOnRemoteDeviceWhenProcessingDone;
   }
 
   public DoOcrConfiguration(File imageToRecognize, boolean showSettingsUi) throws IOException {
-    this(imageToRecognize, showSettingsUi, false);
-  }
+    this(readImageFile(imageToRecognize), showSettingsUi);
 
-  public DoOcrConfiguration(File imageToRecognize, boolean showSettingsUi, boolean showMessageOnRemoteDeviceWhenProcessingDone) throws IOException {
-    this(readImageFile(imageToRecognize), showSettingsUi, showMessageOnRemoteDeviceWhenProcessingDone);
+    try { setImageUri(imageToRecognize.toURI().toString()); } catch(Exception ex) { }
   }
 
 
@@ -93,10 +84,6 @@ public class DoOcrConfiguration {
 
   public boolean showSettingsUi() {
     return showSettingsUi;
-  }
-
-  public boolean showMessageOnRemoteDeviceWhenProcessingDone() {
-    return showMessageOnRemoteDeviceWhenProcessingDone;
   }
 
 
