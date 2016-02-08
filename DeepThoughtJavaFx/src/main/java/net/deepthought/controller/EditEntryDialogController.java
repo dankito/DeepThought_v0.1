@@ -265,7 +265,30 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     filesControl.cleanUp();
 
+    cleanUpToFindMemoryLeak();
+
     super.closeDialog();
+  }
+
+  private void cleanUpToFindMemoryLeak() {
+    contentPane.getChildren().remove(htmledAbstract);
+    contentPane.getChildren().remove(htmledContent);
+
+    contentPane.getChildren().remove(entryTagsControl);
+    contentPane.getChildren().remove(entryCategoriesControl);
+
+    contentPane.getChildren().remove(entryReferenceControl);
+    contentPane.getChildren().remove(entryPersonsControl);
+    contentPane.getChildren().remove(filesControl);
+
+    entry = null;
+    creationResult = null;
+
+    abstractListener = null;
+    contentListener = null;
+
+    editedAttachedFiles = null;
+    editedEmbeddedFiles = null;
   }
 
   @Override
