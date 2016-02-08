@@ -29,6 +29,10 @@
 
     <string name="loading_data_wait_message">Lade daten ...</string>
 
+    <string name="image_source">Wähle Bildquelle.</string>
+
+    <string name="error_message_could_not_show_activity">Dialog kann nicht angezeigt werden: %s</string>
+
     <string name="error_message_tag_with_that_name_already_exists">Ein Schlagwort mit diesem Namen existiert bereits</string>
     <string name="error_message_tag_name_must_be_a_non_empty_string">Der Schlagwortname muss ein nicht-leerer String sein</string>
 

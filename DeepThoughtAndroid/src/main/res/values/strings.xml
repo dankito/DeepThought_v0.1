@@ -29,6 +29,8 @@
 
     <string name="loading_data_wait_message">Loading data ...</string>
 
+    <string name="image_source">Pick image source.</string>
+
     <string name="error_message_could_not_show_activity">Could not show dialog: %s</string>
 
     <string name="error_message_tag_with_that_name_already_exists">A Tag with that name already exists</string>

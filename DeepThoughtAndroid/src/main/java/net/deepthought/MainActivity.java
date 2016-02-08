@@ -3,6 +3,7 @@ package net.deepthought;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -22,8 +23,8 @@ import com.google.zxing.integration.android.IntentResult;
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
-import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.ImportFilesRequest;
@@ -50,15 +51,17 @@ import net.deepthought.fragments.SearchFragment;
 import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
 import net.deepthought.util.file.FileUtils;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   protected static final int CaptureImageForConnectPeerRequestCode = 7;
 
+  protected final static int SelectImageFromGalleryForConnectPeerRequestCode = 8;
+
   protected static final int ScanBarCodeRequestCode = 49374;
 
 
@@ -78,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   // make them static otherwise the will be cleaned up when starting TakePhoto Activity
   protected static FileLink temporaryImageFile = null;
   protected static RequestWithAsynchronousResponse captureImageRequest = null;
+
+  protected static ImportFilesRequest importFilesRequest = null;
 
   protected static RequestWithAsynchronousResponse scanBarcodeRequest = null;
 
@@ -370,6 +377,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       case CaptureImageForConnectPeerRequestCode:
         handleCaptureImageResult(resultCode);
         break;
+      case SelectImageFromGalleryForConnectPeerRequestCode:
+        handleSelectImageFromGalleryResult(resultCode, data);
+        break;
       case ScanBarCodeRequestCode: // TODO: is this really always == 49374
         handleScanBarCodeResult(requestCode, resultCode, data);
         break;
@@ -396,6 +406,40 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     temporaryImageFile = null;
     captureImageRequest = null;
+  }
+
+  protected void handleSelectImageFromGalleryResult(int resultCode, Intent data) {
+    if(resultCode == RESULT_OK) { // TODO: what to do in error case? Send Error Message?
+      if(importFilesRequest != null) {
+        String uri = data.getDataString();
+
+        try {
+          InputStream selectedFileStream = getContentResolver().openInputStream(data.getData());
+          byte[] fileData = readDataFromInputStream(selectedFileStream);
+          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(importFilesRequest, new ImportFilesResult(fileData, true), null);
+        } catch (Exception ex) {
+          log.error("Could not read select file from uri " + uri, ex);
+          // TODO: send error response
+        }
+      }
+    }
+
+    importFilesRequest = null;
+  }
+
+  protected byte[] readDataFromInputStream(InputStream inputStream) throws Exception{
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+    int nRead;
+    byte[] data = new byte[16384];
+
+    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+      buffer.write(data, 0, nRead);
+    }
+
+    buffer.flush();
+
+    return buffer.toByteArray();
   }
 
   protected void handleScanBarCodeResult(int requestCode, int resultCode, Intent data) {
@@ -467,12 +511,32 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     if(configuration.getSource() == ImportFilesSource.CaptureImage) {
       capturePhotoAndSendToCaller(request);
     }
+    else if(configuration.getSource() == ImportFilesSource.SelectFromExistingFiles) {
+      selectImagesFromGalleryAndSendToCaller(request);
+    }
   }
 
   protected void capturePhotoAndSendToCaller(ImportFilesRequest request) {
     temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
     if(temporaryImageFile != null)
       this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller
+  }
+
+  protected void selectImagesFromGalleryAndSendToCaller(ImportFilesRequest request) {
+    this.importFilesRequest = request;
+
+    Intent i = new Intent(Intent.ACTION_GET_CONTENT, null);
+
+    // TODO: set Files types either to Html compatible types or that ones in request parameter
+    if (Build.VERSION.SDK_INT >= 19) {
+      i.setType("image/*");
+      i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/png", "image/jpg", "image/jpeg"});
+    } else {
+      i.setType("image/png,image/jpg, image/jpeg");
+    }
+
+    Intent chooser = Intent.createChooser(i, getString(R.string.image_source));
+    startActivityForResult(chooser, SelectImageFromGalleryForConnectPeerRequestCode);
   }
 
   protected void doOcrAndSendToCaller(final DoOcrRequest request) {
