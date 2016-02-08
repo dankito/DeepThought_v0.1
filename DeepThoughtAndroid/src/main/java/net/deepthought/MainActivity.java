@@ -3,7 +3,6 @@ package net.deepthought;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,51 +16,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
-import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
-import net.deepthought.communication.listener.ResponseListener;
-import net.deepthought.communication.messages.request.DoOcrRequest;
-import net.deepthought.communication.messages.request.ImportFilesRequest;
-import net.deepthought.communication.messages.request.Request;
-import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.Response;
-import net.deepthought.communication.messages.response.ResponseCode;
-import net.deepthought.communication.messages.response.ScanBarcodeResult;
 import net.deepthought.communication.model.ConnectedDevice;
-import net.deepthought.communication.model.ImportFilesConfiguration;
-import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
-import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
-import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
-import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.FileLink;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.SearchFragment;
 import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
+import net.deepthought.listener.AndroidImportFilesOrDoOcrListener;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
-import net.deepthought.util.file.FileUtils;
 import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -71,22 +48,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
 
 
-  protected static final int CaptureImageForConnectPeerRequestCode = 7;
-
-  protected final static int SelectImageFromGalleryForConnectPeerRequestCode = 8;
-
-  protected static final int ScanBarCodeRequestCode = 49374;
-
-
   protected static boolean hasDeepThoughtBeenSetup = false;
-
-  // make them static otherwise the will be cleaned up when starting TakePhoto Activity
-  protected static FileLink temporaryImageFile = null;
-  protected static RequestWithAsynchronousResponse captureImageRequest = null;
-
-  protected static ImportFilesRequest importFilesRequest = null;
-
-  protected static RequestWithAsynchronousResponse scanBarcodeRequest = null;
 
 
   protected ProgressDialog loadingDataProgressDialog = null;
@@ -111,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     ViewPager mViewPager;
 
     protected TabLayout tabLayout;
+
+  protected AndroidImportFilesOrDoOcrListener importFilesOrDoOcrListener;
+
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 //      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
+      importFilesOrDoOcrListener = new AndroidImportFilesOrDoOcrListener(this);
       Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtsConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
@@ -374,84 +340,24 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           ActivityManager.getInstance().resetEditEntryActivityCachedData();
         }
         break;
-      case CaptureImageForConnectPeerRequestCode:
-        handleCaptureImageResult(resultCode);
+      case AndroidImportFilesOrDoOcrListener.CaptureImageForConnectPeerRequestCode:
+        if(importFilesOrDoOcrListener != null) {
+          importFilesOrDoOcrListener.handleCaptureImageResult(resultCode);
+        }
         break;
-      case SelectImageFromGalleryForConnectPeerRequestCode:
-        handleSelectImageFromGalleryResult(resultCode, data);
+      case AndroidImportFilesOrDoOcrListener.SelectImageFromGalleryForConnectPeerRequestCode:
+        if(importFilesOrDoOcrListener != null) {
+          importFilesOrDoOcrListener.handleSelectImageFromGalleryResult(resultCode, data);
+        }
         break;
-      case ScanBarCodeRequestCode: // TODO: is this really always == 49374
-        handleScanBarCodeResult(requestCode, resultCode, data);
+      case AndroidImportFilesOrDoOcrListener.ScanBarCodeRequestCode: // TODO: is this really always == 49374
+        if(importFilesOrDoOcrListener != null) {
+          importFilesOrDoOcrListener.handleScanBarCodeResult(requestCode, resultCode, data);
+        }
         break;
     }
 
     super.onActivityResult(requestCode, resultCode, data);
-  }
-
-  protected void handleCaptureImageResult(int resultCode) {
-    if(resultCode == RESULT_OK) {
-      if (captureImageRequest != null && temporaryImageFile != null) {
-        File imageFile = new File(temporaryImageFile.getUriString());
-        try {
-          byte[] imageData = FileUtils.readFile(imageFile);
-          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
-        } catch (Exception ex) {
-          log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
-          // TODO: send error response
-        }
-
-        imageFile.delete();
-      }
-    }
-
-    temporaryImageFile = null;
-    captureImageRequest = null;
-  }
-
-  protected void handleSelectImageFromGalleryResult(int resultCode, Intent data) {
-    if(resultCode == RESULT_OK) { // TODO: what to do in error case? Send Error Message?
-      if(importFilesRequest != null) {
-        String uri = data.getDataString();
-
-        try {
-          InputStream selectedFileStream = getContentResolver().openInputStream(data.getData());
-          byte[] fileData = readDataFromInputStream(selectedFileStream);
-          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(importFilesRequest, new ImportFilesResult(fileData, true), null);
-        } catch (Exception ex) {
-          log.error("Could not read select file from uri " + uri, ex);
-          // TODO: send error response
-        }
-      }
-    }
-
-    importFilesRequest = null;
-  }
-
-  protected byte[] readDataFromInputStream(InputStream inputStream) throws Exception{
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-    int nRead;
-    byte[] data = new byte[16384];
-
-    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-      buffer.write(data, 0, nRead);
-    }
-
-    buffer.flush();
-
-    return buffer.toByteArray();
-  }
-
-  protected void handleScanBarCodeResult(int requestCode, int resultCode, Intent data) {
-    if(scanBarcodeRequest != null) {
-      IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-      if (result != null) {
-        Application.getDeepThoughtsConnector().getCommunicator().respondToScanBarcodeRequest(scanBarcodeRequest,
-            new ScanBarcodeResult(result.getContents(), result.getFormatName()), null);
-      }
-    }
-
-    scanBarcodeRequest = null;
   }
 
   @Override
@@ -481,87 +387,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     }
   };
-
-  protected ImportFilesOrDoOcrListener importFilesOrDoOcrListener = new ImportFilesOrDoOcrListener() {
-
-    @Override
-    public void importFiles(ImportFilesRequest request) {
-      exportFilesToRemoteDevice(request);
-    }
-
-    @Override
-    public void doOcr(DoOcrRequest request) {
-      doOcrAndSendToCaller(request);
-    }
-
-    @Override
-    public void scanBarcode(RequestWithAsynchronousResponse request) {
-      MainActivity.this.scanBarCode(request);
-    }
-
-    @Override
-    public void stopCaptureImageOrDoOcr(StopRequestWithAsynchronousResponse request) {
-      // TODO: implement
-    }
-  };
-
-  protected void exportFilesToRemoteDevice(ImportFilesRequest request) {
-    ImportFilesConfiguration configuration = request.getConfiguration();
-
-    if(configuration.getSource() == ImportFilesSource.CaptureImage) {
-      capturePhotoAndSendToCaller(request);
-    }
-    else if(configuration.getSource() == ImportFilesSource.SelectFromExistingFiles) {
-      selectImagesFromGalleryAndSendToCaller(request);
-    }
-  }
-
-  protected void capturePhotoAndSendToCaller(ImportFilesRequest request) {
-    temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
-    if(temporaryImageFile != null)
-      this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller
-  }
-
-  protected void selectImagesFromGalleryAndSendToCaller(ImportFilesRequest request) {
-    this.importFilesRequest = request;
-
-    Intent i = new Intent(Intent.ACTION_GET_CONTENT, null);
-
-    // TODO: set Files types either to Html compatible types or that ones in request parameter
-    if (Build.VERSION.SDK_INT >= 19) {
-      i.setType("image/*");
-      i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/png", "image/jpg", "image/jpeg"});
-    } else {
-      i.setType("image/png,image/jpg, image/jpeg");
-    }
-
-    Intent chooser = Intent.createChooser(i, getString(R.string.image_source));
-    startActivityForResult(chooser, SelectImageFromGalleryForConnectPeerRequestCode);
-  }
-
-  protected void doOcrAndSendToCaller(final DoOcrRequest request) {
-    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
-      Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(request.getConfiguration(), new RecognizeTextListener() {
-        @Override
-        public void textRecognized(TextRecognitionResult result) {
-          Application.getDeepThoughtsConnector().getCommunicator().respondToDoOcrRequest(request, result, new ResponseListener() {
-            @Override
-            public void responseReceived(Request request, Response response) {
-              if (response.getResponseCode() == ResponseCode.Error) {
-                // TODO: stop process then
-              }
-            }
-          });
-        }
-      });
-    }
-  }
-
-  protected void scanBarCode(RequestWithAsynchronousResponse request) {
-    scanBarcodeRequest = request;
-
-    new IntentIntegrator(this).setOrientationLocked(false).initiateScan();
-  }
 
 
   @Override
