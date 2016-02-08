@@ -7,6 +7,7 @@ import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Device;
 import net.deepthought.util.IconManager;
 import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +106,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
     final Label label = new Label(null, icon);
     label.setUserData(connectedDevice); // add a Label so that we can set a ToolTip (ImageViews have no ToolTips)
     JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
-        connectedDevice.getAddress(), connectedDevice.hasCaptureDevice(), connectedDevice.canDoOcr());
+        connectedDevice.getAddress(), booleanToString(connectedDevice.hasCaptureDevice()), booleanToString(connectedDevice.canDoOcr()));
 
     this.getChildren().add(label);
     HBox.setMargin(label, new Insets(0, 4, 0, 0));
@@ -116,6 +117,15 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
     });
 
     connectedDeviceIcons.put(connectedDevice.getUniqueDeviceId(), label);
+  }
+
+  protected String booleanToString(boolean bool) {
+    if(bool) {
+      return Localization.getLocalizedString("yes");
+    }
+    else {
+      return Localization.getLocalizedString("no");
+    }
   }
 
   protected void createConnectedDeviceContextMenu(final ConnectedDevice connectedDevice, Node icon) {
