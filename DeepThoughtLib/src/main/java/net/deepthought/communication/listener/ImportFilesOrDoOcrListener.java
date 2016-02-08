@@ -1,15 +1,16 @@
 package net.deepthought.communication.listener;
 
 import net.deepthought.communication.messages.request.DoOcrRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 
 /**
  * Created by ganymed on 23/08/15.
  */
-public interface CaptureImageOrDoOcrListener {
+public interface ImportFilesOrDoOcrListener {
 
-  void captureImage(RequestWithAsynchronousResponse request);
+  void importFiles(ImportFilesRequest request);
 
   void doOcr(DoOcrRequest request);
 

@@ -1,7 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.deepthought.communication.listener.CaptureImageResultListener;
+import net.deepthought.communication.listener.ImportFilesResultListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.listener.ScanBarcodeResultListener;
@@ -12,18 +12,21 @@ import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.response.ImportFilesResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.messages.response.ScanBarcodeResult;
 import net.deepthought.communication.messages.response.ScanBarcodeResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.ImportFilesConfiguration;
+import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.communication.model.OcrSource;
-import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
+import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.util.IThreadPool;
 
@@ -197,39 +200,39 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   @Test
   public void startCaptureImage_RequestIsReceived() {
-    communicator.startCaptureImage(localHost, null);
+    communicator.startImportFiles(localHost, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), null);
 
     waitTillListenerHasBeenCalled();
 
-    assertThatCorrectMethodHasBeenCalled(Addresses.StartCaptureImageMethodName, RequestWithAsynchronousResponse.class);
+    assertThatCorrectMethodHasBeenCalled(Addresses.StartImportFilesMethodName, RequestWithAsynchronousResponse.class);
   }
 
   @Test
   public void respondToCaptureImageRequest_RequestIsReceived() throws IOException {
     byte[] imageData = getTestImage();
     RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(TestMessageId, TestIpAddress, CommunicatorPort);
-    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(imageData), null);
+    communicator.respondToImportFilesRequest(request, new ImportFilesResult(imageData), null);
 
     waitTillListenerHasBeenCalled();
 
-    CaptureImageResultResponse response = (CaptureImageResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.CaptureImageResultMethodName, CaptureImageResultResponse.class);
+    ImportFilesResultResponse response = (ImportFilesResultResponse)assertThatCorrectMethodHasBeenCalled(Addresses.ImportFilesResultMethodName, ImportFilesResultResponse.class);
 
     Assert.assertEquals(TestMessageId, response.getRequestMessageId());
     Assert.assertNotNull(response.getResult());
-    Assert.assertNotNull(response.getResult().getImageUri());
-    Assert.assertArrayEquals(imageData, response.getResult().getImageData());
+    Assert.assertNotNull(response.getResult().getFileUri());
+    Assert.assertArrayEquals(imageData, response.getResult().getFileData());
   }
 
   @Test
   public void startCaptureImage_ResponseListenerGetsCalled() throws IOException {
     final AtomicBoolean hasResponseBeenReceived = new AtomicBoolean(false);
-    final List<CaptureImageResultResponse> receivedResponseHolder = new ArrayList<>();
+    final List<ImportFilesResultResponse> receivedResponseHolder = new ArrayList<>();
 
-    RequestWithAsynchronousResponse request = communicator.startCaptureImage(localHost, new CaptureImageResultListener() {
+    ImportFilesRequest request = communicator.startImportFiles(localHost, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), new ImportFilesResultListener() {
       @Override
-      public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResultResponse captureImageResult) {
+      public void responseReceived(ImportFilesRequest importFilesRequest, ImportFilesResultResponse importFilesResult) {
         hasResponseBeenReceived.set(true);
-        receivedResponseHolder.add(captureImageResult);
+        receivedResponseHolder.add(importFilesResult);
       }
     });
 
@@ -237,27 +240,27 @@ public class CommunicatorTest extends CommunicationTestBase {
     resetWaitLatch();
 
     byte[] imageData = getTestImage();
-    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(imageData, true), null);
+    communicator.respondToImportFilesRequest(request, new ImportFilesResult(imageData, true), null);
 
     waitTillListenerHasBeenCalled();
 
     Assert.assertEquals(2, receivedRequests.size());
     Assert.assertTrue(hasResponseBeenReceived.get());
     Assert.assertEquals(1, receivedResponseHolder.size());
-    CaptureImageResultResponse result = receivedResponseHolder.get(0);
-    Assert.assertArrayEquals(imageData, result.getResult().getImageData());
+    ImportFilesResultResponse result = receivedResponseHolder.get(0);
+    Assert.assertArrayEquals(imageData, result.getResult().getFileData());
   }
 
   @Test
   public void startCaptureImage_ResponseListenerGetsRemovedFromListenerManager() throws IOException {
-    RequestWithAsynchronousResponse request = communicator.startCaptureImage(localHost, null);
+    ImportFilesRequest request = communicator.startImportFiles(localHost, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), null);
 
     waitTillListenerHasBeenCalled();
     resetWaitLatch();
 
     Assert.assertEquals(1, communicator.listenerManager.getRegisteredListenersCount());
 
-    communicator.respondToCaptureImageRequest(request, new CaptureImageResult(getTestImage(), true), null);
+    communicator.respondToImportFilesRequest(request, new ImportFilesResult(getTestImage(), true), null);
 
     waitTillListenerHasBeenCalled();
 
@@ -272,7 +275,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //    waitTillListenerHasBeenCalled();
 //
-//    assertThatCorrectMethodHasBeenCalled(Addresses.StopCaptureImageMethodName, StopRequestWithAsynchronousResponse.class);
+//    assertThatCorrectMethodHasBeenCalled(Addresses.StopImportFilesMethodName, StopRequestWithAsynchronousResponse.class);
 //  }
 //
 //  @Test
@@ -280,7 +283,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //    final AtomicBoolean methodCalled = new AtomicBoolean(false);
 //    final CountDownLatch waitLatch = new CountDownLatch(1);
 //
-//    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+//    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 //      @Override
 //      public void captureImageAndDoOcr(CaptureImageOrDoOcrRequest request) {
 //
@@ -293,7 +296,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //      }
 //    });
 //
-//    RequestWithAsynchronousResponse request = communicator.startCaptureImage(localHost, null);
+//    RequestWithAsynchronousResponse request = communicator.startImportFiles(localHost, null);
 //    waitTillListenerHasBeenCalled();
 //
 //    communicator.stopCaptureImage(request.getMessageId(), localHost, null);
@@ -304,7 +307,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //
 //  @Test
 //  public void stopCaptureImage_ListenerGetsRemoved() {
-//    RequestWithAsynchronousResponse request = communicator.startCaptureImage(localHost, null);
+//    RequestWithAsynchronousResponse request = communicator.startImportFiles(localHost, null);
 //    waitTillListenerHasBeenCalled();
 //    resetWaitLatch();
 //
@@ -570,7 +573,7 @@ public class CommunicatorTest extends CommunicationTestBase {
 //    final AtomicBoolean methodCalled = new AtomicBoolean(false);
 //    final CountDownLatch waitLatch = new CountDownLatch(1);
 //
-//    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+//    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 //      @Override
 //      public void captureImageAndDoOcr(CaptureImageOrDoOcrRequest request) {
 //

@@ -212,7 +212,9 @@ public class MessagesReceiver extends NanoHTTPD {
     // TODO: why does it have to be saved to a public folder (e.g. SD Card) on Android, why isn't sufficient anymore to store it to DeepThought's Cache (Android 4.3 phanomena
     File tempFile = FileUtils.createTempFile();
     tempFile.deleteOnExit();
+
     FileUtils.copyFile(new File(partFilename), tempFile);
+
     return tempFile.getAbsolutePath();
   }
 

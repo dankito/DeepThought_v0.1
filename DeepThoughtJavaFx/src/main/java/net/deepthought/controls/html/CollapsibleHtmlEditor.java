@@ -1,17 +1,17 @@
 package net.deepthought.controls.html;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.CaptureImageResultListener;
+import net.deepthought.communication.listener.ImportFilesResultListener;
 import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
-import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
-import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
+import net.deepthought.communication.messages.response.ImportFilesResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.controls.CollapsiblePane;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.controls.connected_devices.CaptureImageOrDoOcrConnectedDevicesPanel;
 import net.deepthought.controls.utils.FXUtils;
-import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
+import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.deepthought.data.html.ImageElementData;
 import net.deepthought.data.model.FileLink;
 import net.deepthought.util.file.FileUtils;
@@ -94,7 +94,7 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
       titlePane.add(lblTitle, 0, 0);
     }
 
-    connectedDevicesPanel = new CaptureImageOrDoOcrConnectedDevicesPanel(captureImageResultListener, ocrResultListener);
+    connectedDevicesPanel = new CaptureImageOrDoOcrConnectedDevicesPanel(importFilesResultListener, ocrResultListener);
     titlePane.add(connectedDevicesPanel, 3, 0);
 
     setTitle(titlePane);
@@ -107,9 +107,9 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     // TODO: show error message (or has it already been shown at this time?)
   }
 
-  protected CaptureImageResultListener captureImageResultListener = new CaptureImageResultListener() {
+  protected ImportFilesResultListener importFilesResultListener = new ImportFilesResultListener() {
     @Override
-    public void responseReceived(RequestWithAsynchronousResponse requestWithAsynchronousResponse, CaptureImageResultResponse response) {
+    public void responseReceived(ImportFilesRequest request, ImportFilesResultResponse response) {
       if (response.getResult() != null && response.getResult().successful())
         imageSuccessfullyCaptured(response.getResult());
       // TODO: show error message (or has it already been shown at this time?)
@@ -124,14 +124,14 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
     }
   };
 
-  protected void imageSuccessfullyCaptured(CaptureImageResult captureImageResult) {
+  protected void imageSuccessfullyCaptured(ImportFilesResult importFilesResult) {
     FileLink imageFile = FileUtils.createCapturedImageFile();
     try {
       log.debug("Writing captured Image to file ...");
-      if(captureImageResult.getImageUri() != null)
-        FileUtils.copyFile(new File(captureImageResult.getImageUri()), new File(imageFile.getUriString())); // TODO: move or copy file
-      else if(captureImageResult.getImageData() != null)
-        FileUtils.writeToFile(captureImageResult.getImageData(), imageFile);
+      if(importFilesResult.getFileUri() != null)
+        FileUtils.copyFile(new File(importFilesResult.getFileUri()), new File(imageFile.getUriString())); // TODO: move or copy file
+      else if(importFilesResult.getFileData() != null)
+        FileUtils.writeToFile(importFilesResult.getFileData(), imageFile);
       log.debug("Wrote to file, adding it to DeepThought ...");
       Application.getDeepThought().addFile(imageFile);
 

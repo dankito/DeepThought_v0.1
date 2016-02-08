@@ -19,9 +19,9 @@ public class Addresses {
   public final static String NotifyRemoteWeHaveConnectedMethodName = "DeviceConnected";
   public final static String HeartbeatMethodName = "Heartbeat";
 
-  public final static String StartCaptureImageMethodName = "StartCaptureImage";
-  public final static String CaptureImageResultMethodName = "CaptureImageResult";
-  public final static String StopCaptureImageMethodName = "StopCaptureImage";
+  public final static String StartImportFilesMethodName = "StartImportFile";
+  public final static String ImportFilesResultMethodName = "ImportFilesResult";
+  public final static String StopImportFilesMethodName = "StopImportFiles";
 
   public final static String DoOcrOnImageMethodName = "DoOcrOnImage";
   public final static String OcrResultMethodName = "OcrResult";
@@ -36,7 +36,7 @@ public class Addresses {
 
   static {
     MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, AskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
-        StartCaptureImageMethodName, StopCaptureImageMethodName, CaptureImageResultMethodName,
+        StartImportFilesMethodName, StopImportFilesMethodName, ImportFilesResultMethodName,
         DoOcrOnImageMethodName, OcrResultMethodName, StopDoOcrOnImageMethodName);
   }
 
@@ -63,9 +63,18 @@ public class Addresses {
   }
 
 
-  public static String getStartCaptureImageAddress(String host, int port) {
-    return createAddress(host, port, StartCaptureImageMethodName);
+  public static String getStartImportFilesAddress(String host, int port) {
+    return createAddress(host, port, StartImportFilesMethodName);
   }
+
+  public static String getImportFilesResultAddress(String host, int port) {
+    return createAddress(host, port, ImportFilesResultMethodName);
+  }
+
+  public static String getStopImportFilesAddress(String host, int port) {
+    return createAddress(host, port, StopImportFilesMethodName);
+  }
+
 
   public static String getDoOcrOnImageAddress(String host, int port) {
     return createAddress(host, port, DoOcrOnImageMethodName);
@@ -73,14 +82,6 @@ public class Addresses {
 
   public static String getOcrResultAddress(String host, int port) {
     return createAddress(host, port, OcrResultMethodName);
-  }
-
-  public static String getCaptureImageResultAddress(String host, int port) {
-    return createAddress(host, port, CaptureImageResultMethodName);
-  }
-
-  public static String getStopCaptureImageAddress(String host, int port) {
-    return createAddress(host, port, StopCaptureImageMethodName);
   }
 
   public static String getStopDoOcrOnImageMethodNameAddress(String host, int port) {

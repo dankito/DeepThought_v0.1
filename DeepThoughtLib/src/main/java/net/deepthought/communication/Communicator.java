@@ -1,7 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.deepthought.communication.listener.CaptureImageResultListener;
+import net.deepthought.communication.listener.ImportFilesResultListener;
 import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.listener.ScanBarcodeResultListener;
@@ -10,10 +10,11 @@ import net.deepthought.communication.messages.IMessagesDispatcher;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.messages.response.CaptureImageResultResponse;
+import net.deepthought.communication.messages.response.ImportFilesResultResponse;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
@@ -22,8 +23,9 @@ import net.deepthought.communication.messages.response.ScanBarcodeResultResponse
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.ImportFilesConfiguration;
 import net.deepthought.communication.registration.IRegisteredDevicesManager;
-import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
+import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
@@ -131,13 +133,13 @@ public class Communicator {
   }
 
 
-  public RequestWithAsynchronousResponse startCaptureImage(ConnectedDevice deviceToDoTheJob, CaptureImageResultListener listener) {
-    String address = Addresses.getStartCaptureImageAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
-    final RequestWithAsynchronousResponse request = new RequestWithAsynchronousResponse(getIpAddressToSendResponseTo(), getMessageReceiverPort());
+  public ImportFilesRequest startImportFiles(ConnectedDevice deviceToDoTheJob, ImportFilesConfiguration configuration, ImportFilesResultListener listener) {
+    String address = Addresses.getStartImportFilesAddress(deviceToDoTheJob.getAddress(), deviceToDoTheJob.getMessagesPort());
+    final ImportFilesRequest request = new ImportFilesRequest(getIpAddressToSendResponseTo(), getMessageReceiverPort(), configuration);
 
     listenerManager.addListenerForResponse(request, listener);
 
-    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+    dispatcher.sendMultipartMessageAsync(address, request, new CommunicatorResponseListener() {
       @Override
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(request, communicatorResponse); // TODO: if an error occurred inform caller
@@ -147,7 +149,7 @@ public class Communicator {
     return request;
   }
 
-//  public void stopCaptureImage(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
+//  public void stopImportFiles(int messageId, ConnectedDevice deviceToDoTheJob, final ResponseListener listener) {
 //    if(listenerManager.removeListenerForMessageId(messageId) == false) {
 //      log.error("stopCaptureImage() has been called but there was no Listener registered for MessageId " + messageId);
 //    }
@@ -163,9 +165,9 @@ public class Communicator {
 //    });
 //  }
 
-  public void respondToCaptureImageRequest(RequestWithAsynchronousResponse request, CaptureImageResult result, final ResponseListener listener) {
-    String address = Addresses.getCaptureImageResultAddress(request.getAddress(), request.getPort());
-    final CaptureImageResultResponse response = new CaptureImageResultResponse(result, request.getMessageId());
+  public void respondToImportFilesRequest(RequestWithAsynchronousResponse request, ImportFilesResult result, final ResponseListener listener) {
+    String address = Addresses.getImportFilesResultAddress(request.getAddress(), request.getPort());
+    final ImportFilesResultResponse response = new ImportFilesResultResponse(result, request.getMessageId());
 
     dispatcher.sendMultipartMessageAsync(address, response, new CommunicatorResponseListener() {
       @Override

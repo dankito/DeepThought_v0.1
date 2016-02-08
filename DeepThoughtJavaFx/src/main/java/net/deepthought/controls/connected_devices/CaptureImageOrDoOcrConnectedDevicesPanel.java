@@ -1,12 +1,14 @@
 package net.deepthought.controls.connected_devices;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.CaptureImageResultListener;
+import net.deepthought.communication.listener.ImportFilesResultListener;
 import net.deepthought.communication.listener.OcrResultListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.response.OcrResultResponse;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.DoOcrConfiguration;
+import net.deepthought.communication.model.ImportFilesConfiguration;
+import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.communication.model.OcrSource;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.localization.JavaFxLocalization;
@@ -38,15 +40,15 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   private static final Logger log = LoggerFactory.getLogger(CaptureImageOrDoOcrConnectedDevicesPanel.class);
 
 
-  protected CaptureImageResultListener captureImageResultListener = null;
+  protected ImportFilesResultListener importFilesResultListener = null;
 
   protected OcrResultListener ocrResultListener = null;
 
   protected Label lblDoOcrProgress = null;
 
 
-  public CaptureImageOrDoOcrConnectedDevicesPanel(CaptureImageResultListener captureImageResultListener, OcrResultListener ocrResultListener) {
-    this.captureImageResultListener = captureImageResultListener;
+  public CaptureImageOrDoOcrConnectedDevicesPanel(ImportFilesResultListener importFilesResultListener, OcrResultListener ocrResultListener) {
+    this.importFilesResultListener = importFilesResultListener;
     this.ocrResultListener = ocrResultListener;
 
     initLabelDoOcrProgress();
@@ -55,7 +57,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
 
   @Override
   public void cleanUp() {
-    this.captureImageResultListener = null;
+    this.importFilesResultListener = null;
     this.ocrResultListener = null;
 
     super.cleanUp();
@@ -76,12 +78,10 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   }
 
   protected void addItemsToConnectedDeviceContextMenu(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    addImportFilesMenuItem(connectedDevice, contextMenu);
+
     if(connectedDevice.hasCaptureDevice()) {
-      MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-      JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
-      // TODO: store requestMessageId so that Capturing Image process can be stopped
-      captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startCaptureImage(connectedDevice, captureImageResultListener));
-      contextMenu.getItems().add(captureImageMenuItem);
+      addCaptureImageMenuItem(connectedDevice, contextMenu);
     }
 
     if(connectedDevice.canDoOcr()) {
@@ -95,6 +95,22 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
 
       addChooseRemoteImageAndDoOcrMenuItem(connectedDevice, contextMenu);
     }
+  }
+
+  protected void addImportFilesMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "import.files");
+    // TODO: store requestMessageId so that Capturing Image process can be stopped
+    captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.SelectFromExistingFiles), importFilesResultListener));
+    contextMenu.getItems().add(captureImageMenuItem);
+  }
+
+  protected void addCaptureImageMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
+    MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
+    // TODO: store requestMessageId so that Capturing Image process can be stopped
+    captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), importFilesResultListener));
+    contextMenu.getItems().add(captureImageMenuItem);
   }
 
   protected void addSelectLocalImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {

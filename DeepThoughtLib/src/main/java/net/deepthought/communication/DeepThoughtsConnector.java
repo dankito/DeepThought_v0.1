@@ -3,7 +3,7 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
@@ -15,6 +15,7 @@ import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrRequest;
 import net.deepthought.communication.messages.request.GenericRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -76,7 +77,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected Set<ConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
 
-  protected Set<CaptureImageOrDoOcrListener> captureImageOrDoOcrListeners = new HashSet<>();
+  protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new HashSet<>();
 
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
@@ -379,12 +380,12 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return connectedDevicesListeners.remove(listener);
   }
 
-  public boolean addCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener) {
-    return captureImageOrDoOcrListeners.add(listener);
+  public boolean addImportFilesOrDoOcrListener(ImportFilesOrDoOcrListener listener) {
+    return importFilesOrDoOcrListeners.add(listener);
   }
 
-  public boolean removeCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener) {
-    return captureImageOrDoOcrListeners.remove(listener);
+  public boolean removeImportFilesOrDoOcrListener(ImportFilesOrDoOcrListener listener) {
+    return importFilesOrDoOcrListeners.remove(listener);
   }
 
   public boolean addMessagesReceiverListener(MessagesReceiverListener listener) {
@@ -452,10 +453,10 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       // TODO: is this correct, calling connectedToRegisteredDevice() ?
       return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
     }
-    else if(Addresses.StartCaptureImageMethodName.equals(methodName)) {
-      return handleStartCaptureImageMessage((RequestWithAsynchronousResponse) request);
+    else if(Addresses.StartImportFilesMethodName.equals(methodName)) {
+      return handleImportFilesMessage((ImportFilesRequest) request);
     }
-    else if(Addresses.CaptureImageResultMethodName.equals(methodName)) {
+    else if(Addresses.ImportFilesResultMethodName.equals(methodName)) {
       return true;
     }
     else if(Addresses.DoOcrOnImageMethodName.equals(methodName)) {
@@ -494,26 +495,26 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     return true;
   }
 
-  protected boolean handleStartCaptureImageMessage(RequestWithAsynchronousResponse request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
-      listener.captureImage(request);
+  protected boolean handleImportFilesMessage(ImportFilesRequest request) {
+    for(ImportFilesOrDoOcrListener listener : importFilesOrDoOcrListeners)
+      listener.importFiles(request);
     return true;
   }
 
   protected boolean handleDoOcrOnImageMessage(DoOcrRequest request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+    for(ImportFilesOrDoOcrListener listener : importFilesOrDoOcrListeners)
       listener.doOcr(request);
     return true;
   }
 
   protected boolean handleStartScanBarcodeMessage(RequestWithAsynchronousResponse request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+    for(ImportFilesOrDoOcrListener listener : importFilesOrDoOcrListeners)
       listener.scanBarcode(request);
     return true;
   }
 
   protected boolean handleStopScanBarcodeMessage(StopRequestWithAsynchronousResponse request) {
-    for(CaptureImageOrDoOcrListener listener : captureImageOrDoOcrListeners)
+    for(ImportFilesOrDoOcrListener listener : importFilesOrDoOcrListeners)
       // TODO
       listener.stopCaptureImageOrDoOcr(request);
     return true;

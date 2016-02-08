@@ -1,7 +1,7 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
@@ -46,8 +46,8 @@ public interface IDeepThoughtsConnector {
   boolean addConnectedDevicesListener(ConnectedDevicesListener listener);
   boolean removeConnectedDevicesListener(ConnectedDevicesListener listener);
 
-  boolean addCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener);
-  boolean removeCaptureImageOrDoOcrListener(CaptureImageOrDoOcrListener listener);
+  boolean addImportFilesOrDoOcrListener(ImportFilesOrDoOcrListener listener);
+  boolean removeImportFilesOrDoOcrListener(ImportFilesOrDoOcrListener listener);
 
   boolean addMessagesReceiverListener(MessagesReceiverListener listener);
   boolean removeMessagesReceiverListener(MessagesReceiverListener listener);

@@ -22,10 +22,11 @@ import com.google.zxing.integration.android.IntentResult;
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -33,9 +34,11 @@ import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.messages.response.ScanBarcodeResult;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.model.ImportFilesConfiguration;
+import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
-import net.deepthought.data.contentextractor.ocr.CaptureImageResult;
+import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.deepthought.data.listener.ApplicationListener;
@@ -158,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
       Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
-      Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
+      Application.getDeepThoughtsConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
   }
 
@@ -381,7 +384,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         File imageFile = new File(temporaryImageFile.getUriString());
         try {
           byte[] imageData = FileUtils.readFile(imageFile);
-          Application.getDeepThoughtsConnector().getCommunicator().respondToCaptureImageRequest(captureImageRequest, new CaptureImageResult(imageData, true), null);
+          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
         } catch (Exception ex) {
           log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
           // TODO: send error response
@@ -435,11 +438,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   };
 
-  protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+  protected ImportFilesOrDoOcrListener importFilesOrDoOcrListener = new ImportFilesOrDoOcrListener() {
 
     @Override
-    public void captureImage(RequestWithAsynchronousResponse request) {
-      captureImageAndSendToCaller(request);
+    public void importFiles(ImportFilesRequest request) {
+      exportFilesToRemoteDevice(request);
     }
 
     @Override
@@ -458,7 +461,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   };
 
-  protected void captureImageAndSendToCaller(RequestWithAsynchronousResponse request) {
+  protected void exportFilesToRemoteDevice(ImportFilesRequest request) {
+    ImportFilesConfiguration configuration = request.getConfiguration();
+
+    if(configuration.getSource() == ImportFilesSource.CaptureImage) {
+      capturePhotoAndSendToCaller(request);
+    }
+  }
+
+  protected void capturePhotoAndSendToCaller(ImportFilesRequest request) {
     temporaryImageFile = AndroidHelper.takePhoto(this, CaptureImageForConnectPeerRequestCode);
     if(temporaryImageFile != null)
       this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller

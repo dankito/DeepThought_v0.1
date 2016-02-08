@@ -29,12 +29,14 @@ public class ConnectorMessagesCreator {
   public static final String MultipartKeyMessageId = "message_id";
 
 
+  public static final String ImportFilesMultipartKeyConfiguration = "configuration";
+
   public static final String DoOcrMultipartKeyConfiguration = "configuration";
   public static final String DoOcrMultipartKeyImage = "image";
 
-  public static final String CaptureImageResultMultipartKeyRequestMessageId = "request_message_id";
-  public static final String CaptureImageResultMultipartKeyResponse = "response";
-  public static final String CaptureImageResultMultipartKeyImage = "image";
+  public static final String ImportFilesResultMultipartKeyRequestMessageId = "request_message_id";
+  public static final String ImportFilesResultMultipartKeyResponse = "response";
+  public static final String ImportFilesResultMultipartKeyImage = "image";
 
 
   private final static Logger log = LoggerFactory.getLogger(ConnectorMessagesCreator.class);

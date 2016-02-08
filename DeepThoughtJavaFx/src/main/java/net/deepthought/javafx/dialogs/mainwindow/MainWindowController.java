@@ -10,8 +10,9 @@ import net.deepthought.Application;
 import net.deepthought.clipboard.ClipboardContentChangedListener;
 import net.deepthought.clipboard.IClipboardWatcher;
 import net.deepthought.clipboard.JavaFxClipboardWatcher;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.messages.request.DoOcrRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.controller.Dialogs;
@@ -237,7 +238,7 @@ public class MainWindowController implements Initializable {
       pnConnectedDevices = new ConnectedDevicesPanel();
       statusBar.add(pnConnectedDevices, 2, 0);
 
-      Application.getDeepThoughtsConnector().addCaptureImageOrDoOcrListener(captureImageOrDoOcrListener);
+      Application.getDeepThoughtsConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
   }
 
@@ -876,10 +877,10 @@ public class MainWindowController implements Initializable {
   };
 
 
-  protected CaptureImageOrDoOcrListener captureImageOrDoOcrListener = new CaptureImageOrDoOcrListener() {
+  protected ImportFilesOrDoOcrListener importFilesOrDoOcrListener = new ImportFilesOrDoOcrListener() {
 
     @Override
-    public void captureImage(RequestWithAsynchronousResponse request) {
+    public void importFiles(ImportFilesRequest request) {
       // TODO
     }
 

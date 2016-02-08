@@ -4,7 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.TestApplicationConfiguration;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.deepthought.communication.listener.CaptureImageOrDoOcrListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
@@ -12,6 +12,7 @@ import net.deepthought.communication.messages.MessagesDispatcher;
 import net.deepthought.communication.messages.MessagesReceiver;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.request.DoOcrRequest;
+import net.deepthought.communication.messages.request.ImportFilesRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
@@ -21,6 +22,8 @@ import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.communication.model.ImportFilesConfiguration;
+import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.communication.model.OcrSource;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
@@ -302,10 +305,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
@@ -326,7 +329,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
       }
     });
 
-    communicator.startCaptureImage(localHost, null);
+    communicator.startImportFiles(localHost, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -338,10 +341,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
@@ -375,10 +378,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
@@ -412,10 +415,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
@@ -449,10 +452,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
@@ -486,10 +489,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
@@ -523,10 +526,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.addCaptureImageOrDoOcrListener(new CaptureImageOrDoOcrListener() {
+    connector.addImportFilesOrDoOcrListener(new ImportFilesOrDoOcrListener() {
 
       @Override
-      public void captureImage(RequestWithAsynchronousResponse request) {
+      public void importFiles(ImportFilesRequest request) {
 
       }
 
