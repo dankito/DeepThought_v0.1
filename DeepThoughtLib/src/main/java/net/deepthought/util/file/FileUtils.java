@@ -144,6 +144,10 @@ public class FileUtils {
     });
   }
 
+  public static FileLink moveFileToCapturedImagesFolder(String filePath) {
+    return moveFileToCapturedImagesFolder(new FileLink(filePath));
+  }
+
   public static FileLink moveFileToCapturedImagesFolder(FileLink file) {
     String destinationFilename = new File(getCapturedImagesFolder(), file.getName()).getAbsolutePath();
 

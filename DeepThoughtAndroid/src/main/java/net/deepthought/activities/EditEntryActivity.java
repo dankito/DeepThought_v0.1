@@ -2,6 +2,7 @@ package net.deepthought.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -87,7 +88,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected boolean hasEntryBeenEdited = false;
 
-  protected FileLink takenPhotoTempFile = null;
+  protected Uri takenPhotoTempFile = null;
 
 
   @Override
@@ -327,7 +328,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == TakePhotoRequestCode && resultCode == RESULT_OK) {
       if(takenPhotoTempFile != null) {
-        FileLink imageFile = FileUtils.moveFileToCapturedImagesFolder(takenPhotoTempFile);
+        FileLink imageFile = FileUtils.moveFileToCapturedImagesFolder(takenPhotoTempFile.toString());
         Application.getDeepThought().addFile(imageFile);
         ImageElementData imageData = new ImageElementData(imageFile);
         contentHtmlEditor.insertHtml(imageData.createHtmlCode());

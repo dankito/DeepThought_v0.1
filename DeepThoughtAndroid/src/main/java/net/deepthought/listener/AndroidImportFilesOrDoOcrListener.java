@@ -2,6 +2,7 @@ package net.deepthought.listener;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -25,7 +26,6 @@ import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.deepthought.data.contentextractor.ocr.RecognizeTextListener;
 import net.deepthought.data.contentextractor.ocr.TextRecognitionResult;
-import net.deepthought.data.model.FileLink;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   protected Activity context;
 
   // make them static otherwise the will be cleaned up when starting TakePhoto Activity
-  protected static FileLink temporaryImageFile = null;
+  protected static Uri capturedPhotoFile = null;
   protected static RequestWithAsynchronousResponse captureImageRequest = null;
 
   protected static ImportFilesRequest importFilesRequest = null;
@@ -100,9 +100,10 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   }
 
   protected void capturePhotoAndSendToCaller(ImportFilesRequest request) {
-    temporaryImageFile = AndroidHelper.takePhoto(context, CaptureImageForConnectPeerRequestCode);
-    if(temporaryImageFile != null)
-      this.captureImageRequest = request; // TODO: in this way only the last of several simultaneous Requests can be send back to caller
+    capturedPhotoFile = AndroidHelper.takePhoto(context, CaptureImageForConnectPeerRequestCode);
+    if(capturedPhotoFile != null) {
+      this.captureImageRequest = request; // TODO: in this way only the last of may several simultaneous Requests can be send back to caller
+    }
   }
 
   protected void selectImagesFromGalleryAndSendToCaller(ImportFilesRequest request) {
@@ -150,13 +151,13 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
 
   public void handleCaptureImageResult(int resultCode) {
     if(resultCode == Activity.RESULT_OK) {
-      if (captureImageRequest != null && temporaryImageFile != null) {
-        File imageFile = new File(temporaryImageFile.getUriString());
+      if (captureImageRequest != null && capturedPhotoFile != null) {
+        File imageFile = new File(capturedPhotoFile.toString());
         try {
           byte[] imageData = FileUtils.readFile(imageFile);
           Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
         } catch (Exception ex) {
-          log.error("Could not read captured photo from temp file " + temporaryImageFile.getUriString(), ex);
+          log.error("Could not read captured photo from temp file " + capturedPhotoFile, ex);
           // TODO: send error response
         }
 
@@ -164,7 +165,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
       }
     }
 
-    temporaryImageFile = null;
+    capturedPhotoFile = null;
     captureImageRequest = null;
   }
 
