@@ -10,6 +10,7 @@ import net.deepthought.communication.model.DoOcrConfiguration;
 import net.deepthought.communication.model.ImportFilesConfiguration;
 import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.communication.model.OcrSource;
+import net.deepthought.controls.Constants;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.localization.Localization;
@@ -29,6 +30,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 
@@ -98,16 +100,18 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   }
 
   protected void addImportFilesMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
-    MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
-    JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "import.files");
+    MenuItem importFilesMenuItem = new MenuItem(); // TODO: add icon
+    JavaFxLocalization.bindMenuItemText(importFilesMenuItem, "import.files");
+    importFilesMenuItem.setGraphic(createMenuItemIcon(Constants.ImportFilesIconPath));
     // TODO: store requestMessageId so that Capturing Image process can be stopped
-    captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.SelectFromExistingFiles), importFilesResultListener));
-    contextMenu.getItems().add(captureImageMenuItem);
+    importFilesMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.SelectFromExistingFiles), importFilesResultListener));
+    contextMenu.getItems().add(importFilesMenuItem);
   }
 
   protected void addCaptureImageMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
     MenuItem captureImageMenuItem = new MenuItem(); // TODO: add icon
     JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
+    captureImageMenuItem.setGraphic(createMenuItemIcon(Constants.CameraIconPath));
     // TODO: store requestMessageId so that Capturing Image process can be stopped
     captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), importFilesResultListener));
     contextMenu.getItems().add(captureImageMenuItem);
@@ -116,6 +120,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   protected void addSelectLocalImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
     MenuItem selectLocalImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
     JavaFxLocalization.bindMenuItemText(selectLocalImageAndDoOcrMenuItem, "select.local.image.and.do.ocr");
+    selectLocalImageAndDoOcrMenuItem.setGraphic(createMenuItemIcon(Constants.OcrOnLocalImageIconPath));
     selectLocalImageAndDoOcrMenuItem.setOnAction(event -> selectImagesForOcr(connectedDevice));
     contextMenu.getItems().add(selectLocalImageAndDoOcrMenuItem);
   }
@@ -123,6 +128,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   protected void addCaptureImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
     MenuItem captureImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
     JavaFxLocalization.bindMenuItemText(captureImageAndDoOcrMenuItem, "capture.image.and.do.ocr");
+    captureImageAndDoOcrMenuItem.setGraphic(createMenuItemIcon(Constants.CaptureImageAndDoOcrIconPath));
     // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
     captureImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
     contextMenu.getItems().add(captureImageAndDoOcrMenuItem);
@@ -131,9 +137,18 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   protected void addChooseRemoteImageAndDoOcrMenuItem(ConnectedDevice connectedDevice, ContextMenu contextMenu) {
     MenuItem chooseRemoteImageAndDoOcrMenuItem = new MenuItem(); // TODO: add icon
     JavaFxLocalization.bindMenuItemText(chooseRemoteImageAndDoOcrMenuItem, "chose.remote.image.and.do.ocr");
+    chooseRemoteImageAndDoOcrMenuItem.setGraphic(createMenuItemIcon(Constants.OcrOnRemoteImageIconPath));
     // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
     chooseRemoteImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), ocrResultListener));
     contextMenu.getItems().add(chooseRemoteImageAndDoOcrMenuItem);
+  }
+
+  protected ImageView createMenuItemIcon(String iconPath) {
+    ImageView icon = new ImageView(iconPath);
+    icon.setFitHeight(24);
+    icon.setFitWidth(32);
+
+    return icon;
   }
 
 

@@ -31,6 +31,12 @@ public class Constants {
 
   public final static String WindowIconPath = "icons/window_icon_16x16.png";
 
+  public final static String CameraIconPath = "icons/camera_import_icon.png";
+  public final static String ImportFilesIconPath = "icons/photos_import_icon.png";
+  public final static String OcrOnLocalImageIconPath = "icons/local_photos_ocr_icon.png";
+  public final static String CaptureImageAndDoOcrIconPath = "icons/camera_ocr_icon.png";
+  public final static String OcrOnRemoteImageIconPath = "icons/remote_photos_ocr_icon.png";
+
   public final static String LockClosedIconPath = "icons/lock_closed_icon_24x24.png";
 
   public final static String LockOpenedIconPath = "icons/lock_opened_icon_24x24.png";
