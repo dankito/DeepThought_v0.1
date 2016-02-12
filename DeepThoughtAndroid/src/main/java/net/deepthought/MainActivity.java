@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     protected TabLayout tabLayout;
 
-  protected AndroidImportFilesOrDoOcrListener importFilesOrDoOcrListener;
+  protected static AndroidImportFilesOrDoOcrListener importFilesOrDoOcrListener;
 
 
   @Override

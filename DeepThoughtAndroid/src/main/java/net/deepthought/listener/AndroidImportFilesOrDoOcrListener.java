@@ -54,12 +54,12 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   protected Activity context;
 
   // make them static otherwise the will be cleaned up when starting TakePhoto Activity
-  protected static Uri capturedPhotoFile = null;
-  protected static RequestWithAsynchronousResponse captureImageRequest = null;
+  protected Uri capturedPhotoFile = null;
+  protected RequestWithAsynchronousResponse captureImageRequest = null;
 
-  protected static ImportFilesRequest importFilesRequest = null;
+  protected ImportFilesRequest importFilesRequest = null;
 
-  protected static RequestWithAsynchronousResponse scanBarcodeRequest = null;
+  protected RequestWithAsynchronousResponse scanBarcodeRequest = null;
 
 
   public AndroidImportFilesOrDoOcrListener(Activity context) {
@@ -152,7 +152,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   public void handleCaptureImageResult(int resultCode) {
     if(resultCode == Activity.RESULT_OK) {
       if (captureImageRequest != null && capturedPhotoFile != null) {
-        File imageFile = new File(capturedPhotoFile.toString());
+        File imageFile = new File(capturedPhotoFile.getPath());
         try {
           byte[] imageData = FileUtils.readFile(imageFile);
           Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
