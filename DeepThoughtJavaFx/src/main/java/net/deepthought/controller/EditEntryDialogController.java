@@ -272,14 +272,21 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
   private void cleanUpToFindMemoryLeak() {
     contentPane.getChildren().remove(htmledAbstract);
+    htmledAbstract = null;
     contentPane.getChildren().remove(htmledContent);
+    htmledContent = null;
 
     contentPane.getChildren().remove(entryTagsControl);
+    entryTagsControl = null;
     contentPane.getChildren().remove(entryCategoriesControl);
+    entryCategoriesControl = null;
 
     contentPane.getChildren().remove(entryReferenceControl);
+    entryReferenceControl = null;
     contentPane.getChildren().remove(entryPersonsControl);
+    entryPersonsControl = null;
     contentPane.getChildren().remove(filesControl);
+    filesControl = null;
 
     entry = null;
     creationResult = null;
