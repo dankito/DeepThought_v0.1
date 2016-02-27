@@ -94,9 +94,10 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.listenerManager = new AsynchronousResponseListenerManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
           NetworkHelper.getIPAddressString(true), messageReceiverPort));
-    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
+
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
   }
 
 
