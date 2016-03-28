@@ -147,7 +147,9 @@ public class EditFileDialogController extends EntityDialogFrameController implem
         }
 
       detectedFileType = FileUtils.getFileType(uriString);
-      lblFileType.setText(detectedFileType.getName());
+      if(detectedFileType != null) {
+        lblFileType.setText(detectedFileType.getName());
+      }
     } catch(Exception ex) {
       log.debug("Could not extract file's name from uriString " + uriString, ex);
     }
