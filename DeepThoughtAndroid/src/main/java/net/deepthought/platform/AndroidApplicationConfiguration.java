@@ -76,7 +76,7 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
 //    return new ArrayList<>();
-    return Arrays.asList(new IPlugin[]{new SueddeutscheContentExtractor(), new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(),
+    return Arrays.asList(new IPlugin[]{new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(), new SueddeutscheContentExtractor(),
         new HeiseContentExtractor(), new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()});
   }
 
