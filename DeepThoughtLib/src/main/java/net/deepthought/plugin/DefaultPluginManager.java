@@ -103,8 +103,9 @@ public class DefaultPluginManager implements IPluginManager {
       ResourceFinder finder = new ResourceFinder("META-INF/services/", classLoader, url);
       List<Class> implementations = finder.findAllImplementations(IPlugin.class);
       for(Class implementation : implementations) {
-        if(IPlugin.class.isAssignableFrom(implementation))
+        if(IPlugin.class.isAssignableFrom(implementation)) {
           foundPlugin(implementation);
+        }
       }
     } catch(Exception ex) {
       log.error("Could not search for Plugins in file " + pluginFile.getAbsolutePath(), ex);
@@ -118,8 +119,9 @@ public class DefaultPluginManager implements IPluginManager {
   protected void foundPlugin(Class pluginImplementation) {
     try {
       Object newInstance = pluginImplementation.newInstance();
-      if(newInstance instanceof IPlugin)
-        pluginLoaded((IPlugin)newInstance);
+      if(newInstance instanceof IPlugin) {
+        pluginLoaded((IPlugin) newInstance);
+      }
     } catch(Exception ex) {
       log.error("Could not create new IPlugin instance for class " + pluginImplementation.getName(), ex);
     }
@@ -158,12 +160,13 @@ public class DefaultPluginManager implements IPluginManager {
   protected void pluginLoaded(final IPlugin plugin) {
     // if plugin is outdated, e.g. does not have methods needed for loading plugin, an AbstractMethodError will be thrown which
     // is not caught by try-catch clause -> dispatch to a new Thread so that only new Thread dies, not current one
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        handleLoadedPluginOnNewThread(plugin);
-      }
-    });
+//    Application.getThreadPool().runTaskAsync(new Runnable() {
+//      @Override
+//      public void run() {
+//        handleLoadedPluginOnNewThread(plugin);
+//      }
+//    });
+    handleLoadedPluginOnNewThread(plugin);
   }
 
   protected void handleLoadedPluginOnNewThread(IPlugin plugin) {

@@ -123,10 +123,10 @@ public class Application {
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
-    Application.contentExtractorManager = dependencyResolver.createContentExtractorManager();
-
     Application.htmlHelper = dependencyResolver.createHtmlHelper();
     Application.downloader = dependencyResolver.createDownloader();
+
+    Application.contentExtractorManager = dependencyResolver.createContentExtractorManager(); // ContentExtractorManager needs HtmlHelper to be created
 
     Application.languageDetector = dependencyResolver.createLanguageDetector();
 
