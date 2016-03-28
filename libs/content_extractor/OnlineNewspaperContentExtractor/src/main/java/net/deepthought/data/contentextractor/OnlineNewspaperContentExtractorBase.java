@@ -161,6 +161,17 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     }
   }
 
+
+  protected Element getFirstElementWithNodeName(Element parentElement, String nodeName) {
+    Elements classElements = parentElement.getElementsByTag(nodeName);
+    if(classElements.size() > 0) {
+      return classElements.get(0);
+    }
+
+    log.error("Could not find a <" + nodeName + "> node for parent Element " + parentElement);
+    return null;
+  }
+
   protected Element getElementByClassAndNodeName(Element parentElement, String nodeName, String className) {
     Elements classElements = parentElement.getElementsByClass(className);
     for(Element classElement : classElements) {

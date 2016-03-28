@@ -42,16 +42,159 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
   @Override
   public String getSiteBaseUrl() {
-    return "Sueddeutsche.de";
+    return "Jetzt.de";
   }
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://jetzt.sueddeutsche.de/") || url.startsWith("https://jetzt.sueddeutsche.de/");
+    return url.contains("www.jetzt.de/") ||url.contains("//jetzt.sueddeutsche.de/");
   }
 
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
+    try {
+      if(isOldJetztVersion(document)) {
+        return parseHtmlToEntryForOldVersion(articleUrl, document);
+      }
+
+      return parseHtmlToEntryNewVersion(articleUrl, document);
+    } catch(Exception ex) {
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html"), ex));
+    }
+  }
+
+
+  /*        Parsing an SZ Jetzt article of new Homepage Style, introduced beginning 2016      */
+
+  protected EntryCreationResult parseHtmlToEntryNewVersion(String articleUrl, Document document) {
+    Element articleElement = getFirstElementWithNodeName(document.body(), "article");
+    if(articleElement == null) {
+      log.warn("Could not find <article> Element");
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.with.node.name", "article")));
+    }
+
+    Elements articleContentElements = articleElement.getElementsByClass("article__content");
+    if(articleContentElements.size() == 0) {
+      log.warn("Could not find Element with class 'article__content'");
+      return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "article__content")));
+    }
+
+    String content = parseContent(articleContentElements.get(0));
+    String abstractString = extractAbstract(articleElement);
+
+    Entry articleEntry = new Entry(content, abstractString);
+    EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
+
+    createReference(creationResult, articleElement, articleUrl);
+
+    addNewspaperTag(creationResult);
+    addNewspaperCategory(creationResult);
+
+    return creationResult;
+  }
+
+  protected String extractAbstract(Element articleElement) {
+    String abstractString = null;
+    Element teaserElement = getElementByClassAndNodeName(articleElement, "div", "article__header-teaser");
+    if(teaserElement != null)
+      abstractString = teaserElement.html();
+    else
+      log.warn("Could not find teaser Element");
+    return abstractString;
+  }
+
+  protected String parseContent(Element articleContentElement) {
+    String content = "";
+
+    Elements itemsContainers = articleContentElement.select(".apos-item[data-type=\"richText\"]");
+    for(Element itemsContainer : itemsContainers) {
+      Elements paragraphs = itemsContainer.getElementsByTag("p");
+      for (Element paragraph : paragraphs) {
+        content += parseParagraph(paragraph);
+      }
+    }
+
+    return content;
+  }
+
+  protected String parseParagraph(Element paragraph) {
+    if(isEmptyParagraph(paragraph)) {
+      return "";
+    }
+
+    return paragraph.outerHtml();
+  }
+
+  protected boolean isEmptyParagraph(Element paragraph) {
+    if(paragraph == null || paragraph.text() == null) {
+      return true;
+    }
+
+    String text = paragraph.text().replace((char)160, ' '); // replace non breakable spaces
+    return text.trim().length() == 0;
+  }
+
+
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, Element articleElement, String articleUrl) {
+    String title = extractTitle(articleElement);
+    String publishingDate = extractPublishingDate(articleElement);
+
+    if(title != null && publishingDate != null) {
+      ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
+      articleReference.setOnlineAddressAndLastAccessToCurrentDateTime(articleUrl);
+      setArticleReference(creationResult, articleReference, publishingDate);
+
+      return articleReference;
+    }
+
+    return null;
+  }
+
+  protected String extractTitle(Element articleElement) {
+    String title = null;
+
+    Elements header2Elements = articleElement.getElementsByClass("article__header-title");
+    if(header2Elements.size() > 0)
+      title = header2Elements.get(0).text();
+    else
+      log.warn("Could not find h1 child Element of article Element with class 'article__header-title'");
+
+    return title;
+  }
+
+  protected String extractPublishingDate(Element articleElement) {
+    Elements headerDateElements = articleElement.getElementsByClass("article__header-date");
+    if(headerDateElements.size() == 0) {
+      log.warn("Could not find Element with class 'article__header-date', therefore cannot extract Article's publishing date");
+      return null;
+    }
+
+    Element headerDateElement = headerDateElements.get(0);
+    return tryToParseSueddeutscheJetztPublishingDate(headerDateElement.text());
+  }
+
+
+  protected static final DateFormat sueddeutscheJetztDateTimeFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+  protected String tryToParseSueddeutscheJetztPublishingDate(String publishingDate) {
+    publishingDate = publishingDate.trim();
+
+    try {
+      Date parsedDate = sueddeutscheJetztDateTimeFormat.parse(publishingDate);
+      return formatDateToDeepThoughtDateString(parsedDate);
+    } catch(Exception ex) { log.error("Could not parse Sueddeutsche Jetzt Date " + publishingDate, ex); }
+    return "";
+  }
+
+
+
+  /*        Parsing an SZ Jetzt article of old Homepage Style as it has been before beginning 2016      */
+
+  protected boolean isOldJetztVersion(Document document) {
+    return getElementByClassAndNodeName(document.body(), "div", "text") != null;
+  }
+
+  protected EntryCreationResult parseHtmlToEntryForOldVersion(String articleUrl, Document document) {
     try {
       Element textElement = getElementByClassAndNodeName(document.body(), "div", "text");
       if(textElement == null) {
@@ -65,13 +208,13 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.find.element.of.class.to.extract.article", "fliesstext")));
       }
 
-      String content = parseContent(fliesstextElement);
-      String abstractString = extractAbstract(textElement);
+      String content = parseContentForVersion(fliesstextElement);
+      String abstractString = extractAbstractOldVersion(textElement);
 
       Entry articleEntry = new Entry(content, abstractString);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      createReference(creationResult, textElement, articleUrl);
+      createReferenceOldVersion(creationResult, textElement, articleUrl);
 
       addNewspaperTag(creationResult);
       addNewspaperCategory(creationResult);
@@ -82,7 +225,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     }
   }
 
-  protected String extractAbstract(Element textElement) {
+  protected String extractAbstractOldVersion(Element textElement) {
     String abstractString = null;
     Element introElement = getElementByClassAndNodeName(textElement, "p", "intro");
     if(introElement != null)
@@ -92,23 +235,10 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return abstractString;
   }
 
-  protected String parseContent(Element fliesstextElement) {
+  protected String parseContentForVersion(Element fliesstextElement) {
     String content = "";
 
     for(Node child : fliesstextElement.childNodes()) {
-      // TODO: also extract instructional image with class image ?
-//      if("div".equals(child.nodeName()) == false && child instanceof Comment == false) {
-//        if(child instanceof Element) { // clear adbox Elements of children
-//          Element adboxElement = getElementByClassAndNodeName((Element)child, "div", "adbox");
-//          if(adboxElement != null)
-//            adboxElement.remove();
-//          for(Element childChild : ((Element) child).children()) {
-//            if("br".equals(childChild.nodeName())) // remove leading <br > elements
-//              childChild.remove();
-//            else break;
-//          }
-//        }
-
         if("em".equals(child.nodeName()) && child.outerHtml().contains("&gt;&gt; ")) { // teaser what's on next page
           String childText = ((Element)child).text();
           int nextPageTeaserStart = childText.indexOf(">>");
@@ -141,7 +271,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     if(content.endsWith("><em><br></em></span>"))
       content = content.substring(0, content.length() - "<span style=\"color:#888888;\"><em><br></em></span>".length());
 
-    content += parseContentOfNextPage(fliesstextElement);
+    content += parseContentOfNextPageOldVersion(fliesstextElement);
 
     while(content.endsWith("<br>")) // remove trailing <br> elements
       content = content.substring(0, content.length() - 4).trim();
@@ -149,7 +279,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return content;
   }
 
-  protected String parseContentOfNextPage(Element artikelElement) {
+  protected String parseContentOfNextPageOldVersion(Element artikelElement) {
     Element pagingElement = getElementByClassAndNodeName(artikelElement.parent(), "div", "paging");
     if(pagingElement != null) {
       int currentPageNumber = 0;
@@ -163,7 +293,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
             try {
               int nextPageNumber = Integer.parseInt(child.text());
               if(nextPageNumber == currentPageNumber + 1) {
-                return parseContentOfNextPage(child.attr("href"));
+                return parseContentOfNextPageOldVersion(child.attr("href"));
               }
             } catch(Exception ex) { log.error("Could not parse next page number " + child.text() + " to an integer"); break; }
           }
@@ -174,7 +304,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return "";
   }
 
-  protected String parseContentOfNextPage(String nextPageUrl) {
+  protected String parseContentOfNextPageOldVersion(String nextPageUrl) {
     if(nextPageUrl.startsWith("http://jetzt.sueddeutsche.de") == false)
       nextPageUrl = "http://jetzt.sueddeutsche.de" + nextPageUrl;
 
@@ -182,14 +312,14 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
       Document nextPageDocument = retrieveOnlineDocument(nextPageUrl);
       Element fliesstextElement = getElementByClassAndNodeName(nextPageDocument.body(), "div", "fliesstext");
       if(fliesstextElement != null)
-        return parseContent(fliesstextElement);
+        return parseContentForVersion(fliesstextElement);
     } catch(Exception ex) { log.error("Could not retrieve HTML code for next Page Url " + nextPageUrl, ex); }
     return "";
   }
 
-  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, Element textElement, String articleUrl) {
-    String title = extractTitle(textElement);
-    String publishingDate = extractPublishingDate(textElement);
+  protected ReferenceSubDivision createReferenceOldVersion(EntryCreationResult creationResult, Element textElement, String articleUrl) {
+    String title = extractTitleOldVersion(textElement);
+    String publishingDate = extractPublishingDateOldVersion(textElement);
 
     if(title != null && publishingDate != null) {
       ReferenceSubDivision articleReference = new ReferenceSubDivision(title);
@@ -202,7 +332,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return null;
   }
 
-  protected String extractTitle(Element textElement) {
+  protected String extractTitleOldVersion(Element textElement) {
     String title = null;
 
     Elements header1Elements = textElement.getElementsByTag("h1");
@@ -214,7 +344,7 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
     return title;
   }
 
-  protected String extractPublishingDate(Element textElement) {
+  protected String extractPublishingDateOldVersion(Element textElement) {
     Element textDetailsElement = textElement.getElementById("text_details");
     if(textDetailsElement == null) {
       log.warn("Could not find Element with id text_details");
@@ -223,25 +353,26 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
     for(Element detailsChild : textDetailsElement.children()) {
       if("p".equals(detailsChild.nodeName()) && detailsChild.hasClass("time")) {
-        return tryToParseSueddeutscheJetztPublishingDate(detailsChild.text());
+        return tryToParseSueddeutscheJetztPublishingDateOldVersion(detailsChild.text());
       }
     }
 
     return null;
   }
 
-  protected DateFormat sueddeutscheJetztDateTimeFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.GERMAN);
+  protected static final DateFormat sueddeutscheJetztDateTimeFormatOldVersion = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.GERMAN);
 
-  protected String tryToParseSueddeutscheJetztPublishingDate(String publishingDate) {
+  protected String tryToParseSueddeutscheJetztPublishingDateOldVersion(String publishingDate) {
     publishingDate = publishingDate.replace("Uhr", "");
     publishingDate = publishingDate.trim();
 
     try {
-      Date parsedDate = sueddeutscheJetztDateTimeFormat.parse(publishingDate);
+      Date parsedDate = sueddeutscheJetztDateTimeFormatOldVersion.parse(publishingDate);
       return formatDateToDeepThoughtDateString(parsedDate);
-    } catch(Exception ex) { log.error("Could not parse Sueddeutsche Magazin Date " + publishingDate, ex); }
+    } catch(Exception ex) { log.error("Could not parse Sueddeutsche Jetzt Date " + publishingDate, ex); }
     return "";
   }
+
 
   @Override
   protected void addNewspaperTag(EntryCreationResult creationResult) {
