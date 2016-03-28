@@ -62,6 +62,8 @@ public class CollapsibleHtmlEditor extends CollapsiblePane implements ICleanUp {
   @Override
   public void cleanUp() {
     connectedDevicesPanel.cleanUp();
+    importFilesResultListener = null;
+    ocrResultListener = null;
 
     setContent(null); // remove from Parent
     Application.getHtmlEditorPool().htmlEditorReleased(htmlEditor);

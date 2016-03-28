@@ -27,6 +27,10 @@ public class ChildWindowsController {
       if (listener != null)
         listener.windowClosed(windowStage, this);
     }
+
+    // added 13.013.2016
+    listener = null;
+    windowStage = null;
   }
 
   protected void closeDialog(DialogResult dialogResult) {

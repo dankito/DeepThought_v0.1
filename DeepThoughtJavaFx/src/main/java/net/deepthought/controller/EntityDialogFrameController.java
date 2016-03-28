@@ -180,6 +180,11 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
     Application.getSettings().removeSettingsChangedListener(settingsChangedListener);
     Application.removeApplicationListener(applicationListener);
 
+    // added 13.03.2016
+    entity = null;
+    settingsChangedListener = null;
+    applicationListener = null;
+
     super.closeDialog();
   }
 

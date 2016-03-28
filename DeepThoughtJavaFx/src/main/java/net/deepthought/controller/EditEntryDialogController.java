@@ -296,6 +296,16 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     editedAttachedFiles = null;
     editedEmbeddedFiles = null;
+
+    // added 13.03.2016
+    entryListener = null;
+    abstractListener = null;
+    contentListener = null;
+
+    dialogPane = null;
+    scrpnContent = null;
+
+    fieldsWithUnsavedChanges.clear();
   }
 
   @Override
