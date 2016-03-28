@@ -4,11 +4,13 @@ import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.listener.AsynchronousResponseListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
+import net.deepthought.communication.messages.request.GenericRequest;
 import net.deepthought.communication.messages.request.MultipartRequest;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.messages.response.ResponseToAsynchronousRequest;
+import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.deepthought.data.persistence.serializer.SerializationResult;
@@ -226,8 +228,13 @@ public class MessagesReceiver extends NanoHTTPD {
       log.debug("Deserializing received message body ...");
       DeserializationResult deserializationResult = JsonIoJsonHelper.parseJsonString(messageBody, requestClass);
       log.debug("Deserializing done");
-      if(deserializationResult.successful())
-        return (Request)deserializationResult.getResult();
+
+      if(deserializationResult.successful()) {
+        Request request = (Request)deserializationResult.getResult();
+        mayAdjustSenderAddress(request, session);
+
+        return request;
+      }
     }
 
     return null;
@@ -250,6 +257,13 @@ public class MessagesReceiver extends NanoHTTPD {
     }
 
     return null;
+  }
+
+  protected void mayAdjustSenderAddress(Request request, IHTTPSession session) {
+    if(request instanceof GenericRequest && ((GenericRequest)request).getRequestBody() instanceof ConnectedDevice) {
+      ConnectedDevice device = ((GenericRequest<ConnectedDevice>)request).getRequestBody();
+      device.setAddress(session.getRemoteIp());
+    }
   }
 
   protected String getAddressFromMultipartRequest(Map<String, String> partFiles) throws IOException {

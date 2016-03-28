@@ -210,7 +210,7 @@ public class RegisteredDevicesSearcher {
   }
 
   protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
-    ConnectedDevice serverInfo = messagesCreator.getConnectedDeviceFromMessage(buffer, packet.getLength());
+    ConnectedDevice serverInfo = messagesCreator.getConnectedDeviceFromMessage(buffer, packet.getLength(), packet.getAddress());
 
     if(registeredDevicesManager.isDeviceRegistered(serverInfo) == true) {
       registeredDeviceConnected(listener, packet, serverInfo);

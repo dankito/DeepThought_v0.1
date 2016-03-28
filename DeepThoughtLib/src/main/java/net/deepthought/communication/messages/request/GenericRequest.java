@@ -15,4 +15,13 @@ public class GenericRequest<T> extends Request {
     return requestBody;
   }
 
+
+  @Override
+  public String toString() {
+    if(requestBody != null) {
+      return "GenericRequest: " + requestBody.toString();
+    }
+
+    return super.toString();
+  }
 }

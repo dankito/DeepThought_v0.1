@@ -13,6 +13,8 @@ import net.deepthought.util.OsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+
 /**
  * Created by ganymed on 19/08/15.
  */
@@ -96,11 +98,13 @@ public class ConnectorMessagesCreator {
     return null;
   }
 
-  public ConnectedDevice getConnectedDeviceFromMessage(byte[] receivedBytes, int packetLength) {
+  public ConnectedDevice getConnectedDeviceFromMessage(byte[] receivedBytes, int packetLength, InetAddress address) {
     String messageBody = getMessageBodyFromMessage(receivedBytes, packetLength);
     DeserializationResult<ConnectedDevice> result = JsonIoJsonHelper.parseJsonString(messageBody, ConnectedDevice.class);
+
     if(result.successful()) {
       ConnectedDevice device = result.getResult();
+      device.setAddress(address.getHostAddress());
       device.setStoredDeviceInstance(config.getLoggedOnUser());
 
       return device;

@@ -930,6 +930,11 @@ public abstract class NanoHTTPD {
     }
 
     @Override
+    public String getRemoteIp() {
+      return remoteIp;
+    }
+
+    @Override
     public void parseBody(Map<String, String> files) throws IOException, ResponseException {
       final int REQUEST_BUFFER_LEN = 512;
       final int MEMORY_STORE_LIMIT = 1024;
@@ -1103,6 +1108,8 @@ public abstract class NanoHTTPD {
      * @return the path part of the URL.
      */
     String getUri();
+
+    String getRemoteIp();
 
     /**
      * Adds the files in the request body to the files map.

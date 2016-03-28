@@ -53,8 +53,16 @@ public class ConnectedDevice {
     return address;
   }
 
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
   public int getMessagesPort() {
     return messagesPort;
+  }
+
+  public void setMessagesPort(int messagesPort) {
+    this.messagesPort = messagesPort;
   }
 
   public boolean hasCaptureDevice() {
