@@ -445,7 +445,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   protected List<ArticlesOverviewItem> extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
-    listener.overviewItemsRetrieved(this, extractSocialModuleItems(frontPage), false);
+//    listener.overviewItemsRetrieved(this, extractSocialModuleItems(frontPage), false);
     listener.overviewItemsRetrieved(this, extractTileItems(frontPage), false);
     listener.overviewItemsRetrieved(this, extractTeaserItems(frontPage), true);
     // TODO: also parse flyout teasers (<ul class="flyout-teasers">) ?
@@ -456,7 +456,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   protected Collection<ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
-    Elements teaserElements = frontPage.body().getElementsByClass("teaser");
+    Elements teaserElements = frontPage.body().getElementsByClass("teaserElement");
     for (Element teaser : teaserElements) {
       ArticlesOverviewItem teaserItem = extractItemFromTeaserElement(teaser);
       if (teaserItem != null)
@@ -472,10 +472,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     ArticlesOverviewItem item = null;
 
     for(Element child : teaser.children()) {
-      if("a".equals(child.nodeName()) && child.hasClass("entry-title")) {
+      if("a".equals(child.nodeName())) {
         item = createOverviewItemFromAnchorElement(child);
       }
-      else if("p".equals(child.nodeName()) && child.hasClass("entry-summary")) {
+      else if("p".equals(child.nodeName()) && child.hasClass("teaserElement__text")) {
         if(item != null) {
           item.setSummary(child.ownText());
           tryToExtractLabel(item, child);
@@ -494,7 +494,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         item.setPreviewImageUrl(extractImageUrlFromImgElement(anchorChild));
       else if("strong".equals(anchorChild.nodeName()))
         item.setSubTitle(anchorChild.text().trim());
-      else if("em".equals(anchorChild.nodeName()))
+      else if("h2".equals(anchorChild.nodeName()))
         item.setTitle(anchorChild.text().trim());
     }
 
