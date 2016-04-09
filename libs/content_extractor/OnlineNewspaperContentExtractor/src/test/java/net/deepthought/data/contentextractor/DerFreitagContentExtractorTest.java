@@ -82,8 +82,8 @@ public class DerFreitagContentExtractorTest extends GermanOnlineNewspaperContent
 
     try { getArticlesOverviewLatch.await(10, TimeUnit.MINUTES); } catch(Exception ex) { }
 
-    Assert.assertEquals(2, partialItemsExtractionCall.get());
-    Assert.assertTrue(allItems.size() >= 30);
+    Assert.assertEquals(3, partialItemsExtractionCall.get());
+    Assert.assertTrue(allItems.size() >= 40);
   }
 
 

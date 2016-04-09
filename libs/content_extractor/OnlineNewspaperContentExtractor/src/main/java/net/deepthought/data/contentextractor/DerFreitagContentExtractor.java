@@ -293,11 +293,60 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
     List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
     Set<String> extractedArticleUrls = new HashSet<>();
 
+    extractProductTeasersItems(frontPage, overviewItems, extractedArticleUrls);
+    listener.overviewItemsRetrieved(this, overviewItems, false);
+
     extractClusterArticleItems(frontPage, overviewItems, extractedArticleUrls);
     listener.overviewItemsRetrieved(this, overviewItems, false);
 
     extractLinkCycleArticles(frontPage, overviewItems, extractedArticleUrls);
     listener.overviewItemsRetrieved(this, overviewItems, true);
+  }
+
+
+  protected void extractProductTeasersItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Elements productTeaserElements = frontPage.body().select("aside#product-teasers .product");
+    for(Element productTeaserElement : productTeaserElements) {
+      extractProductTeaserOverviewItem(productTeaserElement, overviewItems, extractedArticleUrls);
+    }
+  }
+
+  protected void extractProductTeaserOverviewItem(Element productTeaserElement, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Element headerAnchor = productTeaserElement.select("header a").first();
+    if(headerAnchor != null) {
+      String articleUrl = headerAnchor.attr("href");
+      if(extractedArticleUrls.contains(articleUrl)) {
+        return;
+      }
+      extractedArticleUrls.add(articleUrl);
+
+      ArticlesOverviewItem item = new ArticlesOverviewItem(this, articleUrl);
+      item.setLabel(headerAnchor.text());
+      overviewItems.add(item);
+
+      extractProductTeaserTitleAndSummary(productTeaserElement, item);
+    }
+  }
+
+  protected void extractProductTeaserTitleAndSummary(Element productTeaserElement, ArticlesOverviewItem item) {
+    Element innerDiv = productTeaserElement.select("div.inner").first();
+    if(innerDiv != null) {
+      Element imgElement = innerDiv.select("div.image img").first();
+      if(imgElement != null) {
+        item.setPreviewImageUrl(imgElement.attr("src"));
+        item.setTitle(imgElement.attr("title"));
+      }
+
+      Element artistElement = innerDiv.select("div.artist span").first();
+      if(artistElement != null) {
+        item.setSubTitle(artistElement.text());
+      }
+
+      Element descriptionElement = innerDiv.select("div.description a").first();
+      if(descriptionElement != null) {
+        item.setSummary(descriptionElement.text());
+      }
+    }
   }
 
 
