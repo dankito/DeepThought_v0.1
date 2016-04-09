@@ -303,6 +303,9 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
     listener.overviewItemsRetrieved(this, overviewItems, false);
 
     extractLinkCycleArticles(frontPage, overviewItems, extractedArticleUrls);
+    listener.overviewItemsRetrieved(this, overviewItems, false);
+
+    extractSidekickArticles(frontPage, overviewItems, extractedArticleUrls);
     listener.overviewItemsRetrieved(this, overviewItems, true);
   }
 
@@ -436,6 +439,37 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
       for(Element linkCycleArticle : listingElement.select("article")) {
         extractOverviewItemFromArticleElement(overviewItems, linkCycleArticle, extractedArticleUrls);
+      }
+    }
+  }
+
+
+  protected void extractSidekickArticles(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Element sidekickElement = frontPage.body().select("#sidekick").first();
+    if(sidekickElement != null) {
+      for(Element sidekickArticle : sidekickElement.select("article")) {
+        extractSidekickArticle(sidekickArticle, overviewItems, extractedArticleUrls);
+      }
+    }
+  }
+
+  protected void extractSidekickArticle(Element sidekickArticle, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Element sidekickAnchor = sidekickArticle.select("h2 a").first();
+    if(sidekickAnchor != null) {
+      String articleUrl = sidekickAnchor.attr("href");
+      if(extractedArticleUrls.contains(articleUrl)) {
+        return;
+      }
+      extractedArticleUrls.add(articleUrl);
+
+      ArticlesOverviewItem item = new ArticlesOverviewItem(this, articleUrl);
+      overviewItems.add(item);
+
+      TextAndCatchWord summary = tryToExtractTextAndCatchWordFromElement(sidekickAnchor);
+      item.setSummary(summary.getText());
+
+      if(summary.isCatchWordSet()) {
+        item.setTitle(summary.getCatchWord());
       }
     }
   }
