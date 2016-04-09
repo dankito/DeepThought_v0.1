@@ -1,11 +1,21 @@
 package net.deepthought.data.contentextractor;
 
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -50,31 +60,31 @@ public class DerFreitagContentExtractorTest extends GermanOnlineNewspaperContent
   }
 
 
-//  @Test
-//  public void testGetArticlesOverview() {
-//    final List<ArticlesOverviewItem> allItems = new ArrayList<>();
-//    final AtomicInteger partialItemsExtractionCall = new AtomicInteger();
-//    final CountDownLatch getArticlesOverviewLatch = new CountDownLatch(1);
-//
-//    contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
-//      @Override
-//      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {
-//        partialItemsExtractionCall.incrementAndGet();
-//        allItems.addAll(items);
-//
-//        Assert.assertNotNull(contentExtractor);
-//        Assert.assertFalse(items.size() == 0);
-//
-//        if (isDone)
-//          getArticlesOverviewLatch.countDown();
-//      }
-//    });
-//
-//    try { getArticlesOverviewLatch.await(10, TimeUnit.SECONDS); } catch(Exception ex) { }
-//
-//    Assert.assertEquals(2, partialItemsExtractionCall.get());
-//    Assert.assertTrue(allItems.size() > 10);
-//  }
+  @Test
+  public void testGetArticlesOverview() {
+    final Set<ArticlesOverviewItem> allItems = new HashSet<>();
+    final AtomicInteger partialItemsExtractionCall = new AtomicInteger();
+    final CountDownLatch getArticlesOverviewLatch = new CountDownLatch(1);
+
+    contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
+      @Override
+      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {
+        partialItemsExtractionCall.incrementAndGet();
+        allItems.addAll(items);
+
+        Assert.assertNotNull(contentExtractor);
+        Assert.assertFalse(items.size() == 0);
+
+        if (isDone)
+          getArticlesOverviewLatch.countDown();
+      }
+    });
+
+    try { getArticlesOverviewLatch.await(10, TimeUnit.MINUTES); } catch(Exception ex) { }
+
+    Assert.assertEquals(2, partialItemsExtractionCall.get());
+    Assert.assertTrue(allItems.size() >= 30);
+  }
 
 
 }

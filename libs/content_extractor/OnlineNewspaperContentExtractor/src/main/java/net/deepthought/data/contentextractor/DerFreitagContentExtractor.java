@@ -20,8 +20,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Created by ganymed on 20/06/15.
@@ -269,7 +271,7 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
   @Override
   public boolean hasArticlesOverview() {
-    return false;
+    return true;
   }
 
   @Override
@@ -288,14 +290,158 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   }
 
   protected void extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
-    List<ArticlesOverviewItem> indexItems = new ArrayList<>();
-    extractIndexItems(frontPage, indexItems);
-    listener.overviewItemsRetrieved(this, indexItems, true);
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+    Set<String> extractedArticleUrls = new HashSet<>();
+
+    extractClusterArticleItems(frontPage, overviewItems, extractedArticleUrls);
+    listener.overviewItemsRetrieved(this, overviewItems, false);
+
+    extractLinkCycleArticles(frontPage, overviewItems, extractedArticleUrls);
+    listener.overviewItemsRetrieved(this, overviewItems, true);
   }
 
 
-  protected void extractIndexItems(Document frontPage, List<ArticlesOverviewItem> overviewItems) {
+  protected void extractClusterArticleItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Elements clusterElements = frontPage.body().select(".cluster, .additional-links");
 
+    for(Element clusterElement : clusterElements) {
+      extractOverviewItemsFromCluster(overviewItems, clusterElement, extractedArticleUrls);
+    }
+  }
+
+  protected void extractOverviewItemsFromCluster(List<ArticlesOverviewItem> overviewItems, Element clusterElement, Set<String> extractedArticleUrls) {
+    String category = clusterElement.attr("id");
+    if(category != null) {
+      category = category.replace("cluster-prefix-", "");
+      if(category.contains("-")) {
+        category = category.substring(0, category.indexOf('-'));
+      }
+    }
+
+    Element clusterMainArticle = clusterElement.select("article").first();
+    if(clusterMainArticle != null) {
+      extractOverviewItemFromArticleElement(overviewItems, clusterMainArticle, extractedArticleUrls);
+    }
+
+    Elements additionalLinksElements = clusterElement.select(".additional-links article");
+    for(Element additionalLinkClusterElement : additionalLinksElements) {
+      extractOverviewItemFromArticleElement(overviewItems, additionalLinkClusterElement, extractedArticleUrls);
+    }
+  }
+
+
+  protected void extractLinkCycleArticles(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Elements linkCycleElements = frontPage.body().select(".linkcycle");
+    for(Element listingElement : linkCycleElements) {
+      String category = null;
+      Element headerElement = listingElement.select("header").first();
+      if(headerElement != null) {
+        category = headerElement.text();
+      }
+
+      for(Element linkCycleArticle : listingElement.select("article")) {
+        extractOverviewItemFromArticleElement(overviewItems, linkCycleArticle, extractedArticleUrls);
+      }
+    }
+  }
+
+
+  protected void extractOverviewItemFromArticleElement(List<ArticlesOverviewItem> overviewItems, Element articleElement, Set<String> extractedArticleUrls) {
+    Element anchorElement = articleElement.select("h2 a").first();
+    if(anchorElement != null) {
+      String articleUrl = anchorElement.attr("href");
+      if(extractedArticleUrls.contains(articleUrl)) {
+        return;
+      }
+      extractedArticleUrls.add(articleUrl);
+      
+      ArticlesOverviewItem item = new ArticlesOverviewItem(this, articleUrl);
+      overviewItems.add(item);
+
+      TextAndCatchWord title = tryToExtractTextAndCatchWordFromElement(anchorElement);
+      item.setTitle(title.getText());
+      if(title.isCatchWordSet()) {
+        item.setSubTitle(title.getCatchWord());
+      }
+
+      mayExtractImageAndSummary(articleElement, item);
+    }
+  }
+
+  protected void mayExtractImageAndSummary(Element articleElement, ArticlesOverviewItem item) {
+    Element imageBox = articleElement.select("div.imagebox").first();
+    if(imageBox != null) {
+      Element imgElement = imageBox.select("div.image img").first();
+      if(imgElement != null) {
+        item.setPreviewImageUrl(imgElement.attr("src"));
+      }
+
+      Element descriptionElement = imageBox.select("div.box a.description").first();
+      if(descriptionElement != null) {
+        TextAndCatchWord summary = tryToExtractTextAndCatchWordFromElement(descriptionElement);
+        item.setSummary(summary.getText());
+
+        if(summary.isCatchWordSet()) {
+          item.setSubTitle(summary.getCatchWord());
+        }
+      }
+    }
+  }
+
+
+  protected TextAndCatchWord tryToExtractTextAndCatchWordFromElement(Element element) {
+    Element spanChildElement = element.select("span.catchword").first();
+    if(spanChildElement != null) { // an Element with a <span> child containing Catchword
+      spanChildElement.remove();
+      return new TextAndCatchWord(element.text(), spanChildElement.text());
+    }
+
+    return new TextAndCatchWord(element.text());
+  }
+
+  protected class TextAndCatchWord {
+    public String text;
+    public String catchWord;
+
+    public TextAndCatchWord(String text) {
+      this.text = text;
+    }
+
+    public TextAndCatchWord(String text, String catchWord) {
+      this.text = text;
+      this.catchWord = catchWord;
+    }
+
+
+    public String getText() {
+      return text;
+    }
+
+    public void setText(String text) {
+      this.text = text;
+    }
+
+    public boolean isCatchWordSet() {
+      return catchWord != null;
+    }
+
+    public String getCatchWord() {
+      return catchWord;
+    }
+
+    public void setCatchWord(String catchWord) {
+      this.catchWord = catchWord;
+    }
+
+
+    @Override
+    public String toString() {
+      String description = text;
+      if(isCatchWordSet()) {
+        description += " (" + catchWord + ")";
+      }
+      return description;
+    }
   }
 
 }
