@@ -32,8 +32,6 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
   private final static Logger log = LoggerFactory.getLogger(DerFreitagContentExtractor.class);
 
-//  protected static final String LogoFileName = "heise_online_logo.png";
-
 
   @Override
   public int getSupportedPluginSystemVersion() {
@@ -61,10 +59,10 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
     return "https://www.freitag.de";
   }
 
-  //  @Override
-//  public String getIconUrl() {
-//    return tryToLoadIconFile(LogoFileName);
-//  }
+    @Override
+  public String getIconUrl() {
+    return "https://www.freitag.de/++theme++freitag.theme/images/apple-touch-icon-114x114-precomposed.png";
+  }
 
 
   @Override
