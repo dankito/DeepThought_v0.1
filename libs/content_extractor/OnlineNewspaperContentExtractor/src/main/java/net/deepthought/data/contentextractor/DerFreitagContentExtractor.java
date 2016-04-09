@@ -293,6 +293,9 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
     List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
     Set<String> extractedArticleUrls = new HashSet<>();
 
+    extractGalleryItems(frontPage, overviewItems, extractedArticleUrls);
+    listener.overviewItemsRetrieved(this, overviewItems, false);
+
     extractProductTeasersItems(frontPage, overviewItems, extractedArticleUrls);
     listener.overviewItemsRetrieved(this, overviewItems, false);
 
@@ -301,6 +304,49 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
     extractLinkCycleArticles(frontPage, overviewItems, extractedArticleUrls);
     listener.overviewItemsRetrieved(this, overviewItems, true);
+  }
+
+
+  protected void extractGalleryItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Element galleryElement = frontPage.body().select("#gallery-content").first();
+    if(galleryElement != null) {
+      for(Element galleryArticle : galleryElement.select("article")) {
+        extractOverviewItemFromGalleryArticle(galleryElement, galleryArticle, overviewItems, extractedArticleUrls);
+      }
+    }
+  }
+
+  protected void extractOverviewItemFromGalleryArticle(Element galleryElement, Element galleryArticle, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+    Element descriptionElement = galleryArticle.select("div.info .description").first();
+    if(descriptionElement != null) {
+      String articleUrl = descriptionElement.attr("href");
+      if(extractedArticleUrls.contains(articleUrl)) {
+        return;
+      }
+      extractedArticleUrls.add(articleUrl);
+
+      ArticlesOverviewItem item = new ArticlesOverviewItem(this, articleUrl, descriptionElement.text());
+      overviewItems.add(item);
+
+      Element headerElement = galleryArticle.select("div.info h1").first();
+      if (headerElement != null) {
+        item.setTitle(headerElement.text());
+      }
+
+      Element imgElement = galleryArticle.select(".image img").first();
+      if(imgElement != null) {
+        item.setPreviewImageUrl(imgElement.attr("src"));
+      }
+
+      tryToFindGalleryArticleSubTitle(galleryElement, item);
+    }
+  }
+
+  protected void tryToFindGalleryArticleSubTitle(Element galleryElement, ArticlesOverviewItem item) {
+    Element subTitleElement = galleryElement.select(".navigation [href=\"" + item.getUrl() + "\"").first();
+    if(subTitleElement != null) {
+      item.setSubTitle(subTitleElement.text());
+    }
   }
 
 
