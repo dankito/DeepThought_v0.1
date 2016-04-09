@@ -290,33 +290,31 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   }
 
   protected void extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
-    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
     Set<String> extractedArticleUrls = new HashSet<>();
 
-    extractGalleryItems(frontPage, overviewItems, extractedArticleUrls);
-    listener.overviewItemsRetrieved(this, overviewItems, false);
+    listener.overviewItemsRetrieved(this, extractGalleryItems(frontPage, extractedArticleUrls), false);
 
-    extractProductTeasersItems(frontPage, overviewItems, extractedArticleUrls);
-    listener.overviewItemsRetrieved(this, overviewItems, false);
+    listener.overviewItemsRetrieved(this, extractProductTeasersItems(frontPage, extractedArticleUrls), false);
 
-    extractClusterArticleItems(frontPage, overviewItems, extractedArticleUrls);
-    listener.overviewItemsRetrieved(this, overviewItems, false);
+    listener.overviewItemsRetrieved(this, extractClusterArticleItems(frontPage, extractedArticleUrls), false);
 
-    extractLinkCycleArticles(frontPage, overviewItems, extractedArticleUrls);
-    listener.overviewItemsRetrieved(this, overviewItems, false);
+    listener.overviewItemsRetrieved(this, extractLinkCycleArticles(frontPage, extractedArticleUrls), false);
 
-    extractSidekickArticles(frontPage, overviewItems, extractedArticleUrls);
-    listener.overviewItemsRetrieved(this, overviewItems, true);
+    listener.overviewItemsRetrieved(this, extractSidekickArticles(frontPage, extractedArticleUrls), true);
   }
 
 
-  protected void extractGalleryItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+  protected List<ArticlesOverviewItem> extractGalleryItems(Document frontPage, Set<String> extractedArticleUrls) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+
     Element galleryElement = frontPage.body().select("#gallery-content").first();
     if(galleryElement != null) {
       for(Element galleryArticle : galleryElement.select("article")) {
         extractOverviewItemFromGalleryArticle(galleryElement, galleryArticle, overviewItems, extractedArticleUrls);
       }
     }
+
+    return overviewItems;
   }
 
   protected void extractOverviewItemFromGalleryArticle(Element galleryElement, Element galleryArticle, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
@@ -353,11 +351,15 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   }
 
 
-  protected void extractProductTeasersItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+  protected List<ArticlesOverviewItem> extractProductTeasersItems(Document frontPage, Set<String> extractedArticleUrls) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+
     Elements productTeaserElements = frontPage.body().select("aside#product-teasers .product");
     for(Element productTeaserElement : productTeaserElements) {
       extractProductTeaserOverviewItem(productTeaserElement, overviewItems, extractedArticleUrls);
     }
+
+    return overviewItems;
   }
 
   protected void extractProductTeaserOverviewItem(Element productTeaserElement, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
@@ -399,12 +401,16 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   }
 
 
-  protected void extractClusterArticleItems(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+  protected List<ArticlesOverviewItem> extractClusterArticleItems(Document frontPage, Set<String> extractedArticleUrls) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+
     Elements clusterElements = frontPage.body().select(".cluster, .additional-links");
 
     for(Element clusterElement : clusterElements) {
       extractOverviewItemsFromCluster(overviewItems, clusterElement, extractedArticleUrls);
     }
+
+    return overviewItems;
   }
 
   protected void extractOverviewItemsFromCluster(List<ArticlesOverviewItem> overviewItems, Element clusterElement, Set<String> extractedArticleUrls) {
@@ -428,7 +434,9 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   }
 
 
-  protected void extractLinkCycleArticles(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+  protected List<ArticlesOverviewItem> extractLinkCycleArticles(Document frontPage, Set<String> extractedArticleUrls) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+
     Elements linkCycleElements = frontPage.body().select(".linkcycle");
     for(Element listingElement : linkCycleElements) {
       String category = null;
@@ -441,16 +449,22 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
         extractOverviewItemFromArticleElement(overviewItems, linkCycleArticle, extractedArticleUrls);
       }
     }
+
+    return overviewItems;
   }
 
 
-  protected void extractSidekickArticles(Document frontPage, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {
+  protected List<ArticlesOverviewItem> extractSidekickArticles(Document frontPage, Set<String> extractedArticleUrls) {
+    List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
+
     Element sidekickElement = frontPage.body().select("#sidekick").first();
     if(sidekickElement != null) {
       for(Element sidekickArticle : sidekickElement.select("article")) {
         extractSidekickArticle(sidekickArticle, overviewItems, extractedArticleUrls);
       }
     }
+
+    return overviewItems;
   }
 
   protected void extractSidekickArticle(Element sidekickArticle, List<ArticlesOverviewItem> overviewItems, Set<String> extractedArticleUrls) {

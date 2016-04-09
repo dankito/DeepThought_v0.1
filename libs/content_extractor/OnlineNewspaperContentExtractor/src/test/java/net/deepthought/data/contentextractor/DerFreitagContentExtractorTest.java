@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -62,7 +62,7 @@ public class DerFreitagContentExtractorTest extends GermanOnlineNewspaperContent
 
   @Test
   public void testGetArticlesOverview() {
-    final Set<ArticlesOverviewItem> allItems = new HashSet<>();
+    final List<ArticlesOverviewItem> allItems = new ArrayList<>();
     final AtomicInteger partialItemsExtractionCall = new AtomicInteger();
     final CountDownLatch getArticlesOverviewLatch = new CountDownLatch(1);
 
