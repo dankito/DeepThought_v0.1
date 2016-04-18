@@ -66,7 +66,7 @@ public class FileLink extends UserDataEntity implements Serializable, Comparable
 
 
   public FileLink() {
-
+    this.fileType = FileType.getDefaultFileType();
   }
 
   public FileLink(String uri) {

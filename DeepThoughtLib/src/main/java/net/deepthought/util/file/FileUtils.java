@@ -475,7 +475,7 @@ public class FileUtils {
   public static String getUserDataFolderForFile(FileType fileType) {
     String fileDataFolder = getUserDataFolder();
 
-    if(fileDataFolder != Application.CouldNotGetDataFolderPath) {
+    if(fileDataFolder != Application.CouldNotGetDataFolderPath && fileType != null) { // TODO: not a good solution
       try {
         File tmp = new File(fileDataFolder, getUserDataSubFolderForFile(fileType));
 
