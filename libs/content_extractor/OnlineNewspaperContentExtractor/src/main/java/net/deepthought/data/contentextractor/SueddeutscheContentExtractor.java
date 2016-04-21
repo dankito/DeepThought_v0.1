@@ -446,14 +446,52 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
 //    listener.overviewItemsRetrieved(this, extractSocialModuleItems(frontPage), false);
+    listener.overviewItemsRetrieved(this, extractTeaserItems(frontPage), false);
     listener.overviewItemsRetrieved(this, extractTileItems(frontPage), false);
-    listener.overviewItemsRetrieved(this, extractTeaserItems(frontPage), true);
+    listener.overviewItemsRetrieved(this, extractTeaserElementsItems(frontPage), true);
     // TODO: also parse flyout teasers (<ul class="flyout-teasers">) ?
 
     return items;
   }
 
   protected Collection<ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
+    List<ArticlesOverviewItem> items = new ArrayList<>();
+
+    Elements teasers = frontPage.body().getElementsByClass("teaser");
+    for (Element teaser : teasers) {
+      if(teaser.classNames().size() > 1) { // there are some Teasers like 'Stellenangebote' which are more or less Ads. These have only one class
+        ArticlesOverviewItem teaserItem = extractItemFromTeaser(teaser);
+        if (teaserItem != null) {
+          items.add(teaserItem);
+        }
+
+        items.addAll(extractOneLinerTeaserItemsFromTeaserElement(teaser));
+      }
+    }
+
+    return items;
+  }
+
+  protected ArticlesOverviewItem extractItemFromTeaser(Element teaser) {
+    ArticlesOverviewItem item = null;
+
+    for(Element child : teaser.children()) {
+      if("a".equals(child.nodeName())) {
+        item = createOverviewItemFromAnchorElement(child);
+      }
+      else if("p".equals(child.nodeName()) && child.hasClass("entry-summary")) {
+        if(item != null) {
+          item.setSummary(child.ownText());
+          tryToExtractLabel(item, child);
+        }
+      }
+    }
+
+    return item;
+  }
+
+
+  protected Collection<ArticlesOverviewItem> extractTeaserElementsItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
     Elements teaserElements = frontPage.body().getElementsByClass("teaserElement");
@@ -490,12 +528,12 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     ArticlesOverviewItem item = new ArticlesOverviewItem(this, anchorElement.attr("href"));
 
     for(Element anchorChild : anchorElement.children()) {
-      if("img".equals(anchorChild.nodeName()))
+      if("img".equals(anchorChild.nodeName())) {
         item.setPreviewImageUrl(extractImageUrlFromImgElement(anchorChild));
-      else if("strong".equals(anchorChild.nodeName()))
-        item.setSubTitle(anchorChild.text().trim());
-      else if("h2".equals(anchorChild.nodeName()))
+      }
+      else if("em".equals(anchorChild.nodeName())) {
         item.setTitle(anchorChild.text().trim());
+      }
     }
 
     tryToExtractLabel(item, anchorElement);
@@ -550,8 +588,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
             }
           }
 
-          if (oneLinerItem != null)
+          if (oneLinerItem != null) {
             allExtractedItems.add(oneLinerItem);
+          }
         }
       }
     }
@@ -566,8 +605,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     }
     else {
       labelElements = itemElement.getElementsByClass("flyout-teaser-label");
-      if(labelElements.size() > 0)
+      if(labelElements.size() > 0) {
         item.setLabel(labelElements.get(0).text());
+      }
     }
   }
 
