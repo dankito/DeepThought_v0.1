@@ -531,7 +531,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       if("img".equals(anchorChild.nodeName())) {
         item.setPreviewImageUrl(extractImageUrlFromImgElement(anchorChild));
       }
-      else if("em".equals(anchorChild.nodeName())) {
+      else if("em".equals(anchorChild.nodeName()) || "h2".equals(anchorChild.nodeName())) {
         item.setTitle(anchorChild.text().trim());
       }
     }
