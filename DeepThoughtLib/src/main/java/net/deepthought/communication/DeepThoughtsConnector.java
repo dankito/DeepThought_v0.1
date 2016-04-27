@@ -231,7 +231,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     this.userDeviceRegistrationRequestListener = listener;
 
     registrationServer = new RegistrationServer(connectorMessagesCreator, threadPool);
-      registrationServer.startRegistrationServerAsync();
+    registrationServer.startRegistrationServerAsync();
   }
 
   @Override

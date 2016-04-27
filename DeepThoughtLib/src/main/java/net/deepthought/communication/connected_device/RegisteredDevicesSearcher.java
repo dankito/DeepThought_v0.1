@@ -134,9 +134,11 @@ public class RegisteredDevicesSearcher {
 
   protected void serverReceivedPacket(byte[] buffer, DatagramPacket packet) {
     if(messagesCreator.isSearchingForRegisteredDevicesMessage(buffer, packet.getLength())) {
-      HostInfo clientInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
-      if(isSelfSentPacket(clientInfo))
+      HostInfo clientInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
+      if(isSelfSentPacket(clientInfo)) // TODO: adjust isSelfSentPacket() as clientInfo's IP Address will now be set from received Packet
         return;
+
+      clientInfo.setIpAddress(packet.getAddress().getHostAddress());
 
       if(registeredDevicesManager.isDeviceRegistered(clientInfo) == true &&
           connectedDevicesManager.isConnectedToDevice(clientInfo) == false) {
@@ -176,13 +178,19 @@ public class RegisteredDevicesSearcher {
   }
 
   protected void startClient(RegisteredDeviceConnectedListener listener) {
+    for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
+      startClientForBroadcastAddress(broadcastAddress, listener);
+    }
+  }
+
+  protected void startClientForBroadcastAddress(InetAddress broadcastAddress, RegisteredDeviceConnectedListener listener) {
     try {
       clientSocket = new DatagramSocket();
       isClientSocketOpened = true;
       clientSocket.setSoTimeout(10000);
 
       byte[] message = messagesCreator.createSearchingForRegisteredDevicesMessage();
-      DatagramPacket searchRegisteredDevicesPacket = new DatagramPacket(message, message.length, NetworkHelper.getBroadcastAddress(), Constants.RegisteredDevicesListenerPort);
+      DatagramPacket searchRegisteredDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, Constants.RegisteredDevicesListenerPort);
 
       while (isClientSocketOpened) {
         clientSocket.send(searchRegisteredDevicesPacket);
@@ -211,6 +219,7 @@ public class RegisteredDevicesSearcher {
 
   protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
     ConnectedDevice serverInfo = messagesCreator.getConnectedDeviceFromMessage(buffer, packet.getLength(), packet.getAddress());
+    serverInfo.setAddress(packet.getAddress().getHostAddress());
 
     if(registeredDevicesManager.isDeviceRegistered(serverInfo) == true) {
       registeredDeviceConnected(listener, packet, serverInfo);

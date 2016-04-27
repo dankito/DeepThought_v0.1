@@ -8,6 +8,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,17 +20,20 @@ public class NetworkHelper {
   private final static Logger log = LoggerFactory.getLogger(NetworkHelper.class);
 
 
-  public static InetAddress getBroadcastAddress() {
-    try {
-      InetAddress localHost = getIPAddress(true);
-      byte[] broadcastAddress = localHost.getAddress();
-      broadcastAddress[broadcastAddress.length - 1] = (byte)255;
-      return Inet4Address.getByAddress(broadcastAddress);
-    } catch(Exception ex) {
-      log.error("Could not determine local network's Broadcast Address", ex);
+  public static List<InetAddress> getBroadcastAddresses() {
+    List<InetAddress> broadcastAddresses = new ArrayList<>();
+
+    for(InetAddress address : getIPAddresses(true)) { // in IPv6 there's no such thing as broadcast
+      try {
+        byte[] broadcastAddress = address.getAddress();
+        broadcastAddress[broadcastAddress.length - 1] = (byte) 255;
+        broadcastAddresses.add(Inet4Address.getByAddress(broadcastAddress));
+      } catch (Exception ex) {
+        log.error("Could not determine Broadcast Address of " + address.getHostAddress(), ex);
+      }
     }
 
-    return null;
+    return broadcastAddresses;
   }
 
   /**
@@ -62,8 +66,6 @@ public class NetworkHelper {
    * @return  address or empty string
    */
   public static InetAddress getIPAddress(boolean useIPv4) {
-    // TODO: what about if device is connected to more than one network, which address to choose then? Is important for example for LookingForRegistrationServersClient as this
-    // determines to which network it sends packets to (all other networks will be invisible for it)
     try {
       List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
       for (NetworkInterface anInterface : interfaces) {
@@ -86,6 +88,28 @@ public class NetworkHelper {
     return null;
   }
 
+  public static List<InetAddress> getIPAddresses(boolean onlyIPv4) {
+    List<InetAddress> addresses = new ArrayList<>();
+
+    try {
+      List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+      for (NetworkInterface anInterface : interfaces) {
+        List<InetAddress> interfaceAddresses = Collections.list(anInterface.getInetAddresses());
+
+        for(InetAddress address : interfaceAddresses) {
+          if(address.isLoopbackAddress() == false) {
+            if(onlyIPv4 == false || address instanceof Inet4Address) {
+              addresses.add(address);
+            }
+          }
+        }
+      }
+    } catch (Exception ex) { } // for now eat exceptions
+
+    return addresses;
+  }
+
+  // TODO: try to get rid of this method as it's not reliable (see above)
   public static String getIPAddressString(boolean useIPv4) {
     InetAddress address = getIPAddress(useIPv4);
     if(address != null) {

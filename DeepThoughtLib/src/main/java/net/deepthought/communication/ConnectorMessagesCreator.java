@@ -13,6 +13,7 @@ import net.deepthought.util.OsHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 
 /**
@@ -88,11 +89,14 @@ public class ConnectorMessagesCreator {
     return receivedMessage.startsWith(RegisteredDeviceFoundMessage);
   }
 
-  public HostInfo getHostInfoFromMessage(byte[] receivedBytes, int packetLength) {
-    String messageBody = getMessageBodyFromMessage(receivedBytes, packetLength);
+  public HostInfo getHostInfoFromMessage(byte[] receivedBytes, DatagramPacket packet) {
+    String messageBody = getMessageBodyFromMessage(receivedBytes, packet.getLength());
     DeserializationResult<HostInfo> result = JsonIoJsonHelper.parseJsonString(messageBody, HostInfo.class);
-    if(result.successful())
-      return result.getResult();
+    if(result.successful()) {
+      HostInfo hostInfo = result.getResult();
+      hostInfo.setIpAddress(packet.getAddress().getHostAddress());
+      return hostInfo;
+    }
 
     log.error("Could not deserialize message body " + messageBody + " to HostInfo", result.getError());
     return null;

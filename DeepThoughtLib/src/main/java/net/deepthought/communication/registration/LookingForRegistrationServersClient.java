@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,13 +53,19 @@ public class LookingForRegistrationServersClient {
   }
 
   protected void findRegistrationServers(RegistrationRequestListener listener) {
+    for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
+      findRegistrationServersForBroadcastAddress(broadcastAddress, listener);
+    }
+  }
+
+  private void findRegistrationServersForBroadcastAddress(InetAddress broadcastAddress, RegistrationRequestListener listener) {
     try {
       socket = new DatagramSocket();
       isSocketOpened = true;
       socket.setSoTimeout(2000);
 
       byte[] message = messagesCreator.createLookingForRegistrationServerMessage();
-      DatagramPacket findRegistrationServersPacket = new DatagramPacket(message, message.length, NetworkHelper.getBroadcastAddress(), Constants.RegistrationServerPort);
+      DatagramPacket findRegistrationServersPacket = new DatagramPacket(message, message.length, broadcastAddress, Constants.RegistrationServerPort);
 
       Map<InetAddress, Map<String, Set<String>>> receivedResponses = new HashMap<>();
 
@@ -78,19 +85,21 @@ public class LookingForRegistrationServersClient {
 
     try {
       socket.receive(packet);
-      HostInfo serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
+      HostInfo serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
 
       while(hasResponseOfThisServerAlreadyBeenHandled(packet, serverInfo, receivedResponses)) { // request of this client already received and handled
         socket.receive(packet);
-        serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet.getLength());
+        serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
       }
 
       if(registeredDevicesManager.isDeviceRegistered(serverInfo) == false) {
         receivedPacketFromUnregisteredDevice(listener, receivedResponses, packet, serverInfo);
       }
     } catch(Exception ex) {
-      log.error("An error occurred trying to receive response from RegistrationServer", ex);
-    } // a receive time out (may notify user about that
+      if(ex instanceof SocketTimeoutException == false) {
+        log.error("An error occurred trying to receive response from RegistrationServer", ex);
+      }
+    } // a receive time out (may notify user about that)
   }
 
   protected void receivedPacketFromUnregisteredDevice(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses, DatagramPacket packet, HostInfo serverInfo) {
