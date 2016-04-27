@@ -13,8 +13,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ public class LookingForRegistrationServersClient {
 
   protected IThreadPool threadPool;
 
-  protected DatagramSocket socket = null;
+  protected List<DatagramSocket> openedSockets = new ArrayList<>();
   protected boolean isSocketOpened = false;
 
 
@@ -54,14 +56,28 @@ public class LookingForRegistrationServersClient {
 
   protected void findRegistrationServers(RegistrationRequestListener listener) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
-      findRegistrationServersForBroadcastAddress(broadcastAddress, listener);
+      findRegistrationServersForBroadcastAddressAsync(broadcastAddress, listener);
     }
   }
 
-  private void findRegistrationServersForBroadcastAddress(InetAddress broadcastAddress, RegistrationRequestListener listener) {
+  protected void findRegistrationServersForBroadcastAddressAsync(final InetAddress broadcastAddress, final RegistrationRequestListener listener) {
+    threadPool.runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        findRegistrationServersForBroadcastAddress(broadcastAddress, listener);
+      }
+    });
+  }
+
+  protected void findRegistrationServersForBroadcastAddress(InetAddress broadcastAddress, RegistrationRequestListener listener) {
     try {
-      socket = new DatagramSocket();
-      isSocketOpened = true;
+      DatagramSocket socket = new DatagramSocket();
+
+      synchronized(this) {
+        openedSockets.add(socket);
+        isSocketOpened = true;
+      }
+
       socket.setSoTimeout(2000);
 
       byte[] message = messagesCreator.createLookingForRegistrationServerMessage();
@@ -72,14 +88,14 @@ public class LookingForRegistrationServersClient {
       while(isSocketOpened) {
         socket.send(findRegistrationServersPacket);
 
-        waitForResponsePackets(listener, receivedResponses);
+        waitForResponsePackets(socket, listener, receivedResponses);
       }
     } catch(Exception ex) {
       log.error("An error occurred trying to find RegistrationServers", ex);
     }
   }
 
-  protected void waitForResponsePackets(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
+  protected void waitForResponsePackets(DatagramSocket socket, RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
@@ -124,10 +140,10 @@ public class LookingForRegistrationServersClient {
 
   public void stopSearchingForRegistrationServers() {
     synchronized(this) {
-      if(isSocketOpened) {
-        isSocketOpened = false;
+      isSocketOpened = false;
+
+      for(DatagramSocket socket : openedSockets) {
         socket.close();
-        socket = null;
       }
     }
   }

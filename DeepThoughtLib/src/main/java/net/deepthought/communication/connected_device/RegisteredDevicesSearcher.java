@@ -22,6 +22,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ganymed on 22/08/15.
@@ -46,8 +48,8 @@ public class RegisteredDevicesSearcher {
   protected DatagramSocket serverSocket = null;
   protected boolean isServerSocketOpened = false;
 
-  protected DatagramSocket clientSocket = null;
-  protected boolean isClientSocketOpened = false;
+  protected List<DatagramSocket> openedClientSockets = new ArrayList<>();
+  protected boolean areClientSocketsOpened = false;
 
 
   public RegisteredDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool, IRegisteredDevicesManager registeredDevicesManager,
@@ -74,10 +76,12 @@ public class RegisteredDevicesSearcher {
       isServerSocketOpened = false;
     }
 
-    if(isClientSocketOpened) {
-      clientSocket.close();
-      clientSocket = null;
-      isClientSocketOpened = false;
+    synchronized(this) {
+      areClientSocketsOpened = false;
+
+      for (DatagramSocket clientSocket : openedClientSockets) {
+        clientSocket.close();
+      }
     }
   }
 
@@ -179,30 +183,44 @@ public class RegisteredDevicesSearcher {
 
   protected void startClient(RegisteredDeviceConnectedListener listener) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
-      startClientForBroadcastAddress(broadcastAddress, listener);
+      startClientForBroadcastAddressAsync(broadcastAddress, listener);
     }
+  }
+
+  protected void startClientForBroadcastAddressAsync(final InetAddress broadcastAddress, final RegisteredDeviceConnectedListener listener) {
+    threadPool.runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        startClientForBroadcastAddress(broadcastAddress, listener);
+      }
+    });
   }
 
   protected void startClientForBroadcastAddress(InetAddress broadcastAddress, RegisteredDeviceConnectedListener listener) {
     try {
-      clientSocket = new DatagramSocket();
-      isClientSocketOpened = true;
+      DatagramSocket clientSocket = new DatagramSocket();
+
+      synchronized(this) {
+        openedClientSockets.add(clientSocket);
+        areClientSocketsOpened = true;
+      }
+
       clientSocket.setSoTimeout(10000);
 
       byte[] message = messagesCreator.createSearchingForRegisteredDevicesMessage();
       DatagramPacket searchRegisteredDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, Constants.RegisteredDevicesListenerPort);
 
-      while (isClientSocketOpened) {
+      while (areClientSocketsOpened) {
         clientSocket.send(searchRegisteredDevicesPacket);
 
-        waitForResponsePackets(listener);
+        waitForResponsePackets(clientSocket, listener);
       }
     } catch (Exception ex) {
       log.error("An error occurred trying to find RegistrationServers", ex);
     }
   }
 
-  protected void waitForResponsePackets(RegisteredDeviceConnectedListener listener) {
+  protected void waitForResponsePackets(DatagramSocket clientSocket, RegisteredDeviceConnectedListener listener) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
