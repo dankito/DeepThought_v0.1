@@ -198,6 +198,13 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   }
 
   @Test
+  public void importDieTricksDerPersonalabteilung_GalleryGetsImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/karriere/die-tricks-der-personalabteilung-das-bedeutet-der-arbeitszeugnis-geheimcode-1.2865102");
+    testImportedArticleValues(creationResult, 4495, "18.12.2015", "Wanderer halten Flüchtlingsheim für Gasthof - und werden bewirtet", "Oberfranken",
+        "Kawa Suliman serviert Brot und Marmelade, syrische Art. Es dauert eine Weile, bis die Touristen ihren Irrtum bemerken.");
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
     EntryCreationResult zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     EntryCreationResult one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");
@@ -238,10 +245,10 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
       }
     });
 
-    try { getArticlesOverviewLatch.await(10, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { getArticlesOverviewLatch.await(10, TimeUnit.MINUTES); } catch(Exception ex) { }
 
     Assert.assertTrue(partialItemsExtractionCall.get() == 3);
-    Assert.assertTrue(allItems.size() > 100);
+    Assert.assertTrue(allItems.size() > 30);
 
     // TODO: check if panorama teaser has been parsed correctly, all social module list items have been found and only visible Tile are parse
     // in order to do so: save HTML code of Sueddeutsche front page and parse that site

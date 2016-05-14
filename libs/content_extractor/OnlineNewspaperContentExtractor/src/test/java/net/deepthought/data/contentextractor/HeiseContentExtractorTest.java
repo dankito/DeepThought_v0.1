@@ -58,6 +58,29 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
 
 
   @Test
+  public void importPressePhotoDesJahres_ImageGalleryGetsImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/newsticker/meldung/Welt-Presse-Foto-des-Jahres-Das-Fluechtlingselend-im-Stacheldraht-3112090.html?hg=1&hgi=1&hgf=false");
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+  }
+
+
+  @Test
+  public void importHeiseSecurityArticle_AbstractAndReferenceGetImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/security/artikel/Der-WhatsApp-Verschluesselung-auf-die-Finger-geschaut-2629020.html");
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+  }
+
+
+  @Test
+  public void importKommentar_AbstractAndReferenceGetImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/security/artikel/Warum-Google-uns-echte-Verschluesselung-verweigert-2191797.html");
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+  }
+
+  @Test
   public void testGetArticlesOverview() {
     final List<ArticlesOverviewItem> allItems = new ArrayList<>();
     final AtomicInteger partialItemsExtractionCall = new AtomicInteger();

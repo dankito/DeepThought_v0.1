@@ -32,6 +32,8 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
   private final static Logger log = LoggerFactory.getLogger(DerFreitagContentExtractor.class);
 
+  protected static final String LogoFileName = "der_freitag_logo.png";
+
 
   @Override
   public int getSupportedPluginSystemVersion() {
@@ -61,7 +63,8 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
     @Override
   public String getIconUrl() {
-    return "https://www.freitag.de/++theme++freitag.theme/images/apple-touch-icon-114x114-precomposed.png";
+//    return "https://www.freitag.de/++theme++freitag.theme/images/apple-touch-icon-114x114-precomposed.png";
+      return tryToLoadIconFile(LogoFileName);
   }
 
 
