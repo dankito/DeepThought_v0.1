@@ -107,15 +107,28 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
   protected String parseContent(Elements artikelElements) {
     // unbelievable, there are sometimes two 'artikel' elements with the first being almost empty -> find the second one
-    for(Element artikelElement : artikelElements) {
-      if("div".equals(artikelElement.nodeName())) {
-        if(artikelElement.children().size() > 0)
-          return parseContent(artikelElement);
-      }
+    Element artikelElement = getRealArtikelElement(artikelElements);
+    if(artikelElement != null) {
+      return parseContent(artikelElement);
     }
 
     log.error("Could not find 'artikel' Element");
     return null;
+  }
+
+  protected Element getRealArtikelElement(Elements artikelElements) {
+    // unbelievable, there are sometimes two 'artikel' elements with the first being almost empty -> take that one with most children
+    Element artikelElementWithMostChildren = null;
+
+    for(Element artikelElement : artikelElements) {
+      if("div".equals(artikelElement.nodeName())) {
+        if(artikelElementWithMostChildren == null || artikelElement.childNodeSize() > artikelElementWithMostChildren.childNodeSize()) {
+          artikelElementWithMostChildren = artikelElement;
+        }
+      }
+    }
+
+    return artikelElementWithMostChildren;
   }
 
   protected String parseContent(Element artikelElement) {

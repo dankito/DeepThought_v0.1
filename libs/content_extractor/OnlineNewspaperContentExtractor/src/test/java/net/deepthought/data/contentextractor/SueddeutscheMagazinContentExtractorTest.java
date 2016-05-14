@@ -46,7 +46,7 @@ public class SueddeutscheMagazinContentExtractorTest extends GermanOnlineNewspap
   }
 
   @Test
-  public void freiehitIstKapitalistischerMainstream_DateGetsExtractedCorrectly() {
+  public void freiheitIstKapitalistischerMainstream_DateGetsExtractedCorrectly() {
     EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43404/Freiheit-ist-kapitalistischer-Mainstream");
     testImportedArticleValues(creationResult, 11962, "32/2015", "Cornelia Koppetsch im Interview", "»Freiheit ist kapitalistischer Mainstream«",
         "Die Mittelschicht schafft sich ab, Bildungsabschlüsse verlieren an Wert, und der Neoliberalismus vereinnahmt selbst diejenigen, die ihn bekämpfen sollten – beste Voraussetzungen, um das ganze Gesellschaftssystem ins Wanken zu bringen, meint die Soziologin Cornelia Koppetsch.");
@@ -62,7 +62,7 @@ public class SueddeutscheMagazinContentExtractorTest extends GermanOnlineNewspap
   @Test
   public void unfaelleBeimBegruessen_BildGalleryGetsExtractedCorrectly() {
     EntryCreationResult creationResult = testImportArticle("http://sz-magazin.sueddeutsche.de/texte/anzeigen/43797/Na-Servus");
-    testImportedArticleValues(creationResult, 11855, "52/2015", "Selbst gemalte Bilder von Flüchtlingskindern", "»Ich bin die Letzte, ganz links auf dem Bild«",
+    testImportedArticleValues(creationResult, 11855, "45/2015", "Selbst gemalte Bilder von Flüchtlingskindern", "»Ich bin die Letzte, ganz links auf dem Bild«",
         "Unter den 800.000 Flüchtlingen, die Deutschland in diesem Jahr erreicht haben, sind etwa 270.000 Kinder. Wir haben sechs von ihnen gebeten, von ihrer Flucht zu erzählen - und dazu ein Bild zu malen.");
   }
 
