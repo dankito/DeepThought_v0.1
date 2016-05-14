@@ -1,6 +1,8 @@
 package net.deepthought;
 
 import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +12,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -98,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       }
 
       setupUi();
+
+      handleIntent(getIntent());
     }
 
   protected void setupDeepThought() {
@@ -275,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.options_menu_main, menu);
 
         menu.findItem(R.id.action_device_registration).setTitle(Localization.getLocalizedString("device.registration"));
 
@@ -325,6 +331,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     super.onActivityResult(requestCode, resultCode, data);
   }
+
+
+  @Override
+  protected void onNewIntent(Intent intent) {
+    handleIntent(intent);
+  }
+
+  protected void handleIntent(Intent intent) {
+    if(intent == null) {
+      return;
+    }
+  }
+
 
   @Override
   public void onTabSelected(TabLayout.Tab tab) {

@@ -1,9 +1,10 @@
 package net.deepthought.fragments;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,9 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import net.deepthought.Application;
 import net.deepthought.R;
@@ -30,12 +29,6 @@ public class TagsFragment extends Fragment {
 
 
   protected TagsAdapter tagsAdapter;
-
-  protected RelativeLayout rlySearchTags;
-
-  protected EditText edtxtSearchTags;
-
-  protected MenuItem mnitmSearchTags = null;
 
   protected boolean hasNavigatedToOtherFragment = false;
 
@@ -55,11 +48,6 @@ public class TagsFragment extends Fragment {
     lstvwTags.setAdapter(tagsAdapter);
     registerForContextMenu(lstvwTags);
     lstvwTags.setOnItemClickListener(lstvwTagsOnItemClickListener);
-
-    rlySearchTags = (RelativeLayout)rootView.findViewById(R.id.rlySearchTags);
-
-    edtxtSearchTags = (EditText)rootView.findViewById(R.id.edtxtSearchTags);
-    edtxtSearchTags.addTextChangedListener(edtxtSearchTagsTextWatcher);
 
     return rootView;
   }
@@ -95,42 +83,30 @@ public class TagsFragment extends Fragment {
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    inflater.inflate(R.menu.fragment_tags_options_menu, menu);
-
-    mnitmSearchTags = menu.findItem(R.id.mnitmActionSearchTags);
-
-    mnitmSearchTags.setVisible(!hasNavigatedToOtherFragment);
+    // TODO: this is almost the same code as in EntriesFragment -> merge
+    // Associate searchable configuration with the SearchView
+    MenuItem searchItem = menu.findItem(R.id.search);
+    SearchView searchView = (SearchView) searchItem.getActionView();
+    if (searchView != null) {
+      SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+      searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+      searchView.setQueryHint(getActivity().getString(R.string.search_hint_tags));
+      searchView.setOnQueryTextListener(tagsQueryTextListener);
+    }
 
     super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    int id = item.getItemId();
-
-    if(id == R.id.mnitmActionSearchTags) {
-      toggleSearchBarVisibility();
-      return true;
-    }
-
     return super.onOptionsItemSelected(item);
-  }
-
-  protected void toggleSearchBarVisibility() {
-    if(rlySearchTags.getVisibility() == View.GONE) {
-      rlySearchTags.setVisibility(View.VISIBLE);
-      edtxtSearchTags.requestFocus();
-    }
-    else {
-      tagsAdapter.removeSearchTerm();
-      rlySearchTags.setVisibility(View.GONE);
-    }
   }
 
 
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
     super.onCreateContextMenu(menu, v, menuInfo);
+
     MenuInflater inflater = getActivity().getMenuInflater();
     inflater.inflate(R.menu.list_item_tag_context_menu, menu);
   }
@@ -159,22 +135,19 @@ public class TagsFragment extends Fragment {
   }
 
 
-  protected TextWatcher edtxtSearchTagsTextWatcher = new TextWatcher() {
+  protected SearchView.OnQueryTextListener tagsQueryTextListener = new SearchView.OnQueryTextListener() {
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+    public boolean onQueryTextSubmit(String query) {
+      return onQueryTextChange(query);
     }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-      tagsAdapter.searchTags(s.toString());
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
+    public boolean onQueryTextChange(String query) {
+      tagsAdapter.searchTags(query);
+      return true;
     }
   };
+
 
   public boolean hasNavigatedToOtherFragment() {
     return hasNavigatedToOtherFragment;

@@ -7,6 +7,10 @@
     <string name="navigation_drawer_open">Öffne Navigationsleiste</string>
     <string name="navigation_drawer_close">Schließe Navigationsleiste</string>
 
+    <string name="search_title">Suche</string>
+    <string name="search_hint_entries">Einträge suchen</string>
+    <string name="search_hint_tags">Schlagworte suchen</string>
+
     <string name="title_section_entries">Einträge</string>
     <string name="title_section_tags">Schlagworte</string>
     <string name="title_section_search">Suche</string>

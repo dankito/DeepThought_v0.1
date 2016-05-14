@@ -1,9 +1,10 @@
 package net.deepthought.fragments;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,9 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 
 import net.deepthought.Application;
 import net.deepthought.R;
@@ -34,10 +33,6 @@ public class EntriesFragment extends Fragment {
   protected Collection<Entry> entriesToShow = null;
 
   protected EntriesAdapter entriesAdapter;
-
-  protected RelativeLayout rlySearchEntries;
-
-  protected EditText edtxtSearchEntries;
 
 
   public EntriesFragment() {
@@ -65,11 +60,6 @@ public class EntriesFragment extends Fragment {
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
 
-    rlySearchEntries = (RelativeLayout)rootView.findViewById(R.id.rlySearchEntries);
-
-    edtxtSearchEntries = (EditText)rootView.findViewById(R.id.edtxtSearchEntries);
-    edtxtSearchEntries.addTextChangedListener(edtxtSearchEntriesTextWatcher);
-
     return rootView;
   }
 
@@ -91,32 +81,23 @@ public class EntriesFragment extends Fragment {
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    inflater.inflate(R.menu.fragment_entries_options_menu, menu);
+    // TODO: this is almost the same code as in TagsFragment -> merge
+    // Associate searchable configuration with the SearchView
+    MenuItem searchItem = menu.findItem(R.id.search);
+    SearchView searchView = (SearchView) searchItem.getActionView();
+    if (searchView != null) {
+      SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+      searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+      searchView.setQueryHint(getActivity().getString(R.string.search_hint_entries));
+      searchView.setOnQueryTextListener(entriesQueryTextListener);
+    }
 
     super.onCreateOptionsMenu(menu, inflater);
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    int id = item.getItemId();
-
-    if(id == R.id.mnitmActionSearchEntries) {
-      toggleSearchBarVisibility();
-      return true;
-    }
-
     return super.onOptionsItemSelected(item);
-  }
-
-  protected void toggleSearchBarVisibility() {
-    if(rlySearchEntries.getVisibility() == View.GONE) {
-      rlySearchEntries.setVisibility(View.VISIBLE);
-      edtxtSearchEntries.requestFocus();
-    }
-    else {
-      entriesAdapter.showAllEntries();
-      rlySearchEntries.setVisibility(View.GONE);
-    }
   }
 
 
@@ -147,20 +128,16 @@ public class EntriesFragment extends Fragment {
   }
 
 
-  protected TextWatcher edtxtSearchEntriesTextWatcher = new TextWatcher() {
+  protected SearchView.OnQueryTextListener entriesQueryTextListener = new SearchView.OnQueryTextListener() {
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+    public boolean onQueryTextSubmit(String query) {
+      return onQueryTextChange(query);
     }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-      entriesAdapter.searchEntries(s.toString());
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
+    public boolean onQueryTextChange(String query) {
+      entriesAdapter.searchEntries(query);
+      return true;
     }
   };
 

@@ -180,10 +180,6 @@ public class TagsAdapter extends BaseAdapter {
     }
   }
 
-  public void removeSearchTerm() {
-    searchForAllTags();
-  }
-
   protected void toggleFilterTag(Tag tag) {
     if(tagsFilter.contains(tag))
       tagsFilter.remove(tag);

@@ -7,45 +7,11 @@
     >
     <!-- without setting background color it would be transparent and when navigating from TagsFragment underlying TagsFragment would still be visible -->
 
-    <RelativeLayout
-        android:id="@+id/rlySearchEntries"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:visibility="gone"
-        >
-
-        <TextView
-            android:id="@+id/txtvwSearchEntriesLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="6dp"
-            android:gravity="center"
-            android:text="@string/find"
-            />
-
-        <EditText
-            android:id="@+id/edtxtSearchEntries"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/txtvwSearchEntriesLabel"
-            />
-
-    </RelativeLayout>
-
     <ListView
         android:id="@+id/lstvwEntries"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/rlySearchEntries"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
