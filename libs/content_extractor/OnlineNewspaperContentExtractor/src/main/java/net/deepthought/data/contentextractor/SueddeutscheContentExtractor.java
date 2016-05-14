@@ -6,9 +6,10 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.ReferenceSubDivision;
+import net.deepthought.data.model.Tag;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.localization.Localization;
 
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
@@ -99,7 +100,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
       EntryCreationResult creationResult = createEntry(articleUrl, articleElement);
 
-      createReference(creationResult, articleUrl, articleElement);
+      if(creationResult.isAReferenceSet() == false) {
+        createReference(creationResult, articleUrl, articleElement);
+      }
 
       addNewspaperTag(creationResult);
       addNewspaperCategory(creationResult, true);
@@ -364,6 +367,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
         createReferenceForVideoArticle(result, articleUrl, articleElement, articleInfoElement);
       }
+
+      Tag videoTag = Application.getDeepThought().findOrCreateTagForName(Localization.getLocalizedString("video"));
+      result.addTag(videoTag);
 
       return result;
     }
