@@ -1226,7 +1226,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       return existingCategory;
 
     Category newCategory = new Category(name);
-//    addCategory(newCategory);
+    addCategory(newCategory); // TODO: currently we have to add it, otherwise it would get lost, but try to circumvent it so that it's only added when User likes to save it
 
     return newCategory;
   }
@@ -1247,8 +1247,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
       return existingCategory;
 
     Category newCategory = new Category(subCategoryName);
-//    addCategory(newCategory);
-//    parentCategory.addSubCategory(newCategory);
+    addCategory(newCategory); // TODO: currently we have to add it, otherwise it would get lost, but try to circumvent it so that it's only added when User likes to save it
+    parentCategory.addSubCategory(newCategory);
 
     return newCategory;
   }
