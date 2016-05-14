@@ -127,11 +127,6 @@ public class TagsFragment extends Fragment {
     }
   }
 
-  protected void onActionAddTagSelected() {
-    Tag tag = new Tag();
-    editTag(tag);
-  }
-
 
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

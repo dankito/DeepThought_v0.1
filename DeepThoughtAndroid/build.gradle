@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId "net.deepthought"
-        minSdkVersion 9 // ZXing lib needs at minimum API level 9
+        minSdkVersion 14 // com.github.clans.fab needs minimum API level 14 (ZXing lib needs at minimum API level 9)
         targetSdkVersion 15
         versionCode 1
         versionName "0.1"
@@ -84,6 +84,8 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
+
+    compile 'com.github.clans:fab:1.6.3'
 
     compile 'org.slf4j:slf4j-android:1.7.12'
     compile 'com.journeyapps:zxing-android-embedded:3.0.3@aar'

@@ -4,17 +4,16 @@
     <string name="app_name">Deep Thought</string>
 
     <!--TODO: -->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open">Öffne Navigationsleiste</string>
+    <string name="navigation_drawer_close">Schließe Navigationsleiste</string>
 
     <string name="title_section_entries">Einträge</string>
     <string name="title_section_tags">Schlagworte</string>
     <string name="title_section_search">Suche</string>
 
-    <string name="drawer_open">Öffne Navigationsleiste</string>
-    <string name="drawer_close">Schließe Navigationsleiste</string>
-
-    <string name="import_article">Artikel importieren</string>
+    <string name="floating_action_menu_add_entry">Eintrag</string>
+    <string name="floating_action_menu_add_tag">Schlagwort</string>
+    <string name="floating_action_menu_add_newspaper_article">Zeitungsartikel</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>

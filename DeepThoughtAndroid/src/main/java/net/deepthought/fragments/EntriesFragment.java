@@ -119,11 +119,6 @@ public class EntriesFragment extends Fragment {
     }
   }
 
-  protected void onActionAddEntrySelected() {
-    Entry entry = new Entry();
-    ActivityManager.getInstance().showEditEntryActivity(getActivity(), entry);
-  }
-
 
   @Override
   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

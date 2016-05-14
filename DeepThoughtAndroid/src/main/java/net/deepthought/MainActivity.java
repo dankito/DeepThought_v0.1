@@ -12,12 +12,15 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
@@ -28,6 +31,8 @@ import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Entry;
+import net.deepthought.data.model.Tag;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.SearchFragment;
@@ -54,11 +59,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected static boolean hasDeepThoughtBeenSetup = false;
 
 
-  protected ProgressDialog loadingDataProgressDialog = null;
-
   protected Toolbar toolbar;
 
-  protected ActionBarDrawerToggle mDrawerToggle;
+  protected ProgressDialog loadingDataProgressDialog = null;
+
+  protected FloatingActionMenu floatingActionMenu;
+  protected FloatingActionButton floatingActionButtonAddNewspaperArticle;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -130,8 +136,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
     }
     else if(notification.getType() == NotificationType.PluginLoaded) {
-      if(notification.getParameter() instanceof IOnlineArticleContentExtractor && ((IOnlineArticleContentExtractor)notification.getParameter()).hasArticlesOverview())
-        invalidateOptionsMenu(); // now there may are some Article Overview Providers to show -> invalidate its Action
+      if(floatingActionButtonAddNewspaperArticle != null) { // on start floatingActionButtonAddNewspaperArticle can be null
+        setFloatingActionButtonAddNewspaperArticleVisibility();
+      }
 //      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
@@ -172,12 +179,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       tabLayout.setOnTabSelectedListener(this);
 
       initNavigationDrawer();
+
+      initFloatingActionMenu();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
     }
   }
 
-  private void initNavigationDrawer() {
+  protected void initNavigationDrawer() {
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     // TODO: uncomment for showing 'hamburger' icon to activate Navigation Drawer
 //    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -187,6 +196,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
     navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+  }
+
+  protected void initFloatingActionMenu() {
+    floatingActionMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
+
+    FloatingActionButton addEntryButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_entry);
+    addEntryButton.setOnClickListener(floatingActionButtonAddEntryClickListener);
+
+    FloatingActionButton addTagButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_tag);
+    addTagButton.setOnClickListener(floatingActionButtonAddTagClickListener);
+
+    floatingActionButtonAddNewspaperArticle = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_newspaper_article);
+    floatingActionButtonAddNewspaperArticle.setOnClickListener(floatingActionButtonAddNewspaperArticleClickListener);
+    setFloatingActionButtonAddNewspaperArticleVisibility();
+  }
+
+  protected void setFloatingActionButtonAddNewspaperArticleVisibility() {
+    floatingActionButtonAddNewspaperArticle.setVisibility(
+        Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview() ? View.VISIBLE : View.GONE);
   }
 
   protected void showRegisterUserDevicesDialog() {
@@ -251,9 +279,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         menu.findItem(R.id.action_device_registration).setTitle(Localization.getLocalizedString("device.registration"));
 
-    MenuItem articlesOverviewItem = menu.findItem(R.id.action_articles_overview);
-    articlesOverviewItem.setVisible(Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview());
-
         return true;
     }
 
@@ -267,10 +292,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           showRegisterUserDevicesDialog();
           return true;
         }
-      else if (id == R.id.action_articles_overview) {
-        showArticlesOverview();
-        return true;
-      }
 
         return super.onOptionsItemSelected(item);
     }
@@ -327,6 +348,37 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       return false;
     }
   };
+
+
+  View.OnClickListener floatingActionButtonAddEntryClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      Entry entry = new Entry();
+      ActivityManager.getInstance().showEditEntryActivity(MainActivity.this, entry);
+      closeFloatingActionMenu();
+    }
+  };
+
+  View.OnClickListener floatingActionButtonAddTagClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      Tag tag = new Tag();
+      ActivityManager.getInstance().showEditTagAlert(MainActivity.this, tag);
+      closeFloatingActionMenu();
+    }
+  };
+
+  View.OnClickListener floatingActionButtonAddNewspaperArticleClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      showArticlesOverview();
+      closeFloatingActionMenu();
+    }
+  };
+
+  protected void closeFloatingActionMenu() {
+    floatingActionMenu.close(true);
+  }
 
 
   protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
