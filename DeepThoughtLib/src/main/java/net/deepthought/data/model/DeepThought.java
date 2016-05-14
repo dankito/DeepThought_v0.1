@@ -17,6 +17,8 @@ import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.data.search.specific.ReferenceBaseType;
+import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
 import net.deepthought.util.ObjectHolder;
@@ -1117,11 +1119,24 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if (cachedSeriesTitles.containsKey(title))
       return cachedSeriesTitles.get(title);
 
-    for (SeriesTitle seriesTitle : getSeriesTitles()) {
-      if (title.equals(seriesTitle.getTitle())) {
-        cachedSeriesTitles.put(title, seriesTitle);
-        return seriesTitle;
+    final ObjectHolder<Collection<ReferenceBase>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchReferenceBases(new ReferenceBasesSearch(title, ReferenceBaseType.SeriesTitle, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<ReferenceBase> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      SeriesTitle seriesTitle = (SeriesTitle)new ArrayList<ReferenceBase>(results).get(0);
+      cachedSeriesTitles.put(title, seriesTitle);
+      return seriesTitle;
     }
 
     return null;
@@ -1146,11 +1161,24 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if (cachedReferences.containsKey(title))
       return cachedReferences.get(title);
 
-    for (Reference reference : getReferences()) {
-      if (title.equals(reference.getTitle())) {
-        cachedReferences.put(title, reference);
-        return reference;
+    final ObjectHolder<Collection<ReferenceBase>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchReferenceBases(new ReferenceBasesSearch(title, ReferenceBaseType.Reference, new SearchCompletedListener<Collection<ReferenceBase>>() {
+      @Override
+      public void completed(Collection<ReferenceBase> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<ReferenceBase> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      Reference reference = (Reference)new ArrayList<ReferenceBase>(results).get(0);
+      cachedReferences.put(title, reference);
+      return reference;
     }
 
     return null;
@@ -1254,7 +1282,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
-  public Person findPerson(String lastName, String firstName) {final ObjectHolder<Collection<Person>> searchResults = new ObjectHolder<>();
+  public Person findPerson(String lastName, String firstName) {
+    final ObjectHolder<Collection<Person>> searchResults = new ObjectHolder<>();
     final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
 
     Application.getSearchEngine().searchPersons(new Search<Person>(lastName + ", " + firstName, new SearchCompletedListener<Collection<Person>>() {
