@@ -214,8 +214,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void setFloatingActionButtonAddNewspaperArticleVisibility() {
-    floatingActionButtonAddNewspaperArticle.setVisibility(
-        Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview() ? View.VISIBLE : View.GONE);
+    if(Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview() == false) {
+      floatingActionButtonAddNewspaperArticle.setVisibility(View.GONE);
+    }
+    else if(floatingActionMenu.isOpened()) {
+      floatingActionButtonAddNewspaperArticle.setVisibility(View.VISIBLE);
+    }
+    else {
+      floatingActionButtonAddNewspaperArticle.setVisibility(View.INVISIBLE);
+    }
   }
 
   protected void showRegisterUserDevicesDialog() {
