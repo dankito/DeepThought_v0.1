@@ -12,10 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import net.deepthought.Application;
+import net.deepthought.MainActivity;
 import net.deepthought.R;
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.adapter.TagsAdapter;
@@ -48,6 +50,7 @@ public class TagsFragment extends Fragment {
     lstvwTags.setAdapter(tagsAdapter);
     registerForContextMenu(lstvwTags);
     lstvwTags.setOnItemClickListener(lstvwTagsOnItemClickListener);
+    lstvwTags.setOnScrollListener(lstvwTagsOnScrollListener); // hide FloatingActionMenu while scrolling
 
     return rootView;
   }
@@ -73,6 +76,24 @@ public class TagsFragment extends Fragment {
       getActivity().invalidateOptionsMenu();
     }
   };
+
+  // TODO: this is almost the same code as in EntriesFragment -> merge
+  // hide FloatingActionMenu while scrolling
+  AbsListView.OnScrollListener lstvwTagsOnScrollListener = new AbsListView.OnScrollListener() {
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+      if(scrollState == SCROLL_STATE_TOUCH_SCROLL) { // scroll started
+        ((MainActivity)getActivity()).hideFloatingActionMenu();
+      }
+      else if(scrollState == SCROLL_STATE_IDLE) { // scroll stopped
+        ((MainActivity)getActivity()).showFloatingActionMenu();
+      }
+    }
+
+    @Override
+    public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) { }
+  };
+
 
   public void backButtonPressed() {
     if(hasNavigatedToOtherFragment) {

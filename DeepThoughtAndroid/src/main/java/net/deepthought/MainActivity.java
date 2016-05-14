@@ -225,6 +225,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
   }
 
+  public void showFloatingActionMenu() {
+//    floatingActionMenu.setVisibility(View.VISIBLE);
+    floatingActionMenu.setAlpha(1.0f);
+  }
+
+  public void hideFloatingActionMenu() {
+//    floatingActionMenu.setVisibility(View.INVISIBLE);
+    floatingActionMenu.setAlpha(0.25f);
+  }
+
+
   protected void showRegisterUserDevicesDialog() {
     FragmentManager fragmentManager = getSupportFragmentManager();
     new RegisterUserDevicesDialog().show(fragmentManager, RegisterUserDevicesDialog.TAG);

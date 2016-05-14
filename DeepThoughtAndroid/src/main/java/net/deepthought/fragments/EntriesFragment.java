@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -12,10 +13,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import net.deepthought.Application;
+import net.deepthought.MainActivity;
 import net.deepthought.R;
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.adapter.EntriesAdapter;
@@ -59,6 +62,7 @@ public class EntriesFragment extends Fragment {
     lstvwEntries.setAdapter(entriesAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);
+    lstvwEntries.setOnScrollListener(lstvwEntriesOnScrollListener); // for hiding FloatingActionMenu when scrolling
 
     return rootView;
   }
@@ -78,6 +82,24 @@ public class EntriesFragment extends Fragment {
       ActivityManager.getInstance().showEditEntryActivity(getActivity(), entry);
     }
   };
+
+  // TODO: this is almost the same code as in TagsFragment -> merge
+  // hide FloatingActionMenu while scrolling
+  AbsListView.OnScrollListener lstvwEntriesOnScrollListener = new AbsListView.OnScrollListener() {
+    @Override
+    public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+      if(scrollState == SCROLL_STATE_TOUCH_SCROLL) { // scroll started
+        ((MainActivity)getActivity()).hideFloatingActionMenu();
+      }
+      else if(scrollState == SCROLL_STATE_IDLE) { // scroll stopped
+        ((MainActivity)getActivity()).showFloatingActionMenu();
+      }
+    }
+
+    @Override
+    public void onScroll(AbsListView absListView, int firstVisible, int visibleCount, int totalCount) { }
+  };
+
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
