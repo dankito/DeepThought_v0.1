@@ -35,9 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1514,6 +1517,151 @@ public class LuceneSearchEngineTest {
     }));
 
     try { countDownLatch4.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
+  }
+
+  @Test
+  public void findReferenceOfDate() throws Exception {
+    Localization.setLanguageLocale(Locale.GERMAN);
+    SeriesTitle guardian = new SeriesTitle("The Guardian");
+    SeriesTitle newYorkTimes = new SeriesTitle("New York Times");
+    SeriesTitle sz = new SeriesTitle("SZ");
+    deepThought.addSeriesTitle(guardian);
+    deepThought.addSeriesTitle(newYorkTimes);
+    deepThought.addSeriesTitle(sz);
+
+    DateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+    String date27031988String = "27.03.1988";
+    String date07051960String = "07.05.1960";
+    Date date27031988 = dateFormatter.parse(date27031988String);
+    Date date07051960 = dateFormatter.parse(date07051960String);
+
+    Reference guardian27031988 = new Reference();
+    guardian27031988.setSeries(guardian);
+    guardian27031988.setPublishingDate(date27031988);
+    deepThought.addReference(guardian27031988);
+
+    Reference newYorkTimes27031988 = new Reference();
+    newYorkTimes27031988.setSeries(newYorkTimes);
+    newYorkTimes27031988.setPublishingDate(date27031988);
+    deepThought.addReference(newYorkTimes27031988);
+
+    Reference sz27031988 = new Reference();
+    sz27031988.setSeries(sz);
+    sz27031988.setPublishingDate(date27031988);
+    deepThought.addReference(sz27031988);
+
+    Reference guardian07051960 = new Reference();
+    guardian07051960.setSeries(guardian);
+    guardian07051960.setPublishingDate(date07051960);
+    deepThought.addReference(guardian07051960);
+
+    date27031988String = guardian27031988.getIssueOrPublishingDate(); // we cannot predict Locale (of Build Server, User in other countries, ...)
+    date07051960String = guardian07051960.getIssueOrPublishingDate();
+
+    final List<Reference> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchForReferenceOfDate(null, new Search<Reference>(date27031988String, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+    Assert.assertTrue(results.contains(guardian27031988));
+    Assert.assertTrue(results.contains(newYorkTimes27031988));
+    Assert.assertTrue(results.contains(sz27031988));
+
+
+    results.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.searchForReferenceOfDate("The Guardian", new Search<Reference>(date27031988String, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch2.countDown();
+      }
+    }));
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(guardian27031988, results.get(0));
+
+
+    results.clear();
+    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+
+    searchEngine.searchForReferenceOfDate("New York Times", new Search<Reference>(date27031988String, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch3.countDown();
+      }
+    }));
+
+    try { countDownLatch3.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(newYorkTimes27031988, results.get(0));
+
+
+    results.clear();
+    final CountDownLatch countDownLatch4 = new CountDownLatch(1);
+
+    searchEngine.searchForReferenceOfDate("sz", new Search<Reference>(date27031988String, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch4.countDown();
+      }
+    }));
+
+    try { countDownLatch4.await(); } catch(Exception ex) { }
+
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(sz27031988, results.get(0));
+
+
+    results.clear();
+    final CountDownLatch countDownLatch5 = new CountDownLatch(1);
+
+    searchEngine.searchForReferenceOfDate(null, new Search<Reference>(date07051960String, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch5.countDown();
+      }
+    }));
+
+    try { countDownLatch5.await(); } catch(Exception ex) { }
+
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(guardian07051960, results.get(0));
+
+
+    results.clear();
+    final CountDownLatch countDownLatch6 = new CountDownLatch(1);
+    String unstoredDate = dateFormatter.format(dateFormatter.parse("01.01.1970"));
+
+    searchEngine.searchForReferenceOfDate(null, new Search<Reference>(unstoredDate, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> result) {
+        results.addAll(result);
+        countDownLatch6.countDown();
+      }
+    }));
+
+    try { countDownLatch6.await(); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }

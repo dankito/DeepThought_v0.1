@@ -685,14 +685,17 @@ public class LuceneSearchEngine extends SearchEngineBase {
 //    doc.add(new StringField(FieldName.ReferenceTitle, getReferenceIndexTerm(reference), Field.Store.NO));
     doc.add(new StringField(FieldName.ReferenceTitle, getReferenceBaseTitleIndexTerm(reference), Field.Store.NO));
 
-    if(reference.getIssueOrPublishingDate() != null)
-      doc.add(new StringField(FieldName.ReferenceIssueOrPublishingDate, reference.getIssueOrPublishingDate(), Field.Store.NO));
+    if(reference.getIssueOrPublishingDate() != null) {
+      doc.add(new StringField(FieldName.ReferenceIssueOrPublishingDate, reference.getIssueOrPublishingDate().toLowerCase().trim(), Field.Store.NO));
+    }
 
-    if(reference.getPublishingDate() != null)
+    if(reference.getPublishingDate() != null) {
       doc.add(new LongField(FieldName.ReferencePublishingDate, reference.getPublishingDate().getTime(), Field.Store.NO));
+    }
 
-    if(reference.getSeries() != null)
+    if(reference.getSeries() != null) {
       addSeriesTitleFields(reference.getSeries(), doc);
+    }
   }
 
   protected String getReferenceIndexTerm(Reference reference) {
@@ -1157,6 +1160,41 @@ public class LuceneSearchEngine extends SearchEngineBase {
     try {
       search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(ReferenceBase.class), query, ReferenceBase.class, FieldName.ReferenceBaseId, 10000,
           SortOrder.Ascending, FieldName.ReferenceBaseType, FieldName.SeriesTitleTitle, FieldName.ReferenceTitle, FieldName.ReferencePublishingDate, FieldName.ReferenceSubDivisionTitle));
+    } catch(Exception ex) {
+      log.error("Could not execute Query " + query.toString(), ex);
+      // TODO: set error flag in Search
+    }
+
+    search.fireSearchCompleted();
+  }
+
+
+//  @Override
+  protected void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
+    BooleanQuery query = new BooleanQuery();
+
+    String issueOrPublishingDate = search.getSearchTerm();
+    issueOrPublishingDate = QueryParser.escape(issueOrPublishingDate.toLowerCase());
+    issueOrPublishingDate = "*" + issueOrPublishingDate + "*";
+
+    query.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, issueOrPublishingDate)), BooleanClause.Occur.MUST);
+
+    if(search.isInterrupted())
+      return;
+
+    if(StringUtils.isNotNullOrEmpty(optionalSeriesTitleTitle)) {
+      String seriesTitleSearchTerm = "*" + QueryParser.escape(optionalSeriesTitleTitle.toLowerCase()) + "*";
+      query.add(new WildcardQuery(new Term(FieldName.SeriesTitleTitle, seriesTitleSearchTerm)), BooleanClause.Occur.MUST);
+
+      if (search.isInterrupted())
+        return;
+    }
+
+    log.debug("Executing Reference Query for Date " + query);
+
+    try {
+      search.setResults(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(ReferenceBase.class), query, ReferenceBase.class, FieldName.ReferenceBaseId, 10000,
+          SortOrder.Ascending, FieldName.SeriesTitleTitle));
     } catch(Exception ex) {
       log.error("Could not execute Query " + query.toString(), ex);
       // TODO: set error flag in Search
