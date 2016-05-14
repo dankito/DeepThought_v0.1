@@ -104,10 +104,6 @@ public class EntriesFragment extends Fragment {
       toggleSearchBarVisibility();
       return true;
     }
-    if (id == R.id.mnitmActionAddEntry) {
-      onActionAddEntrySelected();
-      return true;
-    }
 
     return super.onOptionsItemSelected(item);
   }

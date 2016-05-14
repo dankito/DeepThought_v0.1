@@ -9,12 +9,4 @@
         app:showAsAction="always"
         />
 
-    <item
-        android:id="@+id/mnitmActionAddTag"
-        android:title="@string/add"
-        android:icon="@android:drawable/ic_input_add"
-        app:showAsAction="always"
-        android:visible="false"
-        />
-
 </menu>

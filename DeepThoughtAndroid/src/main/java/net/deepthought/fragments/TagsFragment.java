@@ -112,10 +112,6 @@ public class TagsFragment extends Fragment {
       toggleSearchBarVisibility();
       return true;
     }
-    if (id == R.id.mnitmActionAddTag) {
-      onActionAddTagSelected();
-      return true;
-    }
 
     return super.onOptionsItemSelected(item);
   }

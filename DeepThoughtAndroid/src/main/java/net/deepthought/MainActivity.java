@@ -4,11 +4,14 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -168,17 +171,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       });
       tabLayout.setOnTabSelectedListener(this);
 
-//      // For each of the sections in the app, add a tab to the action bar.
-//      for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-//        // Create a tab with text corresponding to the page title defined by
-//        // the adapter. Also specify this Activity object, which implements
-//        // the TabListener interface, as the callback (listener) for when
-//        // this tab is selected.
-//          tabLayout.addTab(
-//                  tabLayout.newTab()
-//                          .setText(mSectionsPagerAdapter.getPageTitle(i)));
-//      }
-
       initNavigationDrawer();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
@@ -186,63 +178,16 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   private void initNavigationDrawer() {
-//    final ListView drawer = (ListView) findViewById(R.id.left_drawer);
-//    DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-//    mDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,  R.string.drawer_open, R.string.drawer_close) {
-//
-//      /** Called when a drawer has settled in a completely closed state. */
-//      public void onDrawerClosed(View view) {
-//      }
-//
-//      /** Called when a drawer has settled in a completely open state. */
-//      public void onDrawerOpened(View drawerView) {
-//      }
-//    };
-//
-//    // Set the drawer toggle as the DrawerListener
-//    drawerLayout.setDrawerListener(mDrawerToggle);
-//    // Set the adapter for the list view
-//    drawer.setAdapter(new NavigationDrawerAdapter(this));
-//    drawer.setOnItemClickListener(drawerItemSelectedListener);
-//
-//    // Enable ActionBar app icon to behave as action to toggle nav drawer
-//    getSupportActionBar().setHomeButtonEnabled(true);
-//    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//    mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_drawer);
-//    mDrawerToggle.setDrawerIndicatorEnabled(true);
-  }
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    // TODO: uncomment for showing 'hamburger' icon to activate Navigation Drawer
+//    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//    drawer.setDrawerListener(toggle);
+//    toggle.syncState();
 
-//  protected AdapterView.OnItemClickListener drawerItemSelectedListener = new AdapterView.OnItemClickListener() {
-//    @Override
-//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//      switch(position){
-//        case 0:
-//          showRegisterUserDevicesDialog();
-//          break;
-////        case 1:
-////          Intent i = new Intent(DocumentGridActivity.this, OCRLanguageActivity.class);
-////          startActivity(i);
-////          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-////          break;
-////        case 2:
-////          startActivity(new Intent(DocumentGridActivity.this,HelpActivity.class));
-////          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-////          break;
-////        case 3:
-////          startActivity(new Intent(DocumentGridActivity.this,ContributeActivity.class));
-////          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-////          break;
-////        case 4:
-////          startActivity(new Intent(DocumentGridActivity.this,AboutActivity.class));
-////          overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-////          break;
-////        case 5:
-////          //TODO start product tour
-////          break;
-//      }
-//
-//    }
-//  };
+    NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+    navigationView.setNavigationItemSelectedListener(navigationItemSelectedListener);
+  }
 
   protected void showRegisterUserDevicesDialog() {
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -376,6 +321,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
 
+  protected NavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener = new NavigationView.OnNavigationItemSelectedListener() {
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+      return false;
+    }
+  };
+
+
   protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
@@ -391,14 +344,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   public void onBackPressed() {
-    // a bit hacky but i don't know how to solve it otherwise to reliably get informed of Back Button pressed in TagsFragment
-    // (tip in https://stackoverflow.com/a/7992472 doesn't work as fragment's view needs to stay focused which is not always provided e.g. when displaying Search Bar)
-    int selectedTabPosition = tabLayout.getSelectedTabPosition();
-    Fragment selectedFragment = mSectionsPagerAdapter.getItem(selectedTabPosition);
-    if(selectedFragment instanceof TagsFragment)
-      ((TagsFragment)selectedFragment).backButtonPressed();
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    if (drawer.isDrawerOpen(GravityCompat.START)) {
+      drawer.closeDrawer(GravityCompat.START);
+    } else {
+      // a bit hacky but i don't know how to solve it otherwise to reliably get informed of Back Button pressed in TagsFragment
+      // (tip in https://stackoverflow.com/a/7992472 doesn't work as fragment's view needs to stay focused which is not always provided e.g. when displaying Search Bar)
+      int selectedTabPosition = tabLayout.getSelectedTabPosition();
+      Fragment selectedFragment = mSectionsPagerAdapter.getItem(selectedTabPosition);
+      if (selectedFragment instanceof TagsFragment)
+        ((TagsFragment) selectedFragment).backButtonPressed();
 
-    super.onBackPressed();
+      super.onBackPressed();
+    }
   }
 
   /**
