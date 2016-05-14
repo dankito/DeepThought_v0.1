@@ -122,13 +122,17 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         return createEntryFromImageGalleryArticle(articleUrl, articleElement, element);
     }
 
-    if(bodySection == null) {
+    if(bodySection != null) {
+      Entry articleEntry = extractEntryFromBodySection(bodySection);
+      return new EntryCreationResult(articleUrl, articleEntry);
+    }
+    else if(articleElement.hasClass("video-article")) {
+      return extractVideoArticle(articleUrl, articleElement);
+    }
+    else {
       log.error("Could not find Article Body section for Sueddeutsche Article " + articleElement.baseUri());
       throw new Exception(Localization.getLocalizedString("could.not.find.sueddeutsche.article.body.section", articleElement.baseUri()));
     }
-
-    Entry articleEntry = extractEntryFromBodySection(bodySection);
-    return new EntryCreationResult(articleUrl, articleEntry);
   }
 
   protected Entry extractEntryFromBodySection(Element bodySection) throws Exception {
@@ -344,6 +348,47 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return null;
   }
 
+
+  protected EntryCreationResult extractVideoArticle(String articleUrl, Element articleElement) {
+    Element videoPlayerElement = articleElement.select(".video-article__player").first();
+    if(videoPlayerElement != null) {
+      Entry entry = new Entry(videoPlayerElement.outerHtml());
+      EntryCreationResult result = new EntryCreationResult(articleUrl, entry);
+
+      Element articleInfoElement = articleElement.select("#article-body").first();
+      if (articleInfoElement != null) {
+        Element descriptionElement = articleInfoElement.getElementsByClass("article-info__description").first();
+        if(descriptionElement != null) {
+          entry.setAbstract(descriptionElement.text());
+        }
+
+        createReferenceForVideoArticle(result, articleUrl, articleElement, articleInfoElement);
+      }
+
+      return result;
+    }
+
+    return null;
+  }
+
+  protected void createReferenceForVideoArticle(EntryCreationResult result, String articleUrl, Element articleElement, Element articleInfoElement) {
+    Element captionTitleElement = articleInfoElement.getElementsByClass("caption__title").first();
+    if(captionTitleElement != null) {
+      ReferenceSubDivision subDivision = new ReferenceSubDivision(captionTitleElement.text());
+
+      Element captionOverlineElement = articleInfoElement.getElementsByClass("caption__overline").first();
+      if(captionOverlineElement != null) {
+        subDivision.setSubTitle(captionOverlineElement.text());
+      }
+
+      extractReferenceFromHeaderSection(result, subDivision, articleUrl, articleElement);
+    }
+    else {
+      log.error("Could not create Reference from Video Article, Element with class 'caption__title' not found");
+    }
+  }
+
+
   protected ReferenceSubDivision createReferenceForImageGallery(EntryCreationResult creationResult, Element articleElement, Element articleBodyElement) {
     Element sourceElement = getElementByClassAndNodeName(articleBodyElement, "span", "source");
     if(sourceElement != null) {
@@ -387,19 +432,24 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       return null;
     }
 
-    return extractReferenceFromHeaderSection(creationResult, articleUrl, headerSection);
+    return extractReferenceAndSubDivisionFromHeaderSection(creationResult, articleUrl, headerSection);
   }
 
-  protected ReferenceSubDivision extractReferenceFromHeaderSection(EntryCreationResult creationResult, String articleUrl, Element headerSection) {
+  protected ReferenceSubDivision extractReferenceAndSubDivisionFromHeaderSection(EntryCreationResult creationResult, String articleUrl, Element headerSection) {
+    ReferenceSubDivision articleReferenceSubDivision = extractReferenceSubDivisionFromHeaderSection(articleUrl, headerSection);
+
+    return extractReferenceFromHeaderSection(creationResult, articleReferenceSubDivision, articleUrl, headerSection);
+  }
+
+  protected ReferenceSubDivision extractReferenceFromHeaderSection(EntryCreationResult creationResult, ReferenceSubDivision articleReferenceSubDivision, String articleUrl, Element headerSection) {
     String articleDate = "";
     Elements timeElements = headerSection.getElementsByTag("time");
     if(timeElements.size() > 0)
       articleDate = parseSueddeutscheHeaderDate(timeElements.get(0).attributes().get("datetime"));
 
-    ReferenceSubDivision articleReference = extractReferenceSubDivisionFromHeaderSection(articleUrl, headerSection);
-    setArticleReference(creationResult, articleReference, articleDate);
+    setArticleReference(creationResult, articleReferenceSubDivision, articleDate);
 
-    return articleReference;
+    return articleReferenceSubDivision;
   }
 
   protected ReferenceSubDivision extractReferenceSubDivisionFromHeaderSection(String articleUrl, Element headerSection) {
@@ -600,7 +650,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   }
 
   protected void tryToExtractLabel(ArticlesOverviewItem item, Element itemElement) {
-    Elements labelElements = itemElement.select(".teaserlabel");
+    Elements labelElements = itemElement.getElementsByClass("teaserlabel");
     if(labelElements.size() > 0) {
       item.setLabel(labelElements.get(0).text());
     }
