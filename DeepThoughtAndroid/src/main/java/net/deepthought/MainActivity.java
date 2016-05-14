@@ -1,8 +1,6 @@
 package net.deepthought;
 
 import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,12 +10,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,7 +35,6 @@ import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
-import net.deepthought.fragments.SearchFragment;
 import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.listener.AndroidImportFilesOrDoOcrListener;
@@ -448,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
         @Override
         public int getCount() {
-          return 2; // don't show SearchFragment right now
+          return 2;
         }
 
         @Override
@@ -463,9 +458,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
               tagsFragment = new TagsFragment();
             return tagsFragment;
           }
-          else if(position == 2) {
-            return new SearchFragment();
-          }
 
           return null;
         }
@@ -478,8 +470,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                     return getString(R.string.title_section_entries).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section_tags).toUpperCase(l);
-                case 2:
-                  return getString(R.string.title_section_search).toUpperCase(l);
             }
             return null;
         }

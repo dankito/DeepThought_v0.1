@@ -12,7 +12,6 @@
 
     <string name="title_section_entries">Entries</string>
     <string name="title_section_tags">Tags</string>
-    <string name="title_section_search">Search</string>
 
     <string name="floating_action_menu_add_entry">Entry</string>
     <string name="floating_action_menu_add_tag">Tag</string>
