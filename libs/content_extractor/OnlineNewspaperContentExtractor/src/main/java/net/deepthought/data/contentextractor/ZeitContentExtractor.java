@@ -148,7 +148,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
   }
 
   protected void addTags(Element bodyElement, EntryCreationResult creationResult) {
-    addNewspaperTag(creationResult);
+    findOrCreateTagAndAddToCreationResult(creationResult);
 
     Elements tagsElements = bodyElement.getElementsByClass("tags");
     for(Element tagsElement : tagsElements) {

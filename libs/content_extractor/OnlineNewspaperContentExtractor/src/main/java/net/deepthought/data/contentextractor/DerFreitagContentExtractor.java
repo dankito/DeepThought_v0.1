@@ -263,7 +263,7 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
 
 
   protected void addTags(Element bodyElement, EntryCreationResult creationResult) {
-    addNewspaperTag(creationResult);
+    findOrCreateTagAndAddToCreationResult(creationResult);
 
     Element tagsElement = bodyElement.select("#article-keywords").first();
     // TODO: may extract Article Tags

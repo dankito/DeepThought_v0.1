@@ -80,7 +80,7 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
       createReference(creationResult, articleUrl, articleElement);
 
-      addNewspaperTag(creationResult);
+      findOrCreateTagAndAddToCreationResult(creationResult);
       addNewspaperCategory(creationResult, true);
 
       return creationResult;

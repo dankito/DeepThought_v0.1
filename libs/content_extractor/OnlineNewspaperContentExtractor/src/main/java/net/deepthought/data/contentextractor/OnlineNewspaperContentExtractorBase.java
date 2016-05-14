@@ -9,8 +9,8 @@ import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
 import net.deepthought.plugin.IPlugin;
-import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.localization.Localization;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -136,13 +136,18 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return newspaperDateReference;
   }
 
-  protected void addNewspaperTag(EntryCreationResult creationResult) {
-    addNewspaperTag(creationResult, getNewspaperName());
+  protected void findOrCreateTagAndAddToCreationResult(EntryCreationResult creationResult) {
+    findOrCreateTagAndAddToCreationResult(creationResult, getNewspaperName());
   }
 
-  protected void addNewspaperTag(EntryCreationResult creationResult, String newspaperName) {
-    Tag newspaperTag = Application.getDeepThought().findOrCreateTagForName(newspaperName);
+  protected void findOrCreateTagAndAddToCreationResult(EntryCreationResult creationResult, String newspaperName) {
+    Tag newspaperTag = findOrCreateTagForName(newspaperName);
     creationResult.addTag(newspaperTag);
+  }
+
+  protected Tag findOrCreateTagForName(String tagName) {
+
+    return Application.getDeepThought().findOrCreateTagForName(tagName);
   }
 
   protected void addNewspaperCategory(EntryCreationResult creationResult, boolean isOnlineArticle) {

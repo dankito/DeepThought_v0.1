@@ -104,7 +104,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         createReference(creationResult, articleUrl, articleElement);
       }
 
-      addNewspaperTag(creationResult);
+      findOrCreateTagAndAddToCreationResult(creationResult);
       addNewspaperCategory(creationResult, true);
 
       return creationResult;
@@ -368,8 +368,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         createReferenceForVideoArticle(result, articleUrl, articleElement, articleInfoElement);
       }
 
-      Tag videoTag = Application.getDeepThought().findOrCreateTagForName(Localization.getLocalizedString("video"));
-      result.addTag(videoTag);
+      findOrCreateTagAndAddToCreationResult(result, Localization.getLocalizedString("video"));
 
       return result;
     }

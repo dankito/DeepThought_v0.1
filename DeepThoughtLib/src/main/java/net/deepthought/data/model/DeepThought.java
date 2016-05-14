@@ -1,5 +1,6 @@
 package net.deepthought.data.model;
 
+import net.deepthought.Application;
 import net.deepthought.data.model.enums.BackupFileServiceType;
 import net.deepthought.data.model.enums.FileType;
 import net.deepthought.data.model.enums.Language;
@@ -14,6 +15,10 @@ import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.data.search.specific.TagsSearch;
+import net.deepthought.data.search.specific.TagsSearchResults;
+import net.deepthought.util.ObjectHolder;
 import net.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -29,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -1167,23 +1174,35 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if (cachedTags.containsKey(name))
       return cachedTags.get(name);
 
-    for (Tag tag : getTags()) { // TODO: remove this as in this way all Tags get loaded from DB
-      if (name.equals(tag.getName())) {
-        cachedTags.put(name, tag);
-        return tag;
+    final ObjectHolder<TagsSearchResults> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchTags(new TagsSearch(name, new SearchCompletedListener<TagsSearchResults>() {
+      @Override
+      public void completed(TagsSearchResults results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    TagsSearchResults results = searchResults.get();
+    if(results != null && results.hasLastResultExactMatch()) {
+      return results.getExactMatchesOfLastResult();
     }
 
     return null;
   }
 
+  // TODO: move to other class
   public Tag findOrCreateTagForName(String name) {
     Tag existingTag = findTagForName(name);
     if(existingTag != null)
       return existingTag;
 
     Tag newTag = new Tag(name);
-    cachedTags.put(name, newTag);
+    cachedTags.put(name, newTag); // do not save yet to database, User will have to decide if she/he likes to save it
 //    addTag(newTag);
 
     return newTag;

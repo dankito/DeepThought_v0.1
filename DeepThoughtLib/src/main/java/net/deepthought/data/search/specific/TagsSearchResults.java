@@ -202,8 +202,29 @@ public class TagsSearchResults {
     return results.size() > 0; // no result (and therefore not last result) at all
   }
 
+  public boolean hasLastResultExactMatch() {
+    if(hasLastResult() == false)
+      return false;
+
+    TagsSearchResult lastResult = getLastResult();
+    return lastResult.hasExactMatch();
+  }
+
   public TagsSearchResult getLastResult() {
+    if(results.size() == 0) {
+      return null;
+    }
+
     return results.get(results.size() - 1);
+  }
+
+  public Tag getExactMatchesOfLastResult() {
+    TagsSearchResult lastResult = getLastResult();
+    if(lastResult != null) {
+      return lastResult.getExactMatch();
+    }
+
+    return null;
   }
 
 

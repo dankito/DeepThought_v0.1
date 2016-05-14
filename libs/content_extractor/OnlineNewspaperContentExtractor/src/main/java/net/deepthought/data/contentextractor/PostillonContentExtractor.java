@@ -115,7 +115,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
     if(articleReference != null)
       entry.setAbstract(articleReference.getTitle());
 
-    addNewspaperTag(creationResult);
+    findOrCreateTagAndAddToCreationResult(creationResult);
     addNewspaperCategory(creationResult, false);
 
     return creationResult;
