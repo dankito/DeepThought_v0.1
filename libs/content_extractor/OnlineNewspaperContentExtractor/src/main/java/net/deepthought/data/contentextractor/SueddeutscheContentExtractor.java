@@ -600,12 +600,12 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   }
 
   protected void tryToExtractLabel(ArticlesOverviewItem item, Element itemElement) {
-    Elements labelElements = itemElement.getElementsByClass("teaserlabel");
+    Elements labelElements = itemElement.select(".teaserlabel");
     if(labelElements.size() > 0) {
       item.setLabel(labelElements.get(0).text());
     }
     else {
-      labelElements = itemElement.getElementsByClass("flyout-teaser-label");
+      labelElements = itemElement.select(".flyout-teaser-label");
       if(labelElements.size() > 0) {
         item.setLabel(labelElements.get(0).text());
       }
@@ -630,8 +630,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
           }
         }
 
-        if(item != null)
+        if(item != null) {
           extractedItems.add(item);
+          tryToExtractLabel(item, tileElement);
+        }
       }
     }
 
