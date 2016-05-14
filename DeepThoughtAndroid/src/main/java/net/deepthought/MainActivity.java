@@ -249,10 +249,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   protected void setControlsEnabledState(boolean enable) {
       if(enable) {
-        if(loadingDataProgressDialog != null) {
-          loadingDataProgressDialog.hide();
-          loadingDataProgressDialog = null;
-        }
+        dismissLoadingDataProgressDialog();
       }
       else {
         loadingDataProgressDialog = new ProgressDialog(this);
@@ -276,8 +273,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   protected void onDestroy() {
-    loadingDataProgressDialog = null;
+    dismissLoadingDataProgressDialog();
+
     super.onDestroy();
+  }
+
+  protected void dismissLoadingDataProgressDialog() {
+    if(loadingDataProgressDialog != null) {
+      loadingDataProgressDialog.hide();
+      loadingDataProgressDialog.dismiss();
+      loadingDataProgressDialog = null;
+    }
   }
 
   @Override
