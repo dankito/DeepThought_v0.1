@@ -527,13 +527,14 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   protected ArticlesOverviewItem createOverviewItemFromAnchorElement(Element anchorElement) {
     ArticlesOverviewItem item = new ArticlesOverviewItem(this, anchorElement.attr("href"));
 
-    for(Element anchorChild : anchorElement.children()) {
-      if("img".equals(anchorChild.nodeName())) {
-        item.setPreviewImageUrl(extractImageUrlFromImgElement(anchorChild));
-      }
-      else if("em".equals(anchorChild.nodeName()) || "h2".equals(anchorChild.nodeName())) {
-        item.setTitle(anchorChild.text().trim());
-      }
+    Element img = anchorElement.select("img").first();
+    if(img != null) {
+      item.setPreviewImageUrl(extractImageUrlFromImgElement(img));
+    }
+
+    Element em = anchorElement.select("em").first();
+    if(em != null) {
+      item.setTitle(em.text().trim());
     }
 
     tryToExtractLabel(item, anchorElement);
