@@ -27,6 +27,8 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   private final static Logger log = LoggerFactory.getLogger(HeiseContentExtractor.class);
 
+  protected static final String LogoFileName = "heise_online_logo.png";
+
 
   @Override
   public int getSupportedPluginSystemVersion() {
@@ -57,7 +59,8 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   @Override
   public String getIconUrl() {
 //    return "http://www.heise.de/icons/ho/apple-touch-icon-152.png";
-    return "http://www.heise.de/icons/ho/apple-touch-icon-120.png";
+//    return "http://www.heise.de/icons/ho/apple-touch-icon-120.png";
+    return tryToLoadIconFile(LogoFileName);
   }
 
 
