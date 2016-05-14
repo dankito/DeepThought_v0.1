@@ -256,7 +256,7 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
 
   protected String formatDateToDeepThoughtDateString(Date parsedDate) {
-    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(parsedDate);
+    return DateFormat.getDateInstance(Reference.PublishingDateFormat, Localization.getLanguageLocale()).format(parsedDate);
   }
 
 }

@@ -530,7 +530,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   protected void setReferenceIssueTextFieldToDateSelectedInDatePicker() {
     if(dtpckReferencePublishingDate.getValue() != null) {
       Date date = DateConvertUtils.asUtilDate(dtpckReferencePublishingDate.getValue());
-      txtfldReferenceIssueOrPublishingDate.setText(DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(date));
+      txtfldReferenceIssueOrPublishingDate.setText(DateFormat.getDateInstance(Reference.PublishingDateFormat, Localization.getLanguageLocale()).format(date));
     }
   }
 

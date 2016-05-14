@@ -2,6 +2,7 @@ package net.deepthought.data.contentextractor;
 
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.deepthought.data.model.Reference;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class DerFreitagContentExtractorTest extends GermanOnlineNewspaperContent
 
 
   protected void assertThatPublishingDateEquals(EntryCreationResult creationResult, String publishingDate) throws ParseException {
-    Date dateToBe = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN).parse(publishingDate);
+    Date dateToBe = DateFormat.getDateInstance(Reference.PublishingDateFormat, Locale.GERMAN).parse(publishingDate);
     assertThat(creationResult.getReference().getPublishingDate(), is(dateToBe));
   }
 

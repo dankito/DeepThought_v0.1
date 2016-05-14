@@ -18,7 +18,7 @@ dependencies {
     compile project(':LuceneSearchEngine')
     compile project(':WGetFileDownloader')
 
-//    compile project(':OnlineNewspaperContentExtractor')
+    compile project(':OnlineNewspaperContentExtractor')
 //    compile project(':YouTubeAndVimeoContentExtractor')
 //    compile project(':OpenOfficeDocumentsImporterExporter')
 

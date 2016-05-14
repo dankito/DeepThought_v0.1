@@ -36,6 +36,8 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
   private static final long serialVersionUID = -7176298227016698447L;
 
+  public static final int PublishingDateFormat = DateFormat.SHORT;
+
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = TableConfig.ReferenceSeriesTitleJoinColumnName)
@@ -343,7 +345,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
 
   protected String formatPublishingDate() {
-    return DateFormat.getDateInstance(DateFormat.MEDIUM, Localization.getLanguageLocale()).format(publishingDate);
+    return DateFormat.getDateInstance(PublishingDateFormat, Localization.getLanguageLocale()).format(publishingDate);
   }
 
   public static Date tryToParseIssueOrPublishingDateToDate(String issueOrPublishingDate) {
