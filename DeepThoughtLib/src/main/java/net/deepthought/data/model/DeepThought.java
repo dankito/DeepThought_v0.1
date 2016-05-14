@@ -15,6 +15,7 @@ import net.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
+import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
@@ -1253,18 +1254,24 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
-  protected transient Map<String, Person> cachedPersons = new HashMap<>();
+  public Person findPerson(String lastName, String firstName) {final ObjectHolder<Collection<Person>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
 
-  public Person findPerson(String lastName, String firstName) {
-//    if (cachedPersons.containsKey(lastName))
-//      return cachedPersons.get(lastName);
-
-    for (Person person : getPersons()) {
-      if (lastName.equals(person.getLastName()) && firstName.equals(person.getFirstName())) {
-//        cachedPersons.put(lastName, person);
-        return person;
+    Application.getSearchEngine().searchPersons(new Search<Person>(lastName + ", " + firstName, new SearchCompletedListener<Collection<Person>>() {
+      @Override
+      public void completed(Collection<Person> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<Person> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      return new ArrayList<Person>(results).get(0);
     }
+
 
     return null;
   }
