@@ -59,11 +59,11 @@ public class MessagesReceiver extends NanoHTTPD {
   public Response serve(IHTTPSession session) {
     String methodName = extractMethodName(session.getUri());
     if(isValidUri(session.getUri(), methodName)) {
-      log.debug("Received " + methodName + " message");
+      log.debug("Received " + methodName + " message from " + session.getRemoteIp());
       return respondToMessage(session, methodName);
     }
 
-    log.debug("Don't know how to handle Request of Uri " + session.getUri());
+    log.warn("Don't know how to handle Request of Uri " + session.getUri());
     return createInvalidUrlResponse();
   }
 
@@ -225,9 +225,7 @@ public class MessagesReceiver extends NanoHTTPD {
     String messageBody = getMessageBody(session);
 
     if(messageBody != null) {
-      log.debug("Deserializing received message body ...");
       DeserializationResult deserializationResult = JsonIoJsonHelper.parseJsonString(messageBody, requestClass);
-      log.debug("Deserializing done");
 
       if(deserializationResult.successful()) {
         Request request = (Request)deserializationResult.getResult();
@@ -241,7 +239,6 @@ public class MessagesReceiver extends NanoHTTPD {
   }
 
   protected String getMessageBody(IHTTPSession session) {
-    log.debug("Extracting received message body ...");
     Map<String, String> bodyValues = new HashMap<>();
     try {
       session.parseBody(bodyValues);
@@ -251,7 +248,6 @@ public class MessagesReceiver extends NanoHTTPD {
       return null;
     }
 
-    log.debug("Extracting done");
     if(bodyValues.size() == 1) {
       return new ArrayList<String>(bodyValues.values()).get(0);
     }
