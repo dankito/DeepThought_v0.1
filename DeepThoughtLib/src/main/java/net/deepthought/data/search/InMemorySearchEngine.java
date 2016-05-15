@@ -222,6 +222,11 @@ public class InMemorySearchEngine extends SearchEngineBase {
     search.fireSearchCompleted();
   }
 
+  public void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
+    // TODO:
+    search.callCompletedListener();
+  }
+
 
   @Override
   protected void searchPersons(Search<Person> search, String personFilter) {

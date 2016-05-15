@@ -3,6 +3,7 @@ package net.deepthought.data.search;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.data.search.specific.FilesSearch;
@@ -17,24 +18,25 @@ import java.util.Collection;
  */
 public interface ISearchEngine {
 
-  public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener);
+  void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener);
 
-  public void searchTags(TagsSearch search);
+  void searchTags(TagsSearch search);
 
-  public void searchCategories(Search<Category> search);
+  void searchCategories(Search<Category> search);
 
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
-  public void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, String searchTerm, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
+  void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
+  void findAllEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor, String searchTerm, SearchCompletedListener<FindAllEntriesHavingTheseTagsResult> listener);
 
-  public void searchEntries(EntriesSearch search);
+  void searchEntries(EntriesSearch search);
 
-  public void searchReferenceBases(ReferenceBasesSearch search);
+  void searchReferenceBases(ReferenceBasesSearch search);
+  void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search);
 
-  public void searchPersons(Search<Person> search);
+  void searchPersons(Search<Person> search);
 
-  public void searchFiles(FilesSearch search);
+  void searchFiles(FilesSearch search);
 
 
-  public void close();
+  void close();
 
 }

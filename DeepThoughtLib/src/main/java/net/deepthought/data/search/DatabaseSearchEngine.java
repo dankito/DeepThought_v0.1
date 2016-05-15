@@ -4,6 +4,7 @@ import net.deepthought.Application;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Person;
+import net.deepthought.data.model.Reference;
 import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.IEntityManager;
@@ -179,6 +180,11 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 //    }
 
     search.fireSearchCompleted();
+  }
+
+  public void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
+    // TODO:
+    search.callCompletedListener();
   }
 
   @Override

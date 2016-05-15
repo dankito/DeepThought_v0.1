@@ -1169,7 +1169,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
 
-//  @Override
+  @Override
   protected void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
     BooleanQuery query = new BooleanQuery();
 
