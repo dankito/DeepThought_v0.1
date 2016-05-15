@@ -1197,6 +1197,56 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
+  protected transient Map<String, Map<String, Reference>> cachedReferencesForDate = new HashMap<>();
+
+  protected Reference findReferenceForDate(SeriesTitle series, String articleDate) {
+    String seriesTitleTitle = series == null ? null : series.getTitle();
+    if(cachedReferencesForDate.containsKey(seriesTitleTitle) && cachedReferencesForDate.get(seriesTitleTitle).containsKey(articleDate)) {
+      return cachedReferencesForDate.get(seriesTitleTitle).get(articleDate);
+    }
+
+
+    final ObjectHolder<Collection<Reference>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchForReferenceOfDate(seriesTitleTitle, new Search<Reference>(articleDate, new SearchCompletedListener<Collection<Reference>>() {
+      @Override
+      public void completed(Collection<Reference> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
+      }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<Reference> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      Reference reference = (Reference)new ArrayList<Reference>(results).get(0);
+
+      if(cachedReferencesForDate.containsKey(seriesTitleTitle) == false) {
+        cachedReferencesForDate.put(seriesTitleTitle, new HashMap<String, Reference>());
+      }
+      cachedReferencesForDate.get(seriesTitleTitle).put(articleDate, reference);
+
+      return reference;
+    }
+
+    return null;
+  }
+
+  public Reference findOrCreateReferenceForDate(SeriesTitle series, String articleDate) {
+    Reference existingReference = findReferenceForDate(series, articleDate);
+    if(existingReference != null) {
+      return existingReference;
+    }
+
+    Reference newReference = new Reference();
+    newReference.setIssueOrPublishingDate(articleDate);
+
+    return newReference;
+  }
+
+
   protected transient Map<String, Tag> cachedTags = new HashMap<>();
 
   public Tag findTagForName(String name) {

@@ -1170,7 +1170,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
 
   @Override
-  protected void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
+  public void searchForReferenceOfDate(String optionalSeriesTitleTitle, Search<Reference> search) {
     BooleanQuery query = new BooleanQuery();
 
     String issueOrPublishingDate = search.getSearchTerm();

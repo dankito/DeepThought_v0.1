@@ -107,7 +107,7 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     creationResult.setSeriesTitle(newspaperSeries);
 
     if(newspaperSeries != null && StringUtils.isNotNullOrEmpty(articleDate)) {
-      Reference dateReference = findOrCreateReferenceForThatDate(newspaperSeries, articleDate);
+      Reference dateReference = findOrCreateReferenceForDate(newspaperSeries, articleDate);
       creationResult.setReference(dateReference);
     }
   }
@@ -122,18 +122,12 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     return newspaperSeries;
   }
 
-  protected Reference findOrCreateReferenceForThatDate(SeriesTitle newspaperSeries, String articleDate) {
-    if(newspaperSeries != null) {
-      for (Reference reference : newspaperSeries.getSerialParts()) {
-        if (articleDate.equals(reference.getIssueOrPublishingDate()))
-          return reference;
-      }
+  protected Reference findOrCreateReferenceForDate(SeriesTitle newspaperSeries, String articleDate) {
+    if(Application.getDeepThought() != null) {
+      return Application.getDeepThought().findOrCreateReferenceForDate(newspaperSeries, articleDate);
     }
 
-    Reference newspaperDateReference = new Reference();
-    newspaperDateReference.setIssueOrPublishingDate(articleDate);
-
-    return newspaperDateReference;
+    return null;
   }
 
   protected void findOrCreateTagAndAddToCreationResult(EntryCreationResult creationResult) {
