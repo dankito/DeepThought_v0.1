@@ -459,7 +459,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     deleteIndex();
 
-    log.debug("Going to rebuild Lucene index ...");
+    log.info("Going to rebuild Lucene index ...");
 
     try {
       for (Entry entry : deepThought.getEntries())
@@ -489,7 +489,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
       for(IndexWriter indexWriter : indexWriters.values())
         indexWriter.commit();
-      log.debug("Done rebuilding Lucene Index.");
+      log.info("Done rebuilding Lucene Index.");
     } catch(Exception ex) {
       log.error("Could not rebuild Lucene Index", ex);
     }
@@ -502,14 +502,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
    * </p>
    */
   public void deleteIndex() {
-    log.debug("Going to delete Lucene Index ...");
+    log.info("Going to delete Lucene Index ...");
     try {
       for(IndexWriter indexWriter : indexWriters.values()) {
         indexWriter.deleteAll();
         indexWriter.prepareCommit();
         indexWriter.commit();
       }
-      log.debug("Lucene Index successfully deleted");
+      log.info("Lucene Index successfully deleted");
     } catch(Exception ex) {
       log.error("Could not delete Lucene index", ex);
     }
@@ -821,7 +821,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected void indexDocument(Document doc, Class entityClass) {
     try {
-      log.debug("Indexing document {}", doc);
+      log.info("Indexing document {}", doc);
       IndexWriter indexWriter = getIndexWriter(entityClass);
       indexWriter.addDocument(doc);
       indexWriter.commit();
@@ -1398,7 +1398,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(isReadOnly == true)
       return;
 
-    log.debug("Removing Entity {} from index", removedEntity);
+    log.info("Removing Entity {} from index", removedEntity);
     updatedEntitiesToIndex.remove(removedEntity);
 
     String idFieldName = getIdFieldNameForEntity(removedEntity);
