@@ -113,21 +113,11 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   }
 
   public SeriesTitle findOrCreateNewspaperSeries() {
-    SeriesTitle newspaperSeries = null;
-
-    if(Application.getDeepThought() != null) {
-      newspaperSeries = Application.getDeepThought().findOrCreateSeriesTitleForTitle(getNewspaperName());
-    }
-
-    return newspaperSeries;
+    return Application.getEntitiesSearcherAndCreator().findOrCreateSeriesTitleForTitle(getNewspaperName());
   }
 
   protected Reference findOrCreateReferenceForDate(SeriesTitle newspaperSeries, String articleDate) {
-    if(Application.getDeepThought() != null) {
-      return Application.getDeepThought().findOrCreateReferenceForDate(newspaperSeries, articleDate);
-    }
-
-    return null;
+    return Application.getEntitiesSearcherAndCreator().findOrCreateReferenceForDate(newspaperSeries, articleDate);
   }
 
   protected void findOrCreateTagAndAddToCreationResult(EntryCreationResult creationResult) {
@@ -140,8 +130,7 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
   }
 
   protected Tag findOrCreateTagForName(String tagName) {
-
-    return Application.getDeepThought().findOrCreateTagForName(tagName);
+    return Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(tagName);
   }
 
   protected void addNewspaperCategory(EntryCreationResult creationResult, boolean isOnlineArticle) {
@@ -152,20 +141,26 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     // TODO: here sub categories getting added directly to their (may already saved) parent categories and so also get stored in database whether user likes to save this Article
     // or not, but i can live with that right now
     // Currently there's no other way to solve it as if parent category doesn't get set, on save it gets added to TopLevelCategory -> it will be added a lot of times
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
+    Category periodicalsCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
     if(periodicalsCategory.isPersisted() == false && Application.getDeepThought() != null) {
       Application.getDeepThought().addCategory(periodicalsCategory);
     }
 
-    Category newspaperCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
+    Category newspaperCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
     if(newspaperCategory.isPersisted() == false && Application.getDeepThought() != null) {
       Application.getDeepThought().addCategory(newspaperCategory);
+      periodicalsCategory.addSubCategory(newspaperCategory);
     }
 
     if(isOnlineArticle == false)
       creationResult.addCategory(newspaperCategory);
     else {
-      Category newspaperOnlineCategory = Application.getDeepThought().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedString("online"));
+      Category newspaperOnlineCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(newspaperCategory, newspaperName + " " + Localization.getLocalizedString("online"));
+      if(newspaperOnlineCategory.isPersisted() == false && Application.getDeepThought() != null) {
+        Application.getDeepThought().addCategory(newspaperOnlineCategory);
+        newspaperCategory.addSubCategory(newspaperOnlineCategory);
+      }
+
       creationResult.addCategory(newspaperOnlineCategory);
     }
   }

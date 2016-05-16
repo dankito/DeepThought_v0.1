@@ -302,9 +302,25 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
   }
 
   protected void addNewspaperCategory(EntryCreationResult creationResult) {
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
-    Category sueddeutscheCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
-    Category szMagazinCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, getNewspaperName());
+    // TODO: here sub categories getting added directly to their (may already saved) parent categories and so also get stored in database whether user likes to save this Article
+    // or not, but i can live with that right now
+    // Currently there's no other way to solve it as if parent category doesn't get set, on save it gets added to TopLevelCategory -> it will be added a lot of times
+    Category periodicalsCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
+    if(periodicalsCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(periodicalsCategory);
+    }
+
+    Category sueddeutscheCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
+    if(sueddeutscheCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(sueddeutscheCategory);
+      periodicalsCategory.addSubCategory(sueddeutscheCategory);
+    }
+
+    Category szMagazinCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(sueddeutscheCategory, getNewspaperName());
+    if(szMagazinCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(szMagazinCategory);
+      sueddeutscheCategory.addSubCategory(szMagazinCategory);
+    }
 
     creationResult.addCategory(szMagazinCategory);
   }

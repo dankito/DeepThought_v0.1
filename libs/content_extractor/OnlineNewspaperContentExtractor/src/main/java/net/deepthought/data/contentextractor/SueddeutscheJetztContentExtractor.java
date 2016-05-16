@@ -382,9 +382,25 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
   }
 
   protected void addNewspaperCategory(EntryCreationResult creationResult) {
-    Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
-    Category sueddeutscheCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
-    Category szJetztCategory = Application.getDeepThought().findOrCreateSubCategoryForName(sueddeutscheCategory, "jetzt");
+    // TODO: here sub categories getting added directly to their (may already saved) parent categories and so also get stored in database whether user likes to save this Article
+    // or not, but i can live with that right now
+    // Currently there's no other way to solve it as if parent category doesn't get set, on save it gets added to TopLevelCategory -> it will be added a lot of times
+    Category periodicalsCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
+    if(periodicalsCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(periodicalsCategory);
+    }
+
+    Category sueddeutscheCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(periodicalsCategory, "SZ");
+    if(sueddeutscheCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(sueddeutscheCategory);
+      periodicalsCategory.addSubCategory(sueddeutscheCategory);
+    }
+
+    Category szJetztCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(sueddeutscheCategory, "jetzt");
+    if(szJetztCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(szJetztCategory);
+      sueddeutscheCategory.addSubCategory(szJetztCategory);
+    }
 
     creationResult.addCategory(szJetztCategory);
   }

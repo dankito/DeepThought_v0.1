@@ -162,7 +162,7 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
   protected void addArticleTags(Element tagsElement, EntryCreationResult creationResult) {
     for(Element child : tagsElement.children()) {
       if("a".equals(child.nodeName())) {
-        creationResult.addTag(Application.getDeepThought().findOrCreateTagForName(child.ownText()));
+        creationResult.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(child.ownText()));
       }
     }
   }
