@@ -996,7 +996,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch2 = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1.getId(), new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1, new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -1016,7 +1016,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch3 = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory2.getId(), new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory2, new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -1037,7 +1037,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch countDownLatch4 = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1.getId(), new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1, new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);

@@ -13,7 +13,7 @@ public class CategoriesSearch extends Search<Category> {
 
   protected boolean topLevelCategoriesOnly = false;
 
-  protected Long parentCategoryId = null;
+  protected Category parentCategory = null;
 
 
   public CategoriesSearch(String searchTerm, SearchCompletedListener<Collection<Category>> completedListener) {
@@ -28,9 +28,9 @@ public class CategoriesSearch extends Search<Category> {
     this.topLevelCategoriesOnly = topLevelCategoriesOnly;
   }
 
-  public CategoriesSearch(String searchTerm, Long parentCategoryId, SearchCompletedListener<Collection<Category>> completedListener) {
+  public CategoriesSearch(String searchTerm, Category parentCategory, SearchCompletedListener<Collection<Category>> completedListener) {
     this(searchTerm, completedListener);
-    this.parentCategoryId = parentCategoryId;
+    this.parentCategory = parentCategory;
   }
 
 
@@ -38,12 +38,12 @@ public class CategoriesSearch extends Search<Category> {
     return topLevelCategoriesOnly;
   }
 
-  public boolean isParentCategoryIdSet() {
-    return parentCategoryId != null;
+  public boolean isParentCategorySet() {
+    return parentCategory != null;
   }
 
-  public Long getParentCategoryId() {
-    return parentCategoryId;
+  public Category getParentCategory() {
+    return parentCategory;
   }
 
 }

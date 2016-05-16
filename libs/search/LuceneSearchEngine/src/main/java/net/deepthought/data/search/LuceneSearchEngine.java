@@ -1068,8 +1068,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
     if(search.topLevelCategoriesOnly()) {
       query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(NoParentCategoryIdFieldValue))), BooleanClause.Occur.MUST);
     }
-    else if(search.isParentCategoryIdSet()) {
-      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(search.getParentCategoryId()))), BooleanClause.Occur.MUST);
+    else if(search.isParentCategorySet()) {
+      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(search.getParentCategory().getId()))), BooleanClause.Occur.MUST);
     }
 
     executeQuery(search, query, Category.class, FieldName.CategoryId, SortOrder.Ascending, FieldName.CategoryName);

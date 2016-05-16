@@ -17,6 +17,7 @@ import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.Search;
 import net.deepthought.data.search.SearchCompletedListener;
+import net.deepthought.data.search.specific.CategoriesSearch;
 import net.deepthought.data.search.specific.ReferenceBaseType;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.deepthought.data.search.specific.TagsSearch;
@@ -1289,10 +1290,22 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
 
   public Category findTopLevelCategoryForName(String name) {
-    for (Category category : topLevelCategory.getSubCategories()) {
-      if (name.equals(category.getName())) {
-        return category;
+    final ObjectHolder<Collection<Category>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchCategories(new CategoriesSearch(name, true, new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<Category> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      return new ArrayList<Category>(results).get(0);
     }
 
     return null;
@@ -1310,10 +1323,22 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
   public Category findSubCategoryForName(Category parentCategory, String subCategoryName) {
-    for (Category subCategory : parentCategory.getSubCategories()) {
-      if (subCategoryName.equals(subCategory.getName())) {
-        return subCategory;
+    final ObjectHolder<Collection<Category>> searchResults = new ObjectHolder<>();
+    final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
+
+    Application.getSearchEngine().searchCategories(new CategoriesSearch(subCategoryName, parentCategory, new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> results) {
+        searchResults.set(results);
+        waitForSearchResultsLatch.countDown();
       }
+    }));
+
+    try { waitForSearchResultsLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
+
+    Collection<Category> results = searchResults.get();
+    if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
+      return new ArrayList<Category>(results).get(0);
     }
 
     return null;
@@ -1350,7 +1375,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
       return new ArrayList<Person>(results).get(0);
     }
-
 
     return null;
   }
