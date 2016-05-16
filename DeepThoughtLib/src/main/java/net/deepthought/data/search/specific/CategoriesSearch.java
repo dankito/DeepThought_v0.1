@@ -11,6 +11,8 @@ import java.util.Collection;
  */
 public class CategoriesSearch extends Search<Category> {
 
+  protected boolean topLevelCategoriesOnly = false;
+
   protected Long parentCategoryId = null;
 
 
@@ -18,11 +20,23 @@ public class CategoriesSearch extends Search<Category> {
     super(searchTerm, completedListener);
   }
 
+  /**
+   * If {@code topLevelCategoriesOnly} is set to true, searches only for Top Level Categories (= Categories that have no Parent Category).
+   */
+  public CategoriesSearch(String searchTerm, boolean topLevelCategoriesOnly, SearchCompletedListener<Collection<Category>> completedListener) {
+    this(searchTerm, completedListener);
+    this.topLevelCategoriesOnly = topLevelCategoriesOnly;
+  }
+
   public CategoriesSearch(String searchTerm, Long parentCategoryId, SearchCompletedListener<Collection<Category>> completedListener) {
     this(searchTerm, completedListener);
     this.parentCategoryId = parentCategoryId;
   }
 
+
+  public boolean topLevelCategoriesOnly() {
+    return topLevelCategoriesOnly;
+  }
 
   public boolean isParentCategoryIdSet() {
     return parentCategoryId != null;

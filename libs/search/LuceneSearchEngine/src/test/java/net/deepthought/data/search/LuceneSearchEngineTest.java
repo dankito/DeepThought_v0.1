@@ -872,6 +872,79 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
+  public void searchCategories_SearchForParentCategoriesOnly() {
+    Category topLevelCategory1 = new Category("Category1");
+    Category topLevelCategory2 = new Category("Category2");
+    deepThought.addCategory(topLevelCategory1);
+    deepThought.addCategory(topLevelCategory2);
+
+    for(int i = 0; i < 3; i++) {
+      Category subCategoryForCat1 = new Category("Category" + i);
+      deepThought.addCategory(subCategoryForCat1);
+      topLevelCategory1.addSubCategory(subCategoryForCat1);
+
+      Category subCategoryForCat2 = new Category("Category" + i);
+      deepThought.addCategory(subCategoryForCat2);
+      topLevelCategory2.addSubCategory(subCategoryForCat2);
+    }
+
+
+    // Search for 'Category1' -> all three get found
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch("Category1", new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(3, results.size());
+
+    Assert.assertTrue(results.contains(topLevelCategory1));
+
+
+    // now search for 'Category1' as TopLevelCategory -> only that one TopLevelCategory gets found
+    results.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch("Category1", true, new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch2.countDown();
+      }
+    }));
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(topLevelCategory1, results.get(0));
+
+
+    // now search for 'Category2' as TopLevelCategory -> only that one TopLevelCategory gets found
+    results.clear();
+    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch("Category2", true, new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch3.countDown();
+      }
+    }));
+
+    try { countDownLatch3.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+    Assert.assertEquals(topLevelCategory2, results.get(0));
+  }
+
+  @Test
   public void searchCategories_IncludeParentCategories() {
     Category topLevelCategory1 = new Category("TopLevelCategory1");
     Category topLevelCategory2 = new Category("TopLevelCategory2");
