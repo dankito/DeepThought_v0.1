@@ -19,6 +19,8 @@ import net.deepthought.data.merger.DefaultDataMerger;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.EntitiesSearcherAndCreator;
+import net.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.data.search.InMemorySearchEngine;
 import net.deepthought.language.ILanguageDetector;
@@ -120,6 +122,11 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
     if(searchEngine == null)
       searchEngine = new InMemorySearchEngine();
     return searchEngine;
+  }
+
+  @Override
+  public IEntitiesSearcherAndCreator createEntitiesSearcherAndCreator() {
+    return new EntitiesSearcherAndCreator();
   }
 
   @Override

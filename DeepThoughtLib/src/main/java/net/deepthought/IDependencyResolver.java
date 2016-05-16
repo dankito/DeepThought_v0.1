@@ -11,6 +11,7 @@ import net.deepthought.data.html.IHtmlHelper;
 import net.deepthought.data.merger.IDataMerger;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformTools;
@@ -40,6 +41,8 @@ public interface IDependencyResolver<THtmlEditor> {
   ILanguageDetector createLanguageDetector();
 
   ISearchEngine createSearchEngine();
+
+  IEntitiesSearcherAndCreator createEntitiesSearcherAndCreator();
 
   IHtmlHelper createHtmlHelper();
 

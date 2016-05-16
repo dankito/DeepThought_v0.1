@@ -17,6 +17,7 @@ import net.deepthought.data.model.User;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.persistence.EntityManagerConfiguration;
 import net.deepthought.data.persistence.IEntityManager;
+import net.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.deepthought.data.search.ISearchEngine;
 import net.deepthought.language.ILanguageDetector;
 import net.deepthought.platform.IPlatformConfiguration;
@@ -75,6 +76,8 @@ public class Application {
   protected static ILanguageDetector languageDetector = null;
   protected static ISearchEngine searchEngine = null;
 
+  protected static IEntitiesSearcherAndCreator entitiesSearcherAndCreator = null;
+
   protected static IHtmlHelper htmlHelper = null;
 
   protected static IFileDownloader downloader = null;
@@ -131,6 +134,7 @@ public class Application {
     Application.languageDetector = dependencyResolver.createLanguageDetector();
 
     Application.searchEngine = dependencyResolver.createSearchEngine();
+    Application.entitiesSearcherAndCreator = dependencyResolver.createEntitiesSearcherAndCreator();
 
     if(openDatabase(dependencyResolver) == false)
       return;
@@ -383,6 +387,10 @@ public class Application {
 
   public static ISearchEngine getSearchEngine() {
     return searchEngine;
+  }
+
+  public static IEntitiesSearcherAndCreator getEntitiesSearcherAndCreator() {
+    return entitiesSearcherAndCreator;
   }
 
   public static IHtmlHelper getHtmlHelper() {
