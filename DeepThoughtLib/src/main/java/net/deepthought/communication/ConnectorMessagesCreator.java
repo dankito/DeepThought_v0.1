@@ -158,7 +158,6 @@ public class ConnectorMessagesCreator {
 
   protected String createHostInfoMessageString(User loggedOnUser, Device localDevice) {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setIpAddress(config.getLocalHostIpAddress());
     hostInfo.setPort(config.getMessageReceiverPort());
 
     SerializationResult result = JsonIoJsonHelper.generateJsonString(hostInfo);
