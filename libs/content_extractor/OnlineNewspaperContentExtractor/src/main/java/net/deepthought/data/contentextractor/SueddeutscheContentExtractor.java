@@ -6,7 +6,6 @@ import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.Tag;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.localization.Localization;
@@ -590,6 +589,12 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     Element em = anchorElement.select("em").first();
     if(em != null) {
       item.setTitle(em.text().trim());
+    }
+    else {
+      Element titleElement = anchorElement.select(".teaserElement__title").first();
+      if(titleElement != null) {
+        item.setTitle(titleElement.text().trim());
+      }
     }
 
     tryToExtractLabel(item, anchorElement);
