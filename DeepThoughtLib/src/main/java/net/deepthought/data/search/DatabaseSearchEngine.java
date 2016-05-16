@@ -10,6 +10,7 @@ import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.IEntityManager;
 import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.TableConfig;
+import net.deepthought.data.search.specific.CategoriesSearch;
 import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.ReferenceBasesSearch;
@@ -109,7 +110,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  public void searchCategories(Search<Category> search) {
+  public void searchCategories(CategoriesSearch search) {
     // TODO
     search.fireSearchCompleted();
   }
