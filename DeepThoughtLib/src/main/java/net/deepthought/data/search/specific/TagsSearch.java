@@ -11,9 +11,6 @@ import java.util.Collection;
  */
 public class TagsSearch extends SearchBase {
 
-  public final static String EmptySearchTerm = "";
-
-
   protected TagsSearchResults results = null;
 
   protected SearchCompletedListener<TagsSearchResults> completedListener = null;

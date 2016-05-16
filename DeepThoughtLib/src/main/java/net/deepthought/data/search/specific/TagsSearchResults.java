@@ -2,6 +2,7 @@ package net.deepthought.data.search.specific;
 
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
+import net.deepthought.data.search.SearchBase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class TagsSearchResults {
 
-  public final static TagsSearchResults EmptySearchResults = new TagsSearchResults(TagsSearch.EmptySearchTerm, new ArrayList<Tag>());
+  public final static TagsSearchResults EmptySearchResults = new TagsSearchResults(SearchBase.EmptySearchTerm, new ArrayList<Tag>());
 
 
   protected String overAllSearchTerm;

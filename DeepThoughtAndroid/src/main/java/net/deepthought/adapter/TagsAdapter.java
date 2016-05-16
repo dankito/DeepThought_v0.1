@@ -14,6 +14,7 @@ import net.deepthought.data.model.DeepThought;
 import net.deepthought.data.model.Tag;
 import net.deepthought.data.model.listener.AllEntitiesListener;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.SearchBase;
 import net.deepthought.data.search.SearchCompletedListener;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
@@ -35,7 +36,7 @@ public class TagsAdapter extends BaseAdapter {
   protected Activity context;
 
   protected TagsSearch tagsSearch = null;
-  protected String lastSearchTerm = TagsSearch.EmptySearchTerm;
+  protected String lastSearchTerm = SearchBase.EmptySearchTerm;
 
   protected List<Tag> searchResults = new ArrayList<>();
 
@@ -129,7 +130,7 @@ public class TagsAdapter extends BaseAdapter {
 
 
   public void searchForAllTags() {
-    searchTags(TagsSearch.EmptySearchTerm);
+    searchTags(SearchBase.EmptySearchTerm);
   }
 
   public void researchTagsWithLastSearchTerm() {

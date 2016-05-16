@@ -12,6 +12,7 @@ import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.ui.SystemTag;
 import net.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
+import net.deepthought.data.search.SearchBase;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.deepthought.data.search.specific.TagsSearch;
 import net.deepthought.data.search.specific.TagsSearchResults;
@@ -53,7 +54,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected DeepThought deepThought = null;
   protected Collection<Tag> systemTags = new ArrayList<>();
 
-  protected String lastSearchTerm = TagsSearch.EmptySearchTerm;
+  protected String lastSearchTerm = SearchBase.EmptySearchTerm;
 
   protected TagsSearch tagsSearch = null;
   protected TagsSearchResults lastTagsSearchResults = TagsSearchResults.EmptySearchResults;
@@ -184,7 +185,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
 
   protected void searchForAllTags() {
-    searchTags(TagsSearch.EmptySearchTerm);
+    searchTags(SearchBase.EmptySearchTerm);
   }
 
   protected void researchTagsWithLastSearchTerm() {
