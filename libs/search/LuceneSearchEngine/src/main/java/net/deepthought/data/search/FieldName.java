@@ -50,6 +50,9 @@ public class FieldName {
   public final static String CategoryName = "category_name";
   public final static String CategoryDescription = "category_description";
 
+  public final static String CategoryParentCategoryId = "parent_category_id";
+  public final static String CategoryParentCategoryName = "parent_category_name";
+
 
   /*      Persons      */
 

@@ -112,6 +112,10 @@ public class Category extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.CategoryCategoryOrderColumnName, previousCategoryIndex, categoryOrder);
   }
 
+  public boolean isTopLevelCategory() {
+    return deepThought != null && getParentCategory() == deepThought.getTopLevelCategory();
+  }
+
   public Category getParentCategory() {
     return parentCategory;
   }

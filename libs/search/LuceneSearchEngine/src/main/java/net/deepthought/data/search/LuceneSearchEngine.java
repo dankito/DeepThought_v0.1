@@ -18,6 +18,7 @@ import net.deepthought.data.persistence.LazyLoadingList;
 import net.deepthought.data.persistence.db.BaseEntity;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.data.search.results.LazyLoadingLuceneSearchResultsList;
+import net.deepthought.data.search.specific.CategoriesSearch;
 import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
@@ -91,6 +92,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
   public final static String NoSeriesFieldValue = "noseries";
   public final static String NoReferenceFieldValue = "noreference";
   public final static String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
+
+  public final static String NoParentCategoryNameFieldValue = "noparentcategory";
+  public final static Long NoParentCategoryIdFieldValue = -42L;
 
   public final static int SeriesTitleReferenceBaseType = 1;
   public final static int ReferenceReferenceBaseType = 2;
@@ -628,7 +632,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void indexCategory(Category category) {
-    if(category.getParentCategory() == null) // TopLevelCategory
+    if(category.getParentCategory() == null) // invisible 'I know me nothing knowing' Category (= parent of all Top Level Categories)
       return;
 
     Document doc = new Document();
@@ -636,6 +640,15 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.CategoryName, category.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.CategoryDescription, category.getDescription().toLowerCase(), Field.Store.NO));
+
+    if(category.isTopLevelCategory()) {
+      doc.add(new LongField(FieldName.CategoryParentCategoryId, NoParentCategoryIdFieldValue, Field.Store.YES));
+      doc.add(new StringField(FieldName.CategoryParentCategoryName, NoParentCategoryNameFieldValue, Field.Store.YES));
+    }
+    else {
+      doc.add(new LongField(FieldName.CategoryParentCategoryId, category.getParentCategory().getId(), Field.Store.YES));
+      doc.add(new StringField(FieldName.CategoryParentCategoryName, category.getParentCategory().getName().toLowerCase(), Field.Store.NO));
+    }
 
     indexDocument(doc, Category.class);
   }
@@ -1043,12 +1056,18 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   @Override
-  public void searchCategories(Search<Category> search) {
+  public void searchCategories(CategoriesSearch search) {
     BooleanQuery query = new BooleanQuery();
     String searchTerm = "*" + QueryParser.escape(search.getSearchTerm().toLowerCase()) + "*";
 
-    query.add(new WildcardQuery(new Term(FieldName.CategoryName, searchTerm)), BooleanClause.Occur.SHOULD);
-    query.add(new WildcardQuery(new Term(FieldName.CategoryDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+    BooleanQuery categoryNameQuery = new BooleanQuery();
+    categoryNameQuery.add(new WildcardQuery(new Term(FieldName.CategoryName, searchTerm)), BooleanClause.Occur.SHOULD);
+    categoryNameQuery.add(new WildcardQuery(new Term(FieldName.CategoryDescription, searchTerm)), BooleanClause.Occur.SHOULD);
+    query.add(categoryNameQuery, BooleanClause.Occur.MUST);
+
+    if(search.isParentCategoryIdSet()) {
+      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(search.getParentCategoryId()))), BooleanClause.Occur.MUST);
+    }
 
     executeQuery(search, query, Category.class, FieldName.CategoryId, SortOrder.Ascending, FieldName.CategoryName);
   }
@@ -1312,6 +1331,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
         if (isIndexedEntityOnEntry(addedEntity))
           updateIndexForEntity((UserDataEntity)collectionHolder);
       }
+      else if(collectionHolder instanceof Category && addedEntity instanceof Category) { // SubCategory Added
+        updateIndexForEntity((UserDataEntity)addedEntity);
+      }
     }
 
     @Override
@@ -1319,6 +1341,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
       if(collectionHolder instanceof Entry) {
         if(isIndexedEntityOnEntry(removedEntity))
           updateIndexForEntity((UserDataEntity) collectionHolder);
+      }
+      else if(collectionHolder instanceof Category && removedEntity instanceof Category) { // SubCategory removed
+        updateIndexForEntity((UserDataEntity)removedEntity);
       }
     }
   };

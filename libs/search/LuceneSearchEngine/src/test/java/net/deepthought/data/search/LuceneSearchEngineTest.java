@@ -12,6 +12,7 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.search.specific.CategoriesSearch;
 import net.deepthought.data.search.specific.EntriesSearch;
 import net.deepthought.data.search.specific.FilesSearch;
 import net.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
@@ -784,7 +785,7 @@ public class LuceneSearchEngineTest {
     final List<Category> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new Search<Category>("Category", new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch("Category", new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -808,7 +809,7 @@ public class LuceneSearchEngineTest {
     final List<Category> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new Search<Category>("perio", new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch("perio", new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -825,7 +826,7 @@ public class LuceneSearchEngineTest {
     results.clear();
     final CountDownLatch nextCountDownLatch = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new Search<Category>("category", new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch("category", new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -852,7 +853,7 @@ public class LuceneSearchEngineTest {
     final List<Category> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new Search<Category>("iebe", new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch("iebe", new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
@@ -871,6 +872,112 @@ public class LuceneSearchEngineTest {
   }
 
   @Test
+  public void searchCategories_IncludeParentCategories() {
+    Category topLevelCategory1 = new Category("TopLevelCategory1");
+    Category topLevelCategory2 = new Category("TopLevelCategory2");
+    deepThought.addCategory(topLevelCategory1);
+    deepThought.addCategory(topLevelCategory2);
+
+    for(int i = 0; i < 3; i++) {
+      Category subCategoryForCat1 = new Category("SubCategory" + i);
+      deepThought.addCategory(subCategoryForCat1);
+      topLevelCategory1.addSubCategory(subCategoryForCat1);
+
+      Category subCategoryForCat2 = new Category("SubCategory" + i);
+      deepThought.addCategory(subCategoryForCat2);
+      topLevelCategory2.addSubCategory(subCategoryForCat2);
+    }
+
+    String subCategoryNameToSearchFor = "Amore";
+
+    Category subCategoryForCat1 = new Category(subCategoryNameToSearchFor);
+    deepThought.addCategory(subCategoryForCat1);
+    topLevelCategory1.addSubCategory(subCategoryForCat1);
+
+    Category subCategoryForCat2 = new Category(subCategoryNameToSearchFor);
+    deepThought.addCategory(subCategoryForCat2);
+    topLevelCategory2.addSubCategory(subCategoryForCat2);
+
+
+    // Search for Category without specifying Parent Category -> both Categories must be found
+    final List<Category> results = new ArrayList<>();
+    final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch.countDown();
+      }
+    }));
+
+    try { countDownLatch.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(2, results.size());
+
+    Assert.assertEquals(subCategoryForCat1, results.get(0));
+    Assert.assertEquals(subCategoryForCat2, results.get(1));
+
+
+    // now search for same Category Name but as child of topLevelCategory1
+    results.clear();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1.getId(), new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch2.countDown();
+      }
+    }));
+
+    try { countDownLatch2.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+
+    Assert.assertEquals(subCategoryForCat1, results.get(0));
+    Assert.assertEquals(topLevelCategory1, results.get(0).getParentCategory());
+
+
+    // and now search for same Category Name but as child of topLevelCategory2
+    results.clear();
+    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory2.getId(), new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch3.countDown();
+      }
+    }));
+
+    try { countDownLatch3.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(1, results.size());
+
+    Assert.assertEquals(subCategoryForCat2, results.get(0));
+    Assert.assertEquals(topLevelCategory2, results.get(0).getParentCategory());
+
+
+    // remove SubCategory -> SubCategory doesn't get found anymore
+    topLevelCategory1.removeSubCategory(subCategoryForCat1);
+    results.clear();
+    final CountDownLatch countDownLatch4 = new CountDownLatch(1);
+
+    searchEngine.searchCategories(new CategoriesSearch(subCategoryNameToSearchFor, topLevelCategory1.getId(), new SearchCompletedListener<Collection<Category>>() {
+      @Override
+      public void completed(Collection<Category> result) {
+        results.addAll(result);
+        countDownLatch4.countDown();
+      }
+    }));
+
+    try { countDownLatch4.await(); } catch(Exception ex) { }
+
+    Assert.assertEquals(0, results.size());
+  }
+
+  @Test
   public void deleteCategory_SearchDoesNotFindCategoryAnymore() {
     Category newCategory = new Category("category");
     deepThought.addCategory(newCategory);
@@ -880,7 +987,7 @@ public class LuceneSearchEngineTest {
     final List<Category> results = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.searchCategories(new Search<Category>("category", new SearchCompletedListener<Collection<Category>>() {
+    searchEngine.searchCategories(new CategoriesSearch("category", new SearchCompletedListener<Collection<Category>>() {
       @Override
       public void completed(Collection<Category> result) {
         results.addAll(result);
