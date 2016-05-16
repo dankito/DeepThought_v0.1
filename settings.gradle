@@ -15,8 +15,8 @@ include ':OnlineNewspaperContentExtractor'
 include ':WikipediaOnlineContentExtractor'
 include ':WikipediaImporter'
 include ':OpenOfficeDocumentsImporterExporter'
-include ':YouTubeAndVimeoDownloader'
-include ':YouTubeAndVimeoContentExtractor'
+//include ':YouTubeAndVimeoDownloader'
+//include ':YouTubeAndVimeoContentExtractor'
 
 //include ':JavaFxControls'
 
@@ -52,8 +52,8 @@ project(':WikipediaOnlineContentExtractor').projectDir = new File('libs/content_
 project(':OpenOfficeDocumentsImporterExporter').projectDir = new File('libs/importer_exporter/OpenOfficeDocumentsImporterExporter')
 project(':WikipediaImporter').projectDir = new File('libs/importer_exporter/WikipediaImporter')
 
-project(':YouTubeAndVimeoDownloader').projectDir = new File('libs/content_extractor/YouTubeAndVimeoDownloader')
-project(':YouTubeAndVimeoContentExtractor').projectDir = new File('libs/content_extractor/YouTubeAndVimeoContentExtractor')
+//project(':YouTubeAndVimeoDownloader').projectDir = new File('libs/content_extractor/YouTubeAndVimeoDownloader')
+//project(':YouTubeAndVimeoContentExtractor').projectDir = new File('libs/content_extractor/YouTubeAndVimeoContentExtractor')
 
 //project(':JavaFxControls').projectDir = new File('libs/controls/JavaFxControls')
 
