@@ -153,7 +153,14 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
     // or not, but i can live with that right now
     // Currently there's no other way to solve it as if parent category doesn't get set, on save it gets added to TopLevelCategory -> it will be added a lot of times
     Category periodicalsCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName(Localization.getLocalizedString("periodicals"));
+    if(periodicalsCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(periodicalsCategory);
+    }
+
     Category newspaperCategory = Application.getDeepThought().findOrCreateSubCategoryForName(periodicalsCategory, newspaperName);
+    if(newspaperCategory.isPersisted() == false && Application.getDeepThought() != null) {
+      Application.getDeepThought().addCategory(newspaperCategory);
+    }
 
     if(isOnlineArticle == false)
       creationResult.addCategory(newspaperCategory);
