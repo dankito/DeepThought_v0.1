@@ -91,10 +91,10 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
 
       createReference(creationResult, articleUrl, contentElement);
 
-      creationResult.addTag(Application.getDeepThought().findOrCreateTagForName("Wikipedia"));
+      creationResult.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName("Wikipedia"));
 
-      Category encyclopaediaeCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName("Lexika");
-      Category wikipediaCategory = Application.getDeepThought().findOrCreateSubCategoryForName(encyclopaediaeCategory, "Wikipedia");
+      Category encyclopaediaeCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName("Lexika");
+      Category wikipediaCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(encyclopaediaeCategory, "Wikipedia");
       creationResult.addCategory(wikipediaCategory);
 
       return creationResult;
@@ -152,7 +152,7 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
     creationResult.setReference(articleReference);
 
     if(Application.getDeepThought() != null) {
-      SeriesTitle wikipediaSeries = Application.getDeepThought().findOrCreateSeriesTitleForTitle("Wikipedia");
+      SeriesTitle wikipediaSeries = Application.getEntitiesSearcherAndCreator().findOrCreateSeriesTitleForTitle("Wikipedia");
       creationResult.setSeriesTitle(wikipediaSeries);
     }
 

@@ -134,10 +134,10 @@ public class OpenOfficeDocumentsImporterExporter {
   }
 
   protected void addCategoryAndTagsToQuotationEntry(Entry extractedEntry) {
-    Category quotationCategory = Application.getDeepThought().findOrCreateTopLevelCategoryForName("Zitate");
+    Category quotationCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName("Zitate");
     extractedEntry.addCategory(quotationCategory);
 
-    Tag quotationTag = Application.getDeepThought().findOrCreateTagForName("Zitat");
+    Tag quotationTag = Application.getEntitiesSearcherAndCreator().findOrCreateTagForName("Zitat");
     extractedEntry.addTag(quotationTag);
   }
 
@@ -155,7 +155,7 @@ public class OpenOfficeDocumentsImporterExporter {
 
   protected void addTagsToEntryFromReference(Entry entry) {
     if(entry.getReference() != null) {
-      entry.addTag(Application.getDeepThought().findOrCreateTagForName(entry.getReference().getTitle()));
+      entry.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(entry.getReference().getTitle()));
       for (Person person : entry.getReference().getPersons())
         addTagToEntryFromPerson(entry, person);
     }
@@ -163,9 +163,9 @@ public class OpenOfficeDocumentsImporterExporter {
 
   protected void addTagToEntryFromPerson(Entry entry, Person person) {
     if(StringUtils.isNotNullOrEmpty(person.getFirstName()))
-      entry.addTag(Application.getDeepThought().findOrCreateTagForName(person.getFirstName() + " " + person.getLastName()));
+      entry.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(person.getFirstName() + " " + person.getLastName()));
     else
-      entry.addTag(Application.getDeepThought().findOrCreateTagForName(person.getLastName()));
+      entry.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(person.getLastName()));
   }
 
   protected Entry extractQuotationEntryFromEntryParagraphs(List<Paragraph> entryParagraphs) {
@@ -257,15 +257,15 @@ public class OpenOfficeDocumentsImporterExporter {
       for(int i = 0; i < parts.length - 1; i++)
         firstName += parts[i].trim() + " ";
       firstName = firstName.substring(0, firstName.length() - 1);
-      return Application.getDeepThought().findOrCreatePerson(lastName, firstName);
+      return Application.getEntitiesSearcherAndCreator().findOrCreatePerson(lastName, firstName);
     }
     else {
-      return Application.getDeepThought().findOrCreatePerson(personFullName.trim(), "");
+      return Application.getEntitiesSearcherAndCreator().findOrCreatePerson(personFullName.trim(), "");
     }
   }
 
   protected Reference findOrCreateReferenceForTitle(String title) {
-    return Application.getDeepThought().findOrCreateReferenceForTitle(title);
+    return Application.getEntitiesSearcherAndCreator().findOrCreateReferenceForTitle(title);
   }
 
   protected void tryToFindQuotationPersonOrReferenceFromLastParagraph(Entry entry, List<Paragraph> entryParagraphs) {
@@ -1040,7 +1040,7 @@ public class OpenOfficeDocumentsImporterExporter {
   protected void addTagsToEntry(Entry entry) {
     if(entry.getSeries() != null) {
       String seriesTitleTitle = entry.getSeries().getTitle();
-      Tag tag = Application.getDeepThought().findOrCreateTagForName(seriesTitleTitle);
+      Tag tag = Application.getEntitiesSearcherAndCreator().findOrCreateTagForName(seriesTitleTitle);
       if(tag != null)
         entry.addTag(tag);
     }
