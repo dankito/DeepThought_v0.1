@@ -57,7 +57,7 @@ public class CategoryTreeItem extends TreeItem<Category> {
   public synchronized ObservableList<TreeItem<Category>> getChildren() {
     if(haveChildrenBeenLoaded == false) {
       super.getChildren().clear();
-      super.getChildren().addAll(createSubItems());
+      super.getChildren().addAll(createSubItems()); // TODO: causes an infinite loop
       haveChildrenBeenLoaded = true;
     }
 
@@ -95,7 +95,7 @@ public class CategoryTreeItem extends TreeItem<Category> {
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if (collection.equals(category.getSubCategories())) {
+      if (collection.equals(category.getSubCategories()) && addedEntity instanceof Category) {
         Category parentCategory = (Category) collectionHolder;
         Category subCategory = (Category) addedEntity;
 
@@ -119,7 +119,7 @@ public class CategoryTreeItem extends TreeItem<Category> {
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if (collection.equals(category.getSubCategories())) {
+      if (collection.equals(category.getSubCategories()) && removedEntity instanceof Category) {
         Category parentCategory = (Category) collectionHolder;
         Category subCategory = (Category) removedEntity;
 
