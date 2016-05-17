@@ -86,6 +86,7 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
 
     compile 'com.github.clans:fab:1.6.3'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile 'org.slf4j:slf4j-android:1.7.12'
     compile 'com.journeyapps:zxing-android-embedded:3.0.3@aar'

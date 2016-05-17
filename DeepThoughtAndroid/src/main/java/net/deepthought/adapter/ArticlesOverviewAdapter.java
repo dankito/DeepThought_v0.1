@@ -7,11 +7,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import net.deepthought.R;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
-import net.deepthought.util.IconManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,11 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
     ArticlesOverviewItem article = getArticleAt(position);
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
-    IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
+//    IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
+    Picasso.with(context)
+        .load(article.getPreviewImageUrl())
+//        .noFade()
+        .into(imgvwArticlePreviewImage);
 
     TextView txtvwArticleSubTitle = (TextView)convertView.findViewById(R.id.txtvwArticleSubTitle);
     if(article.hasSubTitle()) {
