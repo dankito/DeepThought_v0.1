@@ -61,8 +61,10 @@ public class OnlineArticleContentExtractorsWithArticleOverviewAdapter extends Ba
 
     IOnlineArticleContentExtractor extractor = getExtractorAt(position);
 
-    ImageView imgvwExtractorIcon = (ImageView)convertView.findViewById(R.id.imgvwExtractorIcon);
-    IconManager.getInstance().setImageViewToImageFromUrl(imgvwExtractorIcon, extractor.getIconUrl());
+    if(IOnlineArticleContentExtractor.NoIcon.equals(extractor.getIconUrl()) == false) {
+      ImageView imgvwExtractorIcon = (ImageView) convertView.findViewById(R.id.imgvwExtractorIcon);
+      IconManager.getInstance().setImageViewToImageFromUrl(imgvwExtractorIcon, extractor.getIconUrl(), true);
+    }
 
     TextView txtvwExtractorName = (TextView)convertView.findViewById(R.id.txtvwExtractorName);
     txtvwExtractorName.setText(extractor.getSiteBaseUrl());
