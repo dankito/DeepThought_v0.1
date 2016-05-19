@@ -1200,6 +1200,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     issueOrPublishingDate = "*" + issueOrPublishingDate + "*";
 
     query.add(new WildcardQuery(new Term(FieldName.ReferenceIssueOrPublishingDate, issueOrPublishingDate)), BooleanClause.Occur.MUST);
+    query.add(new TermQuery(new Term(FieldName.ReferenceBaseType, ReferenceReferenceBaseTypeIntRef)), BooleanClause.Occur.MUST);
 
     if(search.isInterrupted())
       return;
