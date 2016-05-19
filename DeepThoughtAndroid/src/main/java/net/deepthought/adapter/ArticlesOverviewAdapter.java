@@ -10,12 +10,10 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import net.deepthought.R;
+import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,9 +22,7 @@ import java.util.List;
 /**
  * Created by ganymed on 25/09/15.
  */
-public class ArticlesOverviewAdapter extends BaseAdapter {
-
-  private final static Logger log = LoggerFactory.getLogger(OnlineArticleContentExtractorsWithArticleOverviewAdapter.class);
+public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
 
 
   protected Activity context;
@@ -52,6 +48,16 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
         notifyDataSetChangedThreadSafe();
       }
     });
+  }
+
+
+  @Override
+  public void cleanUp() {
+    context = null;
+    extractorWithArticleOverview = null;
+
+    articlesOverviewItems.clear();
+    articlesOverviewItems = null;
   }
 
 
@@ -82,10 +88,8 @@ public class ArticlesOverviewAdapter extends BaseAdapter {
     ArticlesOverviewItem article = getArticleAt(position);
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
-//    IconManager.getInstance().setImageViewToImageFromUrl(imgvwArticlePreviewImage, article.getPreviewImageUrl());
     Picasso.with(context)
         .load(article.getPreviewImageUrl())
-//        .noFade()
         .into(imgvwArticlePreviewImage);
 
     TextView txtvwArticleSubTitle = (TextView)convertView.findViewById(R.id.txtvwArticleSubTitle);
