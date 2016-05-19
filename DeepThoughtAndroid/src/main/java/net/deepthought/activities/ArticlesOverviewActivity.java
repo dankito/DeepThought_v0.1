@@ -25,6 +25,7 @@ import net.deepthought.util.localization.Localization;
 public class ArticlesOverviewActivity extends AppCompatActivity {
 
 
+  protected ListView lstvwArticlesOverview = null;
   protected ArticlesOverviewAdapter articlesOverviewAdapter = null;
 
 
@@ -60,9 +61,27 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
 
     articlesOverviewAdapter = new ArticlesOverviewAdapter(this, contentExtractor);
 
-    ListView lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
+    lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
+  }
+
+
+  @Override
+  public void finish() {
+    cleanUp();
+    super.finish();
+  }
+
+  protected void cleanUp() {
+    lstvwArticlesOverview.setAdapter(null);
+    lstvwArticlesOverview.setOnItemClickListener(null);
+
+    articlesOverviewAdapter.cleanUp();
+    articlesOverviewAdapter = null;
+    lstvwArticlesOverviewOnItemClickListener = null;
+
+    ActivityManager.getInstance().resetShowArticlesOverviewActivityCachedData();
   }
 
 
