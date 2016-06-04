@@ -113,6 +113,8 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
   public void resetInstanceVariables() {
     htmlEditor.setListener(null);
     htmlEditor.setHtml("", true);
+    htmlEditor.releaseData();
+
     this.activity = null;
   }
 
@@ -259,6 +261,10 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
       result &= bridge.beforeCommandExecution(commandName);
 
     return result;
+  }
+
+  public boolean isLoaded() {
+    return htmlEditor.isCKEditorLoaded();
   }
 
   @Override

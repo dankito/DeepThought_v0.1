@@ -92,6 +92,13 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     scriptExecutor.executeScript(CKEditorInstanceName + ".resetUndo()");
   }
 
+  public void releaseData() {
+    scriptExecutor.executeScript(CKEditorInstanceName + ".document.clearCustomData();");
+    scriptExecutor.executeScript(CKEditorInstanceName + ".document.removeAllListeners();");
+    scriptExecutor.executeScript(CKEditorInstanceName + ".window.getFrame().clearCustomData();");
+    scriptExecutor.executeScript(CKEditorInstanceName + ".window.getFrame().removeAllListeners();");
+  }
+
 
   public boolean isCKEditorLoaded() {
     return ckEditorLoaded;

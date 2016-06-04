@@ -412,18 +412,26 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected void saveEntry() {
     // TODO: only save changed fields
-    String abstractString = abstractHtmlEditor.getHtml();
-    String content = contentHtmlEditor.getHtml();
+    boolean isAbstractHtmlEditorLoaded = abstractHtmlEditor.isLoaded();
+    boolean isContentHtmlEditorLoaded = contentHtmlEditor.isLoaded();
 
-    entry.setAbstract(abstractString);
-    entry.setContent(content);
+    if(isAbstractHtmlEditorLoaded) {
+      entry.setAbstract(abstractHtmlEditor.getHtml());
+    }
+    if(isContentHtmlEditorLoaded) {
+      entry.setContent(contentHtmlEditor.getHtml());
+    }
 
     if(entryCreationResult != null) {
+      String abstractString = isAbstractHtmlEditorLoaded ? abstractHtmlEditor.getHtml() : entry.getAbstract();
+      String content = isContentHtmlEditorLoaded ? contentHtmlEditor.getHtml() : entry.getContent();
+
       entryCreationResult.saveCreatedEntities(abstractString, content);
     }
 
-    if(entry.isPersisted() == false) // a new Entry
+    if(entry.isPersisted() == false) { // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
+    }
 
     entry.setTags(entryEditedTags);
 
