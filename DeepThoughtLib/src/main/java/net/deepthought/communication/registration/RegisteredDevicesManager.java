@@ -10,6 +10,7 @@ import net.deepthought.communication.model.UserInfo;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Group;
 import net.deepthought.data.model.User;
+import net.deepthought.util.StringUtils;
 
 import java.util.Collection;
 
@@ -78,6 +79,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
   protected void mergeUserInfo(AskForDeviceRegistrationRequest response, User loggedOnUser, Device peerDevice) {
     String previousUserName = loggedOnUser.getUserName();
+    boolean isPreviousUserNameEmpty = StringUtils.isNullOrEmpty(previousUserName);
 
     UserInfo userInfo = response.getUser();
     loggedOnUser.setUniversallyUniqueId(userInfo.getUniversallyUniqueId());
@@ -91,12 +93,14 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     group.setName(groupInfo.getName());
     group.setDescription(groupInfo.getDescription());
 
-    if(group.getName().contains(previousUserName))
+    if(isPreviousUserNameEmpty == false && group.getName().contains(previousUserName)) {
       group.setName(group.getName().replace(previousUserName, loggedOnUser.getUserName()));
+    }
 
     Device localDevice = Application.getApplication().getLocalDevice();
-    if(localDevice.getName().contains(previousUserName))
+    if(isPreviousUserNameEmpty == false && localDevice.getName().contains(previousUserName)) {
       localDevice.setName(localDevice.getName().replace(previousUserName, loggedOnUser.getUserName()));
+    }
   }
 
 }
