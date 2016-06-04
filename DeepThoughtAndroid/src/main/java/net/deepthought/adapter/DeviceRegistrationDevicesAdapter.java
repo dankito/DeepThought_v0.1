@@ -69,7 +69,11 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     txtvwDeviceIpAddress.setText(serverInfo.getIpAddress());
 
     TextView txtvwDeviceInfo = (TextView)convertView.findViewById(R.id.txtvwDeviceInfo);
-    txtvwDeviceInfo.setText(serverInfo.getPlatform() + " " + serverInfo.getOsVersion());
+    String infoString = serverInfo.getPlatform() + " " + serverInfo.getOsVersion();
+    if(serverInfo.getPlatform() != null && serverInfo.getPlatform().toLowerCase().contains("android")) {
+      infoString = serverInfo.getDeviceName() + " (" + infoString + ")";
+    }
+    txtvwDeviceInfo.setText(infoString);
 
     Button btnAskForRegistration = (Button)convertView.findViewById(R.id.btnAskForRegistration);
     btnAskForRegistration.setOnClickListener(btnAskForRegistrationOnClickListener);
