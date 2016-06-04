@@ -85,6 +85,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
       }
 
       @Override
+      public String getDeviceName() {
+        return null;
+      }
+
+      @Override
       public String getPlatformName() {
         return "TestPlatform";
       }

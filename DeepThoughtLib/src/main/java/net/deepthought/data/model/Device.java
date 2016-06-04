@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.data.persistence.db.TableConfig;
 import net.deepthought.data.persistence.db.UserDataEntity;
 import net.deepthought.util.localization.Localization;
-import net.deepthought.util.OsHelper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -255,29 +254,22 @@ public class Device extends UserDataEntity {
     String universallyUniqueId = UUID.randomUUID().toString();
 
     String platform = System.getProperty("os.name");
+    String deviceName = Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform);
     String osVersion = System.getProperty("os.version");
 
     if(Application.getPlatformConfiguration() != null) { // TODO: try to get rid of static method calls
       osVersion = Application.getPlatformConfiguration().getOsVersionString();
       platform = Application.getPlatformConfiguration().getPlatformName();
+
+      if(Application.getPlatformConfiguration().getDeviceName() != null) {
+        deviceName = Application.getPlatformConfiguration().getDeviceName();
+      }
     }
 
-    if (OsHelper.isRunningOnAndroid())
-      platform = "Android";
+    // TODO: may store timezone (System.getProperty("user.timezone")) for Synchronizing Data
 
-    Device userDefaultDevice = new Device(universallyUniqueId, Localization.getLocalizedString("users.default.device.name", user.getUserName(), platform),
+    Device userDefaultDevice = new Device(universallyUniqueId, deviceName,
         platform, osVersion, System.getProperty("os.arch"));
-
-//    , System.getProperty("os.arch")
-//    userDefaultDevice.setUserRegion(System.getProperty("user.country"));
-//    if(userDefaultDevice.getUserRegion() == null)
-//      userDefaultDevice.setUserRegion(System.getProperty("user.region"));
-//    userDefaultDevice.setUserLanguage(System.getProperty("user.language"));
-//    userDefaultDevice.setUserTimezone(System.getProperty("user.timezone"));
-//    userDefaultDevice.setJavaRuntimeVersion(System.getProperty("java.runtime.version"));
-//    userDefaultDevice.setJavaClassVersion(System.getProperty("java.class.version"));
-//    userDefaultDevice.setJavaSpecificationVersion(System.getProperty("java.specification.version"));
-//    userDefaultDevice.setJavaVirtualMachineVersion(System.getProperty("java.vm.version"));
 
     return userDefaultDevice;
   }

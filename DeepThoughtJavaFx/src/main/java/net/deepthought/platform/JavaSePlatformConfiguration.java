@@ -11,6 +11,11 @@ public class JavaSePlatformConfiguration implements IPlatformConfiguration {
   }
 
   @Override
+  public String getDeviceName() {
+    return null;
+  }
+
+  @Override
   public String getPlatformName() {
     return System.getProperty("os.name");
   }

@@ -7,6 +7,8 @@ public interface IPlatformConfiguration {
 
   String getUserName();
 
+  String getDeviceName();
+
   String getPlatformName();
 
   int getOsVersion();
