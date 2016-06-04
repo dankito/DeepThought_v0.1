@@ -231,12 +231,18 @@ public class Device extends UserDataEntity {
   @Override
   @Transient
   public String getTextRepresentation() {
-    return "Device " + getName();
+    String infoString = platform + " " + osVersion;
+
+    if(platform != null && platform.toLowerCase().contains("android")) {
+      infoString = name + " (" + infoString + ")";
+    }
+
+    return infoString;
   }
 
   @Override
   public String toString() {
-    return getTextRepresentation();
+    return "Device " + getTextRepresentation();
   }
 
 

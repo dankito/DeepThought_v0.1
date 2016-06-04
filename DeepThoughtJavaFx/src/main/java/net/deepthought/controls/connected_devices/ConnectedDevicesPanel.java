@@ -105,7 +105,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
 
     final Label label = new Label(null, icon);
     label.setUserData(connectedDevice); // add a Label so that we can set a ToolTip (ImageViews have no ToolTips)
-    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getPlatform(), connectedDevice.getDevice().getOsVersion(),
+    JavaFxLocalization.bindControlToolTip(label, "connected.device.tool.tip", connectedDevice.getDevice().getTextRepresentation(),
         connectedDevice.getAddress(), booleanToString(connectedDevice.hasCaptureDevice()), booleanToString(connectedDevice.canDoOcr()));
 
     this.getChildren().add(label);
