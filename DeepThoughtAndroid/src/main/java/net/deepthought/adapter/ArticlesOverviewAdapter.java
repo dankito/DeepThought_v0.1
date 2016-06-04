@@ -41,6 +41,8 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
 
   public void retrieveArticles() {
     articlesOverviewItems.clear();
+    notifyDataSetChangedThreadSafe();
+
     extractorWithArticleOverview.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
       public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {

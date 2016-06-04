@@ -28,9 +28,10 @@
     </item>
 
     <item
-        android:id="@+id/mnitmActionCancel"
-        android:title="@string/cancel"
-        app:showAsAction="always|withText"
+        android:id="@+id/mnitmActionSave"
+        android:title="@string/save"
+        android:icon="@android:drawable/ic_menu_save"
+        app:showAsAction="always"
         />
 
 </menu>

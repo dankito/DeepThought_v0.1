@@ -18,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -108,7 +107,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
       setSupportActionBar(toolbar);
-      setLogo(toolbar);
 
       ActionBar actionBar = getSupportActionBar();
       if(actionBar != null) {
@@ -167,19 +165,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
       finish();
     }
-  }
-
-  protected void setLogo(Toolbar toolbar) {
-    ImageView logoView = new ImageView(this);
-    logoView.setImageResource(android.R.drawable.ic_menu_save);
-    toolbar.addView(logoView);
-
-    logoView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        saveEntryAndCloseActivity();
-      }
-    });
   }
 
   protected boolean hasAbstractManuallyBeenChanged = false;
@@ -242,11 +227,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     int id = item.getItemId();
 
     if(id == android.R.id.home) {
-      saveEntryAndCloseActivity();
+      finish();
       return true;
     }
-    else if (id == R.id.mnitmActionCancel) {
-      finish();
+    else if (id == R.id.mnitmActionSave) {
+      saveEntryAndCloseActivity();
       return true;
     }
     else if (id == R.id.mnitmActionAddContentFromOcr) {
