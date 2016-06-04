@@ -17,18 +17,17 @@ import net.deepthought.R;
 import net.deepthought.adapter.DeviceRegistrationDevicesAdapter;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.helper.AlertHelper;
-import net.deepthought.util.localization.Localization;
 import net.deepthought.util.StringUtils;
+import net.deepthought.util.localization.Localization;
 
 public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFragment {
 
@@ -150,7 +149,7 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder = builder.setTitle(Localization.getLocalizedString("alert.title.ask.for.device.registration"));
     String message = Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()),
-        extractDeviceInfoString(request.getDevice()), request.getAddress());
+        request.getDevice(), request.getAddress());
     builder = builder.setMessage(message);
 
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -197,11 +196,6 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
       userInfo += " (" + user.getFirstName() + " " + user.getLastName() + ")";
 
     return userInfo;
-  }
-
-  protected static String extractDeviceInfoString(DeviceInfo device) {
-    String deviceInfo = device.getPlatform() + " " + device.getOsVersion();
-    return deviceInfo;
   }
 
 

@@ -3,7 +3,6 @@ package net.deepthought.util;
 import net.deepthought.Application;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Category;
@@ -236,7 +235,7 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), extractDeviceInfoString(request.getDevice())),
+    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), request.getDevice()),
         net.deepthought.util.localization.Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
   }
 
@@ -245,7 +244,7 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.message.successfully.registered.at.device", extractDeviceInfoString(response.getDevice())),
+    showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.message.successfully.registered.at.device", response.getDevice()),
         net.deepthought.util.localization.Localization.getLocalizedString("alert.title.device.registration.successful"));
   }
 
@@ -265,11 +264,6 @@ public class Alerts {
       userInfo += " (" + user.getFirstName() + " " + user.getLastName() + ")";
 
     return userInfo;
-  }
-
-  protected static String extractDeviceInfoString(DeviceInfo device) {
-    String deviceInfo = device.getPlatform() + " " + device.getOsVersion();
-    return deviceInfo;
   }
 
 

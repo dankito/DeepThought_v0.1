@@ -28,8 +28,9 @@ public class DeviceInfo {
 
   }
 
-  public DeviceInfo(String universallyUniqueId, String platform, String osVersion, String platformArchitecture) {
+  public DeviceInfo(String universallyUniqueId, String name, String platform, String osVersion, String platformArchitecture) {
     this.universallyUniqueId = universallyUniqueId;
+    this.name = name;
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
@@ -84,14 +85,6 @@ public class DeviceInfo {
     this.platformArchitecture = platformArchitecture;
   }
 
-  public String getIpAddress() {
-    return ipAddress;
-  }
-
-  public void setIpAddress(String ipAddress) {
-    this.ipAddress = ipAddress;
-  }
-
   public int getPort() {
     return port;
   }
@@ -103,11 +96,17 @@ public class DeviceInfo {
 
   @Override
   public String toString() {
-    return platform + " " + osVersion;
+    String infoString = platform + " " + osVersion;
+
+    if(platform != null && platform.toLowerCase().contains("android")) {
+      infoString = name + " (" + infoString + ")";
+    }
+
+    return infoString;
   }
 
   public static DeviceInfo fromDevice(Device device) {
-    return new DeviceInfo(device.getUniversallyUniqueId(), device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
+    return new DeviceInfo(device.getUniversallyUniqueId(), device.getName(), device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture());
   }
 
 }
