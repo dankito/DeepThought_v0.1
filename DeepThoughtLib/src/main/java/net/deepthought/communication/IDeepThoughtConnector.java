@@ -10,7 +10,7 @@ import net.deepthought.communication.registration.RegisteredDevicesManager;
 /**
  * Created by ganymed on 20/08/15.
  */
-public interface IDeepThoughtsConnector {
+public interface IDeepThoughtConnector {
 
   void runAsync();
 

@@ -144,8 +144,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
       importFilesOrDoOcrListener = new AndroidImportFilesOrDoOcrListener(this);
-      Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
-      Application.getDeepThoughtsConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
+      Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
+      Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
   }
 

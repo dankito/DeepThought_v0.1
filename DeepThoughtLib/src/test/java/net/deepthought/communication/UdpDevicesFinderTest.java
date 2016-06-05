@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class UdpDevicesFinderTest extends CommunicationTestBase {
 
-  protected IDeepThoughtsConnector connector;
+  protected IDeepThoughtConnector connector;
 
   protected Communicator communicator;
 
@@ -52,9 +52,9 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     Application.instantiate(new TestApplicationConfiguration());
     try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
 
-    connector = Application.getDeepThoughtsConnector();
+    connector = Application.getDeepThoughtConnector();
     communicator = connector.getCommunicator();
-    devicesFinder = (UdpDevicesFinder)((DeepThoughtsConnector)connector).devicesFinder;
+    devicesFinder = (UdpDevicesFinder)((DeepThoughtConnector)connector).devicesFinder;
 
     loggedOnUser = Application.getLoggedOnUser();
     localDevice = Application.getApplication().getLocalDevice();
@@ -223,7 +223,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void connectsToARegisteredDevice_IsNowConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStopped() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector();
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 1);
@@ -239,7 +239,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void disconnectsFromARegisteredDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector();
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 2);
@@ -268,7 +268,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void deviceConnected_ConnectionsAliveWatcherIsRunning() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector();
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
@@ -279,7 +279,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void disconnectsFromLastDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtsConnector connector = new DeepThoughtsConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector();
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
@@ -301,18 +301,18 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
   }
 
 
-  protected void mockNumberOfRegisteredDevices(IDeepThoughtsConnector connector, int numberOfRegisteredDevices) {
+  protected void mockNumberOfRegisteredDevices(IDeepThoughtConnector connector, int numberOfRegisteredDevices) {
     RegisteredDevicesManager registeredDevicesManager = Mockito.mock(RegisteredDevicesManager.class);
-    ((DeepThoughtsConnector)connector).setRegisteredDevicesManager(registeredDevicesManager);
+    ((DeepThoughtConnector)connector).setRegisteredDevicesManager(registeredDevicesManager);
 
     Mockito.when(registeredDevicesManager.getRegisteredDevicesCount()).thenReturn(numberOfRegisteredDevices);
 
     Mockito.when(registeredDevicesManager.hasRegisteredDevices()).thenReturn(numberOfRegisteredDevices > 0);
   }
 
-  protected ConnectedDevicesManager mockNumberOfConnectedDevices(IDeepThoughtsConnector connector, int numberOfConnectedDevices) {
+  protected ConnectedDevicesManager mockNumberOfConnectedDevices(IDeepThoughtConnector connector, int numberOfConnectedDevices) {
     ConnectedDevicesManager connectedDevicesManager = Mockito.mock(ConnectedDevicesManager.class);
-    ((DeepThoughtsConnector)connector).setConnectedDevicesManager(connectedDevicesManager);
+    ((DeepThoughtConnector)connector).setConnectedDevicesManager(connectedDevicesManager);
 
     Mockito.when(connectedDevicesManager.getConnectedDevicesCount()).thenReturn(numberOfConnectedDevices);
 

@@ -128,7 +128,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
       Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(request.getConfiguration(), new RecognizeTextListener() {
         @Override
         public void textRecognized(TextRecognitionResult result) {
-          Application.getDeepThoughtsConnector().getCommunicator().respondToDoOcrRequest(request, result, new ResponseListener() {
+          Application.getDeepThoughtConnector().getCommunicator().respondToDoOcrRequest(request, result, new ResponseListener() {
             @Override
             public void responseReceived(Request request, Response response) {
               if (response.getResponseCode() == ResponseCode.Error) {
@@ -155,7 +155,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
         File imageFile = new File(capturedPhotoFile.getPath());
         try {
           byte[] imageData = FileUtils.readFile(imageFile);
-          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
+          Application.getDeepThoughtConnector().getCommunicator().respondToImportFilesRequest(captureImageRequest, new ImportFilesResult(imageData, true), null);
         } catch (Exception ex) {
           log.error("Could not read captured photo from temp file " + capturedPhotoFile, ex);
           // TODO: send error response
@@ -177,7 +177,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
         try {
           InputStream selectedFileStream = context.getContentResolver().openInputStream(data.getData());
           byte[] fileData = readDataFromInputStream(selectedFileStream);
-          Application.getDeepThoughtsConnector().getCommunicator().respondToImportFilesRequest(importFilesRequest, new ImportFilesResult(fileData, true), null);
+          Application.getDeepThoughtConnector().getCommunicator().respondToImportFilesRequest(importFilesRequest, new ImportFilesResult(fileData, true), null);
         } catch (Exception ex) {
           log.error("Could not read select file from uri " + uri, ex);
           // TODO: send error response
@@ -207,7 +207,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
     if(scanBarcodeRequest != null) {
       IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
       if (result != null) {
-        Application.getDeepThoughtsConnector().getCommunicator().respondToScanBarcodeRequest(scanBarcodeRequest,
+        Application.getDeepThoughtConnector().getCommunicator().respondToScanBarcodeRequest(scanBarcodeRequest,
             new ScanBarcodeResult(result.getContents(), result.getFormatName()), null);
       }
     }

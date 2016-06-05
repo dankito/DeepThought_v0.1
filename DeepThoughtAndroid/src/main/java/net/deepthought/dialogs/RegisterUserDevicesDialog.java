@@ -116,14 +116,14 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
   protected void startSelectedOption() {
     spnDeviceRegistrationOptions.setEnabled(false);
 
-    Application.getDeepThoughtsConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
+    Application.getDeepThoughtConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
 
     isStarted = true;
     btnStartStop.setText(getString(R.string.stop));
   }
 
   protected void stop() {
-    Application.getDeepThoughtsConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
+    Application.getDeepThoughtConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
 
     devicesAdapter.clearItems();
 
@@ -168,7 +168,7 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
       // TODO: check if user information differ and if so ask which one to use
     }
 
-    Application.getDeepThoughtsConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
+    Application.getDeepThoughtConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
         if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {

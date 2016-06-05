@@ -1,6 +1,6 @@
 package net.deepthought;
 
-import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.communication.IDeepThoughtConnector;
 import net.deepthought.controls.html.HtmlEditor;
 import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.IDataManager;
@@ -86,7 +86,7 @@ public class Application {
 
   protected static IContentExtractorManager contentExtractorManager = null;
 
-  protected static IDeepThoughtsConnector deepThoughtsConnector = null;
+  protected static IDeepThoughtConnector deepThoughtConnector = null;
 
   protected static IIsbnResolver isbnResolver;
 
@@ -160,8 +160,8 @@ public class Application {
       Application.pluginManager = dependencyResolver.createPluginManager();
       pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
 
-      Application.deepThoughtsConnector = dependencyResolver.createDeepThoughtsConnector();
-      deepThoughtsConnector.runAsync();
+      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector();
+      deepThoughtConnector.runAsync();
 
       Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
 
@@ -271,9 +271,9 @@ public class Application {
 
     downloader = null;
 
-    if(deepThoughtsConnector != null) {
-      deepThoughtsConnector.shutDown();
-      deepThoughtsConnector = null;
+    if(deepThoughtConnector != null) {
+      deepThoughtConnector.shutDown();
+      deepThoughtConnector = null;
     }
 
     isbnResolver = null;
@@ -409,8 +409,8 @@ public class Application {
     return contentExtractorManager;
   }
 
-  public static IDeepThoughtsConnector getDeepThoughtsConnector() {
-    return deepThoughtsConnector;
+  public static IDeepThoughtConnector getDeepThoughtConnector() {
+    return deepThoughtConnector;
   }
 
   public static IIsbnResolver getIsbnResolver() {

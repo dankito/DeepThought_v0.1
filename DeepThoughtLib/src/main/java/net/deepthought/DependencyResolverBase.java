@@ -1,7 +1,7 @@
 package net.deepthought;
 
-import net.deepthought.communication.DeepThoughtsConnector;
-import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.communication.DeepThoughtConnector;
+import net.deepthought.communication.IDeepThoughtConnector;
 import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.DefaultDataManager;
 import net.deepthought.data.IDataManager;
@@ -151,8 +151,8 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
-  public IDeepThoughtsConnector createDeepThoughtsConnector() {
-    return new DeepThoughtsConnector();
+  public IDeepThoughtConnector createDeepThoughtConnector() {
+    return new DeepThoughtConnector();
   }
 
   @Override

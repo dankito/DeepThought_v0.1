@@ -43,9 +43,9 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
   protected void init() {
     initUi();
 
-    Application.getDeepThoughtsConnector().addConnectedDevicesListener(connectedDevicesListener);
+    Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
 
-    for(ConnectedDevice connectedDevice : Application.getDeepThoughtsConnector().getConnectedDevicesManager().getConnectedDevices()) {
+    for(ConnectedDevice connectedDevice : Application.getDeepThoughtConnector().getConnectedDevicesManager().getConnectedDevices()) {
       if(checkIfConnectedDeviceShouldBeShown(connectedDevice))
         addConnectedDeviceIcon(connectedDevice);
     }
@@ -66,8 +66,8 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
     connectedDeviceIcons.clear();
     getChildren().clear();
 
-    if(Application.getDeepThoughtsConnector() != null) {
-      Application.getDeepThoughtsConnector().removeConnectedDevicesListener(connectedDevicesListener);
+    if(Application.getDeepThoughtConnector() != null) {
+      Application.getDeepThoughtConnector().removeConnectedDevicesListener(connectedDevicesListener);
     }
   }
 

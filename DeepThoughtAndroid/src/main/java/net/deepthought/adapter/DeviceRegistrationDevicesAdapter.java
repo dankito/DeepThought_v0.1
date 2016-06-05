@@ -125,7 +125,7 @@ public class DeviceRegistrationDevicesAdapter extends BaseAdapter {
     public void onClick(View view) {
       HostInfo serverInfo = (HostInfo) view.getTag();
 
-      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), new AskForDeviceRegistrationResultListener() {
+      Application.getDeepThoughtConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), new AskForDeviceRegistrationResultListener() {
         @Override
         public void responseReceived(AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response) {
           if (response != null) {

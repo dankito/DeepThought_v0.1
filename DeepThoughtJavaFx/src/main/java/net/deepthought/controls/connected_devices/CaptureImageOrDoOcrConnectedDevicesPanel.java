@@ -104,7 +104,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     JavaFxLocalization.bindMenuItemText(importFilesMenuItem, "import.files");
     importFilesMenuItem.setGraphic(createMenuItemIcon(Constants.ImportFilesIconPath));
     // TODO: store requestMessageId so that Capturing Image process can be stopped
-    importFilesMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.SelectFromExistingFiles), importFilesResultListener));
+    importFilesMenuItem.setOnAction(event -> Application.getDeepThoughtConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.SelectFromExistingFiles), importFilesResultListener));
     contextMenu.getItems().add(importFilesMenuItem);
   }
 
@@ -113,7 +113,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     JavaFxLocalization.bindMenuItemText(captureImageMenuItem, "capture.image");
     captureImageMenuItem.setGraphic(createMenuItemIcon(Constants.CameraIconPath));
     // TODO: store requestMessageId so that Capturing Image process can be stopped
-    captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), importFilesResultListener));
+    captureImageMenuItem.setOnAction(event -> Application.getDeepThoughtConnector().getCommunicator().startImportFiles(connectedDevice, new ImportFilesConfiguration(ImportFilesSource.CaptureImage), importFilesResultListener));
     contextMenu.getItems().add(captureImageMenuItem);
   }
 
@@ -130,7 +130,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     JavaFxLocalization.bindMenuItemText(captureImageAndDoOcrMenuItem, "capture.image.and.do.ocr");
     captureImageAndDoOcrMenuItem.setGraphic(createMenuItemIcon(Constants.CaptureImageAndDoOcrIconPath));
     // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
-    captureImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
+    captureImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.CaptureImage), ocrResultListener));
     contextMenu.getItems().add(captureImageAndDoOcrMenuItem);
   }
 
@@ -139,7 +139,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     JavaFxLocalization.bindMenuItemText(chooseRemoteImageAndDoOcrMenuItem, "chose.remote.image.and.do.ocr");
     chooseRemoteImageAndDoOcrMenuItem.setGraphic(createMenuItemIcon(Constants.OcrOnRemoteImageIconPath));
     // TODO: store requestMessageId so that Capturing Image and Doing OCR process can be stopped
-    chooseRemoteImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), ocrResultListener));
+    chooseRemoteImageAndDoOcrMenuItem.setOnAction(event -> Application.getDeepThoughtConnector().getCommunicator().startDoOcr(connectedDevice, new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), ocrResultListener));
     contextMenu.getItems().add(chooseRemoteImageAndDoOcrMenuItem);
   }
 
@@ -181,7 +181,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
     try {
       final DoOcrConfiguration configuration = new DoOcrConfiguration(imageToRecognize, true);
 
-      Application.getDeepThoughtsConnector().getCommunicator().startDoOcr(connectedDevice, configuration, new OcrResultListener() {
+      Application.getDeepThoughtConnector().getCommunicator().startDoOcr(connectedDevice, configuration, new OcrResultListener() {
         @Override
         public void responseReceived(DoOcrRequest doOcrRequest, OcrResultResponse result) {
           receivedOcrResultForImage(doOcrRequest, connectedDevice, imagesToRecognize, currentImageIndex, result);

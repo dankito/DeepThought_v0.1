@@ -1,6 +1,6 @@
 package net.deepthought;
 
-import net.deepthought.communication.IDeepThoughtsConnector;
+import net.deepthought.communication.IDeepThoughtConnector;
 import net.deepthought.controls.html.IHtmlEditorPool;
 import net.deepthought.data.IDataManager;
 import net.deepthought.data.backup.IBackupManager;
@@ -52,7 +52,7 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IContentExtractorManager createContentExtractorManager();
 
-  IDeepThoughtsConnector createDeepThoughtsConnector();
+  IDeepThoughtConnector createDeepThoughtConnector();
 
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
 

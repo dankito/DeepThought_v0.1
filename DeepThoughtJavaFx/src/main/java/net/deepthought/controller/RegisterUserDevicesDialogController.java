@@ -137,14 +137,14 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
     rdbtnOpenRegistrationServer.setDisable(true);
     rdbtnSearchForRegistrationServers.setDisable(true);
 
-    Application.getDeepThoughtsConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
+    Application.getDeepThoughtConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
 
     isStarted = true;
     JavaFxLocalization.bindLabeledText(btnStartStop, "to.stop");
   }
 
   protected void stop() {
-    Application.getDeepThoughtsConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
+    Application.getDeepThoughtConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
 
     lstvwFoundRegistrationServers.getItems().clear();
     lstvwDevicesRequestingRegistration.getItems().clear();
@@ -194,7 +194,7 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
       // TODO: check if user information differ and if so ask which one to use
     }
 
-    Application.getDeepThoughtsConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
+    Application.getDeepThoughtConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
       @Override
       public void responseReceived(Request request1, Response response) {
         if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {

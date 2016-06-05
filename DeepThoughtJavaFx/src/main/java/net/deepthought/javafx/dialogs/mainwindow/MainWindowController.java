@@ -238,7 +238,7 @@ public class MainWindowController implements Initializable {
       pnConnectedDevices = new ConnectedDevicesPanel();
       statusBar.add(pnConnectedDevices, 2, 0);
 
-      Application.getDeepThoughtsConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
+      Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
   }
 

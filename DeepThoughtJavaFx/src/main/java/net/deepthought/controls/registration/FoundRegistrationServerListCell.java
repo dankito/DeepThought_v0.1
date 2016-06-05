@@ -89,7 +89,7 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
   protected void askForRegistration() {
     HostInfo serverInfo = getItem();
     if(serverInfo != null) {
-      Application.getDeepThoughtsConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), listener);
+      Application.getDeepThoughtConnector().getCommunicator().askForDeviceRegistration(serverInfo, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), listener);
     }
   }
 

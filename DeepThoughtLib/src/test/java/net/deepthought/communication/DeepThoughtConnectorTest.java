@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by ganymed on 19/08/15.
  */
-public class DeepThoughtsConnectorTest extends CommunicationTestBase {
+public class DeepThoughtConnectorTest extends CommunicationTestBase {
 
-  protected IDeepThoughtsConnector connector;
+  protected IDeepThoughtConnector connector;
 
   protected Communicator communicator;
 
@@ -38,7 +38,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     Application.instantiate(new TestApplicationConfiguration());
     try { Thread.sleep(200); } catch(Exception ex) { } // it is very critical that server is fully started therefore wait some time
 
-    connector = Application.getDeepThoughtsConnector();
+    connector = Application.getDeepThoughtConnector();
     communicator = connector.getCommunicator();
 
     loggedOnUser = Application.getLoggedOnUser();
@@ -54,10 +54,10 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
 
   @Test
   public void startTwoDeepThoughtsConnectors_BothMessageHandlersStartSuccessfully() {
-//    DeepThoughtsConnector connector1 = new DeepThoughtsConnector(null);
+//    DeepThoughtConnector connector1 = new DeepThoughtConnector(null);
 //    connector1.runAsync();
 
-    DeepThoughtsConnector connector2 = new DeepThoughtsConnector();
+    DeepThoughtConnector connector2 = new DeepThoughtConnector();
     connector2.runAsync();
 
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started

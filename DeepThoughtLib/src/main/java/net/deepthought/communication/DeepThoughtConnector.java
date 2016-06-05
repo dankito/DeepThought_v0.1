@@ -40,9 +40,9 @@ import java.util.Set;
 /**
  * Created by ganymed on 19/08/15.
  */
-public class DeepThoughtsConnector implements IDeepThoughtsConnector {
+public class DeepThoughtConnector implements IDeepThoughtConnector {
 
-  private final static Logger log = LoggerFactory.getLogger(DeepThoughtsConnector.class);
+  private final static Logger log = LoggerFactory.getLogger(DeepThoughtConnector.class);
 
 
   protected int messageReceiverPort;
@@ -72,11 +72,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  public DeepThoughtsConnector() {
+  public DeepThoughtConnector() {
     this(Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtsConnector(int messageReceiverPort) {
+  public DeepThoughtConnector(int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
     // TODO: make configurable
@@ -100,9 +100,9 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       @Override
       public void run() {
         try {
-          DeepThoughtsConnector.this.run();
+          DeepThoughtConnector.this.run();
         } catch (Exception ex) {
-          log.error("An error occurred trying to run DeepThoughtsConnector on port " + messageReceiverPort, ex);
+          log.error("An error occurred trying to run DeepThoughtConnector on port " + messageReceiverPort, ex);
         }
       }
     });

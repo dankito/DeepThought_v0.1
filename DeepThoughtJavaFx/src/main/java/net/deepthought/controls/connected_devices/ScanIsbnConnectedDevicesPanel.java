@@ -45,7 +45,7 @@ public class ScanIsbnConnectedDevicesPanel extends ConnectedDevicesPanel {
     MenuItem scanBarcodeMenuItem = new MenuItem(); // TODO: add icon
     JavaFxLocalization.bindMenuItemText(scanBarcodeMenuItem, "scan.from.isbn");
     // TODO: store requestMessageId so that Scanning Barcode process can be stopped
-    scanBarcodeMenuItem.setOnAction(event -> Application.getDeepThoughtsConnector().getCommunicator().startScanBarcode(connectedDevice,
+    scanBarcodeMenuItem.setOnAction(event -> Application.getDeepThoughtConnector().getCommunicator().startScanBarcode(connectedDevice,
         (request, response) -> scanBarcodeResultReceived(response)));
     contextMenu.getItems().add(scanBarcodeMenuItem);
   }

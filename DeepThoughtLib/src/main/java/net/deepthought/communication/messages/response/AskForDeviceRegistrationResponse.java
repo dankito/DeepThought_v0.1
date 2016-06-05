@@ -66,7 +66,7 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useServersUserInformation, User user, Device device) {
     return new AskForDeviceRegistrationResponse(true, useServersUserInformation, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
-        DeviceInfo.fromDevice(device), NetworkHelper.getIPAddressString(true), Application.getDeepThoughtsConnector().getMessageReceiverPort());
+        DeviceInfo.fromDevice(device), NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
   }
 
 }
