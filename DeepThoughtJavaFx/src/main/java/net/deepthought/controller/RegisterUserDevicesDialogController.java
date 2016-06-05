@@ -4,18 +4,17 @@ import net.deepthought.Application;
 import net.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.request.Request;
+import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.model.HostInfo;
-import net.deepthought.communication.registration.RegistrationRequestListener;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.controller.enums.DialogResult;
 import net.deepthought.controls.Constants;
 import net.deepthought.controls.ContextHelpControl;
-import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.controls.registration.FoundRegistrationServerListCell;
+import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.localization.JavaFxLocalization;
 import net.deepthought.util.localization.Localization;
@@ -139,10 +138,10 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
     rdbtnSearchForRegistrationServers.setDisable(true);
 
     if(rdbtnOpenRegistrationServer.isSelected()) {
-      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(userDeviceRegistrationRequestListener);
+      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(unregisteredDevicesListener);
     }
     else {
-      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(registrationRequestListener);
+      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(unregisteredDevicesListener);
     }
 
     isStarted = true;
@@ -168,10 +167,29 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
   }
 
 
-  protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = new UserDeviceRegistrationRequestListener() {
+  protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
     @Override
-    public void registerDeviceRequestRetrieved(final AskForDeviceRegistrationRequest request) {
+    public void unregisteredDeviceFound(final HostInfo hostInfo) {
+      Platform.runLater(() -> lstvwFoundRegistrationServers.getItems().add(hostInfo));
+    }
+
+    @Override
+    public void deviceIsAskingForRegistration(final AskForDeviceRegistrationRequest request) {
       Platform.runLater(() -> askUserIfRegisteringDeviceIsAllowed(request)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
+    }
+  };
+
+  protected AskForDeviceRegistrationResultListener askForDeviceRegistrationResultListener = new AskForDeviceRegistrationResultListener() {
+    @Override
+    public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
+      Platform.runLater(() -> {
+        if(response != null) {
+          if (response.allowsRegistration())
+            Alerts.showDeviceRegistrationSuccessfulAlert(response, windowStage);
+          else
+            Alerts.showServerDeniedDeviceRegistrationAlert(response, windowStage);
+        }
+      });
     }
   };
 
@@ -196,26 +214,5 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
       }
     });
   }
-
-  protected RegistrationRequestListener registrationRequestListener = new RegistrationRequestListener() {
-    @Override
-    public void openRegistrationServerFound(final HostInfo hostInfo) {
-      Platform.runLater(() -> lstvwFoundRegistrationServers.getItems().add(hostInfo));
-    }
-  };
-
-  protected AskForDeviceRegistrationResultListener askForDeviceRegistrationResultListener = new AskForDeviceRegistrationResultListener() {
-    @Override
-    public void responseReceived(AskForDeviceRegistrationRequest request, AskForDeviceRegistrationResponse response) {
-      Platform.runLater(() -> {
-        if(response != null) {
-          if (response.allowsRegistration())
-            Alerts.showDeviceRegistrationSuccessfulAlert(response, windowStage);
-          else
-            Alerts.showServerDeniedDeviceRegistrationAlert(response, windowStage);
-        }
-      });
-    }
-  };
 
 }

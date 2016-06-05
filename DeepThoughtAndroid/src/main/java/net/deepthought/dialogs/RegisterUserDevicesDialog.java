@@ -23,8 +23,7 @@ import net.deepthought.communication.messages.response.Response;
 import net.deepthought.communication.messages.response.ResponseCode;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
-import net.deepthought.communication.registration.RegistrationRequestListener;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
+import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.StringUtils;
 import net.deepthought.util.localization.Localization;
@@ -118,10 +117,10 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
     spnDeviceRegistrationOptions.setEnabled(false);
 
     if(spnDeviceRegistrationOptions.getSelectedItemPosition() == 0) {
-      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(userDeviceRegistrationRequestListener);
+      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(unregisteredDevicesListener);
     }
     else if(spnDeviceRegistrationOptions.getSelectedItemPosition() == 1)  {
-      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(registrationRequestListener);
+      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(unregisteredDevicesListener);
     }
 
     isStarted = true;
@@ -199,9 +198,15 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
   }
 
 
-  protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = new UserDeviceRegistrationRequestListener() {
+  protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
+
     @Override
-    public void registerDeviceRequestRetrieved(final AskForDeviceRegistrationRequest request) {
+    public void unregisteredDeviceFound(HostInfo hostInfo) {
+      devicesAdapter.serverFound(hostInfo);
+    }
+
+    @Override
+    public void deviceIsAskingForRegistration(final AskForDeviceRegistrationRequest request) {
       getActivity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -209,13 +214,7 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
         }
       });
     }
-  };
 
-  protected RegistrationRequestListener registrationRequestListener = new RegistrationRequestListener() {
-    @Override
-    public void openRegistrationServerFound(HostInfo hostInfo) {
-      devicesAdapter.serverFound(hostInfo);
-    }
   };
 
 

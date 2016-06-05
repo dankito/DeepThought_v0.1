@@ -3,8 +3,8 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
-import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
@@ -21,18 +21,17 @@ import net.deepthought.communication.messages.request.RequestWithAsynchronousRes
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.ConnectedDevice;
+import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.communication.registration.LookingForRegistrationServersClient;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
-import net.deepthought.communication.registration.RegistrationRequestListener;
 import net.deepthought.communication.registration.RegistrationServer;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
-import net.deepthought.util.localization.Localization;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
+import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +68,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
   protected RegistrationServer registrationServer = null;
-  protected UserDeviceRegistrationRequestListener userDeviceRegistrationRequestListener = null;
+  protected IUnregisteredDevicesListener unregisteredDevicesListener = null;
 
   protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
@@ -224,11 +223,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
 
   @Override
-  public void openUserDeviceRegistrationServer(UserDeviceRegistrationRequestListener listener) {
+  public void openUserDeviceRegistrationServer(IUnregisteredDevicesListener listener) {
     if(isRegistrationServerRunning())
       closeUserDeviceRegistrationServer();
 
-    this.userDeviceRegistrationRequestListener = listener;
+    this.unregisteredDevicesListener = listener;
 
     registrationServer = new RegistrationServer(connectorMessagesCreator, threadPool);
     registrationServer.startRegistrationServerAsync();
@@ -241,11 +240,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       registrationServer = null;
     }
 
-    this.userDeviceRegistrationRequestListener = null;
+    this.unregisteredDevicesListener = null;
   }
 
   @Override
-  public void findOtherUserDevicesToRegisterAtAsync(RegistrationRequestListener listener) {
+  public void findOtherUserDevicesToRegisterAtAsync(IUnregisteredDevicesListener listener) {
     if(isSearchRegistrationServersClientRunning())
       stopSearchingOtherUserDevicesToRegisterAt();
 
@@ -480,8 +479,8 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
   protected boolean handleAskForDeviceRegistrationRequest(AskForDeviceRegistrationRequest request) {
-    if(userDeviceRegistrationRequestListener != null)
-      userDeviceRegistrationRequestListener.registerDeviceRequestRetrieved(request);
+    if(unregisteredDevicesListener != null)
+      unregisteredDevicesListener.deviceIsAskingForRegistration(request);
     else // if listener is null it's not possible that the user chooses whether she/he likes to allow register or not -> send a deny directly
       communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.Deny, null);
 

@@ -1,13 +1,12 @@
 package net.deepthought.communication;
 
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
+import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
-import net.deepthought.communication.registration.RegistrationRequestListener;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 
 /**
  * Created by ganymed on 20/08/15.
@@ -18,10 +17,10 @@ public interface IDeepThoughtsConnector {
 
   void shutDown();
 
-  void openUserDeviceRegistrationServer(UserDeviceRegistrationRequestListener listener);
+  void openUserDeviceRegistrationServer(IUnregisteredDevicesListener listener);
   void closeUserDeviceRegistrationServer();
 
-  void findOtherUserDevicesToRegisterAtAsync(RegistrationRequestListener listener);
+  void findOtherUserDevicesToRegisterAtAsync(IUnregisteredDevicesListener listener);
   void stopSearchingOtherUserDevicesToRegisterAt();
 
   boolean isStarted();

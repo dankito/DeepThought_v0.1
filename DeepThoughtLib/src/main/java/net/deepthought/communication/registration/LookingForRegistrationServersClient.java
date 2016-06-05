@@ -4,6 +4,7 @@ import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.model.HostInfo;
+import net.deepthought.data.model.Device;
 import net.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class LookingForRegistrationServersClient {
   }
 
 
-  public void findRegistrationServersAsync(final RegistrationRequestListener listener) {
+  public void findRegistrationServersAsync(final IUnregisteredDevicesListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
@@ -54,13 +55,13 @@ public class LookingForRegistrationServersClient {
     });
   }
 
-  protected void findRegistrationServers(RegistrationRequestListener listener) {
+  protected void findRegistrationServers(IUnregisteredDevicesListener listener) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
       findRegistrationServersForBroadcastAddressAsync(broadcastAddress, listener);
     }
   }
 
-  protected void findRegistrationServersForBroadcastAddressAsync(final InetAddress broadcastAddress, final RegistrationRequestListener listener) {
+  protected void findRegistrationServersForBroadcastAddressAsync(final InetAddress broadcastAddress, final IUnregisteredDevicesListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
@@ -69,7 +70,7 @@ public class LookingForRegistrationServersClient {
     });
   }
 
-  protected void findRegistrationServersForBroadcastAddress(InetAddress broadcastAddress, RegistrationRequestListener listener) {
+  protected void findRegistrationServersForBroadcastAddress(InetAddress broadcastAddress, IUnregisteredDevicesListener listener) {
     try {
       DatagramSocket socket = new DatagramSocket();
 
@@ -95,20 +96,21 @@ public class LookingForRegistrationServersClient {
     }
   }
 
-  protected void waitForResponsePackets(DatagramSocket socket, RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
+  protected void waitForResponsePackets(DatagramSocket socket, IUnregisteredDevicesListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
     try {
-      socket.receive(packet);
-      HostInfo serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
+      HostInfo serverInfo = null;
 
-      while(hasResponseOfThisServerAlreadyBeenHandled(packet, serverInfo, receivedResponses)) { // request of this client already received and handled
+      do {
+        serverInfo = null; // may reset previously received one
         socket.receive(packet);
         serverInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
-      }
+      } while(isSelfSentMessage(packet, serverInfo) ||
+          hasResponseOfThisServerAlreadyBeenHandled(packet, serverInfo, receivedResponses)); // request of this client already  received and handled
 
-      if(registeredDevicesManager.isDeviceRegistered(serverInfo) == false) {
+      if(serverInfo != null && registeredDevicesManager.isDeviceRegistered(serverInfo) == false) {
         receivedPacketFromUnregisteredDevice(listener, receivedResponses, packet, serverInfo);
       }
     } catch(Exception ex) {
@@ -118,11 +120,11 @@ public class LookingForRegistrationServersClient {
     } // a receive time out (may notify user about that)
   }
 
-  protected void receivedPacketFromUnregisteredDevice(RegistrationRequestListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses, DatagramPacket packet, HostInfo serverInfo) {
+  protected void receivedPacketFromUnregisteredDevice(IUnregisteredDevicesListener listener, Map<InetAddress, Map<String, Set<String>>> receivedResponses, DatagramPacket packet, HostInfo serverInfo) {
     boolean isOpenRegistrationServer = messagesCreator.isOpenRegistrationServerInfoMessage(packet.getData(), packet.getLength());
 
     if (isOpenRegistrationServer == true && listener != null) {
-      listener.openRegistrationServerFound(serverInfo);
+      listener.unregisteredDeviceFound(serverInfo);
     }
 
     InetAddress address = packet.getAddress();
@@ -131,6 +133,11 @@ public class LookingForRegistrationServersClient {
     if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
       receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new HashSet<String>());
     receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
+  }
+
+  protected boolean isSelfSentMessage(DatagramPacket packet, HostInfo serverInfo) {
+    Device localDevice = this.messagesCreator.getConfig().getLocalDevice();
+    return localDevice.getUniversallyUniqueId().equals(serverInfo.getDeviceUniqueId());
   }
 
   protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {

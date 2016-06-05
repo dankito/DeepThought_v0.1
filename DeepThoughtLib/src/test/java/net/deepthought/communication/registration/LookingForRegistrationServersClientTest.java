@@ -4,6 +4,7 @@ import net.deepthought.communication.CommunicationTestBase;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.ConnectorMessagesCreatorConfig;
 import net.deepthought.communication.NetworkHelper;
+import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.HostInfo;
 
 import org.junit.Assert;
@@ -30,17 +31,23 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
   @Test
   public void noRegistrationServersOpen_ClientReceivesNoResponse() {
     final List<HostInfo> serverResponse = new ArrayList<>();
+    final CountDownLatch waitForResponseLatch = new CountDownLatch(1);
 
     LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
-    client.findRegistrationServersAsync(new RegistrationRequestListener() {
+    client.findRegistrationServersAsync(new IUnregisteredDevicesListener() {
       @Override
-      public void openRegistrationServerFound(HostInfo serverInfo) {
+      public void unregisteredDeviceFound(HostInfo serverInfo) {
         serverResponse.add(serverInfo);
+        waitForResponseLatch.countDown();
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
+
       }
     });
 
-    CountDownLatch latch = new CountDownLatch(1);
-    try { latch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
+    try { waitForResponseLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
     Assert.assertEquals(0, serverResponse.size());
 
     client.stopSearchingForRegistrationServers();
@@ -55,11 +62,16 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
     registrationServer.startRegistrationServerAsync();
 
     LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
-    client.findRegistrationServersAsync(new RegistrationRequestListener() {
+    client.findRegistrationServersAsync(new IUnregisteredDevicesListener() {
       @Override
-      public void openRegistrationServerFound(HostInfo serverInfo) {
+      public void unregisteredDeviceFound(HostInfo serverInfo) {
         serverInfos.add(serverInfo);
         waitForResponseLatch.countDown();
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
+
       }
     });
 
@@ -80,11 +92,16 @@ public class LookingForRegistrationServersClientTest extends CommunicationTestBa
     registrationServer.startRegistrationServerAsync();
 
     LookingForRegistrationServersClient client = new LookingForRegistrationServersClient(messagesCreator, registeredDevicesManager, threadPool);
-    client.findRegistrationServersAsync(new RegistrationRequestListener() {
+    client.findRegistrationServersAsync(new IUnregisteredDevicesListener() {
       @Override
-      public void openRegistrationServerFound(HostInfo serverInfo) {
+      public void unregisteredDeviceFound(HostInfo serverInfo) {
         serverInfos.add(serverInfo);
         waitForResponseLatch.countDown();
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
+
       }
     });
 

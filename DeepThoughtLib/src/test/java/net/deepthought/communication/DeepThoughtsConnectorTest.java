@@ -26,8 +26,8 @@ import net.deepthought.communication.model.ImportFilesConfiguration;
 import net.deepthought.communication.model.ImportFilesSource;
 import net.deepthought.communication.model.OcrSource;
 import net.deepthought.communication.model.UserInfo;
+import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
-import net.deepthought.communication.registration.UserDeviceRegistrationRequestListener;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
 
@@ -79,9 +79,14 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final AtomicBoolean methodCalled = new AtomicBoolean(false);
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+    connector.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
       @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      public void unregisteredDeviceFound(HostInfo hostInfo) {
+
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
         methodCalled.set(true);
         waitLatch.countDown();
       }
@@ -100,9 +105,14 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+    connector.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
       @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      public void unregisteredDeviceFound(HostInfo hostInfo) {
+
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
         communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.Deny, null);
       }
     });
@@ -126,9 +136,14 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     final List<AskForDeviceRegistrationResponse> responses = new ArrayList<>();
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    connector.openUserDeviceRegistrationServer(new UserDeviceRegistrationRequestListener() {
+    connector.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
       @Override
-      public void registerDeviceRequestRetrieved(AskForDeviceRegistrationRequest request) {
+      public void unregisteredDeviceFound(HostInfo hostInfo) {
+
+      }
+
+      @Override
+      public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
         communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true,
             Application.getLoggedOnUser(), Application.getApplication().getLocalDevice()), null);
       }

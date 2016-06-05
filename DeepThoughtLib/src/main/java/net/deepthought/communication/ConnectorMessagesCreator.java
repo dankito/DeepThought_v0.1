@@ -200,4 +200,9 @@ public class ConnectorMessagesCreator {
     return "";
   }
 
+
+  public ConnectorMessagesCreatorConfig getConfig() {
+    return config;
+  }
+
 }
