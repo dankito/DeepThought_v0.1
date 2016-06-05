@@ -34,7 +34,7 @@ public class TestConnectedDevicesManager implements IConnectedDevicesManager {
   public boolean isConnectedToDevice(HostInfo hostInfo) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
       if(connectedDevice.getAddress().equals(hostInfo.getIpAddress()) && connectedDevice.getMessagesPort() == hostInfo.getPort() && connectedDevice.getUniqueDeviceId().equals
-          (hostInfo.getDeviceUniqueId())) {
+          (hostInfo.getDeviceId())) {
         return true;
       }
     }

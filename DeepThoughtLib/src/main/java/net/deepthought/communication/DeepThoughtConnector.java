@@ -18,7 +18,7 @@ import net.deepthought.communication.messages.request.RequestWithAsynchronousRes
 import net.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.ConnectedDevice;
-import net.deepthought.communication.model.DeviceInfo;
+import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.data.model.Device;
@@ -169,7 +169,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     } catch(Exception ex) { log.error("Could not close MessagesReceiver", ex); }
   }
 
-  protected void connectedToUnregisteredDevice(DeviceInfo device) {
+  protected void connectedToUnregisteredDevice(HostInfo device) {
     for(IUnregisteredDevicesListener listener : unregisteredDevicesListeners) {
       listener.unregisteredDeviceFound(null); // TODO: set to DeviceInfo
     }
@@ -301,7 +301,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
 
 //    mayStartRegisteredDevicesSearcher();
-    communicator.notifyRemoteWeHaveConnected(new ConnectedDevice(message.getDevice().getUniversallyUniqueId(), message.getAddress(), message.getPort()));
+    communicator.notifyRemoteWeHaveConnected(new ConnectedDevice(message.getDevice().getDeviceId(), message.getAddress(), message.getPort()));
 
   }
 

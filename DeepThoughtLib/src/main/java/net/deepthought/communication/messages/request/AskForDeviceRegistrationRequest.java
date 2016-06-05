@@ -1,7 +1,7 @@
 package net.deepthought.communication.messages.request;
 
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
+import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
@@ -15,7 +15,7 @@ public class AskForDeviceRegistrationRequest extends RequestWithAsynchronousResp
 
   protected GroupInfo group;
 
-  protected DeviceInfo device;
+  protected HostInfo device;
 
 
   protected AskForDeviceRegistrationRequest() {
@@ -23,10 +23,10 @@ public class AskForDeviceRegistrationRequest extends RequestWithAsynchronousResp
   }
 
   public AskForDeviceRegistrationRequest(User user, Device device, String ipAddress, int port) {
-    this(UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()), DeviceInfo.fromDevice(device), ipAddress, port);
+    this(UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()), HostInfo.fromUserAndDevice(user, device), ipAddress, port);
   }
 
-  public AskForDeviceRegistrationRequest(UserInfo user, GroupInfo group, DeviceInfo device, String ipAddress, int port) {
+  public AskForDeviceRegistrationRequest(UserInfo user, GroupInfo group, HostInfo device, String ipAddress, int port) {
     super(ipAddress, port);
 
     this.user = user;
@@ -43,7 +43,7 @@ public class AskForDeviceRegistrationRequest extends RequestWithAsynchronousResp
     return group;
   }
 
-  public DeviceInfo getDevice() {
+  public HostInfo getDevice() {
     return device;
   }
 

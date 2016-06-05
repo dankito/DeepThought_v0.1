@@ -3,7 +3,6 @@ package net.deepthought.communication.registration;
 import net.deepthought.Application;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.ConnectedDevice;
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
@@ -40,7 +39,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     User loggedOnUser = Application.getLoggedOnUser();
     if(loggedOnUser.getDevices().size() > 1 && loggedOnUser.getUniversallyUniqueId().equals(info.getUserUniqueId())) {
       for(Device device : loggedOnUser.getDevices()) {
-        if(device.getUniversallyUniqueId().equals(info.getDeviceUniqueId()))
+        if(device.getUniversallyUniqueId().equals(info.getDeviceId()))
           return true;
       }
     }
@@ -69,9 +68,9 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
   }
 
   protected Device extractDeviceInformation(AskForDeviceRegistrationRequest response) {
-    DeviceInfo deviceInfo = response.getDevice();
-    Device device = new Device(deviceInfo.getUniversallyUniqueId(), deviceInfo.getName(),  deviceInfo.getPlatform(), deviceInfo.getOsVersion(), deviceInfo.getPlatformArchitecture());
-    device.setDescription(deviceInfo.getDescription());
+    HostInfo deviceInfo = response.getDevice();
+    Device device = new Device(deviceInfo.getDeviceId(), deviceInfo.getDeviceName(),  deviceInfo.getPlatform(), deviceInfo.getOsVersion(), deviceInfo.getPlatformArchitecture());
+    device.setDescription(deviceInfo.getDeviceDescription());
     device.setLastKnownIpAddress(response.getAddress());
 
     return device;

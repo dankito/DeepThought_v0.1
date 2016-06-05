@@ -12,9 +12,11 @@ public class HostInfo {
 
   protected String userName = "";
 
-  protected String deviceUniqueId = "";
+  protected String deviceId = "";
 
   protected String deviceName = "";
+
+  protected String deviceDescription = "";
 
   protected String platform = "";
 
@@ -31,18 +33,18 @@ public class HostInfo {
 
   }
 
-  public HostInfo(String userUniqueId, String userName, String deviceUniqueId, String deviceName, String platform, String osVersion, String platformArchitecture) {
+  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture) {
     this.userUniqueId = userUniqueId;
     this.userName = userName;
-    this.deviceUniqueId = deviceUniqueId;
+    this.deviceId = deviceId;
     this.deviceName = deviceName;
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
   }
 
-  public HostInfo(String userUniqueId, String userName, String deviceUniqueId, String deviceName, String platform, String osVersion, String platformArchitecture, String ipAddress, int port) {
-    this(userUniqueId, userName, deviceUniqueId, deviceName, platform, osVersion, platformArchitecture);
+  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture, String ipAddress, int port) {
+    this(userUniqueId, userName, deviceId, deviceName, platform, osVersion, platformArchitecture);
     this.ipAddress = ipAddress;
     this.port = port;
   }
@@ -64,12 +66,12 @@ public class HostInfo {
     this.userName = userName;
   }
 
-  public String getDeviceUniqueId() {
-    return deviceUniqueId;
+  public String getDeviceId() {
+    return deviceId;
   }
 
-  public void setDeviceUniqueId(String deviceUniqueId) {
-    this.deviceUniqueId = deviceUniqueId;
+  public void setDeviceId(String deviceId) {
+    this.deviceId = deviceId;
   }
 
   public String getDeviceName() {
@@ -78,6 +80,14 @@ public class HostInfo {
 
   public void setDeviceName(String deviceName) {
     this.deviceName = deviceName;
+  }
+
+  public String getDeviceDescription() {
+    return deviceDescription;
+  }
+
+  public void setDeviceDescription(String deviceDescription) {
+    this.deviceDescription = deviceDescription;
   }
 
   public String getPlatform() {
@@ -120,6 +130,16 @@ public class HostInfo {
     this.port = port;
   }
 
+
+  public String getDeviceInfo() {
+    String infoString = platform + " " + osVersion;
+
+    if(platform != null && platform.toLowerCase().contains("android")) {
+      infoString = deviceName + " (" + infoString + ")";
+    }
+
+    return infoString;
+  }
 
   @Override
   public String toString() {

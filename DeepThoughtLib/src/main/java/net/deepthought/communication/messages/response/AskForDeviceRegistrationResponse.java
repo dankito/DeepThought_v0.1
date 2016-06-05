@@ -3,8 +3,8 @@ package net.deepthought.communication.messages.response;
 import net.deepthought.Application;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
+import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
@@ -26,7 +26,7 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
     this.allowsRegistration = allowsRegistration;
   }
 
-  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useServersUserInformation, UserInfo user, GroupInfo group, DeviceInfo device,
+  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useServersUserInformation, UserInfo user, GroupInfo group, HostInfo device,
                                           String ipAddress, int port) {
     super(user, group, device, ipAddress, port);
     this.allowsRegistration = allowsRegistration;
@@ -66,7 +66,7 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useServersUserInformation, User user, Device device) {
     return new AskForDeviceRegistrationResponse(true, useServersUserInformation, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
-        DeviceInfo.fromDevice(device), NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
+        HostInfo.fromUserAndDevice(user, device), NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
   }
 
 }

@@ -152,7 +152,7 @@ public class RegisteredDevicesSearcher {
 
   protected boolean isSelfSentPacket(HostInfo clientInfo) {
     return loggedOnUser.getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
-        localDevice.getUniversallyUniqueId().equals(clientInfo.getDeviceUniqueId()) &&
+        localDevice.getUniversallyUniqueId().equals(clientInfo.getDeviceId()) &&
         clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 

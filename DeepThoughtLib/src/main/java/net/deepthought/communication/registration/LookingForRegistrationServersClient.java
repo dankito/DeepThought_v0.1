@@ -130,19 +130,19 @@ public class LookingForRegistrationServersClient {
     InetAddress address = packet.getAddress();
     if(receivedResponses.containsKey(address) == false)
       receivedResponses.put(address, new HashMap<String, Set<String>>());
-    if(receivedResponses.get(address).containsKey(serverInfo.getDeviceUniqueId()) == false)
-      receivedResponses.get(address).put(serverInfo.getDeviceUniqueId(), new HashSet<String>());
-    receivedResponses.get(address).get(serverInfo.getDeviceUniqueId()).add(serverInfo.getUserUniqueId());
+    if(receivedResponses.get(address).containsKey(serverInfo.getDeviceId()) == false)
+      receivedResponses.get(address).put(serverInfo.getDeviceId(), new HashSet<String>());
+    receivedResponses.get(address).get(serverInfo.getDeviceId()).add(serverInfo.getUserUniqueId());
   }
 
   protected boolean isSelfSentMessage(DatagramPacket packet, HostInfo serverInfo) {
     Device localDevice = this.messagesCreator.getConfig().getLocalDevice();
-    return localDevice.getUniversallyUniqueId().equals(serverInfo.getDeviceUniqueId());
+    return localDevice.getUniversallyUniqueId().equals(serverInfo.getDeviceId());
   }
 
   protected boolean hasResponseOfThisServerAlreadyBeenHandled(DatagramPacket packet, HostInfo serverInfo, Map<InetAddress, Map<String, Set<String>>> receivedResponses) {
-    return receivedResponses.containsKey(packet.getAddress()) && receivedResponses.get(packet.getAddress()).containsKey((serverInfo.getDeviceUniqueId())) &&
-        receivedResponses.get(packet.getAddress()).get(serverInfo.getDeviceUniqueId()).contains(serverInfo.getUserUniqueId());
+    return receivedResponses.containsKey(packet.getAddress()) && receivedResponses.get(packet.getAddress()).containsKey((serverInfo.getDeviceId())) &&
+        receivedResponses.get(packet.getAddress()).get(serverInfo.getDeviceId()).contains(serverInfo.getUserUniqueId());
   }
 
   public void stopSearchingForRegistrationServers() {

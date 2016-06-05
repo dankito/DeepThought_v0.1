@@ -13,7 +13,6 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.deepthought.communication.model.ConnectedDevice;
-import net.deepthought.communication.model.DeviceInfo;
 import net.deepthought.communication.model.GroupInfo;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.model.UserInfo;
@@ -170,7 +169,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
       public boolean messageReceived(String methodName, Request request) {
         if(Addresses.AskForDeviceRegistrationMethodName.equals(methodName)) {
           communicator2.respondToAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest)request, new AskForDeviceRegistrationResponse(true, true,
-              UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()), DeviceInfo.fromDevice(device2), TestIpAddress, device2MessagesPort), null);
+              UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()), HostInfo.fromUserAndDevice(user2, device2), TestIpAddress, device2MessagesPort), null);
         }
         return false;
       }

@@ -7,11 +7,11 @@ import net.deepthought.data.model.Device;
  */
 public class DeviceInfo {
 
-  protected String universallyUniqueId = "";
+  protected String deviceId = "";
 
-  protected String name = "";
+  protected String deviceName = "";
 
-  protected String description = "";
+  protected String deviceDescription = "";
 
   protected String platform = "";
 
@@ -28,37 +28,37 @@ public class DeviceInfo {
 
   }
 
-  public DeviceInfo(String universallyUniqueId, String name, String platform, String osVersion, String platformArchitecture) {
-    this.universallyUniqueId = universallyUniqueId;
-    this.name = name;
+  public DeviceInfo(String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture) {
+    this.deviceId = deviceId;
+    this.deviceName = deviceName;
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
   }
 
 
-  public String getUniversallyUniqueId() {
-    return universallyUniqueId;
+  public String getDeviceId() {
+    return deviceId;
   }
 
-  public void setUniversallyUniqueId(String universallyUniqueId) {
-    this.universallyUniqueId = universallyUniqueId;
+  public void setDeviceId(String deviceId) {
+    this.deviceId = deviceId;
   }
 
-  public String getName() {
-    return name;
+  public String getDeviceName() {
+    return deviceName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setDeviceName(String deviceName) {
+    this.deviceName = deviceName;
   }
 
-  public String getDescription() {
-    return description;
+  public String getDeviceDescription() {
+    return deviceDescription;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setDeviceDescription(String deviceDescription) {
+    this.deviceDescription = deviceDescription;
   }
 
   public String getPlatform() {
@@ -99,7 +99,7 @@ public class DeviceInfo {
     String infoString = platform + " " + osVersion;
 
     if(platform != null && platform.toLowerCase().contains("android")) {
-      infoString = name + " (" + infoString + ")";
+      infoString = deviceName + " (" + infoString + ")";
     }
 
     return infoString;
