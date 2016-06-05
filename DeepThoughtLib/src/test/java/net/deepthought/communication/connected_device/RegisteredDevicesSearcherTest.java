@@ -1,7 +1,6 @@
 package net.deepthought.communication.connected_device;
 
 import net.deepthought.communication.CommunicationTestBase;
-import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
@@ -104,7 +103,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
 
     RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
-      protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
+      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
         receivedPackets.add(packet);
         waitForPacketsLatch.countDown();
       }
@@ -131,7 +130,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
 
     RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
-      protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
+      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
         responsesReceived.add(packet);
         waitForResponseCreationLatch.countDown();
       }
@@ -160,11 +159,16 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
       }
     };
 
-    searcher.startSearchingAsync(new RegisteredDeviceConnectedListener() {
+    searcher.startSearchingAsync(new IConnectedDevicesListener() {
       @Override
       public void registeredDeviceConnected(ConnectedDevice device) {
         connectedDevices.add(device);
         waitForResponseCreationLatch.countDown();
+      }
+
+      @Override
+      public void registeredDeviceDisconnected(ConnectedDevice device) {
+
       }
     });
 

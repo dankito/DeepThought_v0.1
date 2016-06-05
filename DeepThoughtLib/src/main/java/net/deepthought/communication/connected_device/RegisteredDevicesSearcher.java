@@ -4,7 +4,6 @@ import net.deepthought.Application;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.NetworkHelper;
-import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.IRegisteredDevicesManager;
@@ -63,7 +62,7 @@ public class RegisteredDevicesSearcher {
   }
 
 
-  public void startSearchingAsync(final RegisteredDeviceConnectedListener listener) {
+  public void startSearchingAsync(final IConnectedDevicesListener listener) {
     startServerAsync();
 
     startClientAsync(listener);
@@ -172,7 +171,7 @@ public class RegisteredDevicesSearcher {
   }
 
 
-  protected void startClientAsync(final RegisteredDeviceConnectedListener listener) {
+  protected void startClientAsync(final IConnectedDevicesListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
@@ -181,13 +180,13 @@ public class RegisteredDevicesSearcher {
     });
   }
 
-  protected void startClient(RegisteredDeviceConnectedListener listener) {
+  protected void startClient(IConnectedDevicesListener listener) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
       startClientForBroadcastAddressAsync(broadcastAddress, listener);
     }
   }
 
-  protected void startClientForBroadcastAddressAsync(final InetAddress broadcastAddress, final RegisteredDeviceConnectedListener listener) {
+  protected void startClientForBroadcastAddressAsync(final InetAddress broadcastAddress, final IConnectedDevicesListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
@@ -196,7 +195,7 @@ public class RegisteredDevicesSearcher {
     });
   }
 
-  protected void startClientForBroadcastAddress(InetAddress broadcastAddress, RegisteredDeviceConnectedListener listener) {
+  protected void startClientForBroadcastAddress(InetAddress broadcastAddress, IConnectedDevicesListener listener) {
     try {
       DatagramSocket clientSocket = new DatagramSocket();
 
@@ -220,7 +219,7 @@ public class RegisteredDevicesSearcher {
     }
   }
 
-  protected void waitForResponsePackets(DatagramSocket clientSocket, RegisteredDeviceConnectedListener listener) {
+  protected void waitForResponsePackets(DatagramSocket clientSocket, IConnectedDevicesListener listener) {
     byte[] buffer = new byte[1024];
     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
@@ -235,7 +234,7 @@ public class RegisteredDevicesSearcher {
     } catch(Exception ex) { }
   }
 
-  protected void clientReceivedResponseFromServer(RegisteredDeviceConnectedListener listener, byte[] buffer, DatagramPacket packet) {
+  protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
     ConnectedDevice serverInfo = messagesCreator.getConnectedDeviceFromMessage(buffer, packet.getLength(), packet.getAddress());
     serverInfo.setAddress(packet.getAddress().getHostAddress());
 
@@ -244,7 +243,7 @@ public class RegisteredDevicesSearcher {
     }
   }
 
-  protected void registeredDeviceConnected(RegisteredDeviceConnectedListener listener, DatagramPacket packet, ConnectedDevice serverInfo) {
+  protected void registeredDeviceConnected(IConnectedDevicesListener listener, DatagramPacket packet, ConnectedDevice serverInfo) {
     if (listener != null)
       listener.registeredDeviceConnected(serverInfo);
   }

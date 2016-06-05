@@ -2,7 +2,7 @@ package net.deepthought.communication;
 
 import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
+import net.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.deepthought.communication.listener.ResponseListener;
 import net.deepthought.communication.messages.request.Request;
 import net.deepthought.communication.messages.response.Response;
@@ -36,7 +36,7 @@ public class ConnectionsAliveWatcher {
   }
 
 
-  public void startWatchingAsync(final RegisteredDeviceDisconnectedListener listener) {
+  public void startWatchingAsync(final IConnectedDevicesListener listener) {
     stopWatching();
 
     connectionsAliveCheckTimer = new Timer("ConnectionsAliveWatcher Timer");
@@ -56,7 +56,7 @@ public class ConnectionsAliveWatcher {
   }
 
 
-  protected void checkIfConnectedDevicesStillAreConnected(final RegisteredDeviceDisconnectedListener listener) {
+  protected void checkIfConnectedDevicesStillAreConnected(final IConnectedDevicesListener listener) {
     for(final ConnectedDevice connectedDevice : connectedDevicesManager.getConnectedDevices()) {
       Application.getThreadPool().runTaskAsync(new Runnable() {
         @Override
@@ -73,7 +73,7 @@ public class ConnectionsAliveWatcher {
     }
   }
 
-  protected void deviceDisconnected(ConnectedDevice connectedDevice, RegisteredDeviceDisconnectedListener listener) {
+  protected void deviceDisconnected(ConnectedDevice connectedDevice, IConnectedDevicesListener listener) {
     if(listener != null)
       listener.registeredDeviceDisconnected(connectedDevice);
   }

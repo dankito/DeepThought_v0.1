@@ -1,7 +1,7 @@
 package net.deepthought.controls.connected_devices;
 
 import net.deepthought.Application;
-import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.ICleanUp;
 import net.deepthought.data.model.Device;
@@ -72,7 +72,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
   }
 
 
-  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
+  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
 
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {

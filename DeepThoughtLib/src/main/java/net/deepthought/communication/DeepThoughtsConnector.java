@@ -3,11 +3,9 @@ package net.deepthought.communication;
 import net.deepthought.Application;
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
-import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
-import net.deepthought.communication.listener.RegisteredDeviceConnectedListener;
-import net.deepthought.communication.listener.RegisteredDeviceDisconnectedListener;
 import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
 import net.deepthought.communication.messages.MessagesDispatcher;
@@ -74,7 +72,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   protected ConnectionsAliveWatcher connectionsAliveWatcher = null;
 
-  protected Set<ConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
+  protected Set<IConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
 
   protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new HashSet<>();
 
@@ -187,7 +185,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     stopRegisteredDevicesSearcher();
 
     registeredDevicesSearcher = new RegisteredDevicesSearcher(connectorMessagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, getLoggedOnUser(), getLocalDevice());
-    registeredDevicesSearcher.startSearchingAsync(registeredDeviceConnectedListener);
+    registeredDevicesSearcher.startSearchingAsync(connectedDevicesListener);
   }
 
   protected void stopRegisteredDevicesSearcher() {
@@ -201,7 +199,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     stopConnectionsAliveWatcher();
 
     connectionsAliveWatcher = new ConnectionsAliveWatcher(connectedDevicesManager, communicator);
-    connectionsAliveWatcher.startWatchingAsync(registeredDeviceDisconnectedListener);
+    connectionsAliveWatcher.startWatchingAsync(connectedDevicesListener);
   }
 
   protected void mayStartConnectionsAliveWatcher() {
@@ -274,7 +272,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
     if(connectedDevicesManager.connectedToDevice(device)) {
       communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
 
-      for (ConnectedDevicesListener listener : connectedDevicesListeners)
+      for (IConnectedDevicesListener listener : connectedDevicesListeners)
         listener.registeredDeviceConnected(device);
     }
 
@@ -290,7 +288,7 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
       mayStartRegisteredDevicesSearcher();
       mayStopConnectionsAliveWatcher();
 
-      for (ConnectedDevicesListener listener : connectedDevicesListeners)
+      for (IConnectedDevicesListener listener : connectedDevicesListeners)
         listener.registeredDeviceDisconnected(device);
     }
   }
@@ -372,11 +370,11 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
   }
 
 
-  public boolean addConnectedDevicesListener(ConnectedDevicesListener listener) {
+  public boolean addConnectedDevicesListener(IConnectedDevicesListener listener) {
     return connectedDevicesListeners.add(listener);
   }
 
-  public boolean removeConnectedDevicesListener(ConnectedDevicesListener listener) {
+  public boolean removeConnectedDevicesListener(IConnectedDevicesListener listener) {
     return connectedDevicesListeners.remove(listener);
   }
 
@@ -414,14 +412,12 @@ public class DeepThoughtsConnector implements IDeepThoughtsConnector {
 
   }
 
-  protected RegisteredDeviceConnectedListener registeredDeviceConnectedListener = new RegisteredDeviceConnectedListener() {
+  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
       connectedToRegisteredDevice(device);
     }
-  };
 
-  protected RegisteredDeviceDisconnectedListener registeredDeviceDisconnectedListener = new RegisteredDeviceDisconnectedListener() {
     @Override
     public void registeredDeviceDisconnected(ConnectedDevice device) {
       disconnectedFromRegisteredDevice(device);

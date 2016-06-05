@@ -256,7 +256,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
     mockNumberOfConnectedDevices(connector, 2);
-    connector.registeredDeviceConnectedListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
+    connector.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
 
     Assert.assertFalse(connector.isRegisteredDevicesSearcherRunning());
   }
@@ -275,7 +275,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     ConnectedDevicesManager mockConnectedDevicesManager = mockNumberOfConnectedDevices(connector, 1);
     Mockito.when(mockConnectedDevicesManager.disconnectedFromDevice(disconnectedDevice)).thenReturn(true);
 
-    connector.registeredDeviceDisconnectedListener.registeredDeviceDisconnected(disconnectedDevice);
+    connector.connectedDevicesListener.registeredDeviceDisconnected(disconnectedDevice);
 
     Assert.assertTrue(connector.isRegisteredDevicesSearcherRunning());
   }
@@ -296,7 +296,7 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
-    connector.registeredDeviceConnectedListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
+    connector.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
 
     Assert.assertTrue(connector.isConnectionWatcherRunning());
   }
@@ -308,8 +308,8 @@ public class DeepThoughtsConnectorTest extends CommunicationTestBase {
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
     ConnectedDevice connectedDevice = new ConnectedDevice("", "", 0);
-    connector.registeredDeviceConnectedListener.registeredDeviceConnected(connectedDevice);
-    connector.registeredDeviceDisconnectedListener.registeredDeviceDisconnected(connectedDevice);
+    connector.connectedDevicesListener.registeredDeviceConnected(connectedDevice);
+    connector.connectedDevicesListener.registeredDeviceDisconnected(connectedDevice);
 
     Assert.assertFalse(connector.isConnectionWatcherRunning());
   }

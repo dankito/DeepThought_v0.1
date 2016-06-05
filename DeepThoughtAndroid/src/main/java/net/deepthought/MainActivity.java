@@ -25,7 +25,7 @@ import com.github.clans.fab.FloatingActionMenu;
 import net.deepthought.activities.ActivityManager;
 import net.deepthought.activities.EditEntryActivity;
 import net.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
-import net.deepthought.communication.listener.ConnectedDevicesListener;
+import net.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -419,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
 
-  protected ConnectedDevicesListener connectedDevicesListener = new ConnectedDevicesListener() {
+  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
       // TODO
