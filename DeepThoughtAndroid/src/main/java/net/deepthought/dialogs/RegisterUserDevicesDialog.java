@@ -116,24 +116,14 @@ public class RegisterUserDevicesDialog extends android.support.v4.app.DialogFrag
   protected void startSelectedOption() {
     spnDeviceRegistrationOptions.setEnabled(false);
 
-    if(spnDeviceRegistrationOptions.getSelectedItemPosition() == 0) {
-      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(unregisteredDevicesListener);
-    }
-    else if(spnDeviceRegistrationOptions.getSelectedItemPosition() == 1)  {
-      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(unregisteredDevicesListener);
-    }
+    Application.getDeepThoughtsConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
 
     isStarted = true;
     btnStartStop.setText(getString(R.string.stop));
   }
 
   protected void stop() {
-    if(spnDeviceRegistrationOptions.getSelectedItemPosition() == 0) {
-      Application.getDeepThoughtsConnector().closeUserDeviceRegistrationServer();
-    }
-    else {
-      Application.getDeepThoughtsConnector().stopSearchingOtherUserDevicesToRegisterAt();
-    }
+    Application.getDeepThoughtsConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
 
     devicesAdapter.clearItems();
 

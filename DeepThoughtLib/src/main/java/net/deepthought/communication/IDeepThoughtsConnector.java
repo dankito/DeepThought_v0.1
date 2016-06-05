@@ -4,7 +4,6 @@ import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.deepthought.communication.listener.MessagesReceiverListener;
-import net.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
 
@@ -17,26 +16,14 @@ public interface IDeepThoughtsConnector {
 
   void shutDown();
 
-  void openUserDeviceRegistrationServer(IUnregisteredDevicesListener listener);
-  void closeUserDeviceRegistrationServer();
-
-  void findOtherUserDevicesToRegisterAtAsync(IUnregisteredDevicesListener listener);
-  void stopSearchingOtherUserDevicesToRegisterAt();
+  boolean addUnregisteredDevicesListener(IUnregisteredDevicesListener listener);
+  boolean removeUnregisteredDevicesListener(IUnregisteredDevicesListener listener);
 
   boolean isStarted();
-
-  boolean isRegisteringAllowed();
-  boolean isRegistrationServerRunning();
-  boolean isSearchRegistrationServersClientRunning();
-
-  boolean isRegisteredDevicesSearcherRunning();
-
-  boolean isConnectionWatcherRunning();
 
   int getMessageReceiverPort();
 
   Communicator getCommunicator();
-  AsynchronousResponseListenerManager getListenerManager();
 
   RegisteredDevicesManager getRegisteredDevicesManager();
 

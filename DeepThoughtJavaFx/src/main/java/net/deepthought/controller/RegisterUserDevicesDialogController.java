@@ -137,24 +137,14 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
     rdbtnOpenRegistrationServer.setDisable(true);
     rdbtnSearchForRegistrationServers.setDisable(true);
 
-    if(rdbtnOpenRegistrationServer.isSelected()) {
-      Application.getDeepThoughtsConnector().openUserDeviceRegistrationServer(unregisteredDevicesListener);
-    }
-    else {
-      Application.getDeepThoughtsConnector().findOtherUserDevicesToRegisterAtAsync(unregisteredDevicesListener);
-    }
+    Application.getDeepThoughtsConnector().addUnregisteredDevicesListener(unregisteredDevicesListener);
 
     isStarted = true;
     JavaFxLocalization.bindLabeledText(btnStartStop, "to.stop");
   }
 
   protected void stop() {
-    if(rdbtnOpenRegistrationServer.isSelected()) {
-      Application.getDeepThoughtsConnector().closeUserDeviceRegistrationServer();
-    }
-    else {
-      Application.getDeepThoughtsConnector().stopSearchingOtherUserDevicesToRegisterAt();
-    }
+    Application.getDeepThoughtsConnector().removeUnregisteredDevicesListener(unregisteredDevicesListener);
 
     lstvwFoundRegistrationServers.getItems().clear();
     lstvwDevicesRequestingRegistration.getItems().clear();
