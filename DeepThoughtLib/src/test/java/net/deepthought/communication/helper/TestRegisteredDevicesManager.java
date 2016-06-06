@@ -34,7 +34,7 @@ public class TestRegisteredDevicesManager implements IRegisteredDevicesManager {
   @Override
   public boolean isDeviceRegistered(ConnectedDevice device) {
     for(HostInfo info : registeredDevices) {
-      if(device.getUniqueDeviceId().equals(info.getDeviceId()) && device.getAddress().equals(info.getIpAddress()) && device.getMessagesPort() == info.getPort()) {
+      if(device.getDeviceId().equals(info.getDeviceId()) && device.getAddress().equals(info.getAddress()) && device.getMessagesPort() == info.getMessagesPort()) {
         return true;
       }
     }
@@ -44,8 +44,11 @@ public class TestRegisteredDevicesManager implements IRegisteredDevicesManager {
 
   @Override
   public boolean registerDevice(AskForDeviceRegistrationRequest response, boolean useOtherSidesUserInfo) {
-    return registeredDevices.add(new HostInfo(response.getUser().getUniversallyUniqueId(), response.getUser().getUserName(), response.getDevice().getDeviceId(),
-        response.getDevice().getDeviceName(), response.getDevice().getPlatform(), response.getDevice().getOsVersion(), response.getDevice().getPlatformArchitecture(),
-        response.getAddress(), response.getPort()));
+    HostInfo hostInfo = new HostInfo(response.getUser().getUniversallyUniqueId(), response.getUser().getUserName(), response.getDevice().getDeviceId(),
+        response.getDevice().getDeviceName(), response.getDevice().getPlatform(), response.getDevice().getOsVersion(), response.getDevice().getPlatformArchitecture());
+    hostInfo.setAddress(response.getAddress());
+    hostInfo.setMessagesPort(response.getPort());
+
+    return registeredDevices.add(hostInfo);
   }
 }

@@ -764,8 +764,8 @@ public class CommunicatorTest extends CommunicationTestBase {
 
   protected HostInfo createLocalHostServerInfo() {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setIpAddress(TestIpAddress);
-    hostInfo.setPort(CommunicatorPort);
+    hostInfo.setAddress(TestIpAddress);
+    hostInfo.setMessagesPort(CommunicatorPort);
 
     return hostInfo;
   }

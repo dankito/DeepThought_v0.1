@@ -62,7 +62,7 @@ public class Communicator {
 
 
   public AskForDeviceRegistrationRequest askForDeviceRegistration(HostInfo serverInfo, User loggedOnUser, Device localDevice, final AskForDeviceRegistrationResultListener listener) {
-    String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getIpAddress(), serverInfo.getPort());
+    String address = Addresses.getAskForDeviceRegistrationAddress(serverInfo.getAddress(), serverInfo.getMessagesPort());
 
     final AskForDeviceRegistrationRequest request = createAskForDeviceRegistrationRequest(loggedOnUser, localDevice);
     listenerManager.addListenerForResponse(request, listener);

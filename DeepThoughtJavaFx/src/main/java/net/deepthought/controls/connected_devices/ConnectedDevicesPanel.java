@@ -88,7 +88,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
   };
 
   protected void addConnectedDeviceIcon(final ConnectedDevice connectedDevice) {
-    if(connectedDeviceIcons.containsKey(connectedDevice.getUniqueDeviceId()))
+    if(connectedDeviceIcons.containsKey(connectedDevice.getDeviceId()))
       return;
 
     Device device = connectedDevice.getDevice();
@@ -116,7 +116,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
       event.consume();
     });
 
-    connectedDeviceIcons.put(connectedDevice.getUniqueDeviceId(), label);
+    connectedDeviceIcons.put(connectedDevice.getDeviceId(), label);
   }
 
   protected String booleanToString(boolean bool) {
@@ -141,8 +141,8 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
   }
 
   protected void removeConnectedDeviceIcon(ConnectedDevice device) {
-    if(connectedDeviceIcons.containsKey(device.getUniqueDeviceId())) {
-      Node icon = connectedDeviceIcons.remove(device.getUniqueDeviceId());
+    if(connectedDeviceIcons.containsKey(device.getDeviceId())) {
+      Node icon = connectedDeviceIcons.remove(device.getDeviceId());
       getChildren().remove(icon);
     }
 

@@ -33,7 +33,7 @@ public class TestConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public boolean isConnectedToDevice(HostInfo hostInfo) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(connectedDevice.getAddress().equals(hostInfo.getIpAddress()) && connectedDevice.getMessagesPort() == hostInfo.getPort() && connectedDevice.getUniqueDeviceId().equals
+      if(connectedDevice.getAddress().equals(hostInfo.getAddress()) && connectedDevice.getMessagesPort() == hostInfo.getMessagesPort() && connectedDevice.getDeviceId().equals
           (hostInfo.getDeviceId())) {
         return true;
       }

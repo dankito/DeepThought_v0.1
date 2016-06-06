@@ -94,7 +94,7 @@ public class ConnectorMessagesCreator {
     DeserializationResult<HostInfo> result = JsonIoJsonHelper.parseJsonString(messageBody, HostInfo.class);
     if(result.successful()) {
       HostInfo hostInfo = result.getResult();
-      hostInfo.setIpAddress(packet.getAddress().getHostAddress());
+      hostInfo.setAddress(packet.getAddress().getHostAddress());
       return hostInfo;
     }
 
@@ -158,7 +158,7 @@ public class ConnectorMessagesCreator {
 
   protected String createHostInfoMessageString(User loggedOnUser, Device localDevice) {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setPort(config.getMessageReceiverPort());
+    hostInfo.setMessagesPort(config.getMessageReceiverPort());
 
     SerializationResult result = JsonIoJsonHelper.generateJsonString(hostInfo);
     if(result.successful()) {

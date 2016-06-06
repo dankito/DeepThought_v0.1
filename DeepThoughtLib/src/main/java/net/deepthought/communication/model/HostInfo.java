@@ -24,9 +24,9 @@ public class HostInfo {
 
   protected String platformArchitecture = "";
 
-  protected String ipAddress = null;
+  protected String address = null;
 
-  protected int port = -1;
+  protected int messagesPort = -1;
 
 
   public HostInfo() {
@@ -41,12 +41,6 @@ public class HostInfo {
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
-  }
-
-  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture, String ipAddress, int port) {
-    this(userUniqueId, userName, deviceId, deviceName, platform, osVersion, platformArchitecture);
-    this.ipAddress = ipAddress;
-    this.port = port;
   }
 
 
@@ -114,27 +108,27 @@ public class HostInfo {
     this.platformArchitecture = platformArchitecture;
   }
 
-  public String getIpAddress() {
-    return ipAddress;
+  public String getAddress() {
+    return address;
   }
 
-  public void setIpAddress(String ipAddress) {
-    this.ipAddress = ipAddress;
+  public void setAddress(String address) {
+    this.address = address;
   }
 
-  public int getPort() {
-    return port;
+  public int getMessagesPort() {
+    return messagesPort;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  public void setMessagesPort(int messagesPort) {
+    this.messagesPort = messagesPort;
   }
 
 
-  public String getDeviceInfo() {
+  public String getDeviceInfoString() {
     String infoString = platform + " " + osVersion;
 
-    if(platform != null && platform.toLowerCase().contains("android")) {
+    if(platform.toLowerCase().contains("android")) {
       infoString = deviceName + " (" + infoString + ")";
     }
 
@@ -150,11 +144,6 @@ public class HostInfo {
   public static HostInfo fromUserAndDevice(User user, Device device) {
     return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
         device.getOsVersion(), device.getPlatformArchitecture());
-  }
-
-  public static HostInfo fromUserAndDevice(User user, Device device, String ipAddress, int port) {
-    return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
-        device.getOsVersion(), device.getPlatformArchitecture(), ipAddress, port);
   }
 
 }

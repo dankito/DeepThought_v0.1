@@ -179,8 +179,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
     final CountDownLatch waitLatch = new CountDownLatch(1);
 
-    communicator.askForDeviceRegistration(new HostInfo(user2.getUniversallyUniqueId(), user2.getUserName(), device2.getUniversallyUniqueId(), device2.getName(),
-        device2.getPlatform(), device2.getOsVersion(), device2.getPlatformArchitecture(), TestIpAddress, device2MessagesPort), loggedOnUser, localDevice, null);
+    communicator.askForDeviceRegistration(createHostInfo(user2, device2, TestIpAddress, device2MessagesPort), loggedOnUser, localDevice, null);
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -292,9 +291,13 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
 
   protected HostInfo createLocalHostServerInfo() {
+    return createHostInfo(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), TestIpAddress, connector.getMessageReceiverPort());
+  }
+
+  protected HostInfo createHostInfo(User loggedOnUser, Device localDevice, String address, int port) {
     HostInfo hostInfo = HostInfo.fromUserAndDevice(Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-    hostInfo.setIpAddress(TestIpAddress);
-    hostInfo.setPort(connector.getMessageReceiverPort());
+    hostInfo.setAddress(TestIpAddress);
+    hostInfo.setMessagesPort(connector.getMessageReceiverPort());
 
     return hostInfo;
   }

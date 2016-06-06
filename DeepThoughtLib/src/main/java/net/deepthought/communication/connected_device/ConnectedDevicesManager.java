@@ -36,7 +36,7 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public boolean containsDevice(ConnectedDevice device) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(connectedDevice.getUniqueDeviceId().equals(device.getUniqueDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
+      if(connectedDevice.getDeviceId().equals(device.getDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
         return true;
     }
 
@@ -47,7 +47,7 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public boolean isConnectedToDevice(HostInfo hostInfo) {
     for(ConnectedDevice device : connectedDevices) {
-      if(device.getUniqueDeviceId().equals(hostInfo.getDeviceId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
+      if(device.getDeviceId().equals(hostInfo.getDeviceId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
         return true;
     }
 

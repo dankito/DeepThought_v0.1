@@ -14,7 +14,7 @@ public class ConnectedDevice {
   private final static Logger log = LoggerFactory.getLogger(ConnectedDevice.class);
 
 
-  protected String uniqueDeviceId;
+  protected String deviceId;
 
   protected String address;
 
@@ -31,22 +31,15 @@ public class ConnectedDevice {
   protected Device device = null;
 
 
-  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort) {
-    this.uniqueDeviceId = uniqueDeviceId;
+  public ConnectedDevice(String deviceId, String address, int messagesPort) {
+    this.deviceId = deviceId;
     this.address = address;
     this.messagesPort = messagesPort;
   }
 
-  public ConnectedDevice(String uniqueDeviceId, String address, int messagesPort, boolean hasCaptureDevice, boolean canDoOcr, boolean canScanBarcodes) {
-    this(uniqueDeviceId, address, messagesPort);
-    this.hasCaptureDevice = hasCaptureDevice;
-    this.canDoOcr = canDoOcr;
-    this.canScanBarcodes = canScanBarcodes;
-  }
 
-
-  public String getUniqueDeviceId() {
-    return uniqueDeviceId;
+  public String getDeviceId() {
+    return deviceId;
   }
 
   public String getAddress() {
@@ -59,10 +52,6 @@ public class ConnectedDevice {
 
   public int getMessagesPort() {
     return messagesPort;
-  }
-
-  public void setMessagesPort(int messagesPort) {
-    this.messagesPort = messagesPort;
   }
 
   public boolean hasCaptureDevice() {
@@ -106,13 +95,13 @@ public class ConnectedDevice {
 
   public void setStoredDeviceInstance(User loggedOnUser) {
     for(Device userDevice : loggedOnUser.getDevices()) {
-      if(getUniqueDeviceId().equals(userDevice.getUniversallyUniqueId())) {
+      if(getDeviceId().equals(userDevice.getUniversallyUniqueId())) {
         setDevice(userDevice);
         return;
       }
     }
 
     // TODO: this happens on Server side on each new Device Registration (as there the remote device is not added yet to logged on User's devices)
-    log.error("Could not find local device with unique id " + getUniqueDeviceId() + ". But this happens on Server side on each new Device Registration");
+    log.error("Could not find local device with unique id " + getDeviceId() + ". But this happens on Server side on each new Device Registration");
   }
 }

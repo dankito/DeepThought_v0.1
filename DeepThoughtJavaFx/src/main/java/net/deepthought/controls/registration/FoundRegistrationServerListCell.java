@@ -110,7 +110,7 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
         imgvwOsLogo.setVisible(false);
 
       lblUserInfo.setText(item.getUserName());
-      lblDeviceInfo.setText(item.getPlatform() + " " + item.getOsVersion() + " (" + item.getIpAddress() + ")");
+      lblDeviceInfo.setText(item.getDeviceInfoString() + " (" + item.getAddress() + ")");
     }
   }
 }

@@ -141,7 +141,7 @@ public class RegisteredDevicesSearcher {
       if(isSelfSentPacket(clientInfo)) // TODO: adjust isSelfSentPacket() as clientInfo's IP Address will now be set from received Packet
         return;
 
-      clientInfo.setIpAddress(packet.getAddress().getHostAddress());
+      clientInfo.setAddress(packet.getAddress().getHostAddress());
 
       if(registeredDevicesManager.isDeviceRegistered(clientInfo) == true &&
           connectedDevicesManager.isConnectedToDevice(clientInfo) == false) {
@@ -153,7 +153,7 @@ public class RegisteredDevicesSearcher {
   protected boolean isSelfSentPacket(HostInfo clientInfo) {
     return loggedOnUser.getUniversallyUniqueId().equals(clientInfo.getUserUniqueId()) &&
         localDevice.getUniversallyUniqueId().equals(clientInfo.getDeviceId()) &&
-        clientInfo.getIpAddress().equals(NetworkHelper.getIPAddressString(true));
+        clientInfo.getAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 
   protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
