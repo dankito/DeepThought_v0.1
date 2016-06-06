@@ -13,7 +13,7 @@ public class Constants {
 
   public final static int RegistrationServerPort = 27387;
 
-  public final static int RegisteredDevicesListenerPort = 27384;
+  public final static int SearchDevicesListenerPort = 27384;
 
   public final static int ConnectionsAliveWatcherDefaultInterval = 10000; // every 10 seconds
 

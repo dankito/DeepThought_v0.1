@@ -18,19 +18,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by ganymed on 22/08/15.
  */
-public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
+public class UdpDevicesSearcherTest extends CommunicationTestBase {
 
   @Test
   public void sendPacketToServer_PacketGetsReceived() {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
-      @Override
-      protected void serverReceivedPacket(byte[] buffer, DatagramPacket packet) {
-        receivedPackets.add(packet);
-        waitForPacketsLatch.countDown();
-      }
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+//      @Override
+//      protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet) {
+//        receivedPackets.add(packet);
+//        waitForPacketsLatch.countDown();
+//      }
     };
 
     searcher.startSearchingAsync(null);
@@ -47,7 +47,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
         packetsRespondedTo.add(requestPacket);
@@ -71,7 +71,7 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
       protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
         packetsRespondedTo.add(requestPacket);
@@ -79,8 +79,8 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
       }
 
       @Override
-      protected boolean isSelfSentPacket(HostInfo clientInfo) {
-        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
+      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+        return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };
 
@@ -101,16 +101,16 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
-      @Override
-      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
-        receivedPackets.add(packet);
-        waitForPacketsLatch.countDown();
-      }
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+//      @Override
+//      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
+//        receivedPackets.add(packet);
+//        waitForPacketsLatch.countDown();
+//      }
 
       @Override
-      protected boolean isSelfSentPacket(HostInfo clientInfo) {
-        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
+      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+        return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };
 
@@ -128,12 +128,12 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> responsesReceived = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
-      @Override
-      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
-        responsesReceived.add(packet);
-        waitForResponseCreationLatch.countDown();
-      }
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+//      @Override
+//      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
+//        responsesReceived.add(packet);
+//        waitForResponseCreationLatch.countDown();
+//      }
     };
 
     searcher.startSearchingAsync(null);
@@ -152,25 +152,25 @@ public class RegisteredDevicesSearcherTest extends CommunicationTestBase {
     final List<ConnectedDevice> connectedDevices = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    RegisteredDevicesSearcher searcher = new RegisteredDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice) {
       @Override
-      protected boolean isSelfSentPacket(HostInfo clientInfo) {
-        return false; // TODO: this is really bad. Try to decouple RegisteredDevicesSearcher from current User via static Application object
+      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+        return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };
 
-    searcher.startSearchingAsync(new IConnectedDevicesListener() {
-      @Override
-      public void registeredDeviceConnected(ConnectedDevice device) {
-        connectedDevices.add(device);
-        waitForResponseCreationLatch.countDown();
-      }
-
-      @Override
-      public void registeredDeviceDisconnected(ConnectedDevice device) {
-
-      }
-    });
+//    searcher.startSearchingAsync(new IConnectedDevicesListener() {
+//      @Override
+//      public void registeredDeviceConnected(ConnectedDevice device) {
+//        connectedDevices.add(device);
+//        waitForResponseCreationLatch.countDown();
+//      }
+//
+//      @Override
+//      public void registeredDeviceDisconnected(ConnectedDevice device) {
+//
+//      }
+//    });
 
     try { waitForResponseCreationLatch.await(5, TimeUnit.SECONDS); } catch(Exception ex) { }
 

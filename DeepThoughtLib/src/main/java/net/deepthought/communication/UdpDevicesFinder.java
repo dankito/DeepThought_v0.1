@@ -2,7 +2,7 @@ package net.deepthought.communication;
 
 import net.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.deepthought.communication.connected_device.IConnectedDevicesListener;
-import net.deepthought.communication.connected_device.RegisteredDevicesSearcher;
+import net.deepthought.communication.connected_device.UdpDevicesSearcher;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
@@ -23,7 +23,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected RegistrationServer registrationServer = null;
 
-  protected RegisteredDevicesSearcher registeredDevicesSearcher;
+  protected UdpDevicesSearcher udpDevicesSearcher;
 
   protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
@@ -69,43 +69,34 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected void start(IDevicesFinderListener listener) {
     this.listener = listener;
 
-    mayStartRegisteredDevicesSearcher();
+    startDevicesSearcher(listener);
     mayStartConnectionsAliveWatcher();
 
-    openUserDeviceRegistrationServer();
-    findOtherUserDevicesToRegisterAtAsync();
+//    openUserDeviceRegistrationServer();
+//    findOtherUserDevicesToRegisterAtAsync();
   }
 
   @Override
   public void stop() {
-
-    stopRegisteredDevicesSearcher();
+    stopDevicesSearcher();
     stopConnectionsAliveWatcher();
 
-    stopRegisteredDevicesSearcher();
+    closeUserDeviceRegistrationServer();
     stopSearchingOtherUserDevicesToRegisterAt();
   }
 
 
+  protected void startDevicesSearcher(IDevicesFinderListener listener) {
+    stopDevicesSearcher();
 
-  protected void mayStartRegisteredDevicesSearcher() {
-    if(registeredDevicesManager.hasRegisteredDevices() && connectedDevicesManager.getConnectedDevicesCount() < registeredDevicesManager.getRegisteredDevicesCount() &&
-        isRegisteredDevicesSearcherRunning() == false) {
-      startRegisteredDevicesSearcher();
-    }
+    udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice);
+    udpDevicesSearcher.startSearchingAsync(listener);
   }
 
-  protected void startRegisteredDevicesSearcher() {
-    stopRegisteredDevicesSearcher();
-
-    registeredDevicesSearcher = new RegisteredDevicesSearcher(connectorMessagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice);
-    registeredDevicesSearcher.startSearchingAsync(connectedDevicesListener);
-  }
-
-  protected void stopRegisteredDevicesSearcher() {
-    if(registeredDevicesSearcher != null) {
-      registeredDevicesSearcher.stopSearching();
-      registeredDevicesSearcher = null;
+  protected void stopDevicesSearcher() {
+    if(udpDevicesSearcher != null) {
+      udpDevicesSearcher.stopSearching();
+      udpDevicesSearcher = null;
     }
   }
 
@@ -166,19 +157,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
     }
   }
 
-  protected void mayStopRegisteredDevicesSearcher() {
-    if(isRegisteredDevicesSearcherRunning() &&
-        connectedDevicesManager.getConnectedDevicesCount() >= registeredDevicesManager.getRegisteredDevicesCount())
-      stopRegisteredDevicesSearcher();
-  }
-
 
   protected void connectedToDevice(HostInfo device) {
     if(listener != null) {
       listener.deviceFound(device);
     }
 
-    mayStopRegisteredDevicesSearcher();
     mayStartConnectionsAliveWatcher();
   }
 
@@ -187,7 +171,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
       listener.deviceDisconnected(device);
     }
 
-    mayStartRegisteredDevicesSearcher();
     mayStopConnectionsAliveWatcher();
   }
 
@@ -230,7 +213,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   public boolean isRegisteredDevicesSearcherRunning() {
-    return registeredDevicesSearcher != null;
+    return udpDevicesSearcher != null;
   }
 
   public boolean isConnectionWatcherRunning() {

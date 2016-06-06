@@ -24,7 +24,7 @@ public class ConnectorMessagesCreator {
   public final static String LookingForRegistrationServerMessageHeader = "Looking for Registration Server";
   public final static String OpenRegistrationServerInfoMessageHeader = "Open Registration Server Info";
 
-  public final static String SearchingForRegisteredDevicesMessage = "Searching for Registered Devices";
+  public final static String SearchingForDevicesMessage = "Searching for Devices";
   public final static String RegisteredDeviceFoundMessage = "Registered Device Found";
 
   public static final String MultipartKeyAddress = "address";
@@ -71,13 +71,13 @@ public class ConnectorMessagesCreator {
     return receivedMessage.startsWith(OpenRegistrationServerInfoMessageHeader);
   }
 
-  public byte[] createSearchingForRegisteredDevicesMessage() {
-    return createMessage(SearchingForRegisteredDevicesMessage, createHostInfoMessageString());
+  public byte[] createSearchingForDevicesMessage() {
+    return createMessage(SearchingForDevicesMessage, createHostInfoMessageString());
   }
 
-  public boolean isSearchingForRegisteredDevicesMessage(byte[] receivedBytes, int packetLength) {
+  public boolean isSearchingForDevicesMessage(byte[] receivedBytes, int packetLength) {
     String receivedMessage = parseBytesToString(receivedBytes, packetLength);
-    return receivedMessage.startsWith(SearchingForRegisteredDevicesMessage);
+    return receivedMessage.startsWith(SearchingForDevicesMessage);
   }
 
   public byte[] createRegisteredDeviceFoundMessage() {

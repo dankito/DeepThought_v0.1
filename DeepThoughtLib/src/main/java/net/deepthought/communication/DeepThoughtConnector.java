@@ -110,8 +110,6 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   @Override
   public void shutDown() {
-    devicesFinder.stop();
-
     stopMessagesReceiver();
 
     devicesFinder.stop();
@@ -171,7 +169,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   protected void connectedToUnregisteredDevice(HostInfo device) {
     for(IUnregisteredDevicesListener listener : unregisteredDevicesListeners) {
-      listener.unregisteredDeviceFound(null); // TODO: set to DeviceInfo
+      listener.unregisteredDeviceFound(device);
     }
   }
 
