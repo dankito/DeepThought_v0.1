@@ -1,17 +1,13 @@
 package net.deepthought.communication.connected_device;
 
-import net.deepthought.Application;
 import net.deepthought.communication.ConnectorMessagesCreator;
 import net.deepthought.communication.Constants;
 import net.deepthought.communication.IDevicesFinderListener;
 import net.deepthought.communication.NetworkHelper;
 import net.deepthought.communication.model.HostInfo;
-import net.deepthought.communication.registration.IRegisteredDevicesManager;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
-import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.IThreadPool;
-import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +33,6 @@ public class UdpDevicesSearcher {
 
   protected IThreadPool threadPool;
 
-  protected IRegisteredDevicesManager registeredDevicesManager;
-
-  protected IConnectedDevicesManager connectedDevicesManager;
-
   protected User loggedOnUser;
 
   protected Device localDevice;
@@ -48,18 +40,15 @@ public class UdpDevicesSearcher {
   protected DatagramSocket listenerSocket = null;
   protected boolean isListenerSocketOpened = false;
 
-  protected List<DatagramSocket> openedClientSockets = new ArrayList<>();
-  protected boolean areClientSocketsOpened = false;
+  protected List<DatagramSocket> openedBroadcastSockets = new ArrayList<>();
+  protected boolean areBroadcastSocketsOpened = false;
 
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
-  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool, IRegisteredDevicesManager registeredDevicesManager,
-                            IConnectedDevicesManager connectedDevicesManager, User loggedOnUser, Device localDevice) {
+  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool, User loggedOnUser, Device localDevice) {
     this.messagesCreator = messagesCreator;
     this.threadPool = threadPool;
-    this.registeredDevicesManager = registeredDevicesManager;
-    this.connectedDevicesManager = connectedDevicesManager;
     this.loggedOnUser = loggedOnUser;
     this.localDevice = localDevice;
   }
@@ -68,7 +57,7 @@ public class UdpDevicesSearcher {
   public void startSearchingAsync(final IDevicesFinderListener listener) {
     startListenerAsync(listener);
 
-    startClientAsync();
+    startBroadcastAsync();
   }
 
   public void stopSearching() {
@@ -79,9 +68,9 @@ public class UdpDevicesSearcher {
     }
 
     synchronized(this) {
-      areClientSocketsOpened = false;
+      areBroadcastSocketsOpened = false;
 
-      for (DatagramSocket clientSocket : openedClientSockets) {
+      for (DatagramSocket clientSocket : openedBroadcastSockets) {
         clientSocket.close();
       }
     }
@@ -173,61 +162,47 @@ public class UdpDevicesSearcher {
     listener.deviceFound(device);
   }
 
-  protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
-    InetAddress address = requestPacket.getAddress();
 
-    try {
-      DatagramSocket responseSocket = new DatagramSocket();
-      byte[] message = messagesCreator.createRegisteredDeviceFoundMessage();
-
-      responseSocket.send(new DatagramPacket(message, message.length, address, requestPacket.getPort()));
-    } catch(Exception ex) {
-      log.error("Could not send response to SearchingForRegisteredDevices message from " + address, ex);
-      Application.notifyUser(new DeepThoughtError(Localization.getLocalizedString("could.not.send.message.to.address", address), ex));
-    }
-  }
-
-
-  protected void startClientAsync() {
+  protected void startBroadcastAsync() {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startClient();
+        startBroadcast();
       }
     });
   }
 
-  protected void startClient() {
+  protected void startBroadcast() {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
-      startClientForBroadcastAddressAsync(broadcastAddress);
+      startBroadcastForBroadcastAddressAsync(broadcastAddress);
     }
   }
 
-  protected void startClientForBroadcastAddressAsync(final InetAddress broadcastAddress) {
+  protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startClientForBroadcastAddress(broadcastAddress);
+        startBroadcastForBroadcastAddress(broadcastAddress);
       }
     });
   }
 
-  protected void startClientForBroadcastAddress(InetAddress broadcastAddress) {
+  protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress) {
     try {
-      DatagramSocket clientSocket = new DatagramSocket();
+      DatagramSocket broadcastSocket = new DatagramSocket();
 
       synchronized(this) {
-        openedClientSockets.add(clientSocket);
-        areClientSocketsOpened = true;
+        openedBroadcastSockets.add(broadcastSocket);
+        areBroadcastSocketsOpened = true;
       }
 
-      clientSocket.setSoTimeout(10000);
+      broadcastSocket.setSoTimeout(10000);
 
       byte[] message = messagesCreator.createSearchingForDevicesMessage();
       DatagramPacket searchDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, Constants.SearchDevicesListenerPort);
 
-      while (areClientSocketsOpened) {
-        clientSocket.send(searchDevicesPacket);
+      while (areBroadcastSocketsOpened) {
+        broadcastSocket.send(searchDevicesPacket);
 
         try { Thread.sleep(1000); } catch(Exception ignored) { }
       }

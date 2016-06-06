@@ -89,7 +89,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected void startDevicesSearcher(IDevicesFinderListener listener) {
     stopDevicesSearcher();
 
-    udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool, registeredDevicesManager, connectedDevicesManager, loggedOnUser, localDevice);
+    udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool, loggedOnUser, localDevice);
     udpDevicesSearcher.startSearchingAsync(listener);
   }
 
