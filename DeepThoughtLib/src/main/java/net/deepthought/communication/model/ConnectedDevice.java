@@ -9,16 +9,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by ganymed on 20/08/15.
  */
-public class ConnectedDevice {
+public class ConnectedDevice extends HostInfo {
 
   private final static Logger log = LoggerFactory.getLogger(ConnectedDevice.class);
 
-
-  protected String deviceId;
-
-  protected String address;
-
-  protected int messagesPort;
 
   protected Object securityToken = null; // TODO: implement a Security feature to ensure that it's really the registered device that likes to connect
 
@@ -37,22 +31,6 @@ public class ConnectedDevice {
     this.messagesPort = messagesPort;
   }
 
-
-  public String getDeviceId() {
-    return deviceId;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
-  }
-
-  public int getMessagesPort() {
-    return messagesPort;
-  }
 
   public boolean hasCaptureDevice() {
     return hasCaptureDevice;
