@@ -7,9 +7,7 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.IUnregisteredDevicesListener;
-import net.deepthought.communication.registration.LookingForRegistrationServersClient;
 import net.deepthought.communication.registration.RegisteredDevicesManager;
-import net.deepthought.communication.registration.RegistrationServer;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
 import net.deepthought.util.IThreadPool;
@@ -21,11 +19,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected IDevicesFinderListener listener = null;
 
-  protected RegistrationServer registrationServer = null;
-
   protected UdpDevicesSearcher udpDevicesSearcher;
-
-  protected LookingForRegistrationServersClient searchRegistrationServersClient = null;
 
   protected ConnectionsAliveWatcher connectionsAliveWatcher = null;
 
@@ -71,18 +65,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
     startDevicesSearcher(listener);
     mayStartConnectionsAliveWatcher();
-
-//    openUserDeviceRegistrationServer();
-//    findOtherUserDevicesToRegisterAtAsync();
   }
 
   @Override
   public void stop() {
     stopDevicesSearcher();
     stopConnectionsAliveWatcher();
-
-    closeUserDeviceRegistrationServer();
-    stopSearchingOtherUserDevicesToRegisterAt();
   }
 
 
@@ -122,38 +110,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
     if(connectionsAliveWatcher != null) {
       connectionsAliveWatcher.stopWatching();
       connectionsAliveWatcher = null;
-    }
-  }
-
-
-  public void openUserDeviceRegistrationServer() {
-    if(isRegistrationServerRunning()) {
-      closeUserDeviceRegistrationServer();
-    }
-
-    registrationServer = new RegistrationServer(connectorMessagesCreator, threadPool);
-    registrationServer.startRegistrationServerAsync();
-  }
-
-  public void closeUserDeviceRegistrationServer() {
-    if(registrationServer != null) {
-      registrationServer.closeRegistrationServer();
-      registrationServer = null;
-    }
-  }
-
-  public void findOtherUserDevicesToRegisterAtAsync() {
-    if(isSearchRegistrationServersClientRunning())
-      stopSearchingOtherUserDevicesToRegisterAt();
-
-    searchRegistrationServersClient = new LookingForRegistrationServersClient(connectorMessagesCreator, registeredDevicesManager, threadPool);
-    searchRegistrationServersClient.findRegistrationServersAsync(unregisteredDevicesListener);
-  }
-
-  public void stopSearchingOtherUserDevicesToRegisterAt() {
-    if(searchRegistrationServersClient != null) {
-      searchRegistrationServersClient.stopSearchingForRegistrationServers();
-      searchRegistrationServersClient = null;
     }
   }
 
@@ -199,18 +155,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
     }
   };
 
-
-  public boolean isRegisteringAllowed() {
-    return isRegistrationServerRunning();
-  }
-
-  public boolean isRegistrationServerRunning() {
-    return registrationServer != null;
-  }
-
-  public boolean isSearchRegistrationServersClientRunning() {
-    return searchRegistrationServersClient != null;
-  }
 
   public boolean isRegisteredDevicesSearcherRunning() {
     return udpDevicesSearcher != null;
