@@ -187,24 +187,37 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
 
-  protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
-    if(device.getDevice() == null)
-      device.setStoredDeviceInstance(getLoggedOnUser()); // if it's from a Communicator message locally stored Device instance isn't set yet
+  protected void foundRegisteredDevice(HostInfo device) {
+    communicator.notifyRemoteWeHaveConnected(device); // tell registered Device of our presence -> it will send its Device Capabilities to us -> we're connected
+  }
 
-    if(connectedDevicesManager.connectedToDevice(device)) {
+  protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
+    if(device.getDevice() == null) {
+      device.setStoredDeviceInstance(getLoggedOnUser()); // if it's from a Communicator message locally stored Device instance isn't set yet
+    }
+
+    if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
       communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
 
-      for (IConnectedDevicesListener listener : connectedDevicesListeners)
+      for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
+      }
     }
 
     return true;
   }
 
+  protected void disconnectedFromRegisteredDevice(HostInfo device) {
+    if(connectedDevicesManager.isConnectedToDevice(device)) {
+      disconnectedFromRegisteredDevice(connectedDevicesManager.getConnectedDeviceForHostInfo(device));
+    }
+  }
+
   protected void disconnectedFromRegisteredDevice(ConnectedDevice device) {
     if(connectedDevicesManager.disconnectedFromDevice(device)) {
-      for (IConnectedDevicesListener listener : connectedDevicesListeners)
+      for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceDisconnected(device);
+      }
     }
   }
 
@@ -305,34 +318,22 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   }
 
-  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
-    @Override
-    public void registeredDeviceConnected(ConnectedDevice device) {
-      connectedToRegisteredDevice(device);
-    }
-
-    @Override
-    public void registeredDeviceDisconnected(ConnectedDevice device) {
-      disconnectedFromRegisteredDevice(device);
-    }
-  };
-
   protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
     @Override
-    public void deviceFound() {
-//      if(registeredDevicesManager.isDeviceRegistered(device)) {
-//        connectedToRegisteredDevice(device);
-//      }
-//      else {
-//        connectedToUnregisteredDevice(device);
-//      }
+    public void deviceFound(HostInfo device) {
+      if(registeredDevicesManager.isDeviceRegistered(device)) {
+        foundRegisteredDevice(device);
+      }
+      else {
+        connectedToUnregisteredDevice(device);
+      }
     }
 
     @Override
-    public void deviceDisconnected() {
-//      if(registeredDevicesManager.isDeviceRegistered(device)) {
-//        disconnectedFromRegisteredDevice(device);
-//      }
+    public void deviceDisconnected(HostInfo device) {
+      if(registeredDevicesManager.isDeviceRegistered(device)) {
+        disconnectedFromRegisteredDevice(device);
+      }
     }
   };
 

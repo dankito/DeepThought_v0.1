@@ -173,18 +173,18 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
 
-  protected void connectedToDevice() {
+  protected void connectedToDevice(HostInfo device) {
     if(listener != null) {
-      listener.deviceFound();
+      listener.deviceFound(device);
     }
 
     mayStopRegisteredDevicesSearcher();
     mayStartConnectionsAliveWatcher();
   }
 
-  protected void disconnectedFromDevice() {
+  protected void disconnectedFromDevice(HostInfo device) {
     if(listener != null) {
-      listener.deviceDisconnected();
+      listener.deviceDisconnected(device);
     }
 
     mayStartRegisteredDevicesSearcher();
@@ -195,19 +195,19 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
-      connectedToDevice();
+      connectedToDevice(device);
     }
 
     @Override
     public void registeredDeviceDisconnected(ConnectedDevice device) {
-      disconnectedFromDevice();
+      disconnectedFromDevice(device);
     }
   };
 
   protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
     @Override
     public void unregisteredDeviceFound(HostInfo hostInfo) {
-      connectedToDevice();
+      connectedToDevice(hostInfo);
     }
 
     @Override

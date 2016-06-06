@@ -16,6 +16,7 @@ public interface IConnectedDevicesManager {
   boolean containsDevice(ConnectedDevice device);
 
   boolean isConnectedToDevice(HostInfo hostInfo);
+  ConnectedDevice getConnectedDeviceForHostInfo(HostInfo hostInfo);
 
   boolean areDevicesConnected();
 

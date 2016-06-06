@@ -46,12 +46,17 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
 
   @Override
   public boolean isConnectedToDevice(HostInfo hostInfo) {
+    return getConnectedDeviceForHostInfo(hostInfo) != null;
+  }
+
+  @Override
+  public ConnectedDevice getConnectedDeviceForHostInfo(HostInfo hostInfo) {
     for(ConnectedDevice device : connectedDevices) {
       if(device.getDeviceId().equals(hostInfo.getDeviceId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
-        return true;
+        return device;
     }
 
-    return false;
+    return null;
   }
 
 

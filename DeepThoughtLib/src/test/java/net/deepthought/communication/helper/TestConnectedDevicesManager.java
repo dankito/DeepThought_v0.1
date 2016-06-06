@@ -29,17 +29,21 @@ public class TestConnectedDevicesManager implements IConnectedDevicesManager {
   public boolean containsDevice(ConnectedDevice device) {
     return connectedDevices.contains(device);
   }
-
   @Override
   public boolean isConnectedToDevice(HostInfo hostInfo) {
+    return getConnectedDeviceForHostInfo(hostInfo) != null;
+  }
+
+  @Override
+  public ConnectedDevice getConnectedDeviceForHostInfo(HostInfo hostInfo) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
       if(connectedDevice.getAddress().equals(hostInfo.getAddress()) && connectedDevice.getMessagesPort() == hostInfo.getMessagesPort() && connectedDevice.getDeviceId().equals
           (hostInfo.getDeviceId())) {
-        return true;
+        return connectedDevice;
       }
     }
 
-    return false;
+    return null;
   }
 
   @Override

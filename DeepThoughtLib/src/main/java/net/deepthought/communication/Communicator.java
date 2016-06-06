@@ -100,11 +100,11 @@ public class Communicator {
     });
   }
 
-  public void notifyRemoteWeHaveConnected(ConnectedDevice connectedDevice) {
+  public void notifyRemoteWeHaveConnected(HostInfo connectedDevice) {
     notifyRemoteWeHaveConnected(connectedDevice, getLocalHostInfo());
   }
 
-  public void notifyRemoteWeHaveConnected(ConnectedDevice connectedDevice, ConnectedDevice localHost) {
+  public void notifyRemoteWeHaveConnected(HostInfo connectedDevice, ConnectedDevice localHost) {
     String address = Addresses.getNotifyRemoteWeHaveConnectedAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
     final Request request = new GenericRequest<ConnectedDevice>(localHost);
 

@@ -230,7 +230,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
     mockNumberOfConnectedDevices(connector, 2);
-    connector.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
+    devicesFinder.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
 
     Assert.assertFalse(devicesFinder.isRegisteredDevicesSearcherRunning());
   }
@@ -249,7 +249,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     ConnectedDevicesManager mockConnectedDevicesManager = mockNumberOfConnectedDevices(connector, 1);
     Mockito.when(mockConnectedDevicesManager.disconnectedFromDevice(disconnectedDevice)).thenReturn(true);
 
-    connector.connectedDevicesListener.registeredDeviceDisconnected(disconnectedDevice);
+    devicesFinder.connectedDevicesListener.registeredDeviceDisconnected(disconnectedDevice);
 
     Assert.assertTrue(devicesFinder.isRegisteredDevicesSearcherRunning());
   }
@@ -270,7 +270,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
-    connector.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
+    devicesFinder.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
 
     Assert.assertTrue(devicesFinder.isConnectionWatcherRunning());
   }
@@ -282,8 +282,8 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
     ConnectedDevice connectedDevice = new ConnectedDevice("", "", 0);
-    connector.connectedDevicesListener.registeredDeviceConnected(connectedDevice);
-    connector.connectedDevicesListener.registeredDeviceDisconnected(connectedDevice);
+    devicesFinder.connectedDevicesListener.registeredDeviceConnected(connectedDevice);
+    devicesFinder.connectedDevicesListener.registeredDeviceDisconnected(connectedDevice);
 
     Assert.assertFalse(devicesFinder.isConnectionWatcherRunning());
   }
