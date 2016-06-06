@@ -7,7 +7,6 @@ import net.deepthought.communication.messages.request.AskForDeviceRegistrationRe
 import net.deepthought.communication.model.ConnectedDevice;
 import net.deepthought.communication.model.HostInfo;
 import net.deepthought.communication.registration.IUnregisteredDevicesListener;
-import net.deepthought.communication.registration.RegisteredDevicesManager;
 import net.deepthought.data.model.Device;
 import net.deepthought.data.model.User;
 import net.deepthought.util.IThreadPool;
@@ -29,8 +28,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected IThreadPool threadPool;
 
-  protected RegisteredDevicesManager registeredDevicesManager;
-
   protected ConnectedDevicesManager connectedDevicesManager;
 
   protected ConnectorMessagesCreator connectorMessagesCreator;
@@ -40,10 +37,9 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected Device localDevice;
 
 
-  public UdpDevicesFinder(Communicator communicator, IThreadPool threadPool, RegisteredDevicesManager registeredDevicesManager, ConnectedDevicesManager connectedDevicesManager, ConnectorMessagesCreator connectorMessagesCreator, User loggedOnUser, Device localDevice) {
+  public UdpDevicesFinder(Communicator communicator, IThreadPool threadPool, ConnectedDevicesManager connectedDevicesManager, ConnectorMessagesCreator connectorMessagesCreator, User loggedOnUser, Device localDevice) {
     this.communicator = communicator;
     this.threadPool = threadPool;
-    this.registeredDevicesManager = registeredDevicesManager;
     this.connectedDevicesManager = connectedDevicesManager;
     this.connectorMessagesCreator = connectorMessagesCreator;
     this.loggedOnUser = loggedOnUser;

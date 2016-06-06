@@ -90,7 +90,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
 
     // TODO: create with DependencyResolver
-    this.devicesFinder = new UdpDevicesFinder(communicator, threadPool, registeredDevicesManager, connectedDevicesManager, connectorMessagesCreator, getLoggedOnUser(), getLocalDevice());
+    this.devicesFinder = new UdpDevicesFinder(communicator, threadPool, connectedDevicesManager, connectorMessagesCreator, getLoggedOnUser(), getLocalDevice());
   }
 
 

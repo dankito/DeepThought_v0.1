@@ -86,7 +86,6 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     communicator.askForDeviceRegistration(createLocalHostServerInfo(), loggedOnUser, localDevice, null);
 
     try { waitLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
-    devicesFinder.closeUserDeviceRegistrationServer();
 
     Assert.assertTrue(methodCalled.get());
   }
@@ -117,7 +116,6 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     });
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    devicesFinder.closeUserDeviceRegistrationServer();
 
     Assert.assertFalse(responses.get(0).allowsRegistration());
   }
@@ -149,7 +147,6 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     });
 
     try { waitLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
-    devicesFinder.closeUserDeviceRegistrationServer();
 
     Assert.assertTrue(responses.get(0).allowsRegistration());
   }
@@ -188,7 +185,6 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
 //    Assert.assertEquals(loggedOnUser, registeredDevicesManager.);
 
-    devicesFinder.closeUserDeviceRegistrationServer();
     messagesReceiver2.stop();
   }
 
