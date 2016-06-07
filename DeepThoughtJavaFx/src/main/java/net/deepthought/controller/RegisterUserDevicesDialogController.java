@@ -159,8 +159,8 @@ public class RegisterUserDevicesDialogController extends ChildWindowsController 
 
   protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
     @Override
-    public void unregisteredDeviceFound(final HostInfo hostInfo) {
-      Platform.runLater(() -> lstvwFoundRegistrationServers.getItems().add(hostInfo));
+    public void unregisteredDeviceFound(final HostInfo device) {
+      Platform.runLater(() -> lstvwFoundRegistrationServers.getItems().add(device));
     }
 
     @Override

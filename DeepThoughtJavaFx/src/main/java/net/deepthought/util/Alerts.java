@@ -3,7 +3,7 @@ package net.deepthought.util;
 import net.deepthought.Application;
 import net.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.deepthought.communication.model.UserInfo;
+import net.deepthought.communication.model.HostInfo;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.model.Category;
 import net.deepthought.data.model.DeepThought;
@@ -14,6 +14,7 @@ import net.deepthought.data.model.ReferenceBase;
 import net.deepthought.data.model.ReferenceSubDivision;
 import net.deepthought.data.model.SeriesTitle;
 import net.deepthought.data.model.Tag;
+import net.deepthought.util.localization.Localization;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -230,13 +231,34 @@ public class Alerts {
   }
 
 
+  public static boolean showUnregisteredDeviceFoundAlert(HostInfo device, Stage windowStage) {
+    windowStage.show();
+    windowStage.requestFocus();
+    windowStage.toFront();
+
+    String message = Localization.getLocalizedString("alert.message.unregistered.device.found");
+    if(StringUtils.isNotNullOrEmpty(device.getUserName())) {
+      message += Localization.getLocalizedString("user.info", device.getUserName());
+    }
+    message += Localization.getLocalizedString("device.info", device.getDeviceInfoString());
+
+    return showConfirmationDialog(message,
+        Localization.getLocalizedString("alert.title.unregistered.device.found"), windowStage);
+  }
+
   public static boolean showDeviceAsksForRegistrationAlert(AskForDeviceRegistrationRequest request, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
 
-    return showConfirmationDialog(net.deepthought.util.localization.Localization.getLocalizedString("alert.message.ask.for.device.registration", extractUserInfoString(request.getUser()), request.getDevice()),
-        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
+    String message = Localization.getLocalizedString("alert.message.ask.for.device.registration");
+    if(StringUtils.isNotNullOrEmpty(request.getUser().getUserInfoString())) {
+      message += Localization.getLocalizedString("user.info", request.getUser().getUserInfoString());
+    }
+    message += Localization.getLocalizedString("device.info", request.getDevice().getDeviceInfoString());
+
+    return showConfirmationDialog(message,
+        Localization.getLocalizedString("alert.title.ask.for.device.registration"), windowStage);
   }
 
   public static void showDeviceRegistrationSuccessfulAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
@@ -244,8 +266,8 @@ public class Alerts {
     windowStage.requestFocus();
     windowStage.toFront();
 
-    showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.message.successfully.registered.at.device", response.getDevice()),
-        net.deepthought.util.localization.Localization.getLocalizedString("alert.title.device.registration.successful"));
+    showInfoMessage(windowStage, Localization.getLocalizedString("alert.message.successfully.registered.at.device", response.getDevice()),
+        Localization.getLocalizedString("alert.title.device.registration.successful"));
   }
 
   public static void showServerDeniedDeviceRegistrationAlert(AskForDeviceRegistrationResponse response, Stage windowStage) {
@@ -255,15 +277,6 @@ public class Alerts {
 
     showInfoMessage(windowStage, net.deepthought.util.localization.Localization.getLocalizedString("alert.title.device.registration.denied"),
                                  net.deepthought.util.localization.Localization.getLocalizedString("alert.message.server.denied.device.registration"));
-  }
-
-  protected static String extractUserInfoString(UserInfo user) {
-    String userInfo = user.getUserName();
-
-    if(StringUtils.isNotNullOrEmpty(user.getFirstName()) || StringUtils.isNotNullOrEmpty(user.getLastName()))
-      userInfo += " (" + user.getFirstName() + " " + user.getLastName() + ")";
-
-    return userInfo;
   }
 
 

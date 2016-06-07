@@ -22,10 +22,6 @@ import net.deepthought.controls.clipboard.ContentExtractOptionForUiCreator;
 import net.deepthought.controls.clipboard.CreateEntryFromClipboardContentPopup;
 import net.deepthought.controls.connected_devices.ConnectedDevicesPanel;
 import net.deepthought.controls.entries.EntriesOverviewControl;
-import net.deepthought.data.model.settings.enums.ReferencesDisplay;
-import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
-import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
-import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.data.contentextractor.ContentExtractOptions;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -38,16 +34,21 @@ import net.deepthought.data.model.listener.SettingsChangedListener;
 import net.deepthought.data.model.settings.DeepThoughtSettings;
 import net.deepthought.data.model.settings.UserDeviceSettings;
 import net.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
+import net.deepthought.data.model.settings.enums.ReferencesDisplay;
 import net.deepthought.data.model.settings.enums.SelectedTab;
 import net.deepthought.data.model.settings.enums.Setting;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
+import net.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
 import net.deepthought.platform.JavaSeApplicationConfiguration;
 import net.deepthought.plugin.IPlugin;
 import net.deepthought.util.Alerts;
 import net.deepthought.util.DeepThoughtError;
-import net.deepthought.util.localization.JavaFxLocalization;
-import net.deepthought.util.localization.Localization;
+import net.deepthought.util.DeviceRegistrationHandler;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
+import net.deepthought.util.localization.JavaFxLocalization;
+import net.deepthought.util.localization.Localization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -105,6 +106,8 @@ public class MainWindowController implements Initializable {
   protected Stage stage = null;
 
   protected DeepThought deepThought = null;
+
+  protected DeviceRegistrationHandler deviceRegistrationHandler = null;
 
   protected IClipboardWatcher clipboardWatcher = null;
 
@@ -255,6 +258,8 @@ public class MainWindowController implements Initializable {
 
   protected void applicationInstantiated() {
     tabTagsControl.applicationInstantiated();
+
+    deviceRegistrationHandler = new DeviceRegistrationHandler(stage, Application.getDeepThoughtConnector());
   }
 
   protected void pluginLoaded(IPlugin plugin) {
