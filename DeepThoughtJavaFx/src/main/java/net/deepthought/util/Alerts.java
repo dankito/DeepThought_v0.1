@@ -231,7 +231,7 @@ public class Alerts {
   }
 
 
-  public static boolean showUnregisteredDeviceFoundAlert(HostInfo device, Stage windowStage) {
+  public static Alert createUnregisteredDeviceFoundAlert(HostInfo device, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
@@ -242,7 +242,7 @@ public class Alerts {
     }
     message += Localization.getLocalizedString("device.info", device.getDeviceInfoString());
 
-    return showConfirmationDialog(message,
+    return createConfirmationDialog(message,
         Localization.getLocalizedString("alert.title.unregistered.device.found"), windowStage);
   }
 
@@ -285,6 +285,13 @@ public class Alerts {
   }
 
   protected static boolean showConfirmationDialog(String message, String alertTitle, Stage owner) {
+    Alert alert = createConfirmationDialog(message, alertTitle, owner);
+
+    Optional<ButtonType> result = alert.showAndWait();
+    return result.get() == ButtonType.YES;
+  }
+
+  protected static Alert createConfirmationDialog(String message, String alertTitle, Stage owner) {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     if(owner != null)
       alert.initOwner(owner);
@@ -295,8 +302,7 @@ public class Alerts {
 
     alert.getButtonTypes().setAll(ButtonType.NO, ButtonType.YES);
 
-    Optional<ButtonType> result = alert.showAndWait();
-    return result.get() == ButtonType.YES;
+    return alert;
   }
 
 

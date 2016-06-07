@@ -14,7 +14,13 @@ import net.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.deepthought.controls.utils.FXUtils;
 import net.deepthought.util.localization.Localization;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 
 /**
@@ -44,8 +50,24 @@ public class DeviceRegistrationHandler {
   };
 
 
+  protected Map<String, Map<String, Alert>> unregisteredDeviceFoundAlerts = new ConcurrentHashMap<>();
+
   protected void showNotificationUnregisteredDeviceFound(HostInfo device) {
-    boolean likesToConnectWithDevice = Alerts.showUnregisteredDeviceFoundAlert(device, stage);
+    Alert unregisteredDeviceFoundAlert = Alerts.createUnregisteredDeviceFoundAlert(device, stage);
+
+    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceId()) == false) {
+      unregisteredDeviceFoundAlerts.put(device.getDeviceId(), new ConcurrentHashMap<>());
+    }
+    unregisteredDeviceFoundAlerts.get(device.getDeviceId()).put(device.getUserUniqueId(), unregisteredDeviceFoundAlert);
+
+
+    Optional<ButtonType> result = unregisteredDeviceFoundAlert.showAndWait();
+    boolean likesToConnectWithDevice = result.get() == ButtonType.YES;
+
+    unregisteredDeviceFoundAlerts.get(device.getDeviceId()).remove(device.getUserUniqueId());
+    if(unregisteredDeviceFoundAlerts.get(device.getDeviceId()).size() == 0) {
+      unregisteredDeviceFoundAlerts.remove(device.getDeviceId());
+    }
 
     if(likesToConnectWithDevice) {
       askForRegistration(device);
@@ -76,17 +98,33 @@ public class DeviceRegistrationHandler {
 
 
   protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
-    boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, stage);
-    final AskForDeviceRegistrationResponse result;
+    mayHideUnregisteredDeviceFoundAlert(request);
 
-    if(userAllowsDeviceRegistration == false)
-      result = AskForDeviceRegistrationResponse.Deny;
-    else {
-      result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-      // TODO: check if user information differ and if so ask which one to use
+    Platform.runLater(() -> { // after hiding unregisteredDeviceFoundAlert in mayHideUnregisteredDeviceFoundAlert() we have to wait some time before JavaFX is able to show a new Alert
+      boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, stage);
+      final AskForDeviceRegistrationResponse result;
+
+      if(userAllowsDeviceRegistration == false)
+        result = AskForDeviceRegistrationResponse.Deny;
+      else {
+        result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+        // TODO: check if user information differ and if so ask which one to use
+      }
+
+      sendRespondToAskForDeviceRegistrationRequest(request, result);
+    });
+  }
+
+  protected void mayHideUnregisteredDeviceFoundAlert(AskForDeviceRegistrationRequest request) {
+    if(unregisteredDeviceFoundAlerts.containsKey(request.getDevice().getDeviceId())) {
+      Map<String, Alert> userToAlertMap = unregisteredDeviceFoundAlerts.get(request.getDevice().getDeviceId());
+
+      if(userToAlertMap.containsKey(request.getUser().getUniversallyUniqueId())) {
+        Alert unregisteredDeviceFoundAlert = userToAlertMap.get(request.getUser().getUniversallyUniqueId());
+        unregisteredDeviceFoundAlert.hide();
+        unregisteredDeviceFoundAlert.close();
+      }
     }
-
-    sendRespondToAskForDeviceRegistrationRequest(request, result);
   }
 
   protected void sendRespondToAskForDeviceRegistrationRequest(final AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse result) {
