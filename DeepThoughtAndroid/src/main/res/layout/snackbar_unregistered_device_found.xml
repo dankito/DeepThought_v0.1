@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginRight="60dp">
+
+    <ImageView
+        android:id="@+id/imgvwDeviceIcon"
+        android:layout_width="60dp"
+        android:layout_height="80dp"
+    />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+    >
+
+        <TextView
+            android:id="@+id/txtvwAskToYouWantToConnectTo"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:text="@string/connect_with_this_device"
+        />
+
+        <TextView
+            android:id="@+id/txtvwDeviceInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+        />
+
+        <CheckBox
+            android:id="@+id/chkbxNeverAskAgainToConnectWithThisDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:text="@string/never_ask_again"
+            android:layout_marginLeft="-8dp"
+            android:enabled="false"
+        />
+
+    </LinearLayout>
+
+</LinearLayout>

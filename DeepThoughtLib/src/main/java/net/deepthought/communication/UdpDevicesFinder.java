@@ -141,8 +141,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
     @Override
-    public void unregisteredDeviceFound(HostInfo hostInfo) {
-      connectedToDevice(hostInfo);
+    public void unregisteredDeviceFound(HostInfo device) {
+      connectedToDevice(device);
     }
 
     @Override

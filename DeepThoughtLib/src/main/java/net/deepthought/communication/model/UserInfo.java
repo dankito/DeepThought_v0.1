@@ -1,6 +1,7 @@
 package net.deepthought.communication.model;
 
 import net.deepthought.data.model.User;
+import net.deepthought.util.StringUtils;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -61,6 +62,15 @@ public class UserInfo {
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
+  }
+
+  public String getUserInfoString() {
+    String userInfo = getUserName();
+
+    if(StringUtils.isNotNullOrEmpty(getFirstName()) || StringUtils.isNotNullOrEmpty(getLastName()))
+      userInfo += " (" + getFirstName() + " " + getLastName() + ")";
+
+    return userInfo;
   }
 
 

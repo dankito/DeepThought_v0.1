@@ -31,8 +31,11 @@ import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
+import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
+import net.deepthought.data.model.User;
+import net.deepthought.dialogs.DeviceRegistrationHandler;
 import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.TagsFragment;
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
 
   protected static boolean hasDeepThoughtBeenSetup = false;
+
+  protected DeviceRegistrationHandler deviceRegistrationHandler = null;
 
 
   protected Toolbar toolbar;
@@ -134,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     else if(notification.getType() == NotificationType.Info)
       AlertHelper.showInfoMessage(this, notification);
     else if(notification.getType() == NotificationType.ApplicationInstantiated) {
-      AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
+      applicationInstantiated();
     }
     else if(notification.getType() == NotificationType.PluginLoaded) {
       if(floatingActionButtonAddNewspaperArticle != null) { // on start floatingActionButtonAddNewspaperArticle can be null
@@ -147,6 +152,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
+  }
+
+  protected void applicationInstantiated() {
+    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
+
+    deviceRegistrationHandler = new DeviceRegistrationHandler(this, Application.getDeepThoughtConnector());
+
+    User localUser = Application.getLoggedOnUser();
+
+    Device localDevice = Application.getApplication().getLocalDevice();
+    localDevice.setName("Samsung Galaxy S3");
   }
 
   protected void setupUi() {

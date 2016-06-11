@@ -8,7 +8,7 @@ import net.deepthought.communication.model.HostInfo;
  */
 public interface IUnregisteredDevicesListener {
 
-  void unregisteredDeviceFound(HostInfo hostInfo);
+  void unregisteredDeviceFound(HostInfo device);
 
   void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request);
 
