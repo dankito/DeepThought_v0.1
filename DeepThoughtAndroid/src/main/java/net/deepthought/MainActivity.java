@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -31,12 +30,9 @@ import net.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.listener.ApplicationListener;
 import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Device;
 import net.deepthought.data.model.Entry;
 import net.deepthought.data.model.Tag;
-import net.deepthought.data.model.User;
 import net.deepthought.dialogs.DeviceRegistrationHandler;
-import net.deepthought.dialogs.RegisterUserDevicesDialog;
 import net.deepthought.fragments.EntriesFragment;
 import net.deepthought.fragments.TagsFragment;
 import net.deepthought.helper.AlertHelper;
@@ -158,11 +154,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
 
     deviceRegistrationHandler = new DeviceRegistrationHandler(this, Application.getDeepThoughtConnector());
-
-    User localUser = Application.getLoggedOnUser();
-
-    Device localDevice = Application.getApplication().getLocalDevice();
-    localDevice.setName("Samsung Galaxy S3");
   }
 
   protected void setupUi() {
@@ -252,11 +243,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
 
-  protected void showRegisterUserDevicesDialog() {
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    new RegisterUserDevicesDialog().show(fragmentManager, RegisterUserDevicesDialog.TAG);
-  }
-
   protected void showArticlesOverview() {
     final List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = Application.getContentExtractorManager().getOnlineArticleContentExtractorsWithArticleOverview();
 
@@ -329,10 +315,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_device_registration) {
-          showRegisterUserDevicesDialog();
-          return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
