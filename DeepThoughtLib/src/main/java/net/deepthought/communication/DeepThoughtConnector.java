@@ -36,6 +36,8 @@ import java.net.BindException;
 import java.net.SocketException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -118,7 +120,12 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected void run() throws Exception {
     startMessageReceiver();
 
-    devicesFinder.startAsync(devicesFinderListener);
+    new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
+      @Override
+      public void run() {
+        devicesFinder.startAsync(devicesFinderListener);
+      }
+    }, 5 * 1000);
 
     Application.notifyUser(new Notification(NotificationType.DeepThoughtsConnectorStarted, Localization.getLocalizedString("deep.thoughts.connector.started")));
   }
@@ -168,6 +175,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
   protected void connectedToUnregisteredDevice(HostInfo device) {
+    log.info("Found an unregistered Device: " + device.getDeviceInfoString());
+
     for(IUnregisteredDevicesListener listener : unregisteredDevicesListeners) {
       listener.unregisteredDeviceFound(device);
     }
@@ -186,6 +195,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
 
   protected void foundRegisteredDevice(HostInfo device) {
+    log.info("Found a registered Device: " + device.getDeviceInfoString());
+
     communicator.notifyRemoteWeHaveConnected(device); // tell registered Device of our presence -> it will send its Device Capabilities to us -> we're connected
   }
 
@@ -206,6 +217,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
   protected void disconnectedFromRegisteredDevice(HostInfo device) {
+    log.info("Disconnected from registered Device: " + device.getDeviceInfoString());
+
     if(connectedDevicesManager.isConnectedToDevice(device)) {
       disconnectedFromRegisteredDevice(connectedDevicesManager.getConnectedDeviceForHostInfo(device));
     }
@@ -387,6 +400,9 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
   protected boolean handleAskForDeviceRegistrationRequest(AskForDeviceRegistrationRequest request) {
+    request.getDevice().setAddress(request.getAddress());
+    request.getDevice().setMessagesPort(request.getPort());
+
     deviceIsAskingForRegistration(request);
 
     return true;
