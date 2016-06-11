@@ -1,8 +1,5 @@
 package net.deepthought.dialogs;
 
-import android.app.ActivityManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -68,10 +65,8 @@ public class DeviceRegistrationHandler {
   };
 
   protected void notifyUnregisteredDeviceFound(final HostInfo device) {
-    ActivityManager activityManager = (ActivityManager)mainActivity.getSystemService(Context.ACTIVITY_SERVICE);
-    ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
-
-    View rootView = mainActivity.findViewById(android.R.id.content);
+    // TODO: may always show Snackbar in active Activity, see http://stackoverflow.com/a/29786451/119733
+    View rootView = mainActivity.findViewById(R.id.pager); // has to be Pager otherwise Snackbar cannot be dismissed anymore by User
     snackbarAskRegisterUnknownDevice = Snackbar.make(rootView, "", Snackbar.LENGTH_INDEFINITE);
     deviceIdShowingSnackbarFor = device.getDeviceId();
 
