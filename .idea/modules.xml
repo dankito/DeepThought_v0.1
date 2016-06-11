@@ -20,6 +20,7 @@
       <module fileurl="file://$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" filepath="$PROJECT_DIR$/libs/importer_exporter/WikipediaImporter/WikipediaImporter.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" filepath="$PROJECT_DIR$/libs/content_extractor/WikipediaOnlineContentExtractor/WikipediaOnlineContentExtractor.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" filepath="$PROJECT_DIR$/libs/utils/commons-lang/commons-lang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jmdnsdevicesfinder/jmdnsdevicesfinder.iml" filepath="$PROJECT_DIR$/jmdnsdevicesfinder/jmdnsdevicesfinder.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" filepath="$PROJECT_DIR$/libs/persistence/json/json-io/json-io.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-android/ormlite-jpa-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-core/ormlite-jpa-core.iml" filepath="$PROJECT_DIR$/libs/persistence/database/ormlite-jpa-core/ormlite-jpa-core.iml" />

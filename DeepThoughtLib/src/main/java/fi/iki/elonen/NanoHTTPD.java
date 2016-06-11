@@ -33,7 +33,7 @@ package fi.iki.elonen;
  * #L%
  */
 
-import net.deepthought.util.file.FileUtils;
+import net.dankito.deepthought.util.file.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

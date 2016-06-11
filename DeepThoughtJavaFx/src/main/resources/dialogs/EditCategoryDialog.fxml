@@ -7,7 +7,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="95.0" prefWidth="533.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.deepthought.controller.EditCategoryDialogController">
+<VBox prefHeight="95.0" prefWidth="533.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.dankito.deepthought.controller.EditCategoryDialogController">
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="40.0">
                <children>

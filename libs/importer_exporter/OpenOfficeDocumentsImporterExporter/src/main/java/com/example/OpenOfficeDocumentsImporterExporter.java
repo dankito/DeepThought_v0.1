@@ -1,21 +1,21 @@
 package com.example;
 
-import net.deepthought.Application;
-import net.deepthought.data.contentextractor.EntryCreationResult;
-import net.deepthought.data.contentextractor.SpiegelContentExtractor;
-import net.deepthought.data.contentextractor.SueddeutscheContentExtractor;
-import net.deepthought.data.model.Category;
-import net.deepthought.data.model.Entry;
-import net.deepthought.data.model.FileLink;
-import net.deepthought.data.model.Person;
-import net.deepthought.data.model.Reference;
-import net.deepthought.data.model.ReferenceBase;
-import net.deepthought.data.model.ReferenceSubDivision;
-import net.deepthought.data.model.SeriesTitle;
-import net.deepthought.data.model.Tag;
-import net.deepthought.data.persistence.db.UserDataEntity;
-import net.deepthought.util.StringUtils;
-import net.deepthought.util.file.FileUtils;
+import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
+import net.dankito.deepthought.data.contentextractor.SpiegelContentExtractor;
+import net.dankito.deepthought.data.contentextractor.SueddeutscheContentExtractor;
+import net.dankito.deepthought.data.model.Category;
+import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.FileLink;
+import net.dankito.deepthought.data.model.Person;
+import net.dankito.deepthought.data.model.Reference;
+import net.dankito.deepthought.data.model.ReferenceBase;
+import net.dankito.deepthought.data.model.ReferenceSubDivision;
+import net.dankito.deepthought.data.model.SeriesTitle;
+import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.persistence.db.UserDataEntity;
+import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.file.FileUtils;
 
 import org.apache.xerces.dom.TextImpl;
 import org.odftoolkit.odfdom.dom.element.draw.DrawFrameElement;

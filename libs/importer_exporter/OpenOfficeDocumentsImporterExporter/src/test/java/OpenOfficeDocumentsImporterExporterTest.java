@@ -1,14 +1,14 @@
 import com.example.OpenOfficeDocumentsImporterExporter;
 
-import net.deepthought.Application;
-import net.deepthought.TestApplicationConfiguration;
-import net.deepthought.data.model.DeepThought;
-import net.deepthought.data.model.Entry;
-import net.deepthought.data.persistence.EntityManagerConfiguration;
-import net.deepthought.data.persistence.IEntityManager;
-import net.deepthought.data.search.ISearchEngine;
-import net.deepthought.data.search.LuceneAndDatabaseSearchEngine;
-import net.deepthought.javase.db.OrmLiteJavaSeEntityManager;
+import net.dankito.deepthought.Application;
+import net.dankito.deepthought.TestApplicationConfiguration;
+import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
+import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.search.ISearchEngine;
+import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
+import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.junit.Assert;
 import org.junit.Before;

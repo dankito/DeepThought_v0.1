@@ -1,0 +1,44 @@
+package net.dankito.deepthought.data;
+
+import net.dankito.deepthought.data.listener.ApplicationListener;
+import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.DeepThoughtApplication;
+import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.model.listener.AllEntitiesListener;
+import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
+import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.persistence.db.BaseEntity;
+
+/**
+ * Created by ganymed on 03/01/15.
+ */
+public interface IDataManager {
+
+  public DeepThoughtApplication getApplication();
+  public UserDeviceSettings getSettings();
+  public User getLoggedOnUser();
+  public DeepThought getDeepThought();
+  public String getDataCollectionSavePath();
+  public String getDataFolderPath();
+
+  public IEntityManager getEntityManager();
+
+  public boolean addApplicationListener(ApplicationListener listener);
+  public boolean removeApplicationListener(ApplicationListener listener);
+
+  public boolean addAllEntitiesListener(AllEntitiesListener listener);
+  public boolean removeAllEntitiesListener(AllEntitiesListener listener);
+
+  public void deleteExistingDataCollection();
+  public void replaceExistingDataCollectionWithData(DeepThoughtApplication data);
+
+  public DeepThought retrieveDeepThoughtApplication();
+  public void recreateEntityManagerAndRetrieveDeepThoughtApplication();
+
+  public void ensureAllLazyLoadingDataIsLoaded(BaseEntity entity);
+
+  public void lazyLoadedEntityMapped(BaseEntity entity);
+
+  public void close();
+
+}

@@ -1,0 +1,8 @@
+net.dankito.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor
+net.dankito.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor
+net.dankito.deepthought.data.contentextractor.SueddeutscheContentExtractor
+net.dankito.deepthought.data.contentextractor.SpiegelContentExtractor
+net.dankito.deepthought.data.contentextractor.ZeitContentExtractor
+net.dankito.deepthought.data.contentextractor.HeiseContentExtractor
+net.dankito.deepthought.data.contentextractor.DerFreitagContentExtractor
+net.dankito.deepthought.data.contentextractor.PostillonContentExtractor
