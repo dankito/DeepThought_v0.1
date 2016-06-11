@@ -136,7 +136,6 @@
                                     <CheckMenuItem mnemonicParsing="false" text="%application.language.german" />
                                 </items>
                               </Menu>
-                              <MenuItem mnemonicParsing="false" onAction="#handleMenuItemToolsDeviceRegistrationAction" text="%device.registration..." />
                               <SeparatorMenuItem mnemonicParsing="false" />
                             <MenuItem fx:id="mnitmToolsBackups" disable="true" mnemonicParsing="false" onAction="#handleMenuItemToolsBackupsAction" text="%backups...">
                                  <accelerator>

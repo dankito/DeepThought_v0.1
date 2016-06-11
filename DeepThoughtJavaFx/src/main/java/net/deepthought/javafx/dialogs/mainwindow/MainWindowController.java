@@ -765,11 +765,6 @@ public class MainWindowController implements Initializable {
   }
 
   @FXML
-  public void handleMenuItemToolsDeviceRegistrationAction(Event event) {
-    Dialogs.showRegisterUserDevicesDialog(stage);
-  }
-
-  @FXML
   public void handleMenuItemToolsBackupsAction(Event event) {
     Dialogs.showRestoreBackupDialog(stage);
   }

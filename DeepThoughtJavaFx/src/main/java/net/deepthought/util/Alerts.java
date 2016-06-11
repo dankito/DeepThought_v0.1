@@ -242,6 +242,12 @@ public class Alerts {
     }
     message += Localization.getLocalizedString("device.info", device.getDeviceInfoString());
 
+//    String logoPath = IconManager.getInstance().getLogoForOperatingSystem(item.getPlatform(), item.getOsVersion(), item.getPlatformArchitecture());
+//    if(logoPath != null)
+//      imgvwOsLogo.setImage(new Image(logoPath));
+//    else
+//      imgvwOsLogo.setVisible(false);
+
     return createConfirmationDialog(message,
         Localization.getLocalizedString("alert.title.unregistered.device.found"), windowStage);
   }
