@@ -42,6 +42,16 @@ public class DeepThoughtError extends Notification {
   }
 
 
+  @Override
+  public String toString() {
+    String description = notificationMessage;
+
+    if(exception != null) {
+      description += ": " + exception.getLocalizedMessage();
+    }
+
+    return description;
+  }
 
   public static DeepThoughtError errorFromLocalizationKey(String localizationKey, Object... formatArguments) {
     return new DeepThoughtError(net.deepthought.util.localization.Localization.getLocalizedString(localizationKey, formatArguments));

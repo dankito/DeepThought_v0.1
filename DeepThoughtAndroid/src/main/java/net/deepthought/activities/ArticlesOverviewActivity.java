@@ -137,19 +137,32 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     article.getArticleContentExtractor().createEntryFromUrlAsync(article.getUrl(), new CreateEntryListener() {
       @Override
       public void entryCreated(EntryCreationResult creationResult) {
-        if(creationResult.successful()) {
-          creationResult.saveCreatedEntities();
-
-          runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              String successfullySavedMessage = getString(R.string.articles_overview_article_saved, article.getTitle());
-              Toast.makeText(ArticlesOverviewActivity.this, successfullySavedMessage, Toast.LENGTH_LONG);
-            }
-          });
-        }
+        handleCreateEntryResult(creationResult, article);
       }
     });
+  }
+
+  protected void handleCreateEntryResult(final EntryCreationResult creationResult, final ArticlesOverviewItem article) {
+    if(creationResult.successful()) {
+      creationResult.saveCreatedEntities();
+
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          String successfullySavedMessage = getString(R.string.articles_overview_article_saved, article.getTitle());
+          Toast.makeText(ArticlesOverviewActivity.this, successfullySavedMessage, Toast.LENGTH_LONG).show();
+        }
+      });
+    }
+    else {
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          String couldNotExtractArticleMessage = getString(R.string.articles_overview_could_not_extract_article, article.getTitle(), creationResult.getError());
+          Toast.makeText(ArticlesOverviewActivity.this, couldNotExtractArticleMessage, Toast.LENGTH_LONG).show();
+        }
+      });
+    }
   }
 
 
