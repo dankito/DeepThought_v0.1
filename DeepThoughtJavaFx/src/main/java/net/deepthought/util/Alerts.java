@@ -242,6 +242,8 @@ public class Alerts {
     }
     message += Localization.getLocalizedString("device.info", device.getDeviceInfoString());
 
+    message += Localization.getLocalizedString("ip.address", device.getAddress());
+
 //    String logoPath = IconManager.getInstance().getLogoForOperatingSystem(item.getPlatform(), item.getOsVersion(), item.getPlatformArchitecture());
 //    if(logoPath != null)
 //      imgvwOsLogo.setImage(new Image(logoPath));

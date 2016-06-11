@@ -1,5 +1,8 @@
 package net.deepthought.dialogs;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -65,7 +68,11 @@ public class DeviceRegistrationHandler {
   };
 
   protected void notifyUnregisteredDeviceFound(final HostInfo device) {
-    snackbarAskRegisterUnknownDevice = Snackbar.make(mainActivity.findViewById(R.id.pager), "", Snackbar.LENGTH_INDEFINITE);
+    ActivityManager activityManager = (ActivityManager)mainActivity.getSystemService(Context.ACTIVITY_SERVICE);
+    ComponentName componentName = activityManager.getRunningTasks(1).get(0).topActivity;
+
+    View rootView = mainActivity.findViewById(android.R.id.content);
+    snackbarAskRegisterUnknownDevice = Snackbar.make(rootView, "", Snackbar.LENGTH_INDEFINITE);
     deviceIdShowingSnackbarFor = device.getDeviceId();
 
     snackbarAskRegisterUnknownDevice.setCallback(new Snackbar.Callback() {
@@ -85,12 +92,12 @@ public class DeviceRegistrationHandler {
     // Warning: Actually a Snackbar's Design should not be manipulated:
     // "Don't customize the Snackbar. It should not contain any more elements than a short text and one action. See Google Material design guidelines."
     // Code found at: http://stackoverflow.com/questions/32453946/how-to-customize-snackbars-layout
-    customizeSnackbar(device);
+    customizeSnackbar(device, rootView.getWidth());
 
     snackbarAskRegisterUnknownDevice.show();
   }
 
-  protected void customizeSnackbar(HostInfo device) {
+  protected void customizeSnackbar(HostInfo device, int windowWidth) {
     Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbarAskRegisterUnknownDevice.getView();
 
     TextView txtvwSnackbarStandardText = (TextView) layout.findViewById(android.support.design.R.id.snackbar_text);
@@ -106,6 +113,11 @@ public class DeviceRegistrationHandler {
     TextView txtvwDeviceInfo = (TextView) snackView.findViewById(R.id.txtvwDeviceInfo);
     txtvwDeviceInfo.setText(device.getDeviceInfoString());
     txtvwDeviceInfo.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
+    imageView.setImageResource(getOsLogoId(device));
+
+    TextView txtvwDeviceAddress = (TextView) snackView.findViewById(R.id.txtvwDeviceAddress);
+    txtvwDeviceAddress.setText(device.getAddress());
+    txtvwDeviceAddress.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
 
     TextView txtvwAskToYouWantToConnectTo = (TextView) snackView.findViewById(R.id.txtvwAskToYouWantToConnectTo);
     txtvwAskToYouWantToConnectTo.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
@@ -181,11 +193,16 @@ public class DeviceRegistrationHandler {
     AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
     builder = builder.setTitle(Localization.getLocalizedString("alert.title.ask.for.device.registration"));
 
-    String message = Localization.getLocalizedString("alert.message.ask.for.device.registration", request.getDevice());
+    HostInfo device = request.getDevice();
+
+    String message = Localization.getLocalizedString("alert.message.ask.for.device.registration", device);
     if(StringUtils.isNotNullOrEmpty(request.getUser().getUserInfoString())) {
       message += Localization.getLocalizedString("user.info", request.getUser().getUserInfoString());
     }
-    message += Localization.getLocalizedString("device.info", request.getDevice().getDeviceInfoString());
+
+    message += Localization.getLocalizedString("device.info", device.getDeviceInfoString());
+    message += Localization.getLocalizedString("ip.address", device.getAddress());
+
     builder = builder.setMessage(message);
 
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {

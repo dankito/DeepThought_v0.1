@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:layout_marginRight="60dp">
+              android:layout_width="match_parent"
+              android:layout_height="96dp"
+              android:layout_marginRight="60dp">
 
     <ImageView
         android:id="@+id/imgvwDeviceIcon"
         android:layout_width="60dp"
-        android:layout_height="80dp"
+        android:layout_height="96dp"
+        android:layout_alignParentLeft="true"
     />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="80dp"
+        android:layout_height="96dp"
         android:orientation="vertical"
         android:layout_marginLeft="20dp"
+        android:layout_marginRight="60dp"
+        android:layout_toRightOf="@+id/imgvwDeviceIcon"
+        android:layout_alignParentRight="true"
     >
 
         <TextView
@@ -29,6 +33,15 @@
             android:id="@+id/txtvwDeviceInfo"
             android:layout_width="wrap_content"
             android:layout_height="24dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+        />
+
+        <TextView
+            android:id="@+id/txtvwDeviceAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:maxLines="1"
         />
 
         <CheckBox
@@ -42,4 +55,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

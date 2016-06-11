@@ -40,7 +40,6 @@ import net.deepthought.listener.AndroidImportFilesOrDoOcrListener;
 import net.deepthought.util.DeepThoughtError;
 import net.deepthought.util.Notification;
 import net.deepthought.util.NotificationType;
-import net.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -303,8 +302,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.options_menu_main, menu);
-
-        menu.findItem(R.id.action_device_registration).setTitle(Localization.getLocalizedString("device.registration"));
 
         return true;
     }
