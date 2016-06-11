@@ -67,11 +67,8 @@
     <string name="search_ends_with_text">Ended mit</string>
     <string name="search_equals_text">Exakt</string>
 
-    <string name="close">Schließen</string>
-    <string name="start">Start</string>
-    <string name="stop">Stop</string>
+    <string name="articles_overview_article_saved">Artikel %s wurde gespeichert</string>
 
-    <string name="ask_for_registration">Registrieren</string>
     <string name="device_registration_server_allowed_registration">Gerät wurde erfolgreich registiert</string>
     <string name="device_registration_server_denied_registration">Der Server hat die Registrierung nicht gestattet</string>
     <string name="device_registration_successfully_registered_device">Gerät %s wurde erfolgreich registriert</string>

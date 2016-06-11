@@ -65,11 +65,8 @@
     <string name="search_ends_with_text">Ends with</string>
     <string name="search_equals_text">Equals</string>
 
-    <string name="close">Close</string>
-    <string name="start">Start</string>
-    <string name="stop">Stop</string>
+    <string name="articles_overview_article_saved">Saved Article %s</string>
 
-    <string name="ask_for_registration">Register</string>
     <string name="device_registration_server_allowed_registration">Server allowed registration</string>
     <string name="device_registration_server_denied_registration">Server denied registration</string>
     <string name="device_registration_successfully_registered_device">Successfully registered device %s</string>

@@ -4,18 +4,23 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import net.deepthought.Application;
 import net.deepthought.R;
 import net.deepthought.adapter.ArticlesOverviewAdapter;
 import net.deepthought.data.contentextractor.CreateEntryListener;
 import net.deepthought.data.contentextractor.EntryCreationResult;
 import net.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.deepthought.data.model.DeepThought;
 import net.deepthought.helper.AlertHelper;
 import net.deepthought.util.localization.Localization;
 
@@ -64,6 +69,8 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     lstvwArticlesOverview = (ListView) findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
+
+    registerForContextMenu(lstvwArticlesOverview);
   }
 
 
@@ -101,6 +108,48 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
     }
 
     return super.onOptionsItemSelected(item);
+  }
+
+
+  @Override
+  public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    super.onCreateContextMenu(menu, v, menuInfo);
+    MenuInflater inflater = getMenuInflater();
+    inflater.inflate(R.menu.list_item_article_overview_menu, menu);
+  }
+
+  @Override
+  public boolean onContextItemSelected(MenuItem item) {
+    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    DeepThought deepThought = Application.getDeepThought();
+
+    switch(item.getItemId()) {
+      case R.id.list_item_articles_overview_menu_save:
+        ArticlesOverviewItem selectedArticle = articlesOverviewAdapter.getArticleAt(info.position);
+        saveArticle(selectedArticle);
+        return true;
+      default:
+        return super.onContextItemSelected(item);
+    }
+  }
+
+  protected void saveArticle(final ArticlesOverviewItem article) {
+    article.getArticleContentExtractor().createEntryFromUrlAsync(article.getUrl(), new CreateEntryListener() {
+      @Override
+      public void entryCreated(EntryCreationResult creationResult) {
+        if(creationResult.successful()) {
+          creationResult.saveCreatedEntities();
+
+          runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              String successfullySavedMessage = getString(R.string.articles_overview_article_saved, article.getTitle());
+              Toast.makeText(ArticlesOverviewActivity.this, successfullySavedMessage, Toast.LENGTH_LONG);
+            }
+          });
+        }
+      }
+    });
   }
 
 
