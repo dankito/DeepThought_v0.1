@@ -1,5 +1,6 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.controls.html.HtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
@@ -92,6 +93,8 @@ public class Application {
 
   protected static IHtmlEditorPool htmlEditorPool;
 
+  protected static IClipboardHelper clipboardHelper;
+
   protected static boolean isInstantiated = false;
 
   protected static boolean hasOnlyReadOnlyAccess = false;
@@ -166,6 +169,8 @@ public class Application {
       Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
 
       Application.htmlEditorPool = dependencyResolver.createHtmlEditorPool();
+
+      Application.clipboardHelper = dependencyResolver.createClipboardHelper();
 
       isInstantiated = true;
       callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated));
@@ -419,6 +424,10 @@ public class Application {
 
   public static IHtmlEditorPool getHtmlEditorPool() {
     return htmlEditorPool;
+  }
+
+  public static IClipboardHelper getClipboardHelper() {
+    return clipboardHelper;
   }
 
   public static DeepThoughtApplication getApplication() {

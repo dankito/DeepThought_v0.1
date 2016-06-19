@@ -100,7 +100,7 @@ public class FileLabel extends net.dankito.deepthought.controls.CollectionItemLa
 //    contextMenu.getItems().add(new SeparatorMenuItem());
 //
 //    MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.person.text.to.clipboard"));
-//    copyReferenceTextMenuItem.setOnAction(event -> ClipboardHelper.copyStringToClipboard(getToolTipText()));
+//    copyReferenceTextMenuItem.setOnAction(event -> Application.getClipboardHelper().copyStringToClipboard(getToolTipText()));
 //    contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     return contextMenu;

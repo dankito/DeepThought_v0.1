@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.reference;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceBase;
@@ -166,13 +167,13 @@ public class EntryReferenceBaseLabel extends net.dankito.deepthought.controls.Co
     contextMenu.getItems().add(new SeparatorMenuItem());
 
     MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.text.to.clipboard"));
-    copyReferenceTextMenuItem.setOnAction(event -> net.dankito.deepthought.util.ClipboardHelper.copyStringToClipboard(getItemDisplayName()));
+    copyReferenceTextMenuItem.setOnAction(event -> Application.getClipboardHelper().copyStringToClipboard(getItemDisplayName()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     final String referenceUrl = getReferenceUrl();
     if(referenceUrl != null) {
       MenuItem copyReferenceUrlMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.url.to.clipboard"));
-      copyReferenceUrlMenuItem.setOnAction(event -> net.dankito.deepthought.util.ClipboardHelper.copyStringToClipboard(referenceUrl));
+      copyReferenceUrlMenuItem.setOnAction(event -> Application.getClipboardHelper().copyStringToClipboard(referenceUrl));
       contextMenu.getItems().add(copyReferenceUrlMenuItem);
     }
 

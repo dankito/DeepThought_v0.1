@@ -1,5 +1,7 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.clipboard.IClipboardHelper;
+import net.dankito.deepthought.clipboard.NoOpClipboardHelper;
 import net.dankito.deepthought.communication.DeepThoughtConnector;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
@@ -165,4 +167,8 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
     return null;
   }
 
+  @Override
+  public IClipboardHelper createClipboardHelper() {
+    return new NoOpClipboardHelper();
+  }
 }

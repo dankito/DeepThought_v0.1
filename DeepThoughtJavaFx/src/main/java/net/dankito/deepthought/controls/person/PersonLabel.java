@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.person;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -102,7 +103,7 @@ public class PersonLabel extends net.dankito.deepthought.controls.CollectionItem
     contextMenu.getItems().add(new SeparatorMenuItem());
 
     MenuItem copyReferenceTextMenuItem = new MenuItem(Localization.getLocalizedString("copy.person.text.to.clipboard"));
-    copyReferenceTextMenuItem.setOnAction(event -> net.dankito.deepthought.util.ClipboardHelper.copyStringToClipboard(getToolTipText()));
+    copyReferenceTextMenuItem.setOnAction(event -> Application.getClipboardHelper().copyStringToClipboard(getToolTipText()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 
     return contextMenu;

@@ -2,6 +2,7 @@ package net.dankito.deepthought.platform;
 
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
+import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.download.IFileDownloader;
@@ -15,6 +16,7 @@ import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.language.LanguageDetector;
 import net.dankito.deepthought.plugin.IPlugin;
+import net.dankito.deepthought.util.JavaFxClipboardHelper;
 import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
@@ -110,5 +112,9 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
     return new net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditorPool();
   }
 
+  @Override
+  public IClipboardHelper createClipboardHelper() {
+    return new JavaFxClipboardHelper();
+  }
 
 }

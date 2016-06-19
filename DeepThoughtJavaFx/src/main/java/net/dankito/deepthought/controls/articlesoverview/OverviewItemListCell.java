@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.articlesoverview;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.util.localization.Localization;
@@ -177,7 +178,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
     if(contextMenu == null)
       contextMenu = createContextMenu();
 
-    copyUrlToClipboardItem.setOnAction(actionEvent -> net.dankito.deepthought.util.ClipboardHelper.copyStringToClipboard(item.getUrl()));
+    copyUrlToClipboardItem.setOnAction(actionEvent -> Application.getClipboardHelper().copyStringToClipboard(item.getUrl()));
 
     contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }

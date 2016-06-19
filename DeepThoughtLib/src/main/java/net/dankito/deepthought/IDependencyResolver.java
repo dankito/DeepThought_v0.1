@@ -1,5 +1,6 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.IDataManager;
@@ -57,5 +58,7 @@ public interface IDependencyResolver<THtmlEditor> {
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
 
   IHtmlEditorPool<THtmlEditor> createHtmlEditorPool();
+
+  IClipboardHelper createClipboardHelper();
 
 }
