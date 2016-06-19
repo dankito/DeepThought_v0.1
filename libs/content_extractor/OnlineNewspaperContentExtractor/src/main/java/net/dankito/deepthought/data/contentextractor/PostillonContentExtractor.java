@@ -70,9 +70,14 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://www.der-postillon.com/") || url.startsWith("https://www.der-postillon.com/") ||
-        url.startsWith("http://www.der-postillon.de/") || url.startsWith("https://www.der-postillon.de/");
+    return url.toLowerCase().contains("www.der-postillon.com/") || url.toLowerCase().contains("www.der-postillon.de/");
   }
+
+  @Override
+  protected boolean articleUrlsStartWithHttps() {
+    return false;
+  }
+
 
   @Override
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {

@@ -47,9 +47,13 @@ public class SueddeutscheJetztContentExtractor extends SueddeutscheContentExtrac
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.contains("www.jetzt.de/") ||url.contains("//jetzt.sueddeutsche.de/");
+    return url.toLowerCase().contains("www.jetzt.de/") || url.toLowerCase().contains("jetzt.sueddeutsche.de/");
   }
 
+  @Override
+  protected boolean articleUrlsStartWithHttps() {
+    return false;
+  }
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     try {

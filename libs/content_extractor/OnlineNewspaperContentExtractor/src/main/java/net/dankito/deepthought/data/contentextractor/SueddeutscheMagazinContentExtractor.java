@@ -55,7 +55,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://sz-magazin.sueddeutsche.de/") || url.startsWith("https://sz-magazin.sueddeutsche.de/");
+    return url.toLowerCase().contains("sz-magazin.sueddeutsche.de/");
   }
 
 

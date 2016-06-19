@@ -62,7 +62,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://www.sueddeutsche.de/") || url.startsWith("https://www.sueddeutsche.de/") ||
+    return url.toLowerCase().contains("www.sueddeutsche.de/") ||
         szMagazinContentExtractor.canCreateEntryFromUrl(url) || jetztContentExtractor.canCreateEntryFromUrl(url);
   }
 
@@ -81,7 +81,6 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     try {
-      // TODO: implement Sueddeutsche Magazin articles like http://sz-magazin.sueddeutsche.de/texte/anzeigen/42288/Das-Zerquetschen-von-Eiern
       if(document.body().getElementById("singlePageForm") != null) { // an article with multiple pages
         try {
           Map<String, String> data = new HashMap<>();

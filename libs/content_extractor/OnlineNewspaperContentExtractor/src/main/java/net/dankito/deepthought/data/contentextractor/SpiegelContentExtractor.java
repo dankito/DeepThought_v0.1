@@ -46,7 +46,7 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://www.spiegel.de/") || url.startsWith("https://www.spiegel.de/");
+    return url.toLowerCase().contains("www.spiegel.de/");
   }
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {

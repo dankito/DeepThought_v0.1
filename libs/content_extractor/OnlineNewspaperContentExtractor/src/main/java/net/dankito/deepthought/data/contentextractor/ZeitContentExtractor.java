@@ -49,8 +49,14 @@ public class ZeitContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.startsWith("http://www.zeit.de/") || url.startsWith("https://www.zeit.de/");
+    return url.toLowerCase().contains("www.zeit.de/");
   }
+
+  @Override
+  protected boolean articleUrlsStartWithHttps() {
+    return false;
+  }
+
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     try {
