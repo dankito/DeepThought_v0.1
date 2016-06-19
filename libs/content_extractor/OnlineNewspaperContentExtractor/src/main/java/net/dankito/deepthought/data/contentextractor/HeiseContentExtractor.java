@@ -104,7 +104,7 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
     // if it doesn't have any class (= normal article paragraph) or has class subheading (= Sub Heading)
     // TODO: implement Image Gallery Extraction
 //    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), h3.subheading, .yt-video-container, div.gallery")) {
-    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), pre, ol, h3.subheading, .yt-video-container")) {
+    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), pre, ol, h3.subheading, div.player, .yt-video-container")) {
       if(paragraphElement.hasClass("gallery")) {
         content += extractImageGallery(paragraphElement);
       }
