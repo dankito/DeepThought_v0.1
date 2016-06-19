@@ -195,13 +195,19 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
         if(bodyChild.hasClass("embed"))
           content += bodyChild.outerHtml().replace(" src=\"//", " src=\"http://");
         else if(bodyChild.hasClass("include")) {
-          makeLazyLoadingChildrenEagerLoading(bodyChild);
-          content += bodyChild.outerHtml();
+          if(isSzEspressoDiv(bodyChild) == false) {
+            makeLazyLoadingChildrenEagerLoading(bodyChild);
+            content += bodyChild.outerHtml();
+          }
         }
       }
     }
 
     return content;
+  }
+
+  protected boolean isSzEspressoDiv(Element element) {
+    return element.html().contains("subscribe/sueddeutsche/anmeldeseite/sz_espresso"); // TODO: implement a more sophisticated check
   }
 
   protected void makeLazyLoadingChildrenEagerLoading(Element bodyChild) {
