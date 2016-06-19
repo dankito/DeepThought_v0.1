@@ -76,7 +76,7 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
   @Test
   public void importKommentar_AbstractAndReferenceGetImportedCorrectly() {
     EntryCreationResult creationResult = testImportArticle("http://www.heise.de/security/artikel/Warum-Google-uns-echte-Verschluesselung-verweigert-2191797.html");
-    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "Google I/O",
         "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
   }
 
@@ -84,8 +84,8 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
   @Test
   public void importAndroidUpdate_EnumerationGetsImportedCorrectly() {
     EntryCreationResult creationResult = testImportArticle("http://www.heise.de/newsticker/meldung/Google-I-O-Hintergrund-Updates-von-Android-N-beheben-nicht-die-Update-Problematik-3211383.html");
-    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
-        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+    testImportedArticleValues(creationResult, 3898, "20.05.16", "Hintergrund-Updates von Android N beheben nicht die Update-Problematik", "heise Foto Galerie",
+        "Android N wird Updates automatisch herunterladen und im Hintergrund installieren. Nun erklärt Google, was das heißt: Die Installation wird beschleunigt, Androids Update-Problem aber nicht behoben. Auch funktioniert es nicht bei aktuellen Smartphones.");
   }
 
 
