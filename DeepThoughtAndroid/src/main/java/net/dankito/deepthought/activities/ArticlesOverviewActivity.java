@@ -121,12 +121,14 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
   @Override
   public boolean onContextItemSelected(MenuItem item) {
     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-    DeepThought deepThought = Application.getDeepThought();
+    ArticlesOverviewItem selectedArticle = articlesOverviewAdapter.getArticleAt(info.position);
 
     switch(item.getItemId()) {
       case R.id.list_item_articles_overview_menu_save:
-        ArticlesOverviewItem selectedArticle = articlesOverviewAdapter.getArticleAt(info.position);
         saveArticle(selectedArticle);
+        return true;
+      case R.id.list_item_articles_overview_menu_copy_url_to_clipboard:
+        copyArticleUrlToClipboard(selectedArticle);
         return true;
       default:
         return super.onContextItemSelected(item);
@@ -163,6 +165,11 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
         }
       });
     }
+  }
+
+
+  protected void copyArticleUrlToClipboard(ArticlesOverviewItem article) {
+    Application.getClipboardHelper().copyStringToClipboard(article.getUrl());
   }
 
 

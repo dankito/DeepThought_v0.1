@@ -5,6 +5,7 @@ import android.content.Context;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
+import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.contentextractor.DerFreitagContentExtractor;
@@ -23,6 +24,7 @@ import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
 import net.dankito.deepthought.plugin.AndroidPluginManager;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.plugin.IPluginManager;
+import net.dankito.deepthought.util.AndroidClipboardHelper;
 import net.dankito.deepthought.util.OsHelper;
 import net.dankito.deepthought.util.file.FileUtils;
 
@@ -125,4 +127,10 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   public IPlatformConfiguration getPlatformConfiguration() {
     return platformConfiguration;
   }
+
+  @Override
+  public IClipboardHelper createClipboardHelper() {
+    return new AndroidClipboardHelper(context);
+  }
+
 }
