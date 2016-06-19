@@ -90,6 +90,14 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
 
 
   @Test
+  public void importIntelVerankertAntiExploitTechnik_CodeExampleGetsImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/newsticker/meldung/Intel-verankert-Anti-Exploit-Technik-in-CPU-Hardware-3236707.html");
+    testImportedArticleValues(creationResult, 3243, "13.06.16", "Intel verankert Anti-Exploit-Technik in (CPU-)Hardware", "",
+        "Mit der \"Control-flow Enforcement Technology\" will Intel dem Ausnutzen von Sicherheitslücken eine weitere Hürde in den Weg legen. Wann CET jedoch in Prozessoren debütiert, steht noch in den Sternen.");
+  }
+
+
+  @Test
   public void testGetArticlesOverview() {
     final List<ArticlesOverviewItem> allItems = new ArrayList<>();
     final AtomicInteger partialItemsExtractionCall = new AtomicInteger();
