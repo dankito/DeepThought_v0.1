@@ -67,6 +67,7 @@
 
     <string name="articles_overview_article_saved">Saved Article %s</string>
     <string name="articles_overview_could_not_extract_article">Could not extract Article %1$s:\r\%2$s</string>
+    <string name="copy_url_to_clipboard">Copy URL to Clipboard</string>
 
     <string name="device_registration_server_allowed_registration">Server allowed registration</string>
     <string name="device_registration_server_denied_registration">Server denied registration</string>

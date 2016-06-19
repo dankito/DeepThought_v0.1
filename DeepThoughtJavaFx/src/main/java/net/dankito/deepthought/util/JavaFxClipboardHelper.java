@@ -16,4 +16,12 @@ public class JavaFxClipboardHelper implements IClipboardHelper {
     Clipboard.getSystemClipboard().setContent(content);
   }
 
+  @Override
+  public void copyUrlToClipboard(String url) {
+    final ClipboardContent content = new ClipboardContent();
+    content.putString(url); // also copy URL as Plain Text
+    content.putUrl(url);
+    Clipboard.getSystemClipboard().setContent(content);
+  }
+
 }

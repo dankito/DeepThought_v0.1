@@ -169,7 +169,7 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
 
 
   protected void copyArticleUrlToClipboard(ArticlesOverviewItem article) {
-    Application.getClipboardHelper().copyStringToClipboard(article.getUrl());
+    Application.getClipboardHelper().copyUrlToClipboard(article.getUrl());
   }
 
 

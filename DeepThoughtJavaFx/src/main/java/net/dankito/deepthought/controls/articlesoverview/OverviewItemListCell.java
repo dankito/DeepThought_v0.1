@@ -178,7 +178,7 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
     if(contextMenu == null)
       contextMenu = createContextMenu();
 
-    copyUrlToClipboardItem.setOnAction(actionEvent -> Application.getClipboardHelper().copyStringToClipboard(item.getUrl()));
+    copyUrlToClipboardItem.setOnAction(actionEvent -> Application.getClipboardHelper().copyUrlToClipboard(item.getUrl()));
 
     contextMenu.show(event.getPickResult().getIntersectedNode(), event.getScreenX(), event.getScreenY());
   }

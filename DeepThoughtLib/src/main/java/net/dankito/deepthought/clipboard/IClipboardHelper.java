@@ -7,4 +7,6 @@ public interface IClipboardHelper {
 
   void copyStringToClipboard(String clipboardContent);
 
+  void copyUrlToClipboard(String url);
+
 }

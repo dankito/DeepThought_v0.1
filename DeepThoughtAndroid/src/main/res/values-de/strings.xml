@@ -69,6 +69,7 @@
 
     <string name="articles_overview_article_saved">Artikel %s wurde gespeichert</string>
     <string name="articles_overview_could_not_extract_article">Artikel %1$s konnte nicht extrahiert werden:\r\n%2$s</string>
+    <string name="copy_url_to_clipboard">URL in Zwischenablage kopieren</string>
 
     <string name="device_registration_server_allowed_registration">Gerät wurde erfolgreich registiert</string>
     <string name="device_registration_server_denied_registration">Der Server hat die Registrierung nicht gestattet</string>

@@ -6,4 +6,9 @@
         android:title="@string/save"
         />
 
+    <item
+        android:id="@+id/list_item_articles_overview_menu_copy_url_to_clipboard"
+        android:title="@string/copy_url_to_clipboard"
+    />
+
 </menu>

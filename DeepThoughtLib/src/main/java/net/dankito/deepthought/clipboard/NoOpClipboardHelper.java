@@ -10,4 +10,9 @@ public class NoOpClipboardHelper implements IClipboardHelper {
 
   }
 
+  @Override
+  public void copyUrlToClipboard(String url) {
+
+  }
+
 }
