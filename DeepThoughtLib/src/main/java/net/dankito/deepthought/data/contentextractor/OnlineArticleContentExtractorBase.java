@@ -68,6 +68,8 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
 
   public EntryCreationResult createEntryFromArticle(String articleUrl) {
     try {
+      articleUrl = sanitizeArticleUrl(articleUrl);
+
       Document document = retrieveOnlineDocument(articleUrl);
       return parseHtmlToEntry(articleUrl, document);
     } catch(Exception ex) {
@@ -75,6 +77,29 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
       return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", articleUrl), ex));
     }
   }
+
+  protected String sanitizeArticleUrl(String articleUrl) {
+    // Check if URL starts with http or https
+    if(articleUrl != null && articleUrl.toLowerCase().startsWith("http") == false) {
+      if(articleUrlsStartWithHttps()) {
+        articleUrl = "https://" + articleUrl;
+      }
+      else {
+        articleUrl = "http://" + articleUrl;
+      }
+    }
+
+    return articleUrl;
+  }
+
+  /**
+   * Returns if Article Urls start with 'http' or 'https'.
+   * @return
+   */
+  protected boolean articleUrlsStartWithHttps() {
+    return true;
+  }
+
 
   protected Document retrieveOnlineDocument(String articleUrl) throws IOException {
     return htmlHelper.retrieveOnlineDocument(articleUrl);
