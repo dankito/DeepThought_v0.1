@@ -5,8 +5,8 @@ import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewLis
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,9 +23,9 @@ import java.util.Locale;
 /**
  * Created by ganymed on 20/06/15.
  */
-public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
+public class CtContentExtractor extends OnlineNewspaperContentExtractorBase {
 
-  private final static Logger log = LoggerFactory.getLogger(HeiseContentExtractor.class);
+  private final static Logger log = LoggerFactory.getLogger(CtContentExtractor.class);
 
   protected static final String LogoFileName = "heise_online_logo.png";
 
@@ -43,12 +43,12 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   @Override
   public String getNewspaperName() {
-    return "Heise";
+    return "c't";
   }
 
   @Override
   public String getSiteBaseUrl() {
-    return "heise.de";
+    return "heise.de/ct";
   }
 
   @Override
@@ -66,19 +66,19 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.toLowerCase().contains("www.heise.de/") && url.toLowerCase().contains("www.heise.de/ct") == false;
+    return url.toLowerCase().contains("www.heise.de/ct/");
   }
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
     try {
-      Element articleElement = document.body().select("article").first();
-      if(articleElement == null)
+      Element sectionElement = document.body().select("main section").first();
+      if(sectionElement == null)
         return new EntryCreationResult(articleUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.create.entry.from.article.html")));
 
-      Entry articleEntry = createEntry(articleElement);
+      Entry articleEntry = createEntry(sectionElement);
       EntryCreationResult creationResult = new EntryCreationResult(articleUrl, articleEntry);
 
-      createReference(creationResult, articleUrl, articleElement);
+      createReference(creationResult, articleUrl, sectionElement);
 
       findOrCreateTagAndAddToCreationResult(creationResult);
       addNewspaperCategory(creationResult, true);
@@ -89,58 +89,85 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
     }
   }
 
-  protected Entry createEntry(Element articleElement) {
-    String abstractString = articleElement.select(".meldung_anrisstext strong").html();
+  protected Entry createEntry(Element sectionElement) {
+    String abstractString = sectionElement.select("p.article_page_intro strong").html();
 
     String content = "";
-    Element meldungWrapperElement = articleElement.select(".meldung_wrapper").first();
-    if(meldungWrapperElement == null) {
-      meldungWrapperElement = articleElement;
+
+    adjustLinkUrls(sectionElement);
+    adjustSourceElements(sectionElement);
+
+    Element pageImgElement = sectionElement.select("div.article_page_img img").first();
+    if(pageImgElement != null) {
+      content += pageImgElement.outerHtml();
     }
 
-    adjustLinkUrls(meldungWrapperElement);
-    adjustSourceElements(meldungWrapperElement);
+    Element articlePageTextElement = sectionElement.select("div.article_page_text").first();
+    if(articlePageTextElement == null) {
+      articlePageTextElement = sectionElement;
+    }
+    Element articlePageElement = articlePageTextElement.select("div.article_text").first();
+    if(articlePageElement != null) {
+      articlePageTextElement = articlePageElement;
+    }
 
-    // if it doesn't have any class (= normal article paragraph) or has class subheading (= Sub Heading)
-    // TODO: implement Image Gallery Extraction
-//    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), h3.subheading, .yt-video-container, div.gallery")) {
-    for(Element paragraphElement : meldungWrapperElement.select("p:not([class]), pre, ol, ul, h3.subheading, div.player, .yt-video-container")) {
-      if(paragraphElement.hasClass("gallery")) {
-        content += extractImageGallery(paragraphElement);
-      }
-      else if(StringUtils.isNotNullOrEmpty(paragraphElement.text()) || "div".equals(paragraphElement.tagName())) {
-        content += paragraphElement.outerHtml();
+    for(Element childElement : articlePageTextElement.children()) {
+      if(isArticleElement(childElement)) {
+        content += childElement.outerHtml();
       }
     }
+
+    content += extractPatchesIfAny(sectionElement);
 
     return new Entry(content, abstractString);
   }
 
-  protected String extractImageGallery(Element imageGalleryElement) {
-    String content = "<div>";
-    content+= imageGalleryElement.select("h2").outerHtml();
-
-    content+= extractAllImagesOfGallery(imageGalleryElement);
-
-    return content + "</div>";
+  protected boolean isArticleElement(Element childElement) {
+    return StringUtils.isNotNullOrEmpty(childElement.text());
   }
 
-  protected String extractAllImagesOfGallery(Element imageGalleryElement) {
-    return "";
+  protected String extractPatchesIfAny(Element sectionElement) {
+    String patchesHtml = "";
+    Element sectionElementParent = sectionElement.parent();
+
+    Element patchTitleElement = sectionElementParent.select("p.article_page_patch_title").first();
+    if(patchTitleElement != null) {
+      patchesHtml += "<hr/>";
+      patchesHtml += patchTitleElement.outerHtml();
+
+      Element nextSibling = patchTitleElement.nextElementSibling();
+      if(nextSibling != null && "p".equals(nextSibling.nodeName()) && nextSibling.classNames().size() == 1 && "".equals(nextSibling.className())) {
+        patchesHtml += nextSibling.outerHtml();
+      }
+    }
+
+    Element patchDateElement = sectionElementParent.select("p.article_page_patch_date").first();
+    if(patchDateElement != null) {
+      patchesHtml += patchDateElement.outerHtml();
+    }
+
+    Element patchTextElement = sectionElementParent.select("div.article_page_patch_text").first();
+    if(patchTextElement != null) {
+      patchesHtml += patchTextElement.outerHtml();
+    }
+
+    return patchesHtml;
   }
 
-  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element articleElement) {
-    String title = articleElement.select(".news_headline").text();
+
+  protected ReferenceSubDivision createReference(EntryCreationResult creationResult, String articleUrl, Element sectionElement) {
+    Element headerElement = sectionElement.select("header").first();
+
+    String title = headerElement.select("h1").text();
+
     String subTitle = "";
-
-    if(title.contains(": ")) {
-      int indexOfColon = title.indexOf(": ");
-      subTitle = title.substring(0, indexOfColon);
-      title = title.substring(indexOfColon + ": ".length());
+    Element subTitleElement = headerElement.select("h2").first();
+    if(subTitleElement != null) {
+      subTitle = subTitleElement.text();
     }
 
     String publishingDateString = "";
-    Element articleDateTimeElement = articleElement.select("time").first();
+    Element articleDateTimeElement = sectionElement.select("time").first();
     if(articleDateTimeElement != null) {
       publishingDateString = parseDate(articleDateTimeElement);
     }

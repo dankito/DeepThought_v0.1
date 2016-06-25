@@ -69,8 +69,12 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
     List<IPlugin> staticPlugins = new ArrayList<>();
 
-//    staticPlugins.addAll(Arrays.asList(new IPlugin[]{new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(), new SueddeutscheContentExtractor(),
-//        new PostillonContentExtractor(), new DerFreitagContentExtractor(), new HeiseContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()}));
+//    staticPlugins.addAll(Arrays.asList(new IPlugin[]{
+//        new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(), new SueddeutscheContentExtractor(),
+//        new PostillonContentExtractor(), new DerFreitagContentExtractor(), new CtContentExtractor(), new HeiseContentExtractor(),
+//        new ZeitContentExtractor(), new SpiegelContentExtractor()
+//    }));
+
 //    staticPlugins.add(new YouTubeAndVimeoContentExtractor());
 
     return staticPlugins;

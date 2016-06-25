@@ -8,6 +8,7 @@ import net.dankito.deepthought.android.data.persistence.db.OrmLiteAndroidEntityM
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
+import net.dankito.deepthought.data.contentextractor.CtContentExtractor;
 import net.dankito.deepthought.data.contentextractor.DerFreitagContentExtractor;
 import net.dankito.deepthought.data.contentextractor.HeiseContentExtractor;
 import net.dankito.deepthought.data.contentextractor.PostillonContentExtractor;
@@ -79,8 +80,11 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public Collection<IPlugin> getStaticallyLinkedPlugins() {
 //    return new ArrayList<>();
-    return Arrays.asList(new IPlugin[]{new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(), new SueddeutscheContentExtractor(),
-        new HeiseContentExtractor(), new DerFreitagContentExtractor(), new PostillonContentExtractor(), new ZeitContentExtractor(), new SpiegelContentExtractor()});
+    return Arrays.asList(new IPlugin[]{
+        new SueddeutscheMagazinContentExtractor(), new SueddeutscheJetztContentExtractor(), new SueddeutscheContentExtractor(),
+        new CtContentExtractor(), new HeiseContentExtractor(), new DerFreitagContentExtractor(), new PostillonContentExtractor(), new ZeitContentExtractor(),
+        new SpiegelContentExtractor()
+    });
   }
 
   @Override
