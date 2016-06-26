@@ -60,7 +60,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasTitle() {
-    return title != null;
+    return StringUtils.isNotNullOrEmpty(title);
   }
 
   public String getTitle() {
@@ -72,7 +72,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasSubTitle() {
-    return subTitle != null;
+    return StringUtils.isNotNullOrEmpty(subTitle);
   }
 
   public String getSubTitle() {
@@ -84,7 +84,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasSummary() {
-    return summary != null;
+    return StringUtils.isNotNullOrEmpty(summary);
   }
 
   public String getSummary() {
@@ -108,7 +108,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasCategories() {
-    return categories != null;
+    return StringUtils.isNotNullOrEmpty(categories);
   }
 
   public String getCategories() {
@@ -120,7 +120,7 @@ public class ArticlesOverviewItem {
   }
 
   public boolean hasLabel() {
-    return label != null;
+    return StringUtils.isNotNullOrEmpty(label);
   }
 
   public String getLabel() {
