@@ -40,26 +40,37 @@ public class JsoupHtmlHelper implements IHtmlHelper {
 
 
   @Override
-  public Document retrieveOnlineDocument(String articleUrl) throws IOException {
-    return retrieveOnlineDocument(articleUrl, DefaultUserAgent, new HashMap<String, String>(), Connection.Method.GET);
+  public boolean canExtractPlainText() {
+    return true;
   }
 
   @Override
-  public Document retrieveOnlineDocument(String articleUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException {
+  public boolean canRemoveClutterFromHtml() {
+    return false;
+  }
+
+
+  @Override
+  public Document retrieveOnlineDocument(String webPageUrl) throws IOException {
+    return retrieveOnlineDocument(webPageUrl, DefaultUserAgent, new HashMap<String, String>(), Connection.Method.GET);
+  }
+
+  @Override
+  public Document retrieveOnlineDocument(String webPageUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException {
     CookieStore cookieStore = new BasicCookieStore();
     HttpClient httpclient = createHttpClient(userAgent, cookieStore);
 
-    HttpRequestBase request = createHttpRequest(articleUrl, data, method);
+    HttpRequestBase request = createHttpRequest(webPageUrl, data, method);
 
     HttpResponse response = httpclient.execute(request);
     HttpEntity entity = response.getEntity();
-    log.debug("Request Handled for url " + articleUrl + " ?: " + response.getStatusLine());
+    log.debug("Request Handled for url " + webPageUrl + " ?: " + response.getStatusLine());
 
     String html = EntityUtils.toString(entity);
     httpclient.getConnectionManager().shutdown();
     cookieStore.clear();
 
-    return Jsoup.parse(html, articleUrl);
+    return Jsoup.parse(html, webPageUrl);
   }
 
   protected HttpClient createHttpClient(String userAgent, CookieStore cookieStore) {
@@ -162,4 +173,17 @@ public class JsoupHtmlHelper implements IHtmlHelper {
       elementData.setOriginalImgElementHtmlCode(elementHtml);
     }
   }
+
+
+  @Override
+  public String extractPlainText(String webPageUrl) throws Exception {
+    Document document = retrieveOnlineDocument(webPageUrl);
+    return document.body().text();
+  }
+
+  @Override
+  public String tryToRemoveClutter(String webPageUrl) throws Exception {
+    return null;
+  }
+
 }

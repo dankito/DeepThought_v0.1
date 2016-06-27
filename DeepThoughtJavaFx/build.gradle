@@ -17,10 +17,9 @@ dependencies {
     compile project(':JavaSeOrmLiteEntityManager')
     compile project(':LuceneSearchEngine')
     compile project(':WGetFileDownloader')
+    compile project(':Boilerpipe')
 
-    compile project(':OnlineNewspaperContentExtractor')
-//    compile project(':YouTubeAndVimeoContentExtractor')
-//    compile project(':OpenOfficeDocumentsImporterExporter')
+//    compile project(':OnlineNewspaperContentExtractor')
 
     compile 'org.controlsfx:controlsfx:8.20.8'
 

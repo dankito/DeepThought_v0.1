@@ -7,6 +7,8 @@ import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.download.WGetFileDownloader;
+import net.dankito.deepthought.data.html.IHtmlHelper;
+import net.dankito.deepthought.data.html.JsoupAndBoilerpipeHtmlHelper;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
@@ -109,6 +111,11 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   @Override
   public ILanguageDetector createLanguageDetector() {
     return new LanguageDetector();
+  }
+
+  @Override
+  public IHtmlHelper createHtmlHelper() {
+    return new JsoupAndBoilerpipeHtmlHelper();
   }
 
   @Override

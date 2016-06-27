@@ -12,11 +12,20 @@ import java.util.Map;
  */
 public interface IHtmlHelper {
 
-  Document retrieveOnlineDocument(String articleUrl) throws IOException;
-  Document retrieveOnlineDocument(String articleUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException;
+  boolean canRemoveClutterFromHtml();
+
+  boolean canExtractPlainText();
+
+  Document retrieveOnlineDocument(String webPageUrl) throws IOException;
+  Document retrieveOnlineDocument(String webPageUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException;
 
   String extractPlainTextFromHtmlBody(String html);
 
   List<ImageElementData> extractAllImageElementsFromHtml(String html);
+
+
+  String extractPlainText(String webPageUrl) throws Exception;
+
+  String tryToRemoveClutter(String webPageUrl) throws Exception;
 
 }

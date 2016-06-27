@@ -113,19 +113,23 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
       }
     }));
 
-//    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.important.web.page.parts", new ExtractContentAction() {
-//      @Override
-//      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
-//        setWebPageAsEntryContentTryToRemoveClutter(option, listener);
-//      }
-//    }));
-//
-//    options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.extract.plain.text.only", new ExtractContentAction() {
-//      @Override
-//      public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
-//        setWebPagePlainTextAsEntryContent(option, listener);
-//      }
-//    }));
+    if(htmlHelper.canRemoveClutterFromHtml()) {
+      options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.try.to.extract.important.web.page.parts", new ExtractContentAction() {
+        @Override
+        public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+          setWebPageAsEntryContentTryToRemoveClutter(option, htmlHelper, listener);
+        }
+      }));
+    }
+
+    if(htmlHelper.canExtractPlainText()) {
+      options.addContentExtractOption(new ContentExtractOption(this, url, true, "content.extractor.extract.plain.text.only", new ExtractContentAction() {
+        @Override
+        public void runExtraction(ContentExtractOption option, ExtractContentActionResultListener listener) {
+          setWebPagePlainTextAsEntryContent(option, htmlHelper, listener);
+        }
+      }));
+    }
 
     return options;
   }
@@ -145,64 +149,49 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
     }
   }
 
-//  protected void setWebPageAsEntryContentTryToRemoveClutter(ContentExtractOption option, ExtractContentActionResultListener listener) {
-//    EntryCreationResult result = createEntryCreationResultFromPageHtmlTryToRemoveClutter(option.getUrl());
-//    dispatchResult(result, listener);
-//  }
-//
-//  protected EntryCreationResult createEntryCreationResultFromPageHtmlTryToRemoveClutter(String webPageUrl) {
-//    try {
-//      HTMLHighlighter htmlExtractor = HTMLHighlighter.newExtractingInstance();
-//      ExtractorBase extractor = CanolaExtractor.INSTANCE;
-//      String content = htmlExtractor.process(new URL(webPageUrl), extractor);
-//
-//      return createEntryCreationResultFromPageHtmlString(webPageUrl, content);
-//    } catch(Exception ex) {
-//      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
-//      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
-//    }
-//  }
-//
-//  private EntryCreationResult createEntryCreationResultFromPageHtmlString(String webPageUrl, String content) {
-//    Entry entry = new Entry(content);
-//    EntryCreationResult result = new EntryCreationResult(webPageUrl, entry);
-//
-//    result.setReference(createReferenceForUrl(webPageUrl)); // TODO: try to get WebPage's title
-//
-//    return result;
-//  }
-//
-//  protected void setWebPagePlainTextAsEntryContent(ContentExtractOption option, ExtractContentActionResultListener listener) {
-//    EntryCreationResult result = createEntryCreationResultFromPagePlainText(option.getUrl());
-//    dispatchResult(result, listener);
-//  }
-//
-//  protected EntryCreationResult createEntryCreationResultFromPagePlainText(String webPageUrl) {
-//    try {
-//      Document document = retrieveOnlineDocument(webPageUrl);
-////      String content = document.body().text();
-//      String content = getPlainTextFromDocument(document);
-//
-//      EntryCreationResult result = new EntryCreationResult(webPageUrl, new Entry(content));
-//      result.setReference(createReferenceForUrl(webPageUrl, document.title()));
-//
-//      return result;
-//    } catch(Exception ex) {
-//      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
-//      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
-//    }
-//  }
-//
-//  protected String getPlainTextFromDocument(Document document) throws BoilerpipeProcessingException {
-//    String plainText = CanolaExtractor.INSTANCE.getText(document.outerHtml());
-//    String formattedPlainText = "";
-//
-//    for(String paragraph : plainText.split("\n")) {
-//      formattedPlainText += "<p>" + paragraph + "</p>";
-//    }
-//
-//    return formattedPlainText;
-//  }
+  protected void setWebPageAsEntryContentTryToRemoveClutter(ContentExtractOption option, IHtmlHelper htmlHelper, ExtractContentActionResultListener listener) {
+    EntryCreationResult result = createEntryCreationResultFromPageHtmlTryToRemoveClutter(option.getUrl(), htmlHelper);
+    dispatchResult(result, listener);
+  }
+
+  protected EntryCreationResult createEntryCreationResultFromPageHtmlTryToRemoveClutter(String webPageUrl, IHtmlHelper htmlHelper) {
+    try {
+      String content = htmlHelper.tryToRemoveClutter(webPageUrl);
+
+      return createEntryCreationResultFromPageHtmlString(webPageUrl, content);
+    } catch(Exception ex) {
+      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
+      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
+    }
+  }
+
+  private EntryCreationResult createEntryCreationResultFromPageHtmlString(String webPageUrl, String content) {
+    Entry entry = new Entry(content);
+    EntryCreationResult result = new EntryCreationResult(webPageUrl, entry);
+
+    result.setReference(createReferenceForUrl(webPageUrl)); // TODO: try to get WebPage's title
+
+    return result;
+  }
+
+  protected void setWebPagePlainTextAsEntryContent(ContentExtractOption option, IHtmlHelper htmlHelper, ExtractContentActionResultListener listener) {
+    EntryCreationResult result = createEntryCreationResultFromPagePlainText(option.getUrl(), htmlHelper);
+    dispatchResult(result, listener);
+  }
+
+  protected EntryCreationResult createEntryCreationResultFromPagePlainText(String webPageUrl, IHtmlHelper htmlHelper) {
+    try {
+      String content = htmlHelper.extractPlainText(webPageUrl);
+
+      EntryCreationResult result = new EntryCreationResult(webPageUrl, new Entry(content));
+      result.setReference(createReferenceForUrl(webPageUrl));
+
+      return result;
+    } catch(Exception ex) {
+      log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
+      return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
+    }
+  }
 
   protected void dispatchResult(EntryCreationResult result, ExtractContentActionResultListener listener) {
     if(listener != null) {
