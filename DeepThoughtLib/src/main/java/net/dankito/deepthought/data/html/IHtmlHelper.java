@@ -24,8 +24,8 @@ public interface IHtmlHelper {
   List<ImageElementData> extractAllImageElementsFromHtml(String html);
 
 
-  String extractPlainText(String webPageUrl) throws Exception;
+  WebPageExtractionResult extractPlainText(String webPageUrl) throws Exception;
 
-  String tryToRemoveClutter(String webPageUrl) throws Exception;
+  WebPageExtractionResult tryToRemoveClutter(String webPageUrl) throws Exception;
 
 }

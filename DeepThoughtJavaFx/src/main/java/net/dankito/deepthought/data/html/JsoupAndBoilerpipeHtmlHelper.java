@@ -30,7 +30,7 @@ public class JsoupAndBoilerpipeHtmlHelper extends JsoupHtmlHelper {
 
 
   @Override
-  public String extractPlainText(String webPageUrl) throws Exception {
+  public WebPageExtractionResult extractPlainText(String webPageUrl) throws Exception {
     Document document = retrieveOnlineDocument(webPageUrl);
     String plainText = CanolaExtractor.INSTANCE.getText(document.outerHtml());
     String formattedPlainText = "";
@@ -39,14 +39,21 @@ public class JsoupAndBoilerpipeHtmlHelper extends JsoupHtmlHelper {
       formattedPlainText += "<p>" + paragraph + "</p>";
     }
 
-    return formattedPlainText;
+    return new WebPageExtractionResult(formattedPlainText, document.title());
   }
 
   @Override
-  public String tryToRemoveClutter(String webPageUrl) throws Exception {
+  public WebPageExtractionResult tryToRemoveClutter(String webPageUrl) throws Exception {
     HTMLHighlighter htmlExtractor = getHtmlHighlighter();
     ExtractorBase extractor = getExtractor();
-    return htmlExtractor.process(new URL(webPageUrl), extractor);
+    String extractedText = htmlExtractor.process(new URL(webPageUrl), extractor);
+
+    String title = "";
+    try {
+      title = retrieveOnlineDocument(webPageUrl).title();
+    } catch(Exception ignored) { } // title is not that important, just eat exceptions
+
+    return new WebPageExtractionResult(extractedText, title);
   }
 
   protected HTMLHighlighter getHtmlHighlighter() {

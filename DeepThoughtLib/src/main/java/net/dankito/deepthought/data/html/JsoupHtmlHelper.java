@@ -103,6 +103,11 @@ public class JsoupHtmlHelper implements IHtmlHelper {
   }
 
 
+  public String getWebsiteTitle(String webPageUrl) throws Exception {
+    return retrieveOnlineDocument(webPageUrl).title();
+  }
+
+
   @Override
   public String extractPlainTextFromHtmlBody(String html) {
     try {
@@ -176,13 +181,13 @@ public class JsoupHtmlHelper implements IHtmlHelper {
 
 
   @Override
-  public String extractPlainText(String webPageUrl) throws Exception {
+  public WebPageExtractionResult extractPlainText(String webPageUrl) throws Exception {
     Document document = retrieveOnlineDocument(webPageUrl);
-    return document.body().text();
+    return new WebPageExtractionResult(document.body().text(), document.title());
   }
 
   @Override
-  public String tryToRemoveClutter(String webPageUrl) throws Exception {
+  public WebPageExtractionResult tryToRemoveClutter(String webPageUrl) throws Exception {
     return null;
   }
 

@@ -1,5 +1,6 @@
 package net.dankito.deepthought.data.contentextractor;
 
+import net.dankito.deepthought.data.html.WebPageExtractionResult;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.dankito.deepthought.data.html.IHtmlHelper;
@@ -156,20 +157,21 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
 
   protected EntryCreationResult createEntryCreationResultFromPageHtmlTryToRemoveClutter(String webPageUrl, IHtmlHelper htmlHelper) {
     try {
-      String content = htmlHelper.tryToRemoveClutter(webPageUrl);
+      WebPageExtractionResult extractionResult = htmlHelper.tryToRemoveClutter(webPageUrl);
 
-      return createEntryCreationResultFromPageHtmlString(webPageUrl, content);
+      return createEntryCreationResultFromWebPageExtractionResult(webPageUrl, extractionResult);
     } catch(Exception ex) {
       log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
       return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
     }
   }
 
-  private EntryCreationResult createEntryCreationResultFromPageHtmlString(String webPageUrl, String content) {
+  private EntryCreationResult createEntryCreationResultFromWebPageExtractionResult(String webPageUrl, WebPageExtractionResult extractionResult) {
+    String content = extractionResult.getExtractedText();
     Entry entry = new Entry(content);
     EntryCreationResult result = new EntryCreationResult(webPageUrl, entry);
 
-    result.setReference(createReferenceForUrl(webPageUrl)); // TODO: try to get WebPage's title
+    result.setReference(createReferenceForUrl(webPageUrl, extractionResult.getWebPageTitle()));
 
     return result;
   }
@@ -181,12 +183,9 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
 
   protected EntryCreationResult createEntryCreationResultFromPagePlainText(String webPageUrl, IHtmlHelper htmlHelper) {
     try {
-      String content = htmlHelper.extractPlainText(webPageUrl);
+      WebPageExtractionResult extractionResult = htmlHelper.extractPlainText(webPageUrl);
 
-      EntryCreationResult result = new EntryCreationResult(webPageUrl, new Entry(content));
-      result.setReference(createReferenceForUrl(webPageUrl));
-
-      return result;
+      return createEntryCreationResultFromWebPageExtractionResult(webPageUrl, extractionResult);
     } catch(Exception ex) {
       log.error("Could not retrieve WebPage's HTML Code for Url " + webPageUrl, ex);
       return new EntryCreationResult(webPageUrl, new DeepThoughtError(Localization.getLocalizedString("could.not.retrieve.articles.html.code", webPageUrl), ex));
