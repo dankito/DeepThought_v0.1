@@ -2,7 +2,6 @@ package net.dankito.deepthought.data;
 
 import android.os.Environment;
 
-import net.dankito.deepthought.data.DefaultDataManager;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public class AndroidDataManager extends DefaultDataManager {
     }
     else {
       File dataFolderFile = new File(Environment.getDataDirectory(), "data");
-      dataFolderFile = new File(dataFolderFile, "net.deepthought");
+      dataFolderFile = new File(dataFolderFile, "net.dankito.deepthought");
       dataFolderFile = new File(dataFolderFile, "data");
       if(dataFolderFile.exists() == false) {
         dataFolderFile.mkdirs();

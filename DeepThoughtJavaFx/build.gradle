@@ -35,7 +35,7 @@ dependencies {
 //    testCompile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
-mainClassName = 'net.deepthought.DeepThoughtFx'
+mainClassName = 'net.dankito.deepthought.DeepThoughtFx'
 
 def version = '0.1 Beta'
 def title = 'Deep Thought'

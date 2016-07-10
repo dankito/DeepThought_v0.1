@@ -89,6 +89,6 @@ public class DeepThoughtJsonReader extends JsonReader {
   }
 
   protected boolean isDeepThoughtDataModelType(JsonObject jsonObj) {
-    return jsonObj.getType().startsWith("net.deepthought.data.model.");
+    return jsonObj.getType().startsWith("net.dankito.deepthought.data.model.");
   }
 }

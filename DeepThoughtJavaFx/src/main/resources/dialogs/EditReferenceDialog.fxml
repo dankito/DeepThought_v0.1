@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
-<?import net.deepthought.controls.*?>
+<?import net.dankito.deepthought.controls.*?>
 
 <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefViewportHeight="650.0" prefViewportWidth="650.0" prefWidth="830.0" vbarPolicy="ALWAYS" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.dankito.deepthought.controller.EditReferenceDialogController">
                <content>
