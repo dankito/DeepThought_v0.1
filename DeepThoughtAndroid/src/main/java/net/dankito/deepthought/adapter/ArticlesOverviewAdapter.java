@@ -90,9 +90,14 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     ArticlesOverviewItem article = getArticleAt(position);
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
-    Picasso.with(context)
-        .load(article.getPreviewImageUrl())
-        .into(imgvwArticlePreviewImage);
+    if(article.hasPreviewImageUrl()) {
+      Picasso.with(context)
+          .load(article.getPreviewImageUrl())
+          .into(imgvwArticlePreviewImage);
+    }
+    else {
+      imgvwArticlePreviewImage.setVisibility(View.INVISIBLE);
+    }
 
     TextView txtvwArticleSubTitle = (TextView)convertView.findViewById(R.id.txtvwArticleSubTitle);
     if(article.hasSubTitle()) {
