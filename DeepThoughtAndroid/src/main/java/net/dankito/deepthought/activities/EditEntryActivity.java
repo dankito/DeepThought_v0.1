@@ -26,6 +26,7 @@ import android.widget.Toast;
 import net.dankito.deepthought.AndroidHelper;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.adapter.AddImageOrOcrTextOptionsListAdapter;
 import net.dankito.deepthought.adapter.EntryTagsAdapter;
 import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.model.OcrSource;
@@ -62,9 +63,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   public final static int RequestCode = 1;
   public final static String ResultKey = "EntryResult";
 
-  public final static int TakePhotoRequestCode = 3;
+  public final static int TakePhotoRequestCode = 10;
+  public final static int SelectPhotosFromGalleryRequestCode = 11;
 
-  public final static int RecognizeTextFromCameraPhotoRequestCode = 2;
+  public final static int RecognizeTextFromCameraPhotoRequestCode = 20;
+  public final static int RecognizeTextFromPhotosFromGalleryRequestCode = 21;
 
   private final static Logger log = LoggerFactory.getLogger(EditEntryActivity.class);
 
@@ -215,7 +218,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
 
     if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
-      MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddContentFromOcr);
+      MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddImageOrOCRText);
       mnitmActionAddContentFromOcr.setVisible(true);
     }
 
@@ -234,9 +237,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       saveEntryAndCloseActivity();
       return true;
     }
-    else if (id == R.id.mnitmActionAddContentFromOcr) {
-      addContentFromOcr();
-//      insertPhotoFromCamera();
+    else if (id == R.id.mnitmActionAddImageOrOCRText) {
+      addImageOrOcrText();
       return true;
     }
 
@@ -311,23 +313,87 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (requestCode == TakePhotoRequestCode && resultCode == RESULT_OK) {
-      if(takenPhotoTempFile != null) {
+    if (requestCode == TakePhotoRequestCode) {
+      handleTakePhotoResult(resultCode);
+    }
+    if (requestCode == SelectPhotosFromGalleryRequestCode) {
+      handleSelectPhotosFromGalleryResult(resultCode, data);
+    }
+  }
+
+  protected void handleTakePhotoResult(int resultCode) {
+    if(resultCode == RESULT_OK) {
+      if (takenPhotoTempFile != null) {
         FileLink imageFile = FileUtils.moveFileToCapturedImagesFolder(takenPhotoTempFile.toString());
-        Application.getDeepThought().addFile(imageFile);
-        ImageElementData imageData = new ImageElementData(imageFile);
-        contentHtmlEditor.insertHtml(imageData.createHtmlCode());
+        embedImageInHtmlEditor(imageFile, true);
       }
     }
 
     takenPhotoTempFile = null;
   }
 
+  protected void handleSelectPhotosFromGalleryResult(int resultCode, Intent data) {
+    if(resultCode == RESULT_OK) {
+      try {
+        FileLink imageFile = new FileLink(data.getDataString());
+        embedImageInHtmlEditor(imageFile, true);
+      } catch (Exception ex) {
+        log.error("Could not read select file from uri " + data.getDataString(), ex);
+        // TODO: send error response
+      }
+    }
+  }
+
+  protected void embedImageInHtmlEditor(FileLink imageFile, boolean intoContentHtmlEditor) {
+    Application.getDeepThought().addFile(imageFile);
+    ImageElementData imageData = new ImageElementData(imageFile);
+
+    if(intoContentHtmlEditor == true) {
+      contentHtmlEditor.insertHtml(imageData.createHtmlCode());
+    }
+    else {
+      abstractHtmlEditor.insertHtml(imageData.createHtmlCode());
+    }
+  }
+
+  protected void addImageOrOcrText() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder = builder.setAdapter(new AddImageOrOcrTextOptionsListAdapter(this), new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int index) {
+        addImageOrOcrTextOptionsSelected(index);
+      }
+    });
+
+    builder.setNegativeButton(R.string.cancel, null);
+
+    builder.create().show();
+  }
+
+  protected void addImageOrOcrTextOptionsSelected(int index) {
+    if(index == 1) {
+      insertPhotoFromCamera();
+    }
+    else if(index == 2) {
+      insertPhotoFromGallery();
+    }
+    else if(index == 4) {
+      recognizeTextFromCapturedPhoto();
+    }
+    else if(index == 5) {
+      recognizeTextFromPhotoFromGallery();
+    }
+  }
+
   protected void insertPhotoFromCamera() {
     takenPhotoTempFile = AndroidHelper.takePhoto(this, TakePhotoRequestCode);
   }
 
-  protected void addContentFromOcr() {
+  protected void insertPhotoFromGallery() {
+    AndroidHelper.selectImagesFromGallery(this, SelectPhotosFromGalleryRequestCode);
+  }
+
+  protected void recognizeTextFromCapturedPhoto() {
     if(Application.getContentExtractorManager().hasOcrContentExtractors() == false) {
       return;
     }
@@ -339,6 +405,20 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
     });
   }
+
+  protected void recognizeTextFromPhotoFromGallery() {
+    if(Application.getContentExtractorManager().hasOcrContentExtractors() == false) {
+      return;
+    }
+
+    Application.getContentExtractorManager().getPreferredOcrContentExtractor().recognizeTextAsync(new DoOcrConfiguration(OcrSource.SelectAnExistingImageOnDevice), new RecognizeTextListener() {
+      @Override
+      public void textRecognized(TextRecognitionResult result) {
+        EditEntryActivity.this.textRecognized(result);
+      }
+    });
+  }
+
   protected void textRecognized(TextRecognitionResult result) {
     try {
       if (result.isUserCancelled() || (result.isDone() && result.getRecognizedText() == null)) {

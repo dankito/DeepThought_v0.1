@@ -34,8 +34,6 @@
 
     <string name="loading_data_wait_message">Loading data ...</string>
 
-    <string name="image_source">Pick image source.</string>
-
     <string name="error_message_could_not_show_activity">Could not show dialog: %s</string>
 
     <string name="error_message_tag_with_that_name_already_exists">A Tag with that name already exists</string>
@@ -74,5 +72,22 @@
     <string name="device_registration_successfully_registered_device">Successfully registered device %s</string>
     <string name="connect_with_this_device">Connect with this device?</string>
     <string name="never_ask_again">Never ask again</string>
+
+    <string name="add_image">Add Image</string>
+    <string name="from_camera">from Camera</string>
+    <string name="from_gallery">from Gallery</string>
+
+    <string name="recognize_text">Recognize Text</string>
+    <string name="from_camera_photo">from Camera Photo</string>
+    <string name="from_gallery_photo">from Gallery Photo</string>
+
+    <string-array name="add_image_or_ocr_text_options">
+        <item>@string/add_image</item>
+        <item>@string/from_camera</item>
+        <item>@string/from_gallery</item>
+        <item>@string/recognize_text</item>
+        <item>@string/from_camera_photo</item>
+        <item>@string/from_gallery_photo</item>
+    </string-array>
 
 </resources>

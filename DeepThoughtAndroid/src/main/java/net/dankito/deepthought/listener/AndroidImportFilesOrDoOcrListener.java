@@ -3,14 +3,12 @@ package net.dankito.deepthought.listener;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import net.dankito.deepthought.AndroidHelper;
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.R;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.ResponseListener;
 import net.dankito.deepthought.communication.messages.request.DoOcrRequest;
@@ -31,9 +29,7 @@ import net.dankito.deepthought.util.file.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 
 /**
  * Created by ganymed on 09/02/16.
@@ -109,18 +105,7 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   protected void selectImagesFromGalleryAndSendToCaller(ImportFilesRequest request) {
     this.importFilesRequest = request;
 
-    Intent i = new Intent(Intent.ACTION_GET_CONTENT, null);
-
-    // TODO: set Files types either to Html compatible types or that ones in request parameter
-    if (Build.VERSION.SDK_INT >= 19) {
-      i.setType("image/*");
-      i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/png", "image/jpg", "image/jpeg"});
-    } else {
-      i.setType("image/png,image/jpg, image/jpeg");
-    }
-
-    Intent chooser = Intent.createChooser(i, context.getString(R.string.image_source));
-    context.startActivityForResult(chooser, SelectImageFromGalleryForConnectPeerRequestCode);
+    AndroidHelper.selectImagesFromGallery(context, SelectImageFromGalleryForConnectPeerRequestCode);
   }
 
   protected void doOcrAndSendToCaller(final DoOcrRequest request) {
@@ -172,35 +157,17 @@ public class AndroidImportFilesOrDoOcrListener implements ImportFilesOrDoOcrList
   public void handleSelectImageFromGalleryResult(int resultCode, Intent data) {
     if(resultCode == Activity.RESULT_OK) { // TODO: what to do in error case? Send Error Message?
       if(importFilesRequest != null) {
-        String uri = data.getDataString();
-
         try {
-          InputStream selectedFileStream = context.getContentResolver().openInputStream(data.getData());
-          byte[] fileData = readDataFromInputStream(selectedFileStream);
+          byte[] fileData = AndroidHelper.getImageBytesFromIntent(context, data);
           Application.getDeepThoughtConnector().getCommunicator().respondToImportFilesRequest(importFilesRequest, new ImportFilesResult(fileData, true), null);
         } catch (Exception ex) {
-          log.error("Could not read select file from uri " + uri, ex);
+          log.error("Could not read select file from uri " + data.getDataString(), ex);
           // TODO: send error response
         }
       }
     }
 
     importFilesRequest = null;
-  }
-
-  protected byte[] readDataFromInputStream(InputStream inputStream) throws Exception{
-    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-    int nRead;
-    byte[] data = new byte[16384];
-
-    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-      buffer.write(data, 0, nRead);
-    }
-
-    buffer.flush();
-
-    return buffer.toByteArray();
   }
 
   public void handleScanBarCodeResult(int requestCode, int resultCode, Intent data) {

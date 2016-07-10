@@ -19,7 +19,7 @@
     <!--</item>-->
 
     <item
-        android:id="@+id/mnitmActionAddContentFromOcr"
+        android:id="@+id/mnitmActionAddImageOrOCRText"
         android:title="@string/ocr"
         android:icon="@android:drawable/ic_menu_camera"
         app:showAsAction="always"

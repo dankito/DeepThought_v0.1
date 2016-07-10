@@ -5,14 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 
+import net.deepthought.android.lib.R;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -77,6 +82,44 @@ public class AndroidHelper {
     }
 
     return null;
+  }
+
+
+  public static void selectImagesFromGallery(Activity context, int requestCode) {
+    Intent i = new Intent(Intent.ACTION_GET_CONTENT, null);
+
+    // TODO: set Files types either to Html compatible types or that ones in request parameter
+    if (Build.VERSION.SDK_INT >= 19) {
+      i.setType("image/*");
+      i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/png", "image/jpg", "image/jpeg"});
+    } else {
+      i.setType("image/png,image/jpg, image/jpeg");
+    }
+
+    Intent chooser = Intent.createChooser(i, context.getString(R.string.image_source));
+    context.startActivityForResult(chooser, requestCode);
+  }
+
+  public static byte[] getImageBytesFromIntent(Context context, Intent data) throws Exception {
+    String uri = data.getDataString();
+
+    InputStream selectedFileStream = context.getContentResolver().openInputStream(data.getData());
+    return readDataFromInputStream(selectedFileStream);
+  }
+
+  protected static byte[] readDataFromInputStream(InputStream inputStream) throws Exception{
+    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+    int nRead;
+    byte[] data = new byte[16384];
+
+    while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+      buffer.write(data, 0, nRead);
+    }
+
+    buffer.flush();
+
+    return buffer.toByteArray();
   }
 
 }
