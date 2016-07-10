@@ -217,7 +217,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
 
-    if(Application.getContentExtractorManager().hasOcrContentExtractors()) {
+    if(Application.getPlatformConfiguration().hasCaptureDevice() || Application.getContentExtractorManager().hasOcrContentExtractors()) {
       MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddImageOrOCRText);
       mnitmActionAddContentFromOcr.setVisible(true);
     }
