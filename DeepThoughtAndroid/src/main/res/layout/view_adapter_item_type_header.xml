@@ -11,7 +11,7 @@
         style="@style/Base.TextAppearance.AppCompat.Title"
         android:textStyle="bold"
         android:paddingTop="4dp"
-        android:paddingStart="6dp"
+        android:paddingLeft="6dp"
     />
 
 </LinearLayout>
