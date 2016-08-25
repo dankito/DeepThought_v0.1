@@ -89,6 +89,7 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     return new Dao(database, entityConfig, objectCache, daoCache);
   }
 
+
   @Override
   public String getDatabasePath() {
     return databasePath;
@@ -174,7 +175,15 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
 
   @Override
   public <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type) {
-    // TODO: create View for searching for all Documents with type = entityClass.getName()
+    try {
+      Dao dao = getDaoForClass(type);
+
+      if(dao != null) {
+        return dao.retrieveAllEntitiesOfType(type);
+      }
+    }
+    catch(Exception e) { log.error("Could not get all entities of type " + type, e); }
+
     return new ArrayList<T>();
   }
 
