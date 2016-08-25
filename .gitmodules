@@ -1,3 +1,11 @@
+[submodule "libs/persistence/database/JpaAnnotationReader"]
+	path = libs/persistence/database/JpaAnnotationReader
+	url = https://github.com/dankito/JpaAnnotationReader.git
+
+[submodule "libs/persistence/database/couchbase-lite-jpa"]
+	path = libs/persistence/database/couchbase-lite-jpa
+	url = https://github.com/dankito/couchbase-lite-jpa.git
+
 [submodule "libs/persistence/database/ormlite-jpa-core"]
 	path = libs/persistence/database/ormlite-jpa-core
 	url = https://github.com/dankito/ormlite-jpa-core.git
