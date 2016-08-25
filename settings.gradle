@@ -3,6 +3,8 @@ include ':DeepThoughtJavaFx'
 include ':DeepThoughtAndroid', ':DeepThoughtAndroidLib'
 include ':JpaAnnotationReader'
 include ':couchbase-lite-jpa'
+include ':CouchbaseLiteEntityManagerBase'
+include ':JavaCouchbaseLiteEntityManager'
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':EntityManagerTools'
 include ':AndroidOrmLiteEntityManager'
@@ -30,6 +32,8 @@ project(':DeepThoughtAndroidLib').projectDir = new File('libs/os/DeepThoughtAndr
 
 project(':JpaAnnotationReader').projectDir = new File('libs/persistence/database/JpaAnnotationReader')
 project(':couchbase-lite-jpa').projectDir = new File('libs/persistence/database/couchbase-lite-jpa')
+project(':CouchbaseLiteEntityManagerBase').projectDir = new File('libs/persistence/database/CouchbaseLiteEntityManagerBase')
+project(':JavaCouchbaseLiteEntityManager').projectDir = new File('libs/persistence/database/JavaCouchbaseLiteEntityManager')
 
 project(':ormlite-jpa-core').projectDir = new File('libs/persistence/database/ormlite-jpa-core')
 project(':ormlite-jpa-jdbc').projectDir = new File('libs/persistence/database/ormlite-jpa-jdbc')

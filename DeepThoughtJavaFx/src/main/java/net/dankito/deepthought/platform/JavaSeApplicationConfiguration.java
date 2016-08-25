@@ -11,6 +11,7 @@ import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.html.JsoupAndBoilerpipeHtmlHelper;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
@@ -82,9 +83,17 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
     return staticPlugins;
   }
 
+  protected boolean useCouchbaseLite = true;
+
   @Override
   public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-    return new OrmLiteJavaSeEntityManager(configuration);
+    if(useCouchbaseLite) {
+      configuration.setDataCollectionFileName("deep_thought_db_couchbase_lite");
+      return new JavaCouchbaseLiteEntityManager(configuration);
+    }
+    else {
+      return new OrmLiteJavaSeEntityManager(configuration);
+    }
   }
 
   @Override

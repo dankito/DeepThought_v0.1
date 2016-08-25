@@ -1,0 +1,12 @@
+apply plugin: 'java'
+
+def couchbaseLiteVersion = '1.3.0'
+
+
+dependencies {
+    compile project(':CouchbaseLiteEntityManagerBase')
+
+    compile 'com.couchbase.lite:couchbase-lite-java:' + couchbaseLiteVersion
+
+    testCompile 'junit:junit:4.11'
+}
