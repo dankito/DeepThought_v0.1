@@ -1,6 +1,4 @@
-[submodule "libs/persistence/database/JpaAnnotationReader"]
-	path = libs/persistence/database/JpaAnnotationReader
-	url = https://github.com/dankito/JpaAnnotationReader.git
+
 
 [submodule "libs/persistence/database/couchbase-lite-jpa"]
 	path = libs/persistence/database/couchbase-lite-jpa
