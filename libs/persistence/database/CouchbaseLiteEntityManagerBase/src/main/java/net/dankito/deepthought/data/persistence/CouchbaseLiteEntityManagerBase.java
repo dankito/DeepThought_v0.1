@@ -8,6 +8,8 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.ManagerOptions;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.jpa.annotationreader.JpaAnnotationReader;
 import net.dankito.jpa.annotationreader.JpaAnnotationReaderResult;
@@ -193,13 +195,13 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
   }
 
   @Override
-  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
-
+  public Collection<Entry> findEntriesHavingTheseTags(Collection<Tag> tags) {
+    return new ArrayList<>();
   }
 
   @Override
-  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
-    return new ArrayList<T>();
+  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
+
   }
 
   @Override

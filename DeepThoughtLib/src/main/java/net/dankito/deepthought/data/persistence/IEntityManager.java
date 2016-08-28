@@ -1,5 +1,7 @@
 package net.dankito.deepthought.data.persistence;
 
+import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 
 import java.sql.SQLException;
@@ -26,6 +28,8 @@ public interface IEntityManager {
 
   <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds);
 
+  Collection<Entry> findEntriesHavingTheseTags(Collection<Tag> tags);
+
   /**
    * <p>
    *   Lazy initialization requires that the Database connection is still open.
@@ -36,8 +40,6 @@ public interface IEntityManager {
    * @throws Exception
    */
   void resolveAllLazyRelations(BaseEntity entity) throws Exception;
-
-  <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException;
 
   List doNativeQuery(String query) throws SQLException;
 

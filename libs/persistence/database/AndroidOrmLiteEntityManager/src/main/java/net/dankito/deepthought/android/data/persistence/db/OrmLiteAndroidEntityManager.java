@@ -16,6 +16,8 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -376,24 +378,35 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   }
 
   @Override
-  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
-
-  }
-
-  @Override
-  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
+  public Collection<Entry> findEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor) {
     try {
-      Dao dao = getDaoForClass(entityClass);
+      Dao dao = getDaoForClass(Entry.class);
 
       if(dao != null) {
         QueryBuilder queryBuilder = dao.queryBuilder();
-        queryBuilder.where().raw(whereStatement);
-        return (List<T>) queryBuilder.query();
+        queryBuilder.where().raw(createWhereStatementForEntriesHavingTheseTags(tagsToFilterFor));
+        return (List<Entry>) queryBuilder.query();
       }
     } catch(Exception ex) {
-      log.error("Could not query for Entities for Type " + entityClass + " with where statement " + whereStatement, ex); }
+      log.error("Could not query for Entries to get all Entries having these Tags", ex); }
 
     return new ArrayList<>();
+  }
+
+  protected String createWhereStatementForEntriesHavingTheseTags(Collection<Tag> tagsToFilterFor) {
+    String whereStatement =  TableConfig.EntryDeepThoughtJoinColumnName + " = " + Application.getDeepThought().getId();
+
+    for(Tag tag : tagsToFilterFor) {
+      whereStatement += " AND " + TableConfig.BaseEntityIdColumnName + " IN " + "(SELECT " + TableConfig.EntryTagJoinTableEntryIdColumnName + " FROM " +
+          TableConfig.EntryTagJoinTableName + " WHERE " + TableConfig.EntryTagJoinTableTagIdColumnName + " = " + tag.getId() + ")";
+    }
+
+    return whereStatement;
+  }
+
+  @Override
+  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
+
   }
 
   @Override

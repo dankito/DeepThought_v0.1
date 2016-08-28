@@ -206,13 +206,13 @@ public class MockEntityManager implements IEntityManager {
   }
 
   @Override
-  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
-
+  public Collection<Entry> findEntriesHavingTheseTags(Collection<Tag> tags) {
+    return new ArrayList<>();
   }
 
   @Override
-  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException {
-    return new ArrayList<>();
+  public void resolveAllLazyRelations(BaseEntity entity) throws Exception {
+
   }
 
   @Override

@@ -242,14 +242,8 @@ public class DatabaseSearchEngine extends SearchEngineBase {
     Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
     IEntityManager entityManager = Application.getEntityManager();
 
-    String whereStatement =  TableConfig.EntryDeepThoughtJoinColumnName + " = " + deepThought.getId();
-    for(Tag tag : tagsToFilterFor) {
-      whereStatement += " AND " + TableConfig.BaseEntityIdColumnName + " IN " + "(SELECT " + TableConfig.EntryTagJoinTableEntryIdColumnName + " FROM " +
-          TableConfig.EntryTagJoinTableName + " WHERE " + TableConfig.EntryTagJoinTableTagIdColumnName + " = " + tag.getId() + ")";
-    }
-
     try {
-      entriesHavingFilteredTags.addAll(entityManager.queryEntities(Entry.class, whereStatement));
+      entriesHavingFilteredTags.addAll(entityManager.findEntriesHavingTheseTags(tagsToFilterFor));
       for(Entry foundEntry : entriesHavingFilteredTags) // TODO for each loops loads Entries from Database -> find a solution without loading Entries from Database
         tagsOnEntriesContainingFilteredTags.addAll(foundEntry.getTags());
     } catch(Exception ex) {
