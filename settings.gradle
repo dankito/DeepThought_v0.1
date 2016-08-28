@@ -5,6 +5,7 @@ include ':JpaAnnotationReader'
 include ':couchbase-lite-jpa'
 include ':CouchbaseLiteEntityManagerBase'
 include ':JavaCouchbaseLiteEntityManager', ':AndroidCouchbaseLiteEntityManager'
+include  ':CouchbaseLiteSyncManager'
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':EntityManagerTools'
 include ':AndroidOrmLiteEntityManager'
@@ -35,6 +36,8 @@ project(':couchbase-lite-jpa').projectDir = new File('libs/persistence/database/
 project(':CouchbaseLiteEntityManagerBase').projectDir = new File('libs/persistence/database/CouchbaseLiteEntityManagerBase')
 project(':JavaCouchbaseLiteEntityManager').projectDir = new File('libs/persistence/database/JavaCouchbaseLiteEntityManager')
 project(':AndroidCouchbaseLiteEntityManager').projectDir = new File('libs/persistence/database/AndroidCouchbaseLiteEntityManager')
+
+project(':CouchbaseLiteSyncManager').projectDir = new File('libs/persistence/database/CouchbaseLiteSyncManager')
 
 project(':ormlite-jpa-core').projectDir = new File('libs/persistence/database/ormlite-jpa-core')
 project(':ormlite-jpa-jdbc').projectDir = new File('libs/persistence/database/ormlite-jpa-jdbc')

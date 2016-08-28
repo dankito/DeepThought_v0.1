@@ -1,0 +1,16 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+
+
+def couchbaseLiteVersion = '1.3.0'
+
+
+dependencies {
+    compile project(':DeepThoughtLib')
+    compile project(':couchbase-lite-jpa')
+
+    compile 'com.couchbase.lite:couchbase-lite-java-core:' + couchbaseLiteVersion
+
+    testCompile 'junit:junit:4.11'
+}
