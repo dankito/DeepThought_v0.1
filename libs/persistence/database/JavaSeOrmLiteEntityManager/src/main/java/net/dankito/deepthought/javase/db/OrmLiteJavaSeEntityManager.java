@@ -131,7 +131,7 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
         queryBuilder.where().in(dao.getEntityConfig().getIdProperty().getColumnName(), ids);
 
         if(keepOrderingOfIds) {
-          queryBuilder.orderByRaw(createOrderByStatementForGetEntitiesById(ids));
+          queryBuilder.orderByRaw(createOrderByStatementForGetEntitiesById(dao, ids));
         }
 
         return (List<T>) queryBuilder.query();
@@ -142,14 +142,21 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
     return new ArrayList<>();
   }
 
-  private String createOrderByStatementForGetEntitiesById(Collection<Long> entityIds) {
-    String orderBy = "ORDER BY instr(',";
+  protected String createOrderByStatementForGetEntitiesById(Dao dao, Collection<Long> entityIds) {
+    String orderBy = "instr(',";
     for(Long id : entityIds) {
       orderBy += id + ",";
     }
-    //whereStatement = whereStatement.substring(0, whereStatement.length() - ", ".length());
 
-    orderBy += "', ',' || id || ',')";
+    orderBy += "', ',' || ";
+
+    // add id column name
+    if(dao.getEntityConfig().getInheritance() != null) { // for inheritance entities we have to explicitly add entity's table name
+      orderBy += dao.getEntityConfig().getTableName() + ".";
+    }
+    orderBy += dao.getEntityConfig().getIdProperty().getColumnName();
+
+    orderBy += " || ',')";
 
     return orderBy;
   }
