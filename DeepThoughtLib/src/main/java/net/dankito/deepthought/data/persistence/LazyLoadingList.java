@@ -1,6 +1,5 @@
 package net.dankito.deepthought.data.persistence;
 
-import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 
@@ -144,25 +143,8 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 
     if (cachedResults.size() < size()) {
       try {
-        // TODO: use getEntitiesById() with new boolean orderedByIds parameter and create statement there
-        String whereStatement = TableConfig.BaseEntityIdColumnName + " IN (";
-        for(Long id : entityIds)
-          whereStatement += id + ", ";
-        whereStatement = whereStatement.substring(0, whereStatement.length() - ", ".length()) + ") ";
+        List<T> allItems = Application.getEntityManager().getEntitiesById(resultType, entityIds, true);
 
-        whereStatement += "ORDER BY instr(',";
-        for(Long id : entityIds)
-          whereStatement += id + ",";
-        //whereStatement = whereStatement.substring(0, whereStatement.length() - ", ".length());
-        whereStatement += "', ',' || id || ',')";
-
-        List<T> allItems = Application.getEntityManager().queryEntities(resultType, whereStatement);
-//        List<T> allItems = Application.getEntityManager().getEntitiesById(resultType, getEntityIds());
-//        List<Long> ids = entityIds instanceof List ? (List<Long>)entityIds : new ArrayList<>(entityIds);
-//        for (int i = 0; i < allItems.size(); i++) {
-//          T item = findItemById(allItems, ids.get(i));
-//          cachedResults.put(i, item);
-//        }
         int i = 0;
         for(T item : allItems) {
           cachedResults.put(i, item);

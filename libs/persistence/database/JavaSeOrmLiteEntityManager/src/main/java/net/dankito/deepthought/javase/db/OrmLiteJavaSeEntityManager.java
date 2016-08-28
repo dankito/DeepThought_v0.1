@@ -129,12 +129,29 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
       if(dao != null) {
         QueryBuilder queryBuilder = dao.queryBuilder();
         queryBuilder.where().in(dao.getEntityConfig().getIdProperty().getColumnName(), ids);
+
+        if(keepOrderingOfIds) {
+          queryBuilder.orderByRaw(createOrderByStatementForGetEntitiesById(ids));
+        }
+
         return (List<T>) queryBuilder.query();
       }
     } catch(Exception ex) {
       log.error("Could not get Entities for Type " + entityClass, ex); }
 
     return new ArrayList<>();
+  }
+
+  private String createOrderByStatementForGetEntitiesById(Collection<Long> entityIds) {
+    String orderBy = "ORDER BY instr(',";
+    for(Long id : entityIds) {
+      orderBy += id + ",";
+    }
+    //whereStatement = whereStatement.substring(0, whereStatement.length() - ", ".length());
+
+    orderBy += "', ',' || id || ',')";
+
+    return orderBy;
   }
 
   @Override

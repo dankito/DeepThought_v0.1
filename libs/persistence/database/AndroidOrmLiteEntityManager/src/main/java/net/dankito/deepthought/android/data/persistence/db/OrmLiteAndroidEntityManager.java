@@ -19,6 +19,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.db.EntitiesConfigurator;
 import net.dankito.deepthought.util.file.FileUtils;
 
@@ -220,22 +221,36 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids) {
-    List<T> result = new ArrayList<>();
-
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids, boolean keepOrderingOfIds) {
     try {
       Dao dao = getDaoForClass(entityClass);
 
       if(dao != null) {
         QueryBuilder queryBuilder = dao.queryBuilder();
         queryBuilder.where().in(dao.getEntityConfig().getIdProperty().getColumnName(), ids);
-        List result2 = queryBuilder.query();
-        return (List<T>)result2;
+
+        if(keepOrderingOfIds) {
+          queryBuilder.orderByRaw(createOrderByStatementForGetEntitiesById(ids));
+        }
+
+        return (List<T>) queryBuilder.query();
       }
     } catch(Exception ex) {
       log.error("Could not get Entities for Type " + entityClass, ex); }
 
-    return result;
+    return new ArrayList<>();
+  }
+
+  private String createOrderByStatementForGetEntitiesById(Collection<Long> entityIds) {
+    String orderBy = "ORDER BY instr(',";
+    for(Long id : entityIds) {
+      orderBy += id + ",";
+    }
+    //whereStatement = whereStatement.substring(0, whereStatement.length() - ", ".length());
+
+    orderBy += "', ',' || id || ',')";
+
+    return orderBy;
   }
 
   @Override
@@ -310,6 +325,47 @@ public class OrmLiteAndroidEntityManager extends OrmLiteSqliteOpenHelper impleme
       log.error("Could not get all Entities for Type " + entityClass, ex); }
 
     return new ArrayList<>();
+  }
+
+  @Override
+  public <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds) {
+    // TODO: this is the same code as in OrmLiteJavaSeEntityManager
+    List<Long> resultIds = new ArrayList<>();
+
+    try {
+      String query = "SELECT b." + TableConfig.BaseEntityIdColumnName + " FROM " +
+          TableConfig.ReferenceBaseTableName + " b " +
+          ", " + TableConfig.ReferenceTableName + " r " +
+          "WHERE b." + TableConfig.BaseEntityIdColumnName + " IN (";
+
+      for (T id : referenceBaseIds)
+        query += id + ", ";
+      query = query.substring(0, query.length() - ", ".length()) + ") ";
+
+      query += "ORDER BY CASE " + TableConfig.ReferenceBaseDiscriminatorColumnName +
+          " WHEN '" + TableConfig.SeriesTitleDiscriminatorValue + "' THEN 1" +
+          " WHEN '" + TableConfig.ReferenceDiscriminatorValue + "' THEN 2" +
+          " ELSE 4 END, " +
+          "b." + TableConfig.ReferenceBaseTitleColumnName
+          + ", b." + TableConfig.ReferenceBaseSubTitleColumnName
+          + ", cast(r." + TableConfig.ReferencePublishingDateColumnName + " as date)"
+          + ", r." + TableConfig.ReferenceIssueOrPublishingDateColumnName
+      ;
+
+      List<String[]> sortedIds = (List<String[]>) doNativeQuery(query);
+      if (sortedIds.size() == resultIds.size()) {
+        for (String[] id : sortedIds) {
+          resultIds.add(Long.parseLong(id[0]));
+        }
+      }
+      else {
+        return referenceBaseIds;
+      }
+    } catch(Exception e) {
+      log.error("Could not sort ReferenceBases search result IDs", e);
+    }
+
+    return (List<T>)resultIds;
   }
 
   @Override
