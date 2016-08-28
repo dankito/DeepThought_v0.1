@@ -14,7 +14,7 @@ import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
-import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
+import net.dankito.deepthought.data.search.LuceneSearchEngine;
 import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.language.LanguageDetector;
@@ -104,12 +104,14 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   @Override
   public ISearchEngine createSearchEngine() {
     try {
-//          return new LuceneSearchEngine();
-      return new LuceneAndDatabaseSearchEngine();
+          return new LuceneSearchEngine();
+//      return new LuceneAndDatabaseSearchEngine();
     } catch(Exception ex) {
       log.error("Could not initialize LuceneSearchEngine", ex);
     }
-    return new InMemorySearchEngine(); // TODO: abort application?
+
+    // TODO: implement InMemorySearchEngine
+    return new InMemorySearchEngine();  // TODO: abort application?
   }
 
   @Override

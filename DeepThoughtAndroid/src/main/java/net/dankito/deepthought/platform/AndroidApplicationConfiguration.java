@@ -21,7 +21,7 @@ import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
-import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
+import net.dankito.deepthought.data.search.LuceneSearchEngine;
 import net.dankito.deepthought.plugin.AndroidPluginManager;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.plugin.IPluginManager;
@@ -106,15 +106,15 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   public ISearchEngine createSearchEngine() {
     try {
       if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9)) {
-//          return new LuceneSearchEngine();
-        return new LuceneAndDatabaseSearchEngine();
+          return new LuceneSearchEngine();
+//        return new LuceneAndDatabaseSearchEngine();
       }
-      else
-        return new InMemorySearchEngine(); // TODO: implement InMemorySearchEngine
     } catch (Exception ex) {
       log.error("Could not initialize LuceneSearchEngine", ex);
     }
-    return null; // TODO: abort application?
+
+    // TODO: implement InMemorySearchEngine
+    return new InMemorySearchEngine();  // TODO: abort application?
   }
 
   @Override
