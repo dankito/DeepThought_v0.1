@@ -95,7 +95,13 @@ public class LazyLoadingObservableList<T> extends ObservableListBase<T> implemen
     this.underlyingCollection = underlyingCollection;
 
     try {
-      nextAdd(0, size());
+      if(size() > 0) {
+        nextAdd(0, size());
+      }
+      else {
+        // TODO: what to do if previous underlyingCollection had more than one item?
+      }
+
       endChange();
     } catch(Exception ex) {
       log.error("Could not set underlying collection", ex);
