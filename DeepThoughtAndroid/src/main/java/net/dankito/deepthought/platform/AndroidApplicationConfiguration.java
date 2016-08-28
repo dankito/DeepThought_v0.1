@@ -2,9 +2,11 @@ package net.dankito.deepthought.platform;
 
 import android.content.Context;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
+import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.contentextractor.CtContentExtractor;
@@ -17,11 +19,14 @@ import net.dankito.deepthought.data.contentextractor.SueddeutscheJetztContentExt
 import net.dankito.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
 import net.dankito.deepthought.data.contentextractor.ZeitContentExtractor;
 import net.dankito.deepthought.data.persistence.AndroidCouchbaseLiteEntityManager;
+import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.search.LuceneSearchEngine;
+import net.dankito.deepthought.data.sync.CouchbaseLiteSyncManager;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.plugin.AndroidPluginManager;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.plugin.IPluginManager;
@@ -124,6 +129,11 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public IPluginManager createPluginManager() {
     return new AndroidPluginManager(context);
+  }
+
+  @Override
+  public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
+    return new CouchbaseLiteSyncManager(((CouchbaseLiteEntityManagerBase) Application.getEntityManager()).getDatabase(), deepThoughtConnector);
   }
 
   @Override

@@ -88,6 +88,8 @@ dependencies {
     compile project(':AndroidCouchbaseLiteEntityManager')
 //    compile project(':AndroidOrmLiteEntityManager')
 
+    compile project(':CouchbaseLiteSyncManager')
+
     compile project(':LuceneSearchEngine')
     compile project(':OnlineNewspaperContentExtractor')
 

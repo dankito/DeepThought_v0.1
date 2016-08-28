@@ -1,5 +1,7 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.communication.DeepThoughtConnector;
+import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.helper.MockEntityManager;
@@ -7,6 +9,7 @@ import net.dankito.deepthought.data.helper.NoOperationBackupManager;
 import net.dankito.deepthought.data.helper.TestDataManager;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.platform.IPlatformConfiguration;
 import net.dankito.deepthought.platform.IPreferencesStore;
 import net.dankito.deepthought.platform.PreferencesStoreBase;
@@ -74,6 +77,11 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
     if(backupManager != null)
       return backupManager;
     return new NoOperationBackupManager();
+  }
+
+  @Override
+  public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
+    return null;
   }
 
   @Override

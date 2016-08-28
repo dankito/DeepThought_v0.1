@@ -14,6 +14,7 @@ import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.dankito.deepthought.data.search.ISearchEngine;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.platform.IPlatformTools;
 import net.dankito.deepthought.plugin.IPluginManager;
@@ -54,6 +55,8 @@ public interface IDependencyResolver<THtmlEditor> {
   IContentExtractorManager createContentExtractorManager();
 
   IDeepThoughtConnector createDeepThoughtConnector();
+
+  IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector);
 
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
 

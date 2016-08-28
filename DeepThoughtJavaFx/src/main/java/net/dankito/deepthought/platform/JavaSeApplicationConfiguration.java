@@ -1,20 +1,25 @@
 package net.dankito.deepthought.platform;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
+import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.download.WGetFileDownloader;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.html.JsoupAndBoilerpipeHtmlHelper;
+import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.search.LuceneSearchEngine;
+import net.dankito.deepthought.data.sync.CouchbaseLiteSyncManager;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.language.LanguageDetector;
 import net.dankito.deepthought.plugin.IPlugin;
@@ -109,6 +114,11 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   @Override
   public IFileDownloader createDownloader() {
     return new WGetFileDownloader();
+  }
+
+  @Override
+  public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
+    return new CouchbaseLiteSyncManager(((CouchbaseLiteEntityManagerBase)Application.getEntityManager()).getDatabase(), deepThoughtConnector);
   }
 
   @Override

@@ -20,6 +20,8 @@ dependencies {
     compile project(':WGetFileDownloader')
     compile project(':Boilerpipe')
 
+    compile project(':CouchbaseLiteSyncManager')
+
 //    compile project(':OnlineNewspaperContentExtractor')
 
     compile 'org.controlsfx:controlsfx:8.20.8'

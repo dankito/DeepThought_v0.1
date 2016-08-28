@@ -19,6 +19,7 @@ import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.dankito.deepthought.data.search.ISearchEngine;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.platform.IPlatformConfiguration;
 import net.dankito.deepthought.platform.IPlatformTools;
@@ -88,6 +89,8 @@ public class Application {
   protected static IContentExtractorManager contentExtractorManager = null;
 
   protected static IDeepThoughtConnector deepThoughtConnector = null;
+
+  protected static IDeepThoughtSyncManager syncManager = null;
 
   protected static IIsbnResolver isbnResolver;
 
@@ -165,6 +168,8 @@ public class Application {
 
       Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector();
       deepThoughtConnector.runAsync();
+
+      Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);
 
       Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
 
@@ -416,6 +421,10 @@ public class Application {
 
   public static IDeepThoughtConnector getDeepThoughtConnector() {
     return deepThoughtConnector;
+  }
+
+  public static IDeepThoughtSyncManager getSyncManager() {
+    return syncManager;
   }
 
   public static IIsbnResolver getIsbnResolver() {
