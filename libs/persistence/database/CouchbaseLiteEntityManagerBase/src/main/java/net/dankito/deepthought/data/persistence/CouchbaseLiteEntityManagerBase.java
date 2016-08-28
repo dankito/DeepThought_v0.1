@@ -236,4 +236,9 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     return dao;
   }
 
+
+  public Database getDatabase() {
+    return database;
+  }
+
 }

@@ -11,7 +11,7 @@ public class Constants {
 
   public final static int MessageHandlerDefaultPort = 27388;
 
-  public final static int RegistrationServerPort = 27387;
+  public final static int SynchronizationDefaultPort = 27387;
 
   public final static int SearchDevicesListenerPort = 27384;
 
