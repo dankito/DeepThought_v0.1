@@ -92,7 +92,6 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
 //    return new OrmLiteAndroidEntityManager(context, configuration);
 
     try {
-      configuration.setDataCollectionFileName("deep_thought_db_couchbase_lite");
       return new AndroidCouchbaseLiteEntityManager(context, configuration);
     } catch(Exception e) { throw new SQLException("Could not create AndroidCouchbaseLiteEntityManager", e); }
   }

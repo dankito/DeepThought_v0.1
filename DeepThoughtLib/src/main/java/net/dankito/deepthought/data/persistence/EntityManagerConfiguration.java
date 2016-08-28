@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class EntityManagerConfiguration {
   
-  public enum DatabaseType { SQLite, H2Embedded, H2Mem, Derby, HSQLDB }
+  public enum DatabaseType { SQLite, H2Embedded, H2Mem, Derby, HSQLDB, CouchbaseLite }
   
 
   protected Class<? extends IEntityManager> entityManagerClass;
@@ -60,7 +60,7 @@ public class EntityManagerConfiguration {
 
 
   public EntityManagerConfiguration(String dataFolder) {
-    this(dataFolder, DatabaseType.SQLite);
+    this(dataFolder, DatabaseType.CouchbaseLite);
   }
 
   public EntityManagerConfiguration(String dataFolder, int databaseCurrentDataModelVersion) {
@@ -292,6 +292,9 @@ public class EntityManagerConfiguration {
         setDataCollectionFileName("DeepThoughtDb_HSQL/db");
         setDatabaseDriverUrl("jdbc:hsqldb:file:");
         setDatabaseDriver("org.hsqldb.jdbcDriver");
+        break;
+      case CouchbaseLite:
+        setDataCollectionFileName("deep_thought_db_couchbase_lite");
         break;
     }
 

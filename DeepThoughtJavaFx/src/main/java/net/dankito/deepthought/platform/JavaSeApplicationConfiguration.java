@@ -15,7 +15,6 @@ import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.search.LuceneSearchEngine;
-import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.language.LanguageDetector;
 import net.dankito.deepthought.plugin.IPlugin;
@@ -83,17 +82,10 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
     return staticPlugins;
   }
 
-  protected boolean useCouchbaseLite = true;
-
   @Override
   public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-    if(useCouchbaseLite) {
-      configuration.setDataCollectionFileName("deep_thought_db_couchbase_lite");
-      return new JavaCouchbaseLiteEntityManager(configuration);
-    }
-    else {
-      return new OrmLiteJavaSeEntityManager(configuration);
-    }
+    return new JavaCouchbaseLiteEntityManager(configuration);
+//    return new OrmLiteJavaSeEntityManager(configuration);
   }
 
   @Override

@@ -17,7 +17,7 @@ public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
   }
 
   public TestEntityManagerConfiguration(boolean createTables) {
-    super("data/tests/", DatabaseType.SQLite, createTables);
+    super("data/tests/", DatabaseType.CouchbaseLite, createTables);
   }
 
 
@@ -38,6 +38,9 @@ public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
         break;
       case HSQLDB:
         setDataCollectionFileName("DeepThoughtDb_HSQL_Tests");
+        break;
+      case CouchbaseLite:
+        setDataCollectionFileName("deep_thought_db_couchbase_lite_tests");
         break;
     }
 
