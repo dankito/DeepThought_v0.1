@@ -127,6 +127,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected boolean isReadOnly = false;
 
+  protected boolean isInitialized = false;
+
   protected int indexUpdatedEntitiesAfterMilliseconds = 1000;
   protected Queue<UserDataEntity> updatedEntitiesToIndex = new ConcurrentLinkedQueue<>();
   protected Timer indexUpdatedEntitiesTimer = null;
@@ -267,8 +269,11 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
       createIndexSearchersAndWriters();
 
-      if(indexDirExists == false)
+      if(indexDirExists == false) {
         rebuildIndex(); // do not rebuild index asynchronously as Application depends on some functions of SearchEngine (like Entries without Tags)
+      }
+
+      isInitialized = true;
     } catch(Exception ex) {
       log.error("Could not open Lucene Index Directory for DeepThought " + deepThought, ex);
     }
@@ -837,7 +842,26 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   @Override
   public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
-      final Query query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
+    if(isInitialized) {
+      queryForEntriesWithoutTags(listener);
+    }
+    else {
+      final Timer waitTillIndexIsReadyTimer = new Timer();
+      waitTillIndexIsReadyTimer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          if(isInitialized) {
+            waitTillIndexIsReadyTimer.purge();
+
+            queryForEntriesWithoutTags(listener);
+          }
+        }
+      }, 200, 200);
+    }
+  }
+
+  protected void queryForEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
+    final Query query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
 
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
