@@ -1311,7 +1311,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected <T extends BaseEntity> List<T> getBaseEntitiesFromIds(Class<T> type, Collection<Long> searchResultIds) {
-    return Application.getEntityManager().getEntitiesById(type, searchResultIds);
+    return Application.getEntityManager().getEntitiesById(type, searchResultIds, false);
   }
 
 

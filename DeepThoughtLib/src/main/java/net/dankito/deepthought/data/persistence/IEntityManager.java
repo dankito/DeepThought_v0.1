@@ -11,18 +11,20 @@ import java.util.List;
  */
 public interface IEntityManager {
 
-  public String getDatabasePath();
+  String getDatabasePath();
 
-  public boolean persistEntity(BaseEntity entity);
+  boolean persistEntity(BaseEntity entity);
 
-  public boolean updateEntity(BaseEntity entity);
-  public boolean updateEntities(List<BaseEntity> entities);
+  boolean updateEntity(BaseEntity entity);
+  boolean updateEntities(List<BaseEntity> entities);
 
-  public boolean deleteEntity(BaseEntity entity);
+  boolean deleteEntity(BaseEntity entity);
 
-  public <T extends BaseEntity> T getEntityById(Class<T> type, Long id);
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids);
-  public <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type);
+  <T extends BaseEntity> T getEntityById(Class<T> type, Long id);
+  <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds);
+  <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type);
+
+  <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds);
 
   /**
    * <p>
@@ -33,12 +35,12 @@ public interface IEntityManager {
    * @param entity
    * @throws Exception
    */
-  public void resolveAllLazyRelations(BaseEntity entity) throws Exception;
+  void resolveAllLazyRelations(BaseEntity entity) throws Exception;
 
-  public <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException;
+  <T extends BaseEntity> List<T> queryEntities(Class<T> entityClass, String whereStatement) throws SQLException;
 
-  public List doNativeQuery(String query) throws SQLException;
+  List doNativeQuery(String query) throws SQLException;
 
-  public void close();
+  void close();
 
 }

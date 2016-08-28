@@ -163,7 +163,7 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds) {
     List<T> resultEntities = new ArrayList<>();
 
     for(Long id : ids) {
@@ -185,6 +185,11 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     catch(Exception e) { log.error("Could not get all entities of type " + type, e); }
 
     return new ArrayList<T>();
+  }
+
+  @Override
+  public <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds) {
+    return referenceBaseIds;
   }
 
   @Override

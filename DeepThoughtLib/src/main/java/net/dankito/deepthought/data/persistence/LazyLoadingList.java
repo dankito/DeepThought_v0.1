@@ -72,7 +72,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 
       long startTime = new Date().getTime();
       List<Long> idsOfNextEntities = getNextEntityIdsForIndex(index, countEntitiesToQueryOnDatabaseAccess);
-      List<BaseEntity> loadedEntities = (List<BaseEntity>)Application.getEntityManager().getEntitiesById(resultType, idsOfNextEntities);
+      List<BaseEntity> loadedEntities = (List<BaseEntity>)Application.getEntityManager().getEntitiesById(resultType, idsOfNextEntities, false);
 
       for(int i = 0; i < idsOfNextEntities.size(); i++ ) {
         T item = findItemById((List<T>)loadedEntities, idsOfNextEntities.get(i));
@@ -144,6 +144,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 
     if (cachedResults.size() < size()) {
       try {
+        // TODO: use getEntitiesById() with new boolean orderedByIds parameter and create statement there
         String whereStatement = TableConfig.BaseEntityIdColumnName + " IN (";
         for(Long id : entityIds)
           whereStatement += id + ", ";

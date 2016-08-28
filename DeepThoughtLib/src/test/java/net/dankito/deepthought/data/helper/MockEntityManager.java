@@ -184,7 +184,7 @@ public class MockEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds) {
     List<T> result = new ArrayList<>();
 
     for(Long id : ids)
@@ -197,6 +197,11 @@ public class MockEntityManager implements IEntityManager {
   public <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type) {
 //    if(type == DeepThoughtApplication.class)
 //      return new ArrayList<T>() {{ add((T)DataHelper.createTestApplication()); }} ;
+    return new ArrayList<>();
+  }
+
+  @Override
+  public <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds) {
     return new ArrayList<>();
   }
 

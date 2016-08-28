@@ -14,6 +14,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.db.EntitiesConfigurator;
 
 import org.slf4j.Logger;
@@ -121,7 +122,7 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids, boolean keepOrderingOfIds) {
     try {
       Dao dao = getDaoForClass(entityClass);
 
@@ -198,6 +199,47 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
       log.error("Could not get all Entities for Type " + entityClass, ex); }
 
     return new ArrayList<>();
+  }
+
+  @Override
+  public <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds) {
+    // TODO: this is the same code as in OrmLiteAndroidEntityManager
+    List<Long> resultIds = new ArrayList<>();
+
+    try {
+      String query = "SELECT b." + TableConfig.BaseEntityIdColumnName + " FROM " +
+          TableConfig.ReferenceBaseTableName + " b " +
+          ", " + TableConfig.ReferenceTableName + " r " +
+          "WHERE b." + TableConfig.BaseEntityIdColumnName + " IN (";
+
+      for (T id : referenceBaseIds)
+        query += id + ", ";
+      query = query.substring(0, query.length() - ", ".length()) + ") ";
+
+      query += "ORDER BY CASE " + TableConfig.ReferenceBaseDiscriminatorColumnName +
+          " WHEN '" + TableConfig.SeriesTitleDiscriminatorValue + "' THEN 1" +
+          " WHEN '" + TableConfig.ReferenceDiscriminatorValue + "' THEN 2" +
+          " ELSE 4 END, " +
+          "b." + TableConfig.ReferenceBaseTitleColumnName
+          + ", b." + TableConfig.ReferenceBaseSubTitleColumnName
+          + ", cast(r." + TableConfig.ReferencePublishingDateColumnName + " as date)"
+          + ", r." + TableConfig.ReferenceIssueOrPublishingDateColumnName
+      ;
+
+      List<String[]> sortedIds = (List<String[]>) doNativeQuery(query);
+      if (sortedIds.size() == resultIds.size()) {
+        for (String[] id : sortedIds) {
+          resultIds.add(Long.parseLong(id[0]));
+        }
+      }
+      else {
+        return referenceBaseIds;
+      }
+    } catch(Exception e) {
+      log.error("Could not sort ReferenceBases search result IDs", e);
+    }
+
+    return (List<T>)resultIds;
   }
 
   @Override
