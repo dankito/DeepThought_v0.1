@@ -4,7 +4,6 @@ import android.content.Context;
 
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
-import net.dankito.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
@@ -17,6 +16,7 @@ import net.dankito.deepthought.data.contentextractor.SueddeutscheContentExtracto
 import net.dankito.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
 import net.dankito.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
 import net.dankito.deepthought.data.contentextractor.ZeitContentExtractor;
+import net.dankito.deepthought.data.persistence.AndroidCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
@@ -89,7 +89,12 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
 
   @Override
   public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws SQLException {
-    return new OrmLiteAndroidEntityManager(context, configuration);
+//    return new OrmLiteAndroidEntityManager(context, configuration);
+
+    try {
+      configuration.setDataCollectionFileName("deep_thought_db_couchbase_lite");
+      return new AndroidCouchbaseLiteEntityManager(context, configuration);
+    } catch(Exception e) { throw new SQLException("Could not create AndroidCouchbaseLiteEntityManager", e); }
   }
 
   @Override

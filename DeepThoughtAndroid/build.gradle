@@ -13,7 +13,7 @@ System.properties.put("isAndroid", true)
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "net.dankito.deepthought"
@@ -21,6 +21,7 @@ android {
         targetSdkVersion 15
         versionCode 1
         versionName "0.1"
+        multiDexEnabled true
     }
 
 
@@ -63,7 +64,7 @@ android {
 
     dexOptions {
         maxProcessCount 4 // this is the default value
-        javaMaxHeapSize "2g"
+        javaMaxHeapSize "3g"
     }
 }
 
@@ -83,7 +84,10 @@ repositories {
 
 dependencies {
     compile project(':DeepThoughtAndroidLib')
-    compile project(':AndroidOrmLiteEntityManager')
+
+    compile project(':AndroidCouchbaseLiteEntityManager')
+//    compile project(':AndroidOrmLiteEntityManager')
+
     compile project(':LuceneSearchEngine')
     compile project(':OnlineNewspaperContentExtractor')
 

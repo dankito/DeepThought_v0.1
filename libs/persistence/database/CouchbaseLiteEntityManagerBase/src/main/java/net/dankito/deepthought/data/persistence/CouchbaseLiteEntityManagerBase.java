@@ -39,6 +39,8 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
 
   protected Manager manager;
 
+  protected Context context;
+
   protected Database database;
 
   protected DaoCache daoCache = new DaoCache();
@@ -50,8 +52,9 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
   protected Map<Class, Dao> mapEntityClassesToDaos = new HashMap<>();
 
 
-  public CouchbaseLiteEntityManagerBase(EntityManagerConfiguration configuration) throws Exception {
-    this.databasePath = configuration.getDataCollectionPersistencePath();
+  public CouchbaseLiteEntityManagerBase(Context context, EntityManagerConfiguration configuration) throws Exception {
+    this.context = context;
+    this.databasePath = adjustDatabasePath(context, configuration);
 
     createDatabase(configuration);
 
@@ -64,9 +67,11 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
       Application.getPreferencesStore().setDatabaseDataModelVersion(configuration.getApplicationDataModelVersion());
   }
 
+  protected abstract String adjustDatabasePath(Context context, EntityManagerConfiguration configuration);
+
   protected void createDatabase(EntityManagerConfiguration configuration) throws CouchbaseLiteException, IOException {
     ManagerOptions managerOptions = Manager.DEFAULT_OPTIONS;
-    manager = new Manager(createContext(configuration), managerOptions);
+    manager = new Manager(context, managerOptions);
 
     DatabaseOptions options = new DatabaseOptions();
     options.setCreate(true);
@@ -75,8 +80,6 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
 
     Dao.NextDocumentId = database.getDocumentCount() + 100L; // TODO: remove again
   }
-
-  protected abstract Context createContext(EntityManagerConfiguration configuration);
 
   protected void createDaos(JpaAnnotationReaderResult result) {
     for(EntityConfig entityConfig : result.getReadEntities()) {

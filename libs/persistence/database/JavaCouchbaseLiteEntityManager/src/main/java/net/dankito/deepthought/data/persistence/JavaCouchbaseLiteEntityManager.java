@@ -12,19 +12,17 @@ public class JavaCouchbaseLiteEntityManager extends CouchbaseLiteEntityManagerBa
 
 
   public JavaCouchbaseLiteEntityManager(EntityManagerConfiguration configuration) throws Exception {
-    super(configuration);
+    super(new JavaContext(configuration.getDataFolder()), configuration);
   }
 
+
   @Override
-  protected Context createContext(EntityManagerConfiguration configuration) {
-    JavaContext context = new JavaContext(configuration.getDataFolder());
-
+  protected String adjustDatabasePath(Context context, EntityManagerConfiguration configuration) {
     // TODO: implement this in a better way as this uses implementation internal details
-    File databaseFolder = context.getRootDirectory();
+    File databaseFolder = ((JavaContext)context).getRootDirectory();
     databaseFolder = new File(databaseFolder, configuration.getDataFolder());
-    this.databasePath = new File(databaseFolder, configuration.getDataCollectionFileName() + ".cblite2").getAbsolutePath();
 
-    return context;
+    return new File(databaseFolder, configuration.getDataCollectionFileName() + ".cblite2").getAbsolutePath();
   }
 
 }
