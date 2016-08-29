@@ -40,7 +40,7 @@ public class TestEntityManagerConfiguration extends EntityManagerConfiguration {
         setDataCollectionFileName("DeepThoughtDb_HSQL_Tests");
         break;
       case CouchbaseLite:
-        setDataCollectionFileName("deep_thought_db_couchbase_lite_tests");
+        setDataCollectionFileName("deep_thought_tests");
         break;
     }
 

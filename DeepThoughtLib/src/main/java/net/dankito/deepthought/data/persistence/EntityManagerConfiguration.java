@@ -294,7 +294,7 @@ public class EntityManagerConfiguration {
         setDatabaseDriver("org.hsqldb.jdbcDriver");
         break;
       case CouchbaseLite:
-        setDataCollectionFileName("deep_thought_db_couchbase_lite");
+        setDataCollectionFileName("deep_thought");
         break;
     }
 
