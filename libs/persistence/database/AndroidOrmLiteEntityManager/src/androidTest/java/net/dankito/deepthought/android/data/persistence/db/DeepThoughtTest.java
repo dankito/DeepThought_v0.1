@@ -98,7 +98,7 @@ public class DeepThoughtTest extends EntitiesTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
 
-    Long categoryId = category.getId();
+    String categoryId = category.getId();
     deepThought.removeCategory(category);
 
     // assert categories really got deleted from database
@@ -147,7 +147,7 @@ public class DeepThoughtTest extends EntitiesTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    Long entryId = entry.getId();
+    String entryId = entry.getId();
     deepThought.removeEntry(entry);
 
     // assert entry really got deleted from database
@@ -196,7 +196,7 @@ public class DeepThoughtTest extends EntitiesTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addTag(tag);
 
-    Long tagId = tag.getId();
+    String tagId = tag.getId();
     deepThought.removeTag(tag);
 
     // assert entry really got deleted from database

@@ -67,15 +67,15 @@ public class DefaultDataComparer implements IDataComparer {
   }
 
   protected void findCreatedCurrentItems(DataCompareResult result, Collection<BaseEntity> entityCollection, Collection<BaseEntity> currentEntityCollection) {
-    Map<Long, BaseEntity> entityCollectionMappedById = getBaseEntityCollectionMappedById(entityCollection);
+    Map<String, BaseEntity> entityCollectionMappedById = getBaseEntityCollectionMappedById(entityCollection);
     for(BaseEntity currentEntityCollectionItem : currentEntityCollection) {
       if(entityCollectionMappedById.containsKey(currentEntityCollectionItem.getId()) == false)
         result.addCreatedCurrentEntity(currentEntityCollectionItem);
     }
   }
 
-  protected Map<Long, BaseEntity> getBaseEntityCollectionMappedById(Collection<BaseEntity> entityCollection) {
-    Map<Long, BaseEntity> entitiesMappedById = new HashMap<>();
+  protected Map<String, BaseEntity> getBaseEntityCollectionMappedById(Collection<BaseEntity> entityCollection) {
+    Map<String, BaseEntity> entitiesMappedById = new HashMap<>();
 
     for(BaseEntity entity : entityCollection)
       entitiesMappedById.put(entity.getId(), entity);

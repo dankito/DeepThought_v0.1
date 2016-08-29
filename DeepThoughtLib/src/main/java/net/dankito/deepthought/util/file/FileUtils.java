@@ -497,7 +497,7 @@ public class FileUtils {
     if(userDataFolder != Application.CouldNotGetDataFolderPath) {
       try {
         File tmp = new File(userDataFolder, UsersFolderName);
-        tmp = new File(tmp, String.format("%02d", Application.getLoggedOnUser().getId()));
+        tmp = new File(tmp, Application.getLoggedOnUser().getId());
         tmp = new File(tmp, FilesFolderName);
 
         if (tmp.exists() == false)

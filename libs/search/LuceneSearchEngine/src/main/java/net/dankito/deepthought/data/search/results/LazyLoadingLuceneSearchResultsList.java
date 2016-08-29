@@ -94,17 +94,17 @@ public class LazyLoadingLuceneSearchResultsList<T extends BaseEntity> extends La
     return SortField.Type.STRING; // TODO: or STRING_VAL?
   }
 
-  protected Collection<Long> applySorting(SortOrder sortOrder, Collection<Long> resultIds) {
+  protected Collection<String> applySorting(SortOrder sortOrder, Collection<String> resultIds) {
     if(sortOrder == SortOrder.Ascending) {
-      ArrayList<Long> sortedList = new ArrayList(resultIds);
+      ArrayList<String> sortedList = new ArrayList(resultIds);
       Collections.sort(sortedList);
       return sortedList;
     }
     else if(sortOrder == SortOrder.Descending) {
-      ArrayList<Long> sortedList = new ArrayList(resultIds);
-      Collections.sort(sortedList, new Comparator<Long>() {
+      ArrayList<String> sortedList = new ArrayList(resultIds);
+      Collections.sort(sortedList, new Comparator<String>() {
         @Override
-        public int compare(Long o1, Long o2) {
+        public int compare(String o1, String o2) {
           return o2.compareTo(o1);
         }
       });
@@ -120,14 +120,14 @@ public class LazyLoadingLuceneSearchResultsList<T extends BaseEntity> extends La
 //  }
 
   @Override
-  public Collection<Long> getEntityIds() {
-    List<Long> ids = new ArrayList<>(); // do not use a Set as ids are may already sorted, a Set ruins sort order
+  public Collection<String> getEntityIds() {
+    List<String> ids = new ArrayList<>(); // do not use a Set as ids are may already sorted, a Set ruins sort order
 
     try {
       for (int index = 0; index < hits.length; index++) {
 //        ids.add(getEntityIdForIndex(index));
         Document hitDoc = searcher.doc(hits[index].doc);
-        Long entityId = hitDoc.getField(idFieldName).numericValue().longValue();
+        String entityId = hitDoc.getField(idFieldName).stringValue();
         if(ids.contains(entityId) == false) // sometimes for an Entity two search results are retrieved, e.g. FileLinks when their Name value is contained in its URI
           ids.add(entityId);
       }

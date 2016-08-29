@@ -50,7 +50,7 @@ public abstract class HtmlEditorListenerBase implements IHtmlEditorListener {
     return true;
   }
 
-  protected FileLink getEditedFileById(Long fileId) {
+  protected FileLink getEditedFileById(String fileId) {
     for(FileLink file : editedFilesHolder.getEditedEntities()) {
       if(file.getId().equals(fileId))
         return file;

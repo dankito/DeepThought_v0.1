@@ -65,7 +65,7 @@ public class CategoryTest extends EntitiesTestBase {
     Category subCategory = new Category("sub");
     category.addSubCategory(subCategory);
 
-    Long subCategoryId = subCategory.getId();
+    String subCategoryId = subCategory.getId();
 //    category.removeSubCategory(subCategory);
     deepThought.removeCategory(subCategory);
 
@@ -130,7 +130,7 @@ public class CategoryTest extends EntitiesTestBase {
 
     entry.addCategory(category);
 
-    Long entryId = entry.getId();
+    String entryId = entry.getId();
     entry.removeCategory(category);
 
     // assert entry really didn't get deleted from database

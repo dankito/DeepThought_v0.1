@@ -422,19 +422,19 @@ public abstract class ReferenceBaseTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(Long referenceBaseId, Long personId) throws SQLException {
+  protected boolean doesReferenceBasePersonRoleJoinTableEntryExist(String referenceBaseId, String personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.ReferenceBasePersonAssociationTableName + " WHERE " +
         TableConfig.ReferenceBasePersonAssociationReferenceBaseJoinColumnName + "=" + referenceBaseId +
         " AND " + TableConfig.ReferenceBasePersonAssociationPersonJoinColumnName + "=" + personId);
     return result.size() == 1;
   }
 
-  protected boolean doesReferenceBaseAttachedFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
+  protected boolean doesReferenceBaseAttachedFileJoinTableEntryExist(String referenceBaseId, String fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.ReferenceBaseAttachedFileJoinTableName, TableConfig.ReferenceBaseAttachedFileJoinTableReferenceBaseIdColumnName, referenceBaseId,
         TableConfig.ReferenceBaseAttachedFileJoinTableFileLinkIdColumnName, fileId);
   }
 
-  protected boolean doesReferenceBaseEmbeddedFileJoinTableEntryExist(Long referenceBaseId, Long fileId) throws SQLException {
+  protected boolean doesReferenceBaseEmbeddedFileJoinTableEntryExist(String referenceBaseId, String fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.ReferenceBaseEmbeddedFileJoinTableName, TableConfig.ReferenceBaseEmbeddedFileJoinTableReferenceBaseIdColumnName, referenceBaseId,
         TableConfig.ReferenceBaseEmbeddedFileJoinTableFileLinkIdColumnName, fileId);
   }

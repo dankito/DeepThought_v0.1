@@ -31,7 +31,7 @@ public class ImageElementData {
   
   protected String source;
 
-  protected Long fileId;
+  protected String fileId;
 
   protected Long embeddingId;
   
@@ -58,7 +58,7 @@ public class ImageElementData {
     this(file.getUriString(), file.getId(), createUniqueEmbeddingId(), width, height, file.getDescription());
   }
 
-  public ImageElementData(String source, Long fileId, long embeddingId, int width, int height, String alt) {
+  public ImageElementData(String source, String fileId, long embeddingId, int width, int height, String alt) {
     this(embeddingId);
     this.source = source;
     this.fileId = fileId;
@@ -111,11 +111,11 @@ public class ImageElementData {
     imgElementHtmlCode = null;
   }
 
-  public Long getFileId() {
+  public String getFileId() {
     return fileId;
   }
 
-  public void setFileId(Long fileId) {
+  public void setFileId(String fileId) {
     this.fileId = fileId;
     imgElementHtmlCode = null;
   }

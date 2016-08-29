@@ -172,12 +172,12 @@ public abstract class GroupTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesGroupDeviceJoinTableEntryExist(Long userId, Long groupId) throws SQLException {
+  protected boolean doesGroupDeviceJoinTableEntryExist(String userId, String groupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.GroupDeviceJoinTableName, TableConfig.GroupDeviceJoinTableGroupIdColumnName, userId,
         TableConfig.GroupDeviceJoinTableDeviceIdColumnName, groupId);
   }
 
-  protected boolean doesUserGroupJoinTableEntryExist(Long userId, Long groupId) throws SQLException {
+  protected boolean doesUserGroupJoinTableEntryExist(String userId, String groupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserGroupJoinTableName, TableConfig.UserGroupJoinTableUserIdColumnName, userId,
         TableConfig.UserGroupJoinTableGroupIdColumnName, groupId);
   }

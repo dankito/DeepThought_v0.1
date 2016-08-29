@@ -22,8 +22,8 @@ public interface IEntityManager {
 
   boolean deleteEntity(BaseEntity entity);
 
-  <T extends BaseEntity> T getEntityById(Class<T> type, Long id);
-  <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds);
+  <T extends BaseEntity> T getEntityById(Class<T> type, String id);
+  <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<String> ids, boolean keepOrderingOfIds);
   <T extends BaseEntity> List<T> getAllEntitiesOfType(Class<T> type);
 
   <T> Collection<T> sortReferenceBaseIds(Collection<T> referenceBaseIds);

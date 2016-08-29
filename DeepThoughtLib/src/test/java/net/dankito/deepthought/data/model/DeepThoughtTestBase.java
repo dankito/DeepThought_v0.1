@@ -111,7 +111,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addCategory(category);
 
-    Long categoryId = category.getId();
+    String categoryId = category.getId();
     deepThought.removeCategory(category);
 
     // assert category still exists in database (no data ever gets deleted from db, only its 'Deleted' flag gets set to true)
@@ -223,7 +223,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addEntry(entry);
 
-    Long entryId = entry.getId();
+    String entryId = entry.getId();
     deepThought.removeEntry(entry);
 
     // assert entry still exists in database (no data ever gets deleted from db, only its 'Deleted' flag gets set to true)
@@ -340,7 +340,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addTag(tag);
 
-    Long tagId = tag.getId();
+    String tagId = tag.getId();
     deepThought.removeTag(tag);
 
     // assert tag still exists in database (no data ever gets deleted from db, only its 'Deleted' flag gets set to true)
@@ -467,7 +467,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addSeriesTitle(seriesTitle);
 
-    Long seriesTitleId = seriesTitle.getId();
+    String seriesTitleId = seriesTitle.getId();
     deepThought.removeSeriesTitle(seriesTitle);
 
     Assert.assertTrue(seriesTitle.isDeleted());
@@ -519,7 +519,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
     DeepThought deepThought = Application.getDeepThought();
     deepThought.addReference(reference);
 
-    Long referenceId = reference.getId();
+    String referenceId = reference.getId();
     deepThought.removeReference(reference);
 
     Assert.assertTrue(reference.isDeleted());
@@ -725,7 +725,7 @@ public abstract class DeepThoughtTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesDeepThoughtFavoriteEntryTemplateJoinTableEntryExist(Long deepThoughtId, Long entryTemplateId) throws SQLException {
+  protected boolean doesDeepThoughtFavoriteEntryTemplateJoinTableEntryExist(String deepThoughtId, String entryTemplateId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableName, TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableDeepThoughtIdColumnName,
         deepThoughtId, TableConfig.DeepThoughtFavoriteEntryTemplateJoinTableEntryTemplateIdColumnName, entryTemplateId);
   }

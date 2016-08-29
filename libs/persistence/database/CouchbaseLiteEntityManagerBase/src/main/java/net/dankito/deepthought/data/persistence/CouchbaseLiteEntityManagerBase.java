@@ -77,8 +77,6 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     options.setCreate(true);
 
     database = manager.openDatabase(configuration.getDataCollectionFileName(), options);
-
-    Dao.NextDocumentId = database.getDocumentCount() + 100L; // TODO: remove again
   }
 
   protected void createDaos(JpaAnnotationReaderResult result) {
@@ -154,7 +152,7 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> T getEntityById(Class<T> type, Long id) {
+  public <T extends BaseEntity> T getEntityById(Class<T> type, String id) {
     try {
       Dao dao = getDaoForClass(type);
 
@@ -168,10 +166,10 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<String> ids, boolean keepOrderingOfIds) {
     List<T> resultEntities = new ArrayList<>();
 
-    for(Long id : ids) {
+    for(String id : ids) {
       resultEntities.add((T)getEntityById(type, id));
     }
 

@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public abstract class CategoryTestBase extends DataModelTestBase {
 
-  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
+  protected boolean doesCategoryEntryJoinTableEntryExist(String categoryId, String entryId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableCategoryIdColumnName, categoryId,
         TableConfig.EntryCategoryJoinTableEntryIdColumnName, entryId);
   }
@@ -125,7 +125,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     Category subCategory = new Category("sub");
     category.addSubCategory(subCategory);
 
-    Long subCategoryId = subCategory.getId();
+    String subCategoryId = subCategory.getId();
 //    category.removeSubCategory(subCategory);
     deepThought.removeCategory(subCategory);
 
@@ -224,7 +224,7 @@ public abstract class CategoryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry);
     entry.addCategory(category);
 
-    Long entryId = entry.getId();
+    String entryId = entry.getId();
     entry.removeCategory(category);
 
     // assert entry really didn't get deleted from database

@@ -1,8 +1,8 @@
 package net.dankito.deepthought.data.model.ui;
 
-import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class EntriesWithoutTagsSystemTag extends SystemTag {
 
-  public final static Long ID = -43L;
+  public final static String ID = "-43";
 
 
   public EntriesWithoutTagsSystemTag(DeepThought deepThought) {
@@ -35,7 +35,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 
 
   @Override
-  public Long getId() {
+  public String getId() {
     return ID;
   }
 

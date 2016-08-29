@@ -94,7 +94,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   public final static String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
 
   public final static String NoParentCategoryNameFieldValue = "noparentcategory";
-  public final static Long NoParentCategoryIdFieldValue = -42L;
+  public final static String NoParentCategoryIdFieldValue = "-42";
 
   public final static int SeriesTitleReferenceBaseType = 1;
   public final static int ReferenceReferenceBaseType = 2;
@@ -253,7 +253,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       return;
 
     try {
-      File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), String.format("%02d", deepThought.getId()));
+      File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), deepThought.getId());
 //      FileUtils.deleteFile(deepThoughtIndexDirectory);
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
 
@@ -570,14 +570,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected Document createDocumentFromEntry(Entry entry) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.EntryId, entry.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.EntryId, entry.getId(), Field.Store.YES));
 
     doc.add(new Field(FieldName.EntryAbstract, entry.getAbstractAsPlainText(), TextField.TYPE_NOT_STORED));
     doc.add(new Field(FieldName.EntryContent, entry.getContentAsPlainText(), TextField.TYPE_NOT_STORED));
 
     if(entry.hasTags()) {
       for (Tag tag : entry.getTags()) {
-        doc.add(new LongField(FieldName.EntryTagsIds, tag.getId(), Field.Store.YES));
+        doc.add(new StringField(FieldName.EntryTagsIds, tag.getId(), Field.Store.YES));
 //        doc.add(new StringField(FieldName.EntryTags, tag.getName().toLowerCase(), Field.Store.YES));
       }
     }
@@ -630,7 +630,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexTag(Tag tag) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.TagId, tag.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.TagId, tag.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.TagName, tag.getName().toLowerCase(), Field.Store.NO)); // for an not analyzed String it's important to index it lower case as only than lower case search finds ti
 
     indexDocument(doc, Tag.class);
@@ -642,16 +642,16 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.CategoryId, category.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.CategoryId, category.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.CategoryName, category.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.CategoryDescription, category.getDescription().toLowerCase(), Field.Store.NO));
 
     if(category.isTopLevelCategory()) {
-      doc.add(new LongField(FieldName.CategoryParentCategoryId, NoParentCategoryIdFieldValue, Field.Store.YES));
+      doc.add(new StringField(FieldName.CategoryParentCategoryId, NoParentCategoryIdFieldValue, Field.Store.YES));
       doc.add(new StringField(FieldName.CategoryParentCategoryName, NoParentCategoryNameFieldValue, Field.Store.YES));
     }
     else {
-      doc.add(new LongField(FieldName.CategoryParentCategoryId, category.getParentCategory().getId(), Field.Store.YES));
+      doc.add(new StringField(FieldName.CategoryParentCategoryId, category.getParentCategory().getId(), Field.Store.YES));
       doc.add(new StringField(FieldName.CategoryParentCategoryName, category.getParentCategory().getName().toLowerCase(), Field.Store.NO));
     }
 
@@ -661,7 +661,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexPerson(Person person) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.PersonId, person.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.PersonId, person.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.PersonFirstName, person.getFirstName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.PersonLastName, person.getLastName().toLowerCase(), Field.Store.NO));
 
@@ -671,7 +671,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexSeriesTitle(SeriesTitle seriesTitle) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.ReferenceBaseId, seriesTitle.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.ReferenceBaseId, seriesTitle.getId(), Field.Store.YES));
     doc.add(new IntField(FieldName.ReferenceBaseType, SeriesTitleReferenceBaseType, Field.Store.NO));
 
     addSeriesTitleFields(seriesTitle, doc);
@@ -691,7 +691,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexReference(Reference reference) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.ReferenceBaseId, reference.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.ReferenceBaseId, reference.getId(), Field.Store.YES));
     doc.add(new IntField(FieldName.ReferenceBaseType, ReferenceReferenceBaseType, Field.Store.NO));
 
     addReferenceFields(reference, doc);
@@ -732,7 +732,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexReferenceSubDivision(ReferenceSubDivision referenceSubDivision) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.ReferenceBaseId, referenceSubDivision.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.ReferenceBaseId, referenceSubDivision.getId(), Field.Store.YES));
     doc.add(new IntField(FieldName.ReferenceBaseType, ReferenceSubDivisionReferenceBaseType, Field.Store.NO));
 
     addReferenceSubDivisionFields(referenceSubDivision, doc);
@@ -764,7 +764,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexNote(Note note) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.NoteId, note.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.NoteId, note.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.NoteNote, note.getNote().toLowerCase(), Field.Store.NO));
 
     indexDocument(doc, Note.class);
@@ -773,12 +773,12 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void indexFile(FileLink file) {
     Document doc = new Document();
 
-    doc.add(new LongField(FieldName.FileId, file.getId(), Field.Store.YES));
+    doc.add(new StringField(FieldName.FileId, file.getId(), Field.Store.YES));
     doc.add(new StringField(FieldName.FileName, file.getName().toLowerCase(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileUri, file.getUriString().toLowerCase(), Field.Store.NO));
 
     if(file.getFileType() != null)
-      doc.add(new LongField(FieldName.FileFileType, file.getFileType().getId(), Field.Store.NO));
+      doc.add(new StringField(FieldName.FileFileType, file.getFileType().getId(), Field.Store.NO));
     doc.add(new StringField(FieldName.FileDescription, file.getDescription().toLowerCase(), Field.Store.NO));
     if(StringUtils.isNotNullOrEmpty(file.getSourceUriString()))
       doc.add(new StringField(FieldName.FileSourceUri, file.getSourceUriString().toLowerCase(), Field.Store.NO));
@@ -961,7 +961,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     BooleanQuery query = new BooleanQuery();
 
     for(Tag tag : tagsToFilterFor) {
-      query.add(new BooleanClause(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.MUST));
+      query.add(new BooleanClause(new TermQuery(new Term(FieldName.EntryTagsIds, tag.getId())), BooleanClause.Occur.MUST));
     }
 
     try {
@@ -984,16 +984,16 @@ public class LuceneSearchEngine extends SearchEngineBase {
       searchTermQuery.add(new WildcardQuery(new Term(FieldName.TagName, "*" + tagName + "*")), BooleanClause.Occur.SHOULD);
     }
 
-    Collection<Long> tagsWithSearchTermIds = getEntityIdsFromQuery(Tag.class, searchTermQuery, FieldName.TagId, SortOrder.Ascending, FieldName.TagName);
+    Collection<String> tagsWithSearchTermIds = getEntityIdsFromQuery(Tag.class, searchTermQuery, FieldName.TagId, SortOrder.Ascending, FieldName.TagName);
 
-    Map<Long, Tag> tagsOnEntriesIds = new HashMap<>();
+    Map<String, Tag> tagsOnEntriesIds = new HashMap<>();
     for(Tag tagOnEntries : tagsOnEntriesContainingFilteredTags)
       tagsOnEntriesIds.put(tagOnEntries.getId(), tagOnEntries);
 
     tagsWithSearchTermIds.retainAll(tagsOnEntriesIds.keySet());
 
     Collection<Tag> sortedResultTags = new ArrayList<>();
-    for(Long tagId : tagsWithSearchTermIds) {
+    for(String tagId : tagsWithSearchTermIds) {
       sortedResultTags.add(tagsOnEntriesIds.get(tagId));
     }
 
@@ -1001,17 +1001,17 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected <T extends BaseEntity> List<T> getBaseEntitiesFromQuery(Class<T> type, Query query, String idFieldName) {
-    Collection<Long> ids = getEntityIdsFromQuery(type, query, idFieldName);
+    Collection<String> ids = getEntityIdsFromQuery(type, query, idFieldName);
 
     return getBaseEntitiesFromIds(type, ids);
   }
 
-  protected <T extends BaseEntity> Collection<Long> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName) {
+  protected <T extends BaseEntity> Collection<String> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName) {
     return getEntityIdsFromQuery(type, query, idFieldName, SortOrder.Unsorted);
   }
 
-  protected <T extends BaseEntity> Collection<Long> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName, SortOrder sortOrder, String... sortFieldNames) {
-    List<Long> ids = new ArrayList<>();
+  protected <T extends BaseEntity> Collection<String> getEntityIdsFromQuery(Class<T> type, Query query, String idFieldName, SortOrder sortOrder, String... sortFieldNames) {
+    List<String> ids = new ArrayList<>();
 
     try {
       IndexSearcher searcher = getIndexSearcher(type);
@@ -1021,7 +1021,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       for (int i = 0; i < hits.length; i++) {
         try {
           Document hitDoc = searcher.doc(hits[i].doc);
-          ids.add(hitDoc.getField(idFieldName).numericValue().longValue());
+          ids.add(hitDoc.getField(idFieldName).stringValue());
         } catch(Exception ex) { log.error("Could not extract result from hitDoc of Query " + query, ex); }
       }
     } catch(Exception ex) {
@@ -1060,7 +1060,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     else if(search.getEntriesMustHaveTheseTags().size() > 0) {
       BooleanQuery filterEntriesQuery = new BooleanQuery();
       for (Tag tag : search.getEntriesMustHaveTheseTags())
-        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryTagsIds, getByteRefFromLong(tag.getId()))), BooleanClause.Occur.MUST);
+        filterEntriesQuery.add(new TermQuery(new Term(FieldName.EntryTagsIds, tag.getId())), BooleanClause.Occur.MUST);
       query.add(filterEntriesQuery, BooleanClause.Occur.MUST);
     }
 
@@ -1090,10 +1090,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
     query.add(categoryNameQuery, BooleanClause.Occur.MUST);
 
     if(search.topLevelCategoriesOnly()) {
-      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(NoParentCategoryIdFieldValue))), BooleanClause.Occur.MUST);
+      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, NoParentCategoryIdFieldValue)), BooleanClause.Occur.MUST);
     }
     else if(search.isParentCategorySet()) {
-      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, getByteRefFromLong(search.getParentCategory().getId()))), BooleanClause.Occur.MUST);
+      query.add(new TermQuery(new Term(FieldName.CategoryParentCategoryId, search.getParentCategory().getId())), BooleanClause.Occur.MUST);
     }
 
     executeQuery(search, query, Category.class, FieldName.CategoryId, SortOrder.Ascending, FieldName.CategoryName);
@@ -1310,7 +1310,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     return new ScoreDoc[0];
   }
 
-  protected <T extends BaseEntity> List<T> getBaseEntitiesFromIds(Class<T> type, Collection<Long> searchResultIds) {
+  protected <T extends BaseEntity> List<T> getBaseEntitiesFromIds(Class<T> type, Collection<String> searchResultIds) {
     return Application.getEntityManager().getEntitiesById(type, searchResultIds, false);
   }
 
@@ -1430,7 +1430,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     IndexWriter indexWriter = getIndexWriter(removedEntity.getClass());
     try {
       if(idFieldName != null && indexWriter != null)
-        indexWriter.deleteDocuments(new Term(idFieldName, getByteRefFromLong(removedEntity.getId())));
+        indexWriter.deleteDocuments(new Term(idFieldName, removedEntity.getId()));
     } catch(Exception ex) {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
     }

@@ -150,7 +150,7 @@ public class JsoupHtmlHelper implements IHtmlHelper {
       elementData.setAlt(imgElement.attr(ImageElementData.AltAttributeName));
 
     if(imgElement.hasAttr(ImageElementData.ImageIdAttributeName))
-      elementData.setFileId(Long.parseLong(imgElement.attr(ImageElementData.ImageIdAttributeName)));
+      elementData.setFileId(imgElement.attr(ImageElementData.ImageIdAttributeName));
     if(imgElement.hasAttr(ImageElementData.EmbeddingIdAttributeName))
       elementData.setEmbeddingId(Long.parseLong(imgElement.attr(ImageElementData.EmbeddingIdAttributeName)));
 

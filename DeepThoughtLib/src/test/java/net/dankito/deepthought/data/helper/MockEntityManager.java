@@ -176,7 +176,7 @@ public class MockEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> T getEntityById(Class<T> type, Long id) {
+  public <T extends BaseEntity> T getEntityById(Class<T> type, String id) {
     if(mapPersistedEntities.containsKey(type) && mapPersistedEntities.get(type).containsKey(id))
       return (T)mapPersistedEntities.get(type).get(id);
 
@@ -184,10 +184,10 @@ public class MockEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<Long> ids, boolean keepOrderingOfIds) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> type, Collection<String> ids, boolean keepOrderingOfIds) {
     List<T> result = new ArrayList<>();
 
-    for(Long id : ids)
+    for(String id : ids)
       result.add(getEntityById(type, id));
 
     return result;

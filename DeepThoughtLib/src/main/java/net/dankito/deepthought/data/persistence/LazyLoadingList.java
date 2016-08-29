@@ -28,7 +28,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 
   protected Class<T> resultType;
 
-  protected Collection<Long> entityIds;
+  protected Collection<String> entityIds;
 
   protected Map<Integer, T> cachedResults = new HashMap<>();
 
@@ -36,10 +36,10 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 
 
   public LazyLoadingList(Class<T> resultType) {
-    this(resultType, new HashSet<Long>());
+    this(resultType, new HashSet<String>());
   }
 
-  public LazyLoadingList(Class<T> resultType, Collection<Long> entityIds) {
+  public LazyLoadingList(Class<T> resultType, Collection<String> entityIds) {
     this.resultType = resultType;
     this.entityIds = entityIds;
   }
@@ -70,7 +70,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
 //      return item;
 
       long startTime = new Date().getTime();
-      List<Long> idsOfNextEntities = getNextEntityIdsForIndex(index, countEntitiesToQueryOnDatabaseAccess);
+      List<String> idsOfNextEntities = getNextEntityIdsForIndex(index, countEntitiesToQueryOnDatabaseAccess);
       List<BaseEntity> loadedEntities = (List<BaseEntity>)Application.getEntityManager().getEntitiesById(resultType, idsOfNextEntities, false);
 
       for(int i = 0; i < idsOfNextEntities.size(); i++ ) {
@@ -89,7 +89,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
     return null;
   }
 
-  protected T findItemById(List<T> entities, Long id) {
+  protected T findItemById(List<T> entities, String id) {
     for(BaseEntity entity : entities) {
       if(id.equals(entity.getId()))
         return (T)entity;
@@ -98,11 +98,11 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
     return null;
   }
 
-  protected Long getEntityIdForIndex(int index) {
+  protected String getEntityIdForIndex(int index) {
     if(entityIds instanceof List == true)
-      return ((List<Long>)entityIds).get(index);
+      return ((List<String>)entityIds).get(index);
 
-    Iterator<Long> iterator = entityIds.iterator();
+    Iterator<String> iterator = entityIds.iterator();
     int i = 0;
     while(iterator.hasNext()) {
       if(i == index)
@@ -112,12 +112,12 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
       iterator.next();
     }
 
-    entityIds = new ArrayList<Long>(entityIds); // last resort: quite a bad solution as in this way all items of entityIds will be traverse (and therefor loaded if it's a lazy  loading list
-    return ((List<Long>)entityIds).get(index);
+    entityIds = new ArrayList<>(entityIds); // last resort: quite a bad solution as in this way all items of entityIds will be traverse (and therefor loaded if it's a lazy  loading list
+    return ((List<String>)entityIds).get(index);
   }
 
-  protected List<Long> getNextEntityIdsForIndex(int index, int maxCountIdsToReturn) {
-    List<Long> ids = new ArrayList<>();
+  protected List<String> getNextEntityIdsForIndex(int index, int maxCountIdsToReturn) {
+    List<String> ids = new ArrayList<>();
 
     for(int i = index; i < (index + maxCountIdsToReturn < size() ? index + maxCountIdsToReturn : size()); i++)
       ids.add(getEntityIdForIndex(i));
@@ -189,7 +189,7 @@ public class LazyLoadingList<T extends BaseEntity> extends AbstractList<T> {
     return false;
   }
 
-  public Collection<Long> getEntityIds() {
+  public Collection<String> getEntityIds() {
     return entityIds;
   }
 }

@@ -193,12 +193,12 @@ public abstract class DeviceTestBase extends DataModelTestBase {
   }
 
 
-  protected boolean doesUserDeviceJoinTableEntryExist(Long userId, Long deviceId) throws SQLException {
+  protected boolean doesUserDeviceJoinTableEntryExist(String userId, String deviceId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.UserDeviceJoinTableName, TableConfig.UserDeviceJoinTableUserIdColumnName, userId,
         TableConfig.UserDeviceJoinTableDeviceIdColumnName, deviceId);
   }
 
-  protected boolean doesGroupDeviceJoinTableEntryExist(Long groupId, Long deviceId) throws SQLException {
+  protected boolean doesGroupDeviceJoinTableEntryExist(String groupId, String deviceId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.GroupDeviceJoinTableName, TableConfig.GroupDeviceJoinTableGroupIdColumnName, groupId,
         TableConfig.GroupDeviceJoinTableDeviceIdColumnName, deviceId);
   }

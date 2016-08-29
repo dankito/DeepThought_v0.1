@@ -18,17 +18,17 @@ import java.util.List;
  */
 public abstract class EntryTestBase extends DataModelTestBase {
 
-  protected boolean doesCategoryEntryJoinTableEntryExist(Long categoryId, Long entryId) throws SQLException {
+  protected boolean doesCategoryEntryJoinTableEntryExist(String categoryId, String entryId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryCategoryJoinTableName, TableConfig.EntryCategoryJoinTableCategoryIdColumnName, categoryId,
         TableConfig.EntryCategoryJoinTableEntryIdColumnName, entryId);
   }
 
-  protected boolean doesEntryTagJoinTableEntryExist(Long entryId, Long tagId) throws SQLException {
+  protected boolean doesEntryTagJoinTableEntryExist(String entryId, String tagId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryTagJoinTableName, TableConfig.EntryTagJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryTagJoinTableTagIdColumnName, tagId);
   }
 
-  protected boolean doesEntryPersonRoleJoinTableEntryExist(Long entryId, Long personId) throws SQLException {
+  protected boolean doesEntryPersonRoleJoinTableEntryExist(String entryId, String personId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + TableConfig.EntryPersonAssociationTableName + " WHERE " +
         TableConfig.EntryPersonAssociationEntryJoinColumnName +  "=" + entryId +
         " AND " + TableConfig.EntryPersonAssociationPersonJoinColumnName + "=" + personId);
@@ -37,22 +37,22 @@ public abstract class EntryTestBase extends DataModelTestBase {
 //        TableConfig.EntryPersonRolesPersonRoleJoinColumnName, personId);
   }
 
-  protected boolean isNoteEntryJoinColumnValueSet(Long noteId, Long entryId) throws SQLException {
+  protected boolean isNoteEntryJoinColumnValueSet(String noteId, String entryId) throws SQLException {
     Object persistedEntryId = getValueFromTable(TableConfig.NoteTableName, TableConfig.NoteEntryJoinColumnName, noteId);
     return doIdsEqual(entryId, persistedEntryId);
   }
 
-  protected boolean doesEntryGroupLinkJoinTableEntryExist(Long entryId, Long linkGroupId) throws SQLException {
+  protected boolean doesEntryGroupLinkJoinTableEntryExist(String entryId, String linkGroupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryEntriesLinkGroupJoinTableName, TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName, linkGroupId);
   }
 
-  protected boolean doesEntryAttachedFileJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
+  protected boolean doesEntryAttachedFileJoinTableEntryExist(String entryId, String fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryAttachedFilesJoinTableName, TableConfig.EntryAttachedFilesJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryAttachedFilesJoinTableFileLinkIdColumnName, fileId);
   }
 
-  protected boolean doesEntryEmbeddedFileJoinTableEntryExist(Long entryId, Long fileId) throws SQLException {
+  protected boolean doesEntryEmbeddedFileJoinTableEntryExist(String entryId, String fileId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryEmbeddedFilesJoinTableName, TableConfig.EntryEmbeddedFilesJoinTableEntryIdColumnName, entryId,
         TableConfig.EntryEmbeddedFilesJoinTableFileLinkIdColumnName, fileId);
   }
@@ -204,7 +204,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
     Entry subEntry = new Entry("sub");
     entry.addSubEntry(subEntry);
 
-    Long subEntryId = subEntry.getId();
+    String subEntryId = subEntry.getId();
     entry.removeSubEntry(subEntry);
 
     // assert categories really didn't get deleted from database

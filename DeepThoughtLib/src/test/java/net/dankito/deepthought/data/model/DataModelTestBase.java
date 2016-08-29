@@ -91,11 +91,11 @@ public abstract class DataModelTestBase {
 //  }
 
 
-  protected Object[] getRowFromTable(String tableName, Long entityId) throws SQLException {
+  protected Object[] getRowFromTable(String tableName, String entityId) throws SQLException {
     return getRowFromTable(tableName, entityId, TableConfig.BaseEntityIdColumnName);
   }
 
-  protected Object[] getRowFromTable(String tableName, Long entityId, String idColumnName) throws SQLException {
+  protected Object[] getRowFromTable(String tableName, String entityId, String idColumnName) throws SQLException {
     List queryResult = entityManager.doNativeQuery("SELECT * FROM " + tableName + " WHERE " + idColumnName + "=" + entityId);
     Assert.assertEquals(1, queryResult.size()); // only one row fetched
 
@@ -107,7 +107,7 @@ public abstract class DataModelTestBase {
     return queryResult.toArray(new Object[queryResult.size()]);
   }
 
-  protected String getClobFromTable(String tableName, String columnName, Long entityId) throws SQLException {
+  protected String getClobFromTable(String tableName, String columnName, String entityId) throws SQLException {
     Object rawObject = getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
 
     String actual = null;
@@ -121,15 +121,15 @@ public abstract class DataModelTestBase {
     return actual;
   }
 
-  protected Object getValueFromTable(String tableName, String columnName, Long entityId) throws SQLException {
+  protected Object getValueFromTable(String tableName, String columnName, String entityId) throws SQLException {
     return getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
   }
 
-  protected Object getValueFromTable(String tableName, String columnName, Long entityId, String idColumnName) throws SQLException {
+  protected Object getValueFromTable(String tableName, String columnName, String entityId, String idColumnName) throws SQLException {
     return DatabaseHelper.getValueFromTable(entityManager, tableName, columnName, entityId, idColumnName);
   }
 
-  protected boolean doesJoinTableEntryExist(String tableName, String owningSideColumnName, Long owningSideId, String inverseSideColumnName, Long inverseSideId) throws SQLException {
+  protected boolean doesJoinTableEntryExist(String tableName, String owningSideColumnName, String owningSideId, String inverseSideColumnName, String inverseSideId) throws SQLException {
     List<Object[]> result = entityManager.doNativeQuery("SELECT * FROM " + tableName + " WHERE " + owningSideColumnName + "=" + owningSideId +
                                                              " AND " + inverseSideColumnName + "=" + inverseSideId);
     return result.size() == 1;
@@ -138,7 +138,7 @@ public abstract class DataModelTestBase {
 
   protected static final DateFormat defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
 
-  protected Date getDateValueFromTable(String tableName, String columnName, Long entityId) throws SQLException, ParseException {
+  protected Date getDateValueFromTable(String tableName, String columnName, String entityId) throws SQLException, ParseException {
     Object storedValue = getValueFromTable(tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
 
     if(storedValue instanceof String) {
@@ -150,11 +150,11 @@ public abstract class DataModelTestBase {
     return (Date)storedValue;
   }
 
-  protected List getJoinTableEntries(String tableName, String entityColumnName, Long entityId, String otherSideColumnName) throws SQLException {
+  protected List getJoinTableEntries(String tableName, String entityColumnName, String entityId, String otherSideColumnName) throws SQLException {
     return entityManager.doNativeQuery("SELECT " + otherSideColumnName + " FROM " + tableName + " WHERE " + entityColumnName + "=" + entityId);
   }
 
-  protected boolean joinTableEntriesContainEntityId(Long entityId, List<Object> joinTableEntries) {
+  protected boolean joinTableEntriesContainEntityId(String entityId, List<Object> joinTableEntries) {
     for(Object id : joinTableEntries) {
       if(id instanceof Vector) // Toplink
         id = ((Vector)id).get(0);
@@ -168,7 +168,7 @@ public abstract class DataModelTestBase {
     return false;
   }
 
-  protected boolean doIdsEqual(Long entityId, Object id) {
+  protected boolean doIdsEqual(String entityId, Object id) {
     if(id instanceof BigInteger && entityId.equals(((BigInteger)id).longValue()))
       return true;
     if(id instanceof Integer && entityId.equals(((Integer)id).longValue()))
@@ -179,7 +179,7 @@ public abstract class DataModelTestBase {
     return false;
   }
 
-  protected String getClobString(String tableName, String columnName, Long entityId) throws Exception {
+  protected String getClobString(String tableName, String columnName, String entityId) throws Exception {
     Object storedValue = getValueFromTable(tableName, columnName, entityId);
 
     if(storedValue instanceof Clob) {

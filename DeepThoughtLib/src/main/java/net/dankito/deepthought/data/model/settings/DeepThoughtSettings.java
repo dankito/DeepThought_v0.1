@@ -29,15 +29,15 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   protected transient Category lastViewedCategory;
 
-  protected Long lastViewedCategoryId;
+  protected String lastViewedCategoryId;
 
   protected transient Tag lastViewedTag;
 
-  protected Long lastViewedTagId;
+  protected String lastViewedTagId;
 
   protected transient Entry lastViewedEntry;
 
-  protected Long lastViewedEntryId;
+  protected String lastViewedEntryId;
 
   protected double mainWindowTabsAndEntriesOverviewDividerPosition = 300;
 

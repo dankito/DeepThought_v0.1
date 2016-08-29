@@ -204,7 +204,7 @@ public abstract class SearchComparisonTestBase {
   @Test
   public void findAllEntriesHavingTheseTags_ArchäologieOnly() {
     List<Tag> tagsToFilterFor = new ArrayList<>();
-    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 1L));
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, "1"));
 
     final Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();
@@ -229,8 +229,8 @@ public abstract class SearchComparisonTestBase {
   @Test
   public void findAllEntriesHavingTheseTags_AustralopithecusAfricanusAndLatènezeit() {
     List<Tag> tagsToFilterFor = new ArrayList<>();
-    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 41L));
-    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, 10L));
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, "41"));
+    tagsToFilterFor.add(entityManager.getEntityById(Tag.class, "10"));
 
     final Set<Entry> entriesHavingFilteredTags = new HashSet<>();
     final Set<Tag> tagsOnEntriesContainingFilteredTags = new HashSet<>();

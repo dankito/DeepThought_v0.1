@@ -110,7 +110,7 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> T getEntityById(Class<T> entityClass, Long id) {
+  public <T extends BaseEntity> T getEntityById(Class<T> entityClass, String id) {
     try {
       Dao dao = getDaoForClass(entityClass);
 
@@ -124,7 +124,7 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
   }
 
   @Override
-  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<Long> ids, boolean keepOrderingOfIds) {
+  public <T extends BaseEntity> List<T> getEntitiesById(Class<T> entityClass, Collection<String> ids, boolean keepOrderingOfIds) {
     try {
       Dao dao = getDaoForClass(entityClass);
 
@@ -144,9 +144,9 @@ public class OrmLiteJavaSeEntityManager implements IEntityManager {
     return new ArrayList<>();
   }
 
-  protected String createOrderByStatementForGetEntitiesById(Dao dao, Collection<Long> entityIds) {
+  protected String createOrderByStatementForGetEntitiesById(Dao dao, Collection<String> entityIds) {
     String orderBy = "instr(',";
-    for(Long id : entityIds) {
+    for(String id : entityIds) {
       orderBy += id + ",";
     }
 

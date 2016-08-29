@@ -14,11 +14,11 @@ import java.util.List;
 public class DatabaseHelper {
 
 
-  public static Object getValueFromTable(IEntityManager entityManager, String tableName, String columnName, Long entityId) throws SQLException {
+  public static Object getValueFromTable(IEntityManager entityManager, String tableName, String columnName, String entityId) throws SQLException {
     return getValueFromTable(entityManager, tableName, columnName, entityId, TableConfig.BaseEntityIdColumnName);
   }
 
-  public static Object getValueFromTable(IEntityManager entityManager, String tableName, String columnName, Long entityId, String idColumnName) throws SQLException {
+  public static Object getValueFromTable(IEntityManager entityManager, String tableName, String columnName, String entityId, String idColumnName) throws SQLException {
     List queryResult = entityManager.doNativeQuery("SELECT " + columnName + " FROM " + tableName + " WHERE " + idColumnName + "=" + entityId);
     Assert.assertEquals(1, queryResult.size()); // only one row fetched
 

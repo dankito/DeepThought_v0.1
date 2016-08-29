@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class AllEntriesSystemTag extends SystemTag {
 
-  public final static Long ID = -42L;
+  public final static String ID = "-42";
 
 
   public AllEntriesSystemTag(DeepThought deepThought) {
@@ -25,7 +25,7 @@ public class AllEntriesSystemTag extends SystemTag {
 
 
   @Override
-  public Long getId() {
+  public String getId() {
     return ID;
   }
 

@@ -40,7 +40,7 @@ public class BaseEntity implements Serializable {
   @Column(name = TableConfig.BaseEntityIdColumnName)
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  protected Long id;
+  protected String id;
 
 //  @JsonIgnore
   @Column(name = TableConfig.BaseEntityCreatedOnColumnName/*, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"*/, updatable = false)
@@ -66,7 +66,7 @@ public class BaseEntity implements Serializable {
   }
 
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 

@@ -51,14 +51,14 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 //    }
 
     try {
-      Collection<Long> entriesWithoutTagsIds = new ArrayList<>();
+      Collection<String> entriesWithoutTagsIds = new ArrayList<>();
       List<String[]> result = Application.getEntityManager().doNativeQuery("SELECT " + TableConfig.BaseEntityIdColumnName + " from " + TableConfig.EntryTableName +
           " WHERE " + TableConfig.EntryDeepThoughtJoinColumnName + " = " + Application.getDeepThought().getId() + " AND " +
           TableConfig.BaseEntityIdColumnName + " NOT IN " +
           "(SELECT DISTINCT " + TableConfig.EntryTagJoinTableEntryIdColumnName + " FROM " + TableConfig.EntryTagJoinTableName + ")" +
           " ORDER BY " + TableConfig.BaseEntityIdColumnName + " DESC");
       for(String[] resultEntry : result)
-        entriesWithoutTagsIds.add(Long.parseLong(resultEntry[0]));
+        entriesWithoutTagsIds.add(resultEntry[0]);
       listener.completed(new LazyLoadingList<Entry>(Entry.class, entriesWithoutTagsIds));
     } catch(Exception ex) {
       log.error("Could not retrieve IDs of Entries without Tags", ex);
@@ -86,9 +86,9 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
         log.debug("Searching Tags for " + search.getSearchTerm() + " with query: " + query);
         List<String[]> queryResults = entityManager.doNativeQuery(query);
-        List<Long> ids = new ArrayList<>(queryResults.size());
+        List<String> ids = new ArrayList<>(queryResults.size());
         for(String[] result : queryResults) {
-          ids.add(Long.parseLong(result[0]));
+          ids.add(result[0]);
         }
 
         if(search.isInterrupted())
@@ -129,9 +129,9 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
     try {
       List<String[]> results = entityManager.doNativeQuery(query);
-      List<Long> ids = new ArrayList<>(results.size());
+      List<String> ids = new ArrayList<>(results.size());
       for(String[] result : results) {
-        ids.add(Long.parseLong(result[0]));
+        ids.add(result[0]);
       }
       search.setResults(new LazyLoadingList<ReferenceBase>(ReferenceBase.class, ids));
     } catch(Exception ex) {
@@ -220,9 +220,9 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
     try {
       List<String[]> results = entityManager.doNativeQuery(query);
-      List<Long> ids = new ArrayList<>(results.size());
+      List<String> ids = new ArrayList<>(results.size());
       for(String[] result : results) {
-        ids.add(Long.parseLong(result[0]));
+        ids.add(result[0]);
       }
 
       if(search.isInterrupted())

@@ -19,7 +19,7 @@ public class UserDeviceSettings extends SettingsBase implements Serializable {
 
   protected transient ApplicationLanguage language;
 
-  protected Long languageId;
+  protected String languageId;
 
   protected boolean autoSaveChanges = true;
 
