@@ -1,15 +1,20 @@
 include ':DeepThoughtLib'
 include ':DeepThoughtJavaFx'
 include ':DeepThoughtAndroid', ':DeepThoughtAndroidLib'
+
+// TODO: remove again
+include ':couchbase-lite-java-core', ':couchbase-lite-java', ':couchbase-lite-android', ':couchbase-lite-java-listener'
 include ':JpaAnnotationReader'
 include ':couchbase-lite-jpa'
 include ':CouchbaseLiteEntityManagerBase'
 include ':JavaCouchbaseLiteEntityManager', ':AndroidCouchbaseLiteEntityManager'
 include  ':CouchbaseLiteSyncManager'
+
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':EntityManagerTools'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
+
 include ':json-io', ':DeepThoughtJson-io'
 include ':LuceneSearchEngine'
 include ':WGetFileDownloader'
@@ -30,6 +35,11 @@ include ':OpenOfficeDocumentsImporterExporter'
 //        ':SymmetricDS-Server'
 
 project(':DeepThoughtAndroidLib').projectDir = new File('libs/os/DeepThoughtAndroidLib')
+
+project(':couchbase-lite-java-core').projectDir = new File('libs/persistence/database/couchbase-lite-java-core')
+project(':couchbase-lite-java').projectDir = new File('libs/persistence/database/couchbase-lite-java')
+project(':couchbase-lite-android').projectDir = new File('libs/persistence/database/couchbase-lite-android')
+project(':couchbase-lite-java-listener').projectDir = new File('libs/persistence/database/couchbase-lite-java-listener')
 
 project(':JpaAnnotationReader').projectDir = new File('libs/persistence/database/JpaAnnotationReader')
 project(':couchbase-lite-jpa').projectDir = new File('libs/persistence/database/couchbase-lite-jpa')
