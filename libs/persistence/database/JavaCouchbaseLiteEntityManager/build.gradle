@@ -6,7 +6,8 @@ def couchbaseLiteVersion = '1.3.0'
 dependencies {
     compile project(':CouchbaseLiteEntityManagerBase')
 
-    compile 'com.couchbase.lite:couchbase-lite-java:' + couchbaseLiteVersion
+//    compile 'com.couchbase.lite:couchbase-lite-java:' + couchbaseLiteVersion
+    compile project(':couchbase-lite-java')
 
     testCompile 'junit:junit:4.11'
 }
