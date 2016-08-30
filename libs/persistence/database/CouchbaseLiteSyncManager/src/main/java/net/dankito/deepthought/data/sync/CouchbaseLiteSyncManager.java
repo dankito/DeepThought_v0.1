@@ -349,7 +349,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     Map<String, Object> detectedChanges = new HashMap<>();
 
     for (Map.Entry<String, Object> property : change.getAddedRevision().getProperties().entrySet()) {
-      if("_revisions".equals(property.getKey()) == false && "_rev".equals(property.getKey()) == false) {
+      if(isCouchbaseLiteSystemProperty(property.getKey()) == false) {
         Object newValue = property.getValue();
         Object previousValue = previousRevision.getProperties().get(property.getKey());
 
@@ -361,6 +361,11 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     }
 
     return detectedChanges;
+  }
+
+  protected boolean isCouchbaseLiteSystemProperty(String propertyName) {
+    return "_id".equals(propertyName) || "_rev".equals(propertyName) || "_revisions".equals(propertyName) ||
+        "attachments".equals(propertyName) || "_deleted".equals(propertyName);
   }
 
   protected void newEntityCreated(Class<BaseEntity> entityClass, DocumentChange change) {
