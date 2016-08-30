@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -282,23 +283,55 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     }
 
     for(PropertyConfig property : entityConfig.getPropertiesIncludingInheritedOnes()) {
-      String propertyName = property.getColumnName();
-
-      if(isCouchbaseLiteSystemProperty(propertyName) == false) {
-        Object newerValue = newerRevision.getProperty(propertyName);
-        Object olderValue = olderRevision.getProperty(propertyName);
-
-        if((newerValue != null && newerValue.equals(olderValue) == false) ||
-           (newerValue == null && olderValue != null && newerRevision.getProperties().containsKey(propertyName))) { // only put a null value to mergedProperties if by this a previous value got deleted
-          mergedProperties.put(propertyName, newerValue);
-        }
-        else if(olderValue != null && newerValue == null) {
-          mergedProperties.put(propertyName, olderValue);
-        }
+      try {
+        mergeProperty(dao, property, newerRevision, olderRevision, mergedProperties);
+      } catch(Exception e) {
+        log.error("Could not merge Property " + property + " on conflicted Entity of Type " + entityConfig.getEntityClass(), e);
       }
     }
 
     return mergedProperties;
+  }
+
+  protected void mergeProperty(Dao dao, PropertyConfig property, SavedRevision newerRevision, SavedRevision olderRevision, Map<String, Object> mergedProperties) throws SQLException {
+    String propertyName = property.getColumnName();
+
+    if(isCouchbaseLiteSystemProperty(propertyName) == false) {
+      Object newerValue = newerRevision.getProperty(propertyName);
+      Object olderValue = olderRevision.getProperty(propertyName);
+
+      if(property.isCollectionProperty() == false) {
+        if ((newerValue != null && newerValue.equals(olderValue) == false) ||
+            (newerValue == null && olderValue != null && newerRevision.getProperties().containsKey(propertyName))) { // only put a null value to mergedProperties if by this a previous value got deleted
+          mergedProperties.put(propertyName, newerValue);
+        } else if (olderValue != null && newerValue == null) {
+          mergedProperties.put(propertyName, olderValue);
+        }
+      }
+      else {
+        mergeCollectionProperty(property, newerValue, olderValue, mergedProperties);
+      }
+    }
+  }
+
+  protected void mergeCollectionProperty(PropertyConfig property, Object newerValue, Object olderValue, Map<String, Object> mergedProperties) throws SQLException {
+    Dao targetEntityDao = entityManager.getDaoForClass(property.getTargetEntityClass());
+
+    Collection<Object> newerValueTargetEntityIds = targetEntityDao.parseJoinedEntityIdsFromJsonString((String)newerValue);
+    Collection<Object> olderValueTargetEntityIds = targetEntityDao.parseJoinedEntityIdsFromJsonString((String)olderValue);
+
+    List<Object> mergedEntityIds = new ArrayList<>();
+    mergedEntityIds.addAll(newerValueTargetEntityIds);
+    mergedEntityIds.addAll(olderValueTargetEntityIds);
+
+    for(Object targetEntityId : new ArrayList<>(mergedEntityIds)) {
+      if(database.getDocument((String)targetEntityId) == null) { // Entity has been deleted
+        mergedEntityIds.remove(targetEntityId);
+      }
+    }
+
+    String mergedEntityIdsString = targetEntityDao.getPersistableCollectionTargetEntities(mergedEntityIds);
+    mergedProperties.put(property.getColumnName(), mergedEntityIdsString);
   }
 
   protected void notifyListenersOfChanges(DocumentChange change) {
@@ -359,23 +392,35 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected void updateCollectionProperty(BaseEntity cachedEntity, PropertyConfig property, String propertyName, SavedRevision currentRevision, Map<String, Object> detectedChanges,
                                   Object previousValue) throws SQLException {
-    String previousTargetEntityIds = (String)detectedChanges.get(propertyName);
-    String currentTargetEntityIds = (String)currentRevision.getProperty(propertyName);
+    String previousTargetEntityIdsString = (String)detectedChanges.get(propertyName);
+    String currentTargetEntityIdsString = (String)currentRevision.getProperty(propertyName);
+
+    Dao targetDao = entityManager.getDaoForClass(property.getTargetEntityClass());
+    Collection<Object> currentTargetEntityIds = targetDao.parseJoinedEntityIdsFromJsonString(currentTargetEntityIdsString);
+    Collection previousTargetEntityIds = targetDao.parseJoinedEntityIdsFromJsonString(previousTargetEntityIdsString);
 
     Collection previousValueCollection = (Collection)previousValue;
 
     if(previousValue instanceof EntitiesCollection) { // TODO: what to do if it's not an EntitiesCollection yet?
-      ((EntitiesCollection)previousValue).refresh();
+      ((EntitiesCollection)previousValue).refresh(currentTargetEntityIds);
     }
 
-    Collection<BaseEntity> addedEntities = getEntitiesAddedToCollection(property, currentTargetEntityIds, previousTargetEntityIds);
+    SavedRevision parentRevision = currentRevision.getParent();
+    String parentRevisionTargetEntityIdsString = parentRevision != null ? (String)parentRevision.getProperty(propertyName) : null;
+
+    Collection<BaseEntity> addedEntities = getEntitiesAddedToCollection(property, currentTargetEntityIdsString, previousTargetEntityIdsString);
     for(BaseEntity addedEntity : addedEntities) {
       cachedEntity.callEntityAddedListeners(previousValueCollection, addedEntity);
     }
 
-    Collection<BaseEntity> removedEntities = getEntitiesRemovedFromCollection(property, currentTargetEntityIds, previousTargetEntityIds);
+    Collection<BaseEntity> removedEntities = getEntitiesRemovedFromCollection(property, currentTargetEntityIdsString, previousTargetEntityIdsString);
     for(BaseEntity removedEntity : removedEntities) {
-      cachedEntity.callEntityRemovedListeners(previousValueCollection, removedEntity);
+      if(parentRevisionTargetEntityIdsString.contains(removedEntity.getId())) {
+        cachedEntity.callEntityRemovedListeners(previousValueCollection, removedEntity);
+      }
+      else {
+        cachedEntity.callEntityAddedListeners(previousValueCollection, removedEntity);
+      }
     }
   }
 
@@ -428,7 +473,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     Map<String, Object> currentRevisionProperties = currentRevision.getProperties();
 
     for(PropertyConfig propertyConfig : entityConfig.getPropertiesIncludingInheritedOnes()) {
-      if(propertyConfig.isId() || propertyConfig.isVersion() || propertyConfig instanceof DiscriminatorColumnConfig) {
+      if(propertyConfig.isId() || propertyConfig.isVersion() || propertyConfig instanceof DiscriminatorColumnConfig ||
+          TableConfig.BaseEntityModifiedOnColumnName.equals(propertyConfig.getColumnName())) {
         continue;
       }
 
@@ -436,9 +482,16 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
         Object currentRevisionValue = currentRevisionProperties.get(propertyConfig.getColumnName());
         Object cachedEntityValue = dao.getPersistablePropertyValue(cachedEntity, propertyConfig);
 
-        if((cachedEntityValue == null && currentRevisionValue != null) || (cachedEntityValue != null && currentRevisionValue == null) ||
-            (cachedEntityValue != null && cachedEntityValue.equals(currentRevisionValue) == false)) {
-          detectedChanges.put(propertyConfig.getColumnName(), cachedEntityValue);
+        if(propertyConfig.isCollectionProperty() == false) {
+          if ((cachedEntityValue == null && currentRevisionValue != null) || (cachedEntityValue != null && currentRevisionValue == null) ||
+              (cachedEntityValue != null && cachedEntityValue.equals(currentRevisionValue) == false)) {
+            detectedChanges.put(propertyConfig.getColumnName(), cachedEntityValue);
+          }
+        }
+        else {
+          if (hasCollectionPropertyChanged(dao, currentRevisionValue, cachedEntityValue)) {
+            detectedChanges.put(propertyConfig.getColumnName(), cachedEntityValue);
+          }
         }
       } catch(Exception e) {
         log.error("Could not check Property " + propertyConfig + " for changes", e);
@@ -446,6 +499,23 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     }
 
     return detectedChanges;
+  }
+
+  protected boolean hasCollectionPropertyChanged(Dao dao, Object currentRevisionValue, Object cachedEntityValue) throws SQLException {
+    Collection<Object> currentRevisionTargetEntityIds = dao.parseJoinedEntityIdsFromJsonString((String)currentRevisionValue);
+    Collection<Object> cachedEntityTargetEntityIds = dao.parseJoinedEntityIdsFromJsonString((String)cachedEntityValue);
+
+    if(currentRevisionTargetEntityIds.size() != cachedEntityTargetEntityIds.size()) {
+      return true;
+    }
+
+    for(Object targetEntityId : currentRevisionTargetEntityIds) {
+      if(cachedEntityTargetEntityIds.contains(targetEntityId) == false) {
+        return true;
+      }
+    }
+
+    return false; // cachedEntityTargetEntityIds contains all targetEntityIds of currentRevisionTargetEntityIds
   }
 
   protected Map<String, Object> getChanges(DocumentChange change, SavedRevision previousRevision) {
