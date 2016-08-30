@@ -10,7 +10,7 @@ import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 
-import net.deepthought.android.lib.R;
+import net.dankito.deepthought.android.lib.R;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
