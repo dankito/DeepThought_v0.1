@@ -118,7 +118,7 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
 
   @Override
   public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
-    return new CouchbaseLiteSyncManager(((CouchbaseLiteEntityManagerBase)Application.getEntityManager()).getDatabase(), deepThoughtConnector);
+    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)Application.getEntityManager(), deepThoughtConnector);
   }
 
   @Override

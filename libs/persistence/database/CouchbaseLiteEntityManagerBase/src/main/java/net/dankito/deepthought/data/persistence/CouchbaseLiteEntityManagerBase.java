@@ -225,7 +225,7 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     return getDaoForClass(entity.getClass());
   }
 
-  protected Dao getDaoForClass(Class entityClass) {
+  public Dao getDaoForClass(Class entityClass) {
     Dao dao = mapEntityClassesToDaos.get(entityClass);
     if(dao == null) {
       log.error("It was requested to persist or update Entity of type \" + entityClass + \", but mapEntityClassesToDaos does not contain an Entry for this Entity.");
@@ -239,4 +239,7 @@ public abstract class CouchbaseLiteEntityManagerBase implements IEntityManager {
     return database;
   }
 
+  public ObjectCache getObjectCache() {
+    return objectCache;
+  }
 }

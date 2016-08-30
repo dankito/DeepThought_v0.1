@@ -25,7 +25,7 @@ public class LazyLoadingReferenceBasesSearchResultsList extends LazyLoadingLucen
   }
 
   @Override
-  protected Collection<Long> applySorting(SortOrder sortOrder, Collection<Long> resultIds) {
+  protected Collection<String> applySorting(SortOrder sortOrder, Collection<String> resultIds) {
     if(resultIds.size() == 0)
       return resultIds;
 

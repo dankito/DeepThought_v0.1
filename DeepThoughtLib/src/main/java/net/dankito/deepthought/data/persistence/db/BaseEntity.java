@@ -152,7 +152,8 @@ public class BaseEntity implements Serializable {
     return listeners.remove(listener);
   }
 
-  protected void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
+  // TODO: this is very bad code design making call listeners methods public
+  public void callPropertyChangedListeners(String propertyName, Object previousValue, Object newValue) {
     callPropertyChangedListeners(this, propertyName, previousValue, newValue);
   }
 
@@ -164,7 +165,7 @@ public class BaseEntity implements Serializable {
     }
   }
 
-  protected void callEntityAddedListeners(Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+  public void callEntityAddedListeners(Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
     callEntityAddedListeners(this, collection, addedEntity);
   }
 
@@ -173,7 +174,7 @@ public class BaseEntity implements Serializable {
       listener.entityAddedToCollection(collectionHolder, collection, addedEntity);
   }
 
-  protected void callEntityOfCollectionUpdatedListeners(Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+  public void callEntityOfCollectionUpdatedListeners(Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
     callEntityOfCollectionUpdatedListeners(this, collection, updatedEntity);
   }
 
@@ -182,7 +183,7 @@ public class BaseEntity implements Serializable {
       listener.entityOfCollectionUpdated(collectionHolder, collection, addedEntity);
   }
 
-  protected void callEntityRemovedListeners(Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+  public void callEntityRemovedListeners(Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
     callEntityRemovedListeners(this, collection, removedEntity);
   }
 
