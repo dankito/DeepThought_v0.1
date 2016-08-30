@@ -170,9 +170,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
-  protected boolean hasAbstractManuallyBeenChanged = false;
-  protected boolean hasContentManuallyBeenChanged = false;
-
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
     if(entry != null) {
@@ -187,10 +184,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     if(entry != null) {
       txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
-      hasAbstractManuallyBeenChanged = true;
       abstractHtmlEditor.setHtml(entry.getAbstract());
 
-      hasContentManuallyBeenChanged = true;
       contentHtmlEditor.setHtml(entry.getContent());
 
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
@@ -462,8 +457,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntryIfNeeded() {
-    if(hasEntryBeenEdited == true || (entryCreationResult != null && entry.isPersisted() == false))
+    if(hasEntryBeenEdited == true || (entryCreationResult != null && entry.isPersisted() == false)) {
       saveEntry();
+    }
   }
 
   protected void saveEntryAsync() {
@@ -587,10 +583,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated() {
-      if(hasAbstractManuallyBeenChanged == false)
-        setEntryHasBeenEdited();
-      else
-        hasAbstractManuallyBeenChanged = false; // reset
+      setEntryHasBeenEdited();
     }
 
     @Override
@@ -618,10 +611,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated() {
-      if(hasContentManuallyBeenChanged == false)
-        setEntryHasBeenEdited();
-      else
-        hasContentManuallyBeenChanged = false; // reset
+      setEntryHasBeenEdited();
     }
 
     @Override
