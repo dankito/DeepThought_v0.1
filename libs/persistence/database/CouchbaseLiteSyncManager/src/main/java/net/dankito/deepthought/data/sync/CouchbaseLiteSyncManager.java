@@ -9,6 +9,7 @@ import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
@@ -173,9 +174,14 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected Database.ChangeListener databaseChangeListener = new Database.ChangeListener() {
     @Override
-    public void changed(Database.ChangeEvent event) {
+    public void changed(final Database.ChangeEvent event) {
       if(event.isExternal()) {
-        handleSynchronizedChanges(event.getChanges());
+        Application.getThreadPool().runTaskAsync(new Runnable() {
+          @Override
+          public void run() {
+            handleSynchronizedChanges(event.getChanges());
+          }
+        });
       }
     }
   };
