@@ -1,10 +1,13 @@
 package net.dankito.deepthought.data.sync;
 
+import com.couchbase.lite.CouchbaseLiteException;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentChange;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.SavedRevision;
+import com.couchbase.lite.TransactionalTask;
+import com.couchbase.lite.UnsavedRevision;
 import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
@@ -15,6 +18,7 @@ import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.jpa.annotationreader.config.EntityConfig;
 import net.dankito.jpa.annotationreader.config.PropertyConfig;
 import net.dankito.jpa.annotationreader.config.inheritance.DiscriminatorColumnConfig;
@@ -199,7 +203,102 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   }
 
   protected void handleConflict(DocumentChange change) {
-    // TODO:
+    Class<BaseEntity> entityClass = null;
+
+    try {
+      entityClass = (Class<BaseEntity>)Class.forName((String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
+      Document storedDocument = database.getExistingDocument(change.getDocumentId());
+
+      final List<SavedRevision> conflicts = storedDocument.getConflictingRevisions();
+      if(conflicts.size() > 1) {
+        Dao dao = entityManager.getDaoForClass(entityClass);
+        final String currentRevisionId = storedDocument.getCurrentRevisionId();
+
+        final Map<String, Object> updatedProperties = new HashMap<>();
+        updatedProperties.putAll(storedDocument.getCurrentRevision().getProperties());
+
+        Map<String, Object> mergedProperties = mergeProperties(dao, conflicts);
+        updatedProperties.putAll(mergedProperties);
+
+        updateWinningRevisionDeleteConflictedOnes(conflicts, updatedProperties, currentRevisionId);
+      }
+
+    } catch(Exception e) {
+      log.error("Could not handle conflict for Document Id " + change.getDocumentId() + " of Entity " + entityClass, e);
+    }
+  }
+
+  protected void updateWinningRevisionDeleteConflictedOnes(final List<SavedRevision> conflicts, final Map<String, Object> updatedProperties, final String currentRevisionId) {
+    // a modified version of http://labs.couchbase.com/couchbase-mobile-portal/develop/guides/couchbase-lite/native-api/document/index.html#Understanding%20Conflicts
+    database.runInTransaction(new TransactionalTask() {
+      @Override
+      public boolean run() {
+        boolean success = true;
+
+        // Delete the conflicting revisions to get rid of the conflict:
+        for (SavedRevision rev : conflicts) {
+          success &= CouchbaseLiteSyncManager.this.updateWinningRevisionDeleteConflictedOnes(rev, updatedProperties, currentRevisionId);
+        }
+
+        return success;
+      }
+    });
+  }
+
+  protected boolean updateWinningRevisionDeleteConflictedOnes(SavedRevision revision, Map<String, Object> updatedProperties, String currentRevisionId) {
+    try {
+      UnsavedRevision newRevision = revision.createRevision();
+
+      if (revision.getId().equals(currentRevisionId)) {
+        newRevision.setProperties(updatedProperties);
+      }
+      else {
+        newRevision.setIsDeletion(true);
+      }
+
+      // saveAllowingConflict allows 'revision' to be updated even if it
+      // is not the document's current revision.
+      newRevision.save(true);
+
+      return true;
+    }
+    catch (CouchbaseLiteException e) {
+      log.error("Could not resolve conflict", e);
+      return false;
+    }
+  }
+
+  protected Map<String, Object> mergeProperties(Dao dao, List<SavedRevision> conflicts) {
+    Map<String, Object> mergedProperties = new HashMap<>();
+    EntityConfig entityConfig = dao.getEntityConfig();
+
+    SavedRevision newerRevision = conflicts.get(0);
+    SavedRevision olderRevision = conflicts.get(1);
+
+    // get which one is newer
+    if((Long)newerRevision.getProperty(TableConfig.BaseEntityModifiedOnColumnName) < (Long)olderRevision.getProperty(TableConfig.BaseEntityModifiedOnColumnName)) {
+      newerRevision = olderRevision;
+      olderRevision = conflicts.get(0);
+    }
+
+    for(PropertyConfig property : entityConfig.getPropertiesIncludingInheritedOnes()) {
+      String propertyName = property.getColumnName();
+
+      if(isCouchbaseLiteSystemProperty(propertyName) == false) {
+        Object newerValue = newerRevision.getProperty(propertyName);
+        Object olderValue = olderRevision.getProperty(propertyName);
+
+        if((newerValue != null && newerValue.equals(olderValue) == false) ||
+           (newerValue == null && olderValue != null && newerRevision.getProperties().containsKey(propertyName))) { // only put a null value to mergedProperties if by this a previous value got deleted
+          mergedProperties.put(propertyName, newerValue);
+        }
+        else if(olderValue != null && newerValue == null) {
+          mergedProperties.put(propertyName, olderValue);
+        }
+      }
+    }
+
+    return mergedProperties;
   }
 
   protected void notifyListenersOfChanges(DocumentChange change) {
@@ -234,7 +333,11 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
     if (detectedChanges.size() > 0) {
       for(String propertyName : detectedChanges.keySet()) {
-        updateProperty(cachedEntity, propertyName, dao, entityConfig, currentRevision, detectedChanges);
+        try {
+          updateProperty(cachedEntity, propertyName, dao, entityConfig, currentRevision, detectedChanges);
+        } catch(Exception e) {
+          log.error("Could not update Property " + propertyName + " on synchronized Object " + cachedEntity, e);
+        }
       }
     }
   }
