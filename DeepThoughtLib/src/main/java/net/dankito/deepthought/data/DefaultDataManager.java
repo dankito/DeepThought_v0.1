@@ -75,13 +75,15 @@ public class DefaultDataManager implements IDataManager {
   }
 
   public void close() {
+    if(currentDeepThought != null && Application.hasOnlyReadOnlyAccess() == false) {
+      unpersistedUpdatedEntities.add(currentDeepThought);
+    }
+
     persistUpdatedEntities();
 
     Application.getBackupManager().createBackupsForAllRegisteredBackupFileServices();
 
     if(entityManager != null) {
-      if(currentDeepThought != null && Application.hasOnlyReadOnlyAccess() == false)
-        entityManager.updateEntity(currentDeepThought);
       entityManager.close();
     }
 
