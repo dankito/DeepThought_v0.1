@@ -143,6 +143,10 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     scriptExecutor.executeScript(JavaScriptCommandGetHtml, new ExecuteJavaScriptResultListener() {
       @Override
       public void scriptExecuted(Object result) {
+        if("\"\"".equals(result)) { // on empty html '""' is return -> make string empty
+          result = "";
+        }
+
         htmlHolder.set(result);
         waitForAsyncResponseLatch.countDown();
       }
