@@ -189,8 +189,6 @@ public class MainWindowController implements Initializable {
 
   protected EntriesOverviewControl entriesOverviewControl;
 
-  protected boolean hasContentPaneDividerBeenSetForTheFirstTime = false;
-
 
 
   @Override
@@ -327,6 +325,8 @@ public class MainWindowController implements Initializable {
 
     FXUtils.applyWindowSettingsAndListenToChanges(stage, settings.getMainWindowSettings());
     setSelectedTab(settings.getLastSelectedTab());
+
+    applyContentPaneDividerPosition(settings);
 
     applyUserDeviceSettings(); // TODO: isn't this redundant with selecting Tab and current category?
 
@@ -586,17 +586,14 @@ public class MainWindowController implements Initializable {
 
   protected void contentPaneDividerPositionChanged(Number newValue) {
     if (deepThought != null) {
-      if(hasContentPaneDividerBeenSetForTheFirstTime == false) {
-        hasContentPaneDividerBeenSetForTheFirstTime = true;
-
-        double dividerPosition = deepThought.getSettings().getMainWindowTabsAndEntriesOverviewDividerPosition() / stage.getWidth();
-        contentPane.setDividerPosition(0, dividerPosition);
-      }
-      else {
-        double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
-        deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
-      }
+      double newTabsControlWidth = newValue.doubleValue() * stage.getWidth();
+      deepThought.getSettings().setMainWindowTabsAndEntriesOverviewDividerPosition(newTabsControlWidth);
     }
+  }
+
+  protected void applyContentPaneDividerPosition(DeepThoughtSettings settings) {
+    double dividerPosition = settings.getMainWindowTabsAndEntriesOverviewDividerPosition() / stage.getWidth();
+    contentPane.setDividerPosition(0, dividerPosition);
   }
 
   @FXML
