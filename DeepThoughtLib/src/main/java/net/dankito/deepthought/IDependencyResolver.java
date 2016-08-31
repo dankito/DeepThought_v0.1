@@ -2,6 +2,7 @@ package net.dankito.deepthought;
 
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
+import net.dankito.deepthought.communication.IDevicesFinder;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.backup.IBackupManager;
@@ -54,7 +55,9 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IContentExtractorManager createContentExtractorManager();
 
-  IDeepThoughtConnector createDeepThoughtConnector();
+  IDevicesFinder createDevicesFinder(IThreadPool threadPool);
+
+  IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder);
 
   IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector);
 

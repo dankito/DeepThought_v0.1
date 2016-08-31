@@ -2,6 +2,7 @@ package net.dankito.deepthought;
 
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
+import net.dankito.deepthought.communication.IDevicesFinder;
 import net.dankito.deepthought.controls.html.HtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.IDataManager;
@@ -88,6 +89,8 @@ public class Application {
 
   protected static IContentExtractorManager contentExtractorManager = null;
 
+  protected static IDevicesFinder devicesFinder = null;
+
   protected static IDeepThoughtConnector deepThoughtConnector = null;
 
   protected static IDeepThoughtSyncManager syncManager = null;
@@ -166,7 +169,9 @@ public class Application {
       Application.pluginManager = dependencyResolver.createPluginManager();
       pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
 
-      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector();
+      Application.devicesFinder = dependencyResolver.createDevicesFinder(threadPool);
+
+      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder);
       deepThoughtConnector.runAsync();
 
       Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);
@@ -417,6 +422,10 @@ public class Application {
 
   public static IContentExtractorManager getContentExtractorManager() {
     return contentExtractorManager;
+  }
+
+  public static IDevicesFinder getDevicesFinder() {
+    return devicesFinder;
   }
 
   public static IDeepThoughtConnector getDeepThoughtConnector() {

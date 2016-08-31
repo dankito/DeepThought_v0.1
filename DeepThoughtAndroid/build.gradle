@@ -85,6 +85,8 @@ repositories {
 dependencies {
     compile project(':DeepThoughtAndroidLib')
 
+    compile project(':jmDNSDevicesFinderAndroid')
+
     compile project(':AndroidCouchbaseLiteEntityManager')
 //    compile project(':AndroidOrmLiteEntityManager')
 

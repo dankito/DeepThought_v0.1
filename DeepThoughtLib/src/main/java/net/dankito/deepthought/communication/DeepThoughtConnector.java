@@ -74,11 +74,11 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  public DeepThoughtConnector() {
-    this(Constants.MessageHandlerDefaultPort);
+  public DeepThoughtConnector(IDevicesFinder devicesFinder) {
+    this(devicesFinder, Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtConnector(int messageReceiverPort) {
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
     // TODO: make configurable
@@ -91,8 +91,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
     this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
 
-    // TODO: create with DependencyResolver
-    this.devicesFinder = new UdpDevicesFinder(communicator, threadPool, connectedDevicesManager, connectorMessagesCreator);
+    this.devicesFinder = devicesFinder;
   }
 
 
