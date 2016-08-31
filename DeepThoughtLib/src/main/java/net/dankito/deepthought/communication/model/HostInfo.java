@@ -132,6 +132,8 @@ public class HostInfo {
       infoString = deviceName + " (" + infoString + ")";
     }
 
+    infoString = userName + " on " + infoString;
+
     return infoString;
   }
 

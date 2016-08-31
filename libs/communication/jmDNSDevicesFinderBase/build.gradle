@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+
+
+dependencies {
+    compile project(':DeepThoughtLib')
+
+    compile 'org.jmdns:jmdns:3.5.1'
+}

@@ -8,12 +8,14 @@ include ':JpaAnnotationReader'
 include ':couchbase-lite-jpa'
 include ':CouchbaseLiteEntityManagerBase'
 include ':JavaCouchbaseLiteEntityManager', ':AndroidCouchbaseLiteEntityManager'
-include  ':CouchbaseLiteSyncManager'
+include ':CouchbaseLiteSyncManager'
 
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
 include ':EntityManagerTools'
 include ':AndroidOrmLiteEntityManager'
 include ':JavaSeOrmLiteEntityManager'
+
+include ':jmDNSDevicesFinderAndroid', ':jmDNSDevicesFinderBase', ':jmDNSDevicesFinderJava'
 
 include ':json-io', ':DeepThoughtJson-io'
 include ':LuceneSearchEngine'
@@ -56,6 +58,10 @@ project(':ormlite-jpa-android').projectDir = new File('libs/persistence/database
 project(':EntityManagerTools').projectDir = new File('libs/persistence/database/EntityManagerTools')
 project(':AndroidOrmLiteEntityManager').projectDir = new File('libs/persistence/database/AndroidOrmLiteEntityManager')
 project(':JavaSeOrmLiteEntityManager').projectDir = new File('libs/persistence/database/JavaSeOrmLiteEntityManager')
+
+project(':jmDNSDevicesFinderBase').projectDir = new File('libs/communication/jmDNSDevicesFinderBase')
+project(':jmDNSDevicesFinderJava').projectDir = new File('libs/communication/jmDNSDevicesFinderJava')
+project(':jmDNSDevicesFinderAndroid').projectDir = new File('libs/communication/jmDNSDevicesFinderAndroid')
 
 project(':json-io').projectDir = new File('libs/persistence/json/json-io')
 project(':DeepThoughtJson-io').projectDir = new File('libs/persistence/json/DeepThoughtJson-io')
