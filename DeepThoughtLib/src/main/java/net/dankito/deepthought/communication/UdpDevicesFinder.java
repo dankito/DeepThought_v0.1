@@ -2,13 +2,11 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
+import net.dankito.deepthought.communication.connected_device.UdpDevicesSearcher;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
-import net.dankito.deepthought.communication.connected_device.UdpDevicesSearcher;
-import net.dankito.deepthought.communication.model.ConnectedDevice;
-import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.util.IThreadPool;
 
 /**
@@ -32,18 +30,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
-  protected User loggedOnUser;
 
-  protected Device localDevice;
-
-
-  public UdpDevicesFinder(Communicator communicator, IThreadPool threadPool, ConnectedDevicesManager connectedDevicesManager, ConnectorMessagesCreator connectorMessagesCreator, User loggedOnUser, Device localDevice) {
+  public UdpDevicesFinder(Communicator communicator, IThreadPool threadPool, ConnectedDevicesManager connectedDevicesManager, ConnectorMessagesCreator connectorMessagesCreator) {
     this.communicator = communicator;
     this.threadPool = threadPool;
     this.connectedDevicesManager = connectedDevicesManager;
     this.connectorMessagesCreator = connectorMessagesCreator;
-    this.loggedOnUser = loggedOnUser;
-    this.localDevice = localDevice;
   }
 
   @Override
@@ -73,7 +65,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected void startDevicesSearcher(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
     stopDevicesSearcher();
 
-    udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool, loggedOnUser, localDevice);
+    udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool);
     udpDevicesSearcher.startSearchingAsync(localHost, searchDevicesPort, listener);
   }
 

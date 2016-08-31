@@ -29,7 +29,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
 //      @Override
 //      protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet) {
 //        receivedPackets.add(packet);
@@ -51,7 +51,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
 //      @Override
 //      protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
 //        packetsRespondedTo.add(requestPacket);
@@ -75,7 +75,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> packetsRespondedTo = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
 //      @Override
 //      protected void respondToSearchingForRegisteredDevicesMessage(DatagramPacket requestPacket) {
 //        packetsRespondedTo.add(requestPacket);
@@ -83,7 +83,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
 //      }
 
       @Override
-      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+      protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
         return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };
@@ -105,7 +105,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
     final CountDownLatch waitForPacketsLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
 //      @Override
 //      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
 //        receivedPackets.add(packet);
@@ -113,7 +113,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
 //      }
 
       @Override
-      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+      protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
         return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };
@@ -132,7 +132,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<DatagramPacket> responsesReceived = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
 //      @Override
 //      protected void clientReceivedResponseFromServer(IConnectedDevicesListener listener, byte[] buffer, DatagramPacket packet) {
 //        responsesReceived.add(packet);
@@ -156,9 +156,9 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
     final List<ConnectedDevice> connectedDevices = new ArrayList<>();
     final CountDownLatch waitForResponseCreationLatch = new CountDownLatch(1);
 
-    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool, loggedOnUser, localDevice) {
+    UdpDevicesSearcher searcher = new UdpDevicesSearcher(messagesCreator, threadPool) {
       @Override
-      protected boolean isSelfSentPacket(HostInfo hostInfo) {
+      protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
         return false; // TODO: this is really bad. Try to decouple UdpDevicesSearcher from current User via static Application object
       }
     };

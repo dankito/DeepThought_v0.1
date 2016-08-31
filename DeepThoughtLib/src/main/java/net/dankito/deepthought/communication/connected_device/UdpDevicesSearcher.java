@@ -4,8 +4,6 @@ import net.dankito.deepthought.communication.ConnectorMessagesCreator;
 import net.dankito.deepthought.communication.IDevicesFinderListener;
 import net.dankito.deepthought.communication.NetworkHelper;
 import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
@@ -32,10 +30,6 @@ public class UdpDevicesSearcher {
 
   protected IThreadPool threadPool;
 
-  protected User loggedOnUser;
-
-  protected Device localDevice;
-
   protected DatagramSocket listenerSocket = null;
   protected boolean isListenerSocketOpened = false;
 
@@ -45,16 +39,14 @@ public class UdpDevicesSearcher {
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
-  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool, User loggedOnUser, Device localDevice) {
+  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool) {
     this.messagesCreator = messagesCreator;
     this.threadPool = threadPool;
-    this.loggedOnUser = loggedOnUser;
-    this.localDevice = localDevice;
   }
 
 
   public void startSearchingAsync(HostInfo localHost, int searchDevicesPort, final IDevicesFinderListener listener) {
-    startListenerAsync(searchDevicesPort, listener);
+    startListenerAsync(localHost, searchDevicesPort, listener);
 
     startBroadcastAsync(localHost, searchDevicesPort);
   }
@@ -76,16 +68,16 @@ public class UdpDevicesSearcher {
   }
 
 
-  protected void startListenerAsync(final int searchDevicesPort, final IDevicesFinderListener listener) {
+  protected void startListenerAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startListener(searchDevicesPort, listener);
+        startListener(localHost, searchDevicesPort, listener);
       }
     });
   }
 
-  protected void startListener(int searchDevicesPort, IDevicesFinderListener listener) {
+  protected void startListener(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
     try {
       this.listenerSocket = createListenerSocket(searchDevicesPort);
 
@@ -100,11 +92,11 @@ public class UdpDevicesSearcher {
             break;
           else {
             log.error("An Error occurred receiving Packets. listenerSocket = " + listenerSocket, ex);
-            startListener(searchDevicesPort, listener);
+            startListener(localHost, searchDevicesPort, listener);
           }
         }
 
-        listenerReceivedPacket(buffer, packet, listener);
+        listenerReceivedPacket(buffer, packet, localHost, listener);
       }
     } catch(Exception ex) {
       log.error("An error occurred starting UdpDevicesSearcher", ex);
@@ -126,21 +118,21 @@ public class UdpDevicesSearcher {
     return NetworkHelper.isSocketCloseException(ex);
   }
 
-  protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, IDevicesFinderListener listener) {
+  protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, HostInfo localHost, IDevicesFinderListener listener) {
     if(messagesCreator.isSearchingForDevicesMessage(buffer, packet.getLength())) {
-      HostInfo hostInfo = messagesCreator.getHostInfoFromMessage(buffer, packet);
-      hostInfo.setAddress(packet.getAddress().getHostAddress());
+      HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, packet);
+      remoteHost.setAddress(packet.getAddress().getHostAddress());
 
-      if(isSelfSentPacket(hostInfo) == false && hasDeviceAlreadyBeenFound(hostInfo) == false) {
-        deviceFound(hostInfo, listener);
+      if(isSelfSentPacket(remoteHost, localHost) == false && hasDeviceAlreadyBeenFound(remoteHost) == false) {
+        deviceFound(remoteHost, listener);
       }
     }
   }
 
-  protected boolean isSelfSentPacket(HostInfo hostInfo) {
-    return loggedOnUser.getUniversallyUniqueId().equals(hostInfo.getUserUniqueId()) &&
-        localDevice.getUniversallyUniqueId().equals(hostInfo.getDeviceId()) &&
-        hostInfo.getAddress().equals(NetworkHelper.getIPAddressString(true));
+  protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
+    return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
+        localHost.getDeviceId().equals(remoteHost.getDeviceId()) &&
+        remoteHost.getAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 
   protected boolean hasDeviceAlreadyBeenFound(HostInfo hostInfo) {
