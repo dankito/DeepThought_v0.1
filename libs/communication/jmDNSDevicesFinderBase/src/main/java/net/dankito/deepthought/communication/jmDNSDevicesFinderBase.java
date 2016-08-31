@@ -22,7 +22,7 @@ import javax.jmdns.ServiceListener;
 
 public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
-  protected final String TYPE = "_deepthought._tcp.local.";
+  protected final String SERVICE_TYPE = "_devicesfinder._deepthought._tcp.local.";
 
   protected static final String USER_ID_MAP_KEY = "userId";
   protected static final String USER_NAME_MAP_KEY = "userName";
@@ -72,11 +72,11 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
       if(localHost.getDeviceName() == null) { // TODO: remove again
         localHost.setDeviceName("Manjaro");
       }
-      serviceInfo = ServiceInfo.create(TYPE, localHost.getDeviceName(), searchDevicesPort, 1, 1, getHostInfoAsMap(localHost));
+      serviceInfo = ServiceInfo.create(SERVICE_TYPE, localHost.getDeviceName(), searchDevicesPort, 1, 1, getHostInfoAsMap(localHost));
       jmDNS.registerService(serviceInfo);
 
       serviceListener = createServiceListener(listener);
-      jmDNS.addServiceListener(TYPE, serviceListener);
+      jmDNS.addServiceListener(SERVICE_TYPE, serviceListener);
 
     } catch (IOException e) {
       log.error("Error in JmDNS initialization: " + e);
@@ -139,7 +139,7 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
   public void stop() {
     if (jmDNS != null) {
       if (serviceListener != null) {
-        jmDNS.removeServiceListener(TYPE, serviceListener);
+        jmDNS.removeServiceListener(SERVICE_TYPE, serviceListener);
         serviceListener = null;
       }
 
