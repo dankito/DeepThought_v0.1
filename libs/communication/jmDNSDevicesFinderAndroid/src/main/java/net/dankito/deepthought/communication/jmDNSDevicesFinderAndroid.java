@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
-import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.util.IThreadPool;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -25,8 +25,8 @@ public class jmDNSDevicesFinderAndroid extends jmDNSDevicesFinderBase {
   protected Context context;
 
 
-  public jmDNSDevicesFinderAndroid(Context context) {
-    super();
+  public jmDNSDevicesFinderAndroid(Context context, IThreadPool threadPool) {
+    super(threadPool);
     this.context = context;
   }
 

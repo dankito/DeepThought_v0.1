@@ -2,6 +2,7 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,16 +45,19 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
   protected InetAddress ipAddress;
 
+  protected IThreadPool threadPool;
+
   protected Map<String, HostInfo> connectedDevices = new ConcurrentHashMap<>();
 
 
-  public jmDNSDevicesFinderBase() {
+  public jmDNSDevicesFinderBase(IThreadPool threadPool) {
+    this.threadPool = threadPool;
   }
 
 
   @Override
   public void startAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         start(localHost, searchDevicesPort, listener);
