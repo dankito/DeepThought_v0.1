@@ -9,8 +9,8 @@ import java.net.UnknownHostException;
 public class jmDNSDevicesFinderJava extends jmDNSDevicesFinderBase {
 
 
-  public jmDNSDevicesFinderJava(HostInfo localHost) {
-    super(localHost);
+  public jmDNSDevicesFinderJava() {
+    super();
   }
 
 

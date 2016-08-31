@@ -5,9 +5,8 @@ import net.dankito.deepthought.communication.IDevicesFinderListener;
 import net.dankito.deepthought.communication.NetworkHelper;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.util.IThreadPool;
-import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +53,10 @@ public class UdpDevicesSearcher {
   }
 
 
-  public void startSearchingAsync(final IDevicesFinderListener listener) {
-    startListenerAsync(listener);
+  public void startSearchingAsync(HostInfo localHost, int searchDevicesPort, final IDevicesFinderListener listener) {
+    startListenerAsync(searchDevicesPort, listener);
 
-    startBroadcastAsync();
+    startBroadcastAsync(localHost, searchDevicesPort);
   }
 
   public void stopSearching() {
@@ -77,18 +76,18 @@ public class UdpDevicesSearcher {
   }
 
 
-  protected void startListenerAsync(final IDevicesFinderListener listener) {
+  protected void startListenerAsync(final int searchDevicesPort, final IDevicesFinderListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startListener(listener);
+        startListener(searchDevicesPort, listener);
       }
     });
   }
 
-  protected void startListener(IDevicesFinderListener listener) {
+  protected void startListener(int searchDevicesPort, IDevicesFinderListener listener) {
     try {
-      this.listenerSocket = createListenerSocket();
+      this.listenerSocket = createListenerSocket(searchDevicesPort);
 
       byte[] buffer = new byte[1024];
       DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
@@ -101,7 +100,7 @@ public class UdpDevicesSearcher {
             break;
           else {
             log.error("An Error occurred receiving Packets. listenerSocket = " + listenerSocket, ex);
-            startListener(listener);
+            startListener(searchDevicesPort, listener);
           }
         }
 
@@ -112,10 +111,10 @@ public class UdpDevicesSearcher {
     }
   }
 
-  protected DatagramSocket createListenerSocket() throws SocketException {
+  protected DatagramSocket createListenerSocket(int searchDevicesPort) throws SocketException {
     DatagramSocket listenerSocket = new DatagramSocket(null); // so that other Applications on the same Host can also use this port, set bindAddress to null ..,
     listenerSocket.setReuseAddress(true); // and reuseAddress to true
-    listenerSocket.bind(new InetSocketAddress(Constants.SearchDevicesListenerPort));
+    listenerSocket.bind(new InetSocketAddress(searchDevicesPort));
 
     listenerSocket.setBroadcast(true);
     isListenerSocketOpened = true;
@@ -163,31 +162,31 @@ public class UdpDevicesSearcher {
   }
 
 
-  protected void startBroadcastAsync() {
+  protected void startBroadcastAsync(final HostInfo localHost, final int searchDevicesPort) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startBroadcast();
+        startBroadcast(localHost, searchDevicesPort);
       }
     });
   }
 
-  protected void startBroadcast() {
+  protected void startBroadcast(HostInfo localHost, int searchDevicesPort) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
-      startBroadcastForBroadcastAddressAsync(broadcastAddress);
+      startBroadcastForBroadcastAddressAsync(broadcastAddress, localHost, searchDevicesPort);
     }
   }
 
-  protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress) {
+  protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress, final HostInfo localHost, final int searchDevicesPort) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startBroadcastForBroadcastAddress(broadcastAddress);
+        startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort);
       }
     });
   }
 
-  protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress) {
+  protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress, HostInfo localHost, int searchDevicesPort) {
     try {
       DatagramSocket broadcastSocket = new DatagramSocket();
 
@@ -198,8 +197,8 @@ public class UdpDevicesSearcher {
 
       broadcastSocket.setSoTimeout(10000);
 
-      byte[] message = messagesCreator.createSearchingForDevicesMessage();
-      DatagramPacket searchDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, Constants.SearchDevicesListenerPort);
+      byte[] message = messagesCreator.createSearchingForDevicesMessage(localHost);
+      DatagramPacket searchDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, searchDevicesPort);
 
       while (areBroadcastSocketsOpened) {
         broadcastSocket.send(searchDevicesPacket);

@@ -1,6 +1,7 @@
 package net.dankito.deepthought.communication.connected_device;
 
 import net.dankito.deepthought.communication.CommunicationTestBase;
+import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.registration.RegisteredDevicesManager;
@@ -20,6 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class UdpDevicesSearcherTest extends CommunicationTestBase {
 
+  protected int searchDevicesPort = Constants.SearchDevicesListenerPort;
+
+
   @Test
   public void sendPacketToServer_PacketGetsReceived() {
     final List<DatagramPacket> receivedPackets = new ArrayList<>();
@@ -33,7 +37,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
 //      }
     };
 
-    searcher.startSearchingAsync(null);
+    searcher.startSearchingAsync(localHost, searchDevicesPort, null);
 
     try { waitForPacketsLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -55,7 +59,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
 //      }
     };
 
-    searcher.startSearchingAsync(null);
+    searcher.startSearchingAsync(localHost, searchDevicesPort, null);
 
     try { waitForResponseCreationLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -84,7 +88,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
       }
     };
 
-    searcher.startSearchingAsync(null);
+    searcher.startSearchingAsync(localHost, searchDevicesPort, null);
 
     try { waitForResponseCreationLatch.await(3, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -114,7 +118,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
       }
     };
 
-    searcher.startSearchingAsync(null);
+    searcher.startSearchingAsync(localHost, searchDevicesPort, null);
 
     try { waitForPacketsLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
 
@@ -136,7 +140,7 @@ public class UdpDevicesSearcherTest extends CommunicationTestBase {
 //      }
     };
 
-    searcher.startSearchingAsync(null);
+    searcher.startSearchingAsync(localHost, searchDevicesPort, null);
 
     try { waitForResponseCreationLatch.await(1, TimeUnit.SECONDS); } catch(Exception ex) { }
 

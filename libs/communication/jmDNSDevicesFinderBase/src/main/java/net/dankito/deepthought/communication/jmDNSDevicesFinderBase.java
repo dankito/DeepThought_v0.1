@@ -42,40 +42,34 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
   protected ServiceInfo serviceInfo;
   protected ServiceListener serviceListener;
 
-  protected HostInfo localHost;
-
   protected InetAddress ipAddress;
 
   protected Map<String, HostInfo> connectedDevices = new ConcurrentHashMap<>();
 
 
-  public jmDNSDevicesFinderBase(HostInfo localHost) {
-    this.localHost = localHost;
-
-    localHost.setDeviceName(Application.getPlatformConfiguration().getDeviceName()); // TODO: remove again
+  public jmDNSDevicesFinderBase() {
   }
 
 
   @Override
-  public void startAsync(final IDevicesFinderListener listener) {
+  public void startAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        start(listener);
+        start(localHost, searchDevicesPort, listener);
       }
     });
   }
 
-  protected void start(final IDevicesFinderListener listener) {
-    int port = 41234;
-
+  protected void start(HostInfo localHost, int searchDevicesPort, final IDevicesFinderListener listener) {
     try {
       initJmDNS();
 
+      localHost.setDeviceName(Application.getPlatformConfiguration().getDeviceName()); // TODO: remove again
       if(localHost.getDeviceName() == null) { // TODO: remove again
         localHost.setDeviceName("Manjaro");
       }
-      serviceInfo = ServiceInfo.create(TYPE, localHost.getDeviceName(), port, 1, 1, getHostInfoAsMap(localHost));
+      serviceInfo = ServiceInfo.create(TYPE, localHost.getDeviceName(), searchDevicesPort, 1, 1, getHostInfoAsMap(localHost));
       jmDNS.registerService(serviceInfo);
 
       serviceListener = createServiceListener(listener);

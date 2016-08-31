@@ -1,13 +1,11 @@
 package net.dankito.deepthought.communication;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
-import net.dankito.deepthought.Application;
-import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.util.OsHelper;
 
 import org.slf4j.Logger;
@@ -53,40 +51,13 @@ public class ConnectorMessagesCreator {
   }
 
 
-  public byte[] createLookingForRegistrationServerMessage() {
-    return createMessage(LookingForRegistrationServerMessageHeader, createHostInfoMessageString());
-  }
-
-  public boolean isLookingForRegistrationServerMessage(byte[] receivedBytes, int packetLength) {
-    String receivedMessage = parseBytesToString(receivedBytes, packetLength);
-    return receivedMessage.startsWith(LookingForRegistrationServerMessageHeader);
-  }
-
-  public byte[] createOpenRegistrationServerInfoMessage() {
-    return createMessage(OpenRegistrationServerInfoMessageHeader, createHostInfoMessageString());
-  }
-
-  public boolean isOpenRegistrationServerInfoMessage(byte[] receivedBytes, int packetLength) {
-    String receivedMessage = parseBytesToString(receivedBytes, packetLength);
-    return receivedMessage.startsWith(OpenRegistrationServerInfoMessageHeader);
-  }
-
-  public byte[] createSearchingForDevicesMessage() {
-    return createMessage(SearchingForDevicesMessage, createHostInfoMessageString());
+  public byte[] createSearchingForDevicesMessage(HostInfo hostInfo) {
+    return createMessage(SearchingForDevicesMessage, createHostInfoMessageString(hostInfo));
   }
 
   public boolean isSearchingForDevicesMessage(byte[] receivedBytes, int packetLength) {
     String receivedMessage = parseBytesToString(receivedBytes, packetLength);
     return receivedMessage.startsWith(SearchingForDevicesMessage);
-  }
-
-  public byte[] createRegisteredDeviceFoundMessage() {
-    return createMessage(RegisteredDeviceFoundMessage, createConnectedDeviceMessageString());
-  }
-
-  public boolean isRegisteredDeviceFoundMessage(byte[] receivedBytes, int packetLength) {
-    String receivedMessage = parseBytesToString(receivedBytes, packetLength);
-    return receivedMessage.startsWith(RegisteredDeviceFoundMessage);
   }
 
   public HostInfo getHostInfoFromMessage(byte[] receivedBytes, DatagramPacket packet) {
@@ -152,14 +123,7 @@ public class ConnectorMessagesCreator {
     return receivedMessage.substring(index + 1);
   }
 
-  protected String createHostInfoMessageString() {
-    return createHostInfoMessageString(config.getLoggedOnUser(), config.getLocalDevice());
-  }
-
-  protected String createHostInfoMessageString(User loggedOnUser, Device localDevice) {
-    HostInfo hostInfo = HostInfo.fromUserAndDevice(loggedOnUser, localDevice);
-    hostInfo.setMessagesPort(config.getMessageReceiverPort());
-
+  protected String createHostInfoMessageString(HostInfo hostInfo) {
     SerializationResult result = JsonIoJsonHelper.generateJsonString(hostInfo);
     if(result.successful()) {
       return result.getSerializationResult();

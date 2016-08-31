@@ -25,8 +25,8 @@ public class jmDNSDevicesFinderAndroid extends jmDNSDevicesFinderBase {
   protected Context context;
 
 
-  public jmDNSDevicesFinderAndroid(Context context, HostInfo localHost) {
-    super(localHost);
+  public jmDNSDevicesFinderAndroid(Context context) {
+    super();
     this.context = context;
   }
 

@@ -118,38 +118,48 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
   protected void run() throws Exception {
-    startMessageReceiver();
+    int messagesReceiverPort = startMessageReceiver();
+
+    final HostInfo localHost = HostInfo.fromUserAndDevice(getLoggedOnUser(), getLocalDevice());
+    localHost.setMessagesPort(messagesReceiverPort);
 
     new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
       @Override
       public void run() {
-        devicesFinder.startAsync(devicesFinderListener);
+        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, devicesFinderListener);
       }
     }, 5 * 1000);
 
     Application.notifyUser(new Notification(NotificationType.DeepThoughtsConnectorStarted, Localization.getLocalizedString("deep.thoughts.connector.started")));
   }
 
-  protected void startMessageReceiver() {
-    startMessageReceiver(messageReceiverPort);
+  protected int startMessageReceiver() {
+    return startMessageReceiver(messageReceiverPort);
   }
 
-  protected void startMessageReceiver(int messageReceiverPort) {
+  protected int startMessageReceiver(int messageReceiverPort) {
+    int determinedMessageReceiverPort = -1;
+
     try {
       messagesReceiver = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(messageReceiverPort, listenerManager), messagesReceiverListener);
       messagesReceiver.start();
 
       setMessageReceiverPort(messageReceiverPort);
+
+      determinedMessageReceiverPort = messageReceiverPort;
     } catch(Exception ex) {
       stopMessagesReceiver();
 
       if(isPortAlreadyInUseException(ex) == true)
-        startMessageReceiver(determineNextPortNumber(messageReceiverPort));
+        determinedMessageReceiverPort = startMessageReceiver(determineNextPortNumber(messageReceiverPort));
       else {
         log.error("Could not start MessagesReceiver", ex);
         Application.notifyUser(new DeepThoughtError(Localization.getLocalizedString("could.not.start.messages.receiver"), ex));
+        determinedMessageReceiverPort = -1;
       }
     }
+
+    return determinedMessageReceiverPort;
   }
 
   protected int determineNextPortNumber(int messageReceiverPort) {

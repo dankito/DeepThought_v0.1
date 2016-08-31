@@ -47,19 +47,19 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   @Override
-  public void startAsync(final IDevicesFinderListener listener) {
+  public void startAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        start(listener);
+        start(localHost, searchDevicesPort, listener);
       }
     });
   }
 
-  protected void start(IDevicesFinderListener listener) {
+  protected void start(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
     this.listener = listener;
 
-    startDevicesSearcher(listener);
+    startDevicesSearcher(localHost, searchDevicesPort, listener);
     mayStartConnectionsAliveWatcher();
   }
 
@@ -70,11 +70,11 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
 
-  protected void startDevicesSearcher(IDevicesFinderListener listener) {
+  protected void startDevicesSearcher(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
     stopDevicesSearcher();
 
     udpDevicesSearcher = new UdpDevicesSearcher(connectorMessagesCreator, threadPool, loggedOnUser, localDevice);
-    udpDevicesSearcher.startSearchingAsync(listener);
+    udpDevicesSearcher.startSearchingAsync(localHost, searchDevicesPort, listener);
   }
 
   protected void stopDevicesSearcher() {
