@@ -23,7 +23,6 @@ import javax.jmdns.ServiceListener;
 public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
   protected final String TYPE = "_deepthought._tcp.local.";
-  protected final String SERVICE_NAME = "DevicesFinder";
 
   protected static final String USER_ID_MAP_KEY = "userId";
   protected static final String USER_NAME_MAP_KEY = "userName";

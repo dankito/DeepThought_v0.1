@@ -20,6 +20,9 @@ import java.net.UnknownHostException;
  */
 public class jmDNSDevicesFinderAndroid extends jmDNSDevicesFinderBase {
 
+  protected final String MULTICAST_LOCK_NAME = "jmDNSDevicesFinder";
+
+
   protected WifiManager.MulticastLock multicastLock;
 
   protected Context context;
@@ -69,7 +72,7 @@ public class jmDNSDevicesFinderAndroid extends jmDNSDevicesFinderBase {
    */
   protected void acquireWifiLock() {
     WifiManager wifiManager = (WifiManager) context.getSystemService(android.content.Context.WIFI_SERVICE);
-    multicastLock = wifiManager.createMulticastLock(SERVICE_NAME);
+    multicastLock = wifiManager.createMulticastLock(MULTICAST_LOCK_NAME);
     multicastLock.setReferenceCounted(true);
     multicastLock.acquire();
   }
