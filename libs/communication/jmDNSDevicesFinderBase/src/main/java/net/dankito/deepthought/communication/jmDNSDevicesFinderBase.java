@@ -1,6 +1,7 @@
 package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.util.IThreadPool;
 
@@ -158,6 +159,11 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
         jmDNS = null;
       }
     }
+  }
+
+  @Override
+  public void disconnectedFromDevice(ConnectedDevice device) {
+    // nothing to do here for jmDNSDevicesFinder
   }
 
 

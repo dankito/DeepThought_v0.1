@@ -266,6 +266,9 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     log.info("Disconnected from registered Device: " + device.getDeviceInfoString());
 
     if(connectedDevicesManager.disconnectedFromDevice(device)) {
+      // as there are as well other ways of being notified of Device disconnection, inform DevicesFinder so it doesn't think it's still connected ...
+      devicesFinder.disconnectedFromDevice(device); // and therefore can judge device correctly as re-connected on next received message
+
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceDisconnected(device);
       }

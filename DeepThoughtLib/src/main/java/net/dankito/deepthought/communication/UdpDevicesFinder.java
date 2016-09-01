@@ -1,5 +1,6 @@
 package net.dankito.deepthought.communication;
 
+import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.util.IThreadPool;
 
@@ -79,6 +80,11 @@ public class UdpDevicesFinder implements IDevicesFinder {
         clientSocket.close();
       }
     }
+  }
+
+  @Override
+  public void disconnectedFromDevice(ConnectedDevice device) {
+    removeDeviceFromFoundDevices(device);
   }
 
 
@@ -186,13 +192,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void deviceDisconnected(HostInfo device, IDevicesFinderListener listener) {
-    for(HostInfo foundDevice : foundDevices) {
-      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
-          device.getUserUniqueId().equals(foundDevice.getUserUniqueId())) {
-        foundDevices.remove(foundDevice);
-        break;
-      }
-    }
+    removeDeviceFromFoundDevices(device);
 
     if(listener != null) {
       listener.deviceDisconnected(device);
@@ -245,6 +245,27 @@ public class UdpDevicesFinder implements IDevicesFinder {
       }
     } catch (Exception ex) {
       log.error("An error occurred trying to find Devices", ex);
+    }
+  }
+
+
+  protected void removeDeviceFromFoundDevices(HostInfo device) {
+    for(HostInfo foundDevice : foundDevices) {
+      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
+          device.getUserUniqueId().equals(foundDevice.getUserUniqueId())) {
+        foundDevices.remove(foundDevice);
+        break;
+      }
+    }
+  }
+
+  protected void removeDeviceFromFoundDevices(ConnectedDevice device) {
+    for(HostInfo foundDevice : foundDevices) {
+      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
+          device.getAddress().equals(foundDevice.getAddress())) {
+        foundDevices.remove(foundDevice);
+        break;
+      }
     }
   }
 
