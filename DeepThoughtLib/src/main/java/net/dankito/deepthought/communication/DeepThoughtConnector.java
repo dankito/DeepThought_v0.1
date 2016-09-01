@@ -37,8 +37,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -96,7 +94,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   @Override
   public void runAsync() {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         try {
@@ -179,12 +177,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     final HostInfo localHost = HostInfo.fromUserAndDevice(getLoggedOnUser(), getLocalDevice());
     localHost.setMessagesPort(messagesReceiverPort);
 
-    new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
-      @Override
-      public void run() {
-        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, connectorMessagesCreator, devicesFinderListener);
-      }
-    }, 5 * 1000);
+    devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, connectorMessagesCreator, devicesFinderListener);
   }
 
   protected void stopDevicesFinder() {
