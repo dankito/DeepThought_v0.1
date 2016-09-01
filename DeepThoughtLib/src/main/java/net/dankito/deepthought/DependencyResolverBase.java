@@ -167,8 +167,8 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
-  public IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService) {
-    return new DeepThoughtConnector(devicesFinder, lifeCycleService);
+  public IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService) {
+    return new DeepThoughtConnector(devicesFinder, threadPool, lifeCycleService);
   }
 
   @Override

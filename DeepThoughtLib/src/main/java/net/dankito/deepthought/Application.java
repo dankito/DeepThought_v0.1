@@ -174,7 +174,7 @@ public class Application {
 
       Application.devicesFinder = dependencyResolver.createDevicesFinder(threadPool);
 
-      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder, lifeCycleService);
+      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder, threadPool, lifeCycleService);
       deepThoughtConnector.runAsync();
 
       Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);

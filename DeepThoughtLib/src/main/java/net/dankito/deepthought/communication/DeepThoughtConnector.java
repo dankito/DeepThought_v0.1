@@ -78,15 +78,14 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService) {
-    this(devicesFinder, lifeCycleService, Constants.MessageHandlerDefaultPort);
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService) {
+    this(devicesFinder, threadPool, lifeCycleService, Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService, int messageReceiverPort) {
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService, int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
-    // TODO: make configurable
-    this.threadPool = Application.getThreadPool();
+    this.threadPool = threadPool;
     this.listenerManager = new AsynchronousResponseListenerManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
           NetworkHelper.getIPAddressString(true), messageReceiverPort));
