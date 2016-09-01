@@ -17,20 +17,18 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
 
   @Override
   public boolean connectedToDevice(ConnectedDevice device) {
-    for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(doConnectedDeviceInstancesEqual(device, connectedDevice)) {
-        return false; // we're already containing an instance of this remote device
-      }
+    if(containsDevice(device) == false) {
+      return connectedDevices.add(device);
     }
 
-    return connectedDevices.add(device);
+    return false;
   }
 
   @Override
   public boolean disconnectedFromDevice(ConnectedDevice device) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
       if(doConnectedDeviceInstancesEqual(device, connectedDevice)) {
-        return connectedDevices.remove(device);
+        return connectedDevices.remove(connectedDevice);
       }
     }
 
