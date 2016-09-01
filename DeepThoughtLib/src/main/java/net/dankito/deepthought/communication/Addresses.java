@@ -17,6 +17,7 @@ public class Addresses {
   public final static String AskForDeviceRegistrationResponseMethodName = "AskForDeviceRegistrationResponse";
 
   public final static String NotifyRemoteWeHaveConnectedMethodName = "DeviceConnected";
+  public final static String NotifyRemoteWeAreGoingToDisconnectedMethodName = "GoingToDisconnect";
   public final static String HeartbeatMethodName = "Heartbeat";
 
   public final static String StartImportFilesMethodName = "StartImportFile";
@@ -35,7 +36,8 @@ public class Addresses {
 
 
   static {
-    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, AskForDeviceRegistrationResponseMethodName, NotifyRemoteWeHaveConnectedMethodName, HeartbeatMethodName,
+    MethodNames = Arrays.asList(AskForDeviceRegistrationMethodName, AskForDeviceRegistrationResponseMethodName,
+        NotifyRemoteWeHaveConnectedMethodName, NotifyRemoteWeAreGoingToDisconnectedMethodName, HeartbeatMethodName,
         StartImportFilesMethodName, StopImportFilesMethodName, ImportFilesResultMethodName,
         DoOcrOnImageMethodName, OcrResultMethodName, StopDoOcrOnImageMethodName);
   }
@@ -56,6 +58,10 @@ public class Addresses {
 
   public static String getNotifyRemoteWeHaveConnectedAddress(String host, int port) {
     return createAddress(host, port, NotifyRemoteWeHaveConnectedMethodName);
+  }
+
+  public static String getNotifyRemoteWeAreGoingToDisconnectAddress(String host, int port) {
+    return createAddress(host, port, NotifyRemoteWeAreGoingToDisconnectedMethodName);
   }
 
   public static String getHeartbeatAddress(String host, int port) {

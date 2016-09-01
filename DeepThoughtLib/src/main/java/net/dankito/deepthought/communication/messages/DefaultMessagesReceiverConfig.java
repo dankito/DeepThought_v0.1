@@ -26,6 +26,7 @@ public abstract class DefaultMessagesReceiverConfig extends MessagesReceiverConf
     allowedMethods.add(new WebMethodConfig(Addresses.AskForDeviceRegistrationMethodName, AskForDeviceRegistrationRequest.class));
     allowedMethods.add(new WebMethodConfig(Addresses.AskForDeviceRegistrationResponseMethodName, AskForDeviceRegistrationResponse.class));
     allowedMethods.add(new WebMethodConfig(Addresses.NotifyRemoteWeHaveConnectedMethodName, GenericRequest.class));
+    allowedMethods.add(new WebMethodConfig(Addresses.NotifyRemoteWeAreGoingToDisconnectedMethodName, GenericRequest.class));
     allowedMethods.add(new WebMethodConfig(Addresses.HeartbeatMethodName, GenericRequest.class));
 
     return allowedMethods;

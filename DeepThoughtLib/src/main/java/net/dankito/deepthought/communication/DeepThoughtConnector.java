@@ -234,6 +234,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
 
     if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
+      communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
+
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
       }
@@ -243,14 +245,14 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   }
 
   protected void disconnectedFromRegisteredDevice(HostInfo device) {
-    log.info("Disconnected from registered Device: " + device.getDeviceInfoString());
-
     if(connectedDevicesManager.isConnectedToDevice(device)) {
       disconnectedFromRegisteredDevice(connectedDevicesManager.getConnectedDeviceForHostInfo(device));
     }
   }
 
   protected void disconnectedFromRegisteredDevice(ConnectedDevice device) {
+    log.info("Disconnected from registered Device: " + device.getDeviceInfoString());
+
     if(connectedDevicesManager.disconnectedFromDevice(device)) {
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceDisconnected(device);
@@ -261,6 +263,12 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected void disconnectFromAllConnectedDevices() {
     for(ConnectedDevice connectedDevice : new ArrayList<>(connectedDevicesManager.getConnectedDevices())) {
       disconnectedFromRegisteredDevice(connectedDevice);
+    }
+  }
+
+  protected void sendWeAreGoingToDisconnect() {
+    for(ConnectedDevice connectedDevice : connectedDevicesManager.getConnectedDevices()) {
+      communicator.notifyRemoteWeAreGoingToDisconnect(connectedDevice);
     }
   }
 
@@ -385,7 +393,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     @Override
     public void applicationIsGoingToTerminate() {
       stopDevicesFinder();
-      // TODO: send a notification to remote device that we're going to disconnect
+      sendWeAreGoingToDisconnect();
       disconnectFromAllConnectedDevices(); // make sure to clean all connected devices as on Android Application may gets restarted with the old instances still available ->
       // would find other Devices but think it's still connected to it
     }
@@ -426,6 +434,10 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     }
     else if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
       return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
+    }
+    else if(Addresses.NotifyRemoteWeAreGoingToDisconnectedMethodName.equals(methodName)) {
+      disconnectedFromRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
+      return true;
     }
     else if(Addresses.HeartbeatMethodName.equals(methodName)) {
       // TODO: is this correct, calling connectedToRegisteredDevice() ?
