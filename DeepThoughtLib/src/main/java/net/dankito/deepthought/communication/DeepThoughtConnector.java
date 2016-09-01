@@ -226,16 +226,28 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     communicator.notifyRemoteWeHaveConnected(device); // tell registered Device of our presence -> it will send its Device Capabilities to us -> we're connected
   }
 
+  protected boolean receivedNotifyRemoteWeHaveConnectedMessage(ConnectedDevice device) {
+    boolean result = connectedToRegisteredDevice(device);
+
+    if(result) {
+      communicator.acknowledgeWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
+    }
+
+    return result;
+  }
+
+  protected boolean receivedAcknowledgeWeHaveConnectedMessage(ConnectedDevice device) {
+    return connectedToRegisteredDevice(device);
+  }
+
   protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
+    log.info("Connected to registered Device: " + device.getDeviceInfoString());
+
     if(device.getDevice() == null) {
       device.setStoredDeviceInstance(getLoggedOnUser()); // if it's from a Communicator message locally stored Device instance isn't set yet
     }
 
-    communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
-
     if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
-      communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
-
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
       }
@@ -433,7 +445,10 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       return handleAskForDeviceRegistrationResponse((AskForDeviceRegistrationResponse) request);
     }
     else if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
-      return connectedToRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());
+      return receivedNotifyRemoteWeHaveConnectedMessage(((GenericRequest<ConnectedDevice>) request).getRequestBody());
+    }
+    else if(Addresses.AcknowledgeWeHaveConnected.equals(methodName)) {
+      return receivedAcknowledgeWeHaveConnectedMessage(((GenericRequest<ConnectedDevice>) request).getRequestBody());
     }
     else if(Addresses.NotifyRemoteWeAreGoingToDisconnectedMethodName.equals(methodName)) {
       disconnectedFromRegisteredDevice(((GenericRequest<ConnectedDevice>) request).getRequestBody());

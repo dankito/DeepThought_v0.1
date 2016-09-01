@@ -116,6 +116,22 @@ public class Communicator {
     });
   }
 
+  public void acknowledgeWeHaveConnected(HostInfo connectedDevice) {
+    acknowledgeWeHaveConnected(connectedDevice, getLocalHostInfo());
+  }
+
+  public void acknowledgeWeHaveConnected(HostInfo connectedDevice, ConnectedDevice localHost) {
+    String address = Addresses.getAcknowledgeWeHaveConnectedAddress(connectedDevice.getAddress(), connectedDevice.getMessagesPort());
+    final Request request = new GenericRequest<ConnectedDevice>(localHost);
+
+    dispatcher.sendMessageAsync(address, request, new CommunicatorResponseListener() {
+      @Override
+      public void responseReceived(Response communicatorResponse) {
+        dispatchResponse(request, communicatorResponse);
+      }
+    });
+  }
+
   public void notifyRemoteWeAreGoingToDisconnect(HostInfo connectedDevice) {
     notifyRemoteWeAreGoingToDisconnect(connectedDevice, getLocalHostInfo());
   }
