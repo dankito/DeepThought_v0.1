@@ -190,7 +190,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
       @Override
       public void run() {
-        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, devicesFinderListener);
+        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, connectorMessagesCreator, devicesFinderListener);
       }
     }, 5 * 1000);
   }

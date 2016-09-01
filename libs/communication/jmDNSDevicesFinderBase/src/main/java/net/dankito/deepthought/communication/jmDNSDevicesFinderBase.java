@@ -56,7 +56,7 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
 
   @Override
-  public void startAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
+  public void startAsync(final HostInfo localHost, final int searchDevicesPort, ConnectorMessagesCreator messagesCreator, final IDevicesFinderListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {

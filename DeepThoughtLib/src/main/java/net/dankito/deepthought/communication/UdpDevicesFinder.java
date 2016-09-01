@@ -26,8 +26,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected ConnectionsAliveWatcher connectionsAliveWatcher = null;
 
-  protected ConnectorMessagesCreator messagesCreator;
-
   protected IThreadPool threadPool;
 
   protected DatagramSocket listenerSocket = null;
@@ -39,10 +37,9 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
-  public UdpDevicesFinder(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool) {
-    this.messagesCreator = messagesCreator;
+  public UdpDevicesFinder(IThreadPool threadPool) {
     this.threadPool = threadPool;
-    // 3.5 = from 3 messages one must be received to be still valued as 'connected'
+    // * 3.5 = from 3 messages one must be received to be still valued as 'connected'
     this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 3.5));
   }
 
@@ -53,12 +50,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   @Override
-  public void startAsync(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
+  public void startAsync(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
     log.info("Starting UdpDevicesFinder ...");
 
-    startListenerAsync(localHost, searchDevicesPort, listener);
+    startListenerAsync(localHost, searchDevicesPort, messagesCreator, listener);
 
-    startBroadcastAsync(localHost, searchDevicesPort);
+    startBroadcastAsync(localHost, searchDevicesPort, messagesCreator);
   }
 
   @Override
@@ -88,16 +85,16 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
 
-  protected void startListenerAsync(final HostInfo localHost, final int searchDevicesPort, final IDevicesFinderListener listener) {
+  protected void startListenerAsync(final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator, final IDevicesFinderListener listener) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startListener(localHost, searchDevicesPort, listener);
+        startListener(localHost, searchDevicesPort, messagesCreator, listener);
       }
     });
   }
 
-  protected void startListener(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener) {
+  protected void startListener(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
     try {
       this.listenerSocket = createListenerSocket(searchDevicesPort);
 
@@ -112,11 +109,11 @@ public class UdpDevicesFinder implements IDevicesFinder {
             break;
           else {
             log.error("An Error occurred receiving Packets. listenerSocket = " + listenerSocket, ex);
-            startListener(localHost, searchDevicesPort, listener);
+            startListener(localHost, searchDevicesPort, messagesCreator, listener);
           }
         }
 
-        listenerReceivedPacket(buffer, packet, localHost, listener);
+        listenerReceivedPacket(buffer, packet, localHost, messagesCreator, listener);
       }
     } catch(Exception ex) {
       log.error("An error occurred starting UdpDevicesSearcher", ex);
@@ -138,7 +135,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
     return NetworkHelper.isSocketCloseException(ex);
   }
 
-  protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, HostInfo localHost, IDevicesFinderListener listener) {
+  protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, HostInfo localHost, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
     if(messagesCreator.isSearchingForDevicesMessage(buffer, packet.getLength())) {
       HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, packet);
       remoteHost.setAddress(packet.getAddress().getHostAddress());
@@ -200,31 +197,31 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
 
-  protected void startBroadcastAsync(final HostInfo localHost, final int searchDevicesPort) {
+  protected void startBroadcastAsync(final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startBroadcast(localHost, searchDevicesPort);
+        startBroadcast(localHost, searchDevicesPort, messagesCreator);
       }
     });
   }
 
-  protected void startBroadcast(HostInfo localHost, int searchDevicesPort) {
+  protected void startBroadcast(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) {
     for(InetAddress broadcastAddress : NetworkHelper.getBroadcastAddresses()) {
-      startBroadcastForBroadcastAddressAsync(broadcastAddress, localHost, searchDevicesPort);
+      startBroadcastForBroadcastAddressAsync(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
     }
   }
 
-  protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress, final HostInfo localHost, final int searchDevicesPort) {
+  protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress, final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator) {
     threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
-        startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort);
+        startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
       }
     });
   }
 
-  protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress, HostInfo localHost, int searchDevicesPort) {
+  protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress, HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) {
     try {
       DatagramSocket broadcastSocket = new DatagramSocket();
 

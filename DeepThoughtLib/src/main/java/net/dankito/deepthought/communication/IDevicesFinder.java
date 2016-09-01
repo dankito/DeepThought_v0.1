@@ -10,7 +10,7 @@ public interface IDevicesFinder {
 
   boolean isRunning();
 
-  void startAsync(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener);
+  void startAsync(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener);
 
   void stop();
 
