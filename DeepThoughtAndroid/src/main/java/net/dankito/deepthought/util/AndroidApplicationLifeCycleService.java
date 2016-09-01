@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import net.dankito.deepthought.MainActivity;
 import net.dankito.deepthought.application.ApplicationLifeCycleServiceBase;
 
 import org.slf4j.Logger;
@@ -38,10 +37,6 @@ public class AndroidApplicationLifeCycleService extends ApplicationLifeCycleServ
     // "When user close the app, the process is terminated with no notice. onDestroy is not guaranteed to be called. only when you explicitly call finish()."
     // (from: https://stackoverflow.com/questions/23534046/app-closing-event-in-android)
     log.info("Activity " + activity.getLocalClassName() + " has been destroyed");
-
-    if(MainActivity.class.equals(activity.getClass())) {
-      applicationIsGoingToTerminate();
-    }
   }
 
   @Override
@@ -83,6 +78,11 @@ public class AndroidApplicationLifeCycleService extends ApplicationLifeCycleServ
     if(isApplicationInForeground() && started <= stopped) {
       applicationWentToBackground();
     }
+  }
+
+  // sometimes MainActivity's onDestroy() method is called but not ActivityLifecycleCallbacks' one
+  public void mainActivityIsGoingToBeDestroyed() {
+    applicationIsGoingToTerminate();
   }
 
 }

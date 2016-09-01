@@ -21,10 +21,8 @@ import android.view.View;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import net.dankito.deepthought.activities.EditEntryActivity;
-import net.dankito.deepthought.fragments.TagsFragment;
-import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
 import net.dankito.deepthought.activities.ActivityManager;
+import net.dankito.deepthought.activities.EditEntryActivity;
 import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
@@ -36,7 +34,10 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.fragments.EntriesFragment;
+import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
+import net.dankito.deepthought.util.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -285,6 +286,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   protected void onDestroy() {
+    // sometimes MainActivity's onDestroy() method is called but not ActivityLifecycleCallbacks' one
+    ((AndroidApplicationLifeCycleService)Application.getLifeCycleService()).mainActivityIsGoingToBeDestroyed();
+
     dismissLoadingDataProgressDialog();
 
     super.onDestroy();
