@@ -8,8 +8,6 @@ import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
-import net.dankito.deepthought.communication.IDevicesFinder;
-import net.dankito.deepthought.communication.jmDNSDevicesFinderAndroid;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.contentextractor.CtContentExtractor;
@@ -34,7 +32,6 @@ import net.dankito.deepthought.plugin.AndroidPluginManager;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.plugin.IPluginManager;
 import net.dankito.deepthought.util.AndroidClipboardHelper;
-import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.OsHelper;
 import net.dankito.deepthought.util.file.FileUtils;
 
@@ -141,11 +138,6 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public IApplicationLifeCycleService createApplicationLifeCycleService() {
     return lifeCycleService;
-  }
-
-  @Override
-  public IDevicesFinder createDevicesFinder(IThreadPool threadPool) {
-    return new jmDNSDevicesFinderAndroid(context, threadPool);
   }
 
   @Override

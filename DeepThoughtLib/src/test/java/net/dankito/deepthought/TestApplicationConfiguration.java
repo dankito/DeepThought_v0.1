@@ -81,11 +81,6 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
   }
 
   @Override
-  public IDevicesFinder createDevicesFinder(IThreadPool threadPool) {
-    return null; // TODO
-  }
-
-  @Override
   public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
     return null;
   }

@@ -5,8 +5,6 @@ import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
-import net.dankito.deepthought.communication.IDevicesFinder;
-import net.dankito.deepthought.communicaton.jmDNSDevicesFinderJava;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.download.IFileDownloader;
@@ -25,7 +23,6 @@ import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.language.LanguageDetector;
 import net.dankito.deepthought.plugin.IPlugin;
-import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.JavaFxClipboardHelper;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -117,11 +114,6 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   @Override
   public IFileDownloader createDownloader() {
     return new WGetFileDownloader();
-  }
-
-  @Override
-  public IDevicesFinder createDevicesFinder(IThreadPool threadPool) {
-    return new jmDNSDevicesFinderJava(threadPool);
   }
 
   @Override

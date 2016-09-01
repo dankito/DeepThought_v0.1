@@ -7,6 +7,7 @@ import net.dankito.deepthought.clipboard.NoOpClipboardHelper;
 import net.dankito.deepthought.communication.DeepThoughtConnector;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
+import net.dankito.deepthought.communication.UdpDevicesFinder;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.DefaultDataManager;
 import net.dankito.deepthought.data.IDataManager;
@@ -158,6 +159,11 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   @Override
   public IContentExtractorManager createContentExtractorManager() {
     return new ContentExtractorManager();
+  }
+
+  @Override
+  public IDevicesFinder createDevicesFinder(IThreadPool threadPool) {
+    return new UdpDevicesFinder(threadPool);
   }
 
   @Override
