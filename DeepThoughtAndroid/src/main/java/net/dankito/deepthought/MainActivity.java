@@ -24,9 +24,9 @@ import com.github.clans.fab.FloatingActionMenu;
 import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.activities.EditEntryActivity;
 import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
+import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
-import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -37,7 +37,6 @@ import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
-import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -151,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void applicationInstantiated() {
-    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
+//    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
 
     deviceRegistrationHandler = new DeviceRegistrationHandler(this, Application.getDeepThoughtConnector());
   }
