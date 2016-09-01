@@ -404,10 +404,11 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected ApplicationTerminatesListener applicationTerminatesListener = new ApplicationTerminatesListener() {
     @Override
     public void applicationIsGoingToTerminate() {
-      stopDevicesFinder();
       sendWeAreGoingToDisconnect();
       disconnectFromAllConnectedDevices(); // make sure to clean all connected devices as on Android Application may gets restarted with the old instances still available ->
       // would find other Devices but think it's still connected to it
+
+      stopDevicesFinder();
     }
   };
 
