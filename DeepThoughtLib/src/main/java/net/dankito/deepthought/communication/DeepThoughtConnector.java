@@ -231,9 +231,9 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       device.setStoredDeviceInstance(getLoggedOnUser()); // if it's from a Communicator message locally stored Device instance isn't set yet
     }
 
-    if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
-      communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
+    communicator.notifyRemoteWeHaveConnected(device); // notify peer that we found him so that he for sure knows about our existence
 
+    if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
       }
