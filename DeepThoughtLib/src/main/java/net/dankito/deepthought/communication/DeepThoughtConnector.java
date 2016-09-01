@@ -395,7 +395,12 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     @Override
     public void deviceDisconnected(HostInfo device) {
       if(registeredDevicesManager.isDeviceRegistered(device)) {
-        disconnectedFromRegisteredDevice(device);
+        if(device instanceof ConnectedDevice) { // stupid fix
+          disconnectedFromRegisteredDevice((ConnectedDevice)device);
+        }
+        else {
+          disconnectedFromRegisteredDevice(device);
+        }
       }
     }
   };
