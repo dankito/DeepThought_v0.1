@@ -5,6 +5,7 @@ import android.content.Context;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
@@ -60,9 +61,12 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
 
   protected IPlatformConfiguration platformConfiguration;
 
+  protected IApplicationLifeCycleService lifeCycleService;
 
-  public AndroidApplicationConfiguration(Context context) {
+
+  public AndroidApplicationConfiguration(Context context, IApplicationLifeCycleService lifeCycleService) {
     this.context = context;
+    this.lifeCycleService = lifeCycleService;
 
     this.preferencesStore = new AndroidPreferencesStore(context);
     this.platformConfiguration = new AndroidPlatformConfiguration(context);
@@ -132,6 +136,11 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public IPluginManager createPluginManager() {
     return new AndroidPluginManager(context);
+  }
+
+  @Override
+  public IApplicationLifeCycleService createApplicationLifeCycleService() {
+    return lifeCycleService;
   }
 
   @Override

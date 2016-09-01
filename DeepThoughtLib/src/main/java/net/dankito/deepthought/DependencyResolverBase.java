@@ -1,5 +1,7 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
+import net.dankito.deepthought.application.NoOperationApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.clipboard.NoOpClipboardHelper;
 import net.dankito.deepthought.communication.DeepThoughtConnector;
@@ -92,6 +94,11 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
+  public IApplicationLifeCycleService createApplicationLifeCycleService() {
+    return new NoOperationApplicationLifeCycleService();
+  }
+
+  @Override
   public IBackupManager createBackupManager() {
     if(backupManager == null)
       backupManager = new DefaultBackupManager();
@@ -154,8 +161,8 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
-  public IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder) {
-    return new DeepThoughtConnector(devicesFinder);
+  public IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService) {
+    return new DeepThoughtConnector(devicesFinder, lifeCycleService);
   }
 
   @Override

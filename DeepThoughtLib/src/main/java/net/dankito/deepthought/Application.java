@@ -1,5 +1,6 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
@@ -65,6 +66,7 @@ public class Application {
   protected static IPreferencesStore preferencesStore;
   protected static IPlatformConfiguration platformConfiguration;
   protected static IPlatformTools platformTools;
+  protected static IApplicationLifeCycleService lifeCycleService;
   protected static IThreadPool threadPool;
 
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
@@ -130,6 +132,7 @@ public class Application {
       threadPool = dependencyResolver.createThreadPool();
     Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
     Application.platformTools = applicationConfiguration.createPlatformTools();
+    Application.lifeCycleService = applicationConfiguration.createApplicationLifeCycleService();
 
     HtmlEditor.extractHtmlEditorIfNeededAsync();
 
@@ -171,7 +174,7 @@ public class Application {
 
       Application.devicesFinder = dependencyResolver.createDevicesFinder(threadPool);
 
-      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder);
+      Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder, lifeCycleService);
       deepThoughtConnector.runAsync();
 
       Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);
@@ -364,6 +367,10 @@ public class Application {
 
   public static IPlatformTools getPlatformTools() {
     return platformTools;
+  }
+
+  public static IApplicationLifeCycleService getLifeCycleService() {
+    return lifeCycleService;
   }
 
   public static IThreadPool getThreadPool() {

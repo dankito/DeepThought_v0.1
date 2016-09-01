@@ -1,5 +1,6 @@
 package net.dankito.deepthought;
 
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
@@ -35,6 +36,8 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IPlatformTools createPlatformTools();
 
+  IApplicationLifeCycleService createApplicationLifeCycleService();
+
   IBackupManager createBackupManager();
 
   IDataComparer createDataComparer();
@@ -57,7 +60,7 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IDevicesFinder createDevicesFinder(IThreadPool threadPool);
 
-  IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder);
+  IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService);
 
   IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector);
 
