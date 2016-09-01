@@ -7,6 +7,7 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.application.JavaFXApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.ClipboardContentChangedListener;
 import net.dankito.deepthought.clipboard.IClipboardWatcher;
 import net.dankito.deepthought.clipboard.JavaFxClipboardWatcher;
@@ -91,7 +92,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 
 /**
@@ -205,7 +205,10 @@ public class MainWindowController implements Initializable {
       }
     });
 
-    Application.instantiateAsync(new JavaSeApplicationConfiguration());
+    JavaFXApplicationLifeCycleService lifeCycleService = new JavaFXApplicationLifeCycleService();
+    lifeCycleService.addApplicationTerminatesListenerListener(() -> applicationTerminating());
+
+    Application.instantiateAsync(new JavaSeApplicationConfiguration(lifeCycleService));
 
     setupControls();
 
@@ -407,7 +410,7 @@ public class MainWindowController implements Initializable {
     entriesOverviewControl.clearData();
   }
 
-  protected void windowClosing() {
+  protected void applicationTerminating() {
     setStatusLabelText(Localization.getLocalizedString("backing.up.data"));
     Application.shutdown();
 
@@ -820,16 +823,11 @@ public class MainWindowController implements Initializable {
   public void setStage(Stage stage) {
     this.stage = stage;
 
+    ((JavaFXApplicationLifeCycleService)Application.getLifeCycleService()).setMainWindowStage(stage);
+
     clipboardWatcher = new JavaFxClipboardWatcher(stage, clipboardContentChangedExternallyListener);
     this.createEntryFromClipboardContentPopup = new CreateEntryFromClipboardContentPopup(stage, clipboardWatcher);
     this.contentExtractOptionForUiCreator = new ContentExtractOptionForUiCreator(stage);
-
-    stage.setOnHiding(new EventHandler<WindowEvent>() {
-      @Override
-      public void handle(WindowEvent event) {
-        windowClosing();
-      }
-    });
   }
 
   protected SettingsChangedListener userDeviceSettingsChangedListener = new SettingsChangedListener() {

@@ -37,7 +37,7 @@ import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
-import net.dankito.deepthought.util.AndroidApplicationLifeCycleService;
+import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;

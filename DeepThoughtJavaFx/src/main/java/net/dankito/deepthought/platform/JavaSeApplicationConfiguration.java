@@ -3,6 +3,7 @@ package net.dankito.deepthought.platform;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
@@ -47,8 +48,15 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
 
   protected EntityManagerConfiguration entityManagerConfiguration;
 
+  protected IApplicationLifeCycleService lifeCycleService;
 
-  public JavaSeApplicationConfiguration() {
+  @Override
+  public IApplicationLifeCycleService createApplicationLifeCycleService() {
+    return lifeCycleService;
+  }
+
+  public JavaSeApplicationConfiguration(IApplicationLifeCycleService lifeCycleService) {
+    this.lifeCycleService = lifeCycleService;
     this.preferencesStore = new JavaSePreferencesStore();
     this.platformConfiguration = new net.dankito.deepthought.platform.JavaSePlatformConfiguration();
     this.entityManagerConfiguration = new EntityManagerConfiguration(preferencesStore.getDataFolder(), preferencesStore.getDatabaseDataModelVersion());
