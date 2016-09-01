@@ -1,33 +1,30 @@
 package net.dankito.deepthought.communication;
 
-import net.dankito.deepthought.application.ApplicationForegroundBackgroundListener;
-import net.dankito.deepthought.application.ApplicationTerminatesListener;
-import net.dankito.deepthought.application.IApplicationLifeCycleService;
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
 import net.dankito.deepthought.communication.messages.AsynchronousResponseListenerManager;
-import net.dankito.deepthought.communication.messages.MessagesDispatcher;
-import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.messages.request.GenericRequest;
-import net.dankito.deepthought.communication.messages.request.Request;
-import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
-import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.util.IThreadPool;
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.messages.DeepThoughtMessagesReceiverConfig;
+import net.dankito.deepthought.communication.messages.MessagesDispatcher;
 import net.dankito.deepthought.communication.messages.MessagesReceiver;
+import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.messages.request.DoOcrRequest;
+import net.dankito.deepthought.communication.messages.request.GenericRequest;
 import net.dankito.deepthought.communication.messages.request.ImportFilesRequest;
+import net.dankito.deepthought.communication.messages.request.Request;
 import net.dankito.deepthought.communication.messages.request.RequestWithAsynchronousResponse;
 import net.dankito.deepthought.communication.messages.request.StopRequestWithAsynchronousResponse;
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
 import net.dankito.deepthought.communication.registration.RegisteredDevicesManager;
+import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.util.DeepThoughtError;
+import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.localization.Localization;
@@ -78,14 +75,15 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService) {
-    this(devicesFinder, threadPool, lifeCycleService, Constants.MessageHandlerDefaultPort);
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool) {
+    this(devicesFinder, threadPool, Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService, int messageReceiverPort) {
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, int messageReceiverPort) {
+    this.devicesFinder = devicesFinder;
+    this.threadPool = threadPool;
     this.messageReceiverPort = messageReceiverPort;
 
-    this.threadPool = threadPool;
     this.listenerManager = new AsynchronousResponseListenerManager();
     this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
           NetworkHelper.getIPAddressString(true), messageReceiverPort));
@@ -93,11 +91,6 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     this.connectedDevicesManager = new ConnectedDevicesManager();
 
     this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
-
-    this.devicesFinder = devicesFinder;
-
-    lifeCycleService.addApplicationTerminatesListenerListener(applicationTerminatesListener);
-    lifeCycleService.addApplicationForegroundBackgroundListener(foregroundBackgroundListener);
   }
 
 
@@ -404,32 +397,6 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
           disconnectedFromRegisteredDevice(device);
         }
       }
-    }
-  };
-
-
-  protected ApplicationTerminatesListener applicationTerminatesListener = new ApplicationTerminatesListener() {
-    @Override
-    public void applicationIsGoingToTerminate() {
-      sendWeAreGoingToDisconnect();
-      disconnectFromAllConnectedDevices(); // make sure to clean all connected devices as on Android Application may gets restarted with the old instances still available ->
-      // would find other Devices but think it's still connected to it
-
-      stopDevicesFinder();
-    }
-  };
-
-  protected ApplicationForegroundBackgroundListener foregroundBackgroundListener = new ApplicationForegroundBackgroundListener() {
-    @Override
-    public void applicationCameToForeground() {
-      if(devicesFinder.isRunning() == false) {
-        startDevicesFinder(getMessageReceiverPort());
-      }
-    }
-
-    @Override
-    public void applicationWentToBackground() {
-
     }
   };
 

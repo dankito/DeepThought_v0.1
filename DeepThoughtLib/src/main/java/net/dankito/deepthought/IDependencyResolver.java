@@ -60,7 +60,7 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IDevicesFinder createDevicesFinder(IThreadPool threadPool);
 
-  IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool, IApplicationLifeCycleService lifeCycleService);
+  IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool);
 
   IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector);
 
