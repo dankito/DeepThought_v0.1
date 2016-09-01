@@ -15,7 +15,10 @@ public class Constants {
 
   public final static int SearchDevicesListenerPort = 27384;
 
-  public final static int ConnectionsAliveWatcherDefaultInterval = 10000; // every 10 seconds
+  /**
+   * Interval at which a Broadcast that we're alive is sent in milliseconds
+   */
+  public final static int SendWeAreAliveMessageInterval = 500;
 
 
   public final static Charset MessagesCharset = Charset.forName("utf8");
