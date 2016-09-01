@@ -65,21 +65,23 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
   }
 
   protected void start(HostInfo localHost, int searchDevicesPort, final IDevicesFinderListener listener) {
-    try {
-      initJmDNS();
+    synchronized(this) {
+      try {
+        initJmDNS();
 
-      localHost.setDeviceName(Application.getPlatformConfiguration().getDeviceName()); // TODO: remove again
-      if(localHost.getDeviceName() == null) { // TODO: remove again
-        localHost.setDeviceName("Manjaro");
+        localHost.setDeviceName(Application.getPlatformConfiguration().getDeviceName()); // TODO: remove again
+        if (localHost.getDeviceName() == null) { // TODO: remove again
+          localHost.setDeviceName("Manjaro");
+        }
+        serviceInfo = ServiceInfo.create(SERVICE_TYPE, localHost.getDeviceName(), searchDevicesPort, 1, 1, getHostInfoAsMap(localHost));
+        jmDNS.registerService(serviceInfo);
+
+        serviceListener = createServiceListener(listener);
+        jmDNS.addServiceListener(SERVICE_TYPE, serviceListener);
+
+      } catch (IOException e) {
+        log.error("Error in JmDNS initialization: " + e);
       }
-      serviceInfo = ServiceInfo.create(SERVICE_TYPE, localHost.getDeviceName(), searchDevicesPort, 1, 1, getHostInfoAsMap(localHost));
-      jmDNS.registerService(serviceInfo);
-
-      serviceListener = createServiceListener(listener);
-      jmDNS.addServiceListener(SERVICE_TYPE, serviceListener);
-
-    } catch (IOException e) {
-      log.error("Error in JmDNS initialization: " + e);
     }
   }
 
@@ -137,22 +139,24 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
   @Override
   public void stop() {
-    log.info("Stopping jmDNSDevicesFinder ...");
+    synchronized(this) {
+      log.info("Stopping jmDNSDevicesFinder ...");
 
-    if (jmDNS != null) {
-      if (serviceListener != null) {
-        jmDNS.removeServiceListener(SERVICE_TYPE, serviceListener);
-        serviceListener = null;
+      if (jmDNS != null) {
+        if (serviceListener != null) {
+          jmDNS.removeServiceListener(SERVICE_TYPE, serviceListener);
+          serviceListener = null;
+        }
+
+        jmDNS.unregisterAllServices();
+        try {
+          jmDNS.close();
+        } catch (Exception e) {
+          log.error("Could not close jmDNS", e);
+        }
+
+        jmDNS = null;
       }
-
-      jmDNS.unregisterAllServices();
-      try {
-        jmDNS.close();
-      } catch(Exception e) {
-        log.error("Could not close jmDNS", e);
-      }
-
-      jmDNS = null;
     }
   }
 
@@ -271,7 +275,9 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
   @Override
   public boolean isRunning() {
-    return jmDNS != null;
+    synchronized(this) {
+      return jmDNS != null;
+    }
   }
 
 }
