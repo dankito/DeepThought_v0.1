@@ -1,7 +1,5 @@
 package net.dankito.deepthought.communication;
 
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesManager;
-import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.util.IThreadPool;
 
@@ -40,11 +38,11 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
-  public UdpDevicesFinder(ConnectorMessagesCreator messagesCreator, IConnectedDevicesManager connectedDevicesManager, IThreadPool threadPool) {
+  public UdpDevicesFinder(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool) {
     this.messagesCreator = messagesCreator;
     this.threadPool = threadPool;
     // 3.5 = from 3 messages one must be received to be still valued as 'connected'
-    this.connectionsAliveWatcher = new ConnectionsAliveWatcher(connectedDevicesManager, (int)(Constants.SendWeAreAliveMessageInterval * 3.5));
+    this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 3.5));
   }
 
 
@@ -179,17 +177,17 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void startConnectionsAliveWatcher(final IDevicesFinderListener listener) {
-    connectionsAliveWatcher.startWatchingAsync(new IConnectionsAliveWatcherListener() {
+    connectionsAliveWatcher.startWatchingAsync(foundDevices, new IConnectionsAliveWatcherListener() {
       @Override
-      public void deviceDisconnected(ConnectedDevice device) {
+      public void deviceDisconnected(HostInfo device) {
         UdpDevicesFinder.this.deviceDisconnected(device, listener);
       }
     });
   }
 
-  protected void deviceDisconnected(ConnectedDevice device, IDevicesFinderListener listener) {
+  protected void deviceDisconnected(HostInfo device, IDevicesFinderListener listener) {
     for(HostInfo foundDevice : foundDevices) {
-      if(device.getDevice().getUniversallyUniqueId().equals(foundDevice.getDeviceId()) &&
+      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
           device.getUserUniqueId().equals(foundDevice.getUserUniqueId())) {
         foundDevices.remove(foundDevice);
         break;
@@ -249,13 +247,5 @@ public class UdpDevicesFinder implements IDevicesFinder {
       log.error("An error occurred trying to find Devices", ex);
     }
   }
-
-
-  protected IConnectionsAliveWatcherListener connectionsAliveWatcherListener = new IConnectionsAliveWatcherListener() {
-    @Override
-    public void deviceDisconnected(ConnectedDevice device) {
-
-    }
-  };
 
 }

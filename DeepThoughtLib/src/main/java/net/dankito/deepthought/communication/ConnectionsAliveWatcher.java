@@ -1,14 +1,12 @@
 package net.dankito.deepthought.communication;
 
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesManager;
-import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,15 +26,12 @@ public class ConnectionsAliveWatcher {
 
   protected Map<String, Long> lastMessageReceivedFromDeviceTimestamps = new ConcurrentHashMap<>();
 
-  protected IConnectedDevicesManager connectedDevicesManager;
 
-
-  public ConnectionsAliveWatcher(IConnectedDevicesManager connectedDevicesManager) {
-    this(connectedDevicesManager, (int)(Constants.SendWeAreAliveMessageInterval * 3.5));
+  public ConnectionsAliveWatcher() {
+    this((int)(Constants.SendWeAreAliveMessageInterval * 3.5));
   }
 
-  public ConnectionsAliveWatcher(IConnectedDevicesManager connectedDevicesManager, int connectionTimeout) {
-    this.connectedDevicesManager = connectedDevicesManager;
+  public ConnectionsAliveWatcher(int connectionTimeout) {
     this.connectionTimeout = connectionTimeout;
   }
 
@@ -45,7 +40,7 @@ public class ConnectionsAliveWatcher {
     return connectionsAliveCheckTimer != null;
   }
 
-  public void startWatchingAsync(final IConnectionsAliveWatcherListener listener) {
+  public void startWatchingAsync(final List<HostInfo> foundDevices, final IConnectionsAliveWatcherListener listener) {
     log.info("Starting ConnectionsAliveWatcher ...");
 
     synchronized(this) {
@@ -55,7 +50,7 @@ public class ConnectionsAliveWatcher {
       connectionsAliveCheckTimer.scheduleAtFixedRate(new TimerTask() {
         @Override
         public void run() {
-          checkIfConnectedDevicesStillAreConnected(listener);
+          checkIfConnectedDevicesStillAreConnected(foundDevices, listener);
         }
       }, connectionTimeout, connectionTimeout);
     }
@@ -78,17 +73,17 @@ public class ConnectionsAliveWatcher {
   }
 
 
-  protected void checkIfConnectedDevicesStillAreConnected(final IConnectionsAliveWatcherListener listener) {
+  protected void checkIfConnectedDevicesStillAreConnected(List<HostInfo> foundDevices, final IConnectionsAliveWatcherListener listener) {
     Long now = new Date().getTime();
 
-    for(final ConnectedDevice connectedDevice : new ArrayList<>(connectedDevicesManager.getConnectedDevices())) {
+    for(final HostInfo connectedDevice : foundDevices) {
       if(hasDeviceExpired(connectedDevice, now)) {
         deviceDisconnected(connectedDevice, listener);
       }
     }
   }
 
-  protected boolean hasDeviceExpired(ConnectedDevice connectedDevice, Long now) {
+  protected boolean hasDeviceExpired(HostInfo connectedDevice, Long now) {
     Long lastMessageReceivedFromDeviceTimestamp = lastMessageReceivedFromDeviceTimestamps.get(getDeviceKey(connectedDevice));
 
     if(lastMessageReceivedFromDeviceTimestamp != null) {
@@ -98,16 +93,12 @@ public class ConnectionsAliveWatcher {
     return false;
   }
 
-  protected void deviceDisconnected(ConnectedDevice connectedDevice, IConnectionsAliveWatcherListener listener) {
+  protected void deviceDisconnected(HostInfo connectedDevice, IConnectionsAliveWatcherListener listener) {
     lastMessageReceivedFromDeviceTimestamps.remove(getDeviceKey(connectedDevice));
 
     if(listener != null) {
       listener.deviceDisconnected(connectedDevice);
     }
-  }
-
-  protected String getDeviceKey(ConnectedDevice connectedDevice) {
-    return connectedDevice.getDevice().getName(); // TODO: use deviceId as soon as synchronizing is working
   }
 
   protected String getDeviceKey(HostInfo device) {
