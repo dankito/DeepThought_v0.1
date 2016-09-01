@@ -20,6 +20,8 @@ import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.search.LuceneSearchEngine;
 import net.dankito.deepthought.data.sync.CouchbaseLiteSyncManager;
 import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
+import net.dankito.deepthought.language.ILanguageDetector;
+import net.dankito.deepthought.language.LanguageDetector;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.util.JavaFxClipboardHelper;
 import net.dankito.deepthought.util.localization.Localization;
@@ -117,6 +119,11 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   @Override
   public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
     return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)Application.getEntityManager(), deepThoughtConnector);
+  }
+
+  @Override
+  public ILanguageDetector createLanguageDetector() {
+    return new LanguageDetector();
   }
 
   @Override
