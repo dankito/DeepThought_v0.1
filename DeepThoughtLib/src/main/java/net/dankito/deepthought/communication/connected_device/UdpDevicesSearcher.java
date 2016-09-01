@@ -1,8 +1,12 @@
 package net.dankito.deepthought.communication.connected_device;
 
+import net.dankito.deepthought.communication.ConnectionsAliveWatcher;
 import net.dankito.deepthought.communication.ConnectorMessagesCreator;
+import net.dankito.deepthought.communication.Constants;
+import net.dankito.deepthought.communication.IConnectionsAliveWatcherListener;
 import net.dankito.deepthought.communication.IDevicesFinderListener;
 import net.dankito.deepthought.communication.NetworkHelper;
+import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.util.IThreadPool;
 
@@ -26,6 +30,8 @@ public class UdpDevicesSearcher {
   private final static Logger log = LoggerFactory.getLogger(UdpDevicesSearcher.class);
 
 
+  protected ConnectionsAliveWatcher connectionsAliveWatcher = null;
+
   protected ConnectorMessagesCreator messagesCreator;
 
   protected IThreadPool threadPool;
@@ -39,9 +45,11 @@ public class UdpDevicesSearcher {
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
-  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IThreadPool threadPool) {
+  public UdpDevicesSearcher(ConnectorMessagesCreator messagesCreator, IConnectedDevicesManager connectedDevicesManager, IThreadPool threadPool) {
     this.messagesCreator = messagesCreator;
     this.threadPool = threadPool;
+    // 3.5 = from 3 messages one must be received to be still valued as 'connected'
+    this.connectionsAliveWatcher = new ConnectionsAliveWatcher(connectedDevicesManager, (int)(Constants.SendWeAreAliveMessageInterval * 3.5));
   }
 
 
@@ -51,7 +59,9 @@ public class UdpDevicesSearcher {
     startBroadcastAsync(localHost, searchDevicesPort);
   }
 
-  public void stopSearching() {
+  public void stop() {
+    connectionsAliveWatcher.stopWatching();
+
     if(isListenerSocketOpened) {
       listenerSocket.close();
       listenerSocket = null;
@@ -123,8 +133,13 @@ public class UdpDevicesSearcher {
       HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, packet);
       remoteHost.setAddress(packet.getAddress().getHostAddress());
 
-      if(isSelfSentPacket(remoteHost, localHost) == false && hasDeviceAlreadyBeenFound(remoteHost) == false) {
-        deviceFound(remoteHost, listener);
+      if(isSelfSentPacket(remoteHost, localHost) == false) {
+        if(hasDeviceAlreadyBeenFound(remoteHost) == false) {
+          deviceFound(remoteHost, listener);
+        }
+        else {
+          connectionsAliveWatcher.receivedMessageFromDevice(remoteHost);
+        }
       }
     }
   }
@@ -150,7 +165,26 @@ public class UdpDevicesSearcher {
   protected void deviceFound(HostInfo device, IDevicesFinderListener listener) {
     foundDevices.add(device);
 
+    if(foundDevices.size() == 1) {
+      startConnectionsAliveWatcher(listener);
+    }
+
     listener.deviceFound(device);
+  }
+
+  protected void startConnectionsAliveWatcher(final IDevicesFinderListener listener) {
+    connectionsAliveWatcher.startWatchingAsync(new IConnectionsAliveWatcherListener() {
+      @Override
+      public void deviceDisconnected(ConnectedDevice device) {
+        UdpDevicesSearcher.this.deviceDisconnected(device, listener);
+      }
+    });
+  }
+
+  protected void deviceDisconnected(ConnectedDevice device, IDevicesFinderListener listener) {
+    if(listener != null) {
+      listener.deviceDisconnected(device);
+    }
   }
 
 
@@ -195,11 +229,19 @@ public class UdpDevicesSearcher {
       while (areBroadcastSocketsOpened) {
         broadcastSocket.send(searchDevicesPacket);
 
-        try { Thread.sleep(1000); } catch(Exception ignored) { }
+        try { Thread.sleep(Constants.SendWeAreAliveMessageInterval); } catch(Exception ignored) { }
       }
     } catch (Exception ex) {
       log.error("An error occurred trying to find Devices", ex);
     }
   }
+
+
+  protected IConnectionsAliveWatcherListener connectionsAliveWatcherListener = new IConnectionsAliveWatcherListener() {
+    @Override
+    public void deviceDisconnected(ConnectedDevice device) {
+
+    }
+  };
 
 }
