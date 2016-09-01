@@ -17,17 +17,21 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
 
   @Override
   public boolean connectedToDevice(ConnectedDevice device) {
-    if(containsDevice(device) == false) {
-      return connectedDevices.add(device);
+    for(ConnectedDevice connectedDevice : connectedDevices) {
+      if(doConnectedDeviceInstancesEqual(device, connectedDevice)) {
+        return false; // we're already containing an instance of this remote device
+      }
     }
 
-    return false;
+    return connectedDevices.add(device);
   }
 
   @Override
   public boolean disconnectedFromDevice(ConnectedDevice device) {
-    if(containsDevice(device)) {
-      return connectedDevices.remove(device);
+    for(ConnectedDevice connectedDevice : connectedDevices) {
+      if(doConnectedDeviceInstancesEqual(device, connectedDevice)) {
+        return connectedDevices.remove(device);
+      }
     }
 
     return false;
@@ -36,11 +40,16 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public boolean containsDevice(ConnectedDevice device) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(connectedDevice.getDeviceId().equals(device.getDeviceId()) && connectedDevice.getAddress().equals(device.getAddress())) // TODO: check if it's also the same user
+      if(doConnectedDeviceInstancesEqual(device, connectedDevice)) {
         return true;
+      }
     }
 
     return false;
+  }
+
+  protected boolean doConnectedDeviceInstancesEqual(ConnectedDevice storedDevice, ConnectedDevice otherDeviceInstance) {
+    return otherDeviceInstance.getDeviceId().equals(storedDevice.getDeviceId()) && otherDeviceInstance.getAddress().equals(storedDevice.getAddress()); // TODO: check if it's also the same user
   }
 
 
