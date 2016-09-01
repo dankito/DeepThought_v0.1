@@ -1,10 +1,8 @@
-package net.dankito.deepthought.util;
+package net.dankito.deepthought.application;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-
-import net.dankito.deepthought.application.ApplicationLifeCycleServiceBase;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
