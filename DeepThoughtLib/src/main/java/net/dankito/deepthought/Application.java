@@ -157,17 +157,11 @@ public class Application {
       return;
 
     try {
-//      startTime = new Date();
       Application.backupManager = dependencyResolver.createBackupManager();
-//      logResolvingDependencyDuration("BackupManager", startTime);
 
-//      startTime = new Date();
       Application.dataComparer = dependencyResolver.createDataComparer();
-//      logResolvingDependencyDuration("DataComparer", startTime);
 
-//      startTime = new Date();
       Application.dataMerger = dependencyResolver.createDataMerger();
-//      logResolvingDependencyDuration("DataMerger", startTime);
 
       Application.pluginManager = dependencyResolver.createPluginManager();
       pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
