@@ -109,9 +109,19 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
         startCBLListener(device, Constants.SynchronizationDefaultPort, manager, allowedCredentials);
       }
       else {
-        startReplication(device);
+        if(isAlreadySynchronizingWithDevice(device) == false) { // avoid that synchronization is started twice with the same device
+          startReplication(device);
+        }
       }
     }
+  }
+
+  protected boolean isAlreadySynchronizingWithDevice(ConnectedDevice device) {
+    return pushReplications.containsKey(device.getDeviceId());
+  }
+
+  protected String getDeviceKey(ConnectedDevice device) {
+    return device.getDeviceId();
   }
 
   protected void startReplication(ConnectedDevice device) throws Exception {
@@ -127,7 +137,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     pushReplication.addChangeListener(replicationChangeListener);
     pushReplication.setContinuous(true);
 
-    pushReplications.put(device.getDeviceId(), pushReplication);
+    pushReplications.put(getDeviceKey(device), pushReplication);
 
     pushReplication.start();
 
@@ -137,7 +147,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
       pullReplication.addChangeListener(replicationChangeListener);
       pullReplication.setContinuous(true);
 
-      pullReplications.put(device.getDeviceId(), pullReplication);
+      pullReplications.put(getDeviceKey(device), pullReplication);
 
       pullReplication.start();
     }
@@ -148,13 +158,13 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   @Override
   protected void stopSynchronizationWithDevice(ConnectedDevice device) {
     synchronized(this) {
-      Replication pullReplication = pullReplications.get(device.getDeviceId());
+      Replication pullReplication = pullReplications.get(getDeviceKey(device));
       if (pullReplication != null) {
         pullReplication.stop();
       }
 
-      Replication pushReplication = pullReplications.get(device.getDeviceId());
-      if (pushReplications != null) {
+      Replication pushReplication = pushReplications.get(getDeviceKey(device));
+      if (pushReplication != null) {
         pushReplication.stop();
       }
 
