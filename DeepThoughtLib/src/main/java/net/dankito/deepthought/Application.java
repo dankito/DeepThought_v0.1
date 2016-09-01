@@ -164,12 +164,10 @@ public class Application {
       Application.dataMerger = dependencyResolver.createDataMerger();
 
       Application.pluginManager = dependencyResolver.createPluginManager();
-      pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
 
       Application.devicesFinder = dependencyResolver.createDevicesFinder(threadPool);
 
       Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder, threadPool);
-      deepThoughtConnector.runAsync();
 
       Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);
 
@@ -181,11 +179,19 @@ public class Application {
 
       isInstantiated = true;
       callNotificationListeners(new Notification(NotificationType.ApplicationInstantiated));
+
+      startInstances(applicationConfiguration);
     } catch(Exception ex) {
       log.error("Could not resolve a Manager dependency", ex);
       callNotificationListeners(new DeepThoughtError(Localization.getLocalizedString("alert.message.message.a.severe.error.occurred.resolving.a.manager.instance"), ex, true,
           Localization.getLocalizedString("alert.message.title.a.severe.error.occurred.resolving.a.manager.instance")));
     }
+  }
+
+  private static void startInstances(IApplicationConfiguration applicationConfiguration) {
+    deepThoughtConnector.runAsync();
+
+    pluginManager.loadPluginsAsync(applicationConfiguration.getStaticallyLinkedPlugins());
   }
 
   protected static boolean openDatabase(IDependencyResolver dependencyResolver) {
