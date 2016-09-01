@@ -7,6 +7,8 @@ import net.dankito.deepthought.communication.model.HostInfo;
  */
 public interface IDevicesFinder {
 
+  boolean isRunning();
+
   void startAsync(HostInfo localHost, int searchDevicesPort, IDevicesFinderListener listener);
 
   void stop();

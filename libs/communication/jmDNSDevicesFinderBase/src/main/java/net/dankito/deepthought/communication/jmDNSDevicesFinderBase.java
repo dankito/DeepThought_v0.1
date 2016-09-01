@@ -137,6 +137,8 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
 
   @Override
   public void stop() {
+    log.info("Stopping jmDNSDevicesFinder ...");
+
     if (jmDNS != null) {
       if (serviceListener != null) {
         jmDNS.removeServiceListener(SERVICE_TYPE, serviceListener);
@@ -264,6 +266,12 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
     host.setMessagesPort((int)port);
 
     return host;
+  }
+
+
+  @Override
+  public boolean isRunning() {
+    return jmDNS != null;
   }
 
 }

@@ -1,5 +1,8 @@
 package net.dankito.deepthought.communication;
 
+import net.dankito.deepthought.application.ApplicationForegroundBackgroundListener;
+import net.dankito.deepthought.application.ApplicationTerminatesListener;
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
@@ -34,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.BindException;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
@@ -74,11 +78,11 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder) {
-    this(devicesFinder, Constants.MessageHandlerDefaultPort);
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService) {
+    this(devicesFinder, lifeCycleService, Constants.MessageHandlerDefaultPort);
   }
 
-  public DeepThoughtConnector(IDevicesFinder devicesFinder, int messageReceiverPort) {
+  public DeepThoughtConnector(IDevicesFinder devicesFinder, IApplicationLifeCycleService lifeCycleService, int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
     // TODO: make configurable
@@ -92,6 +96,9 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
     this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
 
     this.devicesFinder = devicesFinder;
+
+    lifeCycleService.addApplicationTerminatesListenerListener(applicationTerminatesListener);
+    lifeCycleService.addApplicationForegroundBackgroundListener(foregroundBackgroundListener);
   }
 
 
@@ -113,21 +120,13 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
   public void shutDown() {
     stopMessagesReceiver();
 
-    devicesFinder.stop();
+    stopDevicesFinder();
   }
 
   protected void run() throws Exception {
     int messagesReceiverPort = startMessageReceiver();
 
-    final HostInfo localHost = HostInfo.fromUserAndDevice(getLoggedOnUser(), getLocalDevice());
-    localHost.setMessagesPort(messagesReceiverPort);
-
-    new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
-      @Override
-      public void run() {
-        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, devicesFinderListener);
-      }
-    }, 5 * 1000);
+    startDevicesFinder(messagesReceiverPort);
 
     Application.notifyUser(new Notification(NotificationType.DeepThoughtsConnectorStarted, Localization.getLocalizedString("deep.thoughts.connector.started")));
   }
@@ -182,6 +181,24 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       }
     } catch(Exception ex) { log.error("Could not close MessagesReceiver", ex); }
   }
+
+
+  protected void startDevicesFinder(final int messagesReceiverPort) {
+    final HostInfo localHost = HostInfo.fromUserAndDevice(getLoggedOnUser(), getLocalDevice());
+    localHost.setMessagesPort(messagesReceiverPort);
+
+    new Timer().schedule(new TimerTask() { // wait some time as sometimes UI isn't fully initialized when first device is found
+      @Override
+      public void run() {
+        devicesFinder.startAsync(localHost, Constants.SearchDevicesListenerPort, devicesFinderListener);
+      }
+    }, 5 * 1000);
+  }
+
+  protected void stopDevicesFinder() {
+    devicesFinder.stop();
+  }
+
 
   protected void connectedToUnregisteredDevice(HostInfo device) {
     log.info("Found an unregistered Device: " + device.getDeviceInfoString());
@@ -238,6 +255,12 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       for (IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceDisconnected(device);
       }
+    }
+  }
+
+  protected void disconnectFromAllConnectedDevices() {
+    for(ConnectedDevice connectedDevice : new ArrayList<>(connectedDevicesManager.getConnectedDevices())) {
+      disconnectedFromRegisteredDevice(connectedDevice);
     }
   }
 
@@ -354,6 +377,31 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       if(registeredDevicesManager.isDeviceRegistered(device)) {
         disconnectedFromRegisteredDevice(device);
       }
+    }
+  };
+
+
+  protected ApplicationTerminatesListener applicationTerminatesListener = new ApplicationTerminatesListener() {
+    @Override
+    public void applicationIsGoingToTerminate() {
+      stopDevicesFinder();
+      // TODO: send a notification to remote device that we're going to disconnect
+      disconnectFromAllConnectedDevices(); // make sure to clean all connected devices as on Android Application may gets restarted with the old instances still available ->
+      // would find other Devices but think it's still connected to it
+    }
+  };
+
+  protected ApplicationForegroundBackgroundListener foregroundBackgroundListener = new ApplicationForegroundBackgroundListener() {
+    @Override
+    public void applicationCameToForeground() {
+      if(devicesFinder.isRunning() == false) {
+        startDevicesFinder(getMessageReceiverPort());
+      }
+    }
+
+    @Override
+    public void applicationWentToBackground() {
+
     }
   };
 

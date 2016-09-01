@@ -2,6 +2,7 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.TestApplicationConfiguration;
+import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
@@ -43,6 +44,8 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   protected UdpDevicesFinder devicesFinder;
 
+  protected IApplicationLifeCycleService lifeCycleService;
+
 
   @Override
   public void setup() throws Exception {
@@ -58,6 +61,8 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     loggedOnUser = Application.getLoggedOnUser();
     localDevice = Application.getApplication().getLocalDevice();
     localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), TestIpAddress, connector.getMessageReceiverPort());
+
+    lifeCycleService = Application.getLifeCycleService();
   }
 
   @After
@@ -217,7 +222,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void connectsToARegisteredDevice_IsNowConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStopped() {
-    DeepThoughtConnector connector = new DeepThoughtConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 1);
@@ -233,7 +238,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void disconnectsFromARegisteredDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtConnector connector = new DeepThoughtConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
 
     mockNumberOfRegisteredDevices(connector, 2);
     mockNumberOfConnectedDevices(connector, 2);
@@ -262,7 +267,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void deviceConnected_ConnectionsAliveWatcherIsRunning() {
-    DeepThoughtConnector connector = new DeepThoughtConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 
@@ -273,7 +278,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   @Test
   public void disconnectsFromLastDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtConnector connector = new DeepThoughtConnector();
+    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
     connector.runAsync();
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
 

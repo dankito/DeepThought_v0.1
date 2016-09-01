@@ -152,4 +152,9 @@ public class UdpDevicesFinder implements IDevicesFinder {
     return connectionsAliveWatcher != null;
   }
 
+  @Override
+  public boolean isRunning() {
+    return isRegisteredDevicesSearcherRunning() && isConnectionWatcherRunning();
+  }
+
 }
