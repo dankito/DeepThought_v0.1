@@ -41,10 +41,10 @@ public class ConnectionsAliveWatcher {
   }
 
   public void startWatchingAsync(final List<HostInfo> foundDevices, final IConnectionsAliveWatcherListener listener) {
-    log.info("Starting ConnectionsAliveWatcher ...");
-
     synchronized(this) {
       stopWatching();
+
+      log.info("Starting ConnectionsAliveWatcher ...");
 
       connectionsAliveCheckTimer = new Timer("ConnectionsAliveWatcher Timer");
       connectionsAliveCheckTimer.scheduleAtFixedRate(new TimerTask() {
@@ -57,10 +57,10 @@ public class ConnectionsAliveWatcher {
   }
 
   public void stopWatching() {
-    log.info("Stopping ConnectionsAliveWatcher ...");
-
     synchronized(this) {
       if (connectionsAliveCheckTimer != null) {
+        log.info("Stopping ConnectionsAliveWatcher ...");
+
         connectionsAliveCheckTimer.cancel();
         connectionsAliveCheckTimer = null;
       }
