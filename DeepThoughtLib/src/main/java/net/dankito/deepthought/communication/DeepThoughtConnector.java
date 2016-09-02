@@ -108,6 +108,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   @Override
   public void shutDown() {
+    disconnectFromAllConnectedDevices();
+
     stopMessagesReceiver();
 
     stopDevicesFinder();
