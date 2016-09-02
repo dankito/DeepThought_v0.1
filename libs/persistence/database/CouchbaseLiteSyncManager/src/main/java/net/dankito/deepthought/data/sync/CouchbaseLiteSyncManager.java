@@ -84,8 +84,6 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
     listenerThread = new Thread(couchbaseLiteListener);
     listenerThread.start();
-
-    startSynchronizationWithDevice(device);
   }
 
   protected void stopCBLListener() {
@@ -108,10 +106,9 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
       if (isListenerStarted() == false) { // first device has connected -> start Listener first
         startCBLListener(device, Constants.SynchronizationDefaultPort, manager, allowedCredentials);
       }
-      else {
-        if(isAlreadySynchronizingWithDevice(device) == false) { // avoid that synchronization is started twice with the same device
-          startReplication(device);
-        }
+
+      if(isAlreadySynchronizingWithDevice(device) == false) { // avoid that synchronization is started twice with the same device
+        startReplication(device);
       }
     }
   }
@@ -140,7 +137,6 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     pushReplications.put(getDeviceKey(device), pushReplication);
 
     pushReplication.start();
-
 
     if (alsoUsePullReplication) {
       Replication pullReplication = database.createPullReplication(syncUrl);
