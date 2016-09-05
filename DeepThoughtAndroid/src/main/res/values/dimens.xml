@@ -18,8 +18,6 @@
 
     <dimen name="list_item_entry_tag_height">40dp</dimen>
 
-    <dimen name="edit_entry_abstract_height">34dp</dimen>
-    <dimen name="edit_entry_tags_height">15dp</dimen>
     <dimen name="edit_entry_search_tags_height">34dp</dimen>
     <dimen name="edit_entry_labels_text_size">12sp</dimen>
     <dimen name="edit_entry_edit_texts_text_size">10sp</dimen>
