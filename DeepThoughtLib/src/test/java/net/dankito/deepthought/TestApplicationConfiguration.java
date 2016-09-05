@@ -1,7 +1,6 @@
 package net.dankito.deepthought;
 
-import net.dankito.deepthought.communication.IDeepThoughtConnector;
-import net.dankito.deepthought.communication.IDevicesFinder;
+import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.helper.MockEntityManager;
@@ -81,7 +80,7 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
   }
 
   @Override
-  public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
+  public IDeepThoughtSyncManager createSyncManager(IConnectedDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
     return null;
   }
 

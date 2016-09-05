@@ -7,7 +7,7 @@ import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
-import net.dankito.deepthought.communication.IDeepThoughtConnector;
+import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.data.AndroidDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.contentextractor.CtContentExtractor;
@@ -32,6 +32,7 @@ import net.dankito.deepthought.plugin.AndroidPluginManager;
 import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.plugin.IPluginManager;
 import net.dankito.deepthought.util.AndroidClipboardHelper;
+import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.OsHelper;
 import net.dankito.deepthought.util.file.FileUtils;
 
@@ -141,8 +142,8 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   }
 
   @Override
-  public IDeepThoughtSyncManager createSyncManager(IDeepThoughtConnector deepThoughtConnector) {
-    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase) Application.getEntityManager(), deepThoughtConnector);
+  public IDeepThoughtSyncManager createSyncManager(IConnectedDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
+    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase) Application.getEntityManager(), threadPool, connectedDevicesListenerManager);
   }
 
   @Override

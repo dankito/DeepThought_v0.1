@@ -169,7 +169,7 @@ public class Application {
 
       Application.deepThoughtConnector = dependencyResolver.createDeepThoughtConnector(devicesFinder, threadPool);
 
-      Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector);
+      Application.syncManager = dependencyResolver.createSyncManager(deepThoughtConnector, threadPool);
 
       Application.isbnResolver = dependencyResolver.createIsbnResolver(htmlHelper, threadPool);
 
