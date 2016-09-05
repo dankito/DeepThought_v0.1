@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -45,6 +47,7 @@ import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.file.FileUtils;
@@ -94,6 +97,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected boolean hasEntryBeenEdited = false;
 
   protected Uri takenPhotoTempFile = null;
+
+  protected EditEntryDialog editEntryDialog = null;
+
+  protected boolean isShowingEditEntryDialog = false;
 
 
   @Override
@@ -245,7 +252,13 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     int id = item.getItemId();
 
     if(id == android.R.id.home) {
-      finish();
+      if(isShowingEditEntryDialog) {
+        hideEditEntryDialog();
+      }
+      else {
+        finish();
+      }
+
       return true;
     }
     else if (id == R.id.mnitmActionSave) {
@@ -520,23 +533,53 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
 
+  protected void showEditEntryDialog() {
+    if(editEntryDialog == null) {
+      editEntryDialog = new EditEntryDialog();
+    }
+
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    FragmentTransaction transaction = fragmentManager.beginTransaction();
+    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+    transaction.add(android.R.id.content, editEntryDialog).addToBackStack(null).commit();
+
+    isShowingEditEntryDialog = true;
+  }
+
+  protected void hideEditEntryDialog() {
+    // TODO: ask User if she/he likes to save changes
+
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    FragmentTransaction transaction = fragmentManager.beginTransaction();
+    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+    transaction.remove(editEntryDialog);
+    transaction.commit();
+
+    isShowingEditEntryDialog = false;
+  }
+
+
   protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      if(abstractHtmlEditor.getVisibility() == View.GONE)
-        abstractHtmlEditor.setVisibility(View.VISIBLE);
-      else
-        abstractHtmlEditor.setVisibility(View.GONE);
+//      if(abstractHtmlEditor.getVisibility() == View.GONE)
+//        abstractHtmlEditor.setVisibility(View.VISIBLE);
+//      else
+//        abstractHtmlEditor.setVisibility(View.GONE);
+
+      showEditEntryDialog();
     }
   };
 
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      if(rlydEditEntryEditTags.getVisibility() == View.GONE)
-        rlydEditEntryEditTags.setVisibility(View.VISIBLE);
-      else
-        rlydEditEntryEditTags.setVisibility(View.GONE);
+//      if(rlydEditEntryEditTags.getVisibility() == View.GONE)
+//        rlydEditEntryEditTags.setVisibility(View.VISIBLE);
+//      else
+//        rlydEditEntryEditTags.setVisibility(View.GONE);
+
+      showEditEntryDialog();
     }
   };
 
