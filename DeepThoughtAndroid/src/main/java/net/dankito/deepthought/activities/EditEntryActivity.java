@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -87,6 +89,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected AndroidHtmlEditor abstractHtmlEditor = null;
   protected AndroidHtmlEditor contentHtmlEditor = null;
+  protected WebView wbvwContent = null;
 
   protected boolean hasEntryBeenEdited = false;
 
@@ -163,6 +166,12 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
       contentHtmlEditor.setLayoutParams(contentEditorParams);
+
+      wbvwContent = (WebView)findViewById(R.id.wbvwContent);
+      WebSettings settings = wbvwContent.getSettings();
+      settings.setDefaultTextEncodingName("utf-8");
+      wbvwContent.setHorizontalScrollBarEnabled(true);
+      wbvwContent.setVerticalScrollBarEnabled(true);
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
@@ -174,19 +183,23 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
     if(entry != null) {
       entryEditedTags = new ArrayList<>(entry.getTagsSorted());
+      contentHtmlEditor.setHtml(entry.getContent());
     }
 
     entryCreationResult = ActivityManager.getInstance().getEntryCreationResultToBeEdited();
     if(entryCreationResult != null) {
       entry = entryCreationResult.getCreatedEntry();
       entryEditedTags = entryCreationResult.getTags();
+      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null);
     }
 
     if(entry != null) {
       txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
       abstractHtmlEditor.setHtml(entry.getAbstract());
 
-      contentHtmlEditor.setHtml(entry.getContent());
+      wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
+
+      contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
 
       lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
         @Override

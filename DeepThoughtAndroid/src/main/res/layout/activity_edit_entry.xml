@@ -148,6 +148,12 @@
         android:gravity="fill_vertical"
         >
 
+        <WebView
+            android:id="@+id/wbvwContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
     </RelativeLayout>
 
     <android.support.v7.widget.Toolbar
