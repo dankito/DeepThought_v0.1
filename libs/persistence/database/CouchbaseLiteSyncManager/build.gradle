@@ -16,4 +16,7 @@ dependencies {
     compile project(':couchbase-lite-java-listener')
 
     testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile project(':JavaCouchbaseLiteEntityManager')
+    testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
 }
