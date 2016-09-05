@@ -117,7 +117,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       ActionBar actionBar = getSupportActionBar();
       if(actionBar != null) {
         actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
       }
 
