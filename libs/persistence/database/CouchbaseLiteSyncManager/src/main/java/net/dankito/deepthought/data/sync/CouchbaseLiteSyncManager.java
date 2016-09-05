@@ -14,7 +14,7 @@ import com.couchbase.lite.replicator.Replication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.Constants;
-import net.dankito.deepthought.communication.IDeepThoughtConnector;
+import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -64,12 +64,12 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected Map<String, Replication> pullReplications = new ConcurrentHashMap<>();
 
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IDeepThoughtConnector deepThoughtConnector) {
-    this(entityManager, deepThoughtConnector, Constants.SynchronizationDefaultPort, true);
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IConnectedDevicesListenerManager connectedDevicesListenerManager) {
+    this(entityManager, connectedDevicesListenerManager, Constants.SynchronizationDefaultPort, true);
   }
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IDeepThoughtConnector deepThoughtConnector, int synchronizationPort, boolean alsoUsePullReplication) {
-    super(deepThoughtConnector);
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IConnectedDevicesListenerManager connectedDevicesListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
+    super(connectedDevicesListenerManager);
     this.entityManager = entityManager;
     this.database = entityManager.getDatabase();
     this.manager = database.getManager();

@@ -3,6 +3,7 @@ package net.dankito.deepthought.communication;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
+import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
 import net.dankito.deepthought.communication.messages.AsynchronousResponseListenerManager;
@@ -41,7 +42,7 @@ import java.util.Set;
 /**
  * Created by ganymed on 19/08/15.
  */
-public class DeepThoughtConnector implements IDeepThoughtConnector {
+public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDevicesListenerManager {
 
   private final static Logger log = LoggerFactory.getLogger(DeepThoughtConnector.class);
 

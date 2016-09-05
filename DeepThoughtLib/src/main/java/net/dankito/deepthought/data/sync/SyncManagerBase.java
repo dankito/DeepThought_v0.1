@@ -1,8 +1,8 @@
 package net.dankito.deepthought.data.sync;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
+import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   private static final Logger log = LoggerFactory.getLogger(SyncManagerBase.class);
 
 
-  public SyncManagerBase(IDeepThoughtConnector deepThoughtConnector) {
-    deepThoughtConnector.addConnectedDevicesListener(connectedDevicesListener);
+  public SyncManagerBase(IConnectedDevicesListenerManager connectedDevicesListenerManager) {
+    connectedDevicesListenerManager.addConnectedDevicesListener(connectedDevicesListener);
   }
 
 
