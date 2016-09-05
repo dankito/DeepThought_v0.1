@@ -65,14 +65,15 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
 
   public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IDeepThoughtConnector deepThoughtConnector) {
-    this(entityManager, deepThoughtConnector, true);
+    this(entityManager, deepThoughtConnector, Constants.SynchronizationDefaultPort, true);
   }
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IDeepThoughtConnector deepThoughtConnector, boolean alsoUsePullReplication) {
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IDeepThoughtConnector deepThoughtConnector, int synchronizationPort, boolean alsoUsePullReplication) {
     super(deepThoughtConnector);
     this.entityManager = entityManager;
     this.database = entityManager.getDatabase();
     this.manager = database.getManager();
+    this.synchronizationPort = synchronizationPort;
     this.alsoUsePullReplication = alsoUsePullReplication;
   }
 
@@ -104,7 +105,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected void startSynchronizationWithDevice(ConnectedDevice device) throws Exception {
     synchronized(this) {
       if (isListenerStarted() == false) { // first device has connected -> start Listener first
-        startCBLListener(device, Constants.SynchronizationDefaultPort, manager, allowedCredentials);
+        startCBLListener(device, synchronizationPort, manager, allowedCredentials);
       }
 
       if(isAlreadySynchronizingWithDevice(device) == false) { // avoid that synchronization is started twice with the same device
@@ -124,7 +125,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected void startReplication(ConnectedDevice device) throws Exception {
     URL syncUrl;
     try {
-      int remoteDeviceSyncPort = Constants.SynchronizationDefaultPort; // TODO: get remote device's real sync port
+      int remoteDeviceSyncPort = device.getSynchronizationPort();
       syncUrl = new URL("http://" + device.getAddress() + ":" + remoteDeviceSyncPort + "/" + database.getName());
     } catch (MalformedURLException e) {
       throw new Exception(e);

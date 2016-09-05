@@ -1,5 +1,6 @@
 package net.dankito.deepthought.communication.model;
 
+import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
 
@@ -13,6 +14,8 @@ public class ConnectedDevice extends HostInfo {
 
   private final static Logger log = LoggerFactory.getLogger(ConnectedDevice.class);
 
+
+  protected int synchronizationPort = Constants.SynchronizationDefaultPort;
 
   protected Object securityToken = null; // TODO: implement a Security feature to ensure that it's really the registered device that likes to connect
 
@@ -31,6 +34,14 @@ public class ConnectedDevice extends HostInfo {
     this.messagesPort = messagesPort;
   }
 
+
+  public int getSynchronizationPort() {
+    return synchronizationPort;
+  }
+
+  public void setSynchronizationPort(int synchronizationPort) {
+    this.synchronizationPort = synchronizationPort;
+  }
 
   public boolean hasCaptureDevice() {
     return hasCaptureDevice;
