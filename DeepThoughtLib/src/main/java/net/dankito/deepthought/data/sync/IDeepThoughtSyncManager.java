@@ -5,6 +5,10 @@ package net.dankito.deepthought.data.sync;
  */
 public interface IDeepThoughtSyncManager {
 
+  boolean addSynchronizationListener(ISynchronizationListener listener);
+
+  boolean removeSynchronizationListener(ISynchronizationListener listener);
+
   void stop();
 
 }

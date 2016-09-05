@@ -222,9 +222,30 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
           handleConflict(change);
         }
 
-        notifyListenersOfChanges(change);
-      }
+        BaseEntity cachedEntity = updateCachedSynchronizedEntity(change);
+
+        if(cachedEntity != null) {
+          callEntitySynchronizedListeners(cachedEntity);
+        }
+        else if(hasSynchronizationListeners()) {
+            BaseEntity synchronizedEntity = getSynchronizedEntity(change);
+            if(synchronizedEntity != null) {
+              callEntitySynchronizedListeners(synchronizedEntity);
+            }
+          }
+        }
 //    }
+  }
+
+  protected BaseEntity getSynchronizedEntity(DocumentChange change) {
+    try {
+      Class entityClass = (Class<BaseEntity>) Class.forName((String) change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
+      return entityManager.getEntityById(entityClass, change.getDocumentId());
+    } catch(Exception e) {
+      log.error("Could not get Entity Class for DocumentChange, AddedRevision's " + Dao.TYPE_COLUMN_NAME + " property is " + change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME), e);
+    }
+
+    return null;
   }
 
   protected void handleConflict(DocumentChange change) {
@@ -358,30 +379,33 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     mergedProperties.put(property.getColumnName(), mergedEntityIdsString);
   }
 
-  protected void notifyListenersOfChanges(DocumentChange change) {
+  protected BaseEntity updateCachedSynchronizedEntity(DocumentChange change) {
+    BaseEntity cachedEntity = null;
+
     try {
       Class<BaseEntity> entityClass = (Class<BaseEntity>)Class.forName((String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
-      BaseEntity cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityClass, change.getDocumentId());
-      if(cachedEntity == null) { // Entity not retrieved / cached yet -> will be read from DB on next access anyway, therefore no need to update it
-        return;
-      }
+      cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityClass, change.getDocumentId());
+      if(cachedEntity != null) { // cachedEntity == null: Entity not retrieved / cached yet -> will be read from DB on next access anyway, therefore no need to update it
 
-      Document storedDocument = database.getExistingDocument(change.getDocumentId());
-      Dao dao = entityManager.getDaoForClass(entityClass);
+        Document storedDocument = database.getExistingDocument(change.getDocumentId());
+        Dao dao = entityManager.getDaoForClass(entityClass);
 
-      List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
-      SavedRevision currentRevision = storedDocument.getCurrentRevision();
+        List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
+        SavedRevision currentRevision = storedDocument.getCurrentRevision();
 
-      if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
-        newEntityCreated(entityClass, change);
-      }
-      else {
-        updateCachedEntity(cachedEntity, dao, currentRevision);
+        if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
+          newEntityCreated(entityClass, change);
+        }
+        else {
+          updateCachedEntity(cachedEntity, dao, currentRevision);
+        }
       }
     }
     catch(Exception e) {
       log.error("Could not handle Change", e);
     }
+
+    return cachedEntity;
   }
 
   protected void updateCachedEntity(BaseEntity cachedEntity, Dao dao, SavedRevision currentRevision) throws SQLException {
