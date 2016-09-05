@@ -78,6 +78,22 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   }
 
 
+  public void stop() {
+    stopCBLListener();
+
+    stopAllReplications();
+  }
+
+  protected void stopAllReplications() {
+    for(Replication pullReplication : pullReplications.values()) {
+      pullReplication.stop();
+    }
+
+    for(Replication pushReplication : pushReplications.values()) {
+      pushReplication.stop();
+    }
+  }
+
 
   protected void startCBLListener(int listenPort, Manager manager, Credentials allowedCredentials) throws Exception {
     couchbaseLiteListener = new LiteListener(manager, listenPort, allowedCredentials);
