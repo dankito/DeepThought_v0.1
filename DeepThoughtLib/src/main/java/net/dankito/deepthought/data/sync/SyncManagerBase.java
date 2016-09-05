@@ -1,9 +1,9 @@
 package net.dankito.deepthought.data.sync;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,12 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   private static final Logger log = LoggerFactory.getLogger(SyncManagerBase.class);
 
 
-  public SyncManagerBase(IConnectedDevicesListenerManager connectedDevicesListenerManager) {
+  protected IThreadPool threadPool;
+
+
+  public SyncManagerBase(IConnectedDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
+    this.threadPool = threadPool;
+
     connectedDevicesListenerManager.addConnectedDevicesListener(connectedDevicesListener);
   }
 
@@ -27,7 +32,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
 
 
   protected void startSynchronizationWithDeviceAsync(final ConnectedDevice device) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
+    threadPool.runTaskAsync(new Runnable() {
       @Override
       public void run() {
         try {

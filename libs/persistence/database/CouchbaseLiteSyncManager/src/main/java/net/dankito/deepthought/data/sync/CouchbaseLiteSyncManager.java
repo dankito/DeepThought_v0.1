@@ -12,13 +12,13 @@ import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
+import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.jpa.annotationreader.config.EntityConfig;
 import net.dankito.jpa.annotationreader.config.PropertyConfig;
 import net.dankito.jpa.annotationreader.config.inheritance.DiscriminatorColumnConfig;
@@ -64,12 +64,12 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected Map<String, Replication> pullReplications = new ConcurrentHashMap<>();
 
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IConnectedDevicesListenerManager connectedDevicesListenerManager) {
-    this(entityManager, connectedDevicesListenerManager, Constants.SynchronizationDefaultPort, true);
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedDevicesListenerManager connectedDevicesListenerManager) {
+    this(entityManager, threadPool, connectedDevicesListenerManager, Constants.SynchronizationDefaultPort, true);
   }
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IConnectedDevicesListenerManager connectedDevicesListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
-    super(connectedDevicesListenerManager);
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedDevicesListenerManager connectedDevicesListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
+    super(connectedDevicesListenerManager, threadPool);
     this.entityManager = entityManager;
     this.database = entityManager.getDatabase();
     this.manager = database.getManager();
@@ -79,7 +79,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
 
 
-  protected void startCBLListener(ConnectedDevice device, int listenPort, Manager manager, Credentials allowedCredentials) throws Exception {
+  protected void startCBLListener(int listenPort, Manager manager, Credentials allowedCredentials) throws Exception {
     couchbaseLiteListener = new LiteListener(manager, listenPort, allowedCredentials);
     synchronizationPort = couchbaseLiteListener.getListenPort();
 
@@ -105,7 +105,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected void startSynchronizationWithDevice(ConnectedDevice device) throws Exception {
     synchronized(this) {
       if (isListenerStarted() == false) { // first device has connected -> start Listener first
-        startCBLListener(device, synchronizationPort, manager, allowedCredentials);
+        startCBLListener(synchronizationPort, manager, allowedCredentials);
       }
 
       if(isAlreadySynchronizingWithDevice(device) == false) { // avoid that synchronization is started twice with the same device
@@ -115,7 +115,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   }
 
   protected boolean isAlreadySynchronizingWithDevice(ConnectedDevice device) {
-    return pushReplications.containsKey(device.getDeviceId());
+    return pushReplications.containsKey(getDeviceKey(device));
   }
 
   protected String getDeviceKey(ConnectedDevice device) {
@@ -188,7 +188,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     @Override
     public void changed(final Database.ChangeEvent event) {
       if(event.isExternal()) {
-        Application.getThreadPool().runTaskAsync(new Runnable() {
+        threadPool.runTaskAsync(new Runnable() {
           @Override
           public void run() {
             handleSynchronizedChanges(event.getChanges());
@@ -200,14 +200,15 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected void handleSynchronizedChanges(List<DocumentChange> changes) {
     for(DocumentChange change : changes) {
-      if(change.isCurrentRevision()) {
+      log.info("isCurrentRevision() = " + change.isCurrentRevision());
+//      if(change.isCurrentRevision()) {
         if (change.isConflict()) {
           handleConflict(change);
         }
 
         notifyListenersOfChanges(change);
       }
-    }
+//    }
   }
 
   protected void handleConflict(DocumentChange change) {
