@@ -167,10 +167,12 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       contentHtmlEditor.setLayoutParams(contentEditorParams);
 
       wbvwContent = (WebView)findViewById(R.id.wbvwContent);
-      WebSettings settings = wbvwContent.getSettings();
-      settings.setDefaultTextEncodingName("utf-8");
       wbvwContent.setHorizontalScrollBarEnabled(true);
       wbvwContent.setVerticalScrollBarEnabled(true);
+
+      WebSettings settings = wbvwContent.getSettings();
+      settings.setDefaultTextEncodingName("utf-8");
+      settings.setDefaultFontSize(12);
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
