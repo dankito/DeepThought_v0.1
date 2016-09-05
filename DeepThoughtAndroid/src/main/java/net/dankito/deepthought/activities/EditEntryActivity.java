@@ -194,8 +194,13 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     if(entry != null) {
-      txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
-      abstractHtmlEditor.setHtml(entry.getAbstract());
+      if(entry.hasAbstract()) {
+        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
+        abstractHtmlEditor.setHtml(entry.getAbstract());
+      }
+      else {
+        rlydEntryAbstract.setVisibility(View.GONE);
+      }
 
       wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
 
