@@ -285,7 +285,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   @Override
   public void onBackPressed() {
-    if(hasEntryBeenEdited == true)
+    if(isShowingEditEntryDialog) {
+      hideEditEntryDialog();
+    }
+    else if(hasEntryBeenEdited == true)
       askUserIfChangesShouldBeSaved();
     else {
       cleanUp();
@@ -534,14 +537,19 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
 
   protected void showEditEntryDialog() {
-    if(editEntryDialog == null) {
-      editEntryDialog = new EditEntryDialog();
-    }
-
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-    transaction.add(android.R.id.content, editEntryDialog).addToBackStack(null).commit();
+
+    if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
+      editEntryDialog = new EditEntryDialog();
+      transaction.add(android.R.id.content, editEntryDialog);
+    }
+    else { // on subsequent displays we only have to call show() on the then hidden Dialog
+      transaction.show(editEntryDialog);
+    }
+
+    transaction.addToBackStack(null).commit();
 
     isShowingEditEntryDialog = true;
   }
@@ -552,7 +560,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-    transaction.remove(editEntryDialog);
+    transaction.hide(editEntryDialog);
     transaction.commit();
 
     isShowingEditEntryDialog = false;
