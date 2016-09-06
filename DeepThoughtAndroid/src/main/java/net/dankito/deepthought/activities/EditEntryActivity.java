@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -76,6 +77,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected boolean hasEntryBeenEdited = false;
+  protected boolean hasContentBeenEditedInActivity = false;
   protected Map<FieldWithUnsavedChanges, Object> editedFields = new HashMap<>();
 
   protected boolean isShowingEditEntryDialog = false;
@@ -146,6 +148,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
 
     contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
+    contentHtmlEditor.setVisibility(View.GONE);
     rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
     RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
@@ -178,28 +181,26 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
     if(entry != null) {
       entryEditedTags = new ArrayList<>(entry.getTagsSorted());
-      contentHtmlEditor.setHtml(entry.getContent());
+      wbvwContent.setVisibility(View.GONE);
+      contentHtmlEditor.setVisibility(View.VISIBLE);
+      setContentHtml(entry.getContent());
     }
 
     entryCreationResult = ActivityManager.getInstance().getEntryCreationResultToBeEdited();
     if(entryCreationResult != null) {
+      // TODO: why also instantiating contentHtmlEditor if it shouldn't be displayed at all?
       entry = entryCreationResult.getCreatedEntry();
       entryEditedTags = entryCreationResult.getTags();
-      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
+      setContentHtml(entry.getContent());
     }
 
     if(entry != null) {
       if(entry.hasAbstract()) {
-        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
+        setAbstractPreview(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
       }
       else {
         rlydEntryAbstract.setVisibility(View.GONE);
       }
-
-      wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
-
-      // TODO: why also instantiating contentHtmlEditor if it shouldn't be displayed at all?
-      contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
 
       setTextViewEditEntryTags(entryEditedTags);
     }
@@ -296,6 +297,23 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     });
 
     builder.create().show();
+  }
+
+  protected void setAbstractPreviewFromHtml(String abstractHtml) {
+    setAbstractPreview(Application.getHtmlHelper().extractPlainTextFromHtmlBody(abstractHtml));
+  }
+
+  protected void setAbstractPreview(String abstractPlainText) {
+    txtvwEditEntryAbstract.setText(abstractPlainText);
+  }
+
+  protected void setContentHtml(String contentHtml) {
+    if(contentHtml != null && contentHtmlEditor.getVisibility() == View.VISIBLE) {
+      contentHtmlEditor.setHtml(contentHtml);
+    }
+    else {
+      wbvwContent.loadDataWithBaseURL(null, contentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
+    }
   }
 
   protected void setTextViewEditEntryTags(List<Tag> tags) {
@@ -441,7 +459,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntryAndCloseActivity() {
-    new Thread(new Runnable() {
+    // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
+    // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         saveEntryIfNeeded();
@@ -453,7 +473,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
           }
         });
       }
-    }).start();
+    });
   }
 
   @Override
@@ -463,7 +483,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   public void cleanUp() {
-    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    if(contentHtmlEditor != null) {
+      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    }
 
     if(editEntryDialog != null) {
       editEntryDialog.cleanUp();
@@ -486,29 +508,32 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void saveEntry() {
-    // TODO: only save changed fields
-//    boolean isAbstractHtmlEditorLoaded = abstractHtmlEditor.isLoaded();
-    boolean isContentHtmlEditorLoaded = contentHtmlEditor.isLoaded();
+    String abstractHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryAbstract);
+    if(abstractHtml != null) {
+      entry.setAbstract(abstractHtml);
+    }
 
-//    if(isAbstractHtmlEditorLoaded) {
-//      entry.setAbstract(abstractHtmlEditor.getHtml());
-//    }
-    if(isContentHtmlEditorLoaded) {
-      entry.setContent(contentHtmlEditor.getHtml());
+    String contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
+    if(hasContentBeenEditedInActivity) {
+      contentHtml = contentHtmlEditor.getHtml();
+    }
+    if(contentHtml != null) {
+      entry.setContent(contentHtml);
     }
 
     if(entryCreationResult != null) {
-      String abstractString = /*isAbstractHtmlEditorLoaded ? abstractHtmlEditor.getHtml() :*/ entry.getAbstract();
-      String content = isContentHtmlEditorLoaded ? contentHtmlEditor.getHtml() : entry.getContent();
-
-      entryCreationResult.saveCreatedEntities(abstractString, content);
+      entryCreationResult.saveCreatedEntities(abstractHtml, contentHtml);
     }
 
     if(entry.isPersisted() == false) { // a new Entry
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
     }
 
-    entry.setTags(entryEditedTags);
+    // TODO: why setting Tags here and not above before saving?
+    List<Tag> entryEditedTags = (List<Tag>)editedFields.get(FieldWithUnsavedChanges.EntryTags);
+    if(entryEditedTags != null) {
+      entry.setTags(entryEditedTags);
+    }
 
     unsetEntryHasBeenEdited();
   }
@@ -532,7 +557,69 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     transaction.addToBackStack(null).commit();
 
+    passEntryFieldsToEditEntryDialog();
+
     isShowingEditEntryDialog = true;
+  }
+
+  protected void passEntryFieldsToEditEntryDialog() {
+    final Map<FieldWithUnsavedChanges, Object> entryFieldValues = getCurrentEditedEntryFieldValues();
+
+    if(hasContentBeenEditedInActivity) {
+      entryFieldValues.remove(FieldWithUnsavedChanges.EntryContent);
+      editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
+
+      Application.getThreadPool().runTaskAsync(new Runnable() {
+        @Override
+        public void run() {
+          // getHtml() has to be called on a other then main thread
+          final String contentHtml = contentHtmlEditor.getHtml();
+          hasContentBeenEditedInActivity = false;
+
+          entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, contentHtml);
+          editedFields.put(FieldWithUnsavedChanges.EntryContent, contentHtml);
+
+          EditEntryActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() { // don't know why but when calling over a new thread and than man thread again, Html Editors don't load
+              editEntryDialog.updateContentHtml(contentHtml);
+            }
+          });
+        }
+      });
+    }
+
+    else {
+      editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
+    }
+  }
+
+  @NonNull
+  protected Map<FieldWithUnsavedChanges, Object> getCurrentEditedEntryFieldValues() {
+    final Map<FieldWithUnsavedChanges, Object> entryFieldValues = new HashMap<>();
+
+    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryAbstract)) {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryAbstract, editedFields.get(FieldWithUnsavedChanges.EntryAbstract));
+    }
+    else {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryAbstract, entry.getAbstract());
+    }
+
+    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, editedFields.get(FieldWithUnsavedChanges.EntryContent));
+    }
+    else {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, entry.getContent());
+    }
+
+    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryTags)) {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryTags, editedFields.get(FieldWithUnsavedChanges.EntryTags));
+    }
+    else {
+      entryFieldValues.put(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
+    }
+
+    return entryFieldValues;
   }
 
   protected void hideEditEntryDialog() {
@@ -571,6 +658,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated() {
+      hasContentBeenEditedInActivity = true;
       setEntryHasBeenEdited();
     }
 
@@ -597,10 +685,18 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     public void entityEdited(BaseEntity entity, FieldWithUnsavedChanges changedField, Object newFieldValue) {
       setEntryHasBeenEdited();
 
-      if(changedField == FieldWithUnsavedChanges.EntryTags) {
+      if(changedField == FieldWithUnsavedChanges.EntryAbstract) {
+        setAbstractPreviewFromHtml((String)newFieldValue);
+      }
+      else if(changedField == FieldWithUnsavedChanges.EntryContent) {
+        setContentHtml((String)newFieldValue);
+      }
+      else if(changedField == FieldWithUnsavedChanges.EntryTags) {
         entryEditedTags = (List<Tag>)newFieldValue;
         setTextViewEditEntryTags(entryEditedTags);
       }
+
+      editedFields.put(changedField, newFieldValue);
     }
   };
 
