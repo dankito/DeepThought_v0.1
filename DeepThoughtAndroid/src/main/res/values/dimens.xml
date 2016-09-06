@@ -28,6 +28,9 @@
     <dimen name="edit_entry_buttons_height">40dp</dimen>
     <dimen name="edit_entry_buttons_width">120dp</dimen>
 
+    <dimen name="edit_entry_dialog_entry_field_icon_width">32dp</dimen>
+    <dimen name="edit_entry_dialog_entry_field_icon_margin">12dp</dimen>
+
     <dimen name="list_item_tag_height">30dp</dimen>
     <dimen name="list_item_tag_name_text_size">18sp</dimen>
     <dimen name="list_item_tag_filter_icon_width">26dp</dimen>

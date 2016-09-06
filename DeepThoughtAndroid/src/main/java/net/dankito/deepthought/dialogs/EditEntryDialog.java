@@ -21,6 +21,7 @@ import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -152,6 +153,18 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       actionBar.setDisplayHomeAsUpEnabled(true);
       actionBar.setHomeButtonEnabled(true);
       actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+
+      actionBar.setDisplayShowCustomEnabled(true);
+      actionBar.setCustomView(R.layout.dialog_edit_entry_custom_action_bar_view);
+
+      ImageButton imgbtnShowRegionEditAbstract = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditAbstract);
+      imgbtnShowRegionEditAbstract.setOnClickListener(imgbtnShowRegionEditAbstractClickListener);
+
+      ImageButton imgbtnShowRegionEditContent = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditContent);
+      imgbtnShowRegionEditContent.setOnClickListener(imgbtnShowRegionEditContentClickListener);
+
+      ImageButton imgbtnShowRegionEditTags = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditTags);
+      imgbtnShowRegionEditTags.setOnClickListener(imgbtnShowRegionEditTagsClickListener);
     }
   }
 
@@ -286,16 +299,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
 
-    if(id == R.id.mnitmActionEditAbstract) {
-      showEditAbstract();
-    }
-    else if(id == R.id.mnitmActionEditContent) {
-      showEditContent();
-    }
-    else if(id == R.id.mnitmActionEditTags) {
-      showEditTags();
-    }
-    else if (id == R.id.mnitmActionCommitEditedFields) {
+    if(id == R.id.mnitmActionCommitEditedFields) {
       commitEditedFieldsAsync();
       return true;
     }
@@ -308,19 +312,19 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     return super.onOptionsItemSelected(item);
   }
 
-  protected void showEditAbstract() {
+  protected void showRegionEditAbstract() {
     rlytEditAbstract.setVisibility(View.VISIBLE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.GONE);
   }
 
-  protected void showEditContent() {
+  protected void showRegionEditContent() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.VISIBLE);
     rlytEditTags.setVisibility(View.GONE);
   }
 
-  protected void showEditTags() {
+  protected void showRegionEditTags() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.VISIBLE);
@@ -379,6 +383,28 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
     }
   }
+
+
+  protected View.OnClickListener imgbtnShowRegionEditAbstractClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      showRegionEditAbstract();
+    }
+  };
+
+  protected View.OnClickListener imgbtnShowRegionEditContentClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      showRegionEditContent();
+    }
+  };
+
+  protected View.OnClickListener imgbtnShowRegionEditTagsClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+      showRegionEditTags();
+    }
+  };
 
 
   protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {

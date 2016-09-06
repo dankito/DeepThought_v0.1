@@ -4,30 +4,16 @@
       xmlns:tools="http://schemas.android.com/tools" >
 
     <item
+        android:id="@+id/mnitmActionTakePhotoOrRecognizeText"
+        android:orderInCategory="90"
+        android:title="@string/ocr"
+        android:icon="@android:drawable/ic_menu_camera"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/mnitmActionCommitEditedFields"
         android:orderInCategory="100"
         android:title="@string/ok"
-        app:showAsAction="always"/>
-
-    <item
-        android:id="@+id/mnitmActionEditAbstract"
-        android:orderInCategory="10"
-        android:title="Abstract"
-        android:icon="@drawable/ic_short_text_white_48dp"
-        app:showAsAction="always"/>
-
-    <item
-        android:id="@+id/mnitmActionEditContent"
-        android:orderInCategory="20"
-        android:title="Content"
-        android:icon="@drawable/ic_subject_white_48dp"
-        app:showAsAction="always"/>
-
-    <item
-        android:id="@+id/mnitmActionEditTags"
-        android:orderInCategory="30"
-        android:title="Tags"
-        android:icon="@drawable/tag_white_72"
         app:showAsAction="always"/>
 
 
