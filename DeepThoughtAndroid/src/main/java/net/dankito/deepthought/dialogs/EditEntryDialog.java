@@ -41,6 +41,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 import net.dankito.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
@@ -77,6 +78,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected boolean hasViewBeenCreated = false;
 
+  protected MenuItem mnitmActionTakePhotoOrRecognizeText = null;
+
+  protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
+
   protected EditEntityListener listener = null;
 
 
@@ -107,6 +112,9 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     this.listener = listener;
   }
 
+  public void setInsertImageOrRecognizedTextHelper(InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper) {
+    this.insertImageOrRecognizedTextHelper = insertImageOrRecognizedTextHelper;
+  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -255,10 +263,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   protected void commitEditedFields() {
-    for(final FieldWithUnsavedChanges editedField : editedFields) {
-      final Object editedFieldValue = getEditedFieldValue(editedField);
+    if(listener != null) {
+      for(final FieldWithUnsavedChanges editedField : editedFields) {
+        final Object editedFieldValue = getEditedFieldValue(editedField);
 
-      if(listener != null) {
         getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
@@ -293,6 +301,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     menu.clear();
     inflater.inflate(R.menu.dialog_edit_entry_menu, menu);
+
+     mnitmActionTakePhotoOrRecognizeText = menu.findItem(R.id.mnitmActionTakePhotoOrRecognizeText);
   }
 
   @Override
@@ -301,6 +311,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     if(id == R.id.mnitmActionCommitEditedFields) {
       commitEditedFieldsAsync();
+      return true;
+    }
+    else if(id == R.id.mnitmActionTakePhotoOrRecognizeText) {
+      handleTakePhotoOrRecognizeText();
       return true;
     }
     else if (id == android.R.id.home) {
@@ -312,22 +326,50 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     return super.onOptionsItemSelected(item);
   }
 
+  protected void handleTakePhotoOrRecognizeText() {
+    if(isRegionEditAbstractVisible()) {
+      insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(abstractHtmlEditor);
+    }
+    else if(isRegionEditContentVisible()) {
+      insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(contentHtmlEditor);
+    }
+  }
+
+
+  protected boolean isRegionEditAbstractVisible() {
+    return rlytEditAbstract.getVisibility() == View.VISIBLE;
+  }
+
+  protected boolean isRegionEditContentVisible() {
+    return rlytEditContent.getVisibility() == View.VISIBLE;
+  }
+
+  protected boolean isRegionEditTagsVisible() {
+    return rlytEditTags.getVisibility() == View.VISIBLE;
+  }
+
   protected void showRegionEditAbstract() {
     rlytEditAbstract.setVisibility(View.VISIBLE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.GONE);
+
+    mnitmActionTakePhotoOrRecognizeText.setVisible(true);
   }
 
   protected void showRegionEditContent() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.VISIBLE);
     rlytEditTags.setVisibility(View.GONE);
+
+    mnitmActionTakePhotoOrRecognizeText.setVisible(true);
   }
 
   protected void showRegionEditTags() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.VISIBLE);
+
+    mnitmActionTakePhotoOrRecognizeText.setVisible(false);
   }
 
 

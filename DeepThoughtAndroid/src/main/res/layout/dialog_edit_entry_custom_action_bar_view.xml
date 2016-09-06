@@ -12,6 +12,7 @@
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
         android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
         android:background="@android:color/transparent"
         android:src="@drawable/ic_short_text_white_48dp"
         />

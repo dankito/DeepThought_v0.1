@@ -420,6 +420,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
       editEntryDialog = new EditEntryDialog();
       editEntryDialog.setEditEntityListener(editEntryListener);
+      editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
       editEntryDialog.setEntry(entry);
 
       transaction.add(android.R.id.content, editEntryDialog);
