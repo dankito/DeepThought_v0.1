@@ -1,7 +1,7 @@
 package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controller.enums.FileLinkOptions;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.enums.FileType;

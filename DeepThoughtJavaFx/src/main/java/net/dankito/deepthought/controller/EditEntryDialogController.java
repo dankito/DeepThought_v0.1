@@ -2,7 +2,7 @@ package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controller.enums.DialogResult;
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.categories.EntryCategoriesControl;
 import net.dankito.deepthought.controls.event.FieldChangedEvent;
 import net.dankito.deepthought.controls.file.FilesControl;

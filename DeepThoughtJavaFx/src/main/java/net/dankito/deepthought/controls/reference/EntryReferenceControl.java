@@ -5,7 +5,7 @@ import net.dankito.deepthought.controller.ChildWindowsController;
 import net.dankito.deepthought.controller.ChildWindowsControllerListener;
 import net.dankito.deepthought.controller.EditReferenceDialogController;
 import net.dankito.deepthought.controller.enums.DialogResult;
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.CollapsiblePane;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.event.FieldChangedEvent;

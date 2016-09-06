@@ -12,6 +12,7 @@ import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.dankito.deepthought.data.search.specific.ReferenceBaseType;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.Notification;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -248,23 +249,23 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanUp {
 
     if(fieldChangedEvents != null) {
       if(newReferenceBase instanceof SeriesTitle)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntrySeriesTitle, newReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, newReferenceBase);
       else if(newReferenceBase instanceof Reference)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntryReference, newReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, newReferenceBase);
       else if(newReferenceBase instanceof ReferenceSubDivision)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntryReferenceSubDivision, newReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, newReferenceBase);
     }
     else {
       if(previousReferenceBase instanceof SeriesTitle)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntrySeriesTitle, previousReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntrySeriesTitle, previousReferenceBase);
       else if(previousReferenceBase instanceof Reference)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntryReference, previousReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReference, previousReferenceBase);
       else if(previousReferenceBase instanceof ReferenceSubDivision)
-        fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges.EntryReferenceSubDivision, previousReferenceBase);
+        fireFieldChangedEvent(FieldWithUnsavedChanges.EntryReferenceSubDivision, previousReferenceBase);
     }
   }
 
-  protected void fireFieldChangedEvent(net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges changedField, Object newValue) {
+  protected void fireFieldChangedEvent(FieldWithUnsavedChanges changedField, Object newValue) {
     for(EventHandler<net.dankito.deepthought.controls.event.FieldChangedEvent> fieldChangedEvent : fieldChangedEvents)
       fieldChangedEvent.handle(new net.dankito.deepthought.controls.event.FieldChangedEvent(this, changedField, newValue));
   }

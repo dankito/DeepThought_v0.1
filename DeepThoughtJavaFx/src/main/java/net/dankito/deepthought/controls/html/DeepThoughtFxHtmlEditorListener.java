@@ -1,6 +1,7 @@
 package net.dankito.deepthought.controls.html;
 
 import net.dankito.deepthought.data.model.FileLink;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 
 import java.util.Collection;
 
@@ -9,12 +10,12 @@ import java.util.Collection;
  */
 public class DeepThoughtFxHtmlEditorListener extends HtmlEditorListenerBase implements IHtmlEditorListener {
 
-  protected Collection<net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges> fieldsWithUnsavedChanges;
+  protected Collection<FieldWithUnsavedChanges> fieldsWithUnsavedChanges;
 
-  protected net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges fieldToAddOnChanges;
+  protected FieldWithUnsavedChanges fieldToAddOnChanges;
 
 
-  public DeepThoughtFxHtmlEditorListener(net.dankito.deepthought.controls.utils.EditedEntitiesHolder<FileLink> editedFiles, Collection<net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges> fieldsWithUnsavedChanges, net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges fieldToAddOnChanges) {
+  public DeepThoughtFxHtmlEditorListener(net.dankito.deepthought.controls.utils.EditedEntitiesHolder<FileLink> editedFiles, Collection<FieldWithUnsavedChanges> fieldsWithUnsavedChanges, FieldWithUnsavedChanges fieldToAddOnChanges) {
     super(editedFiles);
     this.fieldsWithUnsavedChanges = fieldsWithUnsavedChanges;
     this.fieldToAddOnChanges = fieldToAddOnChanges;

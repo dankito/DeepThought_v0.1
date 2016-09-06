@@ -1,6 +1,6 @@
 package net.dankito.deepthought.controller;
 
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;

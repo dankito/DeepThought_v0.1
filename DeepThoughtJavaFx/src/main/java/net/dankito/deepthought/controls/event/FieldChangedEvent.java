@@ -1,6 +1,6 @@
 package net.dankito.deepthought.controls.event;
 
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 
 import javafx.event.Event;
 import javafx.event.EventType;

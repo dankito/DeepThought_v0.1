@@ -1,4 +1,4 @@
-package net.dankito.deepthought.controller.enums;
+package net.dankito.deepthought.ui.enums;
 
 /**
  * Created by ganymed on 25/12/14.

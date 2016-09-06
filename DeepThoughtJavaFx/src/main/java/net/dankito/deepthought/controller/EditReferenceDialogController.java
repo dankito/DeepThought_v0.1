@@ -1,7 +1,7 @@
 package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.controller.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
 import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.controls.person.SeriesTitlePersonsControl;
