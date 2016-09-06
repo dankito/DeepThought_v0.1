@@ -7,10 +7,92 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rlytContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/appBarLayout"
+        android:background="#ffffff"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <RelativeLayout
+            android:id="@+id/rlytEditAbstract"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            >
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlytEditContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            >
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlytEditTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            >
+
+            <EditText
+                android:id="@+id/edtxtEditEntrySearchTag"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/edit_entry_search_tags_height"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/btnEditEntryNewTag"
+                android:layout_marginRight="6dp"
+                android:textSize="@dimen/edit_entry_search_tags_text_size"
+            />
+
+            <Button
+                android:id="@+id/btnEditEntryNewTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="70dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignBottom="@+id/edtxtEditEntrySearchTag"
+                android:textSize="@dimen/edit_entry_search_tags_text_size"
+                android:text="@string/edit_entry_button_new_tag_text"
+            />
+
+            <ListView
+                android:id="@+id/lstvwEditEntryTags"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/edit_entry_list_view_tags_height"
+                android:minHeight="@dimen/edit_entry_list_view_tags_min_height"
+                android:layout_below="@+id/edtxtEditEntrySearchTag"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+            />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -22,29 +104,5 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/appBarLayout"
-        android:background="#ffffff"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Your content here"/>
-
-    </RelativeLayout>
 
 </RelativeLayout>

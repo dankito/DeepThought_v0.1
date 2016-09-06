@@ -7,6 +7,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,31 +17,68 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.adapter.EntryTagsAdapter;
+import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.html.AndroidHtmlEditor;
+import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
+import net.dankito.deepthought.controls.html.HtmEditorCommand;
+import net.dankito.deepthought.controls.html.HtmlEditor;
+import net.dankito.deepthought.controls.html.IHtmlEditorListener;
+import net.dankito.deepthought.data.html.ImageElementData;
+import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by ganymed on 06/09/16.
  */
-public class EditEntryDialog extends DialogFragment {
+public class EditEntryDialog extends DialogFragment implements ICleanUp {
+
+
+  protected RelativeLayout rlytEditAbstract;
+
+  protected RelativeLayout rlytEditContent;
+
+  protected RelativeLayout rlytEditTags;
+
+  protected AndroidHtmlEditor abstractHtmlEditor = null;
+  protected AndroidHtmlEditor contentHtmlEditor = null;
+
+  protected EditText edtxtEditEntrySearchTag = null;
+
+  protected ListView lstvwEditEntryTags = null;
+
+  protected List<Tag> entryEditedTags = new ArrayList<>();
+
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.dialog_edit_entry, container, false);
 
-    Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-    toolbar.setTitle("");
-
-    ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-    ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setHomeButtonEnabled(true);
-      actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
-    }
+    setupToolbar(rootView);
 
     setHasOptionsMenu(true);
+
+
+    setupEditAbstractRegion(rootView);
+
+    setupEditContentRegion(rootView);
+
+    setupEditTagsRegion(rootView);
+
 
     return rootView;
   }
@@ -51,6 +91,112 @@ public class EditEntryDialog extends DialogFragment {
     return dialog;
   }
 
+
+  protected void setupToolbar(View rootView) {
+    Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+    toolbar.setTitle("");
+
+    ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+    ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+    if (actionBar != null) {
+      actionBar.setDisplayHomeAsUpEnabled(true);
+      actionBar.setHomeButtonEnabled(true);
+      actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
+    }
+  }
+
+  protected void setupEditAbstractRegion(View rootView) {
+    rlytEditAbstract = (RelativeLayout)rootView.findViewById(R.id.rlytEditAbstract);
+
+    abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(getActivity(), abstractListener);
+
+    rlytEditAbstract.addView(abstractHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
+
+    RelativeLayout.LayoutParams abstractEditorParams = (RelativeLayout.LayoutParams)abstractHtmlEditor.getLayoutParams();
+    abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+    abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+    abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+    abstractHtmlEditor.setLayoutParams(abstractEditorParams);
+
+  }
+
+  protected void setupEditContentRegion(View rootView) {
+    rlytEditContent = (RelativeLayout)rootView.findViewById(R.id.rlytEditContent);
+
+    contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(getActivity(), contentListener);
+
+    rlytEditContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+    RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+    contentHtmlEditor.setLayoutParams(contentEditorParams);
+  }
+
+  protected void setupEditTagsRegion(View rootView) {
+    rlytEditTags = (RelativeLayout)rootView.findViewById(R.id.rlytEditTags);
+
+    edtxtEditEntrySearchTag = (EditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
+    edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
+    edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
+
+    Button btnEditEntryNewTag = (Button)rootView.findViewById(R.id.btnEditEntryNewTag);
+    btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
+
+    lstvwEditEntryTags = (ListView)rootView.findViewById(R.id.lstvwEditEntryTags);
+  }
+
+
+  protected void setEntryValues() {
+//    entry = ActivityManager.getInstance().getEntryToBeEdited();
+//    if(entry != null) {
+//      entryEditedTags = new ArrayList<>(entry.getTagsSorted());
+//      contentHtmlEditor.setHtml(entry.getContent());
+//    }
+//
+//    entryCreationResult = ActivityManager.getInstance().getEntryCreationResultToBeEdited();
+//    if(entryCreationResult != null) {
+//      entry = entryCreationResult.getCreatedEntry();
+//      entryEditedTags = entryCreationResult.getTags();
+//      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null);
+//    }
+//
+//    if(entry != null) {
+//      if(entry.hasAbstract()) {
+//        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
+//      }
+//      else {
+//        rlydEntryAbstract.setVisibility(View.GONE);
+//      }
+//
+//      wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
+//
+//      contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
+//
+//      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+//        @Override
+//        public void entryTagsChanged(List<Tag> entryTags) {
+//          setEntryHasBeenEdited();
+//          setTextViewEditEntryTags();
+//        }
+//      }));
+//
+//      setTextViewEditEntryTags();
+//    }
+  }
+
+  protected void setEntryHasBeenEdited() {
+    // TODO
+//    hasEntryBeenEdited = true;
+  }
+
+
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     menu.clear();
@@ -61,7 +207,16 @@ public class EditEntryDialog extends DialogFragment {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
 
-    if (id == R.id.action_save) {
+    if(id == R.id.mnitmActionEditAbstract) {
+      showEditAbstract();
+    }
+    else if(id == R.id.mnitmActionEditContent) {
+      showEditContent();
+    }
+    else if(id == R.id.mnitmActionEditTags) {
+      showEditTags();
+    }
+    else if (id == R.id.action_save) {
       // handle confirmation button click here
       return true;
     }
@@ -74,4 +229,139 @@ public class EditEntryDialog extends DialogFragment {
     return super.onOptionsItemSelected(item);
   }
 
+  protected void showEditAbstract() {
+    rlytEditAbstract.setVisibility(View.VISIBLE);
+    rlytEditContent.setVisibility(View.GONE);
+    rlytEditTags.setVisibility(View.GONE);
+  }
+
+  protected void showEditContent() {
+    rlytEditAbstract.setVisibility(View.GONE);
+    rlytEditContent.setVisibility(View.VISIBLE);
+    rlytEditTags.setVisibility(View.GONE);
+  }
+
+  protected void showEditTags() {
+    rlytEditAbstract.setVisibility(View.GONE);
+    rlytEditContent.setVisibility(View.GONE);
+    rlytEditTags.setVisibility(View.VISIBLE);
+  }
+
+
+  protected TextWatcher edtxtEditEntrySearchTagTextChangedListener = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+      ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).getFilter().filter(s.toString());
+    }
+  };
+
+  protected TextView.OnEditorActionListener edtxtEditEntrySearchTagActionListener = new TextView.OnEditorActionListener() {
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+      if (actionId == EditorInfo.IME_NULL
+          && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
+        createNewTag();
+        return true;
+      }
+      return false;
+    }
+  };
+
+
+  protected View.OnClickListener btnEditEntryNewTagOnClickListener = new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      createNewTag();
+    }
+  };
+
+  protected void createNewTag() {
+    String tagName = edtxtEditEntrySearchTag.getText().toString();
+
+    if(StringUtils.isNullOrEmpty(tagName))
+      Toast.makeText(getActivity(), getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG).show();
+    else if(Application.getDeepThought().containsTagOfName(tagName))
+      Toast.makeText(getActivity(), getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
+    else {
+      Tag newTag = new Tag(tagName);
+      Application.getDeepThought().addTag(newTag);
+      entryEditedTags.add(newTag);
+      setEntryHasBeenEdited();
+      Collections.sort(entryEditedTags);
+    }
+  }
+
+
+  protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
+    @Override
+    public void editorHasLoaded(HtmlEditor editor) {
+
+    }
+
+    @Override
+    public void htmlCodeUpdated() {
+//      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public void htmlCodeHasBeenReset() {
+      // Changes to Abstract have been undone
+      // TODO: how to check now if Entry has been edited or not?
+    }
+
+    @Override
+    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
+      return false;
+    }
+
+    @Override
+    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+      return false;
+    }
+  };
+
+  protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
+    @Override
+    public void editorHasLoaded(HtmlEditor editor) {
+
+    }
+
+    @Override
+    public void htmlCodeUpdated() {
+//      setEntryHasBeenEdited();
+    }
+
+    @Override
+    public void htmlCodeHasBeenReset() {
+      // Changes to Content have been undone
+      // TODO: how to check now if Entry has been edited or not?
+    }
+
+    @Override
+    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
+      return false;
+    }
+
+    @Override
+    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
+      return false;
+    }
+  };
+
+  @Override
+  public void cleanUp() {
+
+    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter)
+      ((EntryTagsAdapter)lstvwEditEntryTags.getAdapter()).cleanUp();
+  }
 }

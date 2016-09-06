@@ -10,28 +10,19 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.dankito.deepthought.AndroidHelper;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.adapter.AddImageOrOcrTextOptionsListAdapter;
-import net.dankito.deepthought.adapter.EntryTagsAdapter;
 import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.model.OcrSource;
 import net.dankito.deepthought.controls.ICleanUp;
@@ -49,14 +40,12 @@ import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.helper.AlertHelper;
-import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -87,12 +76,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected RelativeLayout rlydTags;
   protected RelativeLayout rlydEditEntryEditTags;
   protected TextView txtvwEditEntryTags;
-  protected EditText edtxtEditEntrySearchTag;
-  protected ListView lstvwEditEntryTags;
 
-  protected AndroidHtmlEditor abstractHtmlEditor = null;
-  protected AndroidHtmlEditor contentHtmlEditor = null;
   protected WebView wbvwContent = null;
+  protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected boolean hasEntryBeenEdited = false;
 
@@ -127,23 +113,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         actionBar.setHomeButtonEnabled(true);
       }
 
-      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
-      abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, abstractListener);
-
       txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
 
       rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
       rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
-      rlydEntryAbstract.addView(abstractHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500));
-
-      RelativeLayout.LayoutParams abstractEditorParams = (RelativeLayout.LayoutParams)abstractHtmlEditor.getLayoutParams();
-      abstractEditorParams.addRule(RelativeLayout.BELOW, R.id.txtvwEditEntryAbstractLabel);
-      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-      abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-      abstractHtmlEditor.setLayoutParams(abstractEditorParams);
-      abstractHtmlEditor.setVisibility(View.GONE);
 
       rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
       rlydTags.setOnClickListener(rlydTagsOnClickListener);
@@ -152,17 +125,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       rlydEditEntryEditTags.setVisibility(View.GONE);
 
       txtvwEditEntryTags = (TextView) findViewById(R.id.txtvwEditEntryTags);
-      edtxtEditEntrySearchTag = (EditText) findViewById(R.id.edtxtEditEntrySearchTag);
-      edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
-      edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
-
-      Button btnEditEntryNewTag = (Button) findViewById(R.id.btnEditEntryNewTag);
-      btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
-
-      lstvwEditEntryTags = (ListView) findViewById(R.id.lstvwEditEntryTags);
 
       RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
-      contentHtmlEditor.setVisibility(View.VISIBLE);
+
+      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
       rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
       RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
@@ -204,8 +170,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     if(entry != null) {
       if(entry.hasAbstract()) {
-        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText());
-        abstractHtmlEditor.setHtml(entry.getAbstract());
+        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
       }
       else {
         rlydEntryAbstract.setVisibility(View.GONE);
@@ -215,24 +180,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
 
-      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-        @Override
-        public void entryTagsChanged(List<Tag> entryTags) {
-          setEntryHasBeenEdited();
-          setTextViewEditEntryTags();
-        }
-      }));
-
       setTextViewEditEntryTags();
     }
-  }
-
-  @Override
-  protected void onDestroy() {
-    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter)
-      ((EntryTagsAdapter)lstvwEditEntryTags.getAdapter()).cleanUp();
-
-    super.onDestroy();
   }
 
   @Override
@@ -383,7 +332,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       contentHtmlEditor.insertHtml(imageData.createHtmlCode());
     }
     else {
-      abstractHtmlEditor.insertHtml(imageData.createHtmlCode());
+//      abstractHtmlEditor.insertHtml(imageData.createHtmlCode());
     }
   }
 
@@ -488,8 +437,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   public void cleanUp() {
-    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
-    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+//    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
+    if(contentHtmlEditor != null) {
+      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    }
   }
 
   protected void saveEntryIfNeeded() {
@@ -509,18 +460,18 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected void saveEntry() {
     // TODO: only save changed fields
-    boolean isAbstractHtmlEditorLoaded = abstractHtmlEditor.isLoaded();
+//    boolean isAbstractHtmlEditorLoaded = abstractHtmlEditor.isLoaded();
     boolean isContentHtmlEditorLoaded = contentHtmlEditor.isLoaded();
 
-    if(isAbstractHtmlEditorLoaded) {
-      entry.setAbstract(abstractHtmlEditor.getHtml());
-    }
+//    if(isAbstractHtmlEditorLoaded) {
+//      entry.setAbstract(abstractHtmlEditor.getHtml());
+//    }
     if(isContentHtmlEditorLoaded) {
       entry.setContent(contentHtmlEditor.getHtml());
     }
 
     if(entryCreationResult != null) {
-      String abstractString = isAbstractHtmlEditorLoaded ? abstractHtmlEditor.getHtml() : entry.getAbstract();
+      String abstractString = /*isAbstractHtmlEditorLoaded ? abstractHtmlEditor.getHtml() :*/ entry.getAbstract();
       String content = isContentHtmlEditorLoaded ? contentHtmlEditor.getHtml() : entry.getContent();
 
       entryCreationResult.saveCreatedEntities(abstractString, content);
@@ -591,88 +542,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   };
 
-  protected TextWatcher edtxtEditEntrySearchTagTextChangedListener = new TextWatcher() {
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-      ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).getFilter().filter(s.toString());
-    }
-  };
-
-  protected TextView.OnEditorActionListener edtxtEditEntrySearchTagActionListener = new TextView.OnEditorActionListener() {
-    @Override
-    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-      if (actionId == EditorInfo.IME_NULL
-          && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-        createNewTag();
-        return true;
-      }
-      return false;
-    }
-  };
-
-
-  protected View.OnClickListener btnEditEntryNewTagOnClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      createNewTag();
-    }
-  };
-
-  protected void createNewTag() {
-    String tagName = edtxtEditEntrySearchTag.getText().toString();
-
-    if(StringUtils.isNullOrEmpty(tagName))
-      Toast.makeText(this, getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG).show();
-    else if(Application.getDeepThought().containsTagOfName(tagName))
-      Toast.makeText(this, getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
-    else {
-      Tag newTag = new Tag(tagName);
-      Application.getDeepThought().addTag(newTag);
-      entryEditedTags.add(newTag);
-      setEntryHasBeenEdited();
-      Collections.sort(entryEditedTags);
-      setTextViewEditEntryTags();
-    }
-  }
-
-
-  protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
-    @Override
-    public void editorHasLoaded(HtmlEditor editor) {
-
-    }
-
-    @Override
-    public void htmlCodeUpdated() {
-      setEntryHasBeenEdited();
-    }
-
-    @Override
-    public void htmlCodeHasBeenReset() {
-      // Changes to Abstract have been undone
-      // TODO: how to check now if Entry has been edited or not?
-    }
-
-    @Override
-    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
-      return false;
-    }
-
-    @Override
-    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
-      return false;
-    }
-  };
 
   protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
     @Override

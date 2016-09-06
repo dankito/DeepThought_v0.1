@@ -45,19 +45,6 @@
 
     </RelativeLayout>
 
-    <!--<TextView-->
-        <!--android:id="@+id/txtvwEditEntryTextLabel"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="@dimen/edit_entry_entry_label_height"-->
-        <!--android:maxHeight="@dimen/edit_entry_entry_label_height"-->
-        <!--android:layout_below="@+id/rlydTags"-->
-        <!--android:layout_alignParentLeft="true"-->
-        <!--android:layout_alignParentRight="true"-->
-        <!--android:layout_marginTop="4dp"-->
-        <!--android:textSize="@dimen/edit_entry_labels_text_size"-->
-        <!--android:text="@string/edit_entry_content_label"-->
-        <!--/>-->
-
     <RelativeLayout
         android:id="@+id/rlydContent"
         android:layout_width="match_parent"
@@ -122,39 +109,6 @@
             android:layout_below="@+id/txtvwEditEntryTagsLabel"
             android:visibility="visible"
         >
-
-            <EditText
-                android:id="@+id/edtxtEditEntrySearchTag"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/edit_entry_search_tags_height"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/btnEditEntryNewTag"
-                android:layout_marginRight="6dp"
-                android:textSize="@dimen/edit_entry_edit_texts_text_size"
-            />
-
-            <Button
-                android:id="@+id/btnEditEntryNewTag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="70dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignBottom="@+id/edtxtEditEntrySearchTag"
-                android:textSize="@dimen/edit_entry_edit_texts_text_size"
-                android:text="@string/edit_entry_button_new_tag_text"
-            />
-
-            <ListView
-                android:id="@+id/lstvwEditEntryTags"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/edit_entry_list_view_tags_height"
-                android:minHeight="@dimen/edit_entry_list_view_tags_min_height"
-                android:layout_below="@+id/edtxtEditEntrySearchTag"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-            />
 
         </RelativeLayout>
 
