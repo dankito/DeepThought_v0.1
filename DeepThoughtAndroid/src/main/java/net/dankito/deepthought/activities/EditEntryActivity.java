@@ -49,7 +49,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -73,23 +75,24 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EntryCreationResult entryCreationResult = null;
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
-  protected TextView txtvwEditEntryAbstract;
-  protected RelativeLayout rlydEntryAbstract;
+  protected boolean hasEntryBeenEdited = false;
+  protected Map<FieldWithUnsavedChanges, Object> editedFields = new HashMap<>();
 
-  protected RelativeLayout rlydTags;
-  protected RelativeLayout rlydEditEntryEditTags;
-  protected TextView txtvwEditEntryTags;
+  protected boolean isShowingEditEntryDialog = false;
+  protected EditEntryDialog editEntryDialog = null;
+
+
+  protected RelativeLayout rlydEntryAbstract;
+  protected TextView txtvwEditEntryAbstract;
 
   protected WebView wbvwContent = null;
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
-  protected boolean hasEntryBeenEdited = false;
+  protected RelativeLayout rlydTags;
+  protected TextView txtvwEntryTagsPreview;
 
   protected Uri takenPhotoTempFile = null;
 
-  protected EditEntryDialog editEntryDialog = null;
-
-  protected boolean isShowingEditEntryDialog = false;
 
 
   @Override
@@ -107,55 +110,69 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     try {
       setContentView(R.layout.activity_edit_entry);
 
-      Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-      setSupportActionBar(toolbar);
+      setupToolbar();
 
-      ActionBar actionBar = getSupportActionBar();
-      if(actionBar != null) {
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setHomeButtonEnabled(true);
-      }
+      setupAbstractRegion();
 
-      txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
+      setupContentRegion();
 
-      rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
-      rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
-
-      rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
-      rlydTags.setOnClickListener(rlydTagsOnClickListener);
-
-      rlydEditEntryEditTags = (RelativeLayout) findViewById(R.id.rlydEditEntryEditTags);
-      rlydEditEntryEditTags.setVisibility(View.GONE);
-
-      txtvwEditEntryTags = (TextView) findViewById(R.id.txtvwEditEntryTags);
-
-      RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
-
-      contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
-      rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-      RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
-      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-      contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-      contentHtmlEditor.setLayoutParams(contentEditorParams);
-
-      wbvwContent = (WebView)findViewById(R.id.wbvwContent);
-      wbvwContent.setHorizontalScrollBarEnabled(true);
-      wbvwContent.setVerticalScrollBarEnabled(true);
-
-      WebSettings settings = wbvwContent.getSettings();
-      settings.setDefaultTextEncodingName("utf-8");
-      settings.setDefaultFontSize(12);
-      settings.setJavaScriptEnabled(true);
+      setupTagsRegion();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
       finish();
     }
   }
+
+  protected void setupToolbar() {
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+
+    ActionBar actionBar = getSupportActionBar();
+    if(actionBar != null) {
+      actionBar.setDisplayShowTitleEnabled(false);
+      actionBar.setHomeButtonEnabled(true);
+    }
+  }
+
+  protected void setupAbstractRegion() {
+    rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
+    rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
+
+    txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
+  }
+
+  protected void setupContentRegion() {
+    RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
+
+    contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
+    rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+    RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+    contentHtmlEditor.setLayoutParams(contentEditorParams);
+
+    wbvwContent = (WebView)findViewById(R.id.wbvwContent);
+    wbvwContent.setHorizontalScrollBarEnabled(true);
+    wbvwContent.setVerticalScrollBarEnabled(true);
+
+    WebSettings settings = wbvwContent.getSettings();
+    settings.setDefaultTextEncodingName("utf-8"); // otherwise non ASCII text doesn't get displayed correctly
+    settings.setDefaultFontSize(12); // default font is way to large
+    settings.setJavaScriptEnabled(true); // so that embedded videos etc. work
+  }
+
+  protected void setupTagsRegion() {
+    rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
+    rlydTags.setOnClickListener(rlydTagsOnClickListener);
+
+    txtvwEntryTagsPreview = (TextView) findViewById(R.id.txtvwEntryTagsPreview);
+  }
+
 
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
@@ -168,7 +185,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     if(entryCreationResult != null) {
       entry = entryCreationResult.getCreatedEntry();
       entryEditedTags = entryCreationResult.getTags();
-      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null);
+      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
     }
 
     if(entry != null) {
@@ -181,6 +198,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
 
+      // TODO: why also instantiating contentHtmlEditor if it shouldn't be displayed at all?
       contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
 
       setTextViewEditEntryTags(entryEditedTags);
@@ -192,8 +210,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
 
     if(Application.getPlatformConfiguration().hasCaptureDevice() || Application.getContentExtractorManager().hasOcrContentExtractors()) {
-      MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddImageOrOCRText);
-      mnitmActionAddContentFromOcr.setVisible(true);
+      if(contentHtmlEditor != null && contentHtmlEditor.getVisibility() == View.VISIBLE) {
+        MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddImageOrOCRText);
+        mnitmActionAddContentFromOcr.setVisible(true);
+      }
     }
 
     return super.onCreateOptionsMenu(menu);
@@ -293,7 +313,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       tagsString = getString(R.string.edit_entry_no_tags_set);
     }
 
-    txtvwEditEntryTags.setText(tagsString);
+    txtvwEntryTagsPreview.setText(tagsString);
   }
 
 

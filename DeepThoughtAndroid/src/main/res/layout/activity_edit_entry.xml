@@ -79,15 +79,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_alignTop="@+id/txtvwEditEntryTags"
-            android:layout_alignBottom="@+id/txtvwEditEntryTags"
+            android:layout_alignTop="@+id/txtvwEntryTagsPreview"
+            android:layout_alignBottom="@+id/txtvwEntryTagsPreview"
             android:layout_marginRight="4dp"
             android:textSize="@dimen/edit_entry_labels_text_size"
             android:text="@string/edit_entry_tags_label"
         />
 
         <TextView
-            android:id="@+id/txtvwEditEntryTags"
+            android:id="@+id/txtvwEntryTagsPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
