@@ -35,7 +35,10 @@ import net.dankito.deepthought.controls.html.HtmEditorCommand;
 import net.dankito.deepthought.controls.html.HtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.data.html.ImageElementData;
+import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.listener.EditEntityListener;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
@@ -47,6 +50,8 @@ import java.util.List;
  */
 public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
+
+  protected Entry entry;
 
   protected RelativeLayout rlytEditAbstract;
 
@@ -62,6 +67,21 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected ListView lstvwEditEntryTags = null;
 
   protected List<Tag> entryEditedTags = new ArrayList<>();
+
+  protected EditEntityListener listener = null;
+
+
+  public EditEntryDialog() {
+
+  }
+
+  public void setEntry(Entry entry) {
+    this.entry = entry;
+  }
+
+  public void setEditEntityListener(EditEntityListener listener) {
+    this.listener = listener;
+  }
 
 
   @Override
@@ -79,6 +99,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     setupEditTagsRegion(rootView);
 
+
+    setEntryValues(entry);
 
     return rootView;
   }
@@ -153,47 +175,27 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
-  protected void setEntryValues() {
-//    entry = ActivityManager.getInstance().getEntryToBeEdited();
-//    if(entry != null) {
-//      entryEditedTags = new ArrayList<>(entry.getTagsSorted());
-//      contentHtmlEditor.setHtml(entry.getContent());
-//    }
-//
-//    entryCreationResult = ActivityManager.getInstance().getEntryCreationResultToBeEdited();
-//    if(entryCreationResult != null) {
-//      entry = entryCreationResult.getCreatedEntry();
-//      entryEditedTags = entryCreationResult.getTags();
-//      wbvwContent.loadDataWithBaseURL(null, entry.getContent(), "text/html; charset=utf-8", "utf-8", null);
-//    }
-//
-//    if(entry != null) {
-//      if(entry.hasAbstract()) {
-//        txtvwEditEntryAbstract.setText(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
-//      }
-//      else {
-//        rlydEntryAbstract.setVisibility(View.GONE);
-//      }
-//
-//      wbvwContent.setVisibility(entryCreationResult == null ? View.GONE : View.VISIBLE);
-//
-//      contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
-//
-//      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(this, entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-//        @Override
-//        public void entryTagsChanged(List<Tag> entryTags) {
-//          setEntryHasBeenEdited();
-//          setTextViewEditEntryTags();
-//        }
-//      }));
-//
-//      setTextViewEditEntryTags();
-//    }
+  protected void setEntryValues(Entry entry) {
+    if(entry != null) {
+      abstractHtmlEditor.setHtml(entry.getAbstract());
+
+      contentHtmlEditor.setHtml(entry.getContent());
+
+      entryEditedTags = new ArrayList<>(entry.getTagsSorted());
+
+      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+        @Override
+        public void entryTagsChanged(List<Tag> entryTags) {
+          setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+        }
+      }));
+    }
   }
 
-  protected void setEntryHasBeenEdited() {
-    // TODO
-//    hasEntryBeenEdited = true;
+  protected void setEntryHasBeenEdited(FieldWithUnsavedChanges editedField, Object editedFieldValue) {
+    if(listener != null) {
+      listener.entityEdited(entry, editedField, editedFieldValue);
+    }
   }
 
 
@@ -296,8 +298,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       Tag newTag = new Tag(tagName);
       Application.getDeepThought().addTag(newTag);
       entryEditedTags.add(newTag);
-      setEntryHasBeenEdited();
       Collections.sort(entryEditedTags);
+      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
     }
   }
 
@@ -310,7 +312,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated() {
-//      setEntryHasBeenEdited();
+      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryAbstract, null);
     }
 
     @Override
@@ -338,7 +340,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     @Override
     public void htmlCodeUpdated() {
-//      setEntryHasBeenEdited();
+      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryContent, null);
     }
 
     @Override
@@ -360,8 +362,11 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   @Override
   public void cleanUp() {
+    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
+    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
 
-    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter)
-      ((EntryTagsAdapter)lstvwEditEntryTags.getAdapter()).cleanUp();
+    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter) {
+      ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).cleanUp();
+    }
   }
 }

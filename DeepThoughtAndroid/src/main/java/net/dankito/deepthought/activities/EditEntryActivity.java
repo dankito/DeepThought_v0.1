@@ -38,8 +38,11 @@ import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.listener.EditEntityListener;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
@@ -180,7 +183,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       contentHtmlEditor.setVisibility(entryCreationResult == null ? View.VISIBLE : View.GONE);
 
-      setTextViewEditEntryTags();
+      setTextViewEditEntryTags(entryEditedTags);
     }
   }
 
@@ -275,19 +278,22 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     builder.create().show();
   }
 
-  protected void setTextViewEditEntryTags() {
-    String tags = "";
+  protected void setTextViewEditEntryTags(List<Tag> tags) {
+    String tagsString = "";
 
-    for(Tag tag : entryEditedTags)
-      tags += tag.getName() + ", ";
+    for(Tag tag : tags) {
+      tagsString += tag.getName() + ", ";
+    }
 
-    if(tags.length() > 1)
-      tags = tags.substring(0, tags.length() - 2);
+    if(tagsString.length() > 1) {
+      tagsString = tagsString.substring(0, tagsString.length() - 2);
+    }
 
-    if(tags.length() == 0)
-      tags = getString(R.string.edit_entry_no_tags_set);
+    if(tagsString.length() == 0) {
+      tagsString = getString(R.string.edit_entry_no_tags_set);
+    }
 
-    txtvwEditEntryTags.setText(tags);
+    txtvwEditEntryTags.setText(tagsString);
   }
 
 
@@ -437,9 +443,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   public void cleanUp() {
-//    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
-    if(contentHtmlEditor != null) {
-      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+
+    if(editEntryDialog != null) {
+      editEntryDialog.cleanUp();
     }
   }
 
@@ -494,6 +501,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
       editEntryDialog = new EditEntryDialog();
+      editEntryDialog.setEditEntityListener(editEntryListener);
+      editEntryDialog.setEntry(entry);
+
       transaction.add(android.R.id.content, editEntryDialog);
     }
     else { // on subsequent displays we only have to call show() on the then hidden Dialog
@@ -521,11 +531,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-//      if(abstractHtmlEditor.getVisibility() == View.GONE)
-//        abstractHtmlEditor.setVisibility(View.VISIBLE);
-//      else
-//        abstractHtmlEditor.setVisibility(View.GONE);
-
       showEditEntryDialog();
     }
   };
@@ -533,11 +538,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-//      if(rlydEditEntryEditTags.getVisibility() == View.GONE)
-//        rlydEditEntryEditTags.setVisibility(View.VISIBLE);
-//      else
-//        rlydEditEntryEditTags.setVisibility(View.GONE);
-
       showEditEntryDialog();
     }
   };
@@ -570,4 +570,18 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return false;
     }
   };
+
+
+  protected EditEntityListener editEntryListener = new EditEntityListener() {
+    @Override
+    public void entityEdited(BaseEntity entity, FieldWithUnsavedChanges changedField, Object newFieldValue) {
+      setEntryHasBeenEdited();
+
+      if(changedField == FieldWithUnsavedChanges.EntryTags) {
+        entryEditedTags = (List<Tag>)newFieldValue;
+        setTextViewEditEntryTags(entryEditedTags);
+      }
+    }
+  };
+
 }
