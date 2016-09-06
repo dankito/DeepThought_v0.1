@@ -14,7 +14,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_short_text_white_48dp"
+        android:src="@drawable/ic_abstract_white"
         />
 
     <ImageButton
@@ -27,7 +27,7 @@
         android:layout_toRightOf="@+id/imgbtnShowRegionEditAbstract"
         android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_subject_white_48dp"
+        android:src="@drawable/ic_content_white"
     />
 
     <ImageButton
@@ -40,7 +40,7 @@
         android:layout_toRightOf="@+id/imgbtnShowRegionEditContent"
         android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
         android:background="@android:color/transparent"
-        android:src="@drawable/tag_white_72"
+        android:src="@drawable/ic_tag_white"
     />
 
 </RelativeLayout>

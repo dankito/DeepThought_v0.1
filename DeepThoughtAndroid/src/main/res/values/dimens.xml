@@ -27,6 +27,7 @@
     <dimen name="edit_entry_list_view_tags_min_height">60dp</dimen>
     <dimen name="edit_entry_buttons_height">40dp</dimen>
     <dimen name="edit_entry_buttons_width">120dp</dimen>
+    <dimen name="edit_entry_activity_icon_width">16dp</dimen>
 
     <dimen name="edit_entry_dialog_entry_field_icon_width">32dp</dimen>
     <dimen name="edit_entry_dialog_entry_field_icon_margin">12dp</dimen>
