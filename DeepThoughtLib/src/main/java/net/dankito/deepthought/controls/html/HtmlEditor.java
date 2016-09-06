@@ -216,11 +216,11 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   /*    Methods over which JavaScript running in Browser communicates with Java code        */
 
   public void ckEditorLoaded() {
-    scriptExecutor.executeScript("resizeEditorToFitWindow()"); // don't know why but without calling it CKEditor doesn't size correctly
-
     ckEditorLoaded = true;
 
-    if (htmlToSetWhenLoaded != null) {
+    scriptExecutor.executeScript("resizeEditorToFitWindow()"); // don't know why but without calling it CKEditor doesn't size correctly
+
+    if(htmlToSetWhenLoaded != null) {
       new Timer().schedule(new TimerTask() {
         @Override
         public void run() {
