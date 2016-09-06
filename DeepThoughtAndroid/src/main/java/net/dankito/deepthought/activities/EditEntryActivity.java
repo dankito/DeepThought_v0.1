@@ -35,6 +35,7 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
@@ -214,14 +215,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     int id = item.getItemId();
 
     if(id == android.R.id.home) {
-      if(isShowingEditEntryDialog) {
-        hideEditEntryDialog();
-      }
-      else {
+      if(isShowingEditEntryDialog == false) {
         finish();
+        return true;
       }
-
-      return true;
     }
     else if (id == R.id.mnitmActionSave) {
       saveEntryAndCloseActivity();
@@ -248,7 +245,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   @Override
   public void onBackPressed() {
     if(isShowingEditEntryDialog) {
-      hideEditEntryDialog();
+      editEntryDialog.onBackPressed();
     }
     else if(hasEntryBeenEdited == true)
       askUserIfChangesShouldBeSaved();
@@ -420,6 +417,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
       editEntryDialog = new EditEntryDialog();
       editEntryDialog.setEditEntityListener(editEntryListener);
+      editEntryDialog.setDialogListener(editEntryDialogListener);
       editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
       editEntryDialog.setEntry(entry);
 
@@ -496,18 +494,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     return entryFieldValues;
   }
 
-  protected void hideEditEntryDialog() {
-    // TODO: ask User if she/he likes to save changes
-
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-    transaction.hide(editEntryDialog);
-    transaction.commit();
-
-    isShowingEditEntryDialog = false;
-  }
-
 
   protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
@@ -571,6 +557,13 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
 
       editedFields.put(changedField, newFieldValue);
+    }
+  };
+
+  protected DialogListener editEntryDialogListener = new DialogListener() {
+    @Override
+    public void dialogBecameHidden() {
+      isShowingEditEntryDialog = false;
     }
   };
 

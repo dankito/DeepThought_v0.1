@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -39,6 +41,7 @@ import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
@@ -82,7 +85,9 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
 
-  protected EditEntityListener listener = null;
+  protected EditEntityListener editEntityListener = null;
+
+  protected DialogListener dialogListener = null;
 
 
   public EditEntryDialog() {
@@ -109,7 +114,11 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   public void setEditEntityListener(EditEntityListener listener) {
-    this.listener = listener;
+    this.editEntityListener = listener;
+  }
+
+  public void setDialogListener(DialogListener dialogListener) {
+    this.dialogListener = dialogListener;
   }
 
   public void setInsertImageOrRecognizedTextHelper(InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper) {
@@ -263,20 +272,22 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   protected void commitEditedFields() {
-    if(listener != null) {
+    if(editEntityListener != null) {
       for(final FieldWithUnsavedChanges editedField : editedFields) {
         final Object editedFieldValue = getEditedFieldValue(editedField);
 
         getActivity().runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            listener.entityEdited(entry, editedField, editedFieldValue);
+            editEntityListener.entityEdited(entry, editedField, editedFieldValue);
           }
         });
       }
     }
 
     editedFields.clear();
+
+    hideDialog();
   }
 
   @Nullable
@@ -318,8 +329,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       return true;
     }
     else if (id == android.R.id.home) {
-      // is handled in EditEntryActivity
-
+      checkForUnsavedChangesAndHideDialog();
       return true;
     }
 
@@ -423,6 +433,29 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       entryEditedTags.add(newTag);
       Collections.sort(entryEditedTags);
       setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
+    }
+  }
+
+
+  public void onBackPressed() {
+    checkForUnsavedChangesAndHideDialog();
+  }
+
+  protected void checkForUnsavedChangesAndHideDialog() {
+    // TODO: ask User if she/he likes to save changes
+
+    hideDialog();
+  }
+
+  protected void hideDialog() {
+    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+    FragmentTransaction transaction = fragmentManager.beginTransaction();
+    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
+    transaction.hide(this);
+    transaction.commit();
+
+    if(dialogListener != null) {
+      dialogListener.dialogBecameHidden();
     }
   }
 
