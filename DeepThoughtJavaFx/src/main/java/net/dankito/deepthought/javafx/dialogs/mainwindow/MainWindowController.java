@@ -226,12 +226,15 @@ public class MainWindowController implements Initializable {
   }
 
   protected void notifyUser(Notification notification) {
-    if(notification instanceof DeepThoughtError)
+    if(notification instanceof DeepThoughtError) {
       showErrorOccurredMessage((DeepThoughtError) notification);
-    else if(notification.getType() == NotificationType.Info)
+    }
+    else if(notification.getType() == NotificationType.Info) {
       showInfoMessage(notification);
-    if(notification.getType() == NotificationType.ApplicationInstantiated)
+    }
+    else if(notification.getType() == NotificationType.ApplicationInstantiated) {
       applicationInstantiated();
+    }
     else if(notification.getType() == NotificationType.PluginLoaded) {
       showInfoMessage(notification);
       if(notification.getParameter() instanceof IPlugin) {
