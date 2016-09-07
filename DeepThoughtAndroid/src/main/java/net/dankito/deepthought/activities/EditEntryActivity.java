@@ -364,7 +364,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       contentHtmlEditor.setHtml(contentHtml);
     }
     else {
-      wbvwContent.loadDataWithBaseURL(null, contentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
+      String formattedContentHtml = "<body style=\"font-family: serif, Georgia, Roboto, Helvetica, Arial; font-size:17;\"" + contentHtml + "</body>";
+      wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
     }
   }
 
