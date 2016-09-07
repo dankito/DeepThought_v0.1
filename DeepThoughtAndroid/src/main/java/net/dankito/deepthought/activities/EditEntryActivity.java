@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -158,6 +159,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     settings.setDefaultTextEncodingName("utf-8"); // otherwise non ASCII text doesn't get displayed correctly
     settings.setDefaultFontSize(12); // default font is way to large
     settings.setJavaScriptEnabled(true); // so that embedded videos etc. work
+
+    wbvwContent.setWebViewClient(webViewClient);
   }
 
   protected void setupTagsSection() {
@@ -566,6 +569,18 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     @Override
     public void dialogBecameHidden() {
       isShowingEditEntryDialog = false;
+    }
+  };
+
+
+
+  protected WebViewClient webViewClient = new WebViewClient() {
+    @Override
+    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+      startActivity(intent);
+
+      return true;
     }
   };
 
