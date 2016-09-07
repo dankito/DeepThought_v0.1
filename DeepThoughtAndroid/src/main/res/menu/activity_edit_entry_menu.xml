@@ -2,21 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--<item-->
-        <!--android:id="@+id/test"-->
-        <!--android:title="@string/ocr"-->
-        <!--android:icon="@android:drawable/ic_input_add"-->
-        <!--app:showAsAction="always"-->
-        <!-->-->
-        <!--<menu>-->
-            <!--<item-->
-                <!--android:title="Liebe"-->
-                <!--android:icon="@android:drawable/ic_dialog_email"/>-->
-            <!--<item-->
-                <!--android:title="Hiebe"-->
-                <!--android:icon="@android:drawable/ic_dialog_info" />-->
-        <!--</menu>-->
-    <!--</item>-->
 
     <item
         android:id="@+id/mnitmActionAddImageOrOCRText"
@@ -24,8 +9,15 @@
         android:icon="@android:drawable/ic_menu_camera"
         app:showAsAction="always"
         android:visible="false"
-        >
-    </item>
+        />
+
+    <item
+        android:id="@+id/mnitmActionShareEntry"
+        app:showAsAction="ifRoom"
+        android:title="@string/share"
+        android:icon="@android:drawable/ic_menu_share"
+        android:actionProviderClass="android.widget.ShareActionProvider"
+        />
 
     <item
         android:id="@+id/mnitmActionSave"

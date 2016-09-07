@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,7 +83,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected RelativeLayout rlydTags;
   protected TextView txtvwEntryTagsPreview;
 
-  protected Uri takenPhotoTempFile = null;
+  protected ShareActionProvider shareActionProvider;
 
   protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
 
@@ -200,9 +202,14 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
+
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.activity_edit_entry_menu, menu);
+
+    MenuItem mnitmActionShareEntry = menu.findItem(R.id.mnitmActionShareEntry);
+
+    shareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(mnitmActionShareEntry);
 
     if(Application.getPlatformConfiguration().hasCaptureDevice() || Application.getContentExtractorManager().hasOcrContentExtractors()) {
       if(contentHtmlEditor != null && contentHtmlEditor.getVisibility() == View.VISIBLE) {
@@ -224,16 +231,71 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         return true;
       }
     }
-    else if (id == R.id.mnitmActionSave) {
+    else if(id == R.id.mnitmActionSave) {
       saveEntryAndCloseActivity();
       return true;
     }
-    else if (id == R.id.mnitmActionAddImageOrOCRText) {
+    else if(id == R.id.mnitmActionAddImageOrOCRText) {
       insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(contentHtmlEditor);
+      return true;
+    }
+    else if(id == R.id.mnitmActionShareEntry) {
+      shareEntryWithOtherApps();
       return true;
     }
 
     return super.onOptionsItemSelected(item);
+  }
+
+  protected void shareEntryWithOtherApps() {
+    Intent shareIntent = new Intent();
+    shareIntent.setAction(Intent.ACTION_SEND);
+
+    setContentOnShareIntent(shareIntent);
+
+    setAbstractOnShareIntent(shareIntent);
+
+    // TODO: may also add Reference URL (as EXTRA_TITLE)
+
+    shareIntent.setType("text/plain"); // TODO: set correct MIME Type then
+
+    setShareIntent(shareIntent);
+
+    startActivity(shareIntent);
+  }
+
+  protected void setContentOnShareIntent(Intent shareIntent) {
+    String contentPlain = entry.getContentAsPlainText();
+    String contentHtml = entry.getContent();
+
+    if(hasContentBeenEditedInActivity) {
+      // TODO: extract current content HTML asynchronously
+    }
+    else if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
+      contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
+      contentPlain = Application.getHtmlHelper().extractPlainTextFromHtmlBody(contentHtml);
+    }
+
+    shareIntent.putExtra(Intent.EXTRA_TEXT, contentPlain); // TODO: Serialize Entry to Json or similar
+    shareIntent.putExtra(Intent.EXTRA_HTML_TEXT, contentHtml);
+  }
+
+  protected void setAbstractOnShareIntent(Intent shareIntent) {
+    String abstractPlain = entry.getAbstractAsPlainText();
+
+    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryAbstract)) {
+      abstractPlain = (String)editedFields.get(FieldWithUnsavedChanges.EntryAbstract);
+    }
+
+    if(abstractPlain != null) {
+      shareIntent.putExtra(Intent.EXTRA_SUBJECT, abstractPlain);
+    }
+  }
+
+  protected void setShareIntent(Intent shareIntent) {
+    if (shareActionProvider != null) {
+      shareActionProvider.setShareIntent(shareIntent);
+    }
   }
 
 
