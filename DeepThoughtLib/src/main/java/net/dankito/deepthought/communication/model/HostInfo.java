@@ -26,6 +26,8 @@ public class HostInfo {
 
   protected String address = null;
 
+  protected int countSynchronizingDevice = 0;
+
   protected int messagesPort = -1;
 
 
@@ -33,7 +35,7 @@ public class HostInfo {
 
   }
 
-  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture) {
+  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture, int countSynchronizingDevices) {
     this.userUniqueId = userUniqueId;
     this.userName = userName;
     this.deviceId = deviceId;
@@ -41,6 +43,7 @@ public class HostInfo {
     this.platform = platform;
     this.osVersion = osVersion;
     this.platformArchitecture = platformArchitecture;
+    this.countSynchronizingDevice = countSynchronizingDevices;
   }
 
 
@@ -116,6 +119,14 @@ public class HostInfo {
     this.address = address;
   }
 
+  public int getCountSynchronizingDevice() {
+    return countSynchronizingDevice;
+  }
+
+  public void setCountSynchronizingDevice(int countSynchronizingDevice) {
+    this.countSynchronizingDevice = countSynchronizingDevice;
+  }
+
   public int getMessagesPort() {
     return messagesPort;
   }
@@ -145,7 +156,7 @@ public class HostInfo {
 
   public static HostInfo fromUserAndDevice(User user, Device device) {
     return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
-        device.getOsVersion(), device.getPlatformArchitecture());
+        device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
   }
 
 }

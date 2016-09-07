@@ -121,7 +121,7 @@ public class EditEntryDialogTest extends UiTestBase {
     clickCancel();
 
     assertThat(isEditEntryDialogVisible(), is(false));
-    assertThat(deepThought.countEntries(), is(CountDefaultEntries));
+    assertThat(deepThought.getCountEntries(), is(CountDefaultEntries));
   }
 
 
@@ -396,7 +396,7 @@ public class EditEntryDialogTest extends UiTestBase {
 
 
   protected void assertThatEntryGotPersistedCorrectly(boolean hasDataBeenCreated, boolean shouldEditEntryDialogBeVisible) {
-    assertThat(deepThought.countEntries(), is(CountDefaultEntries + 1));
+    assertThat(deepThought.getCountEntries(), is(CountDefaultEntries + 1));
 
     Entry createdEntry = getMainWindowTableViewEntriesItems().get(0);
     createdEntities.add(createdEntry);

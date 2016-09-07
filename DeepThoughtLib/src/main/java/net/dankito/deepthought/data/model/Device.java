@@ -48,6 +48,9 @@ public class Device extends UserDataEntity {
   @Column(name = TableConfig.DeviceLastKnownIpColumnName)
   protected String lastKnownIpAddress = "";
 
+  @Column(name = TableConfig.DeviceCountSynchronizingDevicesColumnName)
+  protected int countSynchronizingDevices = 0;
+
 ////  @JsonIgnore
 //  @ManyToOne(fetch = FetchType.EAGER)
 //  @JoinColumn(name = TableConfig.DeviceOwnerJoinColumnName)
@@ -153,6 +156,16 @@ public class Device extends UserDataEntity {
     Object previousValue = this.lastKnownIpAddress;
     this.lastKnownIpAddress = lastKnownIpAddress;
     callPropertyChangedListeners(TableConfig.DeviceLastKnownIpColumnName, previousValue, lastKnownIpAddress);
+  }
+
+  public int getCountSynchronizingDevices() {
+    return countSynchronizingDevices;
+  }
+
+  public void setCountSynchronizingDevices(int countSynchronizingDevices) {
+    Object previousValue = this.countSynchronizingDevices;
+    this.countSynchronizingDevices = countSynchronizingDevices;
+    callPropertyChangedListeners(TableConfig.DeviceCountSynchronizingDevicesColumnName, previousValue, countSynchronizingDevices);
   }
 
   public Set<User> getUsers() {

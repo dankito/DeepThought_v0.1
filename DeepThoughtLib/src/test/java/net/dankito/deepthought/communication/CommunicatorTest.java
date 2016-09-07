@@ -130,7 +130,7 @@ public class CommunicatorTest extends CommunicationTestBase {
     Assert.assertNotNull(response.getDevice());
     Assert.assertNotNull(response.getGroup());
     Assert.assertEquals(true, response.allowsRegistration());
-    Assert.assertEquals(true, response.useServersUserInformation());
+    Assert.assertEquals(true, response.getUseLocalUserInformation());
   }
 
   @Test

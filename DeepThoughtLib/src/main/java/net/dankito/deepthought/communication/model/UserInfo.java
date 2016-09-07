@@ -8,6 +8,8 @@ import net.dankito.deepthought.util.StringUtils;
  */
 public class UserInfo {
 
+  protected String databaseId = "";
+
   protected String universallyUniqueId = "";
 
   protected String userName = "";
@@ -21,15 +23,17 @@ public class UserInfo {
 
   }
 
-  public UserInfo(String universallyUniqueId, String userName) {
+  public UserInfo(String databaseId, String universallyUniqueId, String userName, String firstName, String lastName) {
+    this.databaseId = databaseId;
     this.universallyUniqueId = universallyUniqueId;
     this.userName = userName;
-  }
-
-  public UserInfo(String universallyUniqueId, String userName, String firstName, String lastName) {
-    this(universallyUniqueId, userName);
     this.firstName = firstName;
     this.lastName = lastName;
+  }
+
+
+  public String getDatabaseId() {
+    return databaseId;
   }
 
   public String getUniversallyUniqueId() {
@@ -75,7 +79,7 @@ public class UserInfo {
 
 
   public static UserInfo fromUser(User user) {
-    return new UserInfo(user.getUniversallyUniqueId(), user.getUserName(), user.getFirstName(), user.getLastName());
+    return new UserInfo(user.getId(), user.getUniversallyUniqueId(), user.getUserName(), user.getFirstName(), user.getLastName());
   }
 
 }

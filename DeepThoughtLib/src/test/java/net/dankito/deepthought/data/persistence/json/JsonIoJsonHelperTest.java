@@ -71,9 +71,9 @@ public class JsonIoJsonHelperTest {
   protected void testDeepThought(DeepThought deepThought) {
     Assert.assertNotNull(deepThought.getTopLevelCategory());
     Assert.assertTrue(deepThought.getCategories().size() > 0);
-    Assert.assertTrue(deepThought.countEntries() > 0);
-    Assert.assertTrue(deepThought.countTags() > 0);
-    Assert.assertTrue(deepThought.countPersons() > 0);
+    Assert.assertTrue(deepThought.getCountEntries() > 0);
+    Assert.assertTrue(deepThought.getCountTags() > 0);
+    Assert.assertTrue(deepThought.getCountPersons() > 0);
     Assert.assertTrue(deepThought.getNextEntryIndex() > 1);
 
     // TODO: as to unintelligent design decisions by Mr. dankl these throw a NullPointerException in an Environment without initialized EntityManager

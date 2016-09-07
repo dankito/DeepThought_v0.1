@@ -158,7 +158,7 @@ public abstract class UiTestBase extends ApplicationTest {
 //    push(KeyCode.ALT, KeyCode.TAB);
 
     deepThought = Application.getDeepThought();
-    CountDefaultEntries = deepThought.countEntries();
+    CountDefaultEntries = deepThought.getCountEntries();
   }
 
   protected void setupStage(Stage stage, String fxmlFilePath) throws Exception {

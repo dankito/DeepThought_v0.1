@@ -8,27 +8,22 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.MainActivity;
-import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
-import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.dankito.deepthought.communication.listener.ResponseListener;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.messages.request.Request;
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.dankito.deepthought.communication.messages.response.Response;
-import net.dankito.deepthought.communication.messages.response.ResponseCode;
 import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
+import net.dankito.deepthought.communication.registration.DeviceRegistrationHandlerBase;
+import net.dankito.deepthought.data.sync.InitialSyncManager;
+import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 07/06/16.
  */
-public class DeviceRegistrationHandler {
+public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   protected MainActivity mainActivity;
 
@@ -38,31 +33,44 @@ public class DeviceRegistrationHandler {
 
 
   public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector) {
-    this.mainActivity = mainActivity;
-    deepThoughtConnector.addUnregisteredDevicesListener(unregisteredDevicesListener);
+    this(mainActivity, deepThoughtConnector, new InitialSyncManager());
   }
 
-  protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
-    @Override
-    public void unregisteredDeviceFound(final HostInfo device) {
-      mainActivity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          notifyUnregisteredDeviceFound(device);
-        }
-      });
-    }
+  public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector, InitialSyncManager initialSyncManager) {
+    super(deepThoughtConnector, initialSyncManager);
+    this.mainActivity = mainActivity;
+  }
 
-    @Override
-    public void deviceIsAskingForRegistration(final AskForDeviceRegistrationRequest request) {
-      mainActivity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          notifyDeviceIsAskingForRegistration(request);
-        }
-      });
-    }
-  };
+
+  @Override
+  protected void unregisteredDeviceFound(final HostInfo device) {
+    mainActivity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        notifyUnregisteredDeviceFound(device);
+      }
+    });
+  }
+
+  @Override
+  protected void deviceIsAskingForRegistration(final AskForDeviceRegistrationRequest request) {
+    mainActivity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        notifyDeviceIsAskingForRegistration(request);
+      }
+    });
+  }
+
+  @Override
+  protected void askForRegistrationResponseReceived(final AskForDeviceRegistrationResponse response) {
+    mainActivity.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
+      @Override
+      public void run() {
+        showAskForDeviceRegistrationResponseToUser(response);
+      }
+    });
+  }
 
   protected void notifyUnregisteredDeviceFound(final HostInfo device) {
     // TODO: may always show Snackbar in active Activity, see http://stackoverflow.com/a/29786451/119733
@@ -146,21 +154,6 @@ public class DeviceRegistrationHandler {
     return 0; // TODO: create a placeholder logo
   }
 
-  protected void askForRegistration(HostInfo device) {
-    Application.getDeepThoughtConnector().getCommunicator().askForDeviceRegistration(device, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), new AskForDeviceRegistrationResultListener() {
-      @Override
-      public void responseReceived(AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response) {
-        if (response != null) {
-          mainActivity.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
-            @Override
-            public void run() {
-              showAskForDeviceRegistrationResponseToUser(response);
-            }
-          });
-        }
-      }
-    });
-  }
 
   protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
     if (response.allowsRegistration())
@@ -217,24 +210,13 @@ public class DeviceRegistrationHandler {
     builder.create().show();
   }
 
-  protected void sendAskUserIfRegisteringDeviceIsAllowedResponse(final AskForDeviceRegistrationRequest request, boolean userAllowsDeviceRegistration) {
-    final AskForDeviceRegistrationResponse result;
 
-    if(userAllowsDeviceRegistration == false)
-      result = AskForDeviceRegistrationResponse.Deny;
-    else {
-      result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-      // TODO: check if user information differ and if so ask which one to use
-    }
+  protected void showErrorSynchronizingWithDeviceNotPossible(String message, String messageTitle) {
+    AlertHelper.showErrorMessage(mainActivity, message, messageTitle);
+  }
 
-    Application.getDeepThoughtConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
-      @Override
-      public void responseReceived(Request request1, Response response) {
-        if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
-          AlertHelper.showInfoMessage(mainActivity, mainActivity.getString(R.string.device_registration_successfully_registered_device, request.getDevice()));
-        }
-      }
-    });
+  protected void showRegistrationSuccessfulMessage(String message, String messageTitle) {
+    AlertHelper.showInfoMessage(mainActivity, message, messageTitle);
   }
 
 }

@@ -158,9 +158,17 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   }
 
+  public DeepThought(Entry topLevelEntry) {
+    this.topLevelEntry = topLevelEntry;
+  }
+
 
   public Category getTopLevelCategory() {
     return topLevelCategory;
+  }
+
+  public int getCountCategories() {
+    return categories.size();
   }
 
   public Set<Category> getCategories() {
@@ -192,7 +200,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
       category.entries.clear();
 
       for(Category subCategory : new ArrayList<>(category.getSubCategories())) {
-        if(subCategory.getParentCategory().equals(category)) // TODO: what is this line good for?
+        if(subCategory != null && subCategory.getParentCategory().equals(category)) // TODO: what is this line good for?
           removeCategory(subCategory);
       }
       category.subCategories.clear();
@@ -307,7 +315,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return entries.contains(entry);
   }
 
-  public int countEntries() {
+  public int getCountEntries() {
     return entries.size();
   }
 
@@ -385,7 +393,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return false;
   }
 
-  public int countTags() {
+  public int getCountTags() {
     return tags.size();
   }
 
@@ -545,7 +553,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return false;
   }
 
-  public int countPersons() {
+  public int getCountPersons() {
     return persons.size();
   }
 
@@ -591,7 +599,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return false;
   }
 
-  public int countSeriesTitles() {
+  public int getCountSeriesTitles() {
     return seriesTitles.size();
   }
 
@@ -641,7 +649,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
     return false;
   }
 
-  public int countReferences() {
+  public int getCountReferences() {
     return references.size();
   }
 
@@ -649,6 +657,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
     if(referencesSorted == null)
       referencesSorted = new TreeSet<>(references);
     return referencesSorted;
+  }
+
+  public int getCountReferenceSubDivisions() {
+    return referenceSubDivisions.size();
   }
 
   public Set<ReferenceSubDivision> getReferenceSubDivisions() {
@@ -714,6 +726,11 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
 
     return false;
+  }
+
+
+  public int getCountFiles() {
+    return files.size();
   }
 
   public Set<FileLink> getFiles() {
@@ -999,7 +1016,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   @Override
   public String toString() {
-    return "DeepThought with " + countEntries() + " Entries, " + categories.size() + " Categories and " + countTags() + " Tags";
+    return "DeepThought with " + getCountEntries() + " Entries, " + categories.size() + " Categories and " + getCountTags() + " Tags";
   }
 
 

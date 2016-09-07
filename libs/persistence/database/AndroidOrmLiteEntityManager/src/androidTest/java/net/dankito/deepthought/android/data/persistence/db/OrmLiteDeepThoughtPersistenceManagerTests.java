@@ -5,7 +5,6 @@ import android.test.AndroidTestCase;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.TestApplicationConfiguration;
 import net.dankito.deepthought.TestEntityManagerConfiguration;
-import net.dankito.deepthought.android.data.persistence.db.OrmLiteAndroidEntityManager;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
@@ -118,8 +117,8 @@ public class OrmLiteDeepThoughtPersistenceManagerTests extends AndroidTestCase {
 
     DeepThought deserializedDeepThought = Application.getDeepThought();
 
-    assertEquals(persistedDeepThought.countEntries(), deserializedDeepThought.countEntries());
-    assertEquals(persistedDeepThought.countTags(), deserializedDeepThought.countTags());
+    assertEquals(persistedDeepThought.getCountEntries(), deserializedDeepThought.getCountEntries());
+    assertEquals(persistedDeepThought.getCountTags(), deserializedDeepThought.getCountTags());
   }
 
   protected DeepThought buildDeepThoughtWithAllRelationsSet(DeepThought deepThought) {

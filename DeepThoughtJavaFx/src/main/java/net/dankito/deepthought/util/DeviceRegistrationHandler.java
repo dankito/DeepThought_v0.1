@@ -1,17 +1,12 @@
 package net.dankito.deepthought.util;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
-import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
-import net.dankito.deepthought.communication.listener.ResponseListener;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.messages.request.Request;
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
-import net.dankito.deepthought.communication.messages.response.Response;
-import net.dankito.deepthought.communication.messages.response.ResponseCode;
 import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
-import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.communication.registration.DeviceRegistrationHandlerBase;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.data.sync.InitialSyncManager;
 
 import java.util.Map;
 import java.util.Optional;
@@ -25,28 +20,30 @@ import javafx.stage.Stage;
 /**
  * Created by ganymed on 07/06/16.
  */
-public class DeviceRegistrationHandler {
+public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   protected Stage stage;
 
-  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector) {
-    this.stage = stage;
 
-    deepThoughtConnector.addUnregisteredDevicesListener(unregisteredDevicesListener);
+  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector) {
+    this(stage, deepThoughtConnector, new InitialSyncManager());
+  }
+
+  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector, InitialSyncManager initialSyncManager) {
+    super(deepThoughtConnector, initialSyncManager);
+    this.stage = stage;
   }
 
 
-  protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
-    @Override
-    public void unregisteredDeviceFound(HostInfo device) {
-      Platform.runLater(() -> showNotificationUnregisteredDeviceFound(device)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
-    }
+  @Override
+  protected void unregisteredDeviceFound(HostInfo device) {
+    FXUtils.runOnUiThread(() -> showNotificationUnregisteredDeviceFound(device)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
+  }
 
-    @Override
-    public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
-      Platform.runLater(() -> askUserIfRegisteringDeviceIsAllowed(request));
-    }
-  };
+  @Override
+  protected void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
+    FXUtils.runOnUiThread(() -> askUserIfRegisteringDeviceIsAllowed(request));
+  }
 
 
   protected Map<String, Map<String, Alert>> unregisteredDeviceFoundAlerts = new ConcurrentHashMap<>();
@@ -73,20 +70,14 @@ public class DeviceRegistrationHandler {
     }
   }
 
-  protected void askForRegistration(HostInfo device) {
-    Application.getDeepThoughtConnector().getCommunicator().askForDeviceRegistration(device, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice(), new AskForDeviceRegistrationResultListener() {
-      @Override
-      public void responseReceived(AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse response) {
-        if (response != null) {
-          net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> showAskForDeviceRegistrationResponseToUser(response));
-        }
-      }
-    });
+  @Override
+  protected void askForRegistrationResponseReceived(AskForDeviceRegistrationResponse response) {
+    FXUtils.runOnUiThread(() -> showAskForDeviceRegistrationResponseToUser(response));
   }
 
   protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
     if (response != null) {
-      net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> {
+      FXUtils.runOnUiThread(() -> {
         if (response.allowsRegistration())
           Alerts.showDeviceRegistrationSuccessfulAlert(response, stage);
         else
@@ -101,16 +92,7 @@ public class DeviceRegistrationHandler {
 
     Platform.runLater(() -> { // after hiding unregisteredDeviceFoundAlert in mayHideUnregisteredDeviceFoundAlert() we have to wait some time before JavaFX is able to show a new Alert
       boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, stage);
-      final AskForDeviceRegistrationResponse result;
-
-      if(userAllowsDeviceRegistration == false)
-        result = AskForDeviceRegistrationResponse.Deny;
-      else {
-        result = AskForDeviceRegistrationResponse.createAllowRegistrationResponse(true, Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
-        // TODO: check if user information differ and if so ask which one to use
-      }
-
-      sendRespondToAskForDeviceRegistrationRequest(request, result);
+      sendAskUserIfRegisteringDeviceIsAllowedResponse(request, userAllowsDeviceRegistration);
     });
   }
 
@@ -126,16 +108,13 @@ public class DeviceRegistrationHandler {
     }
   }
 
-  protected void sendRespondToAskForDeviceRegistrationRequest(final AskForDeviceRegistrationRequest request, final AskForDeviceRegistrationResponse result) {
-    Application.getDeepThoughtConnector().getCommunicator().respondToAskForDeviceRegistrationRequest(request, result, new ResponseListener() {
-      @Override
-      public void responseReceived(Request request1, Response response) {
-        if (result.allowsRegistration() && response.getResponseCode() == ResponseCode.Ok) {
-          Alerts.showInfoMessage(stage, Localization.getLocalizedString("alert.message.successfully.registered.device", request.getDevice()),
-              Localization.getLocalizedString("alert.title.device.registration.successful"));
-        }
-      }
-    });
+
+  protected void showErrorSynchronizingWithDeviceNotPossible(String message, String messageTitle) {
+    Alerts.showErrorMessage(stage, message, messageTitle);
+  }
+
+  protected void showRegistrationSuccessfulMessage(String message, String messageTitle) {
+    Alerts.showInfoMessage(stage, message, messageTitle);
   }
 
 }

@@ -59,7 +59,7 @@ public class TabTagsTests extends UiTestBase {
   public void start(Stage stage) throws Exception {
     super.start(stage);
 
-    CountDefaultTags = deepThought.countTags();
+    CountDefaultTags = deepThought.getCountTags();
 
     List<Entry> entries = (List<Entry>)deepThought.getEntries();
     testEntry = entries.get(0);
@@ -71,7 +71,7 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void createTag_PressOk_TagGetsAddedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     showEditTagDialogAndFillWithTestData();
     clickOk();
@@ -85,7 +85,7 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void createTag_PressApply_TagGetsAddedCorrectly() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     showEditTagDialogAndFillWithTestData();
     clickApply();
@@ -102,13 +102,13 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void createTag_PressCancel_NoTagGetsAdded() {
     assertTagWithNewTagNameDoesNotExist();
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     showEditTagDialogAndFillWithTestData();
     clickCancel();
 
     assertThat(isEditTagDialogVisible(), is(false));
-    assertThat(deepThought.countTags(), is(CountDefaultTags));
+    assertThat(deepThought.getCountTags(), is(CountDefaultTags));
 
     quickFilterTags(NewTagName);
     assertThat(getTagsInTableViewTags().size(), is(0));
@@ -116,7 +116,7 @@ public class TabTagsTests extends UiTestBase {
 
 
   protected Tag assertThatTagHasBeenCreated(int CountDefaultTags) {
-    assertThat(deepThought.countTags(), is(CountDefaultTags + 1));
+    assertThat(deepThought.getCountTags(), is(CountDefaultTags + 1));
 
     ObservableList<Tag> filteredTags = getTagsInTableViewTags();
     assertThat(filteredTags.size(), is(greaterThan(1)));
@@ -241,7 +241,7 @@ public class TabTagsTests extends UiTestBase {
 
 
   protected void assertThatTagHasBeenDeleted(int CountDefaultTags, Tag newTag) {
-    assertThat(deepThought.countTags(), is(CountDefaultTags));
+    assertThat(deepThought.getCountTags(), is(CountDefaultTags));
     assertThat(deepThought.containsTag(newTag), is(false));
     assertThat(newTag.isDeleted(), is(true));
 
@@ -411,7 +411,7 @@ public class TabTagsTests extends UiTestBase {
     Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
     assertThat(btnRemoveTagsFilter.isDisabled(), is(true));
 
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     filterTags(FilterForThreeTags);
     assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
@@ -437,7 +437,7 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void filterFourTagsIncludingOneNotExistingOne_OnlyThreeTagsAreShown() {
     Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     filterTags(FilterForFourTagsIncludingANotExistingOne);
     assertThat(btnRemoveTagsFilter.isDisabled(), is(false));
@@ -453,7 +453,7 @@ public class TabTagsTests extends UiTestBase {
   @Test
   public void filterThreeTagsIncludingThreeAmbiguousOnes_FiveTagsAreShown() {
     Button btnRemoveTagsFilter = getButtonRemoveTagsFilter();
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     quickFilterTags(FilterForThreeTermsIncludingThreeAmbiguousResults);
     sleep(2, TimeUnit.SECONDS);
@@ -474,7 +474,7 @@ public class TabTagsTests extends UiTestBase {
 
   @Test
   public void clickCheckBoxFilterOnATag_FilterGetsApplied() {
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     quickFilterTags(FilterSingleTag);
     sleep(4, TimeUnit.SECONDS);
@@ -513,7 +513,7 @@ public class TabTagsTests extends UiTestBase {
 
   @Test
   public void clickCheckBoxFilterOnATag_PressButtonRemoveTagsFilter_FilterGetsRemoved() {
-    int CountDefaultTags = deepThought.countTags();
+    int CountDefaultTags = deepThought.getCountTags();
 
     quickFilterTags(FilterSingleTag);
     sleep(4, TimeUnit.SECONDS);

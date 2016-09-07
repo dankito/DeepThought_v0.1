@@ -2,6 +2,7 @@ package net.dankito.deepthought.communication.messages.response;
 
 import net.dankito.deepthought.communication.NetworkHelper;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
+import net.dankito.deepthought.communication.model.DeepThoughtInfo;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.model.UserInfo;
 import net.dankito.deepthought.data.model.Device;
@@ -19,18 +20,21 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   protected boolean allowsRegistration = false;
 
-  protected boolean useServersUserInformation = false;
+  protected boolean useLocalUserInformation = false;
+
+  protected boolean useLocalDatabaseIds = false;
 
 
   protected AskForDeviceRegistrationResponse(boolean allowsRegistration) {
     this.allowsRegistration = allowsRegistration;
   }
 
-  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useServersUserInformation, UserInfo user, GroupInfo group, HostInfo device,
-                                          String ipAddress, int port) {
-    super(user, group, device, ipAddress, port);
+  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useLocalUserInformation, boolean useLocalDatabaseIds, UserInfo user, GroupInfo group,
+                                          HostInfo device, DeepThoughtInfo deepThoughtInfo, String ipAddress, int port) {
+    super(user, group, device, deepThoughtInfo, ipAddress, port);
     this.allowsRegistration = allowsRegistration;
-    this.useServersUserInformation = useServersUserInformation;
+    this.useLocalUserInformation = useLocalUserInformation;
+    this.useLocalDatabaseIds = useLocalDatabaseIds;
   }
 
 
@@ -39,8 +43,8 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
     return allowsRegistration;
   }
 
-  public boolean useServersUserInformation() {
-    return useServersUserInformation;
+  public boolean getUseLocalUserInformation() {
+    return useLocalUserInformation;
   }
 
   @Override
@@ -64,9 +68,10 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
   }
 
 
-  public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useServersUserInformation, User user, Device device) {
-    return new AskForDeviceRegistrationResponse(true, useServersUserInformation, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
-        HostInfo.fromUserAndDevice(user, device), NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
+  public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useLocalUserInformation, boolean useLocalDatabaseIds, User user, Device device) {
+    return new AskForDeviceRegistrationResponse(true, useLocalUserInformation, useLocalDatabaseIds, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
+        HostInfo.fromUserAndDevice(user, device), DeepThoughtInfo.fromDeepThought(user.getLastViewedDeepThought()),
+        NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
   }
 
 }

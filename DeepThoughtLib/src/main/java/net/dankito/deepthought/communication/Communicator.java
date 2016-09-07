@@ -94,7 +94,7 @@ public class Communicator {
 
         // TODO: in order to keep Communicator generic try to avoid reference to IRegisteredDevicesManager
         if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok) {
-          registeredDevicesManager.registerDevice(request, response.useServersUserInformation());
+          registeredDevicesManager.registerDevice(request, response.getUseLocalUserInformation());
         }
       }
     });

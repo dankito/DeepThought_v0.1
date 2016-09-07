@@ -340,7 +340,7 @@ public class MainWindowController implements Initializable {
 //      trvwCategories.getSelectionModel().(deepThought.getLastViewedCategory());
 
 //      List<Entry> allEntries = new ArrayList<>(deepThought.getEntries());
-//      for(int i = 0, length = deepThought.countEntries(); i < length; i++) {
+//      for(int i = 0, length = deepThought.getCountEntries(); i < length; i++) {
 //        Entry entry = allEntries.get(0);
 //        entry.setEntryIndex(length - i);
 //        ((DefaultDataManager)Application.dataManager).entityUpdated(entry);
