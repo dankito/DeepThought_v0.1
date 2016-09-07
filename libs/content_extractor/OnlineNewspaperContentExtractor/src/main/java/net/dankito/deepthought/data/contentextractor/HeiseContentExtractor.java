@@ -66,7 +66,8 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
 
   @Override
   public boolean canCreateEntryFromUrl(String url) {
-    return url.toLowerCase().contains("www.heise.de/") && url.toLowerCase().contains("www.heise.de/ct") == false;
+    return (url.toLowerCase().contains("www.heise.de/") || url.toLowerCase().contains("m.heise.de/"))
+        && url.toLowerCase().contains(".heise.de/ct") == false;
   }
 
   protected EntryCreationResult parseHtmlToEntry(String articleUrl, Document document) {
