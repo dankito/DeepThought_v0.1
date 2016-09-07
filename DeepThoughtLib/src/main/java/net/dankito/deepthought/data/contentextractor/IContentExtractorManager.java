@@ -12,6 +12,8 @@ public interface IContentExtractorManager {
 
   boolean addContentExtractor(IContentExtractor contentExtractor);
 
+  IContentExtractor getContentExtractorForUrl(String url);
+
   void getContentExtractorOptionsForClipboardContentAsync(ClipboardContent clipboardContent, GetContentExtractorOptionsListener listener);
 
   boolean hasOcrContentExtractors();

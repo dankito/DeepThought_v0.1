@@ -112,23 +112,31 @@ public class ContentExtractorManager implements IContentExtractorManager {
 
   protected void createContentExtractOptionsFromUrls(List<String> urls, GetContentExtractorOptionsListener listener) {
     for(String url : urls) {
-      // TODO: what about the remaining urls if a previous one succeeds?
-      for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
-        if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
-          dispatchCreatedContentExtractOptions(onlineArticleContentExtractor.createExtractOptionsForUrl(url), listener);
-          return;
-        }
-      }
-
-      for(IContentExtractor contentExtractor : contentExtractors) {
-        if(contentExtractor.canCreateEntryFromUrl(url)) {
-          dispatchCreatedContentExtractOptions(contentExtractor.createExtractOptionsForUrl(url), listener);
-          return;
-        }
+      IContentExtractor foundContentExtractor = getContentExtractorForUrl(url);
+      if(foundContentExtractor != null) {
+        dispatchCreatedContentExtractOptions(foundContentExtractor.createExtractOptionsForUrl(url), listener);
+        return; // TODO: what about the remaining urls if a previous one succeeds?
       }
     }
 
     dispatchCreatedContentExtractOptions(new ContentExtractOptions(), listener); // no ContentExtractor found for Clipboard Content
+  }
+
+  @Override
+  public IContentExtractor getContentExtractorForUrl(String url) {
+    for(IOnlineArticleContentExtractor onlineArticleContentExtractor : onlineArticleContentExtractors) {
+      if(onlineArticleContentExtractor.canCreateEntryFromUrl(url)) {
+        return onlineArticleContentExtractor;
+      }
+    }
+
+    for(IContentExtractor contentExtractor : contentExtractors) {
+      if(contentExtractor.canCreateEntryFromUrl(url)) {
+        return contentExtractor;
+      }
+    }
+
+    return null;
   }
 
   protected boolean isAttachableFile(String url) {
