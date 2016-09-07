@@ -121,7 +121,6 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
       entry.setAbstract(articleReference.getTitle());
 
     findOrCreateTagAndAddToCreationResult(creationResult);
-    addNewspaperCategory(creationResult, false);
 
     return creationResult;
   }

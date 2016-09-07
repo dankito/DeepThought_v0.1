@@ -62,7 +62,6 @@ public class SpiegelContentExtractor extends OnlineNewspaperContentExtractorBase
       createReference(creationResult, articleUrl, contentElement);
 
       findOrCreateTagAndAddToCreationResult(creationResult);
-      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {

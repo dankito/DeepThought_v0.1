@@ -77,7 +77,6 @@ public class CtContentExtractor extends OnlineNewspaperContentExtractorBase {
       createReference(creationResult, articleUrl, sectionElement);
 
       findOrCreateTagAndAddToCreationResult(creationResult);
-      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {

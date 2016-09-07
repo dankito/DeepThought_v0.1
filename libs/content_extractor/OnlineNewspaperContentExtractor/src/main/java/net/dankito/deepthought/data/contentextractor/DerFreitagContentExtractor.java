@@ -85,7 +85,6 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
       createReference(creationResult, articleUrl, articleElement);
 
       addTags(document.body(), creationResult);
-      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {

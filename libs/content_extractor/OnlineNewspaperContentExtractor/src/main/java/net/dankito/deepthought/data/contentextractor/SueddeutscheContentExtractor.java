@@ -103,7 +103,6 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       }
 
       findOrCreateTagAndAddToCreationResult(creationResult);
-      addNewspaperCategory(creationResult, true);
 
       return creationResult;
     } catch(Exception ex) {
