@@ -11,17 +11,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.InputEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -165,7 +160,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     settings.setJavaScriptEnabled(true); // so that embedded videos etc. work
   }
 
-  protected void setupTagsRegion() {
+  protected void setupTagsSection() {
     rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
     rlydTags.setOnClickListener(rlydTagsOnClickListener);
 
@@ -433,7 +428,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       transaction.show(editEntryDialog);
     }
 
-    transaction.addToBackStack(null).commit();
+    transaction.commit();
 
     editEntryDialog.setSectionToEdit(sectionToEdit);
     passEntryFieldsToEditEntryDialog();
