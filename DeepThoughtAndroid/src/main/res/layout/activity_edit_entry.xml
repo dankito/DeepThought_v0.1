@@ -79,10 +79,13 @@
     <RelativeLayout
         android:id="@+id/rlydTags"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:layout_above="@id/toolbar"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentRight="true"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:minHeight="24dp"
+        >
 
         <ImageView
             android:id="@+id/imgvwEditEntryTagsIcon"

@@ -41,6 +41,7 @@ import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
@@ -80,6 +81,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected boolean hasViewBeenCreated = false;
+
+  protected EditEntrySection sectionToEditAfterLoading = null;
 
   protected MenuItem mnitmActionTakePhotoOrRecognizeText = null;
 
@@ -125,6 +128,28 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     this.insertImageOrRecognizedTextHelper = insertImageOrRecognizedTextHelper;
   }
 
+  public void setSectionToEdit(EditEntrySection section) {
+    if(hasViewBeenCreated) {
+      applySectionToEdit(section);
+    }
+    else {
+      sectionToEditAfterLoading = section;
+    }
+  }
+
+  protected void applySectionToEdit(EditEntrySection section) {
+    if(section == EditEntrySection.Abstract) {
+      showEditAbstractSection();
+    }
+    else if(section == EditEntrySection.Content) {
+      showEditContentSection();
+    }
+    else if(section == EditEntrySection.Tags) {
+      showEditTagsSection();
+    }
+  }
+
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.dialog_edit_entry, container, false);
@@ -134,14 +159,19 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     setHasOptionsMenu(true);
 
 
-    setupEditAbstractRegion(rootView);
+    setupEditAbstractSection(rootView);
 
-    setupEditContentRegion(rootView);
+    setupEditContentSection(rootView);
 
-    setupEditTagsRegion(rootView);
+    setupEditTagsSection(rootView);
 
 
     hasViewBeenCreated = true;
+
+    if(sectionToEditAfterLoading != null) {
+      applySectionToEdit(sectionToEditAfterLoading);
+      sectionToEditAfterLoading = null;
+    }
 
     if(entryFieldValues != null) {
       setEntryFieldValues(entryFieldValues);
@@ -174,18 +204,18 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       actionBar.setDisplayShowCustomEnabled(true);
       actionBar.setCustomView(R.layout.dialog_edit_entry_custom_action_bar_view);
 
-      ImageButton imgbtnShowRegionEditAbstract = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditAbstract);
-      imgbtnShowRegionEditAbstract.setOnClickListener(imgbtnShowRegionEditAbstractClickListener);
+      ImageButton imgbtnShowEditAbstractSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditAbstractSection);
+      imgbtnShowEditAbstractSection.setOnClickListener(imgbtnShowEditAbstractSectionClickListener);
 
-      ImageButton imgbtnShowRegionEditContent = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditContent);
-      imgbtnShowRegionEditContent.setOnClickListener(imgbtnShowRegionEditContentClickListener);
+      ImageButton imgbtnShowEditContentSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditContentSection);
+      imgbtnShowEditContentSection.setOnClickListener(imgbtnShowEditContentSectionClickListener);
 
-      ImageButton imgbtnShowRegionEditTags = (ImageButton)rootView.findViewById(R.id.imgbtnShowRegionEditTags);
-      imgbtnShowRegionEditTags.setOnClickListener(imgbtnShowRegionEditTagsClickListener);
+      ImageButton imgbtnShowEditTagsSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditTagsSection);
+      imgbtnShowEditTagsSection.setOnClickListener(imgbtnShowEditTagsSectionClickListener);
     }
   }
 
-  protected void setupEditAbstractRegion(View rootView) {
+  protected void setupEditAbstractSection(View rootView) {
     rlytEditAbstract = (RelativeLayout)rootView.findViewById(R.id.rlytEditAbstract);
 
     abstractHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(getActivity(), abstractListener);
@@ -202,7 +232,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   }
 
-  protected void setupEditContentRegion(View rootView) {
+  protected void setupEditContentSection(View rootView) {
     rlytEditContent = (RelativeLayout)rootView.findViewById(R.id.rlytEditContent);
 
     contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(getActivity(), contentListener);
@@ -218,7 +248,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     contentHtmlEditor.setLayoutParams(contentEditorParams);
   }
 
-  protected void setupEditTagsRegion(View rootView) {
+  protected void setupEditTagsSection(View rootView) {
     rlytEditTags = (RelativeLayout)rootView.findViewById(R.id.rlytEditTags);
 
     edtxtEditEntrySearchTag = (EditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
@@ -313,7 +343,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     menu.clear();
     inflater.inflate(R.menu.dialog_edit_entry_menu, menu);
 
-     mnitmActionTakePhotoOrRecognizeText = menu.findItem(R.id.mnitmActionTakePhotoOrRecognizeText);
+    mnitmActionTakePhotoOrRecognizeText = menu.findItem(R.id.mnitmActionTakePhotoOrRecognizeText);
+    setActionTakePhotoOrRecognizeTextVisibility();
   }
 
   @Override
@@ -337,49 +368,64 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   protected void handleTakePhotoOrRecognizeText() {
-    if(isRegionEditAbstractVisible()) {
+    if(isEditAbstractSectionVisible()) {
       insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(abstractHtmlEditor);
     }
-    else if(isRegionEditContentVisible()) {
+    else if(isEditContentSectionVisible()) {
       insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(contentHtmlEditor);
     }
   }
 
 
-  protected boolean isRegionEditAbstractVisible() {
+  protected boolean isEditAbstractSectionVisible() {
     return rlytEditAbstract.getVisibility() == View.VISIBLE;
   }
 
-  protected boolean isRegionEditContentVisible() {
+  protected boolean isEditContentSectionVisible() {
     return rlytEditContent.getVisibility() == View.VISIBLE;
   }
 
-  protected boolean isRegionEditTagsVisible() {
+  protected boolean isEditTagsSectionVisible() {
     return rlytEditTags.getVisibility() == View.VISIBLE;
   }
 
-  protected void showRegionEditAbstract() {
+  protected void showEditAbstractSection() {
     rlytEditAbstract.setVisibility(View.VISIBLE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.GONE);
 
-    mnitmActionTakePhotoOrRecognizeText.setVisible(true);
+    setActionTakePhotoOrRecognizeTextVisibility(true);
   }
 
-  protected void showRegionEditContent() {
+  protected void showEditContentSection() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.VISIBLE);
     rlytEditTags.setVisibility(View.GONE);
 
-    mnitmActionTakePhotoOrRecognizeText.setVisible(true);
+    setActionTakePhotoOrRecognizeTextVisibility(true);
   }
 
-  protected void showRegionEditTags() {
+  protected void showEditTagsSection() {
     rlytEditAbstract.setVisibility(View.GONE);
     rlytEditContent.setVisibility(View.GONE);
     rlytEditTags.setVisibility(View.VISIBLE);
 
-    mnitmActionTakePhotoOrRecognizeText.setVisible(false);
+    setActionTakePhotoOrRecognizeTextVisibility(false);
+  }
+
+  protected void setActionTakePhotoOrRecognizeTextVisibility() {
+    if(isEditAbstractSectionVisible() || isEditContentSectionVisible()) {
+      setActionTakePhotoOrRecognizeTextVisibility(true);
+    }
+    else {
+      setActionTakePhotoOrRecognizeTextVisibility(false);
+    }
+  }
+
+  protected void setActionTakePhotoOrRecognizeTextVisibility(boolean show) {
+    if(mnitmActionTakePhotoOrRecognizeText != null) {
+      mnitmActionTakePhotoOrRecognizeText.setVisible(show);
+    }
   }
 
 
@@ -442,9 +488,16 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   protected void checkForUnsavedChangesAndHideDialog() {
-    // TODO: ask User if she/he likes to save changes
+    if(hasUnsavedChanges() == true) {
+      // TODO: ask User if she/he likes to save changes
+    }
+    else {
+      hideDialog();
+    }
+  }
 
-    hideDialog();
+  protected boolean hasUnsavedChanges() {
+    return false; // TODO
   }
 
   protected void hideDialog() {
@@ -454,30 +507,34 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     transaction.hide(this);
     transaction.commit();
 
+    callDialogBecameHiddenListener();
+  }
+
+  protected void callDialogBecameHiddenListener() {
     if(dialogListener != null) {
       dialogListener.dialogBecameHidden();
     }
   }
 
 
-  protected View.OnClickListener imgbtnShowRegionEditAbstractClickListener = new View.OnClickListener() {
+  protected View.OnClickListener imgbtnShowEditAbstractSectionClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      showRegionEditAbstract();
+      showEditAbstractSection();
     }
   };
 
-  protected View.OnClickListener imgbtnShowRegionEditContentClickListener = new View.OnClickListener() {
+  protected View.OnClickListener imgbtnShowEditContentSectionClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      showRegionEditContent();
+      showEditContentSection();
     }
   };
 
-  protected View.OnClickListener imgbtnShowRegionEditTagsClickListener = new View.OnClickListener() {
+  protected View.OnClickListener imgbtnShowEditTagsSectionClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View view) {
-      showRegionEditTags();
+      showEditTagsSection();
     }
   };
 

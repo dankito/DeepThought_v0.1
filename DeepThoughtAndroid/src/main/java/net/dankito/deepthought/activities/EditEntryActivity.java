@@ -11,12 +11,17 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.InputEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +39,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
+import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
@@ -104,11 +110,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
       setupToolbar();
 
-      setupAbstractRegion();
+      setupAbstractSection();
 
-      setupContentRegion();
+      setupContentSection();
 
-      setupTagsRegion();
+      setupTagsSection();
     } catch(Exception ex) {
       log.error("Could not setup UI", ex);
       AlertHelper.showErrorMessage(this, getString(R.string.error_message_could_not_show_activity, ex.getLocalizedMessage()));
@@ -127,14 +133,14 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
-  protected void setupAbstractRegion() {
+  protected void setupAbstractSection() {
     rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
     rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
 
     txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
   }
 
-  protected void setupContentRegion() {
+  protected void setupContentSection() {
     RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
 
     contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
@@ -409,7 +415,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
 
-  protected void showEditEntryDialog() {
+  protected void showEditEntryDialog(EditEntrySection sectionToEdit) {
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -429,6 +435,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     transaction.addToBackStack(null).commit();
 
+    editEntryDialog.setSectionToEdit(sectionToEdit);
     passEntryFieldsToEditEntryDialog();
 
     isShowingEditEntryDialog = true;
@@ -498,14 +505,14 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      showEditEntryDialog();
+      showEditEntryDialog(EditEntrySection.Abstract);
     }
   };
 
   protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      showEditEntryDialog();
+      showEditEntryDialog(EditEntrySection.Tags);
     }
   };
 
