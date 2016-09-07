@@ -188,7 +188,8 @@ public class JsoupHtmlHelper implements IHtmlHelper {
 
   @Override
   public WebPageExtractionResult tryToRemoveClutter(String webPageUrl) throws Exception {
-    return null;
+    // not possible without Boilerpipe which doesn't compile on Android
+    return extractPlainText(webPageUrl);
   }
 
 }

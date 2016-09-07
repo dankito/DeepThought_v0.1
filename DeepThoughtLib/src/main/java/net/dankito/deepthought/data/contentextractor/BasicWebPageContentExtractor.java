@@ -6,6 +6,7 @@ import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewLis
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.util.DeepThoughtError;
+import net.dankito.deepthought.util.OsHelper;
 import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.file.FileUtils;
@@ -103,6 +104,19 @@ public class BasicWebPageContentExtractor extends OnlineArticleContentExtractorB
 
     return isOnlineWebPage;
   }
+
+  @Override
+  public void createEntryFromUrl(String url, CreateEntryListener listener) {
+    if(OsHelper.isRunningOnAndroid() == false) { // TODO: also implement Boilerpipe for Android
+      if (listener != null) {
+        listener.entryCreated(createEntryCreationResultFromPageHtmlTryToRemoveClutter(url, htmlHelper));
+      }
+    }
+    else {
+      super.createEntryFromUrl(url, listener);
+    }
+  }
+
 
   public ContentExtractOptions createExtractOptionsForUrl(String url) {
     ContentExtractOptions options = new ContentExtractOptions(url, getSiteBaseUrl());
