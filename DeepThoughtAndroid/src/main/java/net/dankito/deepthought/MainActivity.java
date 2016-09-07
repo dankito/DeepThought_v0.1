@@ -29,6 +29,9 @@ import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticle
 import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
+import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
+import net.dankito.deepthought.data.contentextractor.IContentExtractor;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.OnlineNewspaperContentExtractorBase;
 import net.dankito.deepthought.data.listener.ApplicationListener;
@@ -45,6 +48,7 @@ import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.IconManager;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -447,16 +451,47 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected void handleReceivedPlainText(Intent intent) {
     String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
     if(sharedText != null) {
-      if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) { // TODO: what about other schemes like file:// ?
-//        Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContentAsync();
-      }
+      if(isReceivedTextHandledAsUrl(sharedText) == false) {
+        String abstractPlain = intent.getStringExtra(Intent.EXTRA_SUBJECT); // e.g. Firefox also send's Page Title
+        if (abstractPlain == null && intent.hasExtra(Intent.EXTRA_TITLE)) {
+          abstractPlain = intent.getStringExtra(Intent.EXTRA_TITLE);
+        }
 
-      String abstractPlain = intent.getStringExtra(Intent.EXTRA_SUBJECT); // e.g. Firefox also send's Page Title
-      if(abstractPlain == null && intent.hasExtra(Intent.EXTRA_TITLE)) {
-        abstractPlain = intent.getStringExtra(Intent.EXTRA_TITLE);
+        showEditEntryDialogForReceivedData("<p>" + sharedText + "</p>", "<p>" + abstractPlain + "</p>");
       }
+    }
+  }
 
-      showEditEntryDialogForReceivedData("<p>" + sharedText + "</p>", "<p>" + abstractPlain + "</p>");
+  protected boolean isReceivedTextHandledAsUrl(String sharedText) {
+    if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) { // TODO: what about other schemes like file:// ?
+      IContentExtractor contentExtractor = Application.getContentExtractorManager().getContentExtractorForUrl(sharedText);
+
+      if(contentExtractor instanceof IOnlineArticleContentExtractor) {
+        handleReceivedTextAsUrl(sharedText, (IOnlineArticleContentExtractor) contentExtractor);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  protected void handleReceivedTextAsUrl(String url, IOnlineArticleContentExtractor contentExtractor) {
+    contentExtractor.createEntryFromUrlAsync(url, new CreateEntryListener() {
+      @Override
+      public void entryCreated(EntryCreationResult creationResult) {
+        handleCreateEntryResult(creationResult);
+      }
+    });
+  }
+
+  // TODO: this is the same code as in ArticlesOverviewActivity and CreateEntryFromClipboardContentPopup
+  protected void handleCreateEntryResult(final EntryCreationResult creationResult) {
+    if (creationResult.successful()) {
+      ActivityManager.getInstance().showEditEntryActivity(MainActivity.this, creationResult);
+    }
+    else {
+      AlertHelper.showErrorMessage(MainActivity.this, creationResult.getError(),
+          Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
     }
   }
 
