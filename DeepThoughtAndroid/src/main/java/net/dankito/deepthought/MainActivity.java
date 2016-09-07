@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -421,6 +422,77 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     if(intent == null) {
       return;
     }
+
+    String action = intent.getAction();
+    String type = intent.getType();
+
+    if(Intent.ACTION_SEND.equals(action) && type != null) {
+      if("text/plain".equals(type)) {
+        handleReceivedPlainText(intent);
+      }
+      else if("text/html".equals(type)) {
+        handleReceivedHtmlText(intent);
+      }
+      else if(type.startsWith("image/")) {
+        handleReceivedImage(intent);
+      }
+    }
+    else if(Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+      if(type.startsWith("image/")) {
+        handleReceivedMultipleImages(intent);
+      }
+    }
+  }
+
+  protected void handleReceivedPlainText(Intent intent) {
+    String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+    if(sharedText != null) {
+      if(sharedText.startsWith("http://") || sharedText.startsWith("https://")) { // TODO: what about other schemes like file:// ?
+//        Application.getContentExtractorManager().getContentExtractorOptionsForClipboardContentAsync();
+      }
+
+      String abstractPlain = intent.getStringExtra(Intent.EXTRA_SUBJECT); // e.g. Firefox also send's Page Title
+      if(abstractPlain == null && intent.hasExtra(Intent.EXTRA_TITLE)) {
+        abstractPlain = intent.getStringExtra(Intent.EXTRA_TITLE);
+      }
+
+      showEditEntryDialogForReceivedData("<p>" + sharedText + "</p>", "<p>" + abstractPlain + "</p>");
+    }
+  }
+
+  protected void handleReceivedHtmlText(Intent intent) {
+    String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+    if(sharedText != null) {
+      showEditEntryDialogForReceivedData(sharedText);
+    }
+  }
+
+  protected void handleReceivedImage(Intent intent) {
+    Uri imageUri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+    if (imageUri != null) {
+      // TODO (but don't forget to enable receiving Images in AndroidManifest)
+    }
+  }
+
+  protected void handleReceivedMultipleImages(Intent intent) {
+    ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+    if (imageUris != null) {
+      // TODO (but don't forget to enable receiving Images in AndroidManifest)
+    }
+  }
+
+  protected void showEditEntryDialogForReceivedData(String contentHtml) {
+    showEditEntryDialogForReceivedData(contentHtml, "");
+  }
+
+  protected void showEditEntryDialogForReceivedData(String contentHtml, String abstractHtml) {
+    if(abstractHtml == null) {
+      abstractHtml = "";
+    }
+
+    Entry newEntry = new Entry(contentHtml, abstractHtml);
+
+    ActivityManager.getInstance().showEditEntryActivity(this, newEntry);
   }
 
 
