@@ -185,22 +185,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
       if(contentExtractor instanceof OnlineNewspaperContentExtractorBase) {
         final OnlineNewspaperContentExtractorBase newspaperContentExtractor = (OnlineNewspaperContentExtractorBase)contentExtractor;
-        favoriteContentExtractorMenu.setLabelText(newspaperContentExtractor.getNewspaperName());
-        favoriteContentExtractorMenu.setImageDrawable(null);
-        Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
-        favoriteContentExtractorMenu.setImageBitmap(icon);
-
-        favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
-        favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
-        favoriteContentExtractorMenu.setColorPressed(0xFFFFFFFF);
-
-        favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, contentExtractor);
-            closeFloatingActionMenu();
-          }
-        });
+        configureNewspaperFavoriteContentExtractorFloatingActionMenuButton(contentExtractor, favoriteContentExtractorMenu, newspaperContentExtractor);
       }
       else {
         favoriteContentExtractorMenu.setLabelText(contentExtractor.getSiteBaseUrl());
@@ -210,6 +195,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       floatingActionMenu.addMenuButton(favoriteContentExtractorMenu, 0);
       favoriteContentExtractorsMenuButtons.add(favoriteContentExtractorMenu);
     }
+  }
+
+  protected void configureNewspaperFavoriteContentExtractorFloatingActionMenuButton(final IOnlineArticleContentExtractor contentExtractor, FloatingActionButton favoriteContentExtractorMenu, OnlineNewspaperContentExtractorBase newspaperContentExtractor) {
+    favoriteContentExtractorMenu.setLabelText(newspaperContentExtractor.getNewspaperName());
+    favoriteContentExtractorMenu.setImageDrawable(null);
+    Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
+    favoriteContentExtractorMenu.setImageBitmap(icon);
+
+    favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
+    favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
+    favoriteContentExtractorMenu.setColorPressed(0xFFFFFFFF);
+
+    favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, contentExtractor);
+        closeFloatingActionMenu();
+      }
+    });
   }
 
   protected void applicationInstantiated() {
