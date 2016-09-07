@@ -3,7 +3,6 @@ package net.dankito.deepthought.data.contentextractor;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
-import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.SeriesTitle;
@@ -92,10 +91,6 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
       createReference(creationResult, articleUrl, contentElement);
 
       creationResult.addTag(Application.getEntitiesSearcherAndCreator().findOrCreateTagForName("Wikipedia"));
-
-      Category encyclopaediaeCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName("Lexika");
-      Category wikipediaCategory = Application.getEntitiesSearcherAndCreator().findOrCreateSubCategoryForName(encyclopaediaeCategory, "Wikipedia");
-      creationResult.addCategory(wikipediaCategory);
 
       return creationResult;
     } catch(Exception ex) {

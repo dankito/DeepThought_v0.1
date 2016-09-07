@@ -123,7 +123,7 @@ public class OpenOfficeDocumentsImporterExporter {
       if(extractedEntry != null) {
         Application.getDeepThought().addEntry(extractedEntry);
         extractedEntries.add(extractedEntry);
-        addCategoryAndTagsToQuotationEntry(extractedEntry);
+        addTagsToQuotationEntry(extractedEntry);
 
         if(entryPersonOrReference != null)
           setEntryPersonOrReference(extractedEntry, entryPersonOrReference);
@@ -133,10 +133,7 @@ public class OpenOfficeDocumentsImporterExporter {
     }
   }
 
-  protected void addCategoryAndTagsToQuotationEntry(Entry extractedEntry) {
-    Category quotationCategory = Application.getEntitiesSearcherAndCreator().findOrCreateTopLevelCategoryForName("Zitate");
-    extractedEntry.addCategory(quotationCategory);
-
+  protected void addTagsToQuotationEntry(Entry extractedEntry) {
     Tag quotationTag = Application.getEntitiesSearcherAndCreator().findOrCreateTagForName("Zitat");
     extractedEntry.addTag(quotationTag);
   }
@@ -383,7 +380,6 @@ public class OpenOfficeDocumentsImporterExporter {
       }
 
       Application.getDeepThought().addEntry(currentEntry);
-      addEntryToCategory(currentEntry);
       addTagsToEntry(currentEntry);
       return currentEntry;
     } catch(Exception ex) {
@@ -919,15 +915,6 @@ public class OpenOfficeDocumentsImporterExporter {
     }
 
     return entryParagraphs;
-  }
-
-  protected void addEntryToCategory(Entry entry) {
-    if(entry.getSeries() != null) {
-      String seriesTitleTitle = entry.getSeries().getTitle();
-      Category category = findOrCreateCategoryForSeriesTitle(seriesTitleTitle);
-      if(category != null)
-        entry.addCategory(category);
-    }
   }
 
   protected Category findOrCreateCategoryForSeriesTitle(String seriesTitleTitle) {
