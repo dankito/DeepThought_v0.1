@@ -3,6 +3,7 @@ package net.dankito.deepthought;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -28,22 +29,26 @@ import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
+import net.dankito.deepthought.data.contentextractor.OnlineNewspaperContentExtractorBase;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
 import net.dankito.deepthought.util.DeepThoughtError;
+import net.dankito.deepthought.util.IconManager;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +68,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected ProgressDialog loadingDataProgressDialog = null;
 
   protected FloatingActionMenu floatingActionMenu;
+  protected FloatingActionButton addEntryButton;
+  protected FloatingActionButton addTagButton;
   protected FloatingActionButton floatingActionButtonAddNewspaperArticle;
+
+  protected List<FloatingActionButton> favoriteContentExtractorsMenuButtons = new ArrayList<>();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -110,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
           @Override
           public void run() {
             setControlsEnabledState(deepThought != null);
+            MainActivity.this.deepThoughtChanged(deepThought);
           }
         });
       }
@@ -128,11 +138,22 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     setControlsEnabledState(Application.getDeepThought() != null);
   }
 
+  protected void deepThoughtChanged(DeepThought deepThought) {
+    if(deepThought != null) {
+      SelectedAndroidTab lastSelectedTab = deepThought.getSettings().getLastSelectedAndroidTab();
+      if(lastSelectedTab == SelectedAndroidTab.EntriesOverview) {
+        // TODO: how to set selected Tab?
+      }
+    }
+  }
+
   protected void notifyUser(Notification notification) {
-    if(notification instanceof DeepThoughtError)
+    if(notification instanceof DeepThoughtError) {
       AlertHelper.showErrorMessage(this, (DeepThoughtError) notification);
-    else if(notification.getType() == NotificationType.Info)
+    }
+    else if(notification.getType() == NotificationType.Info) {
       AlertHelper.showInfoMessage(this, notification);
+    }
     else if(notification.getType() == NotificationType.ApplicationInstantiated) {
       applicationInstantiated();
     }
@@ -141,11 +162,53 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         setFloatingActionButtonAddNewspaperArticleVisibility();
       }
 //      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
+
+      // TODO: remove again, sample code only
+      if(notification.getParameter() instanceof IOnlineArticleContentExtractor) {
+        IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
+        if("heise.de".equals(contentExtractor.getSiteBaseUrl()) ||
+            ("sueddeutsche.de".equals(contentExtractor.getSiteBaseUrl().toLowerCase()) && notification.getNotificationMessage().contains("Magazin") == false)) {
+          addFavoriteContentExtractorFloatingActionMenuButton(contentExtractor);
+        }
+      }
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
       importFilesOrDoOcrListener = new AndroidImportFilesOrDoOcrListener(this);
       Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
+    }
+  }
+
+  protected void addFavoriteContentExtractorFloatingActionMenuButton(final IOnlineArticleContentExtractor contentExtractor) {
+    if(floatingActionMenu != null) {
+      FloatingActionButton favoriteContentExtractorMenu = new FloatingActionButton(this);
+
+      if(contentExtractor instanceof OnlineNewspaperContentExtractorBase) {
+        final OnlineNewspaperContentExtractorBase newspaperContentExtractor = (OnlineNewspaperContentExtractorBase)contentExtractor;
+        favoriteContentExtractorMenu.setLabelText(newspaperContentExtractor.getNewspaperName());
+        favoriteContentExtractorMenu.setImageDrawable(null);
+        Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
+        favoriteContentExtractorMenu.setImageBitmap(icon);
+
+        favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
+        favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
+        favoriteContentExtractorMenu.setColorPressed(0xFFFFFFFF);
+
+        favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+            ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, contentExtractor);
+            closeFloatingActionMenu();
+          }
+        });
+      }
+      else {
+        favoriteContentExtractorMenu.setLabelText(contentExtractor.getSiteBaseUrl());
+        // TODO: what to do on Click?
+      }
+
+      floatingActionMenu.addMenuButton(favoriteContentExtractorMenu, 0);
+      favoriteContentExtractorsMenuButtons.add(favoriteContentExtractorMenu);
     }
   }
 
@@ -177,12 +240,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
       // When swiping between different sections, select the corresponding
       // tab. We can also use ActionBar.Tab#select() to do this if we have
       // a reference to the Tab.
-      mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-        @Override
-        public void onPageSelected(int position) {
-//                actionBar.setSelectedNavigationItem(position);
-        }
-      });
+      mViewPager.addOnPageChangeListener(viewPageOnPageChangeListener);
       tabLayout.setOnTabSelectedListener(this);
 
       initNavigationDrawer();
@@ -208,10 +266,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected void initFloatingActionMenu() {
     floatingActionMenu = (FloatingActionMenu)findViewById(R.id.fab_menu);
 
-    FloatingActionButton addEntryButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_entry);
+    addEntryButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_entry);
     addEntryButton.setOnClickListener(floatingActionButtonAddEntryClickListener);
 
-    FloatingActionButton addTagButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_tag);
+    addTagButton = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_tag);
     addTagButton.setOnClickListener(floatingActionButtonAddTagClickListener);
 
     floatingActionButtonAddNewspaperArticle = (FloatingActionButton)floatingActionMenu.findViewById(R.id.fab_add_newspaper_article);
@@ -375,6 +433,41 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   @Override
   public void onTabReselected(TabLayout.Tab tab) {
 
+  }
+
+
+  protected ViewPager.OnPageChangeListener viewPageOnPageChangeListener = new ViewPager.SimpleOnPageChangeListener() {
+    @Override
+    public void onPageSelected(int position) {
+      if(mSectionsPagerAdapter.getItem(position) instanceof EntriesFragment) {
+        selectedTabEntries();
+      }
+      else if(mSectionsPagerAdapter.getItem(position) instanceof TagsFragment) {
+        selectedTabTags();
+      }
+    }
+  };
+
+  protected void selectedTabEntries() {
+    Application.getDeepThought().getSettings().setLastSelectedAndroidTab(SelectedAndroidTab.EntriesOverview);
+
+    addTagButton.setVisibility(View.GONE);
+    floatingActionButtonAddNewspaperArticle.setVisibility(View.VISIBLE);
+
+    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsMenuButtons) {
+      favoriteContentExtractorButton.setVisibility(View.VISIBLE);
+    }
+  }
+
+  protected void selectedTabTags() {
+    Application.getDeepThought().getSettings().setLastSelectedAndroidTab(SelectedAndroidTab.Tags);
+
+    addTagButton.setVisibility(View.VISIBLE);
+    floatingActionButtonAddNewspaperArticle.setVisibility(View.GONE);
+
+    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsMenuButtons) {
+      favoriteContentExtractorButton.setVisibility(View.GONE);
+    }
   }
 
 

@@ -21,12 +21,13 @@
     fab:menu_animationDelayPerItem="50">
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_add_entry"
+        android:id="@+id/fab_add_newspaper_article"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/MenuButtonsStyle"
         android:src="@drawable/fab_add"
-        fab:fab_label="@string/floating_action_menu_add_entry"
+        fab:fab_label="@string/floating_action_menu_add_newspaper_article"
+        android:visibility="gone"
     />
 
     <com.github.clans.fab.FloatingActionButton
@@ -36,16 +37,16 @@
         style="@style/MenuButtonsStyle"
         android:src="@drawable/fab_add"
         fab:fab_label="@string/floating_action_menu_add_tag"
+        android:visibility="gone"
     />
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_add_newspaper_article"
+        android:id="@+id/fab_add_entry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/MenuButtonsStyle"
         android:src="@drawable/fab_add"
-        fab:fab_label="@string/floating_action_menu_add_newspaper_article"
-        android:visibility="gone"
+        fab:fab_label="@string/floating_action_menu_add_entry"
     />
 
 </com.github.clans.fab.FloatingActionMenu>
