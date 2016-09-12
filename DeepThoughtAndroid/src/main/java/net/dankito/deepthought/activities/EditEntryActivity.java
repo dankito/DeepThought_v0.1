@@ -23,13 +23,13 @@ import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.DialogListener;
-import net.dankito.deepthought.listener.EditEntityListener;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.ui.model.TagsUtil;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 
@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -167,6 +168,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
 
       setTextViewEntryTagsPreview(entryEditedTags);
+
+      entry.addEntityListener(entryListener);
     }
   }
 
@@ -273,6 +276,15 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
+  protected void setAbstractPreviewFromHtmlThreadSafe(final String abstractHtml) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setAbstractPreviewFromHtml(abstractHtml);
+      }
+    });
+  }
+
   protected void setAbstractPreviewFromHtml(String abstractHtml) {
     setAbstractPreview(Application.getHtmlHelper().extractPlainTextFromHtmlBody(abstractHtml));
   }
@@ -281,12 +293,30 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     txtvwEntryAbstractPreview.setText(abstractPlainText);
   }
 
+  protected void setContentHtmlThreadSafe(final String contentHtml) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setContentHtml(contentHtml);
+      }
+    });
+  }
+
   protected void setContentHtml(String contentHtml) {
     String formattedContentHtml = "<body style=\"font-family: serif, Georgia, Roboto, Helvetica, Arial; font-size:17;\"" + contentHtml + "</body>";
     wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
   }
 
-  protected void setTextViewEntryTagsPreview(List<Tag> tags) {
+  protected void setTextViewEntryTagsPreviewThreadSafe(final Collection<Tag> tags) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setTextViewEntryTagsPreview(tags);
+      }
+    });
+  }
+
+  protected void setTextViewEntryTagsPreview(Collection<Tag> tags) {
     String tagsPreview = tagsUtil.createTagsPreview(tags, true);
 
     txtvwEntryTagsPreview.setText(tagsPreview);
@@ -326,7 +356,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EditEntryDialog createEditEntryDialog() {
     EditEntryDialog editEntryDialog = new EditEntryDialog();
 
-    editEntryDialog.setEditEntityListener(editEntryListener);
     editEntryDialog.setDialogListener(editEntryDialogListener);
     editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
     editEntryDialog.setCleanUpOnClose(false);
@@ -354,25 +383,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   };
 
-
-  protected EditEntityListener editEntryListener = new EditEntityListener() {
-    @Override
-    public void entityEdited(BaseEntity entity, FieldWithUnsavedChanges changedField, Object newFieldValue) {
-      if(changedField == FieldWithUnsavedChanges.EntryAbstract) {
-        setAbstractPreviewFromHtml((String)newFieldValue);
-      }
-      else if(changedField == FieldWithUnsavedChanges.EntryContent) {
-        setContentHtml((String)newFieldValue);
-      }
-      else if(changedField == FieldWithUnsavedChanges.EntryTags) {
-        List<Tag> entryEditedTags = (List<Tag>)newFieldValue;
-        setTextViewEntryTagsPreview(entryEditedTags);
-      }
-
-      entryCreationResultHasNowBeenSaved();
-    }
-  };
-
   protected DialogListener editEntryDialogListener = new DialogListener() {
     @Override
     public void dialogBecameHidden() {
@@ -391,5 +401,43 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return true;
     }
   };
+
+
+  protected EntityListener entryListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      checkForEntryChanges(propertyName, newValue);
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      checkForEntrySubCollectionChanges(collection, addedEntity);
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+      checkForEntrySubCollectionChanges(collection, updatedEntity);
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      checkForEntrySubCollectionChanges(collection, removedEntity);
+    }
+  };
+
+  protected void checkForEntryChanges(String propertyName, Object newValue) {
+    if(TableConfig.EntryAbstractColumnName.equals(propertyName)) {
+      setAbstractPreviewFromHtmlThreadSafe((String)newValue);
+    }
+    else if(TableConfig.EntryContentColumnName.equals(propertyName)) {
+      setContentHtmlThreadSafe((String)newValue);
+    }
+  }
+
+  protected void checkForEntrySubCollectionChanges(Collection<? extends BaseEntity> collection, BaseEntity editedEntity) {
+    if(editedEntity instanceof Tag) {
+      setTextViewEntryTagsPreviewThreadSafe((Collection<Tag>)collection);
+    }
+  }
 
 }
