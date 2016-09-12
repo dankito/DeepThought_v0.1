@@ -56,7 +56,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
 
   protected RelativeLayout rlytEntryAbstract;
-  protected TextView txtvwEditEntryAbstract;
+  protected TextView txtvwEntryAbstractPreview;
 
   protected WebView wbvwContent = null;
 
@@ -113,7 +113,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     rlytEntryAbstract = (RelativeLayout)findViewById(R.id.rlytEntryAbstract);
     rlytEntryAbstract.setOnClickListener(rlytEntryAbstractOnClickListener);
 
-    txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
+    txtvwEntryAbstractPreview = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
   }
 
   protected void setupContentSection() {
@@ -241,7 +241,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setAbstractPreview(String abstractPlainText) {
-    txtvwEditEntryAbstract.setText(abstractPlainText);
+    txtvwEntryAbstractPreview.setText(abstractPlainText);
   }
 
   protected void setContentHtml(String contentHtml) {
