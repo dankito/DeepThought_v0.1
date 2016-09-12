@@ -459,12 +459,12 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       askUserIfChangesShouldBeSaved();
     }
     else {
-      closeDialog();
+      closeDialog(false);
     }
   }
 
   protected boolean hasUnsavedChanges() {
-    return editedFields.size() > 0;
+    return editedFields.size() > 0 || entryCreationResult != null;
   }
 
 
@@ -492,19 +492,19 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     }
   }
 
-  protected void hideDialog() {
+  protected void hideDialog(boolean hasEntryBeenSaved) {
     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
     transaction.hide(this);
     transaction.commit();
 
-    callDialogBecameHiddenListener();
+    callDialogBecameHiddenListener(hasEntryBeenSaved);
   }
 
-  protected void callDialogBecameHiddenListener() {
+  protected void callDialogBecameHiddenListener(boolean hasEntryBeenSaved) {
     if(dialogListener != null) {
-      dialogListener.dialogBecameHidden();
+      dialogListener.dialogBecameHidden(hasEntryBeenSaved);
     }
   }
 
@@ -542,7 +542,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected void saveEntryAndCloseDialog() {
     saveEntryAsyncIfNeeded();
 
-    closeDialog();
+    closeDialog(true);
   }
 
   protected void saveEntryAsyncIfNeeded() {
@@ -611,15 +611,15 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     unsetEntryHasBeenEdited();
 
-    closeDialog();
+    closeDialog(false);
   }
 
-  public void closeDialog() {
+  public void closeDialog(boolean hasEntryBeenSaved) {
     if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
       cleanUp();
     }
 
-    hideDialog();
+    hideDialog(hasEntryBeenSaved);
   }
 
 

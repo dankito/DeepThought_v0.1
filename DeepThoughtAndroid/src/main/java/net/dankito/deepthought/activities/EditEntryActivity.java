@@ -385,8 +385,12 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected DialogListener editEntryDialogListener = new DialogListener() {
     @Override
-    public void dialogBecameHidden() {
+    public void dialogBecameHidden(boolean didSaveChanges) {
       isShowingEditEntryDialog = false;
+
+      if(didSaveChanges && entryCreationResult != null) {
+        entryCreationResultHasNowBeenSaved();
+      }
     }
   };
 

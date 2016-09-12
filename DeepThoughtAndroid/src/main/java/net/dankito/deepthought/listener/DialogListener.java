@@ -5,6 +5,6 @@ package net.dankito.deepthought.listener;
  */
 public interface DialogListener {
 
-  void dialogBecameHidden();
+  void dialogBecameHidden(boolean didSaveChanges);
 
 }
