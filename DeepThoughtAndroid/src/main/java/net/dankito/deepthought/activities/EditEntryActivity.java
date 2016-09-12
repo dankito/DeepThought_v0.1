@@ -50,7 +50,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected Entry entry = null;
   protected EntryCreationResult entryCreationResult = null;
-  protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected boolean isShowingEditEntryDialog = false;
   protected EditEntryDialog editEntryDialog = null;
@@ -140,6 +139,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected void setEntryValues() {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
+    List<Tag> entryEditedTags = new ArrayList<>(0);
+
     if(entry != null) {
       entryEditedTags = new ArrayList<>(entry.getTagsSorted());
       setContentHtml(entry.getContent());
@@ -335,7 +336,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         setContentHtml((String)newFieldValue);
       }
       else if(changedField == FieldWithUnsavedChanges.EntryTags) {
-        entryEditedTags = (List<Tag>)newFieldValue;
+        List<Tag> entryEditedTags = (List<Tag>)newFieldValue;
         setTextViewEditEntryTags(entryEditedTags);
       }
 
