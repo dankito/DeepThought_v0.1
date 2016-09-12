@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -21,18 +21,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.adapter.EntrySectionsSpinnerAdapter;
 import net.dankito.deepthought.adapter.EntryTagsAdapter;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.html.AndroidHtmlEditor;
@@ -183,13 +185,27 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     return rootView;
   }
 
-  @NonNull
   @Override
-  public Dialog onCreateDialog(Bundle savedInstanceState) {
-    Dialog dialog = super.onCreateDialog(savedInstanceState);
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    return dialog;
+  public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialog);
+  }
+
+
+  @Override
+  public void onStart() {
+    super.onStart();
+
+    Dialog dialog = getDialog();
+    if(dialog != null) {
+      int width = ViewGroup.LayoutParams.MATCH_PARENT;
+      int height = ViewGroup.LayoutParams.MATCH_PARENT;
+      dialog.getWindow().setLayout(width, height);
+
+      WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
+      attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+      dialog.getWindow().setAttributes(attrs);
+    }
   }
 
 
@@ -320,7 +336,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     int id = item.getItemId();
 
     if(id == R.id.mnitmActionSaveEditedFields) {
-      saveEntryAndCloseDialog();
+      saveEntryAndCloseDialog(false);
       return true;
     }
     else if(id == R.id.mnitmActionTakePhotoOrRecognizeText) {
@@ -328,7 +344,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       return true;
     }
     else if (id == android.R.id.home) {
-      checkForUnsavedChangesAndCloseDialog();
+      checkForUnsavedChangesAndCloseDialog(false);
       return true;
     }
 
@@ -457,15 +473,15 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
 
   public void onBackPressed() {
-    checkForUnsavedChangesAndCloseDialog();
+    checkForUnsavedChangesAndCloseDialog(true);
   }
 
-  protected void checkForUnsavedChangesAndCloseDialog() {
+  protected void checkForUnsavedChangesAndCloseDialog(boolean hasBackButtonBeenPressed) {
     if(hasUnsavedChanges() == true) {
-      askUserIfChangesShouldBeSaved();
+      askUserIfChangesShouldBeSaved(hasBackButtonBeenPressed);
     }
     else {
-      closeDialog(false);
+      closeDialog(hasBackButtonBeenPressed, false);
     }
   }
 
@@ -485,11 +501,13 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
     if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
-      transaction.add(android.R.id.content, this);
+      transaction.add(this, "EditEntry");
     }
     else { // on subsequent displays we only have to call show() on the then hidden Dialog
       transaction.show(this);
     }
+
+    transaction.addToBackStack("");
 
     transaction.commit();
 
@@ -519,7 +537,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
-  protected void askUserIfChangesShouldBeSaved() {
+  protected void askUserIfChangesShouldBeSaved(final boolean hasBackButtonBeenPressed) {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     TextView view = new TextView(getActivity());
     view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
@@ -535,24 +553,24 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        resetEditedFieldsAndCloseDialog();
+        resetEditedFieldsAndCloseDialog(hasBackButtonBeenPressed);
       }
     });
 
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        saveEntryAndCloseDialog();
+        saveEntryAndCloseDialog(hasBackButtonBeenPressed);
       }
     });
 
     builder.create().show();
   }
 
-  protected void saveEntryAndCloseDialog() {
+  protected void saveEntryAndCloseDialog(boolean hasBackButtonBeenPressed) {
     saveEntryAsyncIfNeeded();
 
-    closeDialog(true);
+    closeDialog(hasBackButtonBeenPressed, true);
   }
 
   protected void saveEntryAsyncIfNeeded() {
@@ -614,22 +632,26 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     }
   }
 
-  protected void resetEditedFieldsAndCloseDialog() {
+  protected void resetEditedFieldsAndCloseDialog(boolean hasBackButtonBeenPressed) {
     if(cleanUpOnClose == false) { // an instance of this Dialog is held somewhere
       // TODO: unset controls with edited fields
     }
 
     unsetEntryHasBeenEdited();
 
-    closeDialog(false);
+    closeDialog(hasBackButtonBeenPressed, false);
   }
 
-  public void closeDialog(boolean hasEntryBeenSaved) {
+  public void closeDialog(boolean hasBackButtonBeenPressed, boolean hasEntryBeenSaved) {
     if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
       cleanUp();
     }
 
     hideDialog(hasEntryBeenSaved);
+
+    if(hasBackButtonBeenPressed == false) {
+      getActivity().getSupportFragmentManager().popBackStack();
+    }
   }
 
 
