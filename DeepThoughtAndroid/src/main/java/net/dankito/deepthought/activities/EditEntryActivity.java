@@ -30,6 +30,7 @@ import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.model.TagsUtil;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 
 import org.slf4j.Logger;
@@ -67,6 +68,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected ShareActionProvider shareActionProvider;
 
   protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
+
+  protected TagsUtil tagsUtil = new TagsUtil();
 
 
 
@@ -284,19 +287,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setTextViewEntryTagsPreview(List<Tag> tags) {
-    String tagsPreview = "";
-
-    for(Tag tag : tags) {
-      tagsPreview += tag.getName() + ", ";
-    }
-
-    if(tagsPreview.length() > 1) { // remove last ", "
-      tagsPreview = tagsPreview.substring(0, tagsPreview.length() - 2);
-    }
-
-    if(tagsPreview.length() == 0) {
-      tagsPreview = getString(R.string.edit_entry_no_tags_set);
-    }
+    String tagsPreview = tagsUtil.createTagsPreview(tags, true);
 
     txtvwEntryTagsPreview.setText(tagsPreview);
   }
