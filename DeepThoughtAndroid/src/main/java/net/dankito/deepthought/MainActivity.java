@@ -3,7 +3,6 @@ package net.dankito.deepthought;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -45,7 +44,6 @@ import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.IconManager;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.localization.Localization;
@@ -203,14 +201,15 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   protected void configureNewspaperFavoriteContentExtractorFloatingActionMenuButton(final IOnlineArticleContentExtractor contentExtractor, FloatingActionButton favoriteContentExtractorMenu, OnlineNewspaperContentExtractorBase newspaperContentExtractor) {
-    favoriteContentExtractorMenu.setLabelText(newspaperContentExtractor.getNewspaperName());
-    favoriteContentExtractorMenu.setImageDrawable(null);
-    Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
-    favoriteContentExtractorMenu.setImageBitmap(icon);
-
-    favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
-    favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
+    favoriteContentExtractorMenu.setLabelText(getString(R.string.floating_action_menu_add_article_of_newspaper, newspaperContentExtractor.getNewspaperName()));
+//    Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
+//    favoriteContentExtractorMenu.setImageBitmap(icon);
+//
+//    favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
+//    favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
     favoriteContentExtractorMenu.setColorPressed(0xFFFFFFFF);
+
+    favoriteContentExtractorMenu.setImageResource(R.drawable.fab_add);
 
     favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
       @Override

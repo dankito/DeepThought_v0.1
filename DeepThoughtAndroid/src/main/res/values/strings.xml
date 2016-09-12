@@ -16,6 +16,7 @@
     <string name="floating_action_menu_add_entry">Entry</string>
     <string name="floating_action_menu_add_tag">Tag</string>
     <string name="floating_action_menu_add_newspaper_article">Newspaper Article</string>
+    <string name="floating_action_menu_add_article_of_newspaper">%s Article</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -49,21 +50,11 @@
     <string name="edit_entry_abstract_label">Abstract</string>
     <string name="edit_entry_tags_label">Tags:</string>
     <string name="edit_entry_button_new_tag_text">New</string>
-    <string name="edit_entry_no_tags_set"><![CDATA[<No Tags>]]></string>
     <string name="edit_entry_content_label">Content</string>
 
     <string name="alert_dialog_entry_has_unsaved_changes_text">Entry contains unsaved changes. Would you like to save them?</string>
 
     <string name="search">Search</string>
-    <string name="search_section_tag_title">Tag Search</string>
-    <string name="search_section_tag_label">Tag:</string>
-    <string name="search_select_tags"><![CDATA[<Select Tags>]]></string>
-    <string name="search_section_content_title">Content Search</string>
-    <string name="search_section_results_title">Results:</string>
-    <string name="search_contains_text">Contains</string>
-    <string name="search_starts_with_text">Starts with</string>
-    <string name="search_ends_with_text">Ends with</string>
-    <string name="search_equals_text">Equals</string>
 
     <string name="articles_overview_article_saved">Saved Article %s</string>
     <string name="articles_overview_could_not_extract_article">Could not extract Article %1$s:\r\%2$s</string>

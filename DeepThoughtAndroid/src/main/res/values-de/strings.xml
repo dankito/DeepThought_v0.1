@@ -17,6 +17,7 @@
     <string name="floating_action_menu_add_entry">Eintrag</string>
     <string name="floating_action_menu_add_tag">Schlagwort</string>
     <string name="floating_action_menu_add_newspaper_article">Zeitungsartikel</string>
+    <string name="floating_action_menu_add_article_of_newspaper">%s Artikel</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
@@ -48,8 +49,7 @@
     <string name="edit_entry_action_bar_title_new_entry">Neuen Eintrag erstellen</string>
     <string name="edit_entry_action_bar_title_entry_format">Bearbeite %1$s</string>
     <string name="edit_entry_abstract_label">Zusammenfassung</string>
-    <string name="edit_entry_tags_label">Schlagwörter:</string>
-    <string name="edit_entry_no_tags_set"><![CDATA[<Keine Schlagworte>]]></string>
+    <string name="edit_entry_tags_label">Schlagworte:</string>
     <string name="edit_entry_button_new_tag_text">Neu</string>
     <string name="edit_entry_content_label">Eintrag</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
@@ -57,15 +57,6 @@
     <string name="alert_dialog_entry_has_unsaved_changes_text">Eintrag beinhaltet nicht gespeicherte Änderungen. Möchten Sie sie speichern?</string>
 
     <string name="search">Suche</string>
-    <string name="search_section_tag_title">Schlagwortsuche</string>
-    <string name="search_section_tag_label">Schlagwörter:</string>
-    <string name="search_select_tags"><![CDATA[<Schlagwörter auswählen>]]></string>
-    <string name="search_section_content_title">Inhaltssuche</string>
-    <string name="search_section_results_title">Ergebnisse:</string>
-    <string name="search_contains_text">Enthält</string>
-    <string name="search_starts_with_text">Beginnt mit</string>
-    <string name="search_ends_with_text">Ended mit</string>
-    <string name="search_equals_text">Exakt</string>
 
     <string name="articles_overview_article_saved">Artikel %s wurde gespeichert</string>
     <string name="articles_overview_could_not_extract_article">Artikel %1$s konnte nicht extrahiert werden:\r\n%2$s</string>
