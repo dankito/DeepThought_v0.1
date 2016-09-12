@@ -22,6 +22,7 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -30,6 +31,7 @@ import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.DialogListener;
+import net.dankito.deepthought.ui.model.ReferenceBaseUtil;
 import net.dankito.deepthought.ui.model.TagsUtil;
 
 import org.slf4j.Logger;
@@ -68,6 +70,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected ShareActionProvider shareActionProvider;
 
   protected TagsUtil tagsUtil = new TagsUtil();
+
+  protected ReferenceBaseUtil referenceBaseUtil = new ReferenceBaseUtil();
 
 
 
@@ -239,7 +243,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     Intent shareIntent = new Intent();
     shareIntent.setAction(Intent.ACTION_SEND);
 
-    shareIntent.putExtra(Intent.EXTRA_TEXT, entry.getContentAsPlainText()); // TODO: Serialize Entry to Json or similar
+    String content = entry.getContentAsPlainText();
+    content += appendReferenceInfo();
+
+    shareIntent.putExtra(Intent.EXTRA_TEXT, content);
     shareIntent.putExtra(Intent.EXTRA_HTML_TEXT, entry.getContent());
 
     shareIntent.putExtra(Intent.EXTRA_SUBJECT, entry.getAbstractAsPlainText());
@@ -251,6 +258,32 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     setShareIntent(shareIntent);
 
     startActivity(shareIntent);
+  }
+
+  protected String appendReferenceInfo() {
+    String referenceInfo = "";
+
+    ReferenceBase entryReference = null;
+    if(entryCreationResult != null) {
+      entryReference = entryCreationResult.getLowestReferenceBase();
+    }
+    if(entryReference == null && entry.isAReferenceSet()) {
+      entryReference = entry.getLowestReferenceBase();
+    }
+
+    if(entryReference != null) {
+      referenceInfo += "\r\n\r\n(" + entryReference.getTextRepresentation(); // TODO: for entryCreationResult this returns only entryReference's text representation, not
+      // including its parent references' text representation (e.g. Reference and SeriesTitle)
+
+      String referenceUrl = referenceBaseUtil.getReferenceBaseUrl(entryReference);
+      if(referenceUrl != null) {
+        referenceInfo += ": " + referenceUrl;
+      }
+
+      referenceInfo += ")";
+    }
+
+    return referenceInfo;
   }
 
   protected void setShareIntent(Intent shareIntent) {
