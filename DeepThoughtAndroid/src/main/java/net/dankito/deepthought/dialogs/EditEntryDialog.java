@@ -94,6 +94,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected boolean cleanUpOnClose = false;
 
+  protected boolean hasDialogPreviouslyBeenShown = false;
+
   protected EditEntityListener editEntityListener = null;
 
   protected DialogListener dialogListener = null;
@@ -468,6 +470,27 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected boolean hasUnsavedChanges() {
     return editedFields.size() > 0;
+  }
+
+
+
+  public void showDialog(AppCompatActivity activity, EditEntrySection sectionToEdit) {
+    FragmentManager fragmentManager = activity.getSupportFragmentManager();
+    FragmentTransaction transaction = fragmentManager.beginTransaction();
+    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+
+    if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
+      transaction.add(android.R.id.content, this);
+    }
+    else { // on subsequent displays we only have to call show() on the then hidden Dialog
+      transaction.show(this);
+    }
+
+    transaction.commit();
+
+    hasDialogPreviouslyBeenShown = true;
+
+    setSectionToEdit(sectionToEdit);
   }
 
   protected void hideDialog() {

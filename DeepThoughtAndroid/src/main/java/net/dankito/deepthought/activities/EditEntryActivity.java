@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -323,10 +321,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
 
   protected void showEditEntryDialog(EditEntrySection sectionToEdit) {
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
     if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
       editEntryDialog = new EditEntryDialog();
       editEntryDialog.setEditEntityListener(editEntryListener);
@@ -337,16 +331,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       if(entryCreationResult != null) {
         editEntryDialog.setEntryCreationResult(entryCreationResult);
       }
-
-      transaction.add(android.R.id.content, editEntryDialog);
-    }
-    else { // on subsequent displays we only have to call show() on the then hidden Dialog
-      transaction.show(editEntryDialog);
     }
 
-    transaction.commit();
+    editEntryDialog.showDialog(this, sectionToEdit);
 
-    editEntryDialog.setSectionToEdit(sectionToEdit);
     passEntryFieldsToEditEntryDialog();
 
     isShowingEditEntryDialog = true;
