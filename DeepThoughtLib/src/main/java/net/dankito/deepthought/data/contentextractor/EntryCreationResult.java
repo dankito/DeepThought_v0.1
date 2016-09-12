@@ -8,6 +8,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Reference;
+import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
@@ -118,6 +119,20 @@ public class EntryCreationResult {
 
   public void setReferenceSubDivision(ReferenceSubDivision extractedSubDivision) {
     this.extractedSubDivision = extractedSubDivision;
+  }
+
+  public ReferenceBase getLowestReferenceBase() {
+    if(extractedSubDivision != null) {
+      return extractedSubDivision;
+    }
+    else if(extractedReference != null) {
+      return extractedReference;
+    }
+    else if(extractedSeriesTitle != null) {
+      return extractedSeriesTitle;
+    }
+
+    return null;
   }
 
   public boolean hasPersons() {
