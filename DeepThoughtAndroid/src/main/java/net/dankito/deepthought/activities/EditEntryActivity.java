@@ -36,9 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -53,8 +51,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected Entry entry = null;
   protected EntryCreationResult entryCreationResult = null;
   protected List<Tag> entryEditedTags = new ArrayList<>();
-
-  protected Map<FieldWithUnsavedChanges, Object> editedFields = new HashMap<>();
 
   protected boolean isShowingEditEntryDialog = false;
   protected EditEntryDialog editEntryDialog = null;
@@ -207,9 +203,10 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     Intent shareIntent = new Intent();
     shareIntent.setAction(Intent.ACTION_SEND);
 
-    setContentOnShareIntent(shareIntent);
+    shareIntent.putExtra(Intent.EXTRA_TEXT, entry.getContentAsPlainText()); // TODO: Serialize Entry to Json or similar
+    shareIntent.putExtra(Intent.EXTRA_HTML_TEXT, entry.getContent());
 
-    setAbstractOnShareIntent(shareIntent);
+    shareIntent.putExtra(Intent.EXTRA_SUBJECT, entry.getAbstractAsPlainText());
 
     // TODO: may also add Reference URL (as EXTRA_TITLE)
 
@@ -218,31 +215,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     setShareIntent(shareIntent);
 
     startActivity(shareIntent);
-  }
-
-  protected void setContentOnShareIntent(Intent shareIntent) {
-    String contentPlain = entry.getContentAsPlainText();
-    String contentHtml = entry.getContent();
-
-    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
-      contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
-      contentPlain = Application.getHtmlHelper().extractPlainTextFromHtmlBody(contentHtml);
-    }
-
-    shareIntent.putExtra(Intent.EXTRA_TEXT, contentPlain); // TODO: Serialize Entry to Json or similar
-    shareIntent.putExtra(Intent.EXTRA_HTML_TEXT, contentHtml);
-  }
-
-  protected void setAbstractOnShareIntent(Intent shareIntent) {
-    String abstractPlain = entry.getAbstractAsPlainText();
-
-    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryAbstract)) {
-      abstractPlain = (String)editedFields.get(FieldWithUnsavedChanges.EntryAbstract);
-    }
-
-    if(abstractPlain != null) {
-      shareIntent.putExtra(Intent.EXTRA_SUBJECT, abstractPlain);
-    }
   }
 
   protected void setShareIntent(Intent shareIntent) {
@@ -366,8 +338,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         entryEditedTags = (List<Tag>)newFieldValue;
         setTextViewEditEntryTags(entryEditedTags);
       }
-
-      editedFields.put(changedField, newFieldValue);
 
       entryCreationResult = null; // Entry is saved now
     }
