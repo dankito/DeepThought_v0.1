@@ -188,6 +188,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     Dialog dialog = super.onCreateDialog(savedInstanceState);
     dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
     return dialog;
   }
 
@@ -473,6 +474,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
+
+  public void showDialog(AppCompatActivity activity) {
+    showDialog(activity, EditEntrySection.Content);
+  }
 
   public void showDialog(AppCompatActivity activity, EditEntrySection sectionToEdit) {
     FragmentManager fragmentManager = activity.getSupportFragmentManager();

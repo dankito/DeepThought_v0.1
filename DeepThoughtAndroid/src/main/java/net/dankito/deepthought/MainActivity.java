@@ -39,10 +39,12 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
+import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
+import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected FloatingActionButton floatingActionButtonAddNewspaperArticle;
 
   protected List<FloatingActionButton> favoriteContentExtractorsMenuButtons = new ArrayList<>();
+
+  protected EditEntryDialog editEntryDialog = null;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -388,28 +392,33 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    switch(requestCode) {
-      case EditEntryActivity.RequestCode:
-        if(resultCode == RESULT_OK && data != null) {
-          // Entry has been updated
-          ActivityManager.getInstance().resetEditEntryActivityCachedData();
-        }
-        break;
-      case AndroidImportFilesOrDoOcrListener.CaptureImageForConnectPeerRequestCode:
-        if(importFilesOrDoOcrListener != null) {
-          importFilesOrDoOcrListener.handleCaptureImageResult(resultCode);
-        }
-        break;
-      case AndroidImportFilesOrDoOcrListener.SelectImageFromGalleryForConnectPeerRequestCode:
-        if(importFilesOrDoOcrListener != null) {
-          importFilesOrDoOcrListener.handleSelectImageFromGalleryResult(resultCode, data);
-        }
-        break;
-      case AndroidImportFilesOrDoOcrListener.ScanBarCodeRequestCode: // TODO: is this really always == 49374
-        if(importFilesOrDoOcrListener != null) {
-          importFilesOrDoOcrListener.handleScanBarCodeResult(requestCode, resultCode, data);
-        }
-        break;
+    if(editEntryDialog != null && editEntryDialog.canHandleActivityResult(requestCode, resultCode, data)) {
+
+    }
+    else {
+      switch (requestCode) {
+        case EditEntryActivity.RequestCode:
+          if (resultCode == RESULT_OK && data != null) {
+            // Entry has been updated
+            ActivityManager.getInstance().resetEditEntryActivityCachedData();
+          }
+          break;
+        case AndroidImportFilesOrDoOcrListener.CaptureImageForConnectPeerRequestCode:
+          if (importFilesOrDoOcrListener != null) {
+            importFilesOrDoOcrListener.handleCaptureImageResult(resultCode);
+          }
+          break;
+        case AndroidImportFilesOrDoOcrListener.SelectImageFromGalleryForConnectPeerRequestCode:
+          if (importFilesOrDoOcrListener != null) {
+            importFilesOrDoOcrListener.handleSelectImageFromGalleryResult(resultCode, data);
+          }
+          break;
+        case AndroidImportFilesOrDoOcrListener.ScanBarCodeRequestCode: // TODO: is this really always == 49374
+          if (importFilesOrDoOcrListener != null) {
+            importFilesOrDoOcrListener.handleScanBarCodeResult(requestCode, resultCode, data);
+          }
+          break;
+      }
     }
 
     super.onActivityResult(requestCode, resultCode, data);
@@ -526,8 +535,25 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     Entry newEntry = new Entry(contentHtml, abstractHtml);
 
-    ActivityManager.getInstance().showEditEntryActivity(this, newEntry);
+    showEditEntryDialog(newEntry);
   }
+
+  protected void showEditEntryDialog(Entry entry) {
+    editEntryDialog = new EditEntryDialog();
+
+    editEntryDialog.setEntry(entry);
+    editEntryDialog.setCleanUpOnClose(true);
+    editEntryDialog.setDialogListener(editEntryDialogListener);
+
+    editEntryDialog.showDialog(this);
+  }
+
+  protected DialogListener editEntryDialogListener = new DialogListener() {
+    @Override
+    public void dialogBecameHidden(boolean didSaveChanges) {
+      editEntryDialog = null;
+    }
+  };
 
 
   @Override
@@ -593,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     @Override
     public void onClick(View view) {
       Entry entry = new Entry();
-      ActivityManager.getInstance().showEditEntryActivity(MainActivity.this, entry);
+      showEditEntryDialog(entry);
       closeFloatingActionMenu();
     }
   };
@@ -635,18 +661,23 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   public void onBackPressed() {
-    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-    if (drawer.isDrawerOpen(GravityCompat.START)) {
-      drawer.closeDrawer(GravityCompat.START);
-    } else {
-      // a bit hacky but i don't know how to solve it otherwise to reliably get informed of Back Button pressed in TagsFragment
-      // (tip in https://stackoverflow.com/a/7992472 doesn't work as fragment's view needs to stay focused which is not always provided e.g. when displaying Search Bar)
-      int selectedTabPosition = tabLayout.getSelectedTabPosition();
-      Fragment selectedFragment = mSectionsPagerAdapter.getItem(selectedTabPosition);
-      if (selectedFragment instanceof TagsFragment)
-        ((TagsFragment) selectedFragment).backButtonPressed();
+    if(editEntryDialog != null) {
+      editEntryDialog.onBackPressed();
+    }
+    else {
+      DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+      if (drawer.isDrawerOpen(GravityCompat.START)) {
+        drawer.closeDrawer(GravityCompat.START);
+      } else {
+        // a bit hacky but i don't know how to solve it otherwise to reliably get informed of Back Button pressed in TagsFragment
+        // (tip in https://stackoverflow.com/a/7992472 doesn't work as fragment's view needs to stay focused which is not always provided e.g. when displaying Search Bar)
+        int selectedTabPosition = tabLayout.getSelectedTabPosition();
+        Fragment selectedFragment = mSectionsPagerAdapter.getItem(selectedTabPosition);
+        if (selectedFragment instanceof TagsFragment)
+          ((TagsFragment) selectedFragment).backButtonPressed();
 
-      super.onBackPressed();
+        super.onBackPressed();
+      }
     }
   }
 
