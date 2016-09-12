@@ -1,6 +1,5 @@
 package net.dankito.deepthought.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
@@ -59,7 +57,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EntryCreationResult entryCreationResult = null;
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
-  protected boolean hasEntryBeenEdited = false;
   protected Map<FieldWithUnsavedChanges, Object> editedFields = new HashMap<>();
 
   protected boolean isShowingEditEntryDialog = false;
@@ -89,8 +86,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     setupUi();
 
     setEntryValues();
-
-    unsetEntryHasBeenEdited();
   }
 
   protected void setupUi() {
@@ -260,56 +255,15 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
 
-  protected void setEntryHasBeenEdited() {
-    hasEntryBeenEdited = true;
-  }
-
-  protected void unsetEntryHasBeenEdited() {
-    hasEntryBeenEdited = false;
-  }
-
-
   @Override
   public void onBackPressed() {
     if(isShowingEditEntryDialog) {
       editEntryDialog.onBackPressed();
     }
-    else if(hasEntryBeenEdited == true)
-      askUserIfChangesShouldBeSaved();
     else {
       cleanUp();
       super.onBackPressed();
     }
-  }
-
-  protected void askUserIfChangesShouldBeSaved() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    TextView view = new TextView(this);
-    view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
-    builder.setView(view);
-
-    builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-
-      }
-    });
-
-    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        finish();
-      }
-    });
-
-    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        editEntry();
-      }
-    });
-
-    builder.create().show();
   }
 
   protected void setAbstractPreviewFromHtml(String abstractHtml) {
@@ -451,8 +405,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EditEntityListener editEntryListener = new EditEntityListener() {
     @Override
     public void entityEdited(BaseEntity entity, FieldWithUnsavedChanges changedField, Object newFieldValue) {
-      setEntryHasBeenEdited();
-
       if(changedField == FieldWithUnsavedChanges.EntryAbstract) {
         setAbstractPreviewFromHtml((String)newFieldValue);
       }
