@@ -819,6 +819,8 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   protected final static int LongPreviewMaxLength = 500;
 
+  protected final static int MaxTagsPreviewLength = 150;
+
   protected transient String preview = null;
 
   protected transient String longPreview = null;
@@ -929,15 +931,20 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   protected String determineTagsPreview() {
     String tagsPreview = "";
-    for(Tag tag : getTagsSorted())
+
+    for(Tag tag : getTagsSorted()) {
       tagsPreview += tag.getName() + ", ";
-    if(tagsPreview.length() > 1)
+    }
+
+    if(tagsPreview.length() > 1) { // remove last ", "
       tagsPreview = tagsPreview.substring(0, tagsPreview.length() - 2);
+    }
 
-    if(tagsPreview.length() >= PreviewMaxLength)
-      tagsPreview = tagsPreview.substring(0, PreviewMaxLength) + " ...";
+    if(tagsPreview.length() >= MaxTagsPreviewLength) {
+      tagsPreview = tagsPreview.substring(0, MaxTagsPreviewLength) + " ...";
+    }
 
-    tagsPreview = tagsPreview.replace("\r", "").replace("\n", "");
+    tagsPreview = tagsPreview.replace("\r", "").replace("\n", ""); // if a Tag contains a new line symbol, replace that one for preview
 
     return tagsPreview;
   }
