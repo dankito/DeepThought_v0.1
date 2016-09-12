@@ -60,8 +60,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected WebView wbvwContent = null;
 
-  protected RelativeLayout rlytTags;
   protected TextView txtvwEntryTagsPreview;
+
+  protected MenuItem mnitmActionSaveEntry;
 
   protected ShareActionProvider shareActionProvider;
 
@@ -130,7 +131,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setupTagsSection() {
-    rlytTags = (RelativeLayout) findViewById(R.id.rlytTags);
+    RelativeLayout rlytTags = (RelativeLayout) findViewById(R.id.rlytTags);
     rlytTags.setOnClickListener(rlytTagsOnClickListener);
 
     txtvwEntryTagsPreview = (TextView) findViewById(R.id.txtvwEntryTagsPreview);
@@ -175,6 +176,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     shareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(mnitmActionShareEntry);
 
+    mnitmActionSaveEntry = menu.findItem(R.id.mnitmActionSaveEntry);
+    mnitmActionSaveEntry.setVisible(entryCreationResult != null);
+
     return super.onCreateOptionsMenu(menu);
   }
 
@@ -192,12 +196,42 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       editEntry();
       return true;
     }
+    else if(id == R.id.mnitmActionSaveEntry) {
+      saveEntryCreationResultAndCloseActivity();
+      return true;
+    }
     else if(id == R.id.mnitmActionShareEntry) {
       shareEntryWithOtherApps();
       return true;
     }
 
     return super.onOptionsItemSelected(item);
+  }
+
+  protected void editEntry() {
+    showEditEntryDialog(EditEntrySection.Content);
+  }
+
+
+  protected void saveEntryCreationResultAndCloseActivity() {
+    saveEntryCreationResult();
+
+    finish();
+  }
+
+  protected void saveEntryCreationResult() {
+    if(entryCreationResult != null) {
+      entryCreationResult.saveCreatedEntities();
+    }
+
+    entryCreationResultHasNowBeenSaved();
+  }
+
+  protected void entryCreationResultHasNowBeenSaved() {
+    entryCreationResult = null;
+
+    mnitmActionSaveEntry.setVisible(false);
+    invalidateOptionsMenu();
   }
 
   protected void shareEntryWithOtherApps() {
@@ -275,10 +309,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
-  protected void editEntry() {
-    showEditEntryDialog(EditEntrySection.Content);
-  }
-
   @Override
   public void finish() {
     cleanUp();
@@ -348,7 +378,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         setTextViewEntryTagsPreview(entryEditedTags);
       }
 
-      entryCreationResult = null; // Entry is saved now
+      entryCreationResultHasNowBeenSaved();
     }
   };
 

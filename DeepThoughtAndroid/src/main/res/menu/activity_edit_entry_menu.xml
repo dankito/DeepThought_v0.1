@@ -17,4 +17,12 @@
         app:showAsAction="always"
         />
 
+    <item
+        android:id="@+id/mnitmActionSaveEntry"
+        android:title="@string/save"
+        android:icon="@android:drawable/ic_menu_save"
+        app:showAsAction="always"
+        android:visible="false"
+    />
+
 </menu>
