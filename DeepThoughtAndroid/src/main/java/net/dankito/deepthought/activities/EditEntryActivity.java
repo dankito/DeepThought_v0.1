@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -26,13 +25,7 @@ import android.widget.TextView;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.controls.ICleanUp;
-import net.dankito.deepthought.controls.html.AndroidHtmlEditor;
-import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
-import net.dankito.deepthought.controls.html.HtmEditorCommand;
-import net.dankito.deepthought.controls.html.HtmlEditor;
-import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
-import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -67,7 +60,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
   protected boolean hasEntryBeenEdited = false;
-  protected boolean hasContentBeenEditedInActivity = false;
   protected Map<FieldWithUnsavedChanges, Object> editedFields = new HashMap<>();
 
   protected boolean isShowingEditEntryDialog = false;
@@ -78,7 +70,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected TextView txtvwEditEntryAbstract;
 
   protected WebView wbvwContent = null;
-  protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected RelativeLayout rlytTags;
   protected TextView txtvwEntryTagsPreview;
@@ -139,20 +130,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setupContentSection() {
-    RelativeLayout rlytContent = (RelativeLayout)findViewById(R.id.rlytContent);
-
-    contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
-    contentHtmlEditor.setVisibility(View.GONE);
-    rlytContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-    RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
-    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-    contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-    contentHtmlEditor.setLayoutParams(contentEditorParams);
-
     wbvwContent = (WebView)findViewById(R.id.wbvwContent);
     wbvwContent.setHorizontalScrollBarEnabled(true);
     wbvwContent.setVerticalScrollBarEnabled(true);
@@ -177,8 +154,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     entry = ActivityManager.getInstance().getEntryToBeEdited();
     if(entry != null) {
       entryEditedTags = new ArrayList<>(entry.getTagsSorted());
-      wbvwContent.setVisibility(View.GONE);
-      contentHtmlEditor.setVisibility(View.VISIBLE);
       setContentHtml(entry.getContent());
     }
 
@@ -211,13 +186,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     shareActionProvider = (ShareActionProvider)MenuItemCompat.getActionProvider(mnitmActionShareEntry);
 
-    if(Application.getPlatformConfiguration().hasCaptureDevice() || Application.getContentExtractorManager().hasOcrContentExtractors()) {
-      if(contentHtmlEditor != null && contentHtmlEditor.getVisibility() == View.VISIBLE) {
-        MenuItem mnitmActionAddContentFromOcr = menu.findItem(R.id.mnitmActionAddImageOrOCRText);
-        mnitmActionAddContentFromOcr.setVisible(true);
-      }
-    }
-
     return super.onCreateOptionsMenu(menu);
   }
 
@@ -236,7 +204,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       return true;
     }
     else if(id == R.id.mnitmActionAddImageOrOCRText) {
-      insertImageOrRecognizedTextHelper.addImageOrOcrTextToHtmlEditor(contentHtmlEditor);
       return true;
     }
     else if(id == R.id.mnitmActionShareEntry) {
@@ -268,10 +235,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     String contentPlain = entry.getContentAsPlainText();
     String contentHtml = entry.getContent();
 
-    if(hasContentBeenEditedInActivity) {
-      // TODO: extract current content HTML asynchronously
-    }
-    else if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
+    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
       contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
       contentPlain = Application.getHtmlHelper().extractPlainTextFromHtmlBody(contentHtml);
     }
@@ -360,13 +324,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setContentHtml(String contentHtml) {
-    if(contentHtml != null && contentHtmlEditor.getVisibility() == View.VISIBLE) {
-      contentHtmlEditor.setHtml(contentHtml);
-    }
-    else {
-      String formattedContentHtml = "<body style=\"font-family: serif, Georgia, Roboto, Helvetica, Arial; font-size:17;\"" + contentHtml + "</body>";
-      wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
-    }
+    String formattedContentHtml = "<body style=\"font-family: serif, Georgia, Roboto, Helvetica, Arial; font-size:17;\"" + contentHtml + "</body>";
+    wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
   }
 
   protected void setTextViewEditEntryTags(List<Tag> tags) {
@@ -420,10 +379,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   public void cleanUp() {
-    if(contentHtmlEditor != null) {
-      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
-    }
-
     if(editEntryDialog != null) {
       editEntryDialog.cleanUp();
     }
@@ -451,9 +406,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
 
     String contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
-    if(hasContentBeenEditedInActivity) {
-      contentHtml = contentHtmlEditor.getHtml();
-    }
     if(contentHtml != null) {
       entry.setContent(contentHtml);
     }
@@ -505,33 +457,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected void passEntryFieldsToEditEntryDialog() {
     final Map<FieldWithUnsavedChanges, Object> entryFieldValues = getCurrentEditedEntryFieldValues();
 
-    if(hasContentBeenEditedInActivity) {
-      entryFieldValues.remove(FieldWithUnsavedChanges.EntryContent);
-      editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
-
-      Application.getThreadPool().runTaskAsync(new Runnable() {
-        @Override
-        public void run() {
-          // getHtml() has to be called on a other then main thread
-          final String contentHtml = contentHtmlEditor.getHtml();
-          hasContentBeenEditedInActivity = false;
-
-          entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, contentHtml);
-          editedFields.put(FieldWithUnsavedChanges.EntryContent, contentHtml);
-
-          EditEntryActivity.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() { // don't know why but when calling over a new thread and than man thread again, Html Editors don't load
-              editEntryDialog.updateContentHtml(contentHtml);
-            }
-          });
-        }
-      });
-    }
-
-    else {
-      editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
-    }
+    editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
   }
 
   @NonNull
@@ -574,36 +500,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     @Override
     public void onClick(View v) {
       showEditEntryDialog(EditEntrySection.Tags);
-    }
-  };
-
-
-  protected IHtmlEditorListener contentListener = new IHtmlEditorListener() {
-    @Override
-    public void editorHasLoaded(HtmlEditor editor) {
-
-    }
-
-    @Override
-    public void htmlCodeUpdated() {
-      hasContentBeenEditedInActivity = true;
-      setEntryHasBeenEdited();
-    }
-
-    @Override
-    public void htmlCodeHasBeenReset() {
-      // Changes to Content have been undone
-      // TODO: how to check now if Entry has been edited or not?
-    }
-
-    @Override
-    public boolean handleCommand(HtmlEditor editor, HtmEditorCommand command) {
-      return false;
-    }
-
-    @Override
-    public boolean elementDoubleClicked(HtmlEditor editor, ImageElementData elementData) {
-      return false;
     }
   };
 
