@@ -199,8 +199,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         return true;
       }
     }
-    else if(id == R.id.mnitmActionSave) {
-      saveEntryAndCloseActivity();
+    else if(id == R.id.mnitmActionEdit) {
+      editEntry();
       return true;
     }
     else if(id == R.id.mnitmActionShareEntry) {
@@ -305,7 +305,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        saveEntryAndCloseActivity();
+        editEntry();
       }
     });
 
@@ -351,22 +351,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     }
   }
 
-  protected void saveEntryAndCloseActivity() {
-    // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
-    // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        saveEntryIfNeeded();
-
-        runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            finish();
-          }
-        });
-      }
-    });
+  protected void editEntry() {
+    showEditEntryDialog(EditEntrySection.Content);
   }
 
   @Override
@@ -379,49 +365,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     if(editEntryDialog != null) {
       editEntryDialog.cleanUp();
     }
-  }
-
-  protected void saveEntryIfNeeded() {
-    if(hasEntryBeenEdited == true || (entryCreationResult != null && entry.isPersisted() == false)) {
-      saveEntry();
-    }
-  }
-
-  protected void saveEntryAsync() {
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        saveEntry();
-      }
-    }).start();
-  }
-
-  protected void saveEntry() {
-    String abstractHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryAbstract);
-    if(abstractHtml != null) {
-      entry.setAbstract(abstractHtml);
-    }
-
-    String contentHtml = (String)editedFields.get(FieldWithUnsavedChanges.EntryContent);
-    if(contentHtml != null) {
-      entry.setContent(contentHtml);
-    }
-
-    if(entryCreationResult != null) {
-      entryCreationResult.saveCreatedEntities(abstractHtml, contentHtml);
-    }
-
-    if(entry.isPersisted() == false) { // a new Entry
-      Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
-    }
-
-    // TODO: why setting Tags here and not above before saving?
-    List<Tag> entryEditedTags = (List<Tag>)editedFields.get(FieldWithUnsavedChanges.EntryTags);
-    if(entryEditedTags != null) {
-      entry.setTags(entryEditedTags);
-    }
-
-    unsetEntryHasBeenEdited();
   }
 
 
