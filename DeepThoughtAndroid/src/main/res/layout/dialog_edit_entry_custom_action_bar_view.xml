@@ -4,43 +4,11 @@
                 android:layout_height="match_parent"
                 >
 
-    <ImageButton
-        android:id="@+id/imgbtnShowEditAbstractSection"
-        android:layout_width="@dimen/edit_entry_dialog_entry_field_icon_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_abstract_white"
-        />
+    <Spinner
+        android:id="@+id/spnSelectEntrySection"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/imgbtnShowEditContentSection"
-        android:layout_width="@dimen/edit_entry_dialog_entry_field_icon_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:layout_toRightOf="@+id/imgbtnShowEditAbstractSection"
-        android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_content_white"
-    />
-
-    <ImageButton
-        android:id="@+id/imgbtnShowEditTagsSection"
-        android:layout_width="@dimen/edit_entry_dialog_entry_field_icon_width"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:layout_toRightOf="@+id/imgbtnShowEditContentSection"
-        android:layout_marginLeft="@dimen/edit_entry_dialog_entry_field_icon_margin"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_tag_white"
-    />
+    </Spinner>
 
 </RelativeLayout>

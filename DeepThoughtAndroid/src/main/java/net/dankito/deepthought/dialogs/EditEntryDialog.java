@@ -86,6 +86,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected List<Tag> entryEditedTags = new ArrayList<>();
 
+  protected Spinner spnSelectEntrySection;
+
+  protected EntrySectionsSpinnerAdapter entrySectionsSpinnerAdapter;
+
   protected boolean hasViewBeenCreated = false;
 
   protected EditEntrySection sectionToEditAfterLoading = null;
@@ -140,15 +144,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   protected void applySectionToEdit(EditEntrySection section) {
-    if(section == EditEntrySection.Abstract) {
-      showEditAbstractSection();
-    }
-    else if(section == EditEntrySection.Content) {
-      showEditContentSection();
-    }
-    else if(section == EditEntrySection.Tags) {
-      showEditTagsSection();
-    }
+    spnSelectEntrySection.setSelection(entrySectionsSpinnerAdapter.getIndexForSection(section));
   }
 
 
@@ -224,14 +220,11 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       actionBar.setDisplayShowCustomEnabled(true);
       actionBar.setCustomView(R.layout.dialog_edit_entry_custom_action_bar_view);
 
-      ImageButton imgbtnShowEditAbstractSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditAbstractSection);
-      imgbtnShowEditAbstractSection.setOnClickListener(imgbtnShowEditAbstractSectionClickListener);
+      spnSelectEntrySection = (Spinner)rootView.findViewById(R.id.spnSelectEntrySection);
+      spnSelectEntrySection.setOnItemSelectedListener(spnSelectEntrySectionItemSelectedListener);
 
-      ImageButton imgbtnShowEditContentSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditContentSection);
-      imgbtnShowEditContentSection.setOnClickListener(imgbtnShowEditContentSectionClickListener);
-
-      ImageButton imgbtnShowEditTagsSection = (ImageButton)rootView.findViewById(R.id.imgbtnShowEditTagsSection);
-      imgbtnShowEditTagsSection.setOnClickListener(imgbtnShowEditTagsSectionClickListener);
+      entrySectionsSpinnerAdapter = new EntrySectionsSpinnerAdapter(getActivity(), entry);
+      spnSelectEntrySection.setAdapter(entrySectionsSpinnerAdapter);
     }
   }
 
@@ -655,26 +648,32 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
-  protected View.OnClickListener imgbtnShowEditAbstractSectionClickListener = new View.OnClickListener() {
+  protected AdapterView.OnItemSelectedListener spnSelectEntrySectionItemSelectedListener = new AdapterView.OnItemSelectedListener() {
     @Override
-    public void onClick(View view) {
-      showEditAbstractSection();
+    public void onItemSelected(AdapterView<?> adapterView, View view, int index, long l) {
+      EditEntrySection section = entrySectionsSpinnerAdapter.getSectionAtIndex(index);
+      sectionSelected(section);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
   };
 
-  protected View.OnClickListener imgbtnShowEditContentSectionClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-      showEditContentSection();
+  protected void sectionSelected(EditEntrySection section) {
+    switch(section) {
+      case Abstract:
+        showEditAbstractSection();
+        break;
+      case Content:
+        showEditContentSection();
+        break;
+      case Tags:
+        showEditTagsSection();
+        break;
     }
-  };
-
-  protected View.OnClickListener imgbtnShowEditTagsSectionClickListener = new View.OnClickListener() {
-    @Override
-    public void onClick(View view) {
-      showEditTagsSection();
-    }
-  };
+  }
 
 
   protected IHtmlEditorListener abstractListener = new IHtmlEditorListener() {
