@@ -3,7 +3,6 @@ package net.dankito.deepthought.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -335,43 +334,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
     editEntryDialog.showDialog(this, sectionToEdit);
 
-    passEntryFieldsToEditEntryDialog();
-
     isShowingEditEntryDialog = true;
-  }
-
-  protected void passEntryFieldsToEditEntryDialog() {
-    final Map<FieldWithUnsavedChanges, Object> entryFieldValues = getCurrentEditedEntryFieldValues();
-
-    editEntryDialog.setCurrentEntryFieldValues(entryFieldValues);
-  }
-
-  @NonNull
-  protected Map<FieldWithUnsavedChanges, Object> getCurrentEditedEntryFieldValues() {
-    final Map<FieldWithUnsavedChanges, Object> entryFieldValues = new HashMap<>();
-
-    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryAbstract)) {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryAbstract, editedFields.get(FieldWithUnsavedChanges.EntryAbstract));
-    }
-    else {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryAbstract, entry.getAbstract());
-    }
-
-    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryContent)) {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, editedFields.get(FieldWithUnsavedChanges.EntryContent));
-    }
-    else {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, entry.getContent());
-    }
-
-    if(editedFields.containsKey(FieldWithUnsavedChanges.EntryTags)) {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryTags, editedFields.get(FieldWithUnsavedChanges.EntryTags));
-    }
-    else {
-      entryFieldValues.put(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
-    }
-
-    return entryFieldValues;
   }
 
 

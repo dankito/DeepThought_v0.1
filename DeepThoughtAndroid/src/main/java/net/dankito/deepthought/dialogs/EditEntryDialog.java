@@ -53,7 +53,6 @@ import net.dankito.deepthought.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ganymed on 06/09/16.
@@ -64,8 +63,6 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected Entry entry;
 
   protected EntryCreationResult entryCreationResult = null;
-
-  protected Map<FieldWithUnsavedChanges, Object> entryFieldValues;
 
   protected List<FieldWithUnsavedChanges> editedFields = new ArrayList<>();
 
@@ -116,20 +113,6 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   public void setCleanUpOnClose(boolean cleanUpOnClose) {
     this.cleanUpOnClose = cleanUpOnClose;
-  }
-
-  public void setCurrentEntryFieldValues(Map<FieldWithUnsavedChanges, Object> entryFieldValues) {
-    this.entryFieldValues = entryFieldValues;
-
-    if(hasViewBeenCreated) {
-      setEntryFieldValues(entryFieldValues);
-    }
-  }
-
-  public void updateContentHtml(String contentHtml) {
-    entryFieldValues.put(FieldWithUnsavedChanges.EntryContent, contentHtml);
-
-    setCurrentEntryFieldValues(entryFieldValues);
   }
 
   public void setEditEntityListener(EditEntityListener listener) {
@@ -189,8 +172,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       sectionToEditAfterLoading = null;
     }
 
-    if(entryFieldValues != null) {
-      setEntryFieldValues(entryFieldValues);
+    if(entry != null) {
+      setEntryFieldValues(entry);
     }
 
     return rootView;
@@ -277,28 +260,21 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
-  protected void setEntryFieldValues(Map<FieldWithUnsavedChanges, Object> fieldValues) {
-    String abstractHtml = (String) fieldValues.get(FieldWithUnsavedChanges.EntryAbstract);
-    if(abstractHtml != null) {
-      abstractHtmlEditor.setHtml(abstractHtml);
+  protected void setEntryFieldValues(Entry entry) {
+    if(entry.hasAbstract()) {
+      abstractHtmlEditor.setHtml(entry.getAbstract());
     }
 
-    String contentHtml = (String) fieldValues.get(FieldWithUnsavedChanges.EntryContent);
-    if(contentHtml != null) {
-      contentHtmlEditor.setHtml(contentHtml);
-    }
+    contentHtmlEditor.setHtml(entry.getContent());
 
-    List<Tag> tags = (List<Tag>) fieldValues.get(FieldWithUnsavedChanges.EntryTags);
-    if(tags != null) {
-      entryEditedTags = tags;
+    entryEditedTags = new ArrayList<>(entry.getTags());
 
-      lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-        @Override
-        public void entryTagsChanged(List<Tag> entryTags) {
-          setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
-        }
-      }));
-    }
+    lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+      @Override
+      public void entryTagsChanged(List<Tag> entryTags) {
+        setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+      }
+    }));
   }
 
   protected void setEntryHasBeenEdited(FieldWithUnsavedChanges editedField, Object editedFieldValue) {
@@ -491,6 +467,10 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     hasDialogPreviouslyBeenShown = true;
 
     setSectionToEdit(sectionToEdit);
+
+    if(hasViewBeenCreated) {
+      setEntryFieldValues(entry);
+    }
   }
 
   protected void hideDialog() {
