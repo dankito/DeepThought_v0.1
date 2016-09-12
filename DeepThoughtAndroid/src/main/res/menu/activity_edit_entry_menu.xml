@@ -2,15 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-    <item
-        android:id="@+id/mnitmActionAddImageOrOCRText"
-        android:title="@string/ocr"
-        android:icon="@android:drawable/ic_menu_camera"
-        app:showAsAction="always"
-        android:visible="false"
-        />
-
     <item
         android:id="@+id/mnitmActionShareEntry"
         app:showAsAction="ifRoom"

@@ -203,9 +203,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       saveEntryAndCloseActivity();
       return true;
     }
-    else if(id == R.id.mnitmActionAddImageOrOCRText) {
-      return true;
-    }
     else if(id == R.id.mnitmActionShareEntry) {
       shareEntryWithOtherApps();
       return true;
