@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.widget.ListView;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.MainActivity;
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.adapter.EntriesAdapter;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
@@ -79,7 +77,7 @@ public class EntriesFragment extends Fragment {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Entry entry = (Entry)parent.getItemAtPosition(position);
-      ActivityManager.getInstance().showEditEntryActivity(getActivity(), entry);
+      showEditEntryDialog(entry);
     }
   };
 
@@ -138,7 +136,7 @@ public class EntriesFragment extends Fragment {
     switch(item.getItemId()) {
       case R.id.list_item_entry_context_menu_edit:
         Entry entryToEdit = entriesAdapter.getEntryAt(info.position);
-        ActivityManager.getInstance().showEditEntryActivity(getActivity(), entryToEdit);
+        showEditEntryDialog(entryToEdit);
         return true;
       case R.id.list_item_entry_context_menu_delete:
         Entry entryToDelete = entriesAdapter.getEntryAt(info.position);
@@ -147,6 +145,10 @@ public class EntriesFragment extends Fragment {
       default:
         return super.onContextItemSelected(item);
     }
+  }
+
+  protected void showEditEntryDialog(Entry entryToEdit) {
+    ((MainActivity)getActivity()).showEditEntryDialog(entryToEdit);
   }
 
 

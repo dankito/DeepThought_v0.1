@@ -538,7 +538,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     showEditEntryDialog(newEntry);
   }
 
-  protected void showEditEntryDialog(Entry entry) {
+  public void showEditEntryDialog(Entry entry) {
     editEntryDialog = new EditEntryDialog();
 
     editEntryDialog.setEntry(entry);
