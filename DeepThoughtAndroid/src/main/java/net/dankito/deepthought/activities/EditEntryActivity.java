@@ -378,7 +378,11 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       editEntryDialog.setEditEntityListener(editEntryListener);
       editEntryDialog.setDialogListener(editEntryDialogListener);
       editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
+      editEntryDialog.setCleanUpOnClose(false);
       editEntryDialog.setEntry(entry);
+      if(entryCreationResult != null) {
+        editEntryDialog.setEntryCreationResult(entryCreationResult);
+      }
 
       transaction.add(android.R.id.content, editEntryDialog);
     }
@@ -461,6 +465,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
 
       editedFields.put(changedField, newFieldValue);
+
+      entryCreationResult = null; // Entry is saved now
     }
   };
 

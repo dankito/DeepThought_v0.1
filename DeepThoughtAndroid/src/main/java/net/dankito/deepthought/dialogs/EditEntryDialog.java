@@ -1,13 +1,14 @@
 package net.dankito.deepthought.dialogs;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -38,6 +39,7 @@ import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.dankito.deepthought.controls.html.HtmEditorCommand;
 import net.dankito.deepthought.controls.html.HtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorListener;
+import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
@@ -60,6 +62,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
 
   protected Entry entry;
+
+  protected EntryCreationResult entryCreationResult = null;
 
   protected Map<FieldWithUnsavedChanges, Object> entryFieldValues;
 
@@ -88,6 +92,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
 
+  protected boolean cleanUpOnClose = false;
+
   protected EditEntityListener editEntityListener = null;
 
   protected DialogListener dialogListener = null;
@@ -100,6 +106,14 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   public void setEntry(Entry entry) {
     this.entry = entry;
+  }
+
+  public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
+    this.entryCreationResult = entryCreationResult;
+  }
+
+  public void setCleanUpOnClose(boolean cleanUpOnClose) {
+    this.cleanUpOnClose = cleanUpOnClose;
   }
 
   public void setCurrentEntryFieldValues(Map<FieldWithUnsavedChanges, Object> entryFieldValues) {
@@ -229,7 +243,6 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     abstractEditorParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
     abstractHtmlEditor.setLayoutParams(abstractEditorParams);
-
   }
 
   protected void setupEditContentSection(View rootView) {
@@ -290,51 +303,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     editedFields.add(editedField);
   }
 
-  protected void commitEditedFieldsAsync() {
-    // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
-    // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        commitEditedFields();
-      }
-    });
-  }
-
-  protected void commitEditedFields() {
-    if(editEntityListener != null) {
-      for(final FieldWithUnsavedChanges editedField : editedFields) {
-        final Object editedFieldValue = getEditedFieldValue(editedField);
-
-        getActivity().runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            editEntityListener.entityEdited(entry, editedField, editedFieldValue);
-          }
-        });
-      }
-    }
-
+  protected void unsetEntryHasBeenEdited() {
     editedFields.clear();
-
-    hideDialog();
-  }
-
-  @Nullable
-  protected Object getEditedFieldValue(FieldWithUnsavedChanges editedField) {
-    Object editedFieldValue = null;
-
-    if(editedField == FieldWithUnsavedChanges.EntryAbstract) {
-      editedFieldValue = abstractHtmlEditor.getHtml();
-    }
-    else if(editedField == FieldWithUnsavedChanges.EntryContent) {
-      editedFieldValue = contentHtmlEditor.getHtml();
-    }
-    else if(editedField == FieldWithUnsavedChanges.EntryTags) {
-      editedFieldValue = entryEditedTags;
-    }
-
-    return editedFieldValue;
   }
 
 
@@ -351,8 +321,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
 
-    if(id == R.id.mnitmActionCommitEditedFields) {
-      commitEditedFieldsAsync();
+    if(id == R.id.mnitmActionSaveEditedFields) {
+      saveEntryAndCloseDialog();
       return true;
     }
     else if(id == R.id.mnitmActionTakePhotoOrRecognizeText) {
@@ -360,7 +330,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       return true;
     }
     else if (id == android.R.id.home) {
-      checkForUnsavedChangesAndHideDialog();
+      checkForUnsavedChangesAndCloseDialog();
       return true;
     }
 
@@ -484,20 +454,20 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
 
   public void onBackPressed() {
-    checkForUnsavedChangesAndHideDialog();
+    checkForUnsavedChangesAndCloseDialog();
   }
 
-  protected void checkForUnsavedChangesAndHideDialog() {
+  protected void checkForUnsavedChangesAndCloseDialog() {
     if(hasUnsavedChanges() == true) {
-      // TODO: ask User if she/he likes to save changes
+      askUserIfChangesShouldBeSaved();
     }
     else {
-      hideDialog();
+      closeDialog();
     }
   }
 
   protected boolean hasUnsavedChanges() {
-    return false; // TODO
+    return editedFields.size() > 0;
   }
 
   protected void hideDialog() {
@@ -514,6 +484,120 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     if(dialogListener != null) {
       dialogListener.dialogBecameHidden();
     }
+  }
+
+
+  protected void askUserIfChangesShouldBeSaved() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    TextView view = new TextView(getActivity());
+    view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
+    builder.setView(view);
+
+    builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+
+      }
+    });
+
+    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        resetEditedFieldsAndCloseDialog();
+      }
+    });
+
+    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialogInterface, int i) {
+        saveEntryAndCloseDialog();
+      }
+    });
+
+    builder.create().show();
+  }
+
+  protected void saveEntryAndCloseDialog() {
+    saveEntryAsyncIfNeeded();
+
+    closeDialog();
+  }
+
+  protected void saveEntryAsyncIfNeeded() {
+    if(hasUnsavedChanges() == true || (entryCreationResult != null && entry.isPersisted() == false)) {
+      saveEntryAsync();
+    }
+  }
+
+  protected void saveEntryAsync() {
+    // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
+    // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        saveEntry();
+      }
+    });
+  }
+
+  protected void saveEntry() {
+    if(editedFields.contains(FieldWithUnsavedChanges.EntryAbstract)) {
+      String abstractHtml = abstractHtmlEditor.getHtml();
+      entry.setAbstract(abstractHtml);
+      notifyEditEntryListener(entry, FieldWithUnsavedChanges.EntryAbstract, abstractHtml);
+    }
+
+    if(editedFields.contains(FieldWithUnsavedChanges.EntryContent)) {
+      String contentHtml = contentHtmlEditor.getHtml();
+      entry.setContent(contentHtml);
+      notifyEditEntryListener(entry, FieldWithUnsavedChanges.EntryContent, contentHtml);
+    }
+
+    if(entryCreationResult != null) {
+      entryCreationResult.saveCreatedEntities();
+      entryCreationResult = null;
+    }
+
+    if(entry.isPersisted() == false) { // a new Entry
+      Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
+    }
+
+    // TODO: why setting Tags here and not above before saving?
+    if(editedFields.contains(FieldWithUnsavedChanges.EntryTags)) {
+      entry.setTags(entryEditedTags);
+      notifyEditEntryListener(entry, FieldWithUnsavedChanges.EntryTags, entryEditedTags);
+    }
+
+    unsetEntryHasBeenEdited();
+  }
+
+  protected void notifyEditEntryListener(final Entry entry, final FieldWithUnsavedChanges editedField, final Object editedFieldValue) {
+    if(editEntityListener != null) {
+      getActivity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          editEntityListener.entityEdited(entry, editedField, editedFieldValue);
+        }
+      });
+    }
+  }
+
+  protected void resetEditedFieldsAndCloseDialog() {
+    if(cleanUpOnClose == false) { // an instance of this Dialog is held somewhere
+      // TODO: unset controls with edited fields
+    }
+
+    unsetEntryHasBeenEdited();
+
+    closeDialog();
+  }
+
+  public void closeDialog() {
+    if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
+      cleanUp();
+    }
+
+    hideDialog();
   }
 
 

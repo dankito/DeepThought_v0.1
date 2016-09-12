@@ -11,9 +11,10 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/mnitmActionCommitEditedFields"
+        android:id="@+id/mnitmActionSaveEditedFields"
         android:orderInCategory="100"
-        android:title="@string/ok"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/save"
         app:showAsAction="always"/>
 
 
