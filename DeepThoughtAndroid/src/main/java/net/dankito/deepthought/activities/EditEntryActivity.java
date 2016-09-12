@@ -162,7 +162,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         rlytEntryAbstract.setVisibility(View.GONE);
       }
 
-      setTextViewEditEntryTags(entryEditedTags);
+      setTextViewEntryTagsPreview(entryEditedTags);
     }
   }
 
@@ -249,22 +249,22 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
   }
 
-  protected void setTextViewEditEntryTags(List<Tag> tags) {
-    String tagsString = "";
+  protected void setTextViewEntryTagsPreview(List<Tag> tags) {
+    String tagsPreview = "";
 
     for(Tag tag : tags) {
-      tagsString += tag.getName() + ", ";
+      tagsPreview += tag.getName() + ", ";
     }
 
-    if(tagsString.length() > 1) {
-      tagsString = tagsString.substring(0, tagsString.length() - 2);
+    if(tagsPreview.length() > 1) { // remove last ", "
+      tagsPreview = tagsPreview.substring(0, tagsPreview.length() - 2);
     }
 
-    if(tagsString.length() == 0) {
-      tagsString = getString(R.string.edit_entry_no_tags_set);
+    if(tagsPreview.length() == 0) {
+      tagsPreview = getString(R.string.edit_entry_no_tags_set);
     }
 
-    txtvwEntryTagsPreview.setText(tagsString);
+    txtvwEntryTagsPreview.setText(tagsPreview);
   }
 
 
@@ -294,20 +294,28 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected void showEditEntryDialog(EditEntrySection sectionToEdit) {
     if(editEntryDialog == null) { // on first display create EditEntryDialog and add it to transaction
-      editEntryDialog = new EditEntryDialog();
-      editEntryDialog.setEditEntityListener(editEntryListener);
-      editEntryDialog.setDialogListener(editEntryDialogListener);
-      editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
-      editEntryDialog.setCleanUpOnClose(false);
-      editEntryDialog.setEntry(entry);
-      if(entryCreationResult != null) {
-        editEntryDialog.setEntryCreationResult(entryCreationResult);
-      }
+      editEntryDialog = createEditEntryDialog();
     }
 
     editEntryDialog.showDialog(this, sectionToEdit);
 
     isShowingEditEntryDialog = true;
+  }
+
+  protected EditEntryDialog createEditEntryDialog() {
+    EditEntryDialog editEntryDialog = new EditEntryDialog();
+
+    editEntryDialog.setEditEntityListener(editEntryListener);
+    editEntryDialog.setDialogListener(editEntryDialogListener);
+    editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
+    editEntryDialog.setCleanUpOnClose(false);
+    editEntryDialog.setEntry(entry);
+
+    if(entryCreationResult != null) {
+      editEntryDialog.setEntryCreationResult(entryCreationResult);
+    }
+
+    return editEntryDialog;
   }
 
 
@@ -337,7 +345,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
       }
       else if(changedField == FieldWithUnsavedChanges.EntryTags) {
         List<Tag> entryEditedTags = (List<Tag>)newFieldValue;
-        setTextViewEditEntryTags(entryEditedTags);
+        setTextViewEntryTagsPreview(entryEditedTags);
       }
 
       entryCreationResult = null; // Entry is saved now

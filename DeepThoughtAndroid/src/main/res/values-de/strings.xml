@@ -49,7 +49,7 @@
     <string name="edit_entry_action_bar_title_entry_format">Bearbeite %1$s</string>
     <string name="edit_entry_abstract_label">Zusammenfassung</string>
     <string name="edit_entry_tags_label">Schlagwörter:</string>
-    <string name="edit_entry_no_tags_set"><![CDATA[<noch keine Schlagwörter>]]></string>
+    <string name="edit_entry_no_tags_set"><![CDATA[<Keine Schlagworte>]]></string>
     <string name="edit_entry_button_new_tag_text">Neu</string>
     <string name="edit_entry_content_label">Eintrag</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
