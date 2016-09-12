@@ -31,7 +31,6 @@ import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.ui.model.TagsUtil;
-import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,8 +67,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   protected ShareActionProvider shareActionProvider;
 
-  protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
-
   protected TagsUtil tagsUtil = new TagsUtil();
 
 
@@ -77,8 +74,6 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    insertImageOrRecognizedTextHelper = new InsertImageOrRecognizedTextHelper(this);
 
     setupUi();
 
@@ -325,7 +320,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if(insertImageOrRecognizedTextHelper.canHandleActivityResult(requestCode, resultCode, data) == false) {
+    if(editEntryDialog != null && editEntryDialog.canHandleActivityResult(requestCode, resultCode, data) == false) {
 
     }
   }
@@ -356,10 +351,9 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EditEntryDialog createEditEntryDialog() {
     EditEntryDialog editEntryDialog = new EditEntryDialog();
 
-    editEntryDialog.setDialogListener(editEntryDialogListener);
-    editEntryDialog.setInsertImageOrRecognizedTextHelper(insertImageOrRecognizedTextHelper);
-    editEntryDialog.setCleanUpOnClose(false);
     editEntryDialog.setEntry(entry);
+    editEntryDialog.setCleanUpOnClose(false);
+    editEntryDialog.setDialogListener(editEntryDialogListener);
 
     if(entryCreationResult != null) {
       editEntryDialog.setEntryCreationResult(entryCreationResult);

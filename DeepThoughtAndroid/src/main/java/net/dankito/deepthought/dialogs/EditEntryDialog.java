@@ -2,6 +2,7 @@ package net.dankito.deepthought.dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -127,10 +128,6 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     this.dialogListener = dialogListener;
   }
 
-  public void setInsertImageOrRecognizedTextHelper(InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper) {
-    this.insertImageOrRecognizedTextHelper = insertImageOrRecognizedTextHelper;
-  }
-
   public void setSectionToEdit(EditEntrySection section) {
     if(hasViewBeenCreated) {
       applySectionToEdit(section);
@@ -160,6 +157,9 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     setupToolbar(rootView);
 
     setHasOptionsMenu(true);
+
+
+    insertImageOrRecognizedTextHelper = new InsertImageOrRecognizedTextHelper(getActivity());
 
 
     setupEditAbstractSection(rootView);
@@ -297,6 +297,11 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected void unsetEntryHasBeenEdited() {
     editedFields.clear();
+  }
+
+
+  public boolean canHandleActivityResult(int requestCode, int resultCode, Intent data) {
+    return insertImageOrRecognizedTextHelper.canHandleActivityResult(requestCode, resultCode, data);
   }
 
 
@@ -710,4 +715,5 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).cleanUp();
     }
   }
+
 }
