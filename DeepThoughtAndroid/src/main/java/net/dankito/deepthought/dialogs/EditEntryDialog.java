@@ -267,7 +267,12 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
     contentHtmlEditor.setHtml(entry.getContent());
 
-    entryEditedTags = new ArrayList<>(entry.getTags());
+    if(entryCreationResult == null) {
+      entryEditedTags = new ArrayList<>(entry.getTags());
+    }
+    else {
+      entryEditedTags = entryCreationResult.getTags();
+    }
 
     lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
       @Override
