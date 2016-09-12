@@ -9,7 +9,7 @@
     >
 
     <RelativeLayout
-        android:id="@+id/rlydEntryAbstract"
+        android:id="@+id/rlytEntryAbstract"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -58,9 +58,9 @@
 
 
     <RelativeLayout
-        android:id="@+id/rlydTags"
+        android:id="@+id/rlytTags"
         android:layout_width="fill_parent"
-        android:layout_below="@id/rlydEntryAbstract"
+        android:layout_below="@id/rlytEntryAbstract"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
@@ -109,10 +109,10 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rlydContent"
+        android:id="@+id/rlytContent"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/rlydTags"
+        android:layout_below="@+id/rlytTags"
         android:layout_above="@id/toolbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"

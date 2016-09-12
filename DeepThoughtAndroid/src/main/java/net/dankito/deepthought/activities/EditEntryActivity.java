@@ -74,13 +74,13 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   protected EditEntryDialog editEntryDialog = null;
 
 
-  protected RelativeLayout rlydEntryAbstract;
+  protected RelativeLayout rlytEntryAbstract;
   protected TextView txtvwEditEntryAbstract;
 
   protected WebView wbvwContent = null;
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
-  protected RelativeLayout rlydTags;
+  protected RelativeLayout rlytTags;
   protected TextView txtvwEntryTagsPreview;
 
   protected ShareActionProvider shareActionProvider;
@@ -132,18 +132,18 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setupAbstractSection() {
-    rlydEntryAbstract = (RelativeLayout)findViewById(R.id.rlydEntryAbstract);
-    rlydEntryAbstract.setOnClickListener(rlydEntryAbstractOnClickListener);
+    rlytEntryAbstract = (RelativeLayout)findViewById(R.id.rlytEntryAbstract);
+    rlytEntryAbstract.setOnClickListener(rlytEntryAbstractOnClickListener);
 
     txtvwEditEntryAbstract = (TextView) findViewById(R.id.txtvwEntryAbstractPreview);
   }
 
   protected void setupContentSection() {
-    RelativeLayout rlydContent = (RelativeLayout)findViewById(R.id.rlydContent);
+    RelativeLayout rlytContent = (RelativeLayout)findViewById(R.id.rlytContent);
 
     contentHtmlEditor = AndroidHtmlEditorPool.getInstance().getHtmlEditor(this, contentListener);
     contentHtmlEditor.setVisibility(View.GONE);
-    rlydContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    rlytContent.addView(contentHtmlEditor, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
     RelativeLayout.LayoutParams contentEditorParams = (RelativeLayout.LayoutParams)contentHtmlEditor.getLayoutParams();
     contentEditorParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
@@ -166,8 +166,8 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
   protected void setupTagsSection() {
-    rlydTags = (RelativeLayout) findViewById(R.id.rlydTags);
-    rlydTags.setOnClickListener(rlydTagsOnClickListener);
+    rlytTags = (RelativeLayout) findViewById(R.id.rlytTags);
+    rlytTags.setOnClickListener(rlytTagsOnClickListener);
 
     txtvwEntryTagsPreview = (TextView) findViewById(R.id.txtvwEntryTagsPreview);
   }
@@ -195,7 +195,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
         setAbstractPreview(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
       }
       else {
-        rlydEntryAbstract.setVisibility(View.GONE);
+        rlytEntryAbstract.setVisibility(View.GONE);
       }
 
       setTextViewEditEntryTags(entryEditedTags);
@@ -563,14 +563,14 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
   }
 
 
-  protected View.OnClickListener rlydEntryAbstractOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener rlytEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       showEditEntryDialog(EditEntrySection.Abstract);
     }
   };
 
-  protected View.OnClickListener rlydTagsOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener rlytTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       showEditEntryDialog(EditEntrySection.Tags);
