@@ -1,17 +1,9 @@
 package net.dankito.deepthought.dialogs;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -21,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -36,7 +27,6 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.adapter.EntrySectionsSpinnerAdapter;
 import net.dankito.deepthought.adapter.EntryTagsAdapter;
-import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.html.AndroidHtmlEditor;
 import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.dankito.deepthought.controls.html.HtmEditorCommand;
@@ -47,7 +37,6 @@ import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
-import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.ui.model.TagsUtil;
@@ -61,7 +50,7 @@ import java.util.List;
 /**
  * Created by ganymed on 06/09/16.
  */
-public class EditEntryDialog extends DialogFragment implements ICleanUp {
+public class EditEntryDialog extends FullscreenDialog {
 
 
   protected Entry entry;
@@ -98,13 +87,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
 
   protected InsertImageOrRecognizedTextHelper insertImageOrRecognizedTextHelper;
 
-  protected boolean cleanUpOnClose = false;
-
-  protected boolean hasDialogPreviouslyBeenShown = false;
-
   protected EditEntityListener editEntityListener = null;
-
-  protected DialogListener dialogListener = null;
 
   protected TagsUtil tagsUtil = new TagsUtil();
 
@@ -122,16 +105,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     this.entryCreationResult = entryCreationResult;
   }
 
-  public void setCleanUpOnClose(boolean cleanUpOnClose) {
-    this.cleanUpOnClose = cleanUpOnClose;
-  }
-
   public void setEditEntityListener(EditEntityListener listener) {
     this.editEntityListener = listener;
-  }
-
-  public void setDialogListener(DialogListener dialogListener) {
-    this.dialogListener = dialogListener;
   }
 
   public void setSectionToEdit(EditEntrySection section) {
@@ -181,52 +156,19 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     return rootView;
   }
 
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialog);
-  }
-
 
   @Override
-  public void onStart() {
-    super.onStart();
+  protected void customizeToolbar(View rootView, ActionBar actionBar) {
+    actionBar.setDisplayShowCustomEnabled(true);
+    actionBar.setCustomView(R.layout.dialog_edit_entry_custom_action_bar_view);
 
-    Dialog dialog = getDialog();
-    if(dialog != null) {
-      int width = ViewGroup.LayoutParams.MATCH_PARENT;
-      int height = ViewGroup.LayoutParams.MATCH_PARENT;
-      dialog.getWindow().setLayout(width, height);
+    spnSelectEntrySection = (Spinner)rootView.findViewById(R.id.spnSelectEntrySection);
+    spnSelectEntrySection.setOnItemSelectedListener(spnSelectEntrySectionItemSelectedListener);
 
-      WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
-      attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-      dialog.getWindow().setAttributes(attrs);
-    }
+    entrySectionsSpinnerAdapter = new EntrySectionsSpinnerAdapter(getActivity(), entry);
+    spnSelectEntrySection.setAdapter(entrySectionsSpinnerAdapter);
   }
 
-
-  protected void setupToolbar(View rootView) {
-    Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-    toolbar.setTitle("");
-
-    ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
-    ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
-      actionBar.setHomeButtonEnabled(true);
-      actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
-
-      actionBar.setDisplayShowCustomEnabled(true);
-      actionBar.setCustomView(R.layout.dialog_edit_entry_custom_action_bar_view);
-
-      spnSelectEntrySection = (Spinner)rootView.findViewById(R.id.spnSelectEntrySection);
-      spnSelectEntrySection.setOnItemSelectedListener(spnSelectEntrySectionItemSelectedListener);
-
-      entrySectionsSpinnerAdapter = new EntrySectionsSpinnerAdapter(getActivity(), entry);
-      spnSelectEntrySection.setAdapter(entrySectionsSpinnerAdapter);
-    }
-  }
 
   protected void setupEditAbstractSection(View rootView) {
     rlytEditAbstract = (RelativeLayout)rootView.findViewById(R.id.rlytEditAbstract);
@@ -310,6 +252,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
+  @Override
   public boolean canHandleActivityResult(int requestCode, int resultCode, Intent data) {
     return insertImageOrRecognizedTextHelper.canHandleActivityResult(requestCode, resultCode, data);
   }
@@ -334,10 +277,6 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     }
     else if(id == R.id.mnitmActionTakePhotoOrRecognizeText) {
       handleTakePhotoOrRecognizeText();
-      return true;
-    }
-    else if (id == android.R.id.home) {
-      checkForUnsavedChangesAndCloseDialog(false);
       return true;
     }
 
@@ -465,21 +404,9 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
 
-  public void onBackPressed() {
-    checkForUnsavedChangesAndCloseDialog(true);
-  }
-
-  protected void checkForUnsavedChangesAndCloseDialog(boolean hasBackButtonBeenPressed) {
-    if(hasUnsavedChanges() == true) {
-      askUserIfChangesShouldBeSaved(hasBackButtonBeenPressed);
-    }
-    else {
-      closeDialog(hasBackButtonBeenPressed, false);
-    }
-  }
-
+  @Override
   protected boolean hasUnsavedChanges() {
-    return editedFields.size() > 0 || entryCreationResult != null;
+    return editedFields.size() > 0;
   }
 
 
@@ -489,22 +416,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   }
 
   public void showDialog(AppCompatActivity activity, EditEntrySection sectionToEdit) {
-    FragmentManager fragmentManager = activity.getSupportFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-
-    if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
-      transaction.add(this, "EditEntry");
-    }
-    else { // on subsequent displays we only have to call show() on the then hidden Dialog
-      transaction.show(this);
-    }
-
-    transaction.addToBackStack("");
-
-    transaction.commit();
-
-    hasDialogPreviouslyBeenShown = true;
+    super.showDialog(activity);
 
     setSectionToEdit(sectionToEdit);
 
@@ -513,77 +425,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     }
   }
 
-  protected void hideDialog(boolean hasEntryBeenSaved) {
-    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-    transaction.hide(this);
-    transaction.commit();
-
-    callDialogBecameHiddenListener(hasEntryBeenSaved);
-  }
-
-  protected void callDialogBecameHiddenListener(boolean hasEntryBeenSaved) {
-    if(dialogListener != null) {
-      dialogListener.dialogBecameHidden(hasEntryBeenSaved);
-    }
-  }
-
-
-  protected void askUserIfChangesShouldBeSaved(final boolean hasBackButtonBeenPressed) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    TextView view = new TextView(getActivity());
-    view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
-    builder.setView(view);
-
-    builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-
-      }
-    });
-
-    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        resetEditedFieldsAndCloseDialog(hasBackButtonBeenPressed);
-      }
-    });
-
-    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        saveEntryAndCloseDialog(hasBackButtonBeenPressed);
-      }
-    });
-
-    builder.create().show();
-  }
-
-  protected void saveEntryAndCloseDialog(boolean hasBackButtonBeenPressed) {
-    saveEntryAsyncIfNeeded();
-
-    closeDialog(hasBackButtonBeenPressed, true);
-  }
-
-  protected void saveEntryAsyncIfNeeded() {
-    if(hasUnsavedChanges() == true || (entryCreationResult != null && entry.isPersisted() == false)) {
-      saveEntryAsync();
-    }
-  }
-
-  protected void saveEntryAsync() {
-    // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
-    // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        saveEntry();
-      }
-    });
-  }
-
-  protected void saveEntry() {
+  @Override
+  protected void saveEntity() {
     if(editedFields.contains(FieldWithUnsavedChanges.EntryAbstract)) {
       String abstractHtml = abstractHtmlEditor.getHtml();
       entry.setAbstract(abstractHtml);
@@ -625,26 +468,12 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     }
   }
 
+
+  @Override
   protected void resetEditedFieldsAndCloseDialog(boolean hasBackButtonBeenPressed) {
-    if(cleanUpOnClose == false) { // an instance of this Dialog is held somewhere
-      // TODO: unset controls with edited fields
-    }
+    super.resetEditedFieldsAndCloseDialog(hasBackButtonBeenPressed);
 
     unsetEntryHasBeenEdited();
-
-    closeDialog(hasBackButtonBeenPressed, false);
-  }
-
-  public void closeDialog(boolean hasBackButtonBeenPressed, boolean hasEntryBeenSaved) {
-    if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
-      cleanUp();
-    }
-
-    hideDialog(hasEntryBeenSaved);
-
-    if(hasBackButtonBeenPressed == false) {
-      getActivity().getSupportFragmentManager().popBackStack();
-    }
   }
 
 
@@ -740,6 +569,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
     if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter) {
       ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).cleanUp();
     }
+
+    super.cleanUp();
   }
 
 }
