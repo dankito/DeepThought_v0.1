@@ -56,36 +56,17 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/rlydContent"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@id/rlydEntryAbstract"
-        android:layout_above="@+id/rlydTags"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:gravity="fill_vertical"
-        >
-
-        <WebView
-            android:id="@+id/wbvwContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-    </RelativeLayout>
-
 
     <RelativeLayout
         android:id="@+id/rlydTags"
         android:layout_width="fill_parent"
-        android:layout_above="@id/toolbar"
+        android:layout_below="@id/rlydEntryAbstract"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:minHeight="24dp"
-        >
+    >
 
         <ImageView
             android:id="@+id/imgvwEditEntryTagsIcon"
@@ -129,13 +110,32 @@
             android:id="@+id/rlydEditEntryEditTags"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/txtvwEditEntryTagsLabel"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/txtvwEditEntryTagsLabel"
             android:visibility="visible"
         >
 
         </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlydContent"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/rlydTags"
+        android:layout_above="@id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:gravity="fill_vertical"
+        >
+
+        <WebView
+            android:id="@+id/wbvwContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
 
     </RelativeLayout>
 
