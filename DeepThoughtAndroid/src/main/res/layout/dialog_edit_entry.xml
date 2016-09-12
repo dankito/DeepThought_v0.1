@@ -47,11 +47,34 @@
             android:visibility="gone"
             >
 
+            <TextView
+                android:id="@+id/txtvwEntryTagsPreviewLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@+id/txtvwEntryTagsPreview"
+                android:layout_alignBottom="@+id/txtvwEntryTagsPreview"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:textSize="@dimen/edit_entry_search_tags_text_size"
+                android:text="@string/edit_entry_tags_label"
+            />
+
+            <TextView
+                android:id="@+id/txtvwEntryTagsPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@+id/txtvwEntryTagsPreviewLabel"
+                android:textSize="@dimen/edit_entry_search_tags_text_size"
+            />
+
             <EditText
                 android:id="@+id/edtxtEditEntrySearchTag"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/edit_entry_search_tags_height"
-                android:layout_alignParentTop="true"
+                android:layout_below="@+id/txtvwEntryTagsPreview"
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@+id/btnEditEntryNewTag"
                 android:layout_marginRight="6dp"
@@ -63,7 +86,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="70dp"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignBottom="@+id/edtxtEditEntrySearchTag"
                 android:textSize="@dimen/edit_entry_search_tags_text_size"

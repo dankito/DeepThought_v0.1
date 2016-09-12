@@ -47,6 +47,7 @@ import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.ui.model.TagsUtil;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 import net.dankito.deepthought.util.StringUtils;
 
@@ -75,6 +76,7 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected AndroidHtmlEditor abstractHtmlEditor = null;
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
+  protected TextView txtvwEntryTagsPreview = null;
   protected EditText edtxtEditEntrySearchTag = null;
 
   protected ListView lstvwEditEntryTags = null;
@@ -96,6 +98,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected EditEntityListener editEntityListener = null;
 
   protected DialogListener dialogListener = null;
+
+  protected TagsUtil tagsUtil = new TagsUtil();
 
 
   public EditEntryDialog() {
@@ -249,6 +253,8 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
   protected void setupEditTagsSection(View rootView) {
     rlytEditTags = (RelativeLayout)rootView.findViewById(R.id.rlytEditTags);
 
+    txtvwEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwEntryTagsPreview);
+
     edtxtEditEntrySearchTag = (EditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
     edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
     edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
@@ -274,10 +280,13 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       entryEditedTags = entryCreationResult.getTags();
     }
 
+    setTagsPreview(entryEditedTags);
+
     lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
       @Override
       public void entryTagsChanged(List<Tag> entryTags) {
         setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+        setTagsPreview(entryTags);
       }
     }));
   }
@@ -432,7 +441,12 @@ public class EditEntryDialog extends DialogFragment implements ICleanUp {
       entryEditedTags.add(newTag);
       Collections.sort(entryEditedTags);
       setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryEditedTags);
+      setTagsPreview(entryEditedTags);
     }
+  }
+
+  protected void setTagsPreview(List<Tag> tags) {
+    txtvwEntryTagsPreview.setText(tagsUtil.createTagsPreview(tags, true));
   }
 
 
