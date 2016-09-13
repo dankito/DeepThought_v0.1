@@ -23,7 +23,6 @@ import com.github.clans.fab.FloatingActionMenu;
 
 import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.activities.DialogParentActivity;
-import net.dankito.deepthought.activities.EditEntryActivity;
 import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
@@ -392,12 +391,6 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if(canDialogHandleActivityResult(requestCode, resultCode, data) == false) {
       switch (requestCode) {
-        case EditEntryActivity.RequestCode:
-          if (resultCode == RESULT_OK && data != null) {
-            // Entry has been updated
-            ActivityManager.getInstance().resetEditEntryActivityCachedData();
-          }
-          break;
         case AndroidImportFilesOrDoOcrListener.CaptureImageForConnectPeerRequestCode:
           if (importFilesOrDoOcrListener != null) {
             importFilesOrDoOcrListener.handleCaptureImageResult(resultCode);

@@ -56,14 +56,6 @@
                 <!--<data android:mimeType="image/*" />-->
             <!--</intent-filter>-->
         </activity>
-        
-        <activity android:name=".activities.EditEntryActivity"
-                  android:label="EditEntry"
-                  android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
 
         <activity android:name=".activities.ArticlesOverviewActivity"
                   android:label="ArticlesOverview"
