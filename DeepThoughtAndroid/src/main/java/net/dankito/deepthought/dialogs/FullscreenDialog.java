@@ -12,10 +12,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
@@ -75,6 +77,37 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
 
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View rootView = inflater.inflate(R.layout.dialog_edit_entry, container, false);
+
+    // don't know why but when placing Dialog in android.R.id.content, the Dialog's content starts below the system status bar -> set a top margin in height of status bar
+    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)rootView.getLayoutParams();
+    params.setMargins(0, getStatusBarHeight(), 0, 0);
+    rootView.setLayoutParams(params);
+
+    setupToolbar(rootView);
+
+    setHasOptionsMenu(true);
+
+
+    setupUi(rootView);
+
+    return rootView;
+  }
+
+  protected int getStatusBarHeight() {
+    int result = 0;
+
+    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+      result = getResources().getDimensionPixelSize(resourceId);
+    }
+
+    return result;
+  }
+
   protected void setupToolbar(View rootView) {
     Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
     toolbar.setTitle("");
@@ -92,8 +125,10 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void customizeToolbar(View rootView, ActionBar actionBar) {
-
+    // may be overwritten in sub class
   }
+
+  protected abstract void setupUi(View rootView);
 
 
   public boolean canHandleActivityResult(int requestCode, int resultCode, Intent data) {
@@ -207,7 +242,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     hideDialog(hasEntryBeenSaved);
 
     if(hasBackButtonBeenPressed == false) {
-      getActivity().getSupportFragmentManager().popBackStack();
+//      getActivity().getSupportFragmentManager().popBackStack();
     }
   }
 
@@ -218,14 +253,14 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
-//    if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
-      transaction.add(this, "EditEntry"); // TODO: edit Tag
-//    }
-//    else { // on subsequent displays we only have to call show() on the then hidden Dialog
-//      transaction.show(this);
-//    }
+    if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
+      transaction.add(android.R.id.content, this); // TODO: edit Tag
+    }
+    else { // on subsequent displays we only have to call show() on the then hidden Dialog
+      transaction.show(this);
+    }
 
-    transaction.addToBackStack("");
+//    transaction.addToBackStack("");
 
     transaction.commit();
 

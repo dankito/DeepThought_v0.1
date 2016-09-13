@@ -1,13 +1,11 @@
 package net.dankito.deepthought.dialogs;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -122,16 +120,8 @@ public class EditEntryDialog extends FullscreenDialog {
     spnSelectEntrySection.setSelection(entrySectionsSpinnerAdapter.getIndexForSection(section));
   }
 
-
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    View rootView = inflater.inflate(R.layout.dialog_edit_entry, container, false);
-
-    setupToolbar(rootView);
-
-    setHasOptionsMenu(true);
-
-
+  protected void setupUi(View rootView) {
     insertImageOrRecognizedTextHelper = new InsertImageOrRecognizedTextHelper(getActivity());
 
 
@@ -152,8 +142,6 @@ public class EditEntryDialog extends FullscreenDialog {
     if(entry != null) {
       setEntryFieldValues(entry);
     }
-
-    return rootView;
   }
 
 
@@ -404,12 +392,6 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
 
-  @Override
-  protected boolean hasUnsavedChanges() {
-    return editedFields.size() > 0;
-  }
-
-
 
   public void showDialog(AppCompatActivity activity) {
     showDialog(activity, EditEntrySection.Content);
@@ -425,6 +407,11 @@ public class EditEntryDialog extends FullscreenDialog {
     }
   }
 
+
+  @Override
+  protected boolean hasUnsavedChanges() {
+    return editedFields.size() > 0;
+  }
 
   @Override
   protected int getAlertMessageIfChangesShouldGetSaved() {
