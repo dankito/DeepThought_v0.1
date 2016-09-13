@@ -133,7 +133,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   protected void askUserIfChangesShouldBeSaved(final boolean hasBackButtonBeenPressed) {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     TextView view = new TextView(getActivity());
-    view.setText(R.string.alert_dialog_entry_has_unsaved_changes_text);
+    view.setText(getAlertMessageIfChangesShouldGetSaved());
     builder.setView(view);
 
     builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -160,6 +160,10 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     builder.create().show();
   }
 
+  protected int getAlertMessageIfChangesShouldGetSaved() {
+    return -1; // to be overwritten in subclass
+  }
+
   protected void saveEntryAndCloseDialog(boolean hasBackButtonBeenPressed) {
     saveEntityAsyncIfNeeded();
 
@@ -184,7 +188,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void saveEntity() {
-
+    // to be implemented in subclass
   }
 
   protected void resetEditedFieldsAndCloseDialog(boolean hasBackButtonBeenPressed) {

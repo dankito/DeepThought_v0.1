@@ -425,6 +425,12 @@ public class EditEntryDialog extends FullscreenDialog {
     }
   }
 
+
+  @Override
+  protected int getAlertMessageIfChangesShouldGetSaved() {
+    return R.string.alert_dialog_entry_has_unsaved_changes_text;
+  }
+
   @Override
   protected void saveEntity() {
     if(editedFields.contains(FieldWithUnsavedChanges.EntryAbstract)) {
