@@ -296,7 +296,6 @@ public class ViewEntryDialog extends FullscreenDialog {
       editEntryDialog.onBackPressed();
     }
     else {
-      cleanUp();
       super.onBackPressed();
     }
   }
