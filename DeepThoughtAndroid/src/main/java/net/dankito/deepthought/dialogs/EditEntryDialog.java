@@ -101,6 +101,8 @@ public class EditEntryDialog extends FullscreenDialog {
 
   public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
     this.entryCreationResult = entryCreationResult;
+
+    setEntry(entryCreationResult.getCreatedEntry());
   }
 
   public void setEditEntityListener(EditEntityListener listener) {

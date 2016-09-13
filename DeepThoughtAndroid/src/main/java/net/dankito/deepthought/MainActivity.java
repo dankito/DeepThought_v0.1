@@ -40,6 +40,7 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.settings.enums.SelectedAndroidTab;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
+import net.dankito.deepthought.dialogs.ViewEntryDialog;
 import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
@@ -489,12 +490,19 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   // TODO: this is the same code as in ArticlesOverviewActivity and CreateEntryFromClipboardContentPopup
   protected void handleCreateEntryResult(final EntryCreationResult creationResult) {
     if (creationResult.successful()) {
-      ActivityManager.getInstance().showEditEntryActivity(MainActivity.this, creationResult);
+      showViewEntryDialog(creationResult);
     }
     else {
       AlertHelper.showErrorMessage(MainActivity.this, creationResult.getError(),
           Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
     }
+  }
+
+  protected void showViewEntryDialog(EntryCreationResult creationResult) {
+    ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
+    viewEntryDialog.setEntryCreationResult(creationResult);
+
+    viewEntryDialog.showDialog(this);
   }
 
   protected void handleReceivedHtmlText(Intent intent) {
