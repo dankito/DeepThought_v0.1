@@ -2,7 +2,6 @@ package net.dankito.deepthought.dialogs;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -23,6 +22,7 @@ import android.widget.Toast;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.adapter.EntrySectionsSpinnerAdapter;
 import net.dankito.deepthought.adapter.EntryTagsAdapter;
 import net.dankito.deepthought.controls.html.AndroidHtmlEditor;
@@ -107,7 +107,7 @@ public class EditEntryDialog extends FullscreenDialog {
     this.editEntityListener = listener;
   }
 
-  public void setSectionToEdit(EditEntrySection section) {
+  protected void setSectionToEdit(EditEntrySection section) {
     if(hasViewBeenCreated) {
       applySectionToEdit(section);
     }
@@ -399,11 +399,11 @@ public class EditEntryDialog extends FullscreenDialog {
 
 
 
-  public void showDialog(AppCompatActivity activity) {
+  public void showDialog(DialogParentActivity activity) {
     showDialog(activity, EditEntrySection.Content);
   }
 
-  public void showDialog(AppCompatActivity activity, EditEntrySection sectionToEdit) {
+  public void showDialog(DialogParentActivity activity, EditEntrySection sectionToEdit) {
     super.showDialog(activity);
 
     setSectionToEdit(sectionToEdit);

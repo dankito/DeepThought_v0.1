@@ -13,7 +13,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +22,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import net.dankito.deepthought.activities.ActivityManager;
+import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.activities.EditEntryActivity;
 import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
@@ -44,7 +44,6 @@ import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
-import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -58,7 +57,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
+public class MainActivity extends DialogParentActivity implements TabLayout.OnTabSelectedListener {
 
   private static final Logger log = LoggerFactory.getLogger(MainActivity.class);
 
@@ -78,8 +77,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   protected FloatingActionButton floatingActionButtonAddNewspaperArticle;
 
   protected List<FloatingActionButton> favoriteContentExtractorsMenuButtons = new ArrayList<>();
-
-  protected EditEntryDialog editEntryDialog = null;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -392,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if(editEntryDialog != null && editEntryDialog.canHandleActivityResult(requestCode, resultCode, data)) {
+    if(canDialogHandleActivityResult(requestCode, resultCode, data)) {
 
     }
     else {
@@ -539,20 +536,12 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
   }
 
   public void showEditEntryDialog(Entry entry) {
-    editEntryDialog = new EditEntryDialog();
+    EditEntryDialog editEntryDialog = new EditEntryDialog();
 
     editEntryDialog.setEntry(entry);
-    editEntryDialog.setDialogListener(editEntryDialogListener);
 
     editEntryDialog.showDialog(this);
   }
-
-  protected DialogListener editEntryDialogListener = new DialogListener() {
-    @Override
-    public void dialogBecameHidden(boolean didSaveChanges) {
-      editEntryDialog = null;
-    }
-  };
 
 
   @Override
@@ -660,10 +649,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
   @Override
   public void onBackPressed() {
-    if(editEntryDialog != null) {
-      editEntryDialog.onBackPressed();
-    }
-    else {
+    if(isBackButtonPressHandledByDialog() == false) {
       DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
       if (drawer.isDrawerOpen(GravityCompat.START)) {
         drawer.closeDrawer(GravityCompat.START);

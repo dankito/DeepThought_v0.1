@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.listener.DialogListener;
 
@@ -29,6 +30,8 @@ import net.dankito.deepthought.listener.DialogListener;
  * Created by ganymed on 06/09/16.
  */
 public abstract class FullscreenDialog extends DialogFragment implements ICleanUp {
+
+  protected DialogParentActivity activity;
 
   protected boolean hideOnClose = false;
 
@@ -251,7 +254,9 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
 
 
-  public void showDialog(AppCompatActivity activity) {
+  public void showDialog(DialogParentActivity activity) {
+    this.activity = activity;
+
     FragmentManager fragmentManager = activity.getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -266,6 +271,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     transaction.commit();
 
     hasDialogPreviouslyBeenShown = true;
+
+    activity.dialogShown(this);
   }
 
   protected void closeDialog(boolean hasEntryBeenSaved) {
@@ -281,6 +288,10 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     }
 
     transaction.commit();
+
+    if(activity != null) {
+      activity.dialogHidden(this);
+    }
 
     callDialogBecameHiddenListener(hasEntryBeenSaved);
   }

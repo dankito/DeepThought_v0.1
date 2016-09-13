@@ -3,7 +3,6 @@ package net.dankito.deepthought.dialogs;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,6 +16,7 @@ import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceBase;
@@ -78,13 +78,13 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
 
-  public void showDialog(AppCompatActivity activity, EntryCreationResult entryCreationResult) {
+  public void showDialog(DialogParentActivity activity, EntryCreationResult entryCreationResult) {
     setEntryCreationResult(entryCreationResult);
 
     super.showDialog(activity);
   }
 
-  public void showDialog(AppCompatActivity activity, Entry entry) {
+  public void showDialog(DialogParentActivity activity, Entry entry) {
     setEntry(entry);
 
     super.showDialog(activity);
@@ -367,7 +367,7 @@ public class ViewEntryDialog extends FullscreenDialog {
       editEntryDialog = createEditEntryDialog();
     }
 
-    editEntryDialog.showDialog((AppCompatActivity)getActivity(), sectionToEdit);
+    editEntryDialog.showDialog(this.activity, sectionToEdit);
 
     isShowingEditEntryDialog = true;
   }
