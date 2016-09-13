@@ -77,7 +77,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   protected FloatingActionButton addTagButton;
   protected FloatingActionButton floatingActionButtonAddNewspaperArticle;
 
-  protected List<FloatingActionButton> favoriteContentExtractorsMenuButtons = new ArrayList<>();
+  protected List<FloatingActionButton> favoriteContentExtractorsButtons = new ArrayList<>();
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -173,7 +173,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
         IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
         if("heise.de".equals(contentExtractor.getSiteBaseUrl()) ||
             ("sueddeutsche.de".equals(contentExtractor.getSiteBaseUrl().toLowerCase()) && notification.getNotificationMessage().contains("Magazin") == false)) {
-          addFavoriteContentExtractorFloatingActionMenuButton(contentExtractor);
+          addFavoriteContentExtractorFloatingActionButton(contentExtractor);
         }
       }
     }
@@ -184,36 +184,45 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     }
   }
 
-  protected void addFavoriteContentExtractorFloatingActionMenuButton(final IOnlineArticleContentExtractor contentExtractor) {
+  protected void addFavoriteContentExtractorFloatingActionButton(final IOnlineArticleContentExtractor contentExtractor) {
     if(floatingActionMenu != null) {
-      FloatingActionButton favoriteContentExtractorMenu = new FloatingActionButton(this);
+      FloatingActionButton favoriteContentExtractorButton = getFavoriteContentExtractorFloatingActionButtonTemplate(contentExtractor);
 
-      if(contentExtractor instanceof OnlineNewspaperContentExtractorBase) {
-        final OnlineNewspaperContentExtractorBase newspaperContentExtractor = (OnlineNewspaperContentExtractorBase)contentExtractor;
-        configureNewspaperFavoriteContentExtractorFloatingActionMenuButton(contentExtractor, favoriteContentExtractorMenu, newspaperContentExtractor);
-      }
-      else {
-        favoriteContentExtractorMenu.setLabelText(contentExtractor.getSiteBaseUrl());
-        // TODO: what to do on Click?
-      }
+      if(favoriteContentExtractorButton != null) {
+        if(contentExtractor instanceof OnlineNewspaperContentExtractorBase) {
+          final OnlineNewspaperContentExtractorBase newspaperContentExtractor = (OnlineNewspaperContentExtractorBase) contentExtractor;
+          configureNewspaperFavoriteContentExtractorFloatingActionButton(contentExtractor, favoriteContentExtractorButton, newspaperContentExtractor);
+        }
+        else {
+          favoriteContentExtractorButton.setLabelText(contentExtractor.getSiteBaseUrl());
+          // TODO: what to do on Click?
+        }
 
-      floatingActionMenu.addMenuButton(favoriteContentExtractorMenu, 0);
-      favoriteContentExtractorsMenuButtons.add(favoriteContentExtractorMenu);
+        favoriteContentExtractorButton.setVisibility(View.VISIBLE);
+        favoriteContentExtractorsButtons.add(favoriteContentExtractorButton);
+      }
     }
   }
 
-  protected void configureNewspaperFavoriteContentExtractorFloatingActionMenuButton(final IOnlineArticleContentExtractor contentExtractor, FloatingActionButton favoriteContentExtractorMenu, OnlineNewspaperContentExtractorBase newspaperContentExtractor) {
-    favoriteContentExtractorMenu.setLabelText(getString(R.string.floating_action_menu_add_article_of_newspaper, newspaperContentExtractor.getNewspaperName()));
-//    Bitmap icon = IconManager.getInstance().getImageFromUrl(newspaperContentExtractor.getIconUrl());
-//    favoriteContentExtractorMenu.setImageBitmap(icon);
-//
-//    favoriteContentExtractorMenu.setColorNormal(0xFFFFFFFF);
-//    favoriteContentExtractorMenu.setShadowColor(0xFFFFFFFF);
-    favoriteContentExtractorMenu.setColorPressed(0xFFFFFFFF);
+  protected FloatingActionButton getFavoriteContentExtractorFloatingActionButtonTemplate(IOnlineArticleContentExtractor contentExtractor) {
+    switch(favoriteContentExtractorsButtons.size()) {
+      case 0:
+        return (FloatingActionButton)findViewById(R.id.fab_favorite_content_extractor_1);
+      case 1:
+        return (FloatingActionButton)findViewById(R.id.fab_favorite_content_extractor_2);
+      case 2:
+        return (FloatingActionButton)findViewById(R.id.fab_favorite_content_extractor_3);
+      case 3:
+        return (FloatingActionButton)findViewById(R.id.fab_favorite_content_extractor_4);
+      default:
+        return null;
+    }
+  }
 
-    favoriteContentExtractorMenu.setImageResource(R.drawable.fab_add);
+  protected void configureNewspaperFavoriteContentExtractorFloatingActionButton(final IOnlineArticleContentExtractor contentExtractor, FloatingActionButton favoriteContentExtractorButton, OnlineNewspaperContentExtractorBase newspaperContentExtractor) {
+    favoriteContentExtractorButton.setLabelText(getString(R.string.floating_action_button_add_article_of_newspaper, newspaperContentExtractor.getNewspaperName()));
 
-    favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
+    favoriteContentExtractorButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         MainActivity.this.showArticlesOverview(contentExtractor);
@@ -584,7 +593,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     addTagButton.setVisibility(View.GONE);
     floatingActionButtonAddNewspaperArticle.setVisibility(View.VISIBLE);
 
-    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsMenuButtons) {
+    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsButtons) {
       favoriteContentExtractorButton.setVisibility(View.VISIBLE);
     }
   }
@@ -595,7 +604,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     addTagButton.setVisibility(View.VISIBLE);
     floatingActionButtonAddNewspaperArticle.setVisibility(View.GONE);
 
-    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsMenuButtons) {
+    for(FloatingActionButton favoriteContentExtractorButton : favoriteContentExtractorsButtons) {
       favoriteContentExtractorButton.setVisibility(View.GONE);
     }
   }

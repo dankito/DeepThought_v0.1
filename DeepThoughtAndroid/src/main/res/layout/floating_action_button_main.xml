@@ -20,6 +20,48 @@
 
     fab:menu_animationDelayPerItem="50">
 
+
+    <!-- set fab:fab_label to any value but if not set at all Label Text set in MainActivity won't be displayed at all -->
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_favorite_content_extractor_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/MenuButtonsStyle"
+        android:src="@drawable/fab_add"
+        fab:fab_label=" "
+        android:visibility="gone"
+    />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_favorite_content_extractor_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/MenuButtonsStyle"
+        android:src="@drawable/fab_add"
+        fab:fab_label=" "
+        android:visibility="gone"
+    />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_favorite_content_extractor_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/MenuButtonsStyle"
+        android:src="@drawable/fab_add"
+        fab:fab_label=" "
+        android:visibility="gone"
+    />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_favorite_content_extractor_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/MenuButtonsStyle"
+        android:src="@drawable/fab_add"
+        fab:fab_label=" "
+        android:visibility="gone"
+    />
+
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab_add_newspaper_article"
         android:layout_width="wrap_content"
