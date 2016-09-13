@@ -42,14 +42,6 @@ public class ActivityManager {
     return instance;
   }
 
-  public static void cleanUp() {
-    if(instance != null) {
-
-    }
-
-    instance = null;
-  }
-
 
 
   protected ActivityManager() {

@@ -1,9 +1,8 @@
 package net.dankito.deepthought;
 
-import net.dankito.deepthought.activities.ActivityManager;
+import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.dankito.deepthought.platform.AndroidApplicationConfiguration;
-import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ public class AndroidApplication extends android.app.Application {
   public void onTerminate() {
     Application.shutdown();
     AndroidHtmlEditorPool.getInstance().cleanUp();
-    ActivityManager.cleanUp();
 
     super.onTerminate();
   }
