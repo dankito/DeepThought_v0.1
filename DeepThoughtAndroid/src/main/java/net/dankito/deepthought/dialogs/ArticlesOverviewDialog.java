@@ -206,6 +206,9 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     if(isViewEntryDialogVisible()) {
       lastShownViewEntryDialog.onBackPressed();
     }
+    else {
+      super.onBackPressed();
+    }
   }
 
   protected boolean isViewEntryDialogVisible() {
