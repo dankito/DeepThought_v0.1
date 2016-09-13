@@ -389,10 +389,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
 
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    if(canDialogHandleActivityResult(requestCode, resultCode, data)) {
-
-    }
-    else {
+    if(canDialogHandleActivityResult(requestCode, resultCode, data) == false) {
       switch (requestCode) {
         case EditEntryActivity.RequestCode:
           if (resultCode == RESULT_OK && data != null) {

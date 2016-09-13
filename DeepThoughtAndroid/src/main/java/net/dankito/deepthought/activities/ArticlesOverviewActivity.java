@@ -1,8 +1,8 @@
 package net.dankito.deepthought.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -15,23 +15,25 @@ import android.widget.Toast;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.adapter.ArticlesOverviewAdapter;
+import net.dankito.deepthought.dialogs.ViewEntryDialog;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
-import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 25/09/15.
  */
-public class ArticlesOverviewActivity extends AppCompatActivity {
+public class ArticlesOverviewActivity extends DialogParentActivity {
 
 
   protected ListView lstvwArticlesOverview = null;
   protected ArticlesOverviewAdapter articlesOverviewAdapter = null;
+
+  protected ViewEntryDialog viewEntryDialog = null;
 
 
   @Override
@@ -181,8 +183,9 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
         @Override
         public void entryCreated(EntryCreationResult creationResult) {
           // TODO: this is the same code as in CreateEntryFromClipboardContentPopup.createEntryFromOnlineArticleButViewFirst() and in ArticlesOverviewDialogController -> unify
-          if (creationResult.successful())
-            ActivityManager.getInstance().showEditEntryActivity(ArticlesOverviewActivity.this, creationResult);
+          if (creationResult.successful()) {
+            showViewEntryDialog(creationResult);
+          }
         else
           AlertHelper.showErrorMessage(ArticlesOverviewActivity.this, creationResult.getError(),
               Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
@@ -190,4 +193,33 @@ public class ArticlesOverviewActivity extends AppCompatActivity {
       });
     }
   };
+
+  protected void showViewEntryDialog(EntryCreationResult creationResult) {
+    if(viewEntryDialog == null) {
+      viewEntryDialog = createViewEntryDialog();
+    }
+
+    viewEntryDialog.showDialog(this, creationResult);
+  }
+
+  protected ViewEntryDialog createViewEntryDialog() {
+    ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
+//    viewEntryDialog.setHideOnClose(true);
+
+    return viewEntryDialog;
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if(canDialogHandleActivityResult(requestCode, resultCode, data) == false) {
+
+    }
+  }
+
+  @Override
+  public void onBackPressed() {
+    if(isBackButtonPressHandledByDialog() == false) {
+      super.onBackPressed();
+    }
+  }
 }
