@@ -140,7 +140,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     int id = item.getItemId();
 
     if (id == android.R.id.home) {
-      checkForUnsavedChangesAndCloseDialog(false);
+      checkForUnsavedChangesAndCloseDialog();
       return true;
     }
 
@@ -149,15 +149,15 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
 
   public void onBackPressed() {
-    checkForUnsavedChangesAndCloseDialog(true);
+    checkForUnsavedChangesAndCloseDialog();
   }
 
-  protected void checkForUnsavedChangesAndCloseDialog(boolean hasBackButtonBeenPressed) {
+  protected void checkForUnsavedChangesAndCloseDialog() {
     if(hasUnsavedChanges() == true) {
-      askUserIfChangesShouldBeSaved(hasBackButtonBeenPressed);
+      askUserIfChangesShouldBeSaved();
     }
     else {
-      closeDialog(hasBackButtonBeenPressed, false);
+      closeDialog(false);
     }
   }
 
@@ -165,7 +165,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     return false;
   }
 
-  protected void askUserIfChangesShouldBeSaved(final boolean hasBackButtonBeenPressed) {
+  protected void askUserIfChangesShouldBeSaved() {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     TextView view = new TextView(getActivity());
     view.setText(getAlertMessageIfChangesShouldGetSaved());
@@ -181,14 +181,14 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        resetEditedFieldsAndCloseDialog(hasBackButtonBeenPressed);
+        resetEditedFieldsAndCloseDialog();
       }
     });
 
     builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialogInterface, int i) {
-        saveEntryAndCloseDialog(hasBackButtonBeenPressed);
+        saveEntryAndCloseDialog();
       }
     });
 
@@ -199,10 +199,10 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     return -1; // to be overwritten in subclass
   }
 
-  protected void saveEntryAndCloseDialog(boolean hasBackButtonBeenPressed) {
+  protected void saveEntryAndCloseDialog() {
     saveEntityAsyncIfNeeded();
 
-    closeDialog(hasBackButtonBeenPressed, true);
+    closeDialog(true);
   }
 
   protected void saveEntityAsyncIfNeeded() {
@@ -226,24 +226,20 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     // to be implemented in subclass
   }
 
-  protected void resetEditedFieldsAndCloseDialog(boolean hasBackButtonBeenPressed) {
+  protected void resetEditedFieldsAndCloseDialog() {
     if(cleanUpOnClose == false) { // an instance of this Dialog is held somewhere
       // TODO: unset controls with edited fields
     }
 
-    closeDialog(hasBackButtonBeenPressed, false);
+    closeDialog(false);
   }
 
-  public void closeDialog(boolean hasBackButtonBeenPressed, boolean hasEntryBeenSaved) {
+  public void closeDialog(boolean hasEntryBeenSaved) {
     if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
       cleanUp();
     }
 
     hideDialog(hasEntryBeenSaved);
-
-    if(hasBackButtonBeenPressed == false) {
-//      getActivity().getSupportFragmentManager().popBackStack();
-    }
   }
 
 
@@ -259,8 +255,6 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     else { // on subsequent displays we only have to call show() on the then hidden Dialog
       transaction.show(this);
     }
-
-//    transaction.addToBackStack("");
 
     transaction.commit();
 

@@ -260,7 +260,7 @@ public class EditEntryDialog extends FullscreenDialog {
     int id = item.getItemId();
 
     if(id == R.id.mnitmActionSaveEditedFields) {
-      saveEntryAndCloseDialog(false);
+      saveEntryAndCloseDialog();
       return true;
     }
     else if(id == R.id.mnitmActionTakePhotoOrRecognizeText) {
@@ -463,8 +463,8 @@ public class EditEntryDialog extends FullscreenDialog {
 
 
   @Override
-  protected void resetEditedFieldsAndCloseDialog(boolean hasBackButtonBeenPressed) {
-    super.resetEditedFieldsAndCloseDialog(hasBackButtonBeenPressed);
+  protected void resetEditedFieldsAndCloseDialog() {
+    super.resetEditedFieldsAndCloseDialog();
 
     unsetEntryHasBeenEdited();
   }
