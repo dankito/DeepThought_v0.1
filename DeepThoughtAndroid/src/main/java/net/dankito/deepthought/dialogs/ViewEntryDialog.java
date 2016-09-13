@@ -232,7 +232,9 @@ public class ViewEntryDialog extends FullscreenDialog {
     entryCreationResult = null;
 
     mnitmActionSaveEntry.setVisible(false);
-    activity.invalidateOptionsMenu();
+    if(activity != null) {
+      activity.invalidateOptionsMenu();
+    }
   }
 
 

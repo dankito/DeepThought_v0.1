@@ -216,9 +216,19 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void saveEntityAsyncIfNeeded() {
-    if(hasUnsavedChanges()) {
+    if(hasUnsavedChangesThatShouldBeSaved()) {
       saveEntityAsync();
     }
+  }
+
+  /**
+   * For {@link EditEntryDialog} it makes a difference if it has unsaved changes edited in its Dialog
+   * or changes that can be saved.
+   * For most applications this method can be ignored and simply returns the value of {@link #hasUnsavedChanges()}.
+   * @return
+   */
+  protected boolean hasUnsavedChangesThatShouldBeSaved() {
+    return hasUnsavedChanges();
   }
 
   protected void saveEntityAsync() {

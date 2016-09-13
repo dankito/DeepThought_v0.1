@@ -422,6 +422,11 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   @Override
+  protected boolean hasUnsavedChangesThatShouldBeSaved() {
+    return hasUnsavedChanges() || entryCreationResult != null;
+  }
+
+  @Override
   protected int getAlertMessageIfChangesShouldGetSaved() {
     return R.string.alert_dialog_entry_has_unsaved_changes_text;
   }
