@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.adapter.ArticlesOverviewAdapter;
 import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
@@ -43,7 +42,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   @Override
   protected int getLayoutId() {
-    return R.layout.activity_articles_overview;
+    return R.layout.dialog_articles_overview;
   }
 
   @Override
