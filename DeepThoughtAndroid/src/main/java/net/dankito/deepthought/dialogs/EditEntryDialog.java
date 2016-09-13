@@ -120,6 +120,12 @@ public class EditEntryDialog extends FullscreenDialog {
     spnSelectEntrySection.setSelection(entrySectionsSpinnerAdapter.getIndexForSection(section));
   }
 
+
+  @Override
+  protected int getLayoutId() {
+    return R.layout.dialog_edit_entry;
+  }
+
   @Override
   protected void setupUi(View rootView) {
     insertImageOrRecognizedTextHelper = new InsertImageOrRecognizedTextHelper(getActivity());
