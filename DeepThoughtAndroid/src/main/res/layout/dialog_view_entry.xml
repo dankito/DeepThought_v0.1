@@ -19,8 +19,8 @@
 
         <ImageView
             android:id="@+id/imgvwEditEntryAbstractIcon"
-            android:layout_width="@dimen/edit_entry_activity_icon_width"
-            android:layout_height="@dimen/edit_entry_activity_icon_width"
+            android:layout_width="@dimen/edit_entry_dialog_icon_width"
+            android:layout_height="@dimen/edit_entry_dialog_icon_width"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="top"
@@ -70,8 +70,8 @@
 
         <ImageView
             android:id="@+id/imgvwEditEntryTagsIcon"
-            android:layout_width="@dimen/edit_entry_activity_icon_width"
-            android:layout_height="@dimen/edit_entry_activity_icon_width"
+            android:layout_width="@dimen/edit_entry_dialog_icon_width"
+            android:layout_height="@dimen/edit_entry_dialog_icon_width"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="top"
