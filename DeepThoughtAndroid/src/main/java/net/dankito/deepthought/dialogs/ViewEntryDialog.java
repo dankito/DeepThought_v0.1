@@ -93,7 +93,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   @Override
   protected int getLayoutId() {
-    return R.layout.activity_edit_entry;
+    return R.layout.dialog_view_entry;
   }
 
   @Override
