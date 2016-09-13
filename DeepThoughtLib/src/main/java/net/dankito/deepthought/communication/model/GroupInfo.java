@@ -7,6 +7,8 @@ import net.dankito.deepthought.data.model.Group;
  */
 public class GroupInfo {
 
+  protected String databaseId = "";
+
   protected String universallyUniqueId = "";
 
   protected String name = "";
@@ -14,16 +16,17 @@ public class GroupInfo {
   protected String description = "";
 
 
-  public GroupInfo(String universallyUniqueId, String name) {
+  public GroupInfo(String databaseId, String universallyUniqueId, String name, String description) {
+    this.databaseId = databaseId;
     this.universallyUniqueId = universallyUniqueId;
     this.name = name;
-  }
-
-  public GroupInfo(String universallyUniqueId, String name, String description) {
-    this(universallyUniqueId, name);
     this.description = description;
   }
 
+
+  public String getDatabaseId() {
+    return databaseId;
+  }
 
   public String getUniversallyUniqueId() {
     return universallyUniqueId;
@@ -51,7 +54,7 @@ public class GroupInfo {
 
 
   public static GroupInfo fromGroup(Group group) {
-    return new GroupInfo(group.getUniversallyUniqueId(), group.getName(), group.getDescription());
+    return new GroupInfo(group.getId(), group.getUniversallyUniqueId(), group.getName(), group.getDescription());
   }
 
 }
