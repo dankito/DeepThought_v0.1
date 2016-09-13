@@ -37,6 +37,7 @@ import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.settings.enums.SelectedAndroidTab;
+import net.dankito.deepthought.dialogs.ArticlesOverviewDialog;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.dialogs.ViewEntryDialog;
@@ -215,7 +216,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     favoriteContentExtractorMenu.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, contentExtractor);
+        MainActivity.this.showArticlesOverview(contentExtractor);
         closeFloatingActionMenu();
       }
     });
@@ -317,13 +318,20 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       @Override
       public void onClick(DialogInterface dialog, int which) {
         IOnlineArticleContentExtractor clickedExtractor = onlineArticleContentExtractors.get(which);
-        ActivityManager.getInstance().showArticlesOverviewActivity(MainActivity.this, clickedExtractor);
+        MainActivity.this.showArticlesOverview(clickedExtractor);
       }
     });
 
     builder.setNegativeButton(R.string.cancel, null);
 
     builder.create().show();
+  }
+
+  protected void showArticlesOverview(IOnlineArticleContentExtractor contentExtractor) {
+    ArticlesOverviewDialog articlesOverviewDialog = new ArticlesOverviewDialog();
+    articlesOverviewDialog.setContentExtractor(contentExtractor);
+
+    articlesOverviewDialog.showDialog(this);
   }
 
   protected void setControlsEnabledState(boolean enable) {
