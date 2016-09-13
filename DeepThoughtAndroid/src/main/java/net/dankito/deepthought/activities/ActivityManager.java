@@ -13,13 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import net.dankito.deepthought.fragments.EntriesFragment;
-import net.dankito.deepthought.listener.EntityEditedListener;
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.fragments.EntriesFragment;
+import net.dankito.deepthought.listener.EntityEditedListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,6 @@ public class ActivityManager {
 
   public static void cleanUp() {
     if(instance != null) {
-      instance.resetEditEntryActivityCachedData();
       instance.resetShowArticlesOverviewActivityCachedData();
     }
 
@@ -61,46 +59,6 @@ public class ActivityManager {
 
   }
 
-
-  /*    Edit Entry Activity     */
-
-  protected Entry entryToBeEdited = null;
-
-  protected EntryCreationResult entryCreationResultToBeEdited = null;
-
-  public Entry getEntryToBeEdited() {
-    return entryToBeEdited;
-  }
-
-  public EntryCreationResult getEntryCreationResultToBeEdited() {
-    return entryCreationResultToBeEdited;
-  }
-
-  public void resetEditEntryActivityCachedData() {
-    entryToBeEdited = null;
-    entryCreationResultToBeEdited = null;
-  }
-
-
-  public void showEditEntryActivity(Activity activity, Entry entry) {
-    showEditEntryActivity(activity, entry, null);
-  }
-
-  public void showEditEntryActivity(Activity activity, EntryCreationResult creationResult) {
-    showEditEntryActivity(activity, null, creationResult);
-  }
-
-  protected void showEditEntryActivity(Activity activity, Entry entry, EntryCreationResult creationResult) {
-    entryToBeEdited = entry;
-    entryCreationResultToBeEdited = creationResult;
-
-    try {
-      Intent startEditEntryActivityIntent = new Intent(activity, EditEntryActivity.class);
-      activity.startActivityForResult(startEditEntryActivityIntent, EditEntryActivity.RequestCode);
-    } catch(Exception ex) {
-      log.error("Could not start EditEntryActivity", ex);
-    }
-  }
 
 
   /*    Articles Overview Activity     */
@@ -123,7 +81,7 @@ public class ActivityManager {
       Intent startEditEntryActivityIntent = new Intent(activity, ArticlesOverviewActivity.class);
       activity.startActivity(startEditEntryActivityIntent);
     } catch(Exception ex) {
-      log.error("Could not start EditEntryActivity", ex);
+      log.error("Could not start ArticlesOverviewActivity", ex);
     }
   }
 
