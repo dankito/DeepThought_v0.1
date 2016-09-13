@@ -17,6 +17,7 @@ import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.IEntitiesSearcherAndCreator;
@@ -30,16 +31,16 @@ import net.dankito.deepthought.plugin.IPluginManager;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.LogHelper;
+import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.file.FileUtils;
 import net.dankito.deepthought.util.isbn.IIsbnResolver;
-import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
-import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -317,13 +318,15 @@ public class Application {
   }
 
   protected static void callDeepThoughtChangedListeners(DeepThought deepThought) {
-    for(ApplicationListener listener : listeners)
+    for(ApplicationListener listener : new ArrayList<>(listeners)) {
       listener.deepThoughtChanged(deepThought);
+    }
   }
 
   protected static void callNotificationListeners(Notification notification) {
-    for(ApplicationListener listener : listeners)
+    for(ApplicationListener listener : new ArrayList<>(listeners)) {
       listener.notification(notification);
+    }
   }
 
   protected static DeepThoughtError createDataIsReadonlyNotification(Exception ex) {
