@@ -232,7 +232,7 @@ public class ViewEntryDialog extends FullscreenDialog {
     entryCreationResult = null;
 
     mnitmActionSaveEntry.setVisible(false);
-//    getActivity().invalidateOptionsMenu();
+    activity.invalidateOptionsMenu();
   }
 
 
@@ -300,7 +300,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setAbstractPreviewFromHtmlThreadSafe(final String abstractHtml) {
-    getActivity().runOnUiThread(new Runnable() {
+    activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setAbstractPreviewFromHtml(abstractHtml);
@@ -317,7 +317,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setContentHtmlThreadSafe(final String contentHtml) {
-    getActivity().runOnUiThread(new Runnable() {
+    activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setContentHtml(contentHtml);
@@ -331,7 +331,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setTextViewEntryTagsPreviewThreadSafe(final Collection<Tag> tags) {
-    getActivity().runOnUiThread(new Runnable() {
+    activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setTextViewEntryTagsPreview(tags);
@@ -358,7 +358,13 @@ public class ViewEntryDialog extends FullscreenDialog {
   public void cleanUp() {
     if(editEntryDialog != null) {
       editEntryDialog.cleanUp();
+
+      editEntryDialog = null;
     }
+
+    entry.removeEntityListener(entryListener);
+
+    super.cleanUp();
   }
 
 

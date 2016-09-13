@@ -571,6 +571,8 @@ public class EditEntryDialog extends FullscreenDialog {
       ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).cleanUp();
     }
 
+    editEntityListener = null;
+
     super.cleanUp();
   }
 

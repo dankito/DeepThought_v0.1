@@ -176,8 +176,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void askUserIfChangesShouldBeSaved() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-    TextView view = new TextView(getActivity());
+    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    TextView view = new TextView(activity);
     view.setText(getAlertMessageIfChangesShouldGetSaved());
     builder.setView(view);
 
@@ -276,7 +276,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void closeDialog(boolean hasEntryBeenSaved) {
-    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+    FragmentManager fragmentManager = activity.getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 
@@ -305,7 +305,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   @Override
   public void cleanUp() {
-
+    activity = null;
+    dialogListener = null;
   }
 
 }
