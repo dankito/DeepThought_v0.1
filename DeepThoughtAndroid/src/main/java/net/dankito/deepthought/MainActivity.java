@@ -542,7 +542,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     editEntryDialog = new EditEntryDialog();
 
     editEntryDialog.setEntry(entry);
-    editEntryDialog.setCleanUpOnClose(true);
     editEntryDialog.setDialogListener(editEntryDialogListener);
 
     editEntryDialog.showDialog(this);

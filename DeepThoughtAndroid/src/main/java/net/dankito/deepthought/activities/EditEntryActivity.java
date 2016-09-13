@@ -385,7 +385,7 @@ public class EditEntryActivity extends AppCompatActivity implements ICleanUp {
     EditEntryDialog editEntryDialog = new EditEntryDialog();
 
     editEntryDialog.setEntry(entry);
-    editEntryDialog.setCleanUpOnClose(false);
+    editEntryDialog.setHideOnClose(true);
     editEntryDialog.setDialogListener(editEntryDialogListener);
 
     if(entryCreationResult != null) {

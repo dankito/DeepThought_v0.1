@@ -30,7 +30,7 @@ import net.dankito.deepthought.listener.DialogListener;
  */
 public abstract class FullscreenDialog extends DialogFragment implements ICleanUp {
 
-  protected boolean cleanUpOnClose = false;
+  protected boolean hideOnClose = false;
 
   protected boolean hasDialogPreviouslyBeenShown = false;
 
@@ -42,9 +42,14 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
 
-
-  public void setCleanUpOnClose(boolean cleanUpOnClose) {
-    this.cleanUpOnClose = cleanUpOnClose;
+  /**
+   * Sets if Dialog should be really closed (false) or only be hidden (true) so it can quickly be re-shown again.
+   * When set to false (the default value) {@link #cleanUp()} will be called automatically on close.
+   * When set to true it relies on the caller to call {@link #cleanUp()} by himself after he's done using it.
+   * @param hideOnClose
+   */
+  public void setHideOnClose(boolean hideOnClose) {
+    this.hideOnClose = hideOnClose;
   }
 
   public void setDialogListener(DialogListener dialogListener) {
@@ -157,7 +162,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
       askUserIfChangesShouldBeSaved();
     }
     else {
-      closeDialog(false);
+      closeDialogAndMayCleanUp(false);
     }
   }
 
@@ -202,7 +207,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   protected void saveEntryAndCloseDialog() {
     saveEntityAsyncIfNeeded();
 
-    closeDialog(true);
+    closeDialogAndMayCleanUp(true);
   }
 
   protected void saveEntityAsyncIfNeeded() {
@@ -227,19 +232,19 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void resetEditedFieldsAndCloseDialog() {
-    if(cleanUpOnClose == false) { // an instance of this Dialog is held somewhere
+    if(hideOnClose == false) { // an instance of this Dialog is held somewhere
       // TODO: unset controls with edited fields
     }
 
-    closeDialog(false);
+    closeDialogAndMayCleanUp(false);
   }
 
-  public void closeDialog(boolean hasEntryBeenSaved) {
-    if(cleanUpOnClose) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
+  public void closeDialogAndMayCleanUp(boolean hasEntryBeenSaved) {
+    closeDialog(hasEntryBeenSaved);
+
+    if(hideOnClose == false) { // if calling Activity / Dialog keeps an instance of this Dialog, that one will call cleanUp(), don't do it itself
       cleanUp();
     }
-
-    hideDialog(hasEntryBeenSaved);
   }
 
 
@@ -261,11 +266,18 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     hasDialogPreviouslyBeenShown = true;
   }
 
-  protected void hideDialog(boolean hasEntryBeenSaved) {
+  protected void closeDialog(boolean hasEntryBeenSaved) {
     FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-    transaction.hide(this);
+
+    if(hideOnClose) {
+      transaction.hide(this); // only hide Dialog so that it quickly can be redisplayed later on
+    }
+    else {
+      transaction.remove(this);
+    }
+
     transaction.commit();
 
     callDialogBecameHiddenListener(hasEntryBeenSaved);
