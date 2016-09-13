@@ -5,16 +5,6 @@
                 android:layout_height="match_parent"
                 android:background="#FFFFFF">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:background="?attr/colorPrimary">
-    </android.support.v7.widget.Toolbar>
-
     <ListView
         android:id="@+id/lstvwArticlesOverview"
         android:layout_width="match_parent"
@@ -22,9 +12,17 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@+id/toolbar"
-        >
+        android:layout_above="@+id/toolbar"
+        />
 
-    </ListView>
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="?attr/colorPrimary"
+        />
 
 </RelativeLayout>
