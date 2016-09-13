@@ -1,9 +1,7 @@
 package net.dankito.deepthought.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -14,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.fragments.EntriesFragment;
@@ -47,7 +44,7 @@ public class ActivityManager {
 
   public static void cleanUp() {
     if(instance != null) {
-      instance.resetShowArticlesOverviewActivityCachedData();
+
     }
 
     instance = null;
@@ -59,31 +56,6 @@ public class ActivityManager {
 
   }
 
-
-
-  /*    Articles Overview Activity     */
-
-  protected IOnlineArticleContentExtractor extractorToShowArticlesOverviewActivityFor = null;
-
-  public IOnlineArticleContentExtractor getExtractorToShowArticlesOverviewActivityFor() {
-    return extractorToShowArticlesOverviewActivityFor;
-  }
-
-  public void resetShowArticlesOverviewActivityCachedData() {
-    extractorToShowArticlesOverviewActivityFor = null;
-  }
-
-
-  public void showArticlesOverviewActivity(Activity activity, IOnlineArticleContentExtractor extractor) {
-    try {
-      this.extractorToShowArticlesOverviewActivityFor = extractor;
-
-      Intent startEditEntryActivityIntent = new Intent(activity, ArticlesOverviewActivity.class);
-      activity.startActivity(startEditEntryActivityIntent);
-    } catch(Exception ex) {
-      log.error("Could not start ArticlesOverviewActivity", ex);
-    }
-  }
 
 
   public void navigateToEntriesFragment(FragmentManager fragmentManager, Collection<Entry> entries, int fragmentToReplace) {

@@ -488,7 +488,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     });
   }
 
-  // TODO: this is the same code as in ArticlesOverviewActivity and CreateEntryFromClipboardContentPopup
+  // TODO: this is the same code as in CreateEntryFromClipboardContentPopup
   protected void handleCreateEntryResult(final EntryCreationResult creationResult) {
     if (creationResult.successful()) {
       showViewEntryDialog(creationResult);
