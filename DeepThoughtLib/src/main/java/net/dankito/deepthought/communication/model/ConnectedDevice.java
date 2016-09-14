@@ -34,6 +34,11 @@ public class ConnectedDevice extends HostInfo {
     this.messagesPort = messagesPort;
   }
 
+  public ConnectedDevice(String userUniversallyUniqueId, String userName, String deviceUniversallyUniqueId, String deviceName, String platform, String osVersion,
+                         String platformArchitecture, int countSynchronizingDevices) {
+    super(userUniversallyUniqueId, userName, deviceUniversallyUniqueId, deviceName, platform, osVersion, platformArchitecture, countSynchronizingDevices);
+  }
+
 
   public int getSynchronizationPort() {
     return synchronizationPort;
@@ -93,4 +98,16 @@ public class ConnectedDevice extends HostInfo {
     // TODO: this happens on Server side on each new Device Registration (as there the remote device is not added yet to logged on User's devices)
     log.error("Could not find local device with unique id " + getDeviceId() + ". But this happens on Server side on each new Device Registration");
   }
+
+
+  public static ConnectedDevice fromUserAndDevice(User user, Device device, String localHostIpAddress, int messagesPort) {
+    ConnectedDevice connectedDevice = new ConnectedDevice(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(),
+        device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
+
+    connectedDevice.setAddress(localHostIpAddress);
+    connectedDevice.setMessagesPort(messagesPort);
+
+    return connectedDevice;
+  }
+
 }

@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -52,6 +55,8 @@ public class ConnectorMessagesCreator {
 
   protected ConnectedDevice cachedLocalHost = null;
 
+  protected Map<InetAddress, DatagramPacket> cachedSearchDevicesDatagramPackets = new ConcurrentHashMap<>();
+
 
   public ConnectorMessagesCreator(User loggedOnUser, Device localDevice, String localHostIpAddress, int messageReceiverPort, int synchronizationPort) {
     this.loggedOnUser = loggedOnUser;
@@ -62,7 +67,20 @@ public class ConnectorMessagesCreator {
   }
 
 
-  public byte[] createSearchingForDevicesMessage(HostInfo hostInfo) {
+  public DatagramPacket getSearchDevicesDatagramPacket(InetAddress broadcastAddress, int searchDevicesPort) {
+    DatagramPacket cachedPacket = cachedSearchDevicesDatagramPackets.get(broadcastAddress);
+
+    if(cachedPacket == null) {
+      byte[] message = createSearchingForDevicesMessage(getLocalHostDevice());
+      cachedPacket = new DatagramPacket(message, message.length, broadcastAddress, searchDevicesPort);
+
+      cachedSearchDevicesDatagramPackets.put(broadcastAddress, cachedPacket);
+    }
+
+    return cachedPacket;
+  }
+
+  protected byte[] createSearchingForDevicesMessage(HostInfo hostInfo) {
     return createMessage(SearchingForDevicesMessage, createHostInfoMessageString(hostInfo));
   }
 
@@ -131,7 +149,7 @@ public class ConnectorMessagesCreator {
   public ConnectedDevice getLocalHostDevice() {
     synchronized(this) {
       if(cachedLocalHost == null) {
-        cachedLocalHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), localHostIpAddress, messageReceiverPort);
+        cachedLocalHost = ConnectedDevice.fromUserAndDevice(loggedOnUser, localDevice, localHostIpAddress, messageReceiverPort);
 
         // TODO: try to get rid of static method calls
         if(Application.getPlatformConfiguration() != null) {
@@ -181,6 +199,8 @@ public class ConnectorMessagesCreator {
   protected void resetCachedLocalHostInstances() {
     synchronized(this) {
       cachedLocalHost = null;
+
+      cachedSearchDevicesDatagramPackets.clear();
     }
   }
 }

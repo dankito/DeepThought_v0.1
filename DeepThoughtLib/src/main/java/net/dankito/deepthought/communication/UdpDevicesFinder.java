@@ -233,10 +233,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
       broadcastSocket.setSoTimeout(10000);
 
-      byte[] message = messagesCreator.createSearchingForDevicesMessage(localHost);
-      DatagramPacket searchDevicesPacket = new DatagramPacket(message, message.length, broadcastAddress, searchDevicesPort);
-
       while (areBroadcastSocketsOpened) {
+        DatagramPacket searchDevicesPacket = messagesCreator.getSearchDevicesDatagramPacket(broadcastAddress, searchDevicesPort);
         broadcastSocket.send(searchDevicesPacket);
 
         try { Thread.sleep(Constants.SendWeAreAliveMessageInterval); } catch(Exception ignored) { }
