@@ -4,6 +4,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
 
@@ -52,11 +53,14 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
   @Override
   public boolean registerDevice(AskForDeviceRegistrationRequest response) {
     User loggedOnUser = Application.getLoggedOnUser();
+    DeepThoughtApplication application = Application.getApplication();
     Device peerDevice = extractDeviceInformation(response);
 
-    Application.getApplication().addDevice(peerDevice);
+    application.addDevice(peerDevice);
     loggedOnUser.addDevice(peerDevice);
     loggedOnUser.getUsersDefaultGroup().addDevice(peerDevice);
+
+    application.getLocalDevice().incrementCountSynchronizingDevices();
 
     return true;
   }
