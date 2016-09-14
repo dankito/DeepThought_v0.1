@@ -16,7 +16,7 @@
     <string name="floating_action_menu_add_entry">Entry</string>
     <string name="floating_action_menu_add_tag">Tag</string>
     <string name="floating_action_menu_add_newspaper_article">Newspaper Article</string>
-    <string name="floating_action_menu_add_article_of_newspaper">%s Article</string>
+    <string name="floating_action_button_add_article_of_newspaper">%s Article</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

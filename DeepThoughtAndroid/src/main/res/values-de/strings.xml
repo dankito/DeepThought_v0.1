@@ -17,7 +17,7 @@
     <string name="floating_action_menu_add_entry">Eintrag</string>
     <string name="floating_action_menu_add_tag">Schlagwort</string>
     <string name="floating_action_menu_add_newspaper_article">Zeitungsartikel</string>
-    <string name="floating_action_menu_add_article_of_newspaper">%s Artikel</string>
+    <string name="floating_action_button_add_article_of_newspaper">%s Artikel</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
