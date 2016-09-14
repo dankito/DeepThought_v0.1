@@ -159,9 +159,10 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected boolean hasDeviceAlreadyBeenFound(HostInfo hostInfo) {
     for(HostInfo foundDevice : foundDevices) {
+      // i removed check for user unique id as after initial synchronization this one changes so we would ask user again if she/he likes to connect to this device?
       if(hostInfo.getAddress().equals(foundDevice.getAddress()) &&
           hostInfo.getDeviceId().equals(foundDevice.getDeviceId()) &&
-          hostInfo.getUserUniqueId().equals(foundDevice.getUserUniqueId())) {
+          hostInfo.getMessagesPort() == foundDevice.getMessagesPort()) {
         return true;
       }
     }
@@ -249,17 +250,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected void removeDeviceFromFoundDevices(HostInfo device) {
     for(HostInfo foundDevice : foundDevices) {
       if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
-          device.getUserUniqueId().equals(foundDevice.getUserUniqueId())) {
-        foundDevices.remove(foundDevice);
-        break;
-      }
-    }
-  }
-
-  protected void removeDeviceFromFoundDevices(ConnectedDevice device) {
-    for(HostInfo foundDevice : foundDevices) {
-      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
-          device.getAddress().equals(foundDevice.getAddress())) {
+          device.getMessagesPort() == foundDevice.getMessagesPort()) {
         foundDevices.remove(foundDevice);
         break;
       }
