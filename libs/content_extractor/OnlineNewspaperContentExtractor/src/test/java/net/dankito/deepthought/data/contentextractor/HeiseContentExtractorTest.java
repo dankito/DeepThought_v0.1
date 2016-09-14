@@ -64,6 +64,13 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
         "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
   }
 
+  @Test
+  public void importNordpolDesJupiter_ImageGalleryGetsImportedCorrectly() {
+    EntryCreationResult creationResult = testImportArticle("http://www.heise.de/newsticker/meldung/Nordpol-des-Jupiter-voellig-anders-als-erwartet-3313387.html");
+    testImportedArticleValues(creationResult, 5514, "25.12.2015", "Das sind die Top 50 des Jahres 2015", "heise Foto Galerie",
+        "Tausende neue Bilder, zehntausende Kommentare: Aber welches Bild hatte 2015 die Nase vorn? Wir haben unsere Statistik befragt: Hier sind die Top 50 der meistbewerteten Neuzugänge der vergangenen 365 Tage der heise Foto Galerie.");
+  }
+
 
   @Test
   public void importHeiseSecurityArticle_AbstractAndReferenceGetImportedCorrectly() {
