@@ -236,7 +236,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     }
 
     if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
-      for (IConnectedDevicesListener listener : connectedDevicesListeners) {
+      for(IConnectedDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
       }
     }
@@ -410,10 +410,10 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
       listener.messageReceived(methodName, request);
 
     if(Addresses.AskForDeviceRegistrationMethodName.equals(methodName)) {
-      return handleAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest) request);
+      return handleAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest)request);
     }
     else if(Addresses.AskForDeviceRegistrationResponseMethodName.equals(methodName)) {
-      return handleAskForDeviceRegistrationResponse((AskForDeviceRegistrationResponse) request);
+      return handleAskForDeviceRegistrationResponse((AskForDeviceRegistrationResponse)request);
     }
     else if(Addresses.NotifyRemoteWeHaveConnectedMethodName.equals(methodName)) {
       return receivedNotifyRemoteWeHaveConnectedMessage(((GenericRequest<ConnectedDevice>) request).getRequestBody());
@@ -455,9 +455,6 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
   }
 
   protected boolean handleAskForDeviceRegistrationRequest(AskForDeviceRegistrationRequest request) {
-    request.getDevice().setAddress(request.getAddress());
-    request.getDevice().setMessagesPort(request.getPort());
-
     deviceIsAskingForRegistration(request);
 
     return true;

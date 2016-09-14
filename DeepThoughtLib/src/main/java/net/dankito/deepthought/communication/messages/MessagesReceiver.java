@@ -1,8 +1,10 @@
 package net.dankito.deepthought.communication.messages;
 
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
+import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.messages.request.GenericRequest;
 import net.dankito.deepthought.communication.messages.request.Request;
+import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
@@ -259,6 +261,14 @@ public class MessagesReceiver extends NanoHTTPD {
     if(request instanceof GenericRequest && ((GenericRequest)request).getRequestBody() instanceof ConnectedDevice) {
       ConnectedDevice device = ((GenericRequest<ConnectedDevice>)request).getRequestBody();
       device.setAddress(session.getRemoteIp());
+    }
+
+    if(request instanceof AskForDeviceRegistrationRequest) {
+      AskForDeviceRegistrationRequest askForDeviceRegistrationRequest = (AskForDeviceRegistrationRequest)request;
+      HostInfo device = askForDeviceRegistrationRequest.getDevice();
+
+      device.setAddress(askForDeviceRegistrationRequest.getAddress());
+      device.setMessagesPort(askForDeviceRegistrationRequest.getPort());
     }
   }
 

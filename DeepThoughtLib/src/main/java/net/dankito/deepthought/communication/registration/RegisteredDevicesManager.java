@@ -50,7 +50,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
   }
 
   @Override
-  public boolean registerDevice(AskForDeviceRegistrationRequest response) { // TODO: after calling this start searching for registered devices
+  public boolean registerDevice(AskForDeviceRegistrationRequest response) {
     User loggedOnUser = Application.getLoggedOnUser();
     Device peerDevice = extractDeviceInformation(response);
 
