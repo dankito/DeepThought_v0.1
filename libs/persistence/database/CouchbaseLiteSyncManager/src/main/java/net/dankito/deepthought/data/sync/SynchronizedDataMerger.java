@@ -220,28 +220,30 @@ public class SynchronizedDataMerger {
 
   protected BaseEntity updateCachedSynchronizedEntity(DocumentChange change) {
     BaseEntity cachedEntity = null;
+    String entityClassString = (String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME);
 
-    try {
-      Class<BaseEntity> entityClass = (Class<BaseEntity>)Class.forName((String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
-      cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityClass, change.getDocumentId());
-      if(cachedEntity != null) { // cachedEntity == null: Entity not retrieved / cached yet -> will be read from DB on next access anyway, therefore no need to update it
+    if(entityClassString != null) { // sometimes only some Couchbase internal data is synchronized without any user data -> skip these
+      try {
+        Class<BaseEntity> entityClass = (Class<BaseEntity>) Class.forName(entityClassString);
+        cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityClass, change.getDocumentId());
+        if(cachedEntity != null) { // cachedEntity == null: Entity not retrieved / cached yet -> will be read from DB on next access anyway, therefore no need to update it
 
-        Document storedDocument = database.getExistingDocument(change.getDocumentId());
-        Dao dao = entityManager.getDaoForClass(entityClass);
+          Document storedDocument = database.getExistingDocument(change.getDocumentId());
+          Dao dao = entityManager.getDaoForClass(entityClass);
 
-        List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
-        SavedRevision currentRevision = storedDocument.getCurrentRevision();
+          List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
+          SavedRevision currentRevision = storedDocument.getCurrentRevision();
 
-        if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
-          newEntityCreated(entityClass, change);
+          if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
+            newEntityCreated(entityClass, change);
+          }
+          else {
+            updateCachedEntity(cachedEntity, dao, currentRevision);
+          }
         }
-        else {
-          updateCachedEntity(cachedEntity, dao, currentRevision);
-        }
+      } catch (Exception e) {
+        log.error("Could not handle Change", e);
       }
-    }
-    catch(Exception e) {
-      log.error("Could not handle Change", e);
     }
 
     return cachedEntity;
