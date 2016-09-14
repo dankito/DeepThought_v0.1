@@ -263,7 +263,8 @@ public class MainWindowController implements Initializable {
   protected void applicationInstantiated() {
     tabTagsControl.applicationInstantiated();
 
-    deviceRegistrationHandler = new DeviceRegistrationHandler(stage, Application.getDeepThoughtConnector());
+    deviceRegistrationHandler = new DeviceRegistrationHandler(stage, Application.getDeepThoughtConnector(), Application.getThreadPool(), Application.getEntityManager(),
+        Application.getDeepThought(), Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
   }
 
   protected void pluginLoaded(IPlugin plugin) {

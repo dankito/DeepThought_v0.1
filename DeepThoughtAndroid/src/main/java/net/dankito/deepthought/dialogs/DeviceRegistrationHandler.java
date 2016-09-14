@@ -15,8 +15,13 @@ import net.dankito.deepthought.communication.messages.request.AskForDeviceRegist
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.registration.DeviceRegistrationHandlerBase;
+import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.Device;
+import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.sync.InitialSyncManager;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -32,12 +37,14 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   protected String deviceIdShowingSnackbarFor = null;
 
 
-  public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector) {
-    this(mainActivity, deepThoughtConnector, new InitialSyncManager());
+  public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector, IThreadPool threadPool, IEntityManager entityManager,
+                                   DeepThought deepThought, User loggedOnUser, Device localDevice) {
+    this(mainActivity, deepThoughtConnector, threadPool, new InitialSyncManager(entityManager), deepThought, loggedOnUser, localDevice);
   }
 
-  public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector, InitialSyncManager initialSyncManager) {
-    super(deepThoughtConnector, initialSyncManager);
+  public DeviceRegistrationHandler(MainActivity mainActivity, IDeepThoughtConnector deepThoughtConnector, IThreadPool threadPool, InitialSyncManager initialSyncManager,
+                                   DeepThought deepThought, User loggedOnUser, Device localDevice) {
+    super(deepThoughtConnector, threadPool, initialSyncManager, deepThought, loggedOnUser, localDevice);
     this.mainActivity = mainActivity;
   }
 
@@ -63,7 +70,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   @Override
-  protected void askForRegistrationResponseReceived(final AskForDeviceRegistrationResponse response) {
+  protected void showMessageToReceivedAskForRegistrationResponse(final AskForDeviceRegistrationResponse response) {
     mainActivity.runOnUiThread(new Runnable() { // listener is for sure not executed on UI thread
       @Override
       public void run() {

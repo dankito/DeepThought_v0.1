@@ -6,6 +6,10 @@ import net.dankito.deepthought.communication.messages.response.AskForDeviceRegis
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.registration.DeviceRegistrationHandlerBase;
 import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.Device;
+import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.sync.InitialSyncManager;
 
 import java.util.Map;
@@ -25,12 +29,14 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   protected Stage stage;
 
 
-  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector) {
-    this(stage, deepThoughtConnector, new InitialSyncManager());
+  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector, IThreadPool threadPool, IEntityManager entityManager,
+                                   DeepThought deepThought, User loggedOnUser, Device localDevice) {
+    this(stage, deepThoughtConnector, threadPool, new InitialSyncManager(entityManager), deepThought, loggedOnUser, localDevice);
   }
 
-  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector, InitialSyncManager initialSyncManager) {
-    super(deepThoughtConnector, initialSyncManager);
+  public DeviceRegistrationHandler(Stage stage, IDeepThoughtConnector deepThoughtConnector, IThreadPool threadPool, InitialSyncManager initialSyncManager,
+                                   DeepThought deepThought, User loggedOnUser, Device localDevice) {
+    super(deepThoughtConnector, threadPool, initialSyncManager, deepThought, loggedOnUser, localDevice);
     this.stage = stage;
   }
 
@@ -71,7 +77,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   @Override
-  protected void askForRegistrationResponseReceived(AskForDeviceRegistrationResponse response) {
+  protected void showMessageToReceivedAskForRegistrationResponse(AskForDeviceRegistrationResponse response) {
     FXUtils.runOnUiThread(() -> showAskForDeviceRegistrationResponseToUser(response));
   }
 

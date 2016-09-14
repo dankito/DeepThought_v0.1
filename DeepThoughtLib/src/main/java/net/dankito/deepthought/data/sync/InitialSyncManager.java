@@ -64,8 +64,8 @@ public class InitialSyncManager {
   }
 
 
-  public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, AskForDeviceRegistrationRequest request) {
-    syncLocalDatabaseIdsWithRemoteOnes(localDeepThought, loggedOnUser, localDevice, request.getCurrentDeepThoughtInfo(), request.getUser(), request.getDevice(), request.getGroup());
+  public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, AskForDeviceRegistrationRequest requestOrResponse) {
+    syncLocalDatabaseIdsWithRemoteOnes(localDeepThought, loggedOnUser, localDevice, requestOrResponse.getCurrentDeepThoughtInfo(), requestOrResponse.getUser(), requestOrResponse.getDevice(), requestOrResponse.getGroup());
   }
 
   public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, DeepThoughtInfo remoteDeepThought,
