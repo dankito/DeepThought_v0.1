@@ -103,7 +103,10 @@ public class InitialSyncManagerTest {
 
     user2 = deepThoughtApplication2.getLastLoggedOnUser();
     user2.setUserName("User 2");
+    user2.setFirstName("First name 2");
+    user2.setLastName("Last name 2");
     user2.getUsersDefaultGroup().setName("Group 2");
+    user2.getUsersDefaultGroup().setDescription("Group description 2");
     localDevice2 = deepThoughtApplication2.getLocalDevice();
     deepThought2 = user2.getLastViewedDeepThought();
 
@@ -122,6 +125,32 @@ public class InitialSyncManagerTest {
 
 
   @Test
+  public void syncUserInformationWithRemoteOnes() {
+    Assert.assertNotEquals(user1.getUniversallyUniqueId(), user2.getUniversallyUniqueId());
+    Assert.assertNotEquals(user1.getUserName(), user2.getUserName());
+    Assert.assertNotEquals(user1.getFirstName(), user2.getFirstName());
+    Assert.assertNotEquals(user1.getLastName(), user2.getLastName());
+
+    Assert.assertNotEquals(user1.getUsersDefaultGroup().getUniversallyUniqueId(), user2.getUsersDefaultGroup().getUniversallyUniqueId());
+    Assert.assertNotEquals(user1.getUsersDefaultGroup().getName(), user2.getUsersDefaultGroup().getName());
+    Assert.assertNotEquals(user1.getUsersDefaultGroup().getDescription(), user2.getUsersDefaultGroup().getDescription());
+
+
+    underTest.syncUserInformationWithRemoteOnes(user1, UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()));
+
+
+    Assert.assertEquals(user1.getUniversallyUniqueId(), user2.getUniversallyUniqueId());
+    Assert.assertEquals(user1.getUserName(), user2.getUserName());
+    Assert.assertEquals(user1.getFirstName(), user2.getFirstName());
+    Assert.assertEquals(user1.getLastName(), user2.getLastName());
+
+    Assert.assertEquals(user1.getUsersDefaultGroup().getUniversallyUniqueId(), user2.getUsersDefaultGroup().getUniversallyUniqueId());
+    Assert.assertEquals(user1.getUsersDefaultGroup().getName(), user2.getUsersDefaultGroup().getName());
+    Assert.assertEquals(user1.getUsersDefaultGroup().getDescription(), user2.getUsersDefaultGroup().getDescription());
+  }
+
+
+  @Test
   public void syncLocalDatabaseIdsWithRemoteOnes() {
     assertEntityIdsDoNotEqual();
 
@@ -131,13 +160,8 @@ public class InitialSyncManagerTest {
     Assert.assertEquals(deepThought1.getId(), deepThought2.getId());
 
     Assert.assertEquals(user1.getId(), user2.getId());
-    Assert.assertEquals(user1.getUniversallyUniqueId(), user2.getUniversallyUniqueId());
-    Assert.assertEquals(user1.getUserName(), user2.getUserName());
-    Assert.assertEquals(user1.getFirstName(), user2.getFirstName());
-    Assert.assertEquals(user1.getLastName(), user2.getLastName());
 
     Assert.assertEquals(user1.getUsersDefaultGroup().getId(), user2.getUsersDefaultGroup().getId());
-    Assert.assertEquals(user1.getUsersDefaultGroup().getName(), user2.getUsersDefaultGroup().getName());
 
     testDeepThoughtUserDataEntities(deepThought1, user2);
   }
@@ -146,11 +170,8 @@ public class InitialSyncManagerTest {
     Assert.assertNotEquals(deepThought1.getId(), deepThought2.getId());
 
     Assert.assertNotEquals(user1.getId(), user2.getId());
-    Assert.assertNotEquals(user1.getUniversallyUniqueId(), user2.getUniversallyUniqueId());
-    Assert.assertNotEquals(user1.getUserName(), user2.getUserName());
 
     Assert.assertNotEquals(user1.getUsersDefaultGroup().getId(), user2.getUsersDefaultGroup().getId());
-    Assert.assertNotEquals(user1.getUsersDefaultGroup().getName(), user2.getUsersDefaultGroup().getName());
   }
 
   protected void testDeepThoughtUserDataEntities(DeepThought localDeepThought, User remoteUser) {
@@ -177,13 +198,10 @@ public class InitialSyncManagerTest {
 
   protected void testUserDataEntityGotSynchronizedCorrectly(UserDataEntity entity, User remoteUser) {
     Assert.assertEquals(remoteUser.getId(), entity.getCreatedBy().getId());
-    Assert.assertEquals(remoteUser.getUniversallyUniqueId(), entity.getCreatedBy().getUniversallyUniqueId());
 
     Assert.assertEquals(remoteUser.getId(), entity.getModifiedBy().getId());
-    Assert.assertEquals(remoteUser.getUniversallyUniqueId(), entity.getModifiedBy().getUniversallyUniqueId());
 
     Assert.assertEquals(remoteUser.getId(), entity.getOwner().getId());
-    Assert.assertEquals(remoteUser.getUniversallyUniqueId(), entity.getOwner().getUniversallyUniqueId());
   }
 
 

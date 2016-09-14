@@ -43,6 +43,27 @@ public class InitialSyncManager {
   }
 
 
+  public void syncUserInformationWithRemoteOnes(User loggedOnUser, UserInfo remoteUser, GroupInfo remoteUserDefaultGroup) {
+    synchronizeUser(loggedOnUser, remoteUser);
+
+    Group userDefaultGroup = loggedOnUser.getUsersDefaultGroup();
+    synchronizeGroup(userDefaultGroup, remoteUserDefaultGroup);
+  }
+
+  protected void synchronizeUser(User loggedOnUser, UserInfo remoteUser) {
+    loggedOnUser.setUniversallyUniqueId(remoteUser.getUniversallyUniqueId());
+    loggedOnUser.setUserName(remoteUser.getUserName());
+    loggedOnUser.setFirstName(remoteUser.getFirstName());
+    loggedOnUser.setLastName(remoteUser.getLastName());
+  }
+
+  protected void synchronizeGroup(Group userDefaultGroup, GroupInfo remoteUserDefaultGroup) {
+    userDefaultGroup.setUniversallyUniqueId(remoteUserDefaultGroup.getUniversallyUniqueId());
+    userDefaultGroup.setName(remoteUserDefaultGroup.getName());
+    userDefaultGroup.setDescription(remoteUserDefaultGroup.getDescription());
+  }
+
+
   public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, AskForDeviceRegistrationRequest request) {
     syncLocalDatabaseIdsWithRemoteOnes(localDeepThought, loggedOnUser, localDevice, request.getCurrentDeepThoughtInfo(), request.getUser(), request.getDevice(), request.getGroup());
   }
@@ -51,14 +72,13 @@ public class InitialSyncManager {
                                                  UserInfo remoteUser, HostInfo remoteDevice, GroupInfo remoteUserDefaultGroup) {
     entityManager.deleteEntity(loggedOnUser);
 
-    synchronizeUser(loggedOnUser, remoteUser);
-    // TODO: find a better solution then isAlreadyPersisted() in CouchbaseLiteEntityManager.Dao.persist()
+    loggedOnUser.setId(remoteUser.getDatabaseId());
     entityManager.persistEntity(loggedOnUser);
 
     Group userDefaultGroup = loggedOnUser.getUsersDefaultGroup();
     entityManager.deleteEntity(userDefaultGroup);
 
-    synchronizeGroup(userDefaultGroup, remoteUserDefaultGroup);
+    userDefaultGroup.setId(remoteUserDefaultGroup.getDatabaseId());
     entityManager.persistEntity(userDefaultGroup);
 
     entityManager.deleteEntity(localDeepThought);
@@ -67,21 +87,6 @@ public class InitialSyncManager {
     entityManager.persistEntity(localDeepThought);
 
     updateAllUserDataEntities(loggedOnUser, entityManager);
-  }
-
-  protected void synchronizeUser(User loggedOnUser, UserInfo remoteUser) {
-    loggedOnUser.setId(remoteUser.getDatabaseId());
-    loggedOnUser.setUniversallyUniqueId(remoteUser.getUniversallyUniqueId());
-    loggedOnUser.setUserName(remoteUser.getUserName());
-    loggedOnUser.setFirstName(remoteUser.getFirstName());
-    loggedOnUser.setLastName(remoteUser.getLastName());
-  }
-
-  protected void synchronizeGroup(Group userDefaultGroup, GroupInfo remoteUserDefaultGroup) {
-    userDefaultGroup.setId(remoteUserDefaultGroup.getDatabaseId());
-    userDefaultGroup.setUniversallyUniqueId(remoteUserDefaultGroup.getUniversallyUniqueId());
-    userDefaultGroup.setName(remoteUserDefaultGroup.getName());
-    userDefaultGroup.setDescription(remoteUserDefaultGroup.getDescription());
   }
 
   protected void updateAllUserDataEntities(User loggedOnUser, IEntityManager entityManager) {
