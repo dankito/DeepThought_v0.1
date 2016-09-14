@@ -117,12 +117,15 @@ public class DeepThoughtSettings extends SettingsBase implements Serializable {
 
   public Tag getLastViewedTag() {
     if(lastViewedTag == null && lastViewedTagId != null) {
-      if(lastViewedTagId == AllEntriesSystemTag.ID)
+      if(AllEntriesSystemTag.ID.equals(lastViewedTagId)) {
         lastViewedTag = Application.getDeepThought().AllEntriesSystemTag();
-      else if(lastViewedTagId == EntriesWithoutTagsSystemTag.ID)
+      }
+      else if(EntriesWithoutTagsSystemTag.ID.equals(lastViewedTagId)) {
         lastViewedTag = Application.getDeepThought().EntriesWithoutTagsSystemTag();
-      else
+      }
+      else {
         lastViewedTag = Application.getEntityManager().getEntityById(Tag.class, lastViewedTagId);
+      }
     }
 
     return lastViewedTag;
