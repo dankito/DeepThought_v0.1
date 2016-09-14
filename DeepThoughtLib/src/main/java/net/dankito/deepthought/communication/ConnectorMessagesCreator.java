@@ -12,18 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.DatagramPacket;
-import java.net.InetAddress;
 
 /**
  * Created by ganymed on 19/08/15.
  */
 public class ConnectorMessagesCreator {
 
-  public final static String LookingForRegistrationServerMessageHeader = "Looking for Registration Server";
-  public final static String OpenRegistrationServerInfoMessageHeader = "Open Registration Server Info";
-
   public final static String SearchingForDevicesMessage = "Searching for Devices";
-  public final static String RegisteredDeviceFoundMessage = "Registered Device Found";
 
   public static final String MultipartKeyAddress = "address";
   public static final String MultipartKeyPort = "port";
@@ -73,22 +68,6 @@ public class ConnectorMessagesCreator {
     return null;
   }
 
-  public ConnectedDevice getConnectedDeviceFromMessage(byte[] receivedBytes, int packetLength, InetAddress address) {
-    String messageBody = getMessageBodyFromMessage(receivedBytes, packetLength);
-    DeserializationResult<ConnectedDevice> result = JsonIoJsonHelper.parseJsonString(messageBody, ConnectedDevice.class);
-
-    if(result.successful()) {
-      ConnectedDevice device = result.getResult();
-      device.setAddress(address.getHostAddress());
-      device.setStoredDeviceInstance(config.getLoggedOnUser());
-
-      return device;
-    }
-
-    log.error("Could not deserialize message body " + messageBody + " to ConnectedDevice", result.getError());
-    return null;
-  }
-
 
   protected String parseBytesToString(byte[] receivedBytes, int packetLength) {
     if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
@@ -133,12 +112,6 @@ public class ConnectorMessagesCreator {
     return "";
   }
 
-  protected String createConnectedDeviceMessageString() {
-    ConnectedDevice device = getLocalHostDevice();
-
-    return createConnectedDeviceMessageString(device);
-  }
-
   public ConnectedDevice getLocalHostDevice() {
     ConnectedDevice localHost = new ConnectedDevice(config.getLocalDevice().getUniversallyUniqueId(), config.getLocalHostIpAddress(), config.getMessageReceiverPort());
 
@@ -152,21 +125,6 @@ public class ConnectorMessagesCreator {
     }
 
     return localHost;
-  }
-
-  protected String createConnectedDeviceMessageString(ConnectedDevice device) {
-    SerializationResult result = JsonIoJsonHelper.generateJsonString(device);
-    if(result.successful()) {
-      return result.getSerializationResult();
-    }
-
-    log.error("Could not serialize ConnectedDevice " + device, result.getError());
-    return "";
-  }
-
-
-  public ConnectorMessagesCreatorConfig getConfig() {
-    return config;
   }
 
 }
