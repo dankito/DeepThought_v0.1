@@ -2,23 +2,16 @@ package net.dankito.deepthought.communication.registration;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
-
-import java.util.Collection;
 
 /**
  * Created by ganymed on 21/08/15.
  */
 public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
-
-  public Collection<Device> getRegisteredDevices() {
-    return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices();
-  }
 
   @Override
   public boolean hasRegisteredDevices() {
@@ -42,12 +35,6 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     }
 
     return false;
-  }
-
-  @Override
-  public boolean isDeviceRegistered(ConnectedDevice device) {
-    User loggedOnUser = Application.getLoggedOnUser();
-    return device != null && loggedOnUser.containsDevice(device.getDevice());
   }
 
   @Override
