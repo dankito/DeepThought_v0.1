@@ -163,7 +163,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     AsynchronousResponseListenerManager listenerManager2 = new AsynchronousResponseListenerManager();
 
     final Communicator communicator2 = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager2, device2MessagesPort,
-        new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(user2, device2, TestIpAddress, device2MessagesPort)), registeredDevicesManager));
+        new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(user2, device2, TestIpAddress, device2MessagesPort))));
     MessagesReceiver messagesReceiver2 = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(device2MessagesPort, listenerManager2), new MessagesReceiverListener() {
       @Override
       public boolean messageReceived(String methodName, Request request) {

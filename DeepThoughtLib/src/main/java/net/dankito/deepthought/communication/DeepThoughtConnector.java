@@ -89,7 +89,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
 
-    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator, registeredDevicesManager));
+    this.communicator = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager, messageReceiverPort, connectorMessagesCreator));
   }
 
 

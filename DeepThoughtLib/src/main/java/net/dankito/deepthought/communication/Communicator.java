@@ -23,7 +23,6 @@ import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.model.ImportFilesConfiguration;
-import net.dankito.deepthought.communication.registration.IRegisteredDevicesManager;
 import net.dankito.deepthought.data.contentextractor.ocr.ImportFilesResult;
 import net.dankito.deepthought.data.contentextractor.ocr.TextRecognitionResult;
 import net.dankito.deepthought.data.model.Device;
@@ -48,15 +47,12 @@ public class Communicator {
 
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
-  protected IRegisteredDevicesManager registeredDevicesManager;
-
 
   public Communicator(CommunicatorConfig config) {
     this.dispatcher = config.getDispatcher();
     this.listenerManager = config.getListenerManager();
     this.messageReceiverPort = config.getMessageReceiverPort();
     this.connectorMessagesCreator = config.getConnectorMessagesCreator();
-    this.registeredDevicesManager = config.getRegisteredDevicesManager();
   }
 
 
@@ -90,11 +86,6 @@ public class Communicator {
       @Override
       public void responseReceived(Response communicatorResponse) {
         dispatchResponse(response, communicatorResponse, listener);
-
-        // TODO: in order to keep Communicator generic try to avoid reference to IRegisteredDevicesManager
-//        if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok) {
-//          registeredDevicesManager.registerDevice(request, response.getUseSendersUserInformation());
-//        }
       }
     });
   }

@@ -2,7 +2,6 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.communication.messages.AsynchronousResponseListenerManager;
 import net.dankito.deepthought.communication.messages.IMessagesDispatcher;
-import net.dankito.deepthought.communication.registration.IRegisteredDevicesManager;
 
 /**
  * Created by ganymed on 22/11/15.
@@ -17,15 +16,12 @@ public class CommunicatorConfig {
 
   protected ConnectorMessagesCreator connectorMessagesCreator;
 
-  protected IRegisteredDevicesManager registeredDevicesManager;
-
   public CommunicatorConfig(IMessagesDispatcher dispatcher, AsynchronousResponseListenerManager listenerManager, int messageReceiverPort,
-                            ConnectorMessagesCreator connectorMessagesCreator, IRegisteredDevicesManager registeredDevicesManager) {
+                            ConnectorMessagesCreator connectorMessagesCreator) {
     this.dispatcher = dispatcher;
     this.listenerManager = listenerManager;
     this.messageReceiverPort = messageReceiverPort;
     this.connectorMessagesCreator = connectorMessagesCreator;
-    this.registeredDevicesManager = registeredDevicesManager;
   }
 
 
@@ -43,10 +39,6 @@ public class CommunicatorConfig {
 
   public ConnectorMessagesCreator getConnectorMessagesCreator() {
     return connectorMessagesCreator;
-  }
-
-  public IRegisteredDevicesManager getRegisteredDevicesManager() {
-    return registeredDevicesManager;
   }
 
 }
