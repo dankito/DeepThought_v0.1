@@ -16,5 +16,5 @@ public interface IRegisteredDevicesManager {
 
   boolean isDeviceRegistered(ConnectedDevice device);
 
-  boolean registerDevice(AskForDeviceRegistrationRequest response, boolean useOtherSidesUserInfo);
+  boolean registerDevice(AskForDeviceRegistrationRequest response);
 }

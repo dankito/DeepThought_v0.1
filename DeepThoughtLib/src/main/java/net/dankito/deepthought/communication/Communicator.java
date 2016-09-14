@@ -1,6 +1,5 @@
 package net.dankito.deepthought.communication;
 
-import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.listener.ImportFilesResultListener;
 import net.dankito.deepthought.communication.listener.OcrResultListener;
@@ -18,10 +17,10 @@ import net.dankito.deepthought.communication.messages.response.AskForDeviceRegis
 import net.dankito.deepthought.communication.messages.response.ImportFilesResultResponse;
 import net.dankito.deepthought.communication.messages.response.OcrResultResponse;
 import net.dankito.deepthought.communication.messages.response.Response;
-import net.dankito.deepthought.communication.messages.response.ResponseCode;
 import net.dankito.deepthought.communication.messages.response.ScanBarcodeResult;
 import net.dankito.deepthought.communication.messages.response.ScanBarcodeResultResponse;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.model.ImportFilesConfiguration;
 import net.dankito.deepthought.communication.registration.IRegisteredDevicesManager;
@@ -93,9 +92,9 @@ public class Communicator {
         dispatchResponse(response, communicatorResponse, listener);
 
         // TODO: in order to keep Communicator generic try to avoid reference to IRegisteredDevicesManager
-        if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok) {
-          registeredDevicesManager.registerDevice(request, response.getUseSendersUserInformation());
-        }
+//        if (response.allowsRegistration() && communicatorResponse.getResponseCode() == ResponseCode.Ok) {
+//          registeredDevicesManager.registerDevice(request, response.getUseSendersUserInformation());
+//        }
       }
     });
   }

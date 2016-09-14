@@ -365,7 +365,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
 
 
   protected void registerDevice(AskForDeviceRegistrationRequest message, boolean useOtherSidesUserInfo) {
-    registeredDevicesManager.registerDevice(message, useOtherSidesUserInfo);
+    registeredDevicesManager.registerDevice(message);
 
 //    mayStartRegisteredDevicesSearcher();
     communicator.notifyRemoteWeHaveConnected(new ConnectedDevice(message.getDevice().getDeviceId(), message.getAddress(), message.getPort()));
@@ -464,9 +464,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
   }
 
   protected boolean handleAskForDeviceRegistrationResponse(AskForDeviceRegistrationResponse message) {
-    if(message.allowsRegistration()) {
-      registerDevice(message, message.getUseSendersUserInformation());
-    }
+    // nothing to do here, everything is done in DeviceRegistrationHandler
 
     return true;
   }

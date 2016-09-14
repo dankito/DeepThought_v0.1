@@ -1,15 +1,11 @@
 package net.dankito.deepthought.communication.registration;
 
-import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.model.HostInfo;
-import net.dankito.deepthought.communication.model.UserInfo;
-import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
-import net.dankito.deepthought.communication.model.GroupInfo;
-import net.dankito.deepthought.data.model.Group;
+import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
-import net.dankito.deepthought.util.StringUtils;
 
 import java.util.Collection;
 
@@ -54,7 +50,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
   }
 
   @Override
-  public boolean registerDevice(AskForDeviceRegistrationRequest response, boolean useOtherSidesUserInfo) { // TODO: after calling this start searching for registered devices
+  public boolean registerDevice(AskForDeviceRegistrationRequest response) { // TODO: after calling this start searching for registered devices
     User loggedOnUser = Application.getLoggedOnUser();
     Device peerDevice = extractDeviceInformation(response);
 
@@ -62,9 +58,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     loggedOnUser.addDevice(peerDevice);
     loggedOnUser.getUsersDefaultGroup().addDevice(peerDevice);
 
-    if(useOtherSidesUserInfo)
-      mergeUserInfo(response, loggedOnUser, peerDevice);
-    return false;
+    return true;
   }
 
   protected Device extractDeviceInformation(AskForDeviceRegistrationRequest response) {
@@ -74,32 +68,6 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     device.setLastKnownIpAddress(response.getAddress());
 
     return device;
-  }
-
-  protected void mergeUserInfo(AskForDeviceRegistrationRequest response, User loggedOnUser, Device peerDevice) {
-    String previousUserName = loggedOnUser.getUserName();
-    boolean isPreviousUserNameEmpty = StringUtils.isNullOrEmpty(previousUserName);
-
-    UserInfo userInfo = response.getUser();
-    loggedOnUser.setUniversallyUniqueId(userInfo.getUniversallyUniqueId());
-    loggedOnUser.setUserName(userInfo.getUserName());
-    loggedOnUser.setFirstName(userInfo.getFirstName());
-    loggedOnUser.setLastName(userInfo.getLastName());
-
-    GroupInfo groupInfo = response.getGroup();
-    Group group = loggedOnUser.getUsersDefaultGroup();
-    group.setUniversallyUniqueId(groupInfo.getUniversallyUniqueId());
-    group.setName(groupInfo.getName());
-    group.setDescription(groupInfo.getDescription());
-
-    if(isPreviousUserNameEmpty == false && group.getName().contains(previousUserName)) {
-      group.setName(group.getName().replace(previousUserName, loggedOnUser.getUserName()));
-    }
-
-    Device localDevice = Application.getApplication().getLocalDevice();
-    if(isPreviousUserNameEmpty == false && localDevice.getName().contains(previousUserName)) {
-      localDevice.setName(localDevice.getName().replace(previousUserName, loggedOnUser.getUserName()));
-    }
   }
 
 }
