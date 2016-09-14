@@ -1,6 +1,7 @@
 package net.dankito.deepthought.data.sync;
 
 import com.couchbase.lite.CouchbaseLiteException;
+import com.couchbase.lite.Document;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.TestEntityManagerConfiguration;
@@ -12,6 +13,7 @@ import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.Group;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
@@ -19,9 +21,11 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.ThreadPool;
+import net.dankito.jpa.couchbaselite.Dao;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -54,6 +58,9 @@ public class InitialSyncManagerTest {
   protected CouchbaseLiteEntityManagerBase entityManager1;
   protected CouchbaseLiteEntityManagerBase entityManager2;
 
+  protected DeepThoughtApplication deepThoughtApplication1;
+  protected DeepThoughtApplication deepThoughtApplication2;
+
   protected DeepThought deepThought1;
   protected DeepThought deepThought2;
 
@@ -85,7 +92,7 @@ public class InitialSyncManagerTest {
   }
 
   protected void setupEntities() {
-    DeepThoughtApplication deepThoughtApplication1 = DeepThoughtApplication.createApplication();
+    deepThoughtApplication1 = DeepThoughtApplication.createApplication();
 
     user1 = deepThoughtApplication1.getLastLoggedOnUser();
     user1.setUserName("User 1");
@@ -99,7 +106,7 @@ public class InitialSyncManagerTest {
     createTestEntitiesOnDeepThought(deepThought1);
     entityManager1.persistEntity(deepThoughtApplication1);
 
-    DeepThoughtApplication deepThoughtApplication2 = DeepThoughtApplication.createApplication();
+    deepThoughtApplication2 = DeepThoughtApplication.createApplication();
 
     user2 = deepThoughtApplication2.getLastLoggedOnUser();
     user2.setUserName("User 2");
@@ -151,7 +158,7 @@ public class InitialSyncManagerTest {
 
 
   @Test
-  public void syncLocalDatabaseIdsWithRemoteOnes() {
+  public void syncLocalDatabaseIdsWithRemoteOnes_EntitiesGetUpdatedCorrectly() {
     assertEntityIdsDoNotEqual();
 
     underTest.syncLocalDatabaseIdsWithRemoteOnes(deepThought1, user1, localDevice1, DeepThoughtInfo.fromDeepThought(deepThought2), UserInfo.fromUser(user2),
@@ -163,8 +170,23 @@ public class InitialSyncManagerTest {
 
     Assert.assertEquals(user1.getUsersDefaultGroup().getId(), user2.getUsersDefaultGroup().getId());
 
+    Assert.assertNotEquals(deepThoughtApplication1.getId(), deepThoughtApplication2.getId());
+
     testDeepThoughtUserDataEntities(deepThought1, user2);
   }
+
+  @Test
+  public void syncLocalDatabaseIdsWithRemoteOnes_DatabaseGetsUpdatedCorrectly() {
+    assertEntityIdsDoNotEqual();
+
+    underTest.syncLocalDatabaseIdsWithRemoteOnes(deepThought1, user1, localDevice1, DeepThoughtInfo.fromDeepThought(deepThought2), UserInfo.fromUser(user2),
+        HostInfo.fromUserAndDevice(user2, localDevice2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()));
+
+    assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(deepThoughtApplication1, deepThoughtApplication2);
+    assertUserGotUpdatedCorrectlyInDb(user1, user2);
+    assertGroupGotUpdatedCorrectlyInDb(user1.getUsersDefaultGroup(), user2.getUsersDefaultGroup(), user2);
+  }
+
 
   protected void assertEntityIdsDoNotEqual() {
     Assert.assertNotEquals(deepThought1.getId(), deepThought2.getId());
@@ -202,6 +224,40 @@ public class InitialSyncManagerTest {
     Assert.assertEquals(remoteUser.getId(), entity.getModifiedBy().getId());
 
     Assert.assertEquals(remoteUser.getId(), entity.getOwner().getId());
+  }
+
+
+  protected void assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(DeepThoughtApplication application1, DeepThoughtApplication application2) {
+    Document document = entityManager1.getDatabase().getExistingDocument(application1.getId());
+
+    Assert.assertNotEquals(application2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
+    Assert.assertEquals(application2.getLastLoggedOnUser().getId(), document.getProperty(TableConfig.DeepThoughtApplicationLastLoggedOnUserJoinColumnName));
+
+    String userIds = (String)document.getProperty("users"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
+    Assert.assertTrue(userIds.contains(application2.getLastLoggedOnUser().getId()));
+  }
+
+  protected void assertUserGotUpdatedCorrectlyInDb(User user1, User user2) {
+    Document document = entityManager1.getDatabase().getExistingDocument(user1.getId());
+
+    Assert.assertEquals(user2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
+    Assert.assertEquals(user2.getUsersDefaultGroup().getId(), document.getProperty(TableConfig.UserUsersDefaultGroupJoinColumnName));
+    Assert.assertEquals(user2.getLastViewedDeepThought().getId(), document.getProperty(TableConfig.UserLastViewedDeepThoughtColumnName));
+
+    String deepThoughtIds = (String)document.getProperty("deepThoughts"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
+    Assert.assertTrue(deepThoughtIds.contains(user2.getLastViewedDeepThought().getId()));
+
+    String groupIds = (String)document.getProperty("groups"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
+    Assert.assertTrue(groupIds.contains(user2.getUsersDefaultGroup().getId()));
+  }
+
+  protected void assertGroupGotUpdatedCorrectlyInDb(Group group1, Group group2, User user2) {
+    Document document = entityManager1.getDatabase().getExistingDocument(group1.getId());
+
+    Assert.assertEquals(group2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
+
+    String userIds = (String)document.getProperty("users"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
+    Assert.assertTrue(userIds.contains(user2.getId()));
   }
 
 

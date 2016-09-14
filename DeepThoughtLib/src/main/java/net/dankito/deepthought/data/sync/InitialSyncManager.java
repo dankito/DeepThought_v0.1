@@ -70,22 +70,25 @@ public class InitialSyncManager {
 
   public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, DeepThoughtInfo remoteDeepThought,
                                                  UserInfo remoteUser, HostInfo remoteDevice, GroupInfo remoteUserDefaultGroup) {
-    entityManager.deleteEntity(loggedOnUser);
-
-    loggedOnUser.setId(remoteUser.getDatabaseId());
-    entityManager.persistEntity(loggedOnUser);
-
     Group userDefaultGroup = loggedOnUser.getUsersDefaultGroup();
+
+    entityManager.deleteEntity(loggedOnUser);
     entityManager.deleteEntity(userDefaultGroup);
-
-    userDefaultGroup.setId(remoteUserDefaultGroup.getDatabaseId());
-    entityManager.persistEntity(userDefaultGroup);
-
     entityManager.deleteEntity(localDeepThought);
 
+    loggedOnUser.setId(remoteUser.getDatabaseId());
+
+    userDefaultGroup.setId(remoteUserDefaultGroup.getDatabaseId());
+
     localDeepThought.setId(remoteDeepThought.getDatabaseId());
+
+    entityManager.persistEntity(userDefaultGroup);
+    entityManager.persistEntity(loggedOnUser);
     entityManager.persistEntity(localDeepThought);
 
+    entityManager.updateEntity(loggedOnUser.getApplication());
+
+    // as User's Id has changed, all UserDataEntities pointing to that User Id have to be updated in Database
     updateAllUserDataEntities(loggedOnUser, entityManager);
   }
 

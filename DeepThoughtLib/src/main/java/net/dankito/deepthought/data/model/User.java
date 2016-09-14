@@ -76,7 +76,7 @@ public class User extends BaseEntity implements Serializable {
   protected Set<DeepThought> deepThoughts = new HashSet<>();
 
 //  @OneToMany(fetch = FetchType.EAGER, mappedBy = "deviceOwner"/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/)
-  @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } )
   @JoinTable(
       name = TableConfig.UserDeviceJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.UserDeviceJoinTableUserIdColumnName/*, referencedColumnName = "id"*/) },
@@ -88,7 +88,7 @@ public class User extends BaseEntity implements Serializable {
   @JoinColumn(name = TableConfig.UserUsersDefaultGroupJoinColumnName)
   protected Group usersDefaultGroup = null;
 
-  @ManyToMany(fetch = FetchType.LAZY/*, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH }*/ )
+  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } )
   @JoinTable(
       name = TableConfig.UserGroupJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.UserGroupJoinTableUserIdColumnName/*, referencedColumnName = "id"*/) },
