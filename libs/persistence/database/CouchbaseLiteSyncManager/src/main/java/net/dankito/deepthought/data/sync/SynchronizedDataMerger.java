@@ -309,7 +309,7 @@ public class SynchronizedDataMerger {
 
     Collection<BaseEntity> removedEntities = getEntitiesRemovedFromCollection(property, currentTargetEntityIdsString, previousTargetEntityIdsString);
     for(BaseEntity removedEntity : removedEntities) {
-      if(parentRevisionTargetEntityIdsString.contains(removedEntity.getId())) {
+      if(parentRevisionTargetEntityIdsString != null && parentRevisionTargetEntityIdsString.contains(removedEntity.getId())) {
         cachedEntity.callEntityRemovedListeners(previousValueCollection, removedEntity);
       }
       else {
