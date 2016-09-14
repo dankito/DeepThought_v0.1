@@ -50,6 +50,8 @@ public class ConnectorMessagesCreator {
 
   protected int synchronizationPort;
 
+  protected ConnectedDevice cachedLocalHost = null;
+
 
   public ConnectorMessagesCreator(User loggedOnUser, Device localDevice, String localHostIpAddress, int messageReceiverPort, int synchronizationPort) {
     this.loggedOnUser = loggedOnUser;
@@ -127,38 +129,58 @@ public class ConnectorMessagesCreator {
   }
 
   public ConnectedDevice getLocalHostDevice() {
-    ConnectedDevice localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), localHostIpAddress, messageReceiverPort);
+    synchronized(this) {
+      if(cachedLocalHost == null) {
+        cachedLocalHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), localHostIpAddress, messageReceiverPort);
 
-    // TODO: try to get rid of static method calls
-    if(Application.getPlatformConfiguration() != null) {
-      localHost.setHasCaptureDevice(Application.getPlatformConfiguration().hasCaptureDevice());
-      localHost.setCanScanBarcodes(Application.getPlatformConfiguration().canScanBarcodes());
-    }
-    if(Application.getContentExtractorManager() != null) {
-      localHost.setCanDoOcr(Application.getContentExtractorManager().hasOcrContentExtractors());
+        // TODO: try to get rid of static method calls
+        if(Application.getPlatformConfiguration() != null) {
+          cachedLocalHost.setHasCaptureDevice(Application.getPlatformConfiguration().hasCaptureDevice());
+          cachedLocalHost.setCanScanBarcodes(Application.getPlatformConfiguration().canScanBarcodes());
+        }
+        if(Application.getContentExtractorManager() != null) {
+          cachedLocalHost.setCanDoOcr(Application.getContentExtractorManager().hasOcrContentExtractors());
+        }
+      }
     }
 
-    return localHost;
+    return cachedLocalHost;
   }
 
 
   public void setLoggedOnUser(User loggedOnUser) {
     this.loggedOnUser = loggedOnUser;
+
+    resetCachedLocalHostInstances();
   }
 
   public void setLocalDevice(Device localDevice) {
     this.localDevice = localDevice;
+
+    resetCachedLocalHostInstances();
   }
 
   public void setLocalHostIpAddress(String localHostIpAddress) {
     this.localHostIpAddress = localHostIpAddress;
+
+    resetCachedLocalHostInstances();
   }
 
   public void setMessageReceiverPort(int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
+
+    resetCachedLocalHostInstances();
   }
 
   public void setSynchronizationPort(int synchronizationPort) {
     this.synchronizationPort = synchronizationPort;
+
+    resetCachedLocalHostInstances();
+  }
+
+  protected void resetCachedLocalHostInstances() {
+    synchronized(this) {
+      cachedLocalHost = null;
+    }
   }
 }
