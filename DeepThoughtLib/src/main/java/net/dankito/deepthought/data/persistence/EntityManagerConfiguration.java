@@ -329,7 +329,6 @@ public class EntityManagerConfiguration {
         NoteType.class,
         FileLink.class,
         FileType.class,
-        EntriesLinkGroup.class,
     
         ReferenceBase.class,
         ReferenceBasePersonAssociation.class,
