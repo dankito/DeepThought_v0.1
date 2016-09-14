@@ -28,6 +28,8 @@ public abstract class DeviceRegistrationHandlerBase {
 
   protected IThreadPool threadPool;
 
+  protected IRegisteredDevicesManager registeredDevicesManager;
+
   protected DeepThought deepThought;
   protected User loggedOnUser;
   protected Device localDevice;
@@ -36,8 +38,9 @@ public abstract class DeviceRegistrationHandlerBase {
   public DeviceRegistrationHandlerBase(IDeepThoughtConnector deepThoughtConnector, IThreadPool threadPool, InitialSyncManager initialSyncManager,
                                        DeepThought deepThought, User loggedOnUser, Device localDevice) {
     this.communicator = deepThoughtConnector.getCommunicator();
-    this.initialSyncManager = initialSyncManager;
     this.threadPool = threadPool;
+    this.initialSyncManager = initialSyncManager;
+    this.registeredDevicesManager = deepThoughtConnector.getRegisteredDevicesManager();
 
     this.deepThought = deepThought;
     this.loggedOnUser = loggedOnUser;
@@ -152,6 +155,10 @@ public abstract class DeviceRegistrationHandlerBase {
     if(syncDatabaseIds) {
       syncLocalDatabaseIdsWithRemoteOnesAsync(requestOrResponse);
     }
+
+    if(syncDatabaseIds == false) { // otherwise database ids synchronization is still being done async, so at end of this process initialSynchronizationDone() will be called
+      initialSynchronizationDone(requestOrResponse);
+    }
   }
 
 
@@ -170,6 +177,15 @@ public abstract class DeviceRegistrationHandlerBase {
 
   protected void syncLocalDatabaseIdsWithRemoteOnes(AskForDeviceRegistrationRequest requestOrResponse) {
     initialSyncManager.syncLocalDatabaseIdsWithRemoteOnes(deepThought, loggedOnUser, localDevice, requestOrResponse);
+
+    initialSynchronizationDone(requestOrResponse);
+  }
+
+
+  protected void initialSynchronizationDone(AskForDeviceRegistrationRequest requestOrResponse) {
+    registeredDevicesManager.registerDevice(requestOrResponse);
+
+    communicator.acknowledgeWeHaveConnected(requestOrResponse.getDevice());
   }
 
 }
