@@ -368,14 +368,6 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
   }
 
 
-  protected void registerDevice(AskForDeviceRegistrationRequest message, boolean useOtherSidesUserInfo) {
-    registeredDevicesManager.registerDevice(message);
-
-//    mayStartRegisteredDevicesSearcher();
-    communicator.notifyRemoteWeHaveConnected(new ConnectedDevice(message.getDevice().getDeviceId(), message.getAddress(), message.getPort()));
-
-  }
-
   protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
     @Override
     public void deviceFound(HostInfo device) {
