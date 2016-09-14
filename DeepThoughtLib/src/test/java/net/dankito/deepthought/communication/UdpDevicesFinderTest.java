@@ -2,7 +2,6 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.TestApplicationConfiguration;
-import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
@@ -14,12 +13,14 @@ import net.dankito.deepthought.communication.messages.request.AskForDeviceRegist
 import net.dankito.deepthought.communication.messages.request.Request;
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.communication.model.DeepThoughtInfo;
 import net.dankito.deepthought.communication.model.GroupInfo;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.model.UserInfo;
 import net.dankito.deepthought.communication.registration.RegisteredDevicesManager;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.util.ThreadPool;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -44,8 +45,6 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
   protected UdpDevicesFinder devicesFinder;
 
-  protected IApplicationLifeCycleService lifeCycleService;
-
 
   @Override
   public void setup() throws Exception {
@@ -57,12 +56,11 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
     connector = Application.getDeepThoughtConnector();
     communicator = connector.getCommunicator();
     devicesFinder = (UdpDevicesFinder)((DeepThoughtConnector)connector).devicesFinder;
+    devicesFinder = new UdpDevicesFinder(new ThreadPool());
 
     loggedOnUser = Application.getLoggedOnUser();
     localDevice = Application.getApplication().getLocalDevice();
     localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), TestIpAddress, connector.getMessageReceiverPort());
-
-    lifeCycleService = Application.getLifeCycleService();
   }
 
   @After
@@ -170,8 +168,9 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
       @Override
       public boolean messageReceived(String methodName, Request request) {
         if(Addresses.AskForDeviceRegistrationMethodName.equals(methodName)) {
-          communicator2.respondToAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest)request, new AskForDeviceRegistrationResponse(true, true,
-              UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()), HostInfo.fromUserAndDevice(user2, device2), TestIpAddress, device2MessagesPort), null);
+          communicator2.respondToAskForDeviceRegistrationRequest((AskForDeviceRegistrationRequest)request, new AskForDeviceRegistrationResponse(true, true, true,
+              UserInfo.fromUser(user2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()), HostInfo.fromUserAndDevice(user2, device2),
+              DeepThoughtInfo.fromDeepThought(user2.getLastViewedDeepThought()), TestIpAddress, device2MessagesPort), null);
         }
         return false;
       }
@@ -194,100 +193,39 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
   }
 
 
-  @Test
-  public void registeredDevicesExists_NotConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    connector.shutDown();
 
-    mockNumberOfRegisteredDevices(connector, 2);
-    mockNumberOfConnectedDevices(connector, 1);
-
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    Assert.assertTrue(devicesFinder.isRegisteredDevicesSearcherRunning());
-  }
-
-  @Test
-  public void registeredDevicesExists_AlreadyConnectedToAllRegisteredDevices_RegisteredDevicesSearcherWontBeStarted() {
-    connector.shutDown();
-
-    mockNumberOfRegisteredDevices(connector, 2);
-    mockNumberOfConnectedDevices(connector, 2);
-
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    Assert.assertFalse(devicesFinder.isRegisteredDevicesSearcherRunning());
-  }
-
-  @Test
-  public void connectsToARegisteredDevice_IsNowConnectedToAllRegisteredDevices_RegisteredDevicesSearcherGetsStopped() {
-    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
-
-    mockNumberOfRegisteredDevices(connector, 2);
-    mockNumberOfConnectedDevices(connector, 1);
-
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    mockNumberOfConnectedDevices(connector, 2);
-    devicesFinder.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
-
-    Assert.assertFalse(devicesFinder.isRegisteredDevicesSearcherRunning());
-  }
-
-  @Test
-  public void disconnectsFromARegisteredDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
-
-    mockNumberOfRegisteredDevices(connector, 2);
-    mockNumberOfConnectedDevices(connector, 2);
-
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    ConnectedDevice disconnectedDevice = new ConnectedDevice("", "", 0);
-    ConnectedDevicesManager mockConnectedDevicesManager = mockNumberOfConnectedDevices(connector, 1);
-    Mockito.when(mockConnectedDevicesManager.disconnectedFromDevice(disconnectedDevice)).thenReturn(true);
-
-    devicesFinder.connectedDevicesListener.registeredDeviceDisconnected(disconnectedDevice);
-
-    Assert.assertTrue(devicesFinder.isRegisteredDevicesSearcherRunning());
-  }
-
-
-  @Test
-  public void noConnectedDevices_ConnectionsAliveWatcherIsNotRunning() {
-    connector.shutDown();
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    Assert.assertFalse(devicesFinder.isConnectionWatcherRunning());
-  }
-
-  @Test
-  public void deviceConnected_ConnectionsAliveWatcherIsRunning() {
-    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    devicesFinder.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
-
-    Assert.assertTrue(devicesFinder.isConnectionWatcherRunning());
-  }
-
-  @Test
-  public void disconnectsFromLastDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
-    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, lifeCycleService);
-    connector.runAsync();
-    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
-
-    ConnectedDevice connectedDevice = new ConnectedDevice("", "", 0);
-    devicesFinder.connectedDevicesListener.registeredDeviceConnected(connectedDevice);
-    devicesFinder.connectedDevicesListener.registeredDeviceDisconnected(connectedDevice);
-
-    Assert.assertFalse(devicesFinder.isConnectionWatcherRunning());
-  }
+//  @Test
+//  public void noConnectedDevices_ConnectionsAliveWatcherIsNotRunning() {
+//    connector.shutDown();
+//    connector.runAsync();
+//    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
+//
+//    Assert.assertFalse(devicesFinder.isConnectionWatcherRunning());
+//  }
+//
+//  @Test
+//  public void deviceConnected_ConnectionsAliveWatcherIsRunning() {
+//    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, threadPool);
+//    connector.runAsync();
+//    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
+//
+//    devicesFinder.connectedDevicesListener.registeredDeviceConnected(new ConnectedDevice("", "", 0));
+//
+//    Assert.assertTrue(devicesFinder.isConnectionWatcherRunning());
+//  }
+//
+//  @Test
+//  public void disconnectsFromLastDevice_IsNowNotConnectedAnymoreToAllRegisteredDevices_RegisteredDevicesSearcherGetsStarted() {
+//    DeepThoughtConnector connector = new DeepThoughtConnector(devicesFinder, threadPool);
+//    connector.runAsync();
+//    try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started
+//
+//    ConnectedDevice connectedDevice = new ConnectedDevice("", "", 0);
+//    devicesFinder.connectedDevicesListener.registeredDeviceConnected(connectedDevice);
+//    devicesFinder.connectedDevicesListener.registeredDeviceDisconnected(connectedDevice);
+//
+//    Assert.assertFalse(devicesFinder.isConnectionWatcherRunning());
+//  }
 
 
 

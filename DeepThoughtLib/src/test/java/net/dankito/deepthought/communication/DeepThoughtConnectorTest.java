@@ -2,7 +2,6 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.TestApplicationConfiguration;
-import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.messages.request.DoOcrRequest;
 import net.dankito.deepthought.communication.messages.request.ImportFilesRequest;
@@ -31,8 +30,6 @@ public class DeepThoughtConnectorTest extends CommunicationTestBase {
 
   protected Communicator communicator;
 
-  protected IApplicationLifeCycleService lifeCycleService;
-
 
   @Override
   public void setup() throws Exception {
@@ -47,8 +44,6 @@ public class DeepThoughtConnectorTest extends CommunicationTestBase {
     loggedOnUser = Application.getLoggedOnUser();
     localDevice = Application.getApplication().getLocalDevice();
     localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), TestIpAddress, connector.getMessageReceiverPort());
-
-    lifeCycleService = Application.getLifeCycleService();
   }
 
   @After
@@ -62,7 +57,7 @@ public class DeepThoughtConnectorTest extends CommunicationTestBase {
 //    DeepThoughtConnector connector1 = new DeepThoughtConnector(null);
 //    connector1.runAsync();
 
-    DeepThoughtConnector connector2 = new DeepThoughtConnector(Application.getDevicesFinder(), lifeCycleService);
+    DeepThoughtConnector connector2 = new DeepThoughtConnector(Application.getDevicesFinder(), threadPool);
     connector2.runAsync();
 
     try { Thread.sleep(500); } catch(Exception ex) { } // wait same time till Servers have started

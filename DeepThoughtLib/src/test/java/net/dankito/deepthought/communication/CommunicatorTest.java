@@ -771,8 +771,8 @@ public class CommunicatorTest extends CommunicationTestBase {
   }
 
   protected AskForDeviceRegistrationResponse createAskForDeviceRegistrationResponseFromRequest(AskForDeviceRegistrationRequest request) {
-    AskForDeviceRegistrationResponse response = new AskForDeviceRegistrationResponse(true, true, request.getUser(), request.getGroup(),
-        request.getDevice(), request.getAddress(), request.getPort());
+    AskForDeviceRegistrationResponse response = new AskForDeviceRegistrationResponse(true, true, true, request.getUser(), request.getGroup(),
+        request.getDevice(), request.getCurrentDeepThoughtInfo(), request.getAddress(), request.getPort());
     response.setRequestMessageId(request.getMessageId());
 
     return response;
