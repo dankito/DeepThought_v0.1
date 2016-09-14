@@ -229,6 +229,12 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
   }
 
   protected boolean connectedToRegisteredDevice(ConnectedDevice device) {
+    if(registeredDevicesManager.isDeviceRegistered(device) == false) {
+      log.info("Connected to a Device, but it isn't registered: " + device.getDeviceInfoString());
+
+      return false;
+    }
+
     log.info("Connected to registered Device: " + device.getDeviceInfoString());
 
     if(device.getDevice() == null) {
