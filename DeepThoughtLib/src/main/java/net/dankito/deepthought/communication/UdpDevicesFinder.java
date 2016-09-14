@@ -246,11 +246,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
 
   protected void removeDeviceFromFoundDevices(HostInfo device) {
+    // TODO: is IP Address really set in all possible cases?
     for(HostInfo foundDevice : foundDevices) {
       if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
+          foundDevice.getAddress().equals(device.getAddress()) &&
           device.getMessagesPort() == foundDevice.getMessagesPort()) {
         foundDevices.remove(foundDevice);
-        break;
       }
     }
   }
