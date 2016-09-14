@@ -158,12 +158,13 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
   @Test
   public void askForDeviceRegistration_ServerAllowsRegistration_BothDevicesHaveRegisteredOtherEndpoint() throws IOException {
     final int device2MessagesPort = 43210;
+    final int device2SynchronizationPort = 43211;
     final User user2 = User.createNewLocalUser();
     final Device device2 = new Device("test2", "test2", "test2");
     AsynchronousResponseListenerManager listenerManager2 = new AsynchronousResponseListenerManager();
 
     final Communicator communicator2 = new Communicator(new CommunicatorConfig(new MessagesDispatcher(threadPool), listenerManager2, device2MessagesPort,
-        new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(user2, device2, TestIpAddress, device2MessagesPort))));
+        new ConnectorMessagesCreator(user2, device2, TestIpAddress, device2MessagesPort, device2SynchronizationPort)));
     MessagesReceiver messagesReceiver2 = new MessagesReceiver(new DeepThoughtMessagesReceiverConfig(device2MessagesPort, listenerManager2), new MessagesReceiverListener() {
       @Override
       public boolean messageReceived(String methodName, Request request) {

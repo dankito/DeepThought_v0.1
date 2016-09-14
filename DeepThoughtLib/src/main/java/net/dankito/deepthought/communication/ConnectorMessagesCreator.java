@@ -3,6 +3,8 @@ package net.dankito.deepthought.communication;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.data.model.Device;
+import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
 import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
@@ -38,11 +40,23 @@ public class ConnectorMessagesCreator {
   private final static Logger log = LoggerFactory.getLogger(ConnectorMessagesCreator.class);
 
 
-  protected ConnectorMessagesCreatorConfig config;
+  protected User loggedOnUser;
+
+  protected Device localDevice;
+
+  protected String localHostIpAddress;
+
+  protected int messageReceiverPort;
+
+  protected int synchronizationPort;
 
 
-  public ConnectorMessagesCreator(ConnectorMessagesCreatorConfig config) {
-    this.config = config;
+  public ConnectorMessagesCreator(User loggedOnUser, Device localDevice, String localHostIpAddress, int messageReceiverPort, int synchronizationPort) {
+    this.loggedOnUser = loggedOnUser;
+    this.localDevice = localDevice;
+    this.localHostIpAddress = localHostIpAddress;
+    this.messageReceiverPort = messageReceiverPort;
+    this.synchronizationPort = synchronizationPort;
   }
 
 
@@ -113,7 +127,7 @@ public class ConnectorMessagesCreator {
   }
 
   public ConnectedDevice getLocalHostDevice() {
-    ConnectedDevice localHost = new ConnectedDevice(config.getLocalDevice().getUniversallyUniqueId(), config.getLocalHostIpAddress(), config.getMessageReceiverPort());
+    ConnectedDevice localHost = new ConnectedDevice(localDevice.getUniversallyUniqueId(), localHostIpAddress, messageReceiverPort);
 
     // TODO: try to get rid of static method calls
     if(Application.getPlatformConfiguration() != null) {
@@ -127,4 +141,24 @@ public class ConnectorMessagesCreator {
     return localHost;
   }
 
+
+  public void setLoggedOnUser(User loggedOnUser) {
+    this.loggedOnUser = loggedOnUser;
+  }
+
+  public void setLocalDevice(Device localDevice) {
+    this.localDevice = localDevice;
+  }
+
+  public void setLocalHostIpAddress(String localHostIpAddress) {
+    this.localHostIpAddress = localHostIpAddress;
+  }
+
+  public void setMessageReceiverPort(int messageReceiverPort) {
+    this.messageReceiverPort = messageReceiverPort;
+  }
+
+  public void setSynchronizationPort(int synchronizationPort) {
+    this.synchronizationPort = synchronizationPort;
+  }
 }

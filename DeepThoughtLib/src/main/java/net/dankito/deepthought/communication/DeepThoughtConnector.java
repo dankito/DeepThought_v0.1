@@ -84,8 +84,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     this.messageReceiverPort = messageReceiverPort;
 
     this.listenerManager = new AsynchronousResponseListenerManager();
-    this.connectorMessagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(getLoggedOnUser(), getLocalDevice(),
-          NetworkHelper.getIPAddressString(true), messageReceiverPort));
+    this.connectorMessagesCreator = new ConnectorMessagesCreator(getLoggedOnUser(), getLocalDevice(),
+          NetworkHelper.getIPAddressString(true), messageReceiverPort, Constants.SynchronizationDefaultPort);
     this.registeredDevicesManager = new RegisteredDevicesManager();
     this.connectedDevicesManager = new ConnectedDevicesManager();
 
@@ -284,8 +284,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
   protected void setMessageReceiverPort(int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
-    // TODO: what did you learn in Object Orientated Programming?
-    connectorMessagesCreator.config.messageReceiverPort = messageReceiverPort;
+    connectorMessagesCreator.setMessageReceiverPort(messageReceiverPort);
     communicator.setMessageReceiverPort(messageReceiverPort);
   }
 

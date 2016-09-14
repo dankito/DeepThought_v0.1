@@ -23,6 +23,8 @@ public class CommunicationTestBase {
 
   protected final static int CommunicatorPort = 54321;
 
+  protected final static int SynchronizationPort = 43210;
+
 
   protected ConnectorMessagesCreator messagesCreator;
 
@@ -46,7 +48,7 @@ public class CommunicationTestBase {
 
     registeredDevicesManager = new TestRegisteredDevicesManager();
     connectedDevicesManager = new TestConnectedDevicesManager();
-    messagesCreator = new ConnectorMessagesCreator(new ConnectorMessagesCreatorConfig(loggedOnUser, localDevice, TestIpAddress, CommunicatorPort));
+    messagesCreator = new ConnectorMessagesCreator(loggedOnUser, localDevice, TestIpAddress, CommunicatorPort, SynchronizationPort);
     threadPool = new ThreadPool();
   }
 
