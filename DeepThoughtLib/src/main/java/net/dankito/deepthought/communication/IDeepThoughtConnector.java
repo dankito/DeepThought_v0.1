@@ -25,6 +25,8 @@ public interface IDeepThoughtConnector extends IConnectedDevicesListenerManager 
 
   Communicator getCommunicator();
 
+  ConnectorMessagesCreator getMessagesCreator();
+
   RegisteredDevicesManager getRegisteredDevicesManager();
 
   ConnectedDevicesManager getConnectedDevicesManager();

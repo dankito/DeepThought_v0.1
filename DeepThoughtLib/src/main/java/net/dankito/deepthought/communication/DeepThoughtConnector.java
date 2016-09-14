@@ -294,6 +294,11 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     return communicator;
   }
 
+  @Override
+  public ConnectorMessagesCreator getMessagesCreator() {
+    return connectorMessagesCreator;
+  }
+
   protected void setCommunicator(Communicator communicator) {
     this.communicator = communicator;
   }
