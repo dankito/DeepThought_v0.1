@@ -168,6 +168,10 @@ public class Device extends UserDataEntity {
     callPropertyChangedListeners(TableConfig.DeviceCountSynchronizingDevicesColumnName, previousValue, countSynchronizingDevices);
   }
 
+  public void incrementCountSynchronizingDevices() {
+    setCountSynchronizingDevices(getCountSynchronizingDevices() + 1);
+  }
+
   public Set<User> getUsers() {
     return users;
   }
