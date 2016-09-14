@@ -163,6 +163,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
+  public void setId(String id) {
+    this.id = id;
+  }
+
   public Category getTopLevelCategory() {
     return topLevelCategory;
   }
@@ -1016,7 +1020,7 @@ public class DeepThought extends UserDataEntity implements Serializable {
 
   @Override
   public String toString() {
-    return "DeepThought with " + getCountEntries() + " Entries, " + categories.size() + " Categories and " + getCountTags() + " Tags";
+    return "DeepThought with " + getCountEntries() + " Entries, " + getCountCategories() + " Categories and " + getCountTags() + " Tags";
   }
 
 
