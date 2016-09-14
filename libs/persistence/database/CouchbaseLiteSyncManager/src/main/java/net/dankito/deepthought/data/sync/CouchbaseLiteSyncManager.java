@@ -171,17 +171,17 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   @Override
   protected void stopSynchronizationWithDevice(ConnectedDevice device) {
     synchronized(this) {
-      Replication pullReplication = pullReplications.get(getDeviceKey(device));
-      if (pullReplication != null) {
+      Replication pullReplication = pullReplications.remove(getDeviceKey(device));
+      if(pullReplication != null) {
         pullReplication.stop();
       }
 
-      Replication pushReplication = pushReplications.get(getDeviceKey(device));
-      if (pushReplication != null) {
+      Replication pushReplication = pushReplications.remove(getDeviceKey(device));
+      if(pushReplication != null) {
         pushReplication.stop();
       }
 
-      if (pushReplications.size() == 0) { // no devices connected anymore
+      if(pushReplications.size() == 0) { // no devices connected anymore
         stopCBLListener();
       }
     }
