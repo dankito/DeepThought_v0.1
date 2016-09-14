@@ -20,21 +20,21 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   protected boolean allowsRegistration = false;
 
-  protected boolean useLocalUserInformation = false;
+  protected boolean useSendersUserInformation = false;
 
-  protected boolean useLocalDatabaseIds = false;
+  protected boolean useSendersDatabaseIds = false;
 
 
   protected AskForDeviceRegistrationResponse(boolean allowsRegistration) {
     this.allowsRegistration = allowsRegistration;
   }
 
-  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useLocalUserInformation, boolean useLocalDatabaseIds, UserInfo user, GroupInfo group,
+  public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useSendersUserInformation, boolean useSendersDatabaseIds, UserInfo user, GroupInfo group,
                                           HostInfo device, DeepThoughtInfo deepThoughtInfo, String ipAddress, int port) {
     super(user, group, device, deepThoughtInfo, ipAddress, port);
     this.allowsRegistration = allowsRegistration;
-    this.useLocalUserInformation = useLocalUserInformation;
-    this.useLocalDatabaseIds = useLocalDatabaseIds;
+    this.useSendersUserInformation = useSendersUserInformation;
+    this.useSendersDatabaseIds = useSendersDatabaseIds;
   }
 
 
@@ -43,9 +43,14 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
     return allowsRegistration;
   }
 
-  public boolean getUseLocalUserInformation() {
-    return useLocalUserInformation;
+  public boolean getUseSendersUserInformation() {
+    return useSendersUserInformation;
   }
+
+  public boolean getUseSendersDatabaseIds() {
+    return useSendersDatabaseIds;
+  }
+
 
   @Override
   public int getRequestMessageId() {

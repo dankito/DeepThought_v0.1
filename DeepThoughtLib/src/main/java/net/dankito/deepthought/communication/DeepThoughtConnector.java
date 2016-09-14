@@ -465,7 +465,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
 
   protected boolean handleAskForDeviceRegistrationResponse(AskForDeviceRegistrationResponse message) {
     if(message.allowsRegistration()) {
-      registerDevice(message, message.getUseLocalUserInformation());
+      registerDevice(message, message.getUseSendersUserInformation());
     }
 
     return true;
