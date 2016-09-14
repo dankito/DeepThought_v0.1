@@ -1,6 +1,7 @@
 package net.dankito.deepthought.communication.registration;
 
 import net.dankito.deepthought.communication.Communicator;
+import net.dankito.deepthought.communication.ConnectorMessagesCreator;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.listener.ResponseListener;
@@ -30,6 +31,8 @@ public abstract class DeviceRegistrationHandlerBase {
 
   protected IRegisteredDevicesManager registeredDevicesManager;
 
+  protected ConnectorMessagesCreator messagesCreator;
+
   protected DeepThought deepThought;
   protected User loggedOnUser;
   protected Device localDevice;
@@ -41,6 +44,7 @@ public abstract class DeviceRegistrationHandlerBase {
     this.threadPool = threadPool;
     this.initialSyncManager = initialSyncManager;
     this.registeredDevicesManager = deepThoughtConnector.getRegisteredDevicesManager();
+    this.messagesCreator = deepThoughtConnector.getMessagesCreator();
 
     this.deepThought = deepThought;
     this.loggedOnUser = loggedOnUser;
@@ -164,6 +168,8 @@ public abstract class DeviceRegistrationHandlerBase {
 
   protected void syncUserInformationWithRemoteOnes(AskForDeviceRegistrationRequest requestOrResponse) {
     initialSyncManager.syncUserInformationWithRemoteOnes(loggedOnUser, requestOrResponse.getUser(), requestOrResponse.getGroup());
+
+    messagesCreator.setLoggedOnUser(loggedOnUser);
   }
 
   protected void syncLocalDatabaseIdsWithRemoteOnesAsync(final AskForDeviceRegistrationRequest requestOrResponse) {
@@ -185,7 +191,7 @@ public abstract class DeviceRegistrationHandlerBase {
   protected void initialSynchronizationDone(AskForDeviceRegistrationRequest requestOrResponse) {
     registeredDevicesManager.registerDevice(requestOrResponse);
 
-    communicator.acknowledgeWeHaveConnected(requestOrResponse.getDevice());
+    communicator.notifyRemoteWeHaveConnected(requestOrResponse.getDevice()); // so that remote Device knows we're done with initial synchronization and can start syncing / show us as connected to User
   }
 
 }
