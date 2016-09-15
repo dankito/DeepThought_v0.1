@@ -3,7 +3,6 @@ package net.dankito.deepthought.communication;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
 import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
-import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
 import net.dankito.deepthought.communication.messages.AsynchronousResponseListenerManager;
@@ -36,13 +35,13 @@ import org.slf4j.LoggerFactory;
 import java.net.BindException;
 import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Created by ganymed on 19/08/15.
  */
-public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRegisteredDevicesListenerManager {
+public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   private final static Logger log = LoggerFactory.getLogger(DeepThoughtConnector.class);
 
@@ -65,13 +64,15 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRe
 
   protected IDevicesFinder devicesFinder = null;
 
-  protected Set<IUnregisteredDevicesListener> unregisteredDevicesListeners = new HashSet<>();
+  protected Set<IDevicesFinderListener> devicesFinderListeners = new ConcurrentSkipListSet<>();
 
-  protected Set<ConnectedRegisteredDevicesListener> connectedDevicesListeners = new HashSet<>();
+  protected Set<IUnregisteredDevicesListener> unregisteredDevicesListeners = new ConcurrentSkipListSet<>();
 
-  protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new HashSet<>();
+  protected Set<ConnectedRegisteredDevicesListener> connectedDevicesListeners = new ConcurrentSkipListSet<>();
 
-  protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
+  protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new ConcurrentSkipListSet<>();
+
+  protected Set<MessagesReceiverListener> messagesReceiverListeners = new ConcurrentSkipListSet<>();
 
 
   public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool) {
@@ -332,6 +333,28 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRe
   }
 
 
+  @Override
+  public boolean addDevicesFinderListener(IDevicesFinderListener listener) {
+    return devicesFinderListeners.add(listener);
+  }
+
+  @Override
+  public boolean removeDevicesFinderListener(IDevicesFinderListener listener) {
+    return devicesFinderListeners.remove(listener);
+  }
+
+  protected void callDeviceFoundListeners(HostInfo device) {
+    for(IDevicesFinderListener listener : devicesFinderListeners) {
+      listener.deviceFound(device);
+    }
+  }
+
+  protected void callDeviceDisconnectedListeners(HostInfo device) {
+    for(IDevicesFinderListener listener : devicesFinderListeners) {
+      listener.deviceDisconnected(device);
+    }
+  }
+
   public boolean addUnregisteredDevicesListener(IUnregisteredDevicesListener listener) {
     return unregisteredDevicesListeners.add(listener);
   }
@@ -377,6 +400,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRe
   protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
     @Override
     public void deviceFound(HostInfo device) {
+      callDeviceFoundListeners(device);
+
       if(registeredDevicesManager.isDeviceRegistered(device)) {
         foundRegisteredDevice(device);
       }
@@ -387,6 +412,8 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRe
 
     @Override
     public void deviceDisconnected(HostInfo device) {
+      callDeviceDisconnectedListeners(device);
+
       if(registeredDevicesManager.isDeviceRegistered(device)) {
         if(device instanceof ConnectedDevice) { // stupid fix
           disconnectedFromRegisteredDevice((ConnectedDevice)device);
