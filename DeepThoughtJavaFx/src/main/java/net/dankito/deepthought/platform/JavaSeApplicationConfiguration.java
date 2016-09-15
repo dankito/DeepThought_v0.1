@@ -6,6 +6,7 @@ import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.download.IFileDownloader;
@@ -126,8 +127,8 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   }
 
   @Override
-  public IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
-    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)Application.getEntityManager(), threadPool, connectedDevicesListenerManager);
+  public IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, IThreadPool threadPool) {
+    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)Application.getEntityManager(), threadPool, connectedDevicesListenerManager, devicesFinderListenerManager);
   }
 
   @Override

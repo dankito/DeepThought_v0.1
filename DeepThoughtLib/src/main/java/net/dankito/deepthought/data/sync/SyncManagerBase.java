@@ -1,8 +1,11 @@
 package net.dankito.deepthought.data.sync;
 
+import net.dankito.deepthought.communication.IDevicesFinderListener;
 import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.IThreadPool;
 
@@ -25,12 +28,19 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   protected Set<ISynchronizationListener> synchronizationListeners = new HashSet<>();
 
 
-  public SyncManagerBase(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
+  public SyncManagerBase(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, IThreadPool threadPool) {
     this.threadPool = threadPool;
 
+    devicesFinderListenerManager.addDevicesFinderListener(devicesFinderListener);
     connectedDevicesListenerManager.addConnectedDevicesListener(connectedDevicesListener);
   }
 
+
+  protected abstract boolean isListenerStarted();
+
+  protected abstract void startSynchronizationListener() throws Exception;
+
+  protected abstract void stopSynchronizationListener();
 
   protected abstract void startSynchronizationWithDevice(ConnectedDevice device) throws Exception;
 
@@ -69,6 +79,22 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
     }
   }
 
+
+  protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
+    @Override
+    public void deviceFound(HostInfo device) {
+      if(isListenerStarted() == false) {
+        try {
+          startSynchronizationListener();
+        } catch(Exception e) { log.error("Could not start synchronization listener", e); }
+      }
+    }
+
+    @Override
+    public void deviceDisconnected(HostInfo device) {
+
+    }
+  };
 
   protected ConnectedRegisteredDevicesListener connectedDevicesListener = new ConnectedRegisteredDevicesListener() {
     @Override
