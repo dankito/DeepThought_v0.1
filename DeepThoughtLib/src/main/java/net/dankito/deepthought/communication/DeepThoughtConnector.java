@@ -35,8 +35,8 @@ import org.slf4j.LoggerFactory;
 import java.net.BindException;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -64,15 +64,15 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   protected IDevicesFinder devicesFinder = null;
 
-  protected Set<IDevicesFinderListener> devicesFinderListeners = new ConcurrentSkipListSet<>();
+  protected Set<IDevicesFinderListener> devicesFinderListeners = new HashSet<>();
 
-  protected Set<IUnregisteredDevicesListener> unregisteredDevicesListeners = new ConcurrentSkipListSet<>();
+  protected Set<IUnregisteredDevicesListener> unregisteredDevicesListeners = new HashSet<>();
 
-  protected Set<ConnectedRegisteredDevicesListener> connectedDevicesListeners = new ConcurrentSkipListSet<>();
+  protected Set<ConnectedRegisteredDevicesListener> connectedDevicesListeners = new HashSet<>();
 
-  protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new ConcurrentSkipListSet<>();
+  protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new HashSet<>();
 
-  protected Set<MessagesReceiverListener> messagesReceiverListeners = new ConcurrentSkipListSet<>();
+  protected Set<MessagesReceiverListener> messagesReceiverListeners = new HashSet<>();
 
 
   public DeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool) {
