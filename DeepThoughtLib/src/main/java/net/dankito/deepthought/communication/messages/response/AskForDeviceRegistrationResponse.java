@@ -15,8 +15,6 @@ import net.dankito.deepthought.communication.model.GroupInfo;
  */
 public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRequest implements ResponseToAsynchronousRequest {
 
-  public final static AskForDeviceRegistrationResponse Deny = new AskForDeviceRegistrationResponse(false);
-
 
   protected boolean allowsRegistration = false;
 
@@ -24,10 +22,6 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   protected boolean useSendersDatabaseIds = false;
 
-
-  protected AskForDeviceRegistrationResponse(boolean allowsRegistration) {
-    this.allowsRegistration = allowsRegistration;
-  }
 
   public AskForDeviceRegistrationResponse(boolean allowsRegistration, boolean useSendersUserInformation, boolean useSendersDatabaseIds, UserInfo user, GroupInfo group,
                                           HostInfo device, DeepThoughtInfo deepThoughtInfo, String ipAddress, int port) {
@@ -75,6 +69,12 @@ public class AskForDeviceRegistrationResponse extends AskForDeviceRegistrationRe
 
   public static AskForDeviceRegistrationResponse createAllowRegistrationResponse(boolean useLocalUserInformation, boolean useLocalDatabaseIds, User user, Device device) {
     return new AskForDeviceRegistrationResponse(true, useLocalUserInformation, useLocalDatabaseIds, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
+        HostInfo.fromUserAndDevice(user, device), DeepThoughtInfo.fromDeepThought(user.getLastViewedDeepThought()),
+        NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
+  }
+
+  public static AskForDeviceRegistrationResponse createDenyRegistrationResponse(User user, Device device) {
+    return new AskForDeviceRegistrationResponse(false, false, false, UserInfo.fromUser(user), GroupInfo.fromGroup(user.getUsersDefaultGroup()),
         HostInfo.fromUserAndDevice(user, device), DeepThoughtInfo.fromDeepThought(user.getLastViewedDeepThought()),
         NetworkHelper.getIPAddressString(true), Application.getDeepThoughtConnector().getMessageReceiverPort());
   }

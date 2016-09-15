@@ -204,7 +204,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
       }
     }
     else { // if listener is null it's not possible that the user chooses whether she/he likes to allow register or not -> send a deny directly
-      communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.Deny, null);
+      communicator.respondToAskForDeviceRegistrationRequest(request, AskForDeviceRegistrationResponse.createDenyRegistrationResponse(getLoggedOnUser(), getLocalDevice()), null);
     }
   }
 

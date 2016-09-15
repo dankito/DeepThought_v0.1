@@ -102,7 +102,7 @@ public abstract class DeviceRegistrationHandlerBase {
     final AskForDeviceRegistrationResponse result;
 
     if(userAllowsDeviceRegistration == false) {
-      result = AskForDeviceRegistrationResponse.Deny;
+      result = AskForDeviceRegistrationResponse.createDenyRegistrationResponse(loggedOnUser, localDevice);
     }
     else {
       result = createRegistrationIsAllowedResult(request);
