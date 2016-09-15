@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by ganymed on 19/08/15.
  */
-public class ConnectorMessagesCreator {
+public class ConnectorMessagesCreator implements ICommunicationConfigurationManager {
 
   public final static String SearchingForDevicesMessage = "Searching for Devices";
 
@@ -146,6 +146,7 @@ public class ConnectorMessagesCreator {
     return "";
   }
 
+  @Override
   public ConnectedDevice getLocalHostDevice() {
     synchronized(this) {
       if(cachedLocalHost == null) {
@@ -166,30 +167,35 @@ public class ConnectorMessagesCreator {
   }
 
 
+  @Override
   public void setLoggedOnUser(User loggedOnUser) {
     this.loggedOnUser = loggedOnUser;
 
     resetCachedLocalHostInstances();
   }
 
+  @Override
   public void setLocalDevice(Device localDevice) {
     this.localDevice = localDevice;
 
     resetCachedLocalHostInstances();
   }
 
+  @Override
   public void setLocalHostIpAddress(String localHostIpAddress) {
     this.localHostIpAddress = localHostIpAddress;
 
     resetCachedLocalHostInstances();
   }
 
+  @Override
   public void setMessageReceiverPort(int messageReceiverPort) {
     this.messageReceiverPort = messageReceiverPort;
 
     resetCachedLocalHostInstances();
   }
 
+  @Override
   public void setSynchronizationPort(int synchronizationPort) {
     this.synchronizationPort = synchronizationPort;
 
