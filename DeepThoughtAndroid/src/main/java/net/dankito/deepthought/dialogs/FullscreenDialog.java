@@ -163,7 +163,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void checkForUnsavedChangesAndCloseDialog() {
-    if(hasUnsavedChanges() == true) {
+    if(shouldUserBeAskedToSaveChanges() == true) {
       askUserIfChangesShouldBeSaved();
     }
     else {
@@ -171,8 +171,12 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     }
   }
 
-  protected boolean hasUnsavedChanges() {
-    return false;
+  /**
+   * When leaving dialog, determines if User should be ask if she/he likes to save changes.
+   * @return
+   */
+  protected boolean shouldUserBeAskedToSaveChanges() {
+    return hasUnsavedChangesThatShouldBeSaved();
   }
 
   protected void askUserIfChangesShouldBeSaved() {
@@ -222,13 +226,12 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   /**
-   * For {@link EditEntryDialog} it makes a difference if it has unsaved changes edited in its Dialog
-   * or changes that can be saved.
-   * For most applications this method can be ignored and simply returns the value of {@link #hasUnsavedChanges()}.
+   * Determines if there are changes that should be saved.
+   * Only if this method returns true {@link #saveEntity()} will be called.
    * @return
    */
   protected boolean hasUnsavedChangesThatShouldBeSaved() {
-    return hasUnsavedChanges();
+    return false;
   }
 
   protected void saveEntityAsync() {

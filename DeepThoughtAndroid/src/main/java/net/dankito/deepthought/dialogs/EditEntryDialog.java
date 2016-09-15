@@ -417,13 +417,13 @@ public class EditEntryDialog extends FullscreenDialog {
 
 
   @Override
-  protected boolean hasUnsavedChanges() {
+  protected boolean shouldUserBeAskedToSaveChanges() {
     return editedFields.size() > 0;
   }
 
   @Override
   protected boolean hasUnsavedChangesThatShouldBeSaved() {
-    return hasUnsavedChanges() || entryCreationResult != null;
+    return shouldUserBeAskedToSaveChanges() || entryCreationResult != null;
   }
 
   @Override
