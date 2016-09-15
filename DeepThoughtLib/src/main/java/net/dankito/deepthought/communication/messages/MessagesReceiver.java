@@ -91,7 +91,8 @@ public class MessagesReceiver extends NanoHTTPD {
       Request request = parseRequest(session, methodName);
 
       return handleRequest(methodName, request);
-    } catch(Exception ex) {
+    } catch(Exception e) {
+      log.error("Could not respond to " + methodName + " message", e);
       return createCouldNotDeserializeRequestResponse();
     }
   }
