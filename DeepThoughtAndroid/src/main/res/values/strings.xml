@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Deep Thought</string>
+    <string name="app_name">Deep Thought Test</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -45,9 +45,11 @@
     <string name="list_item_entry_context_menu_edit_title">Edit</string>
     <string name="list_item_entry_context_menu_delete_title">Delete</string>
 
+    <string name="view_entry_abstract_label">Abstract</string>
+    <string name="view_entry_tags_label">Tags:</string>
+
     <string name="edit_entry_action_bar_title_new_entry">Create new Entry</string>
     <string name="edit_entry_action_bar_title_entry_format">Edit %1$s</string>
-    <string name="edit_entry_abstract_label">Abstract</string>
     <string name="edit_entry_tags_label">Tags:</string>
     <string name="edit_entry_button_new_tag_text">New</string>
     <string name="edit_entry_content_label">Content</string>

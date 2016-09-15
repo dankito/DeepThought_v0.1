@@ -52,8 +52,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_alignTop="@+id/txtvwEntryTagsPreview"
-                android:layout_alignBottom="@+id/txtvwEntryTagsPreview"
+                android:layout_alignTop="@+id/txtvwEditEntryTagsPreview"
+                android:layout_alignBottom="@+id/txtvwEditEntryTagsPreview"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:textSize="@dimen/edit_entry_search_tags_text_size"
@@ -61,7 +61,7 @@
             />
 
             <TextView
-                android:id="@+id/txtvwEntryTagsPreview"
+                android:id="@+id/txtvwEditEntryTagsPreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -74,7 +74,7 @@
                 android:id="@+id/edtxtEditEntrySearchTag"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/edit_entry_search_tags_height"
-                android:layout_below="@+id/txtvwEntryTagsPreview"
+                android:layout_below="@+id/txtvwEditEntryTagsPreview"
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@+id/btnEditEntryNewTag"
                 android:layout_marginRight="6dp"

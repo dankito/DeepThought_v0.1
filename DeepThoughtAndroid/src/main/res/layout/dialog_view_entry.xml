@@ -9,7 +9,7 @@
     >
 
     <RelativeLayout
-        android:id="@+id/rlytEntryAbstract"
+        android:id="@+id/rlytViewEntryAbstract"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -18,9 +18,9 @@
         >
 
         <ImageView
-            android:id="@+id/imgvwEditEntryAbstractIcon"
-            android:layout_width="@dimen/edit_entry_dialog_icon_width"
-            android:layout_height="@dimen/edit_entry_dialog_icon_width"
+            android:id="@+id/imgvwViewEntryAbstractIcon"
+            android:layout_width="@dimen/view_entry_dialog_icon_width"
+            android:layout_height="@dimen/view_entry_dialog_icon_width"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="top"
@@ -28,25 +28,25 @@
             />
 
         <TextView
-            android:id="@+id/txtvwEditEntryAbstractLabel"
+            android:id="@+id/txtvwViewEntryAbstractLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imgvwEditEntryAbstractIcon"
-            android:layout_alignBottom="@+id/txtvwEntryAbstractPreview"
+            android:layout_toRightOf="@+id/imgvwViewEntryAbstractIcon"
+            android:layout_alignBottom="@+id/txtvwViewEntryAbstractPreview"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:textSize="@dimen/view_entry_labels_text_size"
-            android:text="@string/edit_entry_abstract_label"
+            android:text="@string/view_entry_abstract_label"
             />
 
         <TextView
-            android:id="@+id/txtvwEntryAbstractPreview"
+            android:id="@+id/txtvwViewEntryAbstractPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/txtvwEditEntryAbstractLabel"
+            android:layout_toRightOf="@+id/txtvwViewEntryAbstractLabel"
             android:gravity="center_vertical"
             android:singleLine="false"
             android:maxLines="3"
@@ -58,9 +58,9 @@
 
 
     <RelativeLayout
-        android:id="@+id/rlytTags"
+        android:id="@+id/rlytViewEntryTags"
         android:layout_width="fill_parent"
-        android:layout_below="@id/rlytEntryAbstract"
+        android:layout_below="@id/rlytViewEntryAbstract"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
@@ -69,9 +69,9 @@
     >
 
         <ImageView
-            android:id="@+id/imgvwEditEntryTagsIcon"
-            android:layout_width="@dimen/edit_entry_dialog_icon_width"
-            android:layout_height="@dimen/edit_entry_dialog_icon_width"
+            android:id="@+id/imgvwViewEntryTagsIcon"
+            android:layout_width="@dimen/view_entry_dialog_icon_width"
+            android:layout_height="@dimen/view_entry_dialog_icon_width"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_gravity="top"
@@ -79,26 +79,26 @@
         />
 
         <TextView
-            android:id="@+id/txtvwEditEntryTagsLabel"
+            android:id="@+id/txtvwViewEntryTagsLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imgvwEditEntryTagsIcon"
-            android:layout_alignTop="@+id/txtvwEntryTagsPreview"
-            android:layout_alignBottom="@+id/txtvwEntryTagsPreview"
+            android:layout_toRightOf="@+id/imgvwViewEntryTagsIcon"
+            android:layout_alignTop="@+id/txtvwViewEntryTagsPreview"
+            android:layout_alignBottom="@+id/txtvwViewEntryTagsPreview"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:textSize="@dimen/view_entry_labels_text_size"
-            android:text="@string/edit_entry_tags_label"
+            android:text="@string/view_entry_tags_label"
         />
 
         <TextView
-            android:id="@+id/txtvwEntryTagsPreview"
+            android:id="@+id/txtvwViewEntryTagsPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/txtvwEditEntryTagsLabel"
+            android:layout_toRightOf="@+id/txtvwViewEntryTagsLabel"
             android:layout_marginRight="4dp"
             android:textSize="@dimen/view_entry_labels_text_size"
             android:singleLine="false"
@@ -109,10 +109,10 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/rlytContent"
+        android:id="@+id/rlytViewEntryContent"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/rlytTags"
+        android:layout_below="@+id/rlytViewEntryTags"
         android:layout_above="@id/toolbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
@@ -120,7 +120,7 @@
         >
 
         <WebView
-            android:id="@+id/wbvwContent"
+            android:id="@+id/wbvwViewEntryContent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />

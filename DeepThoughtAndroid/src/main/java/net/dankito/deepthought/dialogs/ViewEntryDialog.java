@@ -53,12 +53,12 @@ public class ViewEntryDialog extends FullscreenDialog {
   protected EditEntryDialog editEntryDialog = null;
 
 
-  protected RelativeLayout rlytEntryAbstract;
-  protected TextView txtvwEntryAbstractPreview;
+  protected RelativeLayout rlytViewEntryAbstract;
+  protected TextView txtvwViewEntryAbstractPreview;
 
-  protected WebView wbvwContent = null;
+  protected WebView wbvwViewEntryContent = null;
 
-  protected TextView txtvwEntryTagsPreview;
+  protected TextView txtvwViewEntryTagsPreview;
 
   protected MenuItem mnitmActionSaveEntry;
 
@@ -108,30 +108,30 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setupAbstractSection(View rootView) {
-    rlytEntryAbstract = (RelativeLayout)rootView.findViewById(R.id.rlytEntryAbstract);
-    rlytEntryAbstract.setOnClickListener(rlytEntryAbstractOnClickListener);
+    rlytViewEntryAbstract = (RelativeLayout)rootView.findViewById(R.id.rlytViewEntryAbstract);
+    rlytViewEntryAbstract.setOnClickListener(rlytViewEntryAbstractOnClickListener);
 
-    txtvwEntryAbstractPreview = (TextView)rootView.findViewById(R.id.txtvwEntryAbstractPreview);
+    txtvwViewEntryAbstractPreview = (TextView)rootView.findViewById(R.id.txtvwViewEntryAbstractPreview);
   }
 
   protected void setupContentSection(View rootView) {
-    wbvwContent = (WebView)rootView.findViewById(R.id.wbvwContent);
-    wbvwContent.setHorizontalScrollBarEnabled(true);
-    wbvwContent.setVerticalScrollBarEnabled(true);
+    wbvwViewEntryContent = (WebView)rootView.findViewById(R.id.wbvwViewEntryContent);
+    wbvwViewEntryContent.setHorizontalScrollBarEnabled(true);
+    wbvwViewEntryContent.setVerticalScrollBarEnabled(true);
 
-    WebSettings settings = wbvwContent.getSettings();
+    WebSettings settings = wbvwViewEntryContent.getSettings();
     settings.setDefaultTextEncodingName("utf-8"); // otherwise non ASCII text doesn't get displayed correctly
     settings.setDefaultFontSize(12); // default font is way to large
     settings.setJavaScriptEnabled(true); // so that embedded videos etc. work
 
-    wbvwContent.setWebViewClient(webViewClient);
+    wbvwViewEntryContent.setWebViewClient(webViewClient);
   }
 
   protected void setupTagsSection(View rootView) {
-    RelativeLayout rlytTags = (RelativeLayout)rootView.findViewById(R.id.rlytTags);
-    rlytTags.setOnClickListener(rlytTagsOnClickListener);
+    RelativeLayout rlytViewEntryTags = (RelativeLayout)rootView.findViewById(R.id.rlytViewEntryTags);
+    rlytViewEntryTags.setOnClickListener(rlytViewEntryTagsOnClickListener);
 
-    txtvwEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwEntryTagsPreview);
+    txtvwViewEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwViewEntryTagsPreview);
   }
 
 
@@ -155,7 +155,7 @@ public class ViewEntryDialog extends FullscreenDialog {
         setAbstractPreview(entry.getAbstractAsPlainText()); // or use Html.fromHtml() ?
       }
       else {
-        rlytEntryAbstract.setVisibility(View.GONE);
+        rlytViewEntryAbstract.setVisibility(View.GONE);
       }
 
       entry.addEntityListener(entryListener);
@@ -314,7 +314,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setAbstractPreview(String abstractPlainText) {
-    txtvwEntryAbstractPreview.setText(abstractPlainText);
+    txtvwViewEntryAbstractPreview.setText(abstractPlainText);
   }
 
   protected void setContentHtmlThreadSafe(final String contentHtml) {
@@ -328,7 +328,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected void setContentHtml(String contentHtml) {
     String formattedContentHtml = "<body style=\"font-family: serif, Georgia, Roboto, Helvetica, Arial; font-size:17;\"" + contentHtml + "</body>";
-    wbvwContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
+    wbvwViewEntryContent.loadDataWithBaseURL(null, formattedContentHtml, "text/html; charset=utf-8", "utf-8", null); // otherwise non ASCII text doesn't get displayed correctly
   }
 
   protected void setTextViewEntryTagsPreviewThreadSafe(final Collection<Tag> tags) {
@@ -343,7 +343,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   protected void setTextViewEntryTagsPreview(Collection<Tag> tags) {
     String tagsPreview = tagsUtil.createTagsPreview(tags, true);
 
-    txtvwEntryTagsPreview.setText(tagsPreview);
+    txtvwViewEntryTagsPreview.setText(tagsPreview);
   }
 
 
@@ -394,14 +394,14 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
 
-  protected View.OnClickListener rlytEntryAbstractOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener rlytViewEntryAbstractOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       showEditEntryDialog(EditEntrySection.Abstract);
     }
   };
 
-  protected View.OnClickListener rlytTagsOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener rlytViewEntryTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       showEditEntryDialog(EditEntrySection.Tags);
@@ -456,7 +456,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected void checkForEntryChanges(String propertyName, Object newValue) {
     if(TableConfig.EntryAbstractColumnName.equals(propertyName)) {
-      rlytEntryAbstract.setVisibility(View.VISIBLE);
+      rlytViewEntryAbstract.setVisibility(View.VISIBLE);
       setAbstractPreviewFromHtmlThreadSafe((String)newValue);
     }
     else if(TableConfig.EntryContentColumnName.equals(propertyName)) {

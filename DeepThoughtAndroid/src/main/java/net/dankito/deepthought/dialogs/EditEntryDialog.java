@@ -201,7 +201,7 @@ public class EditEntryDialog extends FullscreenDialog {
   protected void setupEditTagsSection(View rootView) {
     rlytEditTags = (RelativeLayout)rootView.findViewById(R.id.rlytEditTags);
 
-    txtvwEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwEntryTagsPreview);
+    txtvwEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwEditEntryTagsPreview);
 
     edtxtEditEntrySearchTag = (EditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
     edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
