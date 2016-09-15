@@ -10,6 +10,7 @@ import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
 
 import net.dankito.deepthought.communication.Constants;
+import net.dankito.deepthought.communication.ICommunicationConfigurationManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
@@ -47,6 +48,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected Manager manager;
 
+  protected ICommunicationConfigurationManager configurationManager;
+
   protected boolean alsoUsePullReplication;
 
   protected int synchronizationPort;
@@ -63,16 +66,17 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
 
   public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
-                                  IDevicesFinderListenerManager devicesFinderListenerManager) {
-    this(entityManager, threadPool, connectedDevicesListenerManager, devicesFinderListenerManager, Constants.SynchronizationDefaultPort, true);
+                                  IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager) {
+    this(entityManager, threadPool, connectedDevicesListenerManager, devicesFinderListenerManager, configurationManager, Constants.SynchronizationDefaultPort, true);
   }
 
   public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
-                                  IDevicesFinderListenerManager devicesFinderListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
+                                  IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, int synchronizationPort, boolean alsoUsePullReplication) {
     super(connectedDevicesListenerManager, devicesFinderListenerManager, threadPool);
     this.entityManager = entityManager;
     this.database = entityManager.getDatabase();
     this.manager = database.getManager();
+    this.configurationManager = configurationManager;
     this.synchronizationPort = synchronizationPort;
     this.alsoUsePullReplication = alsoUsePullReplication;
 
@@ -137,6 +141,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
     couchbaseLiteListener = new LiteListener(manager, listenPort, allowedCredentials);
     synchronizationPort = couchbaseLiteListener.getListenPort();
+
+    configurationManager.setSynchronizationPort(synchronizationPort);
 
     listenerThread = new Thread(couchbaseLiteListener);
     listenerThread.start();

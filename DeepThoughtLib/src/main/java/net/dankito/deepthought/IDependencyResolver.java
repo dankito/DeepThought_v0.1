@@ -2,6 +2,7 @@ package net.dankito.deepthought;
 
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
+import net.dankito.deepthought.communication.ICommunicationConfigurationManager;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
@@ -64,7 +65,8 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool);
 
-  IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, IThreadPool threadPool);
+  IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
+                                            IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool);
 
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
 
