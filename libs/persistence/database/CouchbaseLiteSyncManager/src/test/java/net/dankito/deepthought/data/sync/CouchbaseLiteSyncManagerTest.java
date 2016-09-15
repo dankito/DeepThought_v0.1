@@ -12,7 +12,9 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.sync.helper.TestCommunicationConfigurationManager;
 import net.dankito.deepthought.data.sync.helper.TestConnectedDevicesListenerManager;
+import net.dankito.deepthought.data.sync.helper.TestDevicesFinderListenerManager;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.ThreadPool;
 
@@ -51,6 +53,12 @@ public class CouchbaseLiteSyncManagerTest {
   protected TestConnectedDevicesListenerManager listenerManager1 = new TestConnectedDevicesListenerManager();
   protected TestConnectedDevicesListenerManager listenerManager2 = new TestConnectedDevicesListenerManager();
 
+  protected TestDevicesFinderListenerManager devicesFinderListenerManager1 = new TestDevicesFinderListenerManager();
+  protected TestDevicesFinderListenerManager devicesFinderListenerManager2 = new TestDevicesFinderListenerManager();
+
+  protected TestCommunicationConfigurationManager configurationManager1 = new TestCommunicationConfigurationManager();
+  protected TestCommunicationConfigurationManager configurationManager2 = new TestCommunicationConfigurationManager();
+
   protected CouchbaseLiteEntityManagerBase entityManager1;
   protected CouchbaseLiteEntityManagerBase entityManager2;
 
@@ -68,8 +76,8 @@ public class CouchbaseLiteSyncManagerTest {
     entityManager1 = new JavaCouchbaseLiteEntityManager(new TestEntityManagerConfiguration("data/tests/couchbase/01" + System.currentTimeMillis()));
     entityManager2 = new JavaCouchbaseLiteEntityManager(new TestEntityManagerConfiguration("data/tests/couchbase/02" + System.currentTimeMillis()));
 
-    syncManager1 = new CouchbaseLiteSyncManager(entityManager1, threadPool, listenerManager1, DEVICE_1_SYNCHRONIZATION_PORT, true);
-    syncManager2 = new CouchbaseLiteSyncManager(entityManager2, threadPool, listenerManager2, DEVICE_2_SYNCHRONIZATION_PORT, true);
+    syncManager1 = new CouchbaseLiteSyncManager(entityManager1, threadPool, listenerManager1, devicesFinderListenerManager1, configurationManager1, DEVICE_1_SYNCHRONIZATION_PORT, true);
+    syncManager2 = new CouchbaseLiteSyncManager(entityManager2, threadPool, listenerManager2, devicesFinderListenerManager2, configurationManager2, DEVICE_2_SYNCHRONIZATION_PORT, true);
 
     device1 = new ConnectedDevice(UUID.randomUUID().toString(), NetworkHelper.getIPAddressString(true), Constants.MessageHandlerDefaultPort);
     device1.setSynchronizationPort(DEVICE_1_SYNCHRONIZATION_PORT);
