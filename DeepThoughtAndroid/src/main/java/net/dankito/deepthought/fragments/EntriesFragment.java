@@ -148,7 +148,7 @@ public class EntriesFragment extends Fragment {
   }
 
   protected void showEditEntryDialog(Entry entryToEdit) {
-    ((MainActivity)getActivity()).showEditEntryDialog(entryToEdit);
+    ((MainActivity)getActivity()).showViewEntryDialog(entryToEdit);
   }
 
 

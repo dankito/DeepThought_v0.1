@@ -516,6 +516,13 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     viewEntryDialog.showDialog(this);
   }
 
+  public void showViewEntryDialog(Entry entry) {
+    ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
+    viewEntryDialog.setEntry(entry);
+
+    viewEntryDialog.showDialog(this);
+  }
+
   protected void handleReceivedHtmlText(Intent intent) {
     String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
     if(sharedText != null) {
