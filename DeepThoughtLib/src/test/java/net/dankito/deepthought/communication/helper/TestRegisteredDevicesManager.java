@@ -1,7 +1,6 @@
 package net.dankito.deepthought.communication.helper;
 
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
-import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
 import net.dankito.deepthought.communication.registration.IRegisteredDevicesManager;
 
@@ -29,17 +28,6 @@ public class TestRegisteredDevicesManager implements IRegisteredDevicesManager {
   @Override
   public boolean isDeviceRegistered(HostInfo info) {
     return registeredDevices.contains(info);
-  }
-
-  @Override
-  public boolean isDeviceRegistered(ConnectedDevice device) {
-    for(HostInfo info : registeredDevices) {
-      if(device.getDeviceId().equals(info.getDeviceId()) && device.getAddress().equals(info.getAddress()) && device.getMessagesPort() == info.getMessagesPort()) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   @Override
