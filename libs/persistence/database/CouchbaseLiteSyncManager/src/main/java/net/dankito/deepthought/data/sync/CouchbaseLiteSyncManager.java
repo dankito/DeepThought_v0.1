@@ -127,8 +127,10 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   }
 
   @Override
-  protected void startSynchronizationListener() throws Exception {
-    startCBLListener(synchronizationPort, manager, allowedCredentials);
+  protected void startSynchronizationListener() {
+    try {
+      startCBLListener(synchronizationPort, manager, allowedCredentials);
+    } catch(Exception e) { log.error("Could not start Couchbase Lite synchronization listener", e); }
   }
 
   @Override

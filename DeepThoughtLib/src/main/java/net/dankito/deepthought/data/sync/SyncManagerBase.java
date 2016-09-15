@@ -38,7 +38,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
 
   protected abstract boolean isListenerStarted();
 
-  protected abstract void startSynchronizationListener() throws Exception;
+  protected abstract void startSynchronizationListener();
 
   protected abstract void stopSynchronizationListener();
 
@@ -84,9 +84,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
     @Override
     public void deviceFound(HostInfo device) {
       if(isListenerStarted() == false) {
-        try {
-          startSynchronizationListener();
-        } catch(Exception e) { log.error("Could not start synchronization listener", e); }
+        startSynchronizationListener();
       }
     }
 
@@ -99,6 +97,10 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   protected ConnectedRegisteredDevicesListener connectedDevicesListener = new ConnectedRegisteredDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
+      if(isListenerStarted() == false) {
+        startSynchronizationListener();
+      }
+
       startSynchronizationWithDeviceAsync(device);
     }
 
