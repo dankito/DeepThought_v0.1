@@ -205,6 +205,11 @@ public class ViewEntryDialog extends FullscreenDialog {
 
 
   @Override
+  protected boolean shouldUserBeAskedToSaveChanges() {
+    return false;
+  }
+
+  @Override
   protected boolean hasUnsavedChangesThatShouldBeSaved() {
     return entryCreationResult != null;
   }
