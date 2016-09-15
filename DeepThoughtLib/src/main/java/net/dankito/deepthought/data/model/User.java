@@ -116,10 +116,6 @@ public class User extends BaseEntity implements Serializable {
   }
 
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public String getUniversallyUniqueId() {
     return universallyUniqueId;
   }

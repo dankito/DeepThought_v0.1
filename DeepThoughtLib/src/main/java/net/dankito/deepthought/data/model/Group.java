@@ -66,10 +66,6 @@ public class Group extends UserDataEntity {
   }
 
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public String getUniversallyUniqueId() {
     return universallyUniqueId;
   }

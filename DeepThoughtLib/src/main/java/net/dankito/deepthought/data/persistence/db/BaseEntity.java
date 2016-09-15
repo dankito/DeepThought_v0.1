@@ -71,6 +71,15 @@ public class BaseEntity implements Serializable {
   }
 
   /**
+   * I hope you know what you are doing!
+   * When calling this method urgently remove Entity from Database before and then, after setting id, re-add it. And update all its depended Entities so that the know the new id.
+   * @param id
+   */
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  /**
    * <p>
    *  We hope you really know what you are doing when calling this.
    *  We use this only when adding backed up or imported data to existing collection as Entity's ID from other collection may not be meaningful to this ones.

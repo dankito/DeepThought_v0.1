@@ -163,10 +163,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
   public Category getTopLevelCategory() {
     return topLevelCategory;
   }
