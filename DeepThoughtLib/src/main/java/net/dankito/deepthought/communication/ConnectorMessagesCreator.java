@@ -150,7 +150,7 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
   public ConnectedDevice getLocalHostDevice() {
     synchronized(this) {
       if(cachedLocalHost == null) {
-        cachedLocalHost = ConnectedDevice.fromUserAndDevice(loggedOnUser, localDevice, localHostIpAddress, messageReceiverPort);
+        cachedLocalHost = ConnectedDevice.fromUserAndDevice(loggedOnUser, localDevice, localHostIpAddress, messageReceiverPort, synchronizationPort);
 
         // TODO: try to get rid of static method calls
         if(Application.getPlatformConfiguration() != null) {
