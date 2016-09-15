@@ -78,13 +78,13 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   @Override
   protected void showMessageToReceivedAskForRegistrationResponse(AskForDeviceRegistrationResponse response) {
-    FXUtils.runOnUiThread(() -> showAskForDeviceRegistrationResponseToUser(response));
+    showAskForDeviceRegistrationResponseToUser(response);
   }
 
   protected void showAskForDeviceRegistrationResponseToUser(AskForDeviceRegistrationResponse response) {
-    if (response != null) {
+    if(response != null) {
       FXUtils.runOnUiThread(() -> {
-        if (response.allowsRegistration())
+        if(response.allowsRegistration())
           Alerts.showDeviceRegistrationSuccessfulAlert(response, stage);
         else
           Alerts.showServerDeniedDeviceRegistrationAlert(response, stage);
