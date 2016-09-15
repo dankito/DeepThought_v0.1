@@ -1,7 +1,7 @@
 package net.dankito.deepthought.data.sync.helper;
 
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 
 import java.util.HashSet;
@@ -10,18 +10,18 @@ import java.util.Set;
 /**
  * Created by ganymed on 05/09/16.
  */
-public class TestConnectedDevicesListenerManager implements IConnectedDevicesListenerManager {
+public class TestConnectedDevicesListenerManager implements IConnectedRegisteredDevicesListenerManager {
 
-  protected Set<IConnectedDevicesListener> listeners = new HashSet<>();
+  protected Set<ConnectedRegisteredDevicesListener> listeners = new HashSet<>();
 
 
   @Override
-  public boolean addConnectedDevicesListener(IConnectedDevicesListener listener) {
+  public boolean addConnectedDevicesListener(ConnectedRegisteredDevicesListener listener) {
     return listeners.add(listener);
   }
 
   @Override
-  public boolean removeConnectedDevicesListener(IConnectedDevicesListener listener) {
+  public boolean removeConnectedDevicesListener(ConnectedRegisteredDevicesListener listener) {
     return listeners.remove(listener);
   }
 
@@ -36,13 +36,13 @@ public class TestConnectedDevicesListenerManager implements IConnectedDevicesLis
 
 
   public void callDeviceConnectedListeners(ConnectedDevice device) {
-    for(IConnectedDevicesListener listener : listeners) {
+    for(ConnectedRegisteredDevicesListener listener : listeners) {
       listener.registeredDeviceConnected(device);
     }
   }
 
   public void callDeviceDisconnectedListeners(ConnectedDevice device) {
-    for(IConnectedDevicesListener listener : listeners) {
+    for(ConnectedRegisteredDevicesListener listener : listeners) {
       listener.registeredDeviceDisconnected(device);
     }
   }

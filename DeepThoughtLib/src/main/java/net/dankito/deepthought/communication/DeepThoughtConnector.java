@@ -2,8 +2,8 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
 import net.dankito.deepthought.communication.messages.AsynchronousResponseListenerManager;
@@ -42,7 +42,7 @@ import java.util.Set;
 /**
  * Created by ganymed on 19/08/15.
  */
-public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDevicesListenerManager {
+public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedRegisteredDevicesListenerManager {
 
   private final static Logger log = LoggerFactory.getLogger(DeepThoughtConnector.class);
 
@@ -67,7 +67,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
 
   protected Set<IUnregisteredDevicesListener> unregisteredDevicesListeners = new HashSet<>();
 
-  protected Set<IConnectedDevicesListener> connectedDevicesListeners = new HashSet<>();
+  protected Set<ConnectedRegisteredDevicesListener> connectedDevicesListeners = new HashSet<>();
 
   protected Set<ImportFilesOrDoOcrListener> importFilesOrDoOcrListeners = new HashSet<>();
 
@@ -242,7 +242,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     }
 
     if(connectedDevicesManager.connectedToDevice(device)) { // check if we're not already aware of this device
-      for(IConnectedDevicesListener listener : connectedDevicesListeners) {
+      for(ConnectedRegisteredDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceConnected(device);
       }
     }
@@ -263,7 +263,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
       // as there are as well other ways of being notified of Device disconnection, inform DevicesFinder so it doesn't think it's still connected ...
       devicesFinder.disconnectedFromDevice(device); // and therefore can judge device correctly as re-connected on next received message
 
-      for (IConnectedDevicesListener listener : connectedDevicesListeners) {
+      for(ConnectedRegisteredDevicesListener listener : connectedDevicesListeners) {
         listener.registeredDeviceDisconnected(device);
       }
     }
@@ -340,11 +340,11 @@ public class DeepThoughtConnector implements IDeepThoughtConnector, IConnectedDe
     return unregisteredDevicesListeners.remove(listener);
   }
 
-  public boolean addConnectedDevicesListener(IConnectedDevicesListener listener) {
+  public boolean addConnectedDevicesListener(ConnectedRegisteredDevicesListener listener) {
     return connectedDevicesListeners.add(listener);
   }
 
-  public boolean removeConnectedDevicesListener(IConnectedDevicesListener listener) {
+  public boolean removeConnectedDevicesListener(ConnectedRegisteredDevicesListener listener) {
     return connectedDevicesListeners.remove(listener);
   }
 

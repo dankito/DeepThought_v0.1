@@ -5,7 +5,7 @@ import net.dankito.deepthought.communication.model.ConnectedDevice;
 /**
  * Created by ganymed on 20/08/15.
  */
-public interface IConnectedDevicesListener {
+public interface ConnectedRegisteredDevicesListener {
 
   void registeredDeviceConnected(ConnectedDevice device);
 

@@ -1,7 +1,7 @@
 package net.dankito.deepthought.controls.connected_devices;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
+import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.model.Device;
@@ -70,7 +70,7 @@ public class ConnectedDevicesPanel extends HBox implements ICleanUp {
   }
 
 
-  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
+  protected ConnectedRegisteredDevicesListener connectedDevicesListener = new ConnectedRegisteredDevicesListener() {
 
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {

@@ -1,7 +1,7 @@
 package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.communication.connected_device.ConnectedDevicesManager;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.listener.ImportFilesOrDoOcrListener;
 import net.dankito.deepthought.communication.listener.MessagesReceiverListener;
 import net.dankito.deepthought.communication.registration.IUnregisteredDevicesListener;
@@ -10,7 +10,7 @@ import net.dankito.deepthought.communication.registration.RegisteredDevicesManag
 /**
  * Created by ganymed on 20/08/15.
  */
-public interface IDeepThoughtConnector extends IConnectedDevicesListenerManager {
+public interface IDeepThoughtConnector extends IConnectedRegisteredDevicesListenerManager {
 
   void runAsync();
 

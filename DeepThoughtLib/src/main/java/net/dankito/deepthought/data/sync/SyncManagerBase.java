@@ -1,7 +1,7 @@
 package net.dankito.deepthought.data.sync;
 
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.IThreadPool;
@@ -25,7 +25,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   protected Set<ISynchronizationListener> synchronizationListeners = new HashSet<>();
 
 
-  public SyncManagerBase(IConnectedDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
+  public SyncManagerBase(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IThreadPool threadPool) {
     this.threadPool = threadPool;
 
     connectedDevicesListenerManager.addConnectedDevicesListener(connectedDevicesListener);
@@ -70,7 +70,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   }
 
 
-  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
+  protected ConnectedRegisteredDevicesListener connectedDevicesListener = new ConnectedRegisteredDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
       startSynchronizationWithDeviceAsync(device);

@@ -25,7 +25,7 @@ import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticleOverviewAdapter;
 import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListener;
+import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
@@ -650,7 +650,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   }
 
 
-  protected IConnectedDevicesListener connectedDevicesListener = new IConnectedDevicesListener() {
+  protected ConnectedRegisteredDevicesListener connectedDevicesListener = new ConnectedRegisteredDevicesListener() {
     @Override
     public void registeredDeviceConnected(ConnectedDevice device) {
       // TODO

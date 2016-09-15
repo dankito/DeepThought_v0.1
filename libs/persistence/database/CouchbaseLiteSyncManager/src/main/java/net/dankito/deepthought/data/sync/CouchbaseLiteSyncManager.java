@@ -10,7 +10,7 @@ import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
 
 import net.dankito.deepthought.communication.Constants;
-import net.dankito.deepthought.communication.connected_device.IConnectedDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
@@ -61,11 +61,11 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected SynchronizedDataMerger dataMerger;
 
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedDevicesListenerManager connectedDevicesListenerManager) {
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager) {
     this(entityManager, threadPool, connectedDevicesListenerManager, Constants.SynchronizationDefaultPort, true);
   }
 
-  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedDevicesListenerManager connectedDevicesListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
+  public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, int synchronizationPort, boolean alsoUsePullReplication) {
     super(connectedDevicesListenerManager, threadPool);
     this.entityManager = entityManager;
     this.database = entityManager.getDatabase();
@@ -143,7 +143,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   @Override
   protected void startSynchronizationWithDevice(ConnectedDevice device) throws Exception {
     synchronized(this) {
-      if (isListenerStarted() == false) { // first device has connected -> start Listener first
+      if(isListenerStarted() == false) { // first device has connected -> start Listener first
         startCBLListener(synchronizationPort, manager, allowedCredentials);
       }
 
