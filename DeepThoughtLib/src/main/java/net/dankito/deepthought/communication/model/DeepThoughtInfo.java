@@ -82,6 +82,31 @@ public class DeepThoughtInfo {
   }
 
 
+  public String getTopLevelEntryId() {
+    return topLevelEntryId;
+  }
+
+  public String getTopLevelCategoryId() {
+    return topLevelCategoryId;
+  }
+
+  public Map<String, String> getNoteTypeIds() {
+    return noteTypeIds;
+  }
+
+  public Map<String, String> getFileTypeIds() {
+    return fileTypeIds;
+  }
+
+  public Map<String, String> getLanguageIds() {
+    return languageIds;
+  }
+
+  public Map<String, String> getBackupFileServiceTypesIds() {
+    return backupFileServiceTypesIds;
+  }
+
+
   public static DeepThoughtInfo fromDeepThought(DeepThought deepThought) {
     DeepThoughtInfo deepThoughtInfo = new DeepThoughtInfo(deepThought.getId(), deepThought.getCountEntries(), deepThought.getCountTags(), deepThought.getCountCategories(),
         (deepThought.getCountSeriesTitles() + deepThought.getCountReferences() + deepThought.getCountReferenceSubDivisions()), deepThought.getCountPersons(), deepThought.getCountFiles());

@@ -19,8 +19,13 @@ import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.model.enums.BackupFileServiceType;
+import net.dankito.deepthought.data.model.enums.FileType;
+import net.dankito.deepthought.data.model.enums.Language;
+import net.dankito.deepthought.data.model.enums.NoteType;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
+import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
 import net.dankito.deepthought.util.IThreadPool;
@@ -37,7 +42,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -172,11 +179,16 @@ public class InitialSyncManagerTest {
 
     Assert.assertNotEquals(deepThoughtApplication1.getId(), deepThoughtApplication2.getId());
 
+    Assert.assertEquals(deepThought1.getTopLevelEntry().getId(), deepThought2.getTopLevelEntry().getId());
+    Assert.assertEquals(deepThought1.getTopLevelCategory().getId(), deepThought2.getTopLevelCategory().getId());
+
     testDeepThoughtUserDataEntities(deepThought1, user2);
+
+    testDeepThoughtExtensibleEnumerationEntities(deepThought1, deepThought2);
   }
 
   @Test
-  public void syncLocalDatabaseIdsWithRemoteOnes_DatabaseGetsUpdatedCorrectly() {
+  public void syncLocalDatabaseIdsWithRemoteOnes_DatabaseGetsUpdatedCorrectly() throws SQLException {
     assertEntityIdsDoNotEqual();
 
     underTest.syncLocalDatabaseIdsWithRemoteOnes(deepThought1, user1, localDevice1, DeepThoughtInfo.fromDeepThought(deepThought2), UserInfo.fromUser(user2),
@@ -185,6 +197,7 @@ public class InitialSyncManagerTest {
     assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(deepThoughtApplication1, deepThoughtApplication2);
     assertUserGotUpdatedCorrectlyInDb(user1, user2);
     assertGroupGotUpdatedCorrectlyInDb(user1.getUsersDefaultGroup(), user2.getUsersDefaultGroup(), user2);
+    assertDeepThoughtGotUpdatedCorrectlyInDb(deepThought1, deepThought2);
   }
 
 
@@ -226,6 +239,37 @@ public class InitialSyncManagerTest {
     Assert.assertEquals(remoteUser.getId(), entity.getOwner().getId());
   }
 
+  protected void testDeepThoughtExtensibleEnumerationEntities(DeepThought deepThought1, DeepThought deepThought2) {
+    testExtensibleEnumerationEntitiesGotSynchronizedCorrectly(deepThought1.getNoteTypes(), deepThought2.getNoteTypes());
+
+    testExtensibleEnumerationEntitiesGotSynchronizedCorrectly(deepThought1.getFileTypes(), deepThought2.getFileTypes());
+
+    testExtensibleEnumerationEntitiesGotSynchronizedCorrectly(deepThought1.getLanguages(), deepThought2.getLanguages());
+
+    testExtensibleEnumerationEntitiesGotSynchronizedCorrectly(deepThought1.getBackupFileServiceTypes(), deepThought2.getBackupFileServiceTypes());
+  }
+
+  protected void testExtensibleEnumerationEntitiesGotSynchronizedCorrectly(Collection extensibleEnumerations1, Collection extensibleEnumerations2) {
+    Assert.assertEquals(extensibleEnumerations1.size(), extensibleEnumerations2.size());
+
+    Collection<String> enumerationIds1 = extractIdsFromBaseEntities((Collection<BaseEntity>)extensibleEnumerations1);
+    Collection<String> enumerationIds2 = extractIdsFromBaseEntities((Collection<BaseEntity>)extensibleEnumerations2);
+
+    for(String id1 : enumerationIds1) {
+      Assert.assertTrue(enumerationIds2.contains(id1));
+    }
+  }
+
+  protected Collection<String> extractIdsFromBaseEntities(Collection<BaseEntity> baseEntities) {
+    Collection<String> extractedIds = new ArrayList<>();
+
+    for(BaseEntity entity : baseEntities) {
+      extractedIds.add(entity.getId());
+    }
+
+    return extractedIds;
+  }
+
 
   protected void assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(DeepThoughtApplication application1, DeepThoughtApplication application2) {
     Document document = entityManager1.getDatabase().getExistingDocument(application1.getId());
@@ -258,6 +302,32 @@ public class InitialSyncManagerTest {
 
     String userIds = (String)document.getProperty("users"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
     Assert.assertTrue(userIds.contains(user2.getId()));
+  }
+
+  protected void assertDeepThoughtGotUpdatedCorrectlyInDb(DeepThought deepThought1, DeepThought deepThought2) throws SQLException {
+    Document document = entityManager1.getDatabase().getExistingDocument(deepThought1.getId());
+
+    Assert.assertEquals(deepThought2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
+
+    Assert.assertEquals(deepThought2.getTopLevelEntry().getId(), document.getProperty(TableConfig.DeepThoughtTopLevelEntryJoinColumnName));
+    Assert.assertEquals(deepThought2.getTopLevelCategory().getId(), document.getProperty(TableConfig.DeepThoughtTopLevelCategoryJoinColumnName));
+
+    // TODO: JpaPropertyConfigurationReader doesn't return here correct column names
+    assertExtensibleEnumerationGotUpdatedCorrectlyInDb(deepThought2.getNoteTypes(), (String)document.getProperty("noteTypes"), NoteType.class);
+    assertExtensibleEnumerationGotUpdatedCorrectlyInDb(deepThought2.getFileTypes(), (String)document.getProperty("fileTypes"), FileType.class);
+    assertExtensibleEnumerationGotUpdatedCorrectlyInDb(deepThought2.getLanguages(), (String)document.getProperty("languages"), Language.class);
+    assertExtensibleEnumerationGotUpdatedCorrectlyInDb(deepThought2.getBackupFileServiceTypes(), (String)document.getProperty("backupFileServiceTypes"), BackupFileServiceType.class);
+  }
+
+  protected void assertExtensibleEnumerationGotUpdatedCorrectlyInDb(Collection extensibleEnumerations2, String extensibleEnumerationJoinedEntitiesString1, Class type) throws SQLException {
+    Dao dao = entityManager1.getDaoForClass(type);
+    Collection<Object> extensibleEnumerationsIds1 = dao.parseJoinedEntityIdsFromJsonString(extensibleEnumerationJoinedEntitiesString1);
+
+    Collection<String> extensibleEnumerationsIds2 = extractIdsFromBaseEntities((Collection<BaseEntity>)extensibleEnumerations2);
+
+    for(String id2 : extensibleEnumerationsIds2) {
+      Assert.assertTrue(extensibleEnumerationsIds1.contains(id2));
+    }
   }
 
 

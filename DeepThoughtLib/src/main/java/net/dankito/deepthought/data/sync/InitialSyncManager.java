@@ -22,12 +22,16 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.model.enums.BackupFileServiceType;
+import net.dankito.deepthought.data.model.enums.ExtensibleEnumeration;
 import net.dankito.deepthought.data.model.enums.FileType;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.enums.NoteType;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by ganymed on 07/09/16.
@@ -88,8 +92,48 @@ public class InitialSyncManager {
 
     entityManager.updateEntity(loggedOnUser.getApplication());
 
+
+    entityManager.deleteEntity(localDeepThought.getTopLevelEntry());
+    entityManager.deleteEntity(localDeepThought.getTopLevelCategory());
+
+    localDeepThought.getTopLevelEntry().setId(remoteDeepThought.getTopLevelEntryId());
+    localDeepThought.getTopLevelCategory().setId(remoteDeepThought.getTopLevelCategoryId());
+
+    updateExtensibleEnumerations(localDeepThought, remoteDeepThought, entityManager);
+
     // as User's Id has changed, all UserDataEntities pointing to that User Id have to be updated in Database
     updateAllUserDataEntities(loggedOnUser, entityManager);
+  }
+
+  protected void updateExtensibleEnumerations(DeepThought localDeepThought, DeepThoughtInfo remoteDeepThought, IEntityManager entityManager) {
+    updateExtensibleEnumeration(localDeepThought.getNoteTypes(), remoteDeepThought.getNoteTypeIds(), entityManager);
+
+    updateExtensibleEnumeration(localDeepThought.getFileTypes(), remoteDeepThought.getFileTypeIds(), entityManager);
+
+    updateExtensibleEnumeration(localDeepThought.getLanguages(), remoteDeepThought.getLanguageIds(), entityManager);
+
+    updateExtensibleEnumeration(localDeepThought.getBackupFileServiceTypes(), remoteDeepThought.getBackupFileServiceTypesIds(), entityManager);
+
+    entityManager.updateEntity(localDeepThought);
+  }
+
+  protected void updateExtensibleEnumeration(Collection localExtensibleEnumerationEntities, Map<String, String> remoteExtensibleEnumerationIds, IEntityManager entityManager) {
+    for(String noteTypeNameResourceKey : remoteExtensibleEnumerationIds.keySet()) {
+      for(ExtensibleEnumeration enumerationEntity : (Collection<ExtensibleEnumeration>)localExtensibleEnumerationEntities) {
+        if(noteTypeNameResourceKey.equals(enumerationEntity.getNameResourceKey())) {
+          updateExtensibleEnumeration(enumerationEntity, remoteExtensibleEnumerationIds.get(noteTypeNameResourceKey), entityManager);
+          break;
+        }
+      }
+    }
+  }
+
+  protected void updateExtensibleEnumeration(ExtensibleEnumeration enumerationEntity, String id, IEntityManager entityManager) {
+    entityManager.deleteEntity(enumerationEntity);
+
+    enumerationEntity.setId(id);
+
+    entityManager.persistEntity(enumerationEntity);
   }
 
   protected void updateAllUserDataEntities(User loggedOnUser, IEntityManager entityManager) {
