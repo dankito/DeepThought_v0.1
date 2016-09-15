@@ -7,7 +7,9 @@ import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
 import net.dankito.deepthought.clipboard.IClipboardHelper;
+import net.dankito.deepthought.communication.AndroidUdpDevicesFinder;
 import net.dankito.deepthought.communication.ICommunicationConfigurationManager;
+import net.dankito.deepthought.communication.IDevicesFinder;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.data.AndroidDataManager;
@@ -141,6 +143,11 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   @Override
   public IApplicationLifeCycleService createApplicationLifeCycleService() {
     return lifeCycleService;
+  }
+
+  @Override
+  public IDevicesFinder createDevicesFinder(IThreadPool threadPool) {
+    return new AndroidUdpDevicesFinder(context, threadPool);
   }
 
   @Override
