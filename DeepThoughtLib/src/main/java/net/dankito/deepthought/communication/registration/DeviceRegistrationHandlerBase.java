@@ -3,6 +3,7 @@ package net.dankito.deepthought.communication.registration;
 import net.dankito.deepthought.communication.Communicator;
 import net.dankito.deepthought.communication.ConnectorMessagesCreator;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
+import net.dankito.deepthought.communication.IDevicesFinderListener;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.listener.ResponseListener;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
@@ -51,6 +52,7 @@ public abstract class DeviceRegistrationHandlerBase {
     this.localDevice = localDevice;
 
     deepThoughtConnector.addUnregisteredDevicesListener(unregisteredDevicesListener);
+    deepThoughtConnector.addDevicesFinderListener(devicesFinderListener);
   }
 
 
@@ -64,6 +66,8 @@ public abstract class DeviceRegistrationHandlerBase {
 
   protected abstract void showRegistrationSuccessfulMessage(String message, String messageTitle);
 
+  protected abstract void mayHideInfoUnregisteredDeviceFound(HostInfo device);
+
 
   protected IUnregisteredDevicesListener unregisteredDevicesListener = new IUnregisteredDevicesListener() {
     @Override
@@ -74,6 +78,18 @@ public abstract class DeviceRegistrationHandlerBase {
     @Override
     public void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
       DeviceRegistrationHandlerBase.this.deviceIsAskingForRegistration(request);
+    }
+  };
+
+  protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
+    @Override
+    public void deviceFound(HostInfo device) {
+
+    }
+
+    @Override
+    public void deviceDisconnected(HostInfo device) {
+      mayHideInfoUnregisteredDeviceFound(device);
     }
   };
 

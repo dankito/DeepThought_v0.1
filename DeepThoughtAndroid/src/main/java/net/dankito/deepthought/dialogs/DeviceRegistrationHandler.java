@@ -171,13 +171,27 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
 
   protected void notifyDeviceIsAskingForRegistration(AskForDeviceRegistrationRequest request) {
-    mayHideSnackbarForDevice(request);
+    mayHideInfoUnregisteredDeviceFoundOnMainThread(request);
 
     askUserIfRegisteringDeviceIsAllowed(request);
   }
 
-  protected void mayHideSnackbarForDevice(AskForDeviceRegistrationRequest request) {
-    if(snackbarAskRegisterUnknownDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(request.getDevice().getDeviceId())) {
+  @Override
+  protected void mayHideInfoUnregisteredDeviceFound(final HostInfo device) {
+    mainActivity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        mayHideInfoUnregisteredDeviceFoundOnMainThread(device);
+      }
+    });
+  }
+
+  protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(AskForDeviceRegistrationRequest request) {
+    mayHideInfoUnregisteredDeviceFoundOnMainThread(request.getDevice());
+  }
+
+  protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(HostInfo device) {
+    if(snackbarAskRegisterUnknownDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(device.getDeviceId())) {
       snackbarAskRegisterUnknownDevice.dismiss();
       resetSnackbar();
     }

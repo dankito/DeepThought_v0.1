@@ -94,20 +94,29 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
 
   protected void askUserIfRegisteringDeviceIsAllowed(final AskForDeviceRegistrationRequest request) {
-    mayHideUnregisteredDeviceFoundAlert(request);
+    mayHideInfoUnregisteredDeviceFound(request);
 
-    Platform.runLater(() -> { // after hiding unregisteredDeviceFoundAlert in mayHideUnregisteredDeviceFoundAlert() we have to wait some time before JavaFX is able to show a new Alert
+    Platform.runLater(() -> { // after hiding unregisteredDeviceFoundAlert in mayHideInfoUnregisteredDeviceFound() we have to wait some time before JavaFX is able to show a new Alert
       boolean userAllowsDeviceRegistration = Alerts.showDeviceAsksForRegistrationAlert(request, stage);
       sendAskUserIfRegisteringDeviceIsAllowedResponse(request, userAllowsDeviceRegistration);
     });
   }
 
-  protected void mayHideUnregisteredDeviceFoundAlert(AskForDeviceRegistrationRequest request) {
-    if(unregisteredDeviceFoundAlerts.containsKey(request.getDevice().getDeviceId())) {
-      Map<String, Alert> userToAlertMap = unregisteredDeviceFoundAlerts.get(request.getDevice().getDeviceId());
+  protected void mayHideInfoUnregisteredDeviceFound(AskForDeviceRegistrationRequest request) {
+    mayHideInfoUnregisteredDeviceFound(request.getDevice());
+  }
 
-      if(userToAlertMap.containsKey(request.getUser().getUniversallyUniqueId())) {
-        Alert unregisteredDeviceFoundAlert = userToAlertMap.get(request.getUser().getUniversallyUniqueId());
+  @Override
+  protected void mayHideInfoUnregisteredDeviceFound(HostInfo device) {
+    FXUtils.runOnUiThread(() -> mayHideInfoUnregisteredDeviceFoundOnMainThread(device) );
+  }
+
+  protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(HostInfo device) {
+    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceId())) {
+      Map<String, Alert> userToAlertMap = unregisteredDeviceFoundAlerts.get(device.getDeviceId());
+
+      if(userToAlertMap.containsKey(device.getUserUniqueId())) {
+        Alert unregisteredDeviceFoundAlert = userToAlertMap.get(device.getUserUniqueId());
         unregisteredDeviceFoundAlert.hide();
         unregisteredDeviceFoundAlert.close();
       }
