@@ -173,7 +173,14 @@ public class ViewEntryDialog extends FullscreenDialog {
     shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(mnitmActionShareEntry);
 
     mnitmActionSaveEntry = menu.findItem(R.id.mnitmActionSaveEntry);
+  }
+
+  @Override
+  public void onPrepareOptionsMenu(Menu menu) {
     mnitmActionSaveEntry.setVisible(entryCreationResult != null);
+    mnitmActionSaveEntry.setShowAsAction(entryCreationResult != null ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
+    
+    super.onPrepareOptionsMenu(menu);
   }
 
   @Override
