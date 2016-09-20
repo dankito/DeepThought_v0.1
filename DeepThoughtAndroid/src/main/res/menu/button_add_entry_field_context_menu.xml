@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnitmAddEntryAbstractField"
+        android:title="@string/view_entry_abstract_label"
+        android:icon="@drawable/ic_abstract_white"
+    />
+
+</menu>

@@ -21,6 +21,8 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
 
   protected Activity context;
 
+  protected boolean shouldShowAbstractSection = false;
+
 
   public EntrySectionsSpinnerAdapter(Activity context, Entry entry) {
     this.context = context;
@@ -28,11 +30,15 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   }
 
 
+  public boolean showsAbstractSection() {
+    return shouldShowAbstractSection || entry.hasAbstract();
+  }
+
   @Override
   public int getCount() {
     int count = 2;
 
-    if(entry.hasAbstract()) {
+    if(showsAbstractSection()) {
       count++;
     }
 
@@ -45,7 +51,7 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   }
 
   public EditEntrySection getSectionAtIndex(int index) {
-    if(entry.hasAbstract()) {
+    if(showsAbstractSection()) {
       switch(index) {
         case 0:
           return EditEntrySection.Abstract;
@@ -63,7 +69,7 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   }
 
   public int getIndexForSection(EditEntrySection section) {
-    if(entry.hasAbstract()) {
+    if(showsAbstractSection()) {
       switch(section) {
         case Abstract:
           return 0;
@@ -132,4 +138,12 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
 
     return "";
   }
+
+
+  public void setShouldShowAbstractSection(boolean shouldShowAbstractSection) {
+    this.shouldShowAbstractSection = shouldShowAbstractSection;
+
+    notifyDataSetChanged();
+  }
+
 }

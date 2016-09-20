@@ -11,4 +11,13 @@
 
     </Spinner>
 
+    <ImageButton
+        android:id="@+id/imgbtnAddEntryField"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@+id/spnSelectEntrySection"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/ic_input_add"
+    />
+
 </RelativeLayout>

@@ -2,6 +2,7 @@ package net.dankito.deepthought.dialogs;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -14,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -75,6 +77,10 @@ public class EditEntryDialog extends FullscreenDialog {
 
   protected Spinner spnSelectEntrySection;
 
+  protected ImageButton imgbtnAddEntryField;
+
+  protected MenuItem mnitmAddEntryAbstractField;
+
   protected EntrySectionsSpinnerAdapter entrySectionsSpinnerAdapter;
 
   protected boolean hasViewBeenCreated = false;
@@ -119,7 +125,7 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   protected void applySectionToEdit(EditEntrySection section) {
-    spnSelectEntrySection.setSelection(entrySectionsSpinnerAdapter.getIndexForSection(section));
+    spnSelectEntrySection.setSelection(entrySectionsSpinnerAdapter.getIndexForSection(section), true);
   }
 
 
@@ -163,6 +169,68 @@ public class EditEntryDialog extends FullscreenDialog {
 
     entrySectionsSpinnerAdapter = new EntrySectionsSpinnerAdapter(getActivity(), entry);
     spnSelectEntrySection.setAdapter(entrySectionsSpinnerAdapter);
+
+    imgbtnAddEntryField = (ImageButton)rootView.findViewById(R.id.imgbtnAddEntryField);
+
+    initializePopupForButtonAddEntryField();
+
+    setImgbtnAddEntryFieldAndMenuItemsVisiblity();
+  }
+
+  protected void initializePopupForButtonAddEntryField() {
+    final PopupMenu popup = new PopupMenu(getActivity(), imgbtnAddEntryField);
+    getActivity().getMenuInflater().inflate(R.menu.button_add_entry_field_context_menu, popup.getMenu());
+
+    mnitmAddEntryAbstractField = popup.getMenu().findItem(R.id.mnitmAddEntryAbstractField);
+
+    imgbtnAddEntryField.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        preparePopupForButtonAddEntryField();
+        popup.show();
+      }
+    });
+
+    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(MenuItem item) {
+        imgbtnAddEntryFieldPopupMenuItemSelected(item);
+        return true;
+      }
+    });
+  }
+
+  public void setImgbtnAddEntryFieldAndMenuItemsVisiblity() {
+    imgbtnAddEntryField.setVisibility(areAllEntryFieldsSelectable() ? View.GONE : View.VISIBLE);
+
+    preparePopupForButtonAddEntryField();
+  }
+
+  protected void preparePopupForButtonAddEntryField() {
+    mnitmAddEntryAbstractField.setVisible( ! isAbstractSectionSelectable() );
+  }
+
+  protected void imgbtnAddEntryFieldPopupMenuItemSelected(MenuItem item) {
+    int id = item.getItemId();
+
+    if(id == R.id.mnitmAddEntryAbstractField) {
+      addAbstractSection();
+    }
+  }
+
+  protected void addAbstractSection() {
+    entrySectionsSpinnerAdapter.setShouldShowAbstractSection(true);
+    applySectionToEdit(EditEntrySection.Abstract);
+    showEditAbstractSection();
+    setImgbtnAddEntryFieldAndMenuItemsVisiblity();
+  }
+
+  protected boolean areAllEntryFieldsSelectable() {
+    return isAbstractSectionSelectable();
+  }
+
+  protected boolean isAbstractSectionSelectable() {
+    return entrySectionsSpinnerAdapter.showsAbstractSection();
   }
 
 
@@ -387,6 +455,7 @@ public class EditEntryDialog extends FullscreenDialog {
       Toast.makeText(getActivity(), getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
     else {
       Tag newTag = new Tag(tagName);
+      Application.getEntityManager().persistEntity(newTag);
       Application.getDeepThought().addTag(newTag);
       entryEditedTags.add(newTag);
       Collections.sort(entryEditedTags);
@@ -451,6 +520,7 @@ public class EditEntryDialog extends FullscreenDialog {
     }
 
     if(entry.isPersisted() == false) { // a new Entry
+      Application.getEntityManager().persistEntity(entry);
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
     }
 
