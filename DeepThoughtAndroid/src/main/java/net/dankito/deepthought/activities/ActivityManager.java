@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import net.dankito.deepthought.R;
@@ -79,6 +81,8 @@ public class ActivityManager {
     edtxtTagName.setText(tag.getName());
     edtxtTagDescription.setText(tag.getDescription());
 
+    edtxtTagName.selectAll();
+
     alertDialogBuilder
         .setCancelable(true)
         .setPositiveButton(R.string.ok,
@@ -103,6 +107,13 @@ public class ActivityManager {
     AlertDialog alertDialog = alertDialogBuilder.create();
     alertDialog.show();
     alertDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, 470);
+
+    edtxtTagName.requestFocus();
+
+    InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    imm.showSoftInput(edtxtTagName, InputMethodManager.SHOW_IMPLICIT);
+
+    alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
   }
 
 }
