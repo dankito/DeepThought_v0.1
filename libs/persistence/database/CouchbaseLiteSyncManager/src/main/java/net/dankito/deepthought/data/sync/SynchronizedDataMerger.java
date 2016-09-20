@@ -41,47 +41,59 @@ public class SynchronizedDataMerger {
 
   protected Database database;
 
+  protected SynchronizedCreatedEntitiesHandler createdEntitiesHandler;
+
 
   public SynchronizedDataMerger(CouchbaseLiteEntityManagerBase entityManager, Database database) {
     this.entityManager = entityManager;
     this.database = database;
+
+    createdEntitiesHandler = new SynchronizedCreatedEntitiesHandler(entityManager, database);
   }
 
 
   public BaseEntity synchronizedChange(DocumentChange change) {
       log.info("isCurrentRevision() = " + change.isCurrentRevision());
 //      if(change.isCurrentRevision()) {
+    String entityTypeString = (String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME);
+
+    Class entityType = null;
+    try { entityType = (Class<BaseEntity>)Class.forName(entityTypeString); } catch(Exception e) { log.error("Could not get class for entity type " + entityTypeString); }
+
       if (change.isConflict()) {
-        handleConflict(change);
+        handleConflict(change, entityType);
       }
 
-      return updateCachedSynchronizedEntity(change);
+    createdEntitiesHandler.handleNewlyCreatedEntities(change, entityType);
+
+
+      return updateCachedSynchronizedEntity(change, entityType);
   }
 
 
-  protected void handleConflict(DocumentChange change) {
-    Class<BaseEntity> entityClass = null;
+  protected void handleConflict(DocumentChange change, Class entityType) {
+    if(entityType != null) {
+      try {
+        Document storedDocument = database.getExistingDocument(change.getDocumentId());
+        final List<SavedRevision> conflicts = storedDocument.getConflictingRevisions();
 
-    try {
-      entityClass = (Class<BaseEntity>)Class.forName((String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
-      Document storedDocument = database.getExistingDocument(change.getDocumentId());
+        if(conflicts.size() > 1) {
+          log.info("Handling Conflict for " + entityType + " of Revision " + change.getRevisionId());
 
-      final List<SavedRevision> conflicts = storedDocument.getConflictingRevisions();
-      if(conflicts.size() > 1) {
-        Dao dao = entityManager.getDaoForClass(entityClass);
-        final String currentRevisionId = storedDocument.getCurrentRevisionId();
+          Dao dao = entityManager.getDaoForClass(entityType);
+          final String currentRevisionId = storedDocument.getCurrentRevisionId();
 
-        final Map<String, Object> updatedProperties = new HashMap<>();
-        updatedProperties.putAll(storedDocument.getCurrentRevision().getProperties());
+          final Map<String, Object> updatedProperties = new HashMap<>();
+          updatedProperties.putAll(storedDocument.getCurrentRevision().getProperties());
 
-        Map<String, Object> mergedProperties = mergeProperties(dao, conflicts);
-        updatedProperties.putAll(mergedProperties);
+          Map<String, Object> mergedProperties = mergeProperties(dao, conflicts);
+          updatedProperties.putAll(mergedProperties);
 
-        updateWinningRevisionDeleteConflictedOnes(conflicts, updatedProperties, currentRevisionId);
+          updateWinningRevisionDeleteConflictedOnes(conflicts, updatedProperties, currentRevisionId);
+        }
+      } catch (Exception e) {
+        log.error("Could not handle conflict for Document Id " + change.getDocumentId() + " of Entity " + entityType, e);
       }
-
-    } catch(Exception e) {
-      log.error("Could not handle conflict for Document Id " + change.getDocumentId() + " of Entity " + entityClass, e);
     }
   }
 
@@ -218,24 +230,24 @@ public class SynchronizedDataMerger {
     mergedProperties.put(property.getColumnName(), mergedEntityIdsString);
   }
 
-  protected BaseEntity updateCachedSynchronizedEntity(DocumentChange change) {
+  protected BaseEntity updateCachedSynchronizedEntity(DocumentChange change, Class entityType) {
     BaseEntity cachedEntity = null;
-    String entityClassString = (String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME);
 
-    if(entityClassString != null) { // sometimes only some Couchbase internal data is synchronized without any user data -> skip these
+    if(entityType != null) { // sometimes only some Couchbase internal data is synchronized without any user data -> skip these
       try {
-        Class<BaseEntity> entityClass = (Class<BaseEntity>) Class.forName(entityClassString);
-        cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityClass, change.getDocumentId());
+        cachedEntity = (BaseEntity) entityManager.getObjectCache().get(entityType, change.getDocumentId());
         if(cachedEntity != null) { // cachedEntity == null: Entity not retrieved / cached yet -> will be read from DB on next access anyway, therefore no need to update it
+          log.info("Updating cached synchronized Entity of Revision " + change.getRevisionId() + ": " + cachedEntity);
 
           Document storedDocument = database.getExistingDocument(change.getDocumentId());
-          Dao dao = entityManager.getDaoForClass(entityClass);
+          Dao dao = entityManager.getDaoForClass(entityType);
 
           List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
           SavedRevision currentRevision = storedDocument.getCurrentRevision();
 
           if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
-            newEntityCreated(entityClass, change);
+            log.warn("Did it really ever come to here?");
+            newEntityCreated(entityType, change);
           }
           else {
             updateCachedEntity(cachedEntity, dao, currentRevision);
@@ -284,7 +296,7 @@ public class SynchronizedDataMerger {
     String previousTargetEntityIdsString = (String)detectedChanges.get(propertyName);
     String currentTargetEntityIdsString = (String)currentRevision.getProperty(propertyName);
     if(currentRevision.getProperties().containsKey(propertyName) == false) { // currentRevision has no information about this property
-      currentTargetEntityIdsString = "[]";
+      currentTargetEntityIdsString = "[]"; // TODO: what to do here? Assuming "[]" is for sure false. Removing all items?
     }
 
     Dao targetDao = entityManager.getDaoForClass(property.getTargetEntityClass());
@@ -293,8 +305,13 @@ public class SynchronizedDataMerger {
 
     Collection previousValueCollection = (Collection)previousValue;
 
+    log.info("Collection Property " + property + " of Revision " + currentRevision.getId() + " has now Ids of " + currentTargetEntityIdsString + ". Previous ones: " + previousTargetEntityIdsString);
+
     if(previousValue instanceof EntitiesCollection) { // TODO: what to do if it's not an EntitiesCollection yet?
       ((EntitiesCollection)previousValue).refresh(currentTargetEntityIds);
+    }
+    else {
+      log.warn("Not an EntitiesCollection: " + previousValue);
     }
 
     String parentRevisionTargetEntityIdsString = null;
@@ -335,7 +352,7 @@ public class SynchronizedDataMerger {
         }
       }
     } catch(Exception e) {
-      log.error("Could not get Entities added to Collection from currentTargetEntityIdsString = " + currentTargetEntityIdsString +
+      log.error("Could not get Collection Items of property " + property + " from currentTargetEntityIdsString = " + currentTargetEntityIdsString +
           " and previousTargetEntityIdsString = " + previousTargetEntityIdsString, e);
     }
 
