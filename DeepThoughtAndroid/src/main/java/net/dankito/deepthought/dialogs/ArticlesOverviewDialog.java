@@ -135,7 +135,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
       activity.runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          String successfullySavedMessage = getString(R.string.articles_overview_article_saved, article.getTitle());
+          String successfullySavedMessage = activity.getString(R.string.articles_overview_article_saved, article.getTitle());
           Toast.makeText(activity, successfullySavedMessage, Toast.LENGTH_LONG).show();
         }
       });
@@ -144,7 +144,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
       activity.runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          String couldNotExtractArticleMessage = getString(R.string.articles_overview_could_not_extract_article, article.getTitle(), creationResult.getError());
+          String couldNotExtractArticleMessage = activity.getString(R.string.articles_overview_could_not_extract_article, article.getTitle(), creationResult.getError());
           Toast.makeText(activity, couldNotExtractArticleMessage, Toast.LENGTH_LONG).show();
         }
       });
