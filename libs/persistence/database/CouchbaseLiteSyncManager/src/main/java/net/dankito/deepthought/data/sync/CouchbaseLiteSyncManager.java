@@ -9,11 +9,13 @@ import com.couchbase.lite.listener.Credentials;
 import com.couchbase.lite.listener.LiteListener;
 import com.couchbase.lite.replicator.Replication;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.communication.ICommunicationConfigurationManager;
 import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
 import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.Group;
@@ -87,11 +89,12 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   private void setReplicationFilter(Database database) {
     final List<String> entitiesToFilter = new ArrayList<>();
-    entitiesToFilter.add(DeepThoughtApplication.class.getName());
-    entitiesToFilter.add(ApplicationLanguage.class.getName());
+    entitiesToFilter.add(DeepThought.class.getName());
     entitiesToFilter.add(User.class.getName());
     entitiesToFilter.add(Group.class.getName());
     entitiesToFilter.add(Device.class.getName());
+    entitiesToFilter.add(DeepThoughtApplication.class.getName());
+    entitiesToFilter.add(ApplicationLanguage.class.getName());
 
     database.setFilter(FILTER_NAME, new ReplicationFilter() {
       @Override
