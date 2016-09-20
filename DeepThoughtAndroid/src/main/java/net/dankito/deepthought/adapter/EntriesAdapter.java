@@ -147,11 +147,6 @@ public class EntriesAdapter extends AsyncLoadingAdapter {
     txtvwTags.setVisibility(View.GONE);
   }
 
-  @Override
-  protected Object loadItemInBackgroundThread(int position) {
-    return getItem(position);
-  }
-
 
   public void searchEntries(String searchTerm) {
     if(Application.isInstantiated() == false)

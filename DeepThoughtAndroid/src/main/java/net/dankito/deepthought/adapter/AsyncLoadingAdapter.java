@@ -88,7 +88,9 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
     }
   }
 
-  protected abstract Object loadItemInBackgroundThread(int position);
+  protected Object loadItemInBackgroundThread(int position) {
+    return getItem(position);
+  }
 
 
   public void notifyDataSetChangedThreadSafe() {
