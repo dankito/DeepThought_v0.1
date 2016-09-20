@@ -289,8 +289,11 @@ public class DefaultDataManager implements IDataManager {
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collectionHolder == currentDeepThought || collectionHolder == application ||
           (collectionHolder instanceof User && addedEntity instanceof DeepThought) || addedEntity instanceof AssociationEntity) {
-        if(addedEntity.isPersisted() == false) { // for synchronized entities
+        if(addedEntity.isPersisted() == false) { // don't persist synchronized entities a second time
           entityHasBeenCreated(addedEntity);
+        }
+        else {
+          callEntityCreatedListeners(addedEntity);
         }
       }
       DefaultDataManager.this.entityUpdated(collectionHolder);
