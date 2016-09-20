@@ -1,6 +1,5 @@
 package net.dankito.deepthought.platform;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.DependencyResolverBase;
 import net.dankito.deepthought.IApplicationConfiguration;
 import net.dankito.deepthought.application.IApplicationLifeCycleService;
@@ -128,9 +127,9 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   }
 
   @Override
-  public IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
+  public IDeepThoughtSyncManager createSyncManager(IEntityManager entityManager, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
                                                    IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool) {
-    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)Application.getEntityManager(), threadPool, connectedDevicesListenerManager,
+    return new CouchbaseLiteSyncManager((CouchbaseLiteEntityManagerBase)entityManager, threadPool, connectedDevicesListenerManager,
         devicesFinderListenerManager, configurationManager);
   }
 

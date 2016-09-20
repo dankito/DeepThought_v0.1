@@ -82,7 +82,7 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
   }
 
   @Override
-  public IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool) {
+  public IDeepThoughtSyncManager createSyncManager(IEntityManager entityManager, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool) {
     return null;
   }
 

@@ -65,7 +65,7 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool);
 
-  IDeepThoughtSyncManager createSyncManager(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
+  IDeepThoughtSyncManager createSyncManager(IEntityManager entityManager, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
                                             IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool);
 
   IIsbnResolver createIsbnResolver(IHtmlHelper htmlHelper, IThreadPool threadPool);
