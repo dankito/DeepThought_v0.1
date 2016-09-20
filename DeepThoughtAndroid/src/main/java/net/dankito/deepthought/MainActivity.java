@@ -37,6 +37,7 @@ import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.settings.enums.SelectedAndroidTab;
+import net.dankito.deepthought.data.persistence.db.UserDataEntity;
 import net.dankito.deepthought.dialogs.ArticlesOverviewDialog;
 import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
@@ -45,6 +46,7 @@ import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
+import net.dankito.deepthought.listener.EntityEditedListener;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -639,7 +641,16 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     @Override
     public void onClick(View view) {
       Tag tag = new Tag();
-      ActivityManager.getInstance().showEditTagAlert(MainActivity.this, tag);
+      ActivityManager.getInstance().showEditTagAlert(MainActivity.this, tag, new EntityEditedListener() {
+        @Override
+        public void editingDone(boolean cancelled, UserDataEntity editedEntity) {
+          if(cancelled == false) {
+            Tag newTag = (Tag)editedEntity;
+            Application.getEntityManager().persistEntity(newTag);
+            Application.getDeepThought().addTag(newTag);
+          }
+        }
+      });
       closeFloatingActionMenu();
     }
   };
