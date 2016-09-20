@@ -37,6 +37,8 @@ public class SynchronizedDataMerger {
   private static final Logger log = LoggerFactory.getLogger(SynchronizedDataMerger.class);
 
 
+  protected CouchbaseLiteSyncManager syncManager;
+
   protected CouchbaseLiteEntityManagerBase entityManager;
 
   protected Database database;
@@ -44,7 +46,8 @@ public class SynchronizedDataMerger {
   protected SynchronizedCreatedEntitiesHandler createdEntitiesHandler;
 
 
-  public SynchronizedDataMerger(CouchbaseLiteEntityManagerBase entityManager, Database database) {
+  public SynchronizedDataMerger(CouchbaseLiteSyncManager syncManager, CouchbaseLiteEntityManagerBase entityManager, Database database) {
+    this.syncManager = syncManager;
     this.entityManager = entityManager;
     this.database = database;
 
@@ -284,7 +287,7 @@ public class SynchronizedDataMerger {
       Object updatedValue = dao.deserializePersistedValue(property, currentRevision.getProperty(propertyName));
       dao.setValueOnObject(cachedEntity, property, updatedValue);
 
-      cachedEntity.callPropertyChangedListeners(propertyName, null, detectedChanges.get(propertyName)); // TODO: also supply previousValue
+      syncManager.callEntityUpdatedListeners(cachedEntity, propertyName, null, detectedChanges.get(propertyName)); // TODO: also supply previousValue
     }
     else {
       updateCollectionProperty(cachedEntity, property, propertyName, currentRevision, detectedChanges, previousValue);
@@ -323,16 +326,16 @@ public class SynchronizedDataMerger {
 
     Collection<BaseEntity> addedEntities = getEntitiesAddedToCollection(property, currentTargetEntityIdsString, previousTargetEntityIdsString);
     for(BaseEntity addedEntity : addedEntities) {
-      cachedEntity.callEntityAddedListeners(previousValueCollection, addedEntity);
+      syncManager.callEntityAddedToCollectionListeners(cachedEntity, previousValueCollection, addedEntity);
     }
 
     Collection<BaseEntity> removedEntities = getEntitiesRemovedFromCollection(property, currentTargetEntityIdsString, previousTargetEntityIdsString);
     for(BaseEntity removedEntity : removedEntities) {
       if(parentRevisionTargetEntityIdsString != null && parentRevisionTargetEntityIdsString.contains(removedEntity.getId())) {
-        cachedEntity.callEntityRemovedListeners(previousValueCollection, removedEntity);
+        syncManager.callEntityRemovedFromCollectionListeners(cachedEntity, previousValueCollection, removedEntity);
       }
       else {
-        cachedEntity.callEntityAddedListeners(previousValueCollection, removedEntity);
+        syncManager.callEntityAddedToCollectionListeners(cachedEntity, previousValueCollection, removedEntity);
       }
     }
   }

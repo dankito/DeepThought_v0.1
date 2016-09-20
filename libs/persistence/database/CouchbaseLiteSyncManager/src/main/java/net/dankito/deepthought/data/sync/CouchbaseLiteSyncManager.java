@@ -22,7 +22,6 @@ import net.dankito.deepthought.data.model.Group;
 import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
-import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.jpa.couchbaselite.Dao;
 
@@ -82,7 +81,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     this.synchronizationPort = synchronizationPort;
     this.alsoUsePullReplication = alsoUsePullReplication;
 
-    this.dataMerger = new SynchronizedDataMerger(entityManager, database);
+    this.dataMerger = new SynchronizedDataMerger(this, entityManager, database);
 
     setReplicationFilter(database);
   }
@@ -271,29 +270,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected void handleSynchronizedChanges(List<DocumentChange> changes) {
     for(DocumentChange change : changes) {
-      BaseEntity cachedEntity = dataMerger.synchronizedChange(change);
-
-      if(cachedEntity != null) {
-        callEntitySynchronizedListeners(cachedEntity);
-      }
-      else if(hasSynchronizationListeners()) {
-        BaseEntity synchronizedEntity = getSynchronizedEntity(change);
-        if(synchronizedEntity != null) {
-          callEntitySynchronizedListeners(synchronizedEntity);
-        }
-      }
+      dataMerger.synchronizedChange(change);
     }
-  }
-
-  protected BaseEntity getSynchronizedEntity(DocumentChange change) {
-    try {
-      Class entityClass = (Class<BaseEntity>) Class.forName((String) change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME));
-      return entityManager.getEntityById(entityClass, change.getDocumentId());
-    } catch(Exception e) {
-      log.error("Could not get Entity Class for DocumentChange, AddedRevision's " + Dao.TYPE_COLUMN_NAME + " property is " + change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME), e);
-    }
-
-    return null;
   }
 
 }
