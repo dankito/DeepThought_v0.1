@@ -12,6 +12,7 @@ import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.ReferenceBaseType;
 import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.StringUtils;
 
 import java.util.Collection;
@@ -228,11 +229,17 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
     @Override
     public void notification(Notification notification) {
-
+      if(notification.getType() == NotificationType.ApplicationInstantiated) {
+        applicationInstantiated();
+      }
     }
   };
 
   protected void deepThoughtChanged(DeepThought previousDeepThought, DeepThought newDeepThought) {
+
+  }
+
+  protected void applicationInstantiated() {
 
   }
 

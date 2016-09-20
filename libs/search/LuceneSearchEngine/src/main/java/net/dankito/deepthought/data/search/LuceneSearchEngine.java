@@ -152,8 +152,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void deepThoughtChanged(DeepThought previousDeepThought, DeepThought newDeepThought) {
     super.deepThoughtChanged(previousDeepThought, newDeepThought);
 
-    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
-
     if(previousDeepThought != null) {
       closeIndexSearchersAndWriters();
     }
@@ -161,6 +159,12 @@ public class LuceneSearchEngine extends SearchEngineBase {
     createDirectoryAndIndexSearcherAndWriterForDeepThought(newDeepThought);
   }
 
+  @Override
+  protected void applicationInstantiated() {
+    super.applicationInstantiated();
+
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+  }
 
   public void close() {
     timer.cancel();
