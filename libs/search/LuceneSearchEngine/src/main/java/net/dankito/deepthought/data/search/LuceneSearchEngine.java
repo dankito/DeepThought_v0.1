@@ -13,7 +13,7 @@ import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.AllEntitiesListener;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.persistence.LazyLoadingList;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;

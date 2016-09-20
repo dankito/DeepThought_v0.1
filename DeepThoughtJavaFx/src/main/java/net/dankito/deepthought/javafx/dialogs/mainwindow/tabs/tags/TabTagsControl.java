@@ -6,7 +6,7 @@ import net.dankito.deepthought.controls.tag.IDisplayedTagsChangedListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.AllEntitiesListener;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.settings.enums.SelectedTab;
 import net.dankito.deepthought.data.model.ui.SystemTag;

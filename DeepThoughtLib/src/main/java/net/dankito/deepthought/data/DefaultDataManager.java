@@ -12,7 +12,7 @@ import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.model.enums.FileType;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.enums.NoteType;
-import net.dankito.deepthought.data.model.listener.AllEntitiesListener;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
