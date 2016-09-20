@@ -103,7 +103,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   }
 
   public void applicationInstantiated() {
-    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
 
     updateTags();
   }

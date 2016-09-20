@@ -8,6 +8,7 @@ import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.helper.MockEntityManager;
 import net.dankito.deepthought.data.helper.NoOperationBackupManager;
 import net.dankito.deepthought.data.helper.TestDataManager;
+import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
@@ -70,8 +71,8 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
 
 
   @Override
-  public IDataManager createDataManager(IEntityManager entityManager) {
-    return new TestDataManager(entityManager);
+  public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
+    return new TestDataManager(entityManager, entityChangesService);
   }
 
   @Override

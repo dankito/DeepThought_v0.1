@@ -152,7 +152,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected void deepThoughtChanged(DeepThought previousDeepThought, DeepThought newDeepThought) {
     super.deepThoughtChanged(previousDeepThought, newDeepThought);
 
-    Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
 
     if(previousDeepThought != null) {
       closeIndexSearchersAndWriters();

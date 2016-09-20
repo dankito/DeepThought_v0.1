@@ -5,6 +5,7 @@ import net.dankito.deepthought.TestApplicationConfiguration;
 import net.dankito.deepthought.data.DefaultDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.helper.DataHelper;
+import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.User;
@@ -35,8 +36,8 @@ public class DeepThoughtJsonWriterTest {
 //      }
 
       @Override
-      public IDataManager createDataManager(IEntityManager entityManager) {
-        return new DefaultDataManager(entityManager) {
+      public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
+        return new DefaultDataManager(entityManager, entityChangesService) {
           @Override
           public DeepThought retrieveDeepThoughtApplication() {
             this.application = DataHelper.createTestApplication();

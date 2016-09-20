@@ -49,8 +49,6 @@ public class EntriesAdapter extends BaseAdapter {
 
     Application.addApplicationListener(applicationListener);
 
-    if(Application.getDataManager() != null)
-      Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
     if(Application.getDeepThought() != null)
       deepThoughtChanged(Application.getDeepThought());
   }
@@ -64,7 +62,7 @@ public class EntriesAdapter extends BaseAdapter {
     @Override
     public void notification(Notification notification) {
       if(notification.getType() == NotificationType.ApplicationInstantiated)
-        Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
+        Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
     }
   };
 
@@ -223,7 +221,7 @@ public class EntriesAdapter extends BaseAdapter {
   }
 
   public void cleanUp() {
-    Application.getDataManager().removeAllEntitiesListener(allEntitiesListener);
+    Application.getEntityChangesService().removeAllEntitiesListener(allEntitiesListener);
 
     Application.removeApplicationListener(applicationListener);
   }

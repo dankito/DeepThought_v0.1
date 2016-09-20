@@ -13,6 +13,9 @@ import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.listener.ApplicationListener;
+import net.dankito.deepthought.data.listener.EntityChangesService;
+import net.dankito.deepthought.data.listener.IEntityChangesService;
+import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
@@ -69,6 +72,7 @@ public class Application {
   protected static IPlatformTools platformTools;
   protected static IApplicationLifeCycleService lifeCycleService;
   protected static IThreadPool threadPool;
+  protected static IEntityChangesService entityChangesService;
 
   protected static EntityManagerConfiguration entityManagerConfiguration = null;
   protected static IEntityManager entityManager = null;
@@ -134,6 +138,7 @@ public class Application {
     Application.platformConfiguration = applicationConfiguration.getPlatformConfiguration();
     Application.platformTools = applicationConfiguration.createPlatformTools();
     Application.lifeCycleService = applicationConfiguration.createApplicationLifeCycleService();
+    Application.entityChangesService = new EntityChangesService();
 
     HtmlEditor.extractHtmlEditorIfNeededAsync();
 
@@ -229,7 +234,7 @@ public class Application {
     Date startTime = new Date();
 
     try {
-      Application.dataManager = dependencyResolver.createDataManager(Application.entityManager);
+      Application.dataManager = dependencyResolver.createDataManager(Application.entityManager, (IExternalCallableEntityChangesService)entityChangesService);
       Application.dataManager.addApplicationListener(dataManagerListener);
       Application.dataManager.retrieveDeepThoughtApplication();
     } catch(Exception ex) {
@@ -379,6 +384,10 @@ public class Application {
 
   public static IThreadPool getThreadPool() {
     return threadPool;
+  }
+
+  public static IEntityChangesService getEntityChangesService() {
+    return entityChangesService;
   }
 
   public static EntityManagerConfiguration getEntityManagerConfiguration() {

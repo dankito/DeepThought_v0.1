@@ -4,7 +4,6 @@ import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.User;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -14,31 +13,28 @@ import net.dankito.deepthought.data.persistence.db.BaseEntity;
  */
 public interface IDataManager {
 
-  public DeepThoughtApplication getApplication();
-  public UserDeviceSettings getSettings();
-  public User getLoggedOnUser();
-  public DeepThought getDeepThought();
-  public String getDataCollectionSavePath();
-  public String getDataFolderPath();
+  DeepThoughtApplication getApplication();
+  UserDeviceSettings getSettings();
+  User getLoggedOnUser();
+  DeepThought getDeepThought();
+  String getDataCollectionSavePath();
+  String getDataFolderPath();
 
-  public IEntityManager getEntityManager();
+  IEntityManager getEntityManager();
 
-  public boolean addApplicationListener(ApplicationListener listener);
-  public boolean removeApplicationListener(ApplicationListener listener);
+  boolean addApplicationListener(ApplicationListener listener);
+  boolean removeApplicationListener(ApplicationListener listener);
 
-  public boolean addAllEntitiesListener(AllEntitiesListener listener);
-  public boolean removeAllEntitiesListener(AllEntitiesListener listener);
+  void deleteExistingDataCollection();
+  void replaceExistingDataCollectionWithData(DeepThoughtApplication data);
 
-  public void deleteExistingDataCollection();
-  public void replaceExistingDataCollectionWithData(DeepThoughtApplication data);
+  DeepThought retrieveDeepThoughtApplication();
+  void recreateEntityManagerAndRetrieveDeepThoughtApplication();
 
-  public DeepThought retrieveDeepThoughtApplication();
-  public void recreateEntityManagerAndRetrieveDeepThoughtApplication();
+  void ensureAllLazyLoadingDataIsLoaded(BaseEntity entity);
 
-  public void ensureAllLazyLoadingDataIsLoaded(BaseEntity entity);
+  void lazyLoadedEntityMapped(BaseEntity entity);
 
-  public void lazyLoadedEntityMapped(BaseEntity entity);
-
-  public void close();
+  void close();
 
 }

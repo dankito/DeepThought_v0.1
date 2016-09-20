@@ -3,6 +3,7 @@ package net.dankito.deepthought.data;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.listener.ApplicationListener;
+import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
@@ -12,7 +13,6 @@ import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.model.enums.FileType;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.enums.NoteType;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
@@ -54,14 +54,16 @@ public class DefaultDataManager implements IDataManager {
   protected String dataFolder;
 
   protected Set<ApplicationListener> applicationListeners = new CopyOnWriteArraySet<>();
-  protected Set<AllEntitiesListener> allEntitiesListeners = new CopyOnWriteArraySet<>();
+
+  protected IExternalCallableEntityChangesService entityChangesService;
 
   protected Set<BaseEntity> unpersistedUpdatedEntities = new CopyOnWriteArraySet<>();
   protected Timer persistUpdatedEntitiesTimer = null;
 
 
-  public DefaultDataManager(IEntityManager entityManager) {
+  public DefaultDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
     this.entityManager = entityManager; // TODO: how to set dataCollectionPersistencePath?
+    this.entityChangesService = entityChangesService;
 
     File databasePath = new File(entityManager.getDatabasePath());
     if(databasePath.getParentFile() != null) { // on Android parent file will be null, but data folder will be set explicitly there
@@ -350,39 +352,24 @@ public class DefaultDataManager implements IDataManager {
   }
 
 
-  public boolean addAllEntitiesListener(AllEntitiesListener listener) {
-    if(listener == null)
-      return false;
-    return allEntitiesListeners.add(listener);
-  }
-
-  public boolean removeAllEntitiesListener(AllEntitiesListener listener) {
-    return allEntitiesListeners.remove(listener);
-  }
-
   protected void callEntityCreatedListeners(BaseEntity entity) {
-    for(AllEntitiesListener listener : allEntitiesListeners)
-      listener.entityCreated(entity);
+    entityChangesService.informEntityCreatedListeners(entity);
   }
 
   protected void callEntityUpdatedListeners(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-    for(AllEntitiesListener listener : allEntitiesListeners)
-      listener.entityUpdated(entity, propertyName, previousValue, newValue);
+    entityChangesService.informEntityUpdatedListeners(entity, propertyName, previousValue, newValue);
   }
 
   protected void callEntityDeletedListeners(BaseEntity entity) {
-    for(AllEntitiesListener listener : allEntitiesListeners)
-      listener.entityDeleted(entity);
+    entityChangesService.informEntityDeletedListeners(entity);
   }
 
   protected void callEntityAddedToCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-    for(AllEntitiesListener listener : allEntitiesListeners)
-      listener.entityAddedToCollection(collectionHolder, collection, addedEntity);
+    entityChangesService.informEntityAddedToCollectionListeners(collectionHolder, collection, addedEntity);
   }
 
   protected void callEntityRemovedFromCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-    for(AllEntitiesListener listener : allEntitiesListeners)
-      listener.entityRemovedFromCollection(collectionHolder, collection, addedEntity);
+    entityChangesService.informEntityRemovedFromCollectionListeners(collectionHolder, collection, addedEntity);
   }
 
 

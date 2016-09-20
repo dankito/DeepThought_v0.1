@@ -21,6 +21,7 @@ import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.download.NoOpFileDownloader;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.html.JsoupHtmlHelper;
+import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.merger.DefaultDataMerger;
 import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
@@ -85,8 +86,8 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
-  public IDataManager createDataManager(IEntityManager entityManager) {
-    return new DefaultDataManager(entityManager);
+  public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
+    return new DefaultDataManager(entityManager, entityChangesService);
   }
 
   @Override
