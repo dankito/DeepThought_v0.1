@@ -155,13 +155,23 @@ public class JsoupHtmlHelper implements IHtmlHelper {
       elementData.setEmbeddingId(Long.parseLong(imgElement.attr(ImageElementData.EmbeddingIdAttributeName)));
 
     if(imgElement.hasAttr(ImageElementData.WidthAttributeName))
-      elementData.setWidth(Integer.parseInt(imgElement.attr(ImageElementData.WidthAttributeName)));
+      elementData.setWidth(parseImageMetricToInt(imgElement, ImageElementData.WidthAttributeName));
     if(imgElement.hasAttr(ImageElementData.HeightAttributeName))
-      elementData.setHeight(Integer.parseInt(imgElement.attr(ImageElementData.HeightAttributeName)));
+      elementData.setHeight(parseImageMetricToInt(imgElement, ImageElementData.HeightAttributeName));
     tryToExtractOriginalImgElementHtmlCode(html, imgElement, elementData);
 
 
     return elementData;
+  }
+
+  protected int parseImageMetricToInt(Element imgElement, String attributeName) {
+    // TODO: what to do with percentage values, e.g. 100% ?
+    String attributeValue = imgElement.attr(attributeName);
+    try {
+      return Integer.parseInt(attributeValue);
+    } catch(Exception e) { log.error("Could not parse attributeValue " + attributeValue + " to an Integer", e); }
+
+    return 0;
   }
 
   protected void tryToExtractOriginalImgElementHtmlCode(String html, Element imgElement, ImageElementData elementData) {
