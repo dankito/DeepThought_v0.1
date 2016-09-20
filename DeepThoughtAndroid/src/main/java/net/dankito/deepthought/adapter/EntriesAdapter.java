@@ -2,16 +2,14 @@ package net.dankito.deepthought.adapter;
 
 import android.app.Activity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
@@ -25,12 +23,11 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntriesAdapter extends BaseAdapter {
+public class EntriesAdapter extends AsyncLoadingAdapter {
 
   protected List<Entry> entriesToShow = null;
 
   protected DeepThought deepThought;
-  protected Activity context;
 
   protected EntriesSearch entriesSearch = null;
 
@@ -40,7 +37,7 @@ public class EntriesAdapter extends BaseAdapter {
 
 
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
-    this.context = context;
+    super(context, R.layout.list_item_entry);
 
     if(entriesToShow instanceof List)
       this.entriesToShow = (List<Entry>)entriesToShow;
@@ -113,23 +110,21 @@ public class EntriesAdapter extends BaseAdapter {
     return position;
   }
 
+
   @Override
-  public View getView(int position, View convertView, ViewGroup parent) {
-    if(convertView == null)
-      convertView = context.getLayoutInflater().inflate(R.layout.list_item_entry, parent, false);
+  protected void customizeViewForItem(View listItemView, Object item) {
+    Entry entry = (Entry)item;
 
-    Entry entry = getEntryAt(position);
-
-    TextView txtvwListItemEntryReferencePreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryReferencePreview);
+    TextView txtvwListItemEntryReferencePreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryReferencePreview);
     txtvwListItemEntryReferencePreview.setText(entry.getReferenceOrPersonsPreview());
     txtvwListItemEntryReferencePreview.setVisibility(entry.hasPersonsOrIsAReferenceSet() ? View.VISIBLE : View.GONE);
 
-    TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
+    TextView txtvwPreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryPreview);
     txtvwPreview.setText(entry.getLongPreview());
 
     int txtvwPreviewLines = entry.hasPersonsOrIsAReferenceSet() ? 3 : 4;
 
-    TextView txtvwTags = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTags);
+    TextView txtvwTags = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryTags);
     txtvwTags.setText(entry.getTagsPreview());
 
     txtvwTags.setVisibility(entry.hasTags() ? View.VISIBLE : View.GONE);
@@ -137,8 +132,24 @@ public class EntriesAdapter extends BaseAdapter {
       txtvwPreviewLines++;
 
     txtvwPreview.setLines(txtvwPreviewLines);
+  }
 
-    return convertView;
+  @Override
+  protected void showPlaceholderView(View listItemView) {
+    TextView txtvwListItemEntryReferencePreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryReferencePreview);
+    txtvwListItemEntryReferencePreview.setVisibility(View.GONE);
+
+    TextView txtvwPreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryPreview);
+    txtvwPreview.setText("");
+
+    TextView txtvwTags = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryTags);
+
+    txtvwTags.setVisibility(View.GONE);
+  }
+
+  @Override
+  protected Object loadItemInBackgroundThread(int position) {
+    return getItem(position);
   }
 
 
@@ -171,16 +182,6 @@ public class EntriesAdapter extends BaseAdapter {
     searchResults = null;
     lastSearchTerm = null;
     notifyDataSetChangedThreadSafe();
-  }
-
-
-  public void notifyDataSetChangedThreadSafe() {
-    context.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        notifyDataSetChanged();
-      }
-    });
   }
 
 
@@ -225,4 +226,5 @@ public class EntriesAdapter extends BaseAdapter {
 
     Application.removeApplicationListener(applicationListener);
   }
+
 }
