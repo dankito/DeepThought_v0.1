@@ -6,12 +6,14 @@ import net.dankito.deepthought.communication.connected_device.IConnectedRegister
 import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
 
   protected IThreadPool threadPool;
 
-  protected Set<ISynchronizationListener> synchronizationListeners = new HashSet<>();
+  protected Set<AllEntitiesListener> synchronizationListeners = new HashSet<>();
 
 
   public SyncManagerBase(IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, IThreadPool threadPool) {
@@ -65,17 +67,41 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
     return synchronizationListeners.size() > 0;
   }
 
-  public boolean addSynchronizationListener(ISynchronizationListener listener) {
+  public boolean addSynchronizationListener(AllEntitiesListener listener) {
     return synchronizationListeners.add(listener);
   }
 
-  public boolean removeSynchronizationListener(ISynchronizationListener listener) {
+  public boolean removeSynchronizationListener(AllEntitiesListener listener) {
     return synchronizationListeners.remove(listener);
   }
 
-  protected void callEntitySynchronizedListeners(BaseEntity synchronizedEntity) {
-    for(ISynchronizationListener listener : synchronizationListeners) {
-      listener.entitySynchronized(synchronizedEntity);
+  protected void callEntityCreatedListeners(BaseEntity addedEntity) {
+    for(AllEntitiesListener listener : synchronizationListeners) {
+      listener.entityCreated(addedEntity);
+    }
+  }
+
+  protected void callEntityUpdatedListeners(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    for(AllEntitiesListener listener : synchronizationListeners) {
+      listener.entityUpdated(entity, propertyName, previousValue, newValue);
+    }
+  }
+
+  protected void callEntityDeletedListeners(BaseEntity deletedEntity) {
+    for(AllEntitiesListener listener : synchronizationListeners) {
+      listener.entityDeleted(deletedEntity);
+    }
+  }
+
+  protected void callEntityAddedToCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+    for(AllEntitiesListener listener : synchronizationListeners) {
+      listener.entityAddedToCollection(collectionHolder, collection, addedEntity);
+    }
+  }
+
+  protected void callEntityRemovedFromCollectionListeners(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+    for(AllEntitiesListener listener : synchronizationListeners) {
+      listener.entityRemovedFromCollection(collectionHolder, collection, removedEntity);
     }
   }
 
