@@ -1,8 +1,5 @@
 package net.dankito.deepthought.data;
 
-import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
-import net.dankito.deepthought.data.model.enums.FileType;
-import net.dankito.deepthought.data.persistence.db.AssociationEntity;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.listener.ApplicationListener;
@@ -11,6 +8,8 @@ import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.Group;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
+import net.dankito.deepthought.data.model.enums.FileType;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.enums.NoteType;
 import net.dankito.deepthought.data.model.listener.AllEntitiesListener;
@@ -18,11 +17,12 @@ import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.persistence.db.AssociationEntity;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.file.FileUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +107,7 @@ public class DefaultDataManager implements IDataManager {
     try {
       List<DeepThoughtApplication> applicationsQueryResult = entityManager.getAllEntitiesOfType(DeepThoughtApplication.class);
 
-      if (applicationsQueryResult.size() > 0) { // TODO: what to do if there's more than one DeepThoughtApplication instance persisted?
+      if(applicationsQueryResult.size() > 0) { // TODO: what to do if there's more than one DeepThoughtApplication instance persisted?
         application = applicationsQueryResult.get(0);
 //        setCurrentDeepThoughtApplication(application);
         loggedOnUser = application.getLastLoggedOnUser();
@@ -116,6 +116,7 @@ public class DefaultDataManager implements IDataManager {
         // TODO: what to return if user was already logged on but autoLogOn is set to false?
         if (application.autoLogOnLastLoggedOnUser()) {
           DeepThought deepThought = loggedOnUser.getLastViewedDeepThought();
+
           setCurrentDeepThought(deepThought);
           return deepThought;
         }
@@ -135,9 +136,7 @@ public class DefaultDataManager implements IDataManager {
 
     DeepThought newDeepThought = loggedOnUser.getLastViewedDeepThought();
 
-//    entityManager.persistEntity(loggedOnUser);
     entityManager.persistEntity(application);
-    entityManager.persistEntity(newDeepThought);
     Application.getSettings().setLanguage(Application.getSettings().getLanguage());
     newDeepThought.getSettings().setLastViewedCategory(newDeepThought.getSettings().getLastViewedCategory()); // TODO: what kind of code is this?
 
