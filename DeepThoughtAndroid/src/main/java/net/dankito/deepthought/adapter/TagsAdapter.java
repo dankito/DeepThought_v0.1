@@ -2,23 +2,21 @@ package net.dankito.deepthought.adapter;
 
 import android.app.Activity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchBase;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
+import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
-import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 
@@ -29,11 +27,10 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class TagsAdapter extends BaseAdapter {
+public class TagsAdapter extends AsyncLoadingAdapter {
 
 
   protected DeepThought deepThought;
-  protected Activity context;
 
   protected TagsSearch tagsSearch = null;
   protected String lastSearchTerm = SearchBase.EmptySearchTerm;
@@ -45,7 +42,7 @@ public class TagsAdapter extends BaseAdapter {
 
 
   public TagsAdapter(Activity context) {
-    this.context = context;
+    super(context, R.layout.list_item_tag);
 
     Application.addApplicationListener(applicationListener);
 
@@ -100,30 +97,41 @@ public class TagsAdapter extends BaseAdapter {
   }
 
   @Override
-  public View getView(int position, View convertView, ViewGroup parent) {
-    if(convertView == null)
-      convertView = context.getLayoutInflater().inflate(R.layout.list_item_tag, parent, false);
+  protected void customizeViewForItem(View listItemView, Object item) {
+    Tag tag = (Tag)item;
 
-    Tag tag = getTagAt(position);
-
-    TextView txtvwListItemTagName = (TextView)convertView.findViewById(R.id.txtvwTagName);
+    TextView txtvwListItemTagName = (TextView)listItemView.findViewById(R.id.txtvwTagName);
     txtvwListItemTagName.setText(tag.getTextRepresentation());
     if(tag.hasEntries())
       txtvwListItemTagName.setText(txtvwListItemTagName.getText() + "  ≻");
 
-    ImageView imgvwFilter = (ImageView)convertView.findViewById(R.id.imgvwFilter);
+    ImageView imgvwFilter = (ImageView)listItemView.findViewById(R.id.imgvwFilter);
     imgvwFilter.setTag(tag);
     setFilterIconDependingOnTagState(tag, imgvwFilter);
     imgvwFilter.setOnClickListener(imgvwFilterOnClickListener);
+  }
 
-    return convertView;
+  @Override
+  protected void showPlaceholderView(View listItemView) {
+    TextView txtvwListItemTagName = (TextView)listItemView.findViewById(R.id.txtvwTagName);
+    txtvwListItemTagName.setText("");
+
+    ImageView imgvwFilter = (ImageView)listItemView.findViewById(R.id.imgvwFilter);
+    imgvwFilter.setOnClickListener(null);
+    setImgvwFilterToDisabledState(imgvwFilter);
   }
 
   private void setFilterIconDependingOnTagState(Tag tag, ImageView imgvwFilter) {
-    if(tagsFilter.contains(tag))
+    if(tagsFilter.contains(tag)) {
       imgvwFilter.setImageResource(R.drawable.filter);
-    else
-      imgvwFilter.setImageResource(R.drawable.filter_disabled);
+    }
+    else {
+      setImgvwFilterToDisabledState(imgvwFilter);
+    }
+  }
+
+  protected void setImgvwFilterToDisabledState(ImageView imgvwFilter) {
+    imgvwFilter.setImageResource(R.drawable.filter_disabled);
   }
 
 
@@ -186,16 +194,6 @@ public class TagsAdapter extends BaseAdapter {
       tagsFilter.add(tag);
 
     filterTags();
-  }
-
-
-  public void notifyDataSetChangedThreadSafe() {
-    context.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        notifyDataSetChanged();
-      }
-    });
   }
 
 
