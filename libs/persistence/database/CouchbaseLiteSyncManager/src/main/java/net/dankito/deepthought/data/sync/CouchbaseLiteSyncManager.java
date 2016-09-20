@@ -100,10 +100,19 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
       public boolean filter(SavedRevision revision, Map<String, Object> params) {
         // TODO: also check if owner matches loggedOnUser (or if loggedOnUser is allowed to sync a Document from that owner)
         String entityType = (String)revision.getProperty(Dao.TYPE_COLUMN_NAME);
-        return ! ( entitiesToFilter.contains(entityType) || revision.getDocument().getId().equals(Application.getDeepThought().getTopLevelEntry().getId()) ||
-          revision.getDocument().getId().equals(Application.getDeepThought().getTopLevelCategory().getId()) );
+        return ! ( entitiesToFilter.contains(entityType) || filterEntity(revision.getDocument().getId()) );
       }
     });
+  }
+
+  protected boolean filterEntity(String id) {
+    DeepThought deepThought = Application.getDeepThought();
+    if(deepThought != null) {
+      return id.equals(deepThought.getTopLevelEntry().getId()) ||
+          id.equals(deepThought.getTopLevelCategory().getId());
+    }
+
+    return false;
   }
 
 
