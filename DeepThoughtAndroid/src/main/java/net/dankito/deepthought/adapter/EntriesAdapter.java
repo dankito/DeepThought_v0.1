@@ -6,15 +6,11 @@ import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
-import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
-import net.dankito.deepthought.util.Notification;
-import net.dankito.deepthought.util.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +19,7 @@ import java.util.List;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntriesAdapter extends AsyncLoadingAdapter {
+public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
   protected List<Entry> entriesToShow = null;
 
@@ -43,26 +39,9 @@ public class EntriesAdapter extends AsyncLoadingAdapter {
       this.entriesToShow = (List<Entry>)entriesToShow;
     else if(entriesToShow != null)
       this.entriesToShow = new ArrayList<>(entriesToShow); // TODO: use a lazy loading list
-
-    Application.addApplicationListener(applicationListener);
-
-    if(Application.getDeepThought() != null)
-      deepThoughtChanged(Application.getDeepThought());
   }
 
-  protected ApplicationListener applicationListener = new ApplicationListener() {
-    @Override
-    public void deepThoughtChanged(DeepThought deepThought) {
-      EntriesAdapter.this.deepThoughtChanged(deepThought);
-    }
-
-    @Override
-    public void notification(Notification notification) {
-      if(notification.getType() == NotificationType.ApplicationInstantiated)
-        Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
-    }
-  };
-
+  @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
     if(this.deepThought != null) {
       if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries())
@@ -179,35 +158,17 @@ public class EntriesAdapter extends AsyncLoadingAdapter {
     notifyDataSetChangedThreadSafe();
   }
 
-
-  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
-    @Override
-    public void entityCreated(BaseEntity entity) {
-      checkIfRelevantEntityHasChanged(entity);
-    }
-
-    @Override
-    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      checkIfRelevantEntityHasChanged(entity);
-    }
-
-    @Override
-    public void entityDeleted(BaseEntity entity) {
-      checkIfRelevantEntityHasChanged(entity);
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      checkIfRelevantEntityHasChanged(collectionHolder);
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      checkIfRelevantEntityHasChanged(collectionHolder);
-    }
-  };
-
+  @Override
   protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
+    checkIfAnEntryHasChanged(entity);
+  }
+
+  @Override
+  protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
+    checkIfAnEntryHasChanged(collectionHolder);
+  }
+
+  protected void checkIfAnEntryHasChanged(BaseEntity entity) {
     if(entity instanceof Entry /*|| entity instanceof Tag*/) {
       if(lastSearchTerm != null) // reapply last search to update Entries
         searchEntries(lastSearchTerm);

@@ -7,8 +7,6 @@ import android.widget.TextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
-import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -17,17 +15,14 @@ import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
-import net.dankito.deepthought.util.Notification;
-import net.dankito.deepthought.util.NotificationType;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by ganymed on 01/10/14.
  */
-public class TagsAdapter extends AsyncLoadingAdapter {
+public class TagsAdapter extends AsyncLoadingEntityAdapter {
 
 
   protected DeepThought deepThought;
@@ -43,33 +38,22 @@ public class TagsAdapter extends AsyncLoadingAdapter {
 
   public TagsAdapter(Activity context) {
     super(context, R.layout.list_item_tag);
-
-    Application.addApplicationListener(applicationListener);
-
-    if(Application.getDeepThought() != null)
-      deepThoughtChanged(Application.getDeepThought());
   }
 
-  protected ApplicationListener applicationListener = new ApplicationListener() {
-    @Override
-    public void deepThoughtChanged(DeepThought deepThought) {
-      TagsAdapter.this.deepThoughtChanged(deepThought);
-    }
-
-    @Override
-    public void notification(Notification notification) {
-      if(notification.getType() == NotificationType.ApplicationInstantiated) {
-        Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
-        searchForAllTags();
-      }
-    }
-  };
-
+  @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
     this.deepThought = deepThought;
 
-    if(Application.isInstantiated())
+    if(Application.isInstantiated()) {
       searchForAllTags();
+    }
+  }
+
+  @Override
+  protected void applicationInstantiated() {
+    super.applicationInstantiated();
+
+    searchForAllTags();
   }
 
 
@@ -207,35 +191,14 @@ public class TagsAdapter extends AsyncLoadingAdapter {
   };
 
 
-  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
-    @Override
-    public void entityCreated(BaseEntity entity) {
-      checkIfATagHasChanged(entity, true);
-    }
-
-    @Override
-    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      checkIfATagHasChanged(entity, true);
-    }
-
-    @Override
-    public void entityDeleted(BaseEntity entity) {
-      checkIfATagHasChanged(entity, true);
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      checkIfATagHasChanged(collectionHolder);
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      checkIfATagHasChanged(collectionHolder);
-    }
-  };
-
-  protected void checkIfATagHasChanged(BaseEntity entity) {
+  @Override
+  protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
     checkIfATagHasChanged(entity, false);
+  }
+
+  @Override
+  protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
+    checkIfATagHasChanged(collectionHolder, true);
   }
 
   protected void checkIfATagHasChanged(BaseEntity entity, boolean redoSearch) {
