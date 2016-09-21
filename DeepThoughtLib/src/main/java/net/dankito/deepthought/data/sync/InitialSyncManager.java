@@ -1,5 +1,6 @@
 package net.dankito.deepthought.data.sync;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.model.DeepThoughtInfo;
 import net.dankito.deepthought.communication.model.GroupInfo;
@@ -27,6 +28,8 @@ import net.dankito.deepthought.data.model.enums.FileType;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.enums.NoteType;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -105,6 +108,8 @@ public class InitialSyncManager {
 
     // as User's Id has changed, all UserDataEntities pointing to that User Id have to be updated in Database
     updateAllUserDataEntities(loggedOnUser, entityManager);
+
+    Application.notifyUser(new Notification(NotificationType.InitialDatabaseSynchronizationDone));
   }
 
   protected void updateExtensibleEnumerations(DeepThought localDeepThought, DeepThoughtInfo remoteDeepThought, IEntityManager entityManager) {

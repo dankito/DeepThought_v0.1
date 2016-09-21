@@ -232,6 +232,9 @@ public abstract class SearchEngineBase implements ISearchEngine {
       if(notification.getType() == NotificationType.ApplicationInstantiated) {
         applicationInstantiated();
       }
+      else if(notification.getType() == NotificationType.InitialDatabaseSynchronizationDone) {
+        initialDatabaseSynchronizationDone();
+      }
     }
   };
 
@@ -240,6 +243,10 @@ public abstract class SearchEngineBase implements ISearchEngine {
   }
 
   protected void applicationInstantiated() {
+
+  }
+
+  protected void initialDatabaseSynchronizationDone() {
 
   }
 

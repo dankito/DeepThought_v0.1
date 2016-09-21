@@ -139,8 +139,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
     ReferenceReferenceBaseTypeIntRef = getByteRefFromInteger(ReferenceReferenceBaseType);
     ReferenceSubDivisionReferenceBaseTypeIntRef = getByteRefFromInteger(ReferenceSubDivisionReferenceBaseType);
     
-    if(deepThought != null)
+    if(deepThought != null) {
       deepThoughtChanged(null, deepThought);
+    }
   }
 
   public LuceneSearchEngine(Directory directory) {
@@ -164,6 +165,33 @@ public class LuceneSearchEngine extends SearchEngineBase {
     super.applicationInstantiated();
 
     Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+  }
+
+  @Override
+  protected void initialDatabaseSynchronizationDone() {
+    super.initialDatabaseSynchronizationDone();
+
+    File previousIndexPath = getPreviousIndexPath();
+
+    closeIndexSearchersAndWriters();
+
+    if(previousIndexPath != null) {
+      FileUtils.deleteFile(previousIndexPath); // delete previous index directory to not waste any disk space with a not used anymore index
+    }
+
+    createDirectoryAndIndexSearcherAndWriterForDeepThought(deepThought);
+
+    rebuildIndex();
+  }
+
+  protected File getPreviousIndexPath() {
+    Directory previousIndexDir = directories.get(DefaultIndexDirectoryClass);
+    if(previousIndexDir instanceof FSDirectory) {
+      File previousIndexPathSubDir = ((FSDirectory)previousIndexDir).getDirectory();
+      return previousIndexPathSubDir.getParentFile();
+    }
+
+    return null;
   }
 
   public void close() {
@@ -253,12 +281,15 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void createDirectoryAndIndexSearcherAndWriterForDeepThought(DeepThought deepThought) {
-    if(directories.size() > 0) // on unit tests
+    if(directories.size() > 0) { // on unit tests
       return;
+    }
+    if(deepThought == null) { // there's nothing to create an index for
+      return;
+    }
 
     try {
       File deepThoughtIndexDirectory = new File(new File(Application.getDataFolderPath(), "index"), deepThought.getId());
-//      FileUtils.deleteFile(deepThoughtIndexDirectory);
       boolean indexDirExists = deepThoughtIndexDirectory.exists();
 
       for(Class classWithOwnIndexDirectory : ClassesWithOwnIndexDirectories) {

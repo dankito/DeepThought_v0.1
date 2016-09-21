@@ -9,6 +9,7 @@ public enum NotificationType {
   Info,
   ApplicationInstantiated,
   HasOnlyReadOnlyAccessToData,
+  InitialDatabaseSynchronizationDone,
   DeepThoughtsConnectorStarted,
   PluginLoaded,
   OutdatedPluginFound
