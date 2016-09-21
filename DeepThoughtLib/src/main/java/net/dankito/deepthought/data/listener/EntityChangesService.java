@@ -1,6 +1,10 @@
 package net.dankito.deepthought.data.listener;
 
+import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.NotificationType;
 
 import java.util.Collection;
 import java.util.Set;
@@ -12,6 +16,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class EntityChangesService implements IExternalCallableEntityChangesService {
 
   protected Set<AllEntitiesListener> allEntitiesListeners = new CopyOnWriteArraySet<>();
+
+
+  public EntityChangesService() {
+    Application.addApplicationListener(applicationListener);
+  }
 
 
   @Override
@@ -80,5 +89,50 @@ public class EntityChangesService implements IExternalCallableEntityChangesServi
       listener.entityRemovedFromCollection(collectionHolder, collection, addedEntity);
     }
   }
+
+
+  protected AllEntitiesListener synchronizationListener = new AllEntitiesListener() {
+    @Override
+    public void entityCreated(BaseEntity entity) {
+      callEntityCreatedListeners(entity);
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      callEntityUpdatedListeners(entity, propertyName, previousValue, newValue);
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+      callEntityDeletedListeners(entity);
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      callEntityAddedToCollectionListeners(collectionHolder, collection, addedEntity);
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      callEntityRemovedFromCollectionListeners(collectionHolder, collection, removedEntity);
+    }
+  };
+
+
+  protected ApplicationListener applicationListener = new ApplicationListener() {
+    @Override
+    public void deepThoughtChanged(DeepThought deepThought) {
+
+    }
+
+    @Override
+    public void notification(Notification notification) {
+      if(notification.getType() == NotificationType.ApplicationInstantiated) {
+        Application.removeApplicationListener(applicationListener);
+
+        Application.getSyncManager().addSynchronizationListener(synchronizationListener);
+      }
+    }
+  };
 
 }
