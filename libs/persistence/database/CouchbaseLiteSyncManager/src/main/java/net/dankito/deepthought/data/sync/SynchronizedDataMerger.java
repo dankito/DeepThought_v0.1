@@ -248,13 +248,7 @@ public class SynchronizedDataMerger {
           List<SavedRevision> revisionHistory = storedDocument.getRevisionHistory();
           SavedRevision currentRevision = storedDocument.getCurrentRevision();
 
-          if(getVersionFromRevision(currentRevision).equals(1L)) { // TODO: how should it come to here if we call return on non-cached instances?
-            log.warn("Did it really ever come to here?");
-            newEntityCreated(entityType, change);
-          }
-          else {
-            updateCachedEntity(cachedEntity, dao, currentRevision);
-          }
+          updateCachedEntity(cachedEntity, dao, currentRevision);
         }
       } catch (Exception e) {
         log.error("Could not handle Change", e);
