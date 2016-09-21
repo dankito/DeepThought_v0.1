@@ -94,10 +94,12 @@ public class InitialSyncManager {
 
 
     entityManager.deleteEntity(localDeepThought.getTopLevelEntry());
-    entityManager.deleteEntity(localDeepThought.getTopLevelCategory());
-
     localDeepThought.getTopLevelEntry().setId(remoteDeepThought.getTopLevelEntryId());
+    entityManager.persistEntity(localDeepThought.getTopLevelEntry());
+
+    entityManager.deleteEntity(localDeepThought.getTopLevelCategory());
     localDeepThought.getTopLevelCategory().setId(remoteDeepThought.getTopLevelCategoryId());
+    entityManager.persistEntity(localDeepThought.getTopLevelCategory());
 
     updateExtensibleEnumerations(localDeepThought, remoteDeepThought, entityManager);
 
