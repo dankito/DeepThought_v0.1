@@ -79,7 +79,11 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
   }
 
   public boolean hasEntries() {
-    return getEntries().size() > 0;
+    return getCountEntries() > 0;
+  }
+
+  public int getCountEntries() {
+    return getEntries().size();
   }
 
   public Collection<Entry> getEntries() {
@@ -128,7 +132,7 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
   @Override
   @Transient
   public String getTextRepresentation() {
-    return name + " (" + entries.size() + ")";
+    return name + " (" + getCountEntries() + ")";
   }
 
   @Override
