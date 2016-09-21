@@ -1,7 +1,8 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
+import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
@@ -31,6 +32,8 @@ public class TagNameTableCell extends net.dankito.deepthought.controls.TextField
       lastTagsSearchResults = results;
       setCellBackgroundColor();
     });
+
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
 
     setOnContextMenuRequested(event -> showContextMenu(event));
   }
@@ -62,15 +65,7 @@ public class TagNameTableCell extends net.dankito.deepthought.controls.TextField
   }
 
   protected void tagChanged(Tag tag) {
-    if(this.tag != null) {
-      this.tag.removeEntityListener(tagListener);
-    }
-
     this.tag = tag;
-
-    if(tag != null) {
-      tag.addEntityListener(tagListener);
-    }
 
     setItem(getItemTextRepresentation());
     tagUpdated();
@@ -133,10 +128,22 @@ public class TagNameTableCell extends net.dankito.deepthought.controls.TextField
   }
 
 
-  protected EntityListener tagListener = new EntityListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      callTagUpdatedThreadSafe();
+    public void entityCreated(BaseEntity entity) {
+
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(entity == tag) {
+        callTagUpdatedThreadSafe();
+      }
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+
     }
 
     @Override
@@ -147,13 +154,8 @@ public class TagNameTableCell extends net.dankito.deepthought.controls.TextField
     }
 
     @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == tag.getEntries()) {
+      if(collectionHolder.equals(tag)) {
         callTagUpdatedThreadSafe();
       }
     }
