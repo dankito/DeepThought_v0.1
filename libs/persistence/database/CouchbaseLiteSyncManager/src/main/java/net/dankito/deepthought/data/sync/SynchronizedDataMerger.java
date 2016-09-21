@@ -287,7 +287,7 @@ public class SynchronizedDataMerger {
       Object updatedValue = dao.deserializePersistedValue(property, currentRevision.getProperty(propertyName));
       dao.setValueOnObject(cachedEntity, property, updatedValue);
 
-      syncManager.callEntityUpdatedListeners(cachedEntity, propertyName, null, detectedChanges.get(propertyName)); // TODO: also supply previousValue
+      syncManager.callEntityUpdatedListeners(cachedEntity, propertyName, previousValue, updatedValue);
     }
     else {
       updateCollectionProperty(cachedEntity, property, propertyName, currentRevision, detectedChanges, previousValue);
