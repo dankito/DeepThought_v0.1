@@ -1,6 +1,7 @@
 package net.dankito.deepthought.plugin.ocr;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
@@ -24,12 +25,12 @@ public class StartTextFairyOcrIntent extends Intent {
   private static final Logger log = LoggerFactory.getLogger(StartTextFairyOcrIntent.class);
 
 
-  public StartTextFairyOcrIntent(ResolveInfo resolveInfo, DoOcrConfiguration configuration) {
+  public StartTextFairyOcrIntent(Context context, ResolveInfo resolveInfo, DoOcrConfiguration configuration) {
     ActivityInfo activityInfo = resolveInfo.activityInfo;
     setComponent(new ComponentName(activityInfo.packageName, activityInfo.name));
     setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-    putExtra(Constants.CALLING_APPLICATION_PACKAGE_NAME_EXTRA_NAME, Constants.CALLING_APPLICATION_PACKAGE_NAME);
+    putExtra(Constants.CALLING_APPLICATION_PACKAGE_NAME_EXTRA_NAME, context.getPackageName());
 
     setConfiguration(configuration);
   }

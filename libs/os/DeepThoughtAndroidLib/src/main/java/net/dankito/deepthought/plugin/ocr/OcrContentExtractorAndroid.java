@@ -63,7 +63,7 @@ public class OcrContentExtractorAndroid extends OcrContentExtractorBase {
     try {
       OcrResultBroadcastReceiver ocrResultBroadcastReceiver = new OcrResultBroadcastReceiver(context, listener);
 
-      Intent intent = new StartTextFairyOcrIntent(resolveInfo, configuration);
+      Intent intent = new StartTextFairyOcrIntent(context, resolveInfo, configuration);
 
       context.startActivity(intent);
     } catch(Exception ex) {
