@@ -93,9 +93,21 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
   }
 
 
-  public void notifyDataSetChangedThreadSafe() {
+  @Override
+  public void notifyDataSetInvalidated() {
     loadedItems.clear();
 
+    super.notifyDataSetInvalidated();
+  }
+
+  @Override
+  public void notifyDataSetChanged() {
+    loadedItems.clear();
+
+    super.notifyDataSetChanged();
+  }
+
+  public void notifyDataSetChangedThreadSafe() {
     context.runOnUiThread(new Runnable() {
       @Override
       public void run() {
