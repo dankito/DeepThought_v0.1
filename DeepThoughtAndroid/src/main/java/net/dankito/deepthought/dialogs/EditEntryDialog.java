@@ -455,7 +455,6 @@ public class EditEntryDialog extends FullscreenDialog {
       Toast.makeText(getActivity(), getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
     else {
       Tag newTag = new Tag(tagName);
-      Application.getEntityManager().persistEntity(newTag);
       Application.getDeepThought().addTag(newTag);
       entryEditedTags.add(newTag);
       Collections.sort(entryEditedTags);
@@ -520,7 +519,6 @@ public class EditEntryDialog extends FullscreenDialog {
     }
 
     if(entry.isPersisted() == false) { // a new Entry
-      Application.getEntityManager().persistEntity(entry);
       Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
     }
 

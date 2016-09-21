@@ -646,7 +646,6 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
         public void editingDone(boolean cancelled, UserDataEntity editedEntity) {
           if(cancelled == false) {
             Tag newTag = (Tag)editedEntity;
-            Application.getEntityManager().persistEntity(newTag);
             Application.getDeepThought().addTag(newTag);
           }
         }
