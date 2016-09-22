@@ -192,8 +192,27 @@ public class SynchronizedCreatedEntitiesHandler {
     else if(ReferenceSubDivision.class.equals(entityType)) {
       return deepThought.addReferenceSubDivision((ReferenceSubDivision)entity);
     }
+    else if(Person.class.equals(entityType)) {
+      return deepThought.addPerson((Person)entity);
+    }
     else if(FileLink.class.equals(entityType)) {
       return deepThought.addFile((FileLink)entity);
+    }
+    else if(Note.class.equals(entityType)) {
+      return deepThought.addNote((Note)entity);
+    }
+
+    else if(Language.class.equals(entityType)) {
+      return deepThought.addLanguage((Language)entity);
+    }
+    else if(FileType.class.equals(entityType)) {
+      return deepThought.addFileType((FileType)entity);
+    }
+    else if(NoteType.class.equals(entityType)) {
+      return deepThought.addNoteType((NoteType)entity);
+    }
+    else if(BackupFileServiceType.class.equals(entityType)) {
+      return deepThought.addBackupFileServiceType((BackupFileServiceType)entity);
     }
 
     else if(User.class.equals(entityType)) {
