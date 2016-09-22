@@ -68,6 +68,7 @@ public class TagsSearchResults {
   public void setRelevantMatchesSorted(Collection<Tag> relevantMatchesSorted) {
     this.relevantMatchesSorted = relevantMatchesSorted;
 
+    // TODO: what was that good for?
     if(results.size() == 0)
       addSearchResult(new TagsSearchResult(getOverAllSearchTerm(), relevantMatchesSorted, null));
   }
