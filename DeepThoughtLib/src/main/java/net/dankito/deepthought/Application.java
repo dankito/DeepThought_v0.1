@@ -281,7 +281,9 @@ public class Application {
 
     languageDetector = null;
 
+    entityPreviewService = null;
     htmlHelper = null;
+    entityChangesService = null;
 
     dependencyResolver = null;
 
