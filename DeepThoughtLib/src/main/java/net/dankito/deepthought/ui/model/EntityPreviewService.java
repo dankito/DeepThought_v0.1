@@ -29,9 +29,9 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   public EntityPreviewService(IEntityChangesService changesService, IHtmlHelper htmlHelper) {
     this.tagPreviewService = new TagPreviewService();
-    this.referenceBasePreviewService = new ReferenceBasePreviewService();
     this.personPreviewService = new PersonPreviewService();
-    this.entryPreviewService = new EntryPreviewService(personPreviewService, htmlHelper);
+    this.referenceBasePreviewService = new ReferenceBasePreviewService(personPreviewService);
+    this.entryPreviewService = new EntryPreviewService(referenceBasePreviewService, personPreviewService, htmlHelper);
 
     Localization.addLanguageChangedListener(languageChangedListener);
     changesService.addAllEntitiesListener(allEntitiesListener);

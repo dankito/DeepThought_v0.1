@@ -18,6 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EntryPreviewService implements IUpdatablePreviewService {
 
+  protected ReferenceBasePreviewService referenceBasePreviewService;
+
   protected PersonPreviewService personPreviewService;
 
   protected IHtmlHelper htmlHelper;
@@ -27,7 +29,8 @@ public class EntryPreviewService implements IUpdatablePreviewService {
   protected Map<Entry, String> cachedPersonPreviews = new ConcurrentHashMap<>();
 
 
-  public EntryPreviewService(PersonPreviewService personPreviewService, IHtmlHelper htmlHelper) {
+  public EntryPreviewService(ReferenceBasePreviewService referenceBasePreviewService, PersonPreviewService personPreviewService, IHtmlHelper htmlHelper) {
+    this.referenceBasePreviewService = referenceBasePreviewService;
     this.personPreviewService = personPreviewService;
     this.htmlHelper = htmlHelper;
   }
@@ -55,65 +58,7 @@ public class EntryPreviewService implements IUpdatablePreviewService {
   }
 
   protected String determineReferencePreview(Entry entry) {
-    return determineReferencePreview(entry.getSeries(), entry.getReference(), entry.getReferenceSubDivision());
-  }
-
-  protected String determineReferencePreview(SeriesTitle seriesTitle, Reference reference, ReferenceSubDivision subDivision) {
-    String preview = determineSeriesTitlePreview(seriesTitle);
-
-    String referencePreview = determineReferencePreview(reference);
-    if(StringUtils.isNotNullOrEmpty(referencePreview)) {
-      preview += ( (StringUtils.isNullOrEmpty(preview) ? "" : " ") + referencePreview);
-    }
-
-    String subDivisionPreview = determineReferenceSubDivisionPreview(subDivision);
-    preview += (StringUtils.isNullOrEmpty(subDivisionPreview) ? "" : " - " + subDivisionPreview);
-
-    return preview;
-  }
-
-  protected String determineSeriesTitlePreview(SeriesTitle seriesTitle) {
-    String preview = "";
-
-    if(seriesTitle != null) {
-      preview = seriesTitle.getTitle();
-    }
-
-    return preview;
-  }
-
-  protected String determineReferencePreview(Reference reference) {
-    String preview = "";
-
-    if(reference != null) {
-      preview = reference.getTitle();
-
-      if(StringUtils.isNullOrEmpty(preview)) {
-        if(reference.getPublishingDate() != null) {
-          preview = reference.formatPublishingDate();
-        }
-        else if(reference.getIssueOrPublishingDate() != null) {
-          preview = reference.getIssueOrPublishingDate().toString();
-        }
-      }
-      else {
-        if(reference.getSeries() == null && reference.hasPersons()) {
-          preview = personPreviewService.getShortPersonsPreview(reference.getPersons()) + " - " + preview;
-        }
-      }
-    }
-
-    return preview;
-  }
-
-  protected String determineReferenceSubDivisionPreview(ReferenceSubDivision subDivision) {
-    String preview = "";
-
-    if(subDivision != null) {
-      preview = subDivision.getTitle();
-    }
-
-    return preview;
+    return referenceBasePreviewService.getReferencePreview(entry.getSeries(), entry.getReference(), entry.getReferenceSubDivision());
   }
 
   protected void resetReferencePreview(Entry entry) {
