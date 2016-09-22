@@ -5,8 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
@@ -15,7 +13,8 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
-import net.dankito.deepthought.filter.TagsFilter;
+import net.dankito.deepthought.data.search.ui.TagsSearchResultListener;
+import net.dankito.deepthought.data.search.ui.TagsSearcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,18 +24,19 @@ import java.util.List;
 /**
  * Created by ganymed on 12/10/14.
  */
-public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFilter.TagsFilterListener {
+public class EntryTagsAdapter extends BaseAdapter {
 
   public interface EntryTagsChangedListener {
-    public void entryTagsChanged(List<Tag> entryTags);
+    void entryTagsChanged(List<Tag> entryTags);
   }
 
   protected Activity context;
   protected Entry entry;
   protected List<Tag> entryTags;
-  protected List<Tag> filteredTags;
 
-  protected TagsFilter tagsFilter = null;
+  protected List<Tag> searchTagsResult;
+
+  protected TagsSearcher tagsSearcher;
 
   protected EntryTagsChangedListener entryTagsChangedListener = null;
 
@@ -46,13 +46,15 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
     this.entry = entry;
     this.entryTags = entryTags;
 
-    tagsFilter = new TagsFilter(this);
+    tagsSearcher = new TagsSearcher(Application.getSearchEngine());
+    searchTagsResult = new ArrayList<>();
 
     DeepThought deepThought = Application.getDeepThought();
-    filteredTags = new ArrayList<>(deepThought.getSortedTags());
 
     deepThought.addEntityListener(deepThoughtListener);
     entry.addEntityListener(entryListener);
+
+    searchTags("");
   }
 
   public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags, EntryTagsChangedListener entryTagsChangedListener) {
@@ -69,11 +71,11 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
 
   @Override
   public int getCount() {
-    return filteredTags.size();
+    return searchTagsResult.size();
   }
 
   public Tag getTagAt(int position) {
-    return filteredTags.get(position);
+    return searchTagsResult.get(position);
   }
 
   @Override
@@ -88,8 +90,9 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
-    if(convertView == null)
+    if(convertView == null) {
       convertView = context.getLayoutInflater().inflate(R.layout.list_item_entry_tag, parent, false);
+    }
 
     Tag tag = getTagAt(position);
 
@@ -134,14 +137,18 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
   }
 
 
-  @Override
-  public Filter getFilter() {
-    return tagsFilter;
+  public void searchTags(String searchTerm) {
+    tagsSearcher.search(searchTerm, searchResultListener);
   }
 
-  public void filterTags(String filter) {
-    getFilter().filter(filter);
-  }
+  protected TagsSearchResultListener searchResultListener = new TagsSearchResultListener() {
+    @Override
+    public void completed(List<Tag> searchResult) {
+      searchTagsResult = searchResult;
+
+      notifyDataSetChangedThreadSafe();
+    }
+  };
 
 
   protected EntityListener deepThoughtListener = new EntityListener() {
@@ -152,46 +159,25 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == Application.getDeepThought().getTags()) {
-        tagsFilter.reapplyFilter();
-        notifyDataSetChangedThreadSafe();
-      }
+      collectionUpdated(collectionHolder, addedEntity);
     }
 
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      if(collection == Application.getDeepThought().getTags()) {
-        tagsFilter.reapplyFilter();
-        notifyDataSetChangedThreadSafe();
-      }
+      collectionUpdated(collectionHolder, updatedEntity);
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == Application.getDeepThought().getTags()) {
-        tagsFilter.reapplyFilter();
-        notifyDataSetChangedThreadSafe();
-      }
+      collectionUpdated(collectionHolder, removedEntity);
     }
   };
 
-//  @Override
-//  public void tagAdded(Tag tag) {
-//    tagsFilter.reapplyFilter();
-//    notifyDataSetChangedThreadSafe();
-//  }
-//
-//  @Override
-//  public void tagUpdated(Tag tag) {
-//    tagsFilter.reapplyFilter();
-//    notifyDataSetChangedThreadSafe();
-//  }
-//
-//  @Override
-//  public void tagRemoved(Tag tag) {
-//    tagsFilter.reapplyFilter();
-//    notifyDataSetChangedThreadSafe();
-//  }
+  protected void collectionUpdated(BaseEntity collectionHolder, BaseEntity changedEntity) {
+    if(changedEntity instanceof Tag) {
+      tagsSearcher.researchTagsWithLastSearchTerm(searchResultListener);
+    }
+  }
 
 
   protected EntityListener entryListener = new EntityListener() {
@@ -216,32 +202,5 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
     }
   };
 
-//  @Override
-//  public void entryAdded(Entry entry) {
-//
-//  }
-//
-//  @Override
-//  public void entryUpdated(Entry entry) {
-//    if(this.entry.equals(this.entry))
-//      notifyDataSetChangedThreadSafe();
-//  }
-//
-//  @Override
-//  public void entryRemoved(Entry entry) {
-//
-//  }
-
-  @Override
-  public void publishResults(List<Tag> filteredTags) {
-    this.filteredTags = filteredTags;
-
-    if (filteredTags.size() > 0) {
-      notifyDataSetChanged();
-    }
-    else {
-      notifyDataSetInvalidated();
-    }
-  }
 
 }
