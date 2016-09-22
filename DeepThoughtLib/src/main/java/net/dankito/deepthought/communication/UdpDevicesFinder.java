@@ -153,7 +153,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
     return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
-        localHost.getDeviceId().equals(remoteHost.getDeviceId()) &&
+        localHost.getDeviceUniqueId().equals(remoteHost.getDeviceUniqueId()) &&
         remoteHost.getAddress().equals(NetworkHelper.getIPAddressString(true));
   }
 
@@ -161,7 +161,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
     for(HostInfo foundDevice : foundDevices) {
       // i removed check for user unique id as after initial synchronization this one changes so we would ask user again if she/he likes to connect to this device?
       if(hostInfo.getAddress().equals(foundDevice.getAddress()) &&
-          hostInfo.getDeviceId().equals(foundDevice.getDeviceId()) &&
+          hostInfo.getDeviceUniqueId().equals(foundDevice.getDeviceUniqueId()) &&
           hostInfo.getMessagesPort() == foundDevice.getMessagesPort()) {
         return true;
       }
@@ -171,6 +171,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void deviceFound(HostInfo device, IDevicesFinderListener listener) {
+    log.info("DeviceSync: Found remote host " + device.getDeviceDatabaseId());
     foundDevices.add(device);
 
     if(foundDevices.size() == 1) {
@@ -248,7 +249,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected void removeDeviceFromFoundDevices(HostInfo device) {
     // TODO: is IP Address really set in all possible cases?
     for(HostInfo foundDevice : foundDevices) {
-      if(device.getDeviceId().equals(foundDevice.getDeviceId()) &&
+      if(device.getDeviceUniqueId().equals(foundDevice.getDeviceUniqueId()) &&
           foundDevice.getAddress().equals(device.getAddress()) &&
           device.getMessagesPort() == foundDevice.getMessagesPort()) {
         foundDevices.remove(foundDevice);

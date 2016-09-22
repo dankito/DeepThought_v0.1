@@ -32,9 +32,9 @@ public class TestRegisteredDevicesManager implements IRegisteredDevicesManager {
 
   @Override
   public boolean registerDevice(AskForDeviceRegistrationRequest response) {
-    HostInfo hostInfo = new HostInfo(response.getUser().getUniversallyUniqueId(), response.getUser().getUserName(), response.getDevice().getDeviceId(),
-        response.getDevice().getDeviceName(), response.getDevice().getPlatform(), response.getDevice().getOsVersion(), response.getDevice().getPlatformArchitecture(),
-        response.getDevice().getCountSynchronizingDevice());
+    HostInfo hostInfo = new HostInfo(response.getUser().getUniversallyUniqueId(), response.getUser().getUserName(), response.getDevice().getDeviceDatabaseId(),
+        response.getDevice().getDeviceUniqueId(), response.getDevice().getDeviceName(), response.getDevice().getPlatform(), response.getDevice().getOsVersion(),
+        response.getDevice().getPlatformArchitecture(), response.getDevice().getCountSynchronizingDevice());
     hostInfo.setAddress(response.getAddress());
     hostInfo.setMessagesPort(response.getPort());
 

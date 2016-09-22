@@ -217,7 +217,7 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
     hostMap.put(USER_ID_MAP_KEY, hostInfo.getUserUniqueId());
     hostMap.put(USER_NAME_MAP_KEY, hostInfo.getUserName());
 
-    hostMap.put(DEVICE_ID_MAP_KEY, hostInfo.getDeviceId());
+    hostMap.put(DEVICE_ID_MAP_KEY, hostInfo.getDeviceUniqueId());
     hostMap.put(DEVICE_NAME_MAP_KEY, hostInfo.getDeviceName());
 
     hostMap.put(PLATFORM_MAP_KEY, hostInfo.getPlatform());
@@ -262,7 +262,7 @@ public abstract class jmDNSDevicesFinderBase implements IDevicesFinder {
     host.setUserUniqueId((String)hostMap.get(USER_ID_MAP_KEY));
     host.setUserName((String)hostMap.get(USER_NAME_MAP_KEY));
 
-    host.setDeviceId((String)hostMap.get(DEVICE_ID_MAP_KEY));
+    host.setDeviceUniqueId((String)hostMap.get(DEVICE_ID_MAP_KEY));
     host.setDeviceName((String)hostMap.get(DEVICE_NAME_MAP_KEY));
 
     host.setPlatform((String)hostMap.get(PLATFORM_MAP_KEY));

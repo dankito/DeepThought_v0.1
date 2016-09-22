@@ -57,18 +57,18 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   protected void showNotificationUnregisteredDeviceFound(HostInfo device) {
     Alert unregisteredDeviceFoundAlert = Alerts.createUnregisteredDeviceFoundAlert(device, stage);
 
-    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceId()) == false) {
-      unregisteredDeviceFoundAlerts.put(device.getDeviceId(), new ConcurrentHashMap<>());
+    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceUniqueId()) == false) {
+      unregisteredDeviceFoundAlerts.put(device.getDeviceUniqueId(), new ConcurrentHashMap<>());
     }
-    unregisteredDeviceFoundAlerts.get(device.getDeviceId()).put(device.getUserUniqueId(), unregisteredDeviceFoundAlert);
+    unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).put(device.getUserUniqueId(), unregisteredDeviceFoundAlert);
 
 
     Optional<ButtonType> result = unregisteredDeviceFoundAlert.showAndWait();
     boolean likesToConnectWithDevice = result.get() == ButtonType.YES;
 
-    unregisteredDeviceFoundAlerts.get(device.getDeviceId()).remove(device.getUserUniqueId());
-    if(unregisteredDeviceFoundAlerts.get(device.getDeviceId()).size() == 0) {
-      unregisteredDeviceFoundAlerts.remove(device.getDeviceId());
+    unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).remove(device.getUserUniqueId());
+    if(unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).size() == 0) {
+      unregisteredDeviceFoundAlerts.remove(device.getDeviceUniqueId());
     }
 
     if(likesToConnectWithDevice) {
@@ -112,8 +112,8 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(HostInfo device) {
-    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceId())) {
-      Map<String, Alert> userToAlertMap = unregisteredDeviceFoundAlerts.get(device.getDeviceId());
+    if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceUniqueId())) {
+      Map<String, Alert> userToAlertMap = unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId());
 
       if(userToAlertMap.containsKey(device.getUserUniqueId())) {
         Alert unregisteredDeviceFoundAlert = userToAlertMap.get(device.getUserUniqueId());

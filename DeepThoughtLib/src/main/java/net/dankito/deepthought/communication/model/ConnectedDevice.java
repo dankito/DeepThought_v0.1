@@ -29,14 +29,14 @@ public class ConnectedDevice extends HostInfo {
 
 
   public ConnectedDevice(String deviceId, String address, int messagesPort) {
-    this.deviceId = deviceId;
+    this.deviceUniqueId = deviceId;
     this.address = address;
     this.messagesPort = messagesPort;
   }
 
-  public ConnectedDevice(String userUniversallyUniqueId, String userName, String deviceUniversallyUniqueId, String deviceName, String platform, String osVersion,
+  public ConnectedDevice(String userUniversallyUniqueId, String userName, String deviceDatabaseId, String deviceUniversallyUniqueId, String deviceName, String platform, String osVersion,
                          String platformArchitecture, int countSynchronizingDevices) {
-    super(userUniversallyUniqueId, userName, deviceUniversallyUniqueId, deviceName, platform, osVersion, platformArchitecture, countSynchronizingDevices);
+    super(userUniversallyUniqueId, userName, deviceDatabaseId, deviceUniversallyUniqueId, deviceName, platform, osVersion, platformArchitecture, countSynchronizingDevices);
   }
 
 
@@ -89,19 +89,19 @@ public class ConnectedDevice extends HostInfo {
 
   public void setStoredDeviceInstance(User loggedOnUser) {
     for(Device userDevice : loggedOnUser.getDevices()) {
-      if(getDeviceId().equals(userDevice.getUniversallyUniqueId())) {
+      if(getDeviceUniqueId().equals(userDevice.getUniversallyUniqueId())) {
         setDevice(userDevice);
         return;
       }
     }
 
     // TODO: this happens on Server side on each new Device Registration (as there the remote device is not added yet to logged on User's devices)
-    log.error("Could not find local device with unique id " + getDeviceId() + ". But this happens on Server side on each new Device Registration");
+    log.error("Could not find local device with unique id " + getDeviceUniqueId() + ". But this happens on Server side on each new Device Registration");
   }
 
 
   public static ConnectedDevice fromUserAndDevice(User user, Device device, String localHostIpAddress, int messagesPort, int synchronizationPort) {
-    ConnectedDevice connectedDevice = new ConnectedDevice(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(),
+    ConnectedDevice connectedDevice = new ConnectedDevice(user.getUniversallyUniqueId(), user.getUserName(), device.getId(), device.getUniversallyUniqueId(), device.getName(),
         device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
 
     connectedDevice.setAddress(localHostIpAddress);

@@ -47,7 +47,7 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
   }
 
   protected boolean doConnectedDeviceInstancesEqual(ConnectedDevice storedDevice, ConnectedDevice otherDeviceInstance) {
-    return otherDeviceInstance.getDeviceId().equals(storedDevice.getDeviceId()) && otherDeviceInstance.getAddress().equals(storedDevice.getAddress()); // TODO: check if it's also the same user
+    return otherDeviceInstance.getDeviceUniqueId().equals(storedDevice.getDeviceUniqueId()) && otherDeviceInstance.getAddress().equals(storedDevice.getAddress()); // TODO: check if it's also the same user
   }
 
 
@@ -59,7 +59,7 @@ public class ConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public ConnectedDevice getConnectedDeviceForHostInfo(HostInfo hostInfo) {
     for(ConnectedDevice device : connectedDevices) {
-      if(device.getDeviceId().equals(hostInfo.getDeviceId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
+      if(device.getDeviceUniqueId().equals(hostInfo.getDeviceUniqueId()) && hostInfo.getUserUniqueId().equals(Application.getLoggedOnUser().getUniversallyUniqueId()))
         return device;
     }
 

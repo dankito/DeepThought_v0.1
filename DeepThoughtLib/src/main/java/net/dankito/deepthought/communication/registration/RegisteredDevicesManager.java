@@ -29,7 +29,7 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     User loggedOnUser = Application.getLoggedOnUser();
     if(loggedOnUser.getDevices().size() > 1 && loggedOnUser.getUniversallyUniqueId().equals(info.getUserUniqueId())) {
       for(Device device : loggedOnUser.getDevices()) {
-        if(device.getUniversallyUniqueId().equals(info.getDeviceId()))
+        if(device.getUniversallyUniqueId().equals(info.getDeviceUniqueId()))
           return true;
       }
     }
@@ -54,7 +54,8 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
   protected Device extractDeviceInformation(AskForDeviceRegistrationRequest response) {
     HostInfo deviceInfo = response.getDevice();
-    Device device = new Device(deviceInfo.getDeviceId(), deviceInfo.getDeviceName(),  deviceInfo.getPlatform(), deviceInfo.getOsVersion(), deviceInfo.getPlatformArchitecture());
+    Device device = new Device(deviceInfo.getDeviceUniqueId(), deviceInfo.getDeviceName(),  deviceInfo.getPlatform(), deviceInfo.getOsVersion(), deviceInfo.getPlatformArchitecture());
+    device.setId(deviceInfo.getDeviceDatabaseId());
     device.setDescription(deviceInfo.getDeviceDescription());
     device.setLastKnownIpAddress(response.getAddress());
 

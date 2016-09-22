@@ -12,7 +12,9 @@ public class HostInfo {
 
   protected String userName = "";
 
-  protected String deviceId = "";
+  protected String deviceDatabaseId = "";
+
+  protected String deviceUniqueId = "";
 
   protected String deviceName = "";
 
@@ -35,10 +37,12 @@ public class HostInfo {
 
   }
 
-  public HostInfo(String userUniqueId, String userName, String deviceId, String deviceName, String platform, String osVersion, String platformArchitecture, int countSynchronizingDevices) {
+  public HostInfo(String userUniqueId, String userName, String deviceDatabaseId, String deviceUniqueId, String deviceName, String platform, String osVersion, String platformArchitecture, int
+      countSynchronizingDevices) {
     this.userUniqueId = userUniqueId;
     this.userName = userName;
-    this.deviceId = deviceId;
+    this.deviceDatabaseId = deviceDatabaseId;
+    this.deviceUniqueId = deviceUniqueId;
     this.deviceName = deviceName;
     this.platform = platform;
     this.osVersion = osVersion;
@@ -63,12 +67,16 @@ public class HostInfo {
     this.userName = userName;
   }
 
-  public String getDeviceId() {
-    return deviceId;
+  public String getDeviceDatabaseId() {
+    return deviceDatabaseId;
   }
 
-  public void setDeviceId(String deviceId) {
-    this.deviceId = deviceId;
+  public String getDeviceUniqueId() {
+    return deviceUniqueId;
+  }
+
+  public void setDeviceUniqueId(String deviceUniqueId) {
+    this.deviceUniqueId = deviceUniqueId;
   }
 
   public String getDeviceName() {
@@ -155,7 +163,7 @@ public class HostInfo {
 
 
   public static HostInfo fromUserAndDevice(User user, Device device) {
-    return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
+    return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getId(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
         device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
   }
 

@@ -37,8 +37,8 @@ public class TestConnectedDevicesManager implements IConnectedDevicesManager {
   @Override
   public ConnectedDevice getConnectedDeviceForHostInfo(HostInfo hostInfo) {
     for(ConnectedDevice connectedDevice : connectedDevices) {
-      if(connectedDevice.getAddress().equals(hostInfo.getAddress()) && connectedDevice.getMessagesPort() == hostInfo.getMessagesPort() && connectedDevice.getDeviceId().equals
-          (hostInfo.getDeviceId())) {
+      if(connectedDevice.getAddress().equals(hostInfo.getAddress()) && connectedDevice.getMessagesPort() == hostInfo.getMessagesPort() && connectedDevice.getDeviceUniqueId().equals
+          (hostInfo.getDeviceUniqueId())) {
         return connectedDevice;
       }
     }
