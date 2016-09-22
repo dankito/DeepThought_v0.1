@@ -156,8 +156,8 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
   private String getUnescapedResponse(Object response) {
     String responseAsString = response instanceof String ? (String)response : response.toString();
 
-    if(responseAsString.startsWith("\"") && responseAsString.endsWith("\\n\"")) {
-      responseAsString = responseAsString.substring(1, responseAsString.length() - 3);
+    if(responseAsString.startsWith("\"") && responseAsString.endsWith("\"")) {
+      responseAsString = responseAsString.substring(1, responseAsString.length() - 1);
 
       responseAsString = StringEscapeUtils.unescapeEcmaScript(responseAsString);
     }
