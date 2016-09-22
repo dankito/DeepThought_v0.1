@@ -193,20 +193,17 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
 
   @Override
   protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
-    checkIfATagHasChanged(entity, false);
+    checkIfATagHasChanged(entity);
   }
 
   @Override
   protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
-    checkIfATagHasChanged(collectionHolder, true);
+    checkIfATagHasChanged(collectionHolder);
   }
 
-  protected void checkIfATagHasChanged(BaseEntity entity, boolean redoSearch) {
+  protected void checkIfATagHasChanged(BaseEntity entity) {
     if(entity instanceof Tag) {
-      if(redoSearch)
-        searchForAllTags();
-      else
-        notifyDataSetChangedThreadSafe();
+      researchTagsWithLastSearchTerm();
     }
   }
 
