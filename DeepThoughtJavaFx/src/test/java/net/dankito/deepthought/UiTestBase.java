@@ -26,6 +26,7 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 import net.dankito.deepthought.util.localization.JavaFxLocalization;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -95,6 +96,9 @@ public abstract class UiTestBase extends ApplicationTest {
   protected DeepThought deepThought = null;
 
   protected WindowFinder windowFinder = null;
+
+
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
   protected List<BaseEntity> createdEntities = new ArrayList<>();

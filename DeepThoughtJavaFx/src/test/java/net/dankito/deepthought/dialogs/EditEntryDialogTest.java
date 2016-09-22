@@ -421,8 +421,7 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThat(createdEntry.getContentAsPlainText(), is(EntryContent));
 
     assertThat(createdEntry.getTags().size(), is(6));
-    String debug = createdEntry.getTagsPreview();
-//    assertThat(createdEntry.getTagsPreview(), is("CSU, Flüchtlinge, München"));
+//    assertThat(previewService.getTagsPreview(createdEntry), is("CSU, Flüchtlinge, München"));
 
     assertThat(createdEntry.getCategories().size(), is(2)); // TODO: test that correct Categories have been added
 
@@ -441,7 +440,7 @@ public class EditEntryDialogTest extends UiTestBase {
     assertThat(createdEntry.getContentAsPlainText(), is(EntryContent));
 
     assertThat(createdEntry.getTags().size(), is(8));
-    assertThat(createdEntry.getTagsPreview(), is("2015, Apartheid, CSU, Flüchtlinge, München, Postillon, South Africa, Zitat"));
+    assertThat(previewService.getTagsPreview(createdEntry), is("2015, Apartheid, CSU, Flüchtlinge, München, Postillon, South Africa, Zitat"));
 
     assertThat(createdEntry.getCategories().size(), is(4)); // TODO: test that correct Categories have been added
   }

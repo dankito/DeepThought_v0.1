@@ -107,7 +107,7 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     int txtvwPreviewLines = entry.hasPersonsOrIsAReferenceSet() ? 3 : 4;
 
     TextView txtvwTags = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryTags);
-    txtvwTags.setText(entry.getTagsPreview());
+    txtvwTags.setText(previewService.getTagsPreview(entry));
 
     txtvwTags.setVisibility(entry.hasTags() ? View.VISIBLE : View.GONE);
     if(entry.hasTags() == false)

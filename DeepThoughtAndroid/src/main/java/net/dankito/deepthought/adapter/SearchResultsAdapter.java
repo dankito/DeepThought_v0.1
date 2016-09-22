@@ -6,8 +6,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +21,8 @@ public class SearchResultsAdapter extends BaseAdapter {
 
   protected List<Entry> searchResults = new ArrayList<>();
   protected Activity context;
+
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
   public SearchResultsAdapter(Activity context) {
@@ -53,17 +57,11 @@ public class SearchResultsAdapter extends BaseAdapter {
 
     Entry entry = getSearchResultAt(position);
 
-//    TextView txtvwTitle = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultTitle);
-//    txtvwTitle.setText(entry.getTitle());
-//
-//    TextView txtvwText = (TextView)convertView.findViewById(R.id.txtvwListItemSearchResultText);
-//    txtvwText.setText(entry.getContent());
-
     TextView txtvwPreview = (TextView)convertView.findViewById(R.id.txtvwListItemEntryPreview);
     txtvwPreview.setText(entry.getPreview());
 
     TextView txtvwTags = (TextView)convertView.findViewById(R.id.txtvwListItemEntryTags);
-    txtvwTags.setText(entry.getTagsPreview());
+    txtvwTags.setText(previewService.getTagsPreview(entry));
 
     return convertView;
   }
