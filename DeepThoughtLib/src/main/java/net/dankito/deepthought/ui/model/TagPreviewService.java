@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * Created by ganymed on 12/09/16.
  */
-public class TagsPreviewService {
+public class TagPreviewService {
 
   public static final int NO_MAX_PREVIEW_LENGTH = -1;
 

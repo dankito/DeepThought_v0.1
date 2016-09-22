@@ -20,13 +20,13 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   protected EntryPreviewService entryPreviewService;
 
-  protected TagsPreviewService tagsPreviewService;
+  protected TagPreviewService tagPreviewService;
 
   protected ReferenceBasePreviewService referenceBasePreviewService;
 
 
   public EntityPreviewService(IEntityChangesService changesService, IHtmlHelper htmlHelper) {
-    this.tagsPreviewService = new TagsPreviewService();
+    this.tagPreviewService = new TagPreviewService();
     this.referenceBasePreviewService = new ReferenceBasePreviewService();
     this.entryPreviewService = new EntryPreviewService(htmlHelper);
 
@@ -59,7 +59,7 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   @Override
   public String createTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage) {
-    return tagsPreviewService.createTagsPreview(tags, showNoTagsSetMessage);
+    return tagPreviewService.createTagsPreview(tags, showNoTagsSetMessage);
   }
 
 
