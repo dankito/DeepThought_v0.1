@@ -59,6 +59,8 @@ public class EditEntryDialog extends FullscreenDialog {
 
   protected List<FieldWithUnsavedChanges> editedFields = new ArrayList<>();
 
+  protected EntryTagsAdapter entryTagsAdapter;
+
 
   protected RelativeLayout rlytEditAbstract;
 
@@ -99,6 +101,17 @@ public class EditEntryDialog extends FullscreenDialog {
 
   public EditEntryDialog() {
 
+  }
+
+
+  protected void initEntryTagsAdapter(Entry entry) {
+    entryTagsAdapter = new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+      @Override
+      public void entryTagsChanged(List<Tag> entryTags) {
+        setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+        setTagsPreview(entryTags);
+      }
+    });
   }
 
 
@@ -299,6 +312,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
     setTagsPreview(entryEditedTags);
 
+    initEntryTagsAdapter(entry);
     lstvwEditEntryTags.setAdapter(entryTagsAdapter);
   }
 
@@ -417,7 +431,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
     @Override
     public void afterTextChanged(Editable editable) {
-      entryTagsAdapter.filterTags(editable.toString());
+      entryTagsAdapter.searchTags(editable.toString());
     }
   };
 
@@ -629,15 +643,6 @@ public class EditEntryDialog extends FullscreenDialog {
       return false;
     }
   };
-
-
-  protected EntryTagsAdapter entryTagsAdapter = new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-    @Override
-    public void entryTagsChanged(List<Tag> entryTags) {
-      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
-      setTagsPreview(entryTags);
-    }
-  });
 
 
   @Override
