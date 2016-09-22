@@ -27,7 +27,6 @@ import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
-import net.dankito.deepthought.ui.model.TagsUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected ShareActionProvider shareActionProvider;
 
-  protected TagsUtil tagsUtil = new TagsUtil();
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
   protected IEntityPreviewService entityPreviewService = Application.getEntityPreviewService();
 
@@ -353,7 +352,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setTextViewEntryTagsPreview(Collection<Tag> tags) {
-    String tagsPreview = tagsUtil.createTagsPreview(tags, true);
+    String tagsPreview = previewService.createTagsPreview(tags, true);
 
     txtvwViewEntryTagsPreview.setText(tagsPreview);
   }

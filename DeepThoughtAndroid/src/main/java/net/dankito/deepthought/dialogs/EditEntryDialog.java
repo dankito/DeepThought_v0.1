@@ -39,7 +39,7 @@ import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
-import net.dankito.deepthought.ui.model.TagsUtil;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 import net.dankito.deepthought.util.StringUtils;
 
@@ -93,7 +93,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
   protected EditEntityListener editEntityListener = null;
 
-  protected TagsUtil tagsUtil = new TagsUtil();
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
   public EditEntryDialog() {
@@ -464,7 +464,7 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   protected void setTagsPreview(List<Tag> tags) {
-    txtvwEntryTagsPreview.setText(tagsUtil.createTagsPreview(tags, true));
+    txtvwEntryTagsPreview.setText(previewService.createTagsPreview(tags, true));
   }
 
 

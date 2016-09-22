@@ -5,6 +5,7 @@ import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.IEntityChangesService;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceBase;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 
 import java.util.Collection;
@@ -16,10 +17,13 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   protected EntryPreviewService entryPreviewService;
 
+  protected TagsPreviewService tagsPreviewService;
+
   protected ReferenceBasePreviewService referenceBasePreviewService;
 
 
   public EntityPreviewService(IEntityChangesService changesService, IHtmlHelper htmlHelper) {
+    this.tagsPreviewService = new TagsPreviewService();
     this.referenceBasePreviewService = new ReferenceBasePreviewService();
     this.entryPreviewService = new EntryPreviewService(htmlHelper);
 
@@ -40,6 +44,12 @@ public class EntityPreviewService implements IEntityPreviewService {
   @Override
   public String getPersonsPreview(Entry entry) {
     return entryPreviewService.getLongPersonsPreview(entry);
+  }
+
+
+  @Override
+  public String createTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage) {
+    return tagsPreviewService.createTagsPreview(tags, showNoTagsSetMessage);
   }
 
 
