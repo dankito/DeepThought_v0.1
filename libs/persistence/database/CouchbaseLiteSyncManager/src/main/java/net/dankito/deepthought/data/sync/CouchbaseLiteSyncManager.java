@@ -261,6 +261,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected Database.ChangeListener databaseChangeListener = new Database.ChangeListener() {
     @Override
     public void changed(final Database.ChangeEvent event) {
+      logChanges(event); // TODO: remove again
+
       if(event.isExternal()) {
         threadPool.runTaskAsync(new Runnable() {
           @Override
@@ -275,6 +277,37 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   protected void handleSynchronizedChanges(List<DocumentChange> changes) {
     for(DocumentChange change : changes) {
       dataMerger.synchronizedChange(change);
+    }
+  }
+
+  protected void logChanges(Database.ChangeEvent event) {
+    for(DocumentChange change : event.getChanges()) {
+      String entityTypeString = (String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME);
+      if(StringUtils.isNullOrEmpty(entityTypeString)) {
+        break;
+      }
+
+      if(entityTypeString.endsWith(".Entry")) {
+        String content = Application.getHtmlHelper().extractPlainTextFromHtmlBody((String)change.getAddedRevision().getPropertyForKey("content"));
+        content = content.length() > 30 ? content.substring(0, 30) : content;
+        log.info("Synchronized Entry of Revision " + change.getAddedRevision().getRevID() + ": " + content);
+        log.info("Tags: " + change.getAddedRevision().getPropertyForKey("tags"));
+      }
+      else if(entityTypeString.endsWith(".Tag")) {
+        log.info("Synchronized Tag " + change.getAddedRevision().getPropertyForKey("name") + " of Revision " + change.getAddedRevision().getRevID());
+        log.info("Entries: " + change.getAddedRevision().getPropertyForKey("entries"));
+      }
+      else if(entityTypeString.endsWith(".User")) {
+        log.info("Synchronized User " + change.getDocumentId() + " " + change.getAddedRevision().getPropertyForKey("user_name") + " of Revision " + change.getAddedRevision().getRevID());
+        log.info("Devices: " + change.getAddedRevision().getPropertyForKey("devices"));
+        log.info("Groups: " + change.getAddedRevision().getPropertyForKey("groups"));
+      }
+      else if(entityTypeString.endsWith(".Device")) {
+        log.info("Synchronized Device " + change.getDocumentId() + " " + change.getAddedRevision().getPropertyForKey("universallyUniqueId") + " " +
+            change.getAddedRevision().getPropertyForKey("name") + " " + change.getAddedRevision().getPropertyForKey("platform") + " of Revision " + change.getAddedRevision().getRevID());
+        log.info("Users: " + change.getAddedRevision().getPropertyForKey("users"));
+        log.info("Groups: " + change.getAddedRevision().getPropertyForKey("groups"));
+      }
     }
   }
 
