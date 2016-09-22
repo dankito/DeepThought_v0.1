@@ -214,14 +214,11 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void saveEntryAndCloseDialog() {
-    saveEntityAsyncIfNeeded();
-
-    closeDialogAndMayCleanUp(true);
-  }
-
-  protected void saveEntityAsyncIfNeeded() {
     if(hasUnsavedChangesThatShouldBeSaved()) {
-      saveEntityAsync();
+      saveEntityAsyncAndCloseDialog();
+    }
+    else {
+      closeDialogAndMayCleanUp(true);
     }
   }
 
@@ -234,13 +231,20 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     return false;
   }
 
-  protected void saveEntityAsync() {
+  protected void saveEntityAsyncAndCloseDialog() {
     // why do i run this little code on a new Thread? Getting HTML from AndroidHtmlEditor has to be done from a different one than main thread,
     // as async JavaScript response is dispatched to the main thread, therefore waiting for it as well on the main thread would block JavaScript response listener
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
         saveEntity();
+
+        activity.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            closeDialogAndMayCleanUp(true);
+          }
+        });
       }
     });
   }
