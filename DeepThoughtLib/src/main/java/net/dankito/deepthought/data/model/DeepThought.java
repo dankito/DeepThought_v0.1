@@ -773,6 +773,10 @@ public class DeepThought extends UserDataEntity implements Serializable {
   }
 
 
+  public User getDeepThoughtOwner() {
+    return deepThoughtOwner;
+  }
+
   public DeepThoughtSettings getSettings() {
     if(settings == null) {
       settings = SettingsBase.createSettingsFromString(settingsString, DeepThoughtSettings.class);
