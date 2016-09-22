@@ -31,7 +31,7 @@ public class EntityPreviewService implements IEntityPreviewService {
     this.tagPreviewService = new TagPreviewService();
     this.personPreviewService = new PersonPreviewService();
     this.referenceBasePreviewService = new ReferenceBasePreviewService(personPreviewService);
-    this.entryPreviewService = new EntryPreviewService(referenceBasePreviewService, personPreviewService, htmlHelper);
+    this.entryPreviewService = new EntryPreviewService(tagPreviewService, referenceBasePreviewService, personPreviewService, htmlHelper);
 
     Localization.addLanguageChangedListener(languageChangedListener);
     changesService.addAllEntitiesListener(allEntitiesListener);
@@ -59,6 +59,11 @@ public class EntityPreviewService implements IEntityPreviewService {
     return entryPreviewService.getLongPersonsPreview(entry);
   }
 
+
+  @Override
+  public String getTagsPreview(Entry entry) {
+    return entryPreviewService.getTagsPreview(entry);
+  }
 
   @Override
   public String getTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage) {

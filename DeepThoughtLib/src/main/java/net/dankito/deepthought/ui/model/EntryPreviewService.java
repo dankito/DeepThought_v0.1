@@ -6,6 +6,7 @@ import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.util.StringUtils;
@@ -18,21 +19,46 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EntryPreviewService implements IUpdatablePreviewService {
 
+  protected TagPreviewService tagPreviewService;
+
   protected ReferenceBasePreviewService referenceBasePreviewService;
 
   protected PersonPreviewService personPreviewService;
 
   protected IHtmlHelper htmlHelper;
 
+
+  protected Map<Entry, String> cachedTagPreviews = new ConcurrentHashMap<>();
+
   protected Map<Entry, String> cachedReferencePreviews = new ConcurrentHashMap<>();
 
   protected Map<Entry, String> cachedPersonPreviews = new ConcurrentHashMap<>();
 
 
-  public EntryPreviewService(ReferenceBasePreviewService referenceBasePreviewService, PersonPreviewService personPreviewService, IHtmlHelper htmlHelper) {
+  public EntryPreviewService(TagPreviewService tagsPreviewService, ReferenceBasePreviewService referenceBasePreviewService, PersonPreviewService personPreviewService,
+                             IHtmlHelper htmlHelper) {
+    this.tagPreviewService = tagsPreviewService;
     this.referenceBasePreviewService = referenceBasePreviewService;
     this.personPreviewService = personPreviewService;
     this.htmlHelper = htmlHelper;
+  }
+
+
+  /*      Tags       */
+
+  public String getTagsPreview(Entry entry) {
+    String preview = cachedTagPreviews.get(entry);
+
+    if(preview == null) {
+      preview = tagPreviewService.createTagsPreview(entry.getTags(), false);
+      cachedTagPreviews.put(entry, preview);
+    }
+
+    return preview;
+  }
+
+  protected void resetTagPreview(Entry entry) {
+    cachedTagPreviews.remove(entry);
   }
 
 
@@ -68,7 +94,7 @@ public class EntryPreviewService implements IUpdatablePreviewService {
 
   /*      Persons       */
 
-  protected String getLongPersonsPreview(Entry entry) {
+  public String getLongPersonsPreview(Entry entry) {
     String preview = cachedPersonPreviews.get(entry);
 
     if(preview == null) {
@@ -143,7 +169,10 @@ public class EntryPreviewService implements IUpdatablePreviewService {
   }
 
   protected void collectionOfEntryUpdated(Entry entry, BaseEntity addedOrRemovedEntity) {
-    if(addedOrRemovedEntity instanceof Person) {
+    if(addedOrRemovedEntity instanceof Tag) {
+      resetTagPreview(entry);
+    }
+    else if(addedOrRemovedEntity instanceof Person) {
       resetPersonPreview(entry);
     }
   }
