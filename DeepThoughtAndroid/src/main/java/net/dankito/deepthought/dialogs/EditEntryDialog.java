@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -42,6 +41,8 @@ import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
 import net.dankito.deepthought.util.InsertImageOrRecognizedTextHelper;
 import net.dankito.deepthought.util.StringUtils;
+
+import org.droidparts.widget.ClearableEditText;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +73,7 @@ public class EditEntryDialog extends FullscreenDialog {
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected TextView txtvwEntryTagsPreview = null;
-  protected EditText edtxtEditEntrySearchTag = null;
+  protected ClearableEditText edtxtEditEntrySearchTag = null;
 
   protected ListView lstvwEditEntryTags = null;
 
@@ -285,7 +286,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
     txtvwEntryTagsPreview = (TextView)rootView.findViewById(R.id.txtvwEditEntryTagsPreview);
 
-    edtxtEditEntrySearchTag = (EditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
+    edtxtEditEntrySearchTag = (ClearableEditText)rootView.findViewById(R.id.edtxtEditEntrySearchTag);
     edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
     edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
 

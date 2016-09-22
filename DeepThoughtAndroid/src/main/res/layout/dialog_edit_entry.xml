@@ -70,7 +70,7 @@
                 android:textSize="@dimen/edit_entry_search_tags_text_size"
             />
 
-            <EditText
+            <org.droidparts.widget.ClearableEditText
                 android:id="@+id/edtxtEditEntrySearchTag"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/edit_entry_search_tags_height"
