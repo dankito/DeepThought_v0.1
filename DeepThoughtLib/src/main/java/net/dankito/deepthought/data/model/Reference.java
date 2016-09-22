@@ -344,7 +344,7 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
 
 
-  protected String formatPublishingDate() {
+  public String formatPublishingDate() {
     return DateFormat.getDateInstance(PublishingDateFormat, Localization.getLanguageLocale()).format(publishingDate);
   }
 

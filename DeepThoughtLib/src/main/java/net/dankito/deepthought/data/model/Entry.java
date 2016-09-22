@@ -264,7 +264,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     this.series = series;
-    resetReferencePreview();
 
     if(series != null) {
       series.addEntry(this);
@@ -295,7 +294,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
 
     this.reference = reference;
-    resetReferencePreview();
 
     if(reference != null) {
       reference.addEntry(this);
@@ -326,7 +324,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       this.referenceSubDivision.removeEntry(this);
 
     this.referenceSubDivision = referenceSubDivision;
-    resetReferencePreview();
 
     if(referenceSubDivision != null) {
       referenceSubDivision.addEntry(this);
@@ -592,30 +589,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     }
   }
 
-  protected transient String personsPreview = null;
-
-  @Transient
-  public String getPersonsPreview() {
-    if(personsPreview == null)
-      personsPreview = determinePersonsPreview();
-
-    return personsPreview;
-  }
-
-  @Transient
-  protected String determinePersonsPreview() {
-    if(hasPersons() == false)
-      return null;
-
-    String personsPreview = "";
-
-    for(Person person : getPersons())
-      personsPreview += person.getNameRepresentation() + "; ";
-    personsPreview = personsPreview.substring(0, personsPreview.length() - "; ".length());
-
-    return "";
-  }
-
   public boolean hasPersonsOrIsAReferenceSet() {
     return hasPersons() || isAReferenceSet();
   }
@@ -874,49 +847,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     preview = preview.replace("\r", "").replace("\n", "");
 
     return preview;
-  }
-
-  protected transient String referencePreview = null;
-
-  @Transient
-  public String getReferencePreview() {
-    if(referencePreview == null) {
-      referencePreview = determineReferencePreview();
-    }
-
-    return referencePreview;
-  }
-
-  @Transient
-  protected String determineReferencePreview() {
-    if(referenceSubDivision != null /*&& (referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getNewsPaperArticleCategory() ||
-        referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getMagazineArticleCategory() || referenceSubDivision.getCategory() == ReferenceSubDivisionCategory.getArticleCategory())*/) {
-      return referenceSubDivision.getTextRepresentation();
-    }
-    else if(reference != null) {
-      return reference.getTextRepresentation();
-    }
-    else if(series != null) {
-      return series.getTextRepresentation();
-    }
-
-    return "";
-  }
-
-  public void resetReferencePreview() {
-    referencePreview = null;
-
-    if(reference != null) { // only Reference has a Date (and therefore Language) dependent preview right now
-      reference.resetPreview();
-    }
-  }
-
-  @Transient
-  public String getReferenceOrPersonsPreview() {
-    if(getReferencePreview() != null)
-      return getReferencePreview();
-
-    return getPersonsPreview();
   }
 
 
