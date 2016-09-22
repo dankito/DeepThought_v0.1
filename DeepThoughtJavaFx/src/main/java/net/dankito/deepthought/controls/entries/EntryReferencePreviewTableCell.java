@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.entries;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Person;
@@ -19,12 +20,10 @@ import java.util.Collection;
  */
 public class EntryReferencePreviewTableCell extends EntryTableCell implements ICleanUp {
 
-  protected IEntityPreviewService previewService;
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
-  public EntryReferencePreviewTableCell(IEntityPreviewService previewService) {
-    this.previewService = previewService;
-
+  public EntryReferencePreviewTableCell() {
     Localization.addLanguageChangedListener(languageChangedListener);
   }
 
