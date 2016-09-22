@@ -5,16 +5,20 @@ import com.couchbase.lite.Document;
 import com.couchbase.lite.DocumentChange;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.DeepThoughtApplication;
+import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
+import net.dankito.deepthought.data.model.Group;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.EntityListener;
+import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.Notification;
@@ -22,7 +26,10 @@ import net.dankito.deepthought.util.Notification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +47,11 @@ public class SynchronizedCreatedEntitiesHandler {
 
   protected Database database;
 
+  protected DeepThoughtApplication deepThoughtApplication;
+
   protected DeepThought deepThought = null;
+
+  protected List<Class> synchronizedDeepThoughtApplicationEntities = new ArrayList<>();
 
   protected Set<String> synchronizedEntities = new ConcurrentSkipListSet<>();
 
@@ -51,7 +62,21 @@ public class SynchronizedCreatedEntitiesHandler {
     this.entityManager = entityManager;
     this.database = database;
 
+    // TODO: pass as constructor parameter
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+
+    setupDeepThoughtApplication();
     setupDeepThought();
+  }
+
+  protected void setupDeepThoughtApplication() {
+    deepThoughtApplication = Application.getApplication();
+
+    synchronizedDeepThoughtApplicationEntities.addAll(Arrays.asList(User.class, Device.class, Group.class));
+
+    for(Class entityClass : synchronizedDeepThoughtApplicationEntities) {
+      cacheEntityIds(entityClass, getDeepThoughtApplicationDocument());
+    }
   }
 
   protected void setupDeepThought() {
@@ -119,7 +144,9 @@ public class SynchronizedCreatedEntitiesHandler {
       }
     }
     else {
-      return true;
+      if(version >= 2) {
+        return true;
+      }
     }
 
     return false;
@@ -158,75 +185,117 @@ public class SynchronizedCreatedEntitiesHandler {
       return deepThought.addFile((FileLink)entity);
     }
 
+    else if(User.class.equals(entityType)) {
+      return deepThoughtApplication.addUser((User)entity);
+    }
+    else if(Device.class.equals(entityType)) {
+      return deepThoughtApplication.addDevice((Device)entity);
+    }
+    else if(Group.class.equals(entityType)) {
+      return deepThoughtApplication.addGroup((Group) entity);
+    }
+
     return false;
   }
 
   protected void deepThoughtChanged(DeepThought deepThought) {
-    if(this.deepThought != null) {
-      deepThought.removeEntityListener(deepThoughtListener);
-    }
-
     synchronizedEntities.clear();
 
     this.deepThought = deepThought;
 
     if(deepThought != null) {
-      deepThought.addEntityListener(deepThoughtListener);
-
       Document deepThoughtDocument = database.getDocument(deepThought.getId());
 
-      currentEntityIds.put(Entry.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(Entry.class)));
-      currentEntityIds.put(Category.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(Category.class)));
-      currentEntityIds.put(Tag.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(Tag.class)));
-      currentEntityIds.put(SeriesTitle.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(SeriesTitle.class)));
-      currentEntityIds.put(Reference.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(Reference.class)));
-      currentEntityIds.put(ReferenceSubDivision.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(ReferenceSubDivision.class)));
-      currentEntityIds.put(FileLink.class, getIdsOfProperty(deepThoughtDocument, getDeepThoughtPropertyNameForEntity(FileLink.class)));
+      currentEntityIds.put(Entry.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Entry.class)));
+      currentEntityIds.put(Category.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Category.class)));
+      currentEntityIds.put(Tag.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Tag.class)));
+      currentEntityIds.put(SeriesTitle.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(SeriesTitle.class)));
+      currentEntityIds.put(Reference.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Reference.class)));
+      currentEntityIds.put(ReferenceSubDivision.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(ReferenceSubDivision.class)));
+      currentEntityIds.put(FileLink.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(FileLink.class)));
     }
   }
 
-  protected String getIdsOfProperty(String propertyName) {
-    return getIdsOfProperty(database.getDocument(deepThought.getId()), propertyName);
+  protected void cacheEntityIds(Class entityClass, Document document) {
+    currentEntityIds.put(entityClass, getIdsOfProperty(document, getPropertyNameForEntity(entityClass)));
+  }
+
+  protected Document getDeepThoughtApplicationDocument() {
+    return database.getDocument(deepThoughtApplication.getId());
+  }
+
+  protected Document getDeepThoughtDocument() {
+    return database.getDocument(deepThought.getId());
+  }
+
+  protected String getIdsOfDeepThoughtApplicationProperty(String propertyName) {
+    return getIdsOfProperty(getDeepThoughtApplicationDocument(), propertyName);
+  }
+
+  protected String getIdsOfDeepThoughtProperty(String propertyName) {
+    return getIdsOfProperty(getDeepThoughtDocument(), propertyName);
+  }
+
+  protected String getIdsOfProperty(BaseEntity collectionHolder, String propertyName) {
+    if(collectionHolder instanceof DeepThoughtApplication) {
+      return getIdsOfDeepThoughtApplicationProperty(propertyName);
+    }
+
+    return getIdsOfDeepThoughtProperty(propertyName);
   }
 
   protected String getIdsOfProperty(Document document, String propertyName) {
     return (String)document.getProperty(propertyName);
   }
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
+
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    public void entityCreated(BaseEntity entity) {
+
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
 
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      synchronizedEntities.add(addedEntity.getId());
-
-      updatedEntityIds(collection, addedEntity);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
+      entityAddedOrRemovedFromCollection(collectionHolder, collection, addedEntity, true);
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      updatedEntityIds(collection, removedEntity);
+      entityAddedOrRemovedFromCollection(collectionHolder, collection, removedEntity, false);
     }
   };
 
-  protected void updatedEntityIds(Collection<? extends BaseEntity> collection, BaseEntity entity) {
+  protected void entityAddedOrRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedOrRemovedEntity, boolean added) {
+    if(collectionHolder instanceof DeepThoughtApplication || collection instanceof DeepThought) {
+      updateEntityIds(collectionHolder, collection, addedOrRemovedEntity);
+
+      if(added) {
+        synchronizedEntities.add(addedOrRemovedEntity.getId());
+      }
+    }
+  }
+
+  protected void updateEntityIds(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity entity) {
     try {
       Class entityType = entity.getClass();
-      String propertyName = getDeepThoughtPropertyNameForEntity(entityType);
+      String propertyName = getPropertyNameForEntity(entityType);
 
-      currentEntityIds.put(entityType, getIdsOfProperty(propertyName));
+      currentEntityIds.put(entityType, getIdsOfProperty(collectionHolder, propertyName));
     } catch(Exception e) { log.error("Could not update Entities of " + entity); }
   }
 
-  protected String getDeepThoughtPropertyNameForEntity(Class entityType) {
+  protected String getPropertyNameForEntity(Class entityType) {
     if(Entry.class.equals(entityType)) {
       return "entries";
     }
@@ -247,6 +316,15 @@ public class SynchronizedCreatedEntitiesHandler {
     }
     else if(FileLink.class.equals(entityType)) {
       return "files";
+    }
+    else if(User.class.equals(entityType)) {
+      return "users";
+    }
+    else if(Device.class.equals(entityType)) {
+      return "devices";
+    }
+    else if(Group.class.equals(entityType)) {
+      return "groups";
     }
 
     return null;

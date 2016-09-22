@@ -17,12 +17,10 @@ import net.dankito.deepthought.communication.connected_device.IDevicesFinderList
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
-import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.data.model.Group;
-import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.util.IThreadPool;
+import net.dankito.deepthought.util.StringUtils;
 import net.dankito.jpa.couchbaselite.Dao;
 
 import org.slf4j.Logger;
@@ -89,9 +87,6 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   private void setReplicationFilter(Database database) {
     final List<String> entitiesToFilter = new ArrayList<>();
     entitiesToFilter.add(DeepThought.class.getName());
-    entitiesToFilter.add(User.class.getName());
-    entitiesToFilter.add(Group.class.getName());
-    entitiesToFilter.add(Device.class.getName());
     entitiesToFilter.add(DeepThoughtApplication.class.getName());
     entitiesToFilter.add(ApplicationLanguage.class.getName());
 
@@ -196,7 +191,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
   }
 
   protected String getDeviceKey(ConnectedDevice device) {
-    return device.getDeviceId();
+    return device.getDeviceUniqueId();
   }
 
   protected void startReplication(ConnectedDevice device) throws Exception {

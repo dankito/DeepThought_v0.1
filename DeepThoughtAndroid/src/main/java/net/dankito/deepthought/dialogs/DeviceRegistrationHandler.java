@@ -83,7 +83,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
     // TODO: may always show Snackbar in active Activity, see http://stackoverflow.com/a/29786451/119733
     View rootView = mainActivity.findViewById(R.id.pager); // has to be Pager otherwise Snackbar cannot be dismissed anymore by User
     snackbarAskRegisterUnknownDevice = Snackbar.make(rootView, "", Snackbar.LENGTH_INDEFINITE);
-    deviceIdShowingSnackbarFor = device.getDeviceId();
+    deviceIdShowingSnackbarFor = device.getDeviceUniqueId();
 
     snackbarAskRegisterUnknownDevice.setCallback(new Snackbar.Callback() {
       @Override
@@ -191,7 +191,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(HostInfo device) {
-    if(snackbarAskRegisterUnknownDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(device.getDeviceId())) {
+    if(snackbarAskRegisterUnknownDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(device.getDeviceUniqueId())) {
       snackbarAskRegisterUnknownDevice.dismiss();
       resetSnackbar();
     }
