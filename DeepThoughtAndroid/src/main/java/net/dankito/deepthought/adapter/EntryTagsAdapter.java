@@ -139,6 +139,10 @@ public class EntryTagsAdapter extends BaseAdapter implements Filterable, TagsFil
     return tagsFilter;
   }
 
+  public void filterTags(String filter) {
+    getFilter().filter(filter);
+  }
+
 
   protected EntityListener deepThoughtListener = new EntityListener() {
     @Override
