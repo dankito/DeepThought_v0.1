@@ -60,6 +60,8 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
         entriesToShow = new ArrayList<>(deepThought.AllEntriesSystemTag().getEntries()); // TODO: use a lazy loading list
     }
 
+    previewService = Application.getEntityPreviewService();
+
     notifyDataSetChangedThreadSafe();
   }
 
