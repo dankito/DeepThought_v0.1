@@ -8,7 +8,7 @@ import net.dankito.deepthought.util.StringUtils;
 /**
  * Created by ganymed on 12/09/16.
  */
-public class ReferenceBaseUtil {
+public class ReferenceBasePreviewService {
 
   public String getReferenceBaseUrl(ReferenceBase referenceBase) {
     String url = null;

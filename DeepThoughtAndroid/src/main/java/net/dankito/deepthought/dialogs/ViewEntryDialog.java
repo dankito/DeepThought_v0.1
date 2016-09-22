@@ -26,7 +26,7 @@ import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.DialogListener;
-import net.dankito.deepthought.ui.model.ReferenceBaseUtil;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 import net.dankito.deepthought.ui.model.TagsUtil;
 
 import org.slf4j.Logger;
@@ -66,7 +66,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected TagsUtil tagsUtil = new TagsUtil();
 
-  protected ReferenceBaseUtil referenceBaseUtil = new ReferenceBaseUtil();
+  protected IEntityPreviewService entityPreviewService = Application.getEntityPreviewService();
 
 
   public void setEntry(Entry entry) {
@@ -284,7 +284,7 @@ public class ViewEntryDialog extends FullscreenDialog {
       referenceInfo += "\r\n\r\n(" + entryReference.getTextRepresentation(); // TODO: for entryCreationResult this returns only entryReference's text representation, not
       // including its parent references' text representation (e.g. Reference and SeriesTitle)
 
-      String referenceUrl = referenceBaseUtil.getReferenceBaseUrl(entryReference);
+      String referenceUrl = entityPreviewService.getReferenceBaseUrl(entryReference);
       if(referenceUrl != null) {
         referenceInfo += ": " + referenceUrl;
       }

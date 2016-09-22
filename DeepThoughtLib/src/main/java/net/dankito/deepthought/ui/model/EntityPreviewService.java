@@ -4,6 +4,7 @@ import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.IEntityChangesService;
 import net.dankito.deepthought.data.model.Entry;
+import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 
 import java.util.Collection;
@@ -15,8 +16,11 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   protected EntryPreviewService entryPreviewService;
 
+  protected ReferenceBasePreviewService referenceBasePreviewService;
+
 
   public EntityPreviewService(IEntityChangesService changesService, IHtmlHelper htmlHelper) {
+    this.referenceBasePreviewService = new ReferenceBasePreviewService();
     this.entryPreviewService = new EntryPreviewService(htmlHelper);
 
     changesService.addAllEntitiesListener(allEntitiesListener);
@@ -36,6 +40,12 @@ public class EntityPreviewService implements IEntityPreviewService {
   @Override
   public String getPersonsPreview(Entry entry) {
     return entryPreviewService.getLongPersonsPreview(entry);
+  }
+
+
+  @Override
+  public String getReferenceBaseUrl(ReferenceBase referenceBase) {
+    return referenceBasePreviewService.getReferenceBaseUrl(referenceBase);
   }
 
 
