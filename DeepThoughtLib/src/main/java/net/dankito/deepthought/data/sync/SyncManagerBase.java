@@ -106,6 +106,7 @@ public abstract class SyncManagerBase implements IDeepThoughtSyncManager {
   }
 
 
+  // TODO: this is wrong, could also be an unregistered device
   protected IDevicesFinderListener devicesFinderListener = new IDevicesFinderListener() {
     @Override
     public void deviceFound(HostInfo device) {

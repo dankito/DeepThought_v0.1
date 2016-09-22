@@ -14,11 +14,17 @@ import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Group;
+import net.dankito.deepthought.data.model.Note;
+import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.User;
+import net.dankito.deepthought.data.model.enums.BackupFileServiceType;
+import net.dankito.deepthought.data.model.enums.FileType;
+import net.dankito.deepthought.data.model.enums.Language;
+import net.dankito.deepthought.data.model.enums.NoteType;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.Notification;
@@ -53,6 +59,8 @@ public class SynchronizedCreatedEntitiesHandler {
 
   protected List<Class> synchronizedDeepThoughtApplicationEntities = new ArrayList<>();
 
+  protected List<Class> synchronizedDeepThoughtEntities = new ArrayList<>();
+
   protected Set<String> synchronizedEntities = new ConcurrentSkipListSet<>();
 
   protected Map<Class, String> currentEntityIds = new ConcurrentHashMap<>();
@@ -80,6 +88,9 @@ public class SynchronizedCreatedEntitiesHandler {
   }
 
   protected void setupDeepThought() {
+    synchronizedDeepThoughtEntities.addAll(Arrays.asList(Entry.class, Tag.class, Category.class, SeriesTitle.class, Reference.class, ReferenceSubDivision.class,
+        Person.class, FileLink.class, Note.class, Language.class, NoteType.class, FileType.class, BackupFileServiceType.class));
+
     deepThoughtChanged(Application.getDeepThought());
 
     Application.addApplicationListener(new ApplicationListener() {
@@ -143,7 +154,7 @@ public class SynchronizedCreatedEntitiesHandler {
         return true;
       }
     }
-    else {
+    else { // TODO: is this really true for all Entities?
       if(version >= 2) {
         return true;
       }
@@ -206,13 +217,10 @@ public class SynchronizedCreatedEntitiesHandler {
     if(deepThought != null) {
       Document deepThoughtDocument = database.getDocument(deepThought.getId());
 
-      currentEntityIds.put(Entry.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Entry.class)));
-      currentEntityIds.put(Category.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Category.class)));
-      currentEntityIds.put(Tag.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Tag.class)));
-      currentEntityIds.put(SeriesTitle.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(SeriesTitle.class)));
-      currentEntityIds.put(Reference.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(Reference.class)));
-      currentEntityIds.put(ReferenceSubDivision.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(ReferenceSubDivision.class)));
-      currentEntityIds.put(FileLink.class, getIdsOfProperty(deepThoughtDocument, getPropertyNameForEntity(FileLink.class)));
+
+      for(Class entityClass : synchronizedDeepThoughtEntities) {
+        cacheEntityIds(entityClass, deepThoughtDocument);
+      }
     }
   }
 
@@ -314,9 +322,29 @@ public class SynchronizedCreatedEntitiesHandler {
     else if(ReferenceSubDivision.class.equals(entityType)) {
       return "referenceSubDivisions";
     }
+    else if(Person.class.equals(entityType)) {
+      return "persons";
+    }
     else if(FileLink.class.equals(entityType)) {
       return "files";
     }
+    else if(Note.class.equals(entityType)) {
+      return "notes";
+    }
+
+    else if(Language.class.equals(entityType)) {
+      return "languages";
+    }
+    else if(FileType.class.equals(entityType)) {
+      return "fileTypes";
+    }
+    else if(NoteType.class.equals(entityType)) {
+      return "noteTypes";
+    }
+    else if(BackupFileServiceType.class.equals(entityType)) {
+      return "backupFileServiceTypes";
+    }
+
     else if(User.class.equals(entityType)) {
       return "users";
     }

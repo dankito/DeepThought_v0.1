@@ -7,6 +7,9 @@ import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Created by ganymed on 21/08/15.
  */
@@ -20,15 +23,20 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
 
   @Override
   public int getRegisteredDevicesCount() {
-    return Application.getLoggedOnUser().getUsersDefaultGroup().getDevices().size() - 1; // TODO: will there ever be other Devices than User's Devices in his/her own group?
+    return getRegisteredDevices().size() - 1; // TODO: will there ever be other Devices than User's Devices in his/her own group?
+  }
+
+  protected Collection<Device> getRegisteredDevices() {
+    return new ArrayList<>(Application.getLoggedOnUser().getDevices());
   }
 
 
   @Override
   public boolean isDeviceRegistered(HostInfo info) {
     User loggedOnUser = Application.getLoggedOnUser();
-    if(loggedOnUser.getDevices().size() > 1 && loggedOnUser.getUniversallyUniqueId().equals(info.getUserUniqueId())) {
-      for(Device device : loggedOnUser.getDevices()) {
+    if(loggedOnUser.getUniversallyUniqueId().equals(info.getUserUniqueId())) {
+      Collection<Device> registeredDevices = getRegisteredDevices();
+      for(Device device : registeredDevices) {
         if(device.getUniversallyUniqueId().equals(info.getDeviceUniqueId()))
           return true;
       }
