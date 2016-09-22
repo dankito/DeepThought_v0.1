@@ -461,7 +461,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   public void setTags(Collection<Tag> newTags) {
     sortedTags = null;
-    tagsPreview = null;
 
     for(Tag currentTag : new ArrayList<>(getTags())) {
       if(newTags.contains(currentTag) == false)
@@ -479,7 +478,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
       return false;
 
     sortedTags = null;
-    tagsPreview = null;
 
     boolean result = tags.add(tag);
     if (result) {
@@ -492,7 +490,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   public boolean removeTag(Tag tag) {
     sortedTags = null;
-    tagsPreview = null;
 
     boolean result = tags.remove(tag);
     if(result) {
@@ -792,8 +789,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   protected final static int LongPreviewMaxLength = 500;
 
-  protected final static int MaxTagsPreviewLength = 150;
-
   protected transient String preview = null;
 
   protected transient String longPreview = null;
@@ -847,36 +842,6 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     preview = preview.replace("\r", "").replace("\n", "");
 
     return preview;
-  }
-
-
-  protected transient String tagsPreview = null;
-
-  @Transient
-  public String getTagsPreview() {
-    if(tagsPreview == null)
-      tagsPreview = determineTagsPreview();
-    return tagsPreview;
-  }
-
-  protected String determineTagsPreview() {
-    String tagsPreview = "";
-
-    for(Tag tag : getTagsSorted()) {
-      tagsPreview += tag.getName() + ", ";
-    }
-
-    if(tagsPreview.length() > 1) { // remove last ", "
-      tagsPreview = tagsPreview.substring(0, tagsPreview.length() - 2);
-    }
-
-    if(tagsPreview.length() >= MaxTagsPreviewLength) {
-      tagsPreview = tagsPreview.substring(0, MaxTagsPreviewLength) + " ...";
-    }
-
-    tagsPreview = tagsPreview.replace("\r", "").replace("\n", ""); // if a Tag contains a new line symbol, replace that one for preview
-
-    return tagsPreview;
   }
 
 
