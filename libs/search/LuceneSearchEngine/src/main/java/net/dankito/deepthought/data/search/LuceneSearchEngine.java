@@ -181,7 +181,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
     createDirectoryAndIndexSearcherAndWriterForDeepThought(deepThought);
 
-    rebuildIndex();
+    rebuildIndex(); // as a lot of Ids have changed we better go rebuilding whole index even though it may takes a lot of time
   }
 
   protected File getPreviousIndexPath() {
@@ -886,6 +886,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
         @Override
         public void run() {
           if(isInitialized) {
+            this.cancel(); // stop Timer
             waitTillIndexIsReadyTimer.purge();
 
             queryForEntriesWithoutTags(listener);
