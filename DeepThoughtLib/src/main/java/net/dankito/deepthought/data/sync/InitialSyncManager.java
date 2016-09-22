@@ -33,7 +33,9 @@ import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,23 +79,38 @@ public class InitialSyncManager {
 
   public void syncLocalDatabaseIdsWithRemoteOnes(DeepThought localDeepThought, User loggedOnUser, Device localDevice, DeepThoughtInfo remoteDeepThought,
                                                  UserInfo remoteUser, HostInfo remoteDevice, GroupInfo remoteUserDefaultGroup) {
+    DeepThoughtApplication application = loggedOnUser.getApplication();
     Group userDefaultGroup = loggedOnUser.getUsersDefaultGroup();
 
+    loggedOnUser.removeDeepThought(localDeepThought); // to update EntityCollection's Ids
+    loggedOnUser.removeGroup(userDefaultGroup);
+    application.removeGroup(userDefaultGroup);
+    application.removeUser(loggedOnUser);
+
+    entityManager.deleteEntity(application); // TODO: remove again, we should not sync DTApplication Id
     entityManager.deleteEntity(loggedOnUser);
     entityManager.deleteEntity(userDefaultGroup);
     entityManager.deleteEntity(localDeepThought);
+
+    application.setId(remoteDeepThought.getDeepThoughtApplicationId()); // TODO: remove again, we should sync DTApplication Id
 
     loggedOnUser.setId(remoteUser.getDatabaseId());
 
     userDefaultGroup.setId(remoteUserDefaultGroup.getDatabaseId());
 
-    localDeepThought.setId(remoteDeepThought.getDatabaseId());
+    localDeepThought.setId(remoteDeepThought.getDeepThoughtId());
+
+    loggedOnUser.addDeepThought(localDeepThought);
+    loggedOnUser.addGroup(userDefaultGroup);
+    application.addGroup(userDefaultGroup);
+    application.addUser(loggedOnUser);
 
     entityManager.persistEntity(userDefaultGroup);
-    entityManager.persistEntity(loggedOnUser);
     entityManager.persistEntity(localDeepThought);
+    entityManager.persistEntity(loggedOnUser);
 
-    entityManager.updateEntity(loggedOnUser.getApplication());
+    entityManager.persistEntity(application); // TODO: remove again, we should not sync DTApplication Id
+//    entityManager.updateEntity(loggedOnUser.getApplication());
 
 
     entityManager.deleteEntity(localDeepThought.getTopLevelEntry());
@@ -113,25 +130,32 @@ public class InitialSyncManager {
   }
 
   protected void updateExtensibleEnumerations(DeepThought localDeepThought, DeepThoughtInfo remoteDeepThought, IEntityManager entityManager) {
-    updateExtensibleEnumeration(localDeepThought.getNoteTypes(), remoteDeepThought.getNoteTypeIds(), entityManager);
+    updateExtensibleEnumeration(localDeepThought, localDeepThought.getNoteTypes(), remoteDeepThought.getNoteTypeIds(), entityManager);
 
-    updateExtensibleEnumeration(localDeepThought.getFileTypes(), remoteDeepThought.getFileTypeIds(), entityManager);
+    updateExtensibleEnumeration(localDeepThought, localDeepThought.getFileTypes(), remoteDeepThought.getFileTypeIds(), entityManager);
 
-    updateExtensibleEnumeration(localDeepThought.getLanguages(), remoteDeepThought.getLanguageIds(), entityManager);
+    updateExtensibleEnumeration(localDeepThought, localDeepThought.getLanguages(), remoteDeepThought.getLanguageIds(), entityManager);
 
-    updateExtensibleEnumeration(localDeepThought.getBackupFileServiceTypes(), remoteDeepThought.getBackupFileServiceTypesIds(), entityManager);
+    updateExtensibleEnumeration(localDeepThought, localDeepThought.getBackupFileServiceTypes(), remoteDeepThought.getBackupFileServiceTypesIds(), entityManager);
 
     entityManager.updateEntity(localDeepThought);
   }
 
-  protected void updateExtensibleEnumeration(Collection localExtensibleEnumerationEntities, Map<String, String> remoteExtensibleEnumerationIds, IEntityManager entityManager) {
+  protected void updateExtensibleEnumeration(DeepThought deepThought, Collection localExtensibleEnumerationEntities, Map<String, String> remoteExtensibleEnumerationIds, IEntityManager entityManager) {
+    List backup = new ArrayList(localExtensibleEnumerationEntities);
+    localExtensibleEnumerationEntities.clear(); // to update EntityCollection's Ids
+
     for(String noteTypeNameResourceKey : remoteExtensibleEnumerationIds.keySet()) {
-      for(ExtensibleEnumeration enumerationEntity : (Collection<ExtensibleEnumeration>)localExtensibleEnumerationEntities) {
+      for(ExtensibleEnumeration enumerationEntity : (Collection<ExtensibleEnumeration>)backup) {
         if(noteTypeNameResourceKey.equals(enumerationEntity.getNameResourceKey())) {
           updateExtensibleEnumeration(enumerationEntity, remoteExtensibleEnumerationIds.get(noteTypeNameResourceKey), entityManager);
           break;
         }
       }
+    }
+
+    for(Object item : backup) {
+      localExtensibleEnumerationEntities.add(item);
     }
   }
 
@@ -276,7 +300,7 @@ public class InitialSyncManager {
 
   protected boolean isTheSameUser(User localUser, UserInfo remoteUser, DeepThought localDeepThought, DeepThoughtInfo remoteDeepThought) {
     return localUser.getId().equals(remoteUser.getDatabaseId()) && localUser.getUniversallyUniqueId().equals(remoteUser.getUniversallyUniqueId()) &&
-        localDeepThought.getId().equals(remoteDeepThought.getDatabaseId());
+        localDeepThought.getId().equals(remoteDeepThought.getDeepThoughtId());
   }
 
   protected float calculateEntitiesWeight(DeepThought deepThought) {

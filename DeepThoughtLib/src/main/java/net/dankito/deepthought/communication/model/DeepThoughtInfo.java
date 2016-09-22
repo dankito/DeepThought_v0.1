@@ -14,8 +14,6 @@ import java.util.Map;
  */
 public class DeepThoughtInfo {
 
-  protected String databaseId = "";
-
   protected int countEntries;
 
   protected int countTags;
@@ -28,6 +26,10 @@ public class DeepThoughtInfo {
 
   protected int countFiles;
 
+
+  protected String deepThoughtApplicationId;
+
+  protected String deepThoughtId = "";
 
   protected String topLevelEntryId;
 
@@ -42,8 +44,9 @@ public class DeepThoughtInfo {
   protected Map<String, String> backupFileServiceTypesIds = new HashMap<>();
 
 
-  public DeepThoughtInfo(String databaseId, int countEntries, int countTags, int countCategories, int countReferenceBases, int countPersons, int countFiles) {
-    this.databaseId = databaseId;
+  public DeepThoughtInfo(String deepThoughtApplicationId, String deepThoughtId, int countEntries, int countTags, int countCategories, int countReferenceBases, int countPersons, int countFiles) {
+    this.deepThoughtApplicationId = deepThoughtApplicationId;
+    this.deepThoughtId = deepThoughtId;
     this.countEntries = countEntries;
     this.countTags = countTags;
     this.countCategories = countCategories;
@@ -53,8 +56,12 @@ public class DeepThoughtInfo {
   }
 
 
-  public String getDatabaseId() {
-    return databaseId;
+  public String getDeepThoughtApplicationId() {
+    return deepThoughtApplicationId;
+  }
+
+  public String getDeepThoughtId() {
+    return deepThoughtId;
   }
 
   public int getCountEntries() {
@@ -108,7 +115,8 @@ public class DeepThoughtInfo {
 
 
   public static DeepThoughtInfo fromDeepThought(DeepThought deepThought) {
-    DeepThoughtInfo deepThoughtInfo = new DeepThoughtInfo(deepThought.getId(), deepThought.getCountEntries(), deepThought.getCountTags(), deepThought.getCountCategories(),
+    DeepThoughtInfo deepThoughtInfo = new DeepThoughtInfo(deepThought.getDeepThoughtOwner().getApplication().getId(), deepThought.getId(),
+        deepThought.getCountEntries(), deepThought.getCountTags(), deepThought.getCountCategories(),
         (deepThought.getCountSeriesTitles() + deepThought.getCountReferences() + deepThought.getCountReferenceSubDivisions()), deepThought.getCountPersons(), deepThought.getCountFiles());
 
     deepThoughtInfo.topLevelEntryId = deepThought.getTopLevelEntry().getId();

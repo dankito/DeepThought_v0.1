@@ -171,13 +171,13 @@ public class InitialSyncManagerTest {
     underTest.syncLocalDatabaseIdsWithRemoteOnes(deepThought1, user1, localDevice1, DeepThoughtInfo.fromDeepThought(deepThought2), UserInfo.fromUser(user2),
         HostInfo.fromUserAndDevice(user2, localDevice2), GroupInfo.fromGroup(user2.getUsersDefaultGroup()));
 
+    Assert.assertEquals(deepThoughtApplication1.getId(), deepThoughtApplication2.getId());
+
     Assert.assertEquals(deepThought1.getId(), deepThought2.getId());
 
     Assert.assertEquals(user1.getId(), user2.getId());
 
     Assert.assertEquals(user1.getUsersDefaultGroup().getId(), user2.getUsersDefaultGroup().getId());
-
-    Assert.assertNotEquals(deepThoughtApplication1.getId(), deepThoughtApplication2.getId());
 
     Assert.assertEquals(deepThought1.getTopLevelEntry().getId(), deepThought2.getTopLevelEntry().getId());
     Assert.assertEquals(deepThought1.getTopLevelCategory().getId(), deepThought2.getTopLevelCategory().getId());
@@ -202,6 +202,8 @@ public class InitialSyncManagerTest {
 
 
   protected void assertEntityIdsDoNotEqual() {
+    Assert.assertNotEquals(deepThoughtApplication1.getId(), deepThoughtApplication2.getId());
+
     Assert.assertNotEquals(deepThought1.getId(), deepThought2.getId());
 
     Assert.assertNotEquals(user1.getId(), user2.getId());
@@ -274,11 +276,14 @@ public class InitialSyncManagerTest {
   protected void assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(DeepThoughtApplication application1, DeepThoughtApplication application2) {
     Document document = entityManager1.getDatabase().getExistingDocument(application1.getId());
 
-    Assert.assertNotEquals(application2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
+    Assert.assertEquals(application2.getId(), document.getProperty(Dao.ID_COLUMN_NAME));
     Assert.assertEquals(application2.getLastLoggedOnUser().getId(), document.getProperty(TableConfig.DeepThoughtApplicationLastLoggedOnUserJoinColumnName));
 
     String userIds = (String)document.getProperty("users"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
     Assert.assertTrue(userIds.contains(application2.getLastLoggedOnUser().getId()));
+
+    String groupIds = (String)document.getProperty("groups"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
+    Assert.assertTrue(groupIds.contains(application2.getLastLoggedOnUser().getUsersDefaultGroup().getId()));
   }
 
   protected void assertUserGotUpdatedCorrectlyInDb(User user1, User user2) {
