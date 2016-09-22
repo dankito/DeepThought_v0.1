@@ -6,4 +6,13 @@
     <color name="colorPrimary">#4CAF50</color>
     <color name="colorPrimaryDark">#2E7D32</color>
     <color name="colorAccent">#81C784</color>
+
+    <color name="tagStateExactOrSingleMatchButNotOfLastResult">#80008000</color>
+    <!--<color name="tagStateExactOrSingleMatchButNotOfLastResult">#00FF00</color>-->
+    <color name="tagStateMatchButNotOfLastResult">#8090ee90</color>
+    <color name="tagStateExactMatchOfLastResult">#806495ed</color>
+    <!--<color name="tagStateExactMatchOfLastResult">#0000FF</color>-->
+    <color name="tagStateSingleMatchOfLastResult">#8087cefa</color>
+    <!--<color name="tagStateSingleMatchOfLastResult">#800000FF</color>-->
+    <color name="tagStateDefault">@android:color/transparent</color>
 </resources>
