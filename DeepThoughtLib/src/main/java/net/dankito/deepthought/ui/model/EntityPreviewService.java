@@ -6,7 +6,10 @@ import net.dankito.deepthought.data.listener.IEntityChangesService;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.util.localization.LanguageChangedListener;
+import net.dankito.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 
@@ -27,7 +30,14 @@ public class EntityPreviewService implements IEntityPreviewService {
     this.referenceBasePreviewService = new ReferenceBasePreviewService();
     this.entryPreviewService = new EntryPreviewService(htmlHelper);
 
+    Localization.addLanguageChangedListener(languageChangedListener);
     changesService.addAllEntitiesListener(allEntitiesListener);
+  }
+
+
+  @Override
+  public void cleanUp() {
+    Localization.removeLanguageChangedListener(languageChangedListener);
   }
 
 
@@ -58,6 +68,17 @@ public class EntityPreviewService implements IEntityPreviewService {
     return referenceBasePreviewService.getReferenceBaseUrl(referenceBase);
   }
 
+
+  protected LanguageChangedListener languageChangedListener = new LanguageChangedListener() {
+    @Override
+    public void languageChanged(ApplicationLanguage newLanguage) {
+      EntityPreviewService.this.languageChanged();
+    }
+  };
+
+  protected void languageChanged() {
+    entryPreviewService.languageChanged();
+  }
 
   protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override

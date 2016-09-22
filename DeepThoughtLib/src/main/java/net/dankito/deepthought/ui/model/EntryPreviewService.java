@@ -231,4 +231,10 @@ public class EntryPreviewService implements IUpdatablePreviewService {
     }
   }
 
+
+  @Override
+  public void languageChanged() {
+    cachedReferencePreviews.clear();
+  }
+
 }

@@ -13,4 +13,6 @@ public interface IUpdatablePreviewService {
 
   void collectionOfEntityUpdated(BaseEntity collectionHolder, BaseEntity addedOrRemovedEntity);
 
+  void languageChanged();
+
 }
