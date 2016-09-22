@@ -24,11 +24,14 @@ public class EntityPreviewService implements IEntityPreviewService {
 
   protected ReferenceBasePreviewService referenceBasePreviewService;
 
+  protected PersonPreviewService personPreviewService;
+
 
   public EntityPreviewService(IEntityChangesService changesService, IHtmlHelper htmlHelper) {
     this.tagPreviewService = new TagPreviewService();
     this.referenceBasePreviewService = new ReferenceBasePreviewService();
-    this.entryPreviewService = new EntryPreviewService(htmlHelper);
+    this.personPreviewService = new PersonPreviewService();
+    this.entryPreviewService = new EntryPreviewService(personPreviewService, htmlHelper);
 
     Localization.addLanguageChangedListener(languageChangedListener);
     changesService.addAllEntitiesListener(allEntitiesListener);

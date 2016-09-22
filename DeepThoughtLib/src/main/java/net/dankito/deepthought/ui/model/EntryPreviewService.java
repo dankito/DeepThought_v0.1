@@ -11,13 +11,14 @@ import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.util.StringUtils;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganymed on 21/09/16.
  */
 public class EntryPreviewService implements IUpdatablePreviewService {
+
+  protected PersonPreviewService personPreviewService;
 
   protected IHtmlHelper htmlHelper;
 
@@ -26,7 +27,8 @@ public class EntryPreviewService implements IUpdatablePreviewService {
   protected Map<Entry, String> cachedPersonPreviews = new ConcurrentHashMap<>();
 
 
-  public EntryPreviewService(IHtmlHelper htmlHelper) {
+  public EntryPreviewService(PersonPreviewService personPreviewService, IHtmlHelper htmlHelper) {
+    this.personPreviewService = personPreviewService;
     this.htmlHelper = htmlHelper;
   }
 
@@ -96,7 +98,7 @@ public class EntryPreviewService implements IUpdatablePreviewService {
       }
       else {
         if(reference.getSeries() == null && reference.hasPersons()) {
-          preview = getShortPersonsPreview(reference.getPersons()) + " - " + preview;
+          preview = personPreviewService.getShortPersonsPreview(reference.getPersons()) + " - " + preview;
         }
       }
     }
@@ -121,42 +123,12 @@ public class EntryPreviewService implements IUpdatablePreviewService {
 
   /*      Persons       */
 
-  /**
-   * Returns the last name of the first person.
-   * @param persons
-   * @return
-   */
-  protected String getShortPersonsPreview(Set<Person> persons) {
-    String preview = "";
-
-    if(persons.size() > 0) {
-      Person[] personsArray = persons.toArray(new Person[persons.size()]);
-      preview = personsArray[0].getLastName();
-    }
-
-    return preview;
-  }
-
   protected String getLongPersonsPreview(Entry entry) {
     String preview = cachedPersonPreviews.get(entry);
 
     if(preview == null) {
-      preview = getLongPersonsPreview(entry.getPersons());
+      preview = personPreviewService.getLongPersonsPreview(entry.getPersons());
       cachedPersonPreviews.put(entry, preview);
-    }
-
-    return preview;
-  }
-
-  protected String getLongPersonsPreview(Set<Person> persons) {
-    String preview = "";
-
-    for(Person person : persons) {
-      preview += person.getNameRepresentation() + "; ";
-    }
-
-    if(preview.length() > 2) {
-      preview = preview.substring(0, preview.length() - "; ".length()); // remove last "; "
     }
 
     return preview;
