@@ -140,7 +140,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
       HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, packet);
       remoteHost.setAddress(packet.getAddress().getHostAddress());
 
-      if(isSelfSentPacket(remoteHost, localHost) == false) {
+      if(isSelfSentPacket(remoteHost, messagesCreator) == false) {
         if(hasDeviceAlreadyBeenFound(remoteHost) == false) {
           deviceFound(remoteHost, listener);
         }
@@ -151,10 +151,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
     }
   }
 
-  protected boolean isSelfSentPacket(HostInfo remoteHost, HostInfo localHost) {
-    return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
-        localHost.getDeviceUniqueId().equals(remoteHost.getDeviceUniqueId()) &&
-        remoteHost.getAddress().equals(NetworkHelper.getIPAddressString(true));
+  protected boolean isSelfSentPacket(HostInfo remoteHost, ConnectorMessagesCreator messagesCreator) {
+    return messagesCreator.equalsLocalHostDevice(remoteHost);
   }
 
   protected boolean hasDeviceAlreadyBeenFound(HostInfo hostInfo) {
@@ -171,7 +169,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void deviceFound(HostInfo device, IDevicesFinderListener listener) {
-    log.info("DeviceSync: Found remote host " + device.getDeviceDatabaseId());
+    log.info("DeviceSync: Found remote host " + device.getDeviceDatabaseId() + ", " + device.getDeviceUniqueId());
+    log.info("foundDevices");
+    for(HostInfo foundDevice : foundDevices) {
+      log.info("DeviceSync: Found device " + foundDevice.getDeviceDatabaseId() + ", " + foundDevice.getDeviceUniqueId());
+    }
+
     foundDevices.add(device);
 
     if(foundDevices.size() == 1) {

@@ -166,6 +166,14 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
     return cachedLocalHost;
   }
 
+  public boolean equalsLocalHostDevice(HostInfo remoteHost) {
+    ConnectedDevice localHost = getLocalHostDevice();
+
+    return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
+        localHost.getDeviceUniqueId().equals(remoteHost.getDeviceUniqueId()) &&
+        localHost.getAddress().equals(remoteHost.getAddress());
+  }
+
 
   @Override
   public void setLoggedOnUser(User loggedOnUser) {
@@ -209,4 +217,5 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
       cachedSearchDevicesDatagramPackets.clear();
     }
   }
+
 }
