@@ -13,6 +13,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.search.ui.TagSearchResultState;
 import net.dankito.deepthought.data.search.ui.TagsSearchResultListener;
 import net.dankito.deepthought.data.search.ui.TagsSearcher;
 
@@ -102,7 +103,36 @@ public class EntryTagsAdapter extends BaseAdapter {
     chktxtvwListItemEntryTag.setOnClickListener(chktxtvwListItemEntryTagOnClickListener);
     chktxtvwListItemEntryTag.setTag(tag);
 
+    setBackgroundColorForTag(tag, convertView);
+
     return convertView;
+  }
+
+  protected void setBackgroundColorForTag(Tag tag, View itemView) {
+    TagSearchResultState state = tagsSearcher.getTagSearchResultState(tag);
+
+    setBackgroundColorForTagState(state, itemView);
+  }
+
+  protected void setBackgroundColorForTagState(TagSearchResultState state, View itemView) {
+    int colorResource = getBackgroundColorForTagState(state);
+
+    itemView.setBackgroundResource(colorResource);
+  }
+
+  protected int getBackgroundColorForTagState(TagSearchResultState state) {
+    switch(state) {
+      case EXACT_OR_SINGLE_MATCH_BUT_NOT_OF_LAST_RESULT:
+        return R.color.tagStateExactOrSingleMatchButNotOfLastResult;
+      case MATCH_BUT_NOT_OF_LAST_RESULT:
+        return R.color.tagStateMatchButNotOfLastResult;
+      case EXACT_MATCH_OF_LAST_RESULT:
+        return R.color.tagStateExactMatchOfLastResult;
+      case SINGLE_MATCH_OF_LAST_RESULT:
+        return R.color.tagStateSingleMatchOfLastResult;
+    }
+
+    return R.color.tagStateDefault;
   }
 
 
