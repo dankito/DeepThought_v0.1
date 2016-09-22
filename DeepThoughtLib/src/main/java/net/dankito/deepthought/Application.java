@@ -31,6 +31,8 @@ import net.dankito.deepthought.platform.IPlatformConfiguration;
 import net.dankito.deepthought.platform.IPlatformTools;
 import net.dankito.deepthought.platform.IPreferencesStore;
 import net.dankito.deepthought.plugin.IPluginManager;
+import net.dankito.deepthought.ui.model.EntityPreviewService;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.LogHelper;
@@ -89,6 +91,7 @@ public class Application {
   protected static IEntitiesSearcherAndCreator entitiesSearcherAndCreator = null;
 
   protected static IHtmlHelper htmlHelper = null;
+  protected static IEntityPreviewService entityPreviewService;
 
   protected static IFileDownloader downloader = null;
 
@@ -145,6 +148,7 @@ public class Application {
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
     Application.htmlHelper = dependencyResolver.createHtmlHelper();
+    Application.entityPreviewService = new EntityPreviewService(entityChangesService, htmlHelper);
     Application.downloader = dependencyResolver.createDownloader();
 
     Application.contentExtractorManager = dependencyResolver.createContentExtractorManager(); // ContentExtractorManager needs HtmlHelper to be created
@@ -430,6 +434,10 @@ public class Application {
 
   public static IHtmlHelper getHtmlHelper() {
     return htmlHelper;
+  }
+
+  public static IEntityPreviewService getEntityPreviewService() {
+    return entityPreviewService;
   }
 
   public static IFileDownloader getDownloader() {
