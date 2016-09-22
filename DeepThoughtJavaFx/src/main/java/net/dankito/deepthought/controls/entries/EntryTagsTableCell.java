@@ -2,6 +2,9 @@ package net.dankito.deepthought.controls.entries;
 
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.persistence.db.BaseEntity;
+
+import java.util.Collection;
 
 /**
  * Created by ganymed on 28/11/14.
@@ -16,16 +19,15 @@ public class EntryTagsTableCell extends EntryTableCell {
       return "";
   }
 
-  @Override
-  protected void tagHasBeenAdded(Entry entry, Tag tag) {
-    super.tagHasBeenAdded(entry, tag);
-    entryUpdated(entry);
-  }
 
   @Override
-  protected void tagHasBeenRemoved(Entry entry, Tag tag) {
-    super.tagHasBeenRemoved(entry, tag);
-    entryUpdated(entry);
+  protected void entryCollectionChanged(Collection<? extends BaseEntity> collection, BaseEntity addedOrRemovedEntity) {
+    super.entryCollectionChanged(collection, addedOrRemovedEntity);
+
+    if(addedOrRemovedEntity instanceof Tag) {
+      entryUpdated(entry);
+    }
   }
+
 }
 

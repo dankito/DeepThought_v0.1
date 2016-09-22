@@ -1,18 +1,14 @@
 package net.dankito.deepthought.controls.entries;
 
+import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.Entry;
-import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collection;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableRow;
 
@@ -21,44 +17,28 @@ import javafx.scene.control.TableRow;
  */
 public abstract class EntryTableCell extends TableCell<Entry, String> {
 
-  private final static Logger log = LoggerFactory.getLogger(EntryTableCell.class);
-
 
   protected Entry entry;
   protected String textRepresentation = "";
 
 
   public EntryTableCell() {
-    tableRowProperty().addListener(new ChangeListener<TableRow>() {
-      @Override
-      public void changed(ObservableValue<? extends TableRow> observable, TableRow oldValue, TableRow newValue) {
-        if(newValue != null)
-          newValue.itemProperty().addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-              entryChanged((Entry)newValue);
-            }
-          });
-      }
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+
+    tableRowProperty().addListener((observable, oldValue, newValue) -> {
+      if(newValue != null)
+        newValue.itemProperty().addListener((observable1, oldValue1, newValue1) -> entryChanged((Entry) newValue1));
     });
   }
 
   protected void entryChanged(Entry entry) {
-    if(this.entry != null) {
-      this.entry.removeEntityListener(entryListener);
-    }
-
     this.entry = entry;
-
-    if(entry != null) {
-      entry.addEntityListener(entryListener);
-    }
 
     entryUpdated(entry);
   }
 
   protected void entryUpdated(final Entry entry) {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> entryUpdatedOnUiThread(entry));
+    FXUtils.runOnUiThread(() -> entryUpdatedOnUiThread(entry));
   }
 
   protected void entryUpdatedOnUiThread(Entry entry) {
@@ -71,7 +51,6 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
   protected abstract String getTextRepresentationForCell(Entry entry);
 
   protected String getItemTextRepresentation() {
-//    return getItem(); // don't know why but item is always null
     return textRepresentation;
   }
 
@@ -95,40 +74,48 @@ public abstract class EntryTableCell extends TableCell<Entry, String> {
   }
 
 
-  protected EntityListener entryListener = new EntityListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      entryUpdated((Entry)entity);
+    public void entityCreated(BaseEntity entity) {
+
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      if(entry != null) {
+        EntryTableCell.this.entityUpdated(entity, propertyName);
+      }
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
+
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      Entry entry = (Entry)collectionHolder;
-      if(collection == entry.getTags())
-        tagHasBeenAdded(entry, (Tag)addedEntity);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
+      if(entry == collectionHolder) {
+        entryCollectionChanged(collection, addedEntity);
+      }
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      Entry entry = (Entry)collectionHolder;
-      if(collection == entry.getTags())
-        tagHasBeenRemoved(entry, (Tag) removedEntity);
+      if(entry == collectionHolder) {
+        entryCollectionChanged(collection, removedEntity);
+      }
     }
   };
 
-
-
-  protected void tagHasBeenAdded(Entry entry, Tag tag) {
-    // nothing to do here but may in subclasses
+  protected void entityUpdated(BaseEntity entity, String propertyName) {
+    if(entity == entry) {
+      entryUpdated((Entry)entity);
+    }
   }
 
-  protected void tagHasBeenRemoved(Entry entry, Tag tag) {
-    // nothing to do here but may in subclasses
+  protected void entryCollectionChanged(Collection<? extends BaseEntity> collection, BaseEntity addedOrRemovedEntity) {
+
   }
+
 }
 
