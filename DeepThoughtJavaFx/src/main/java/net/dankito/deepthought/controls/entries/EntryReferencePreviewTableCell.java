@@ -6,11 +6,8 @@ import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
-import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
-import net.dankito.deepthought.util.localization.LanguageChangedListener;
-import net.dankito.deepthought.util.localization.Localization;
 
 import java.util.Collection;
 
@@ -24,13 +21,10 @@ public class EntryReferencePreviewTableCell extends EntryTableCell implements IC
 
   public EntryReferencePreviewTableCell(IEntityPreviewService previewService) {
     this.previewService = previewService;
-
-    Localization.addLanguageChangedListener(languageChangedListener);
   }
 
   @Override
-  public void cleanUp() { // TODO: not called right now
-    Localization.removeLanguageChangedListener(languageChangedListener);
+  public void cleanUp() {
   }
 
 
@@ -70,20 +64,6 @@ public class EntryReferencePreviewTableCell extends EntryTableCell implements IC
 
     if(addedOrRemovedEntity instanceof Person) {
       entryUpdated(entry);
-    }
-  }
-
-  protected LanguageChangedListener languageChangedListener = new LanguageChangedListener() {
-    @Override
-    public void languageChanged(ApplicationLanguage newLanguage) {
-      EntryReferencePreviewTableCell.this.languageChanged();
-    }
-  };
-
-  protected void languageChanged() {
-    if(entry != null) {
-      entry.resetReferencePreview();
-      entryChanged(entry); // show updated Entry's Reference preview (has Date format may has changed)
     }
   }
 
