@@ -226,7 +226,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
     clmnId.setCellValueFactory(new PropertyValueFactory<Entry, Long>("entryIndex"));
     clmnReferencePreview.setCellFactory((param) -> {
-      return new EntryReferencePreviewTableCell();
+      return new EntryReferencePreviewTableCell(Application.getEntityPreviewService());
     });
     clmnEntryPreview.setCellFactory((param) -> {
       return new EntryPreviewTableCell();
