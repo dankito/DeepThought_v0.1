@@ -90,8 +90,23 @@ public class TagsSearcher {
   }
 
 
-  public void getTagSearchResultState(Tag tag) {
-    // TODO:
+  public TagSearchResultState getTagSearchResultState(Tag tag) {
+    if(lastSearchTagsResult != null && lastSearchTagsResult.getResults().size() > 0) {
+      if(lastSearchTagsResult.isExactOrSingleMatchButNotOfLastResult(tag)) {
+        return TagSearchResultState.EXACT_OR_SINGLE_MATCH_BUT_NOT_OF_LAST_RESULT;
+      }
+      else if(lastSearchTagsResult.isMatchButNotOfLastResult(tag)) {
+        return TagSearchResultState.MATCH_BUT_NOT_OF_LAST_RESULT;
+      }
+      else if(lastSearchTagsResult.isExactMatchOfLastResult(tag)) {
+        return TagSearchResultState.EXACT_MATCH_OF_LAST_RESULT;
+      }
+      else if(lastSearchTagsResult.isSingleMatchOfLastResult(tag)) {
+        return TagSearchResultState.SINGLE_MATCH_OF_LAST_RESULT;
+      }
+    }
+
+    return TagSearchResultState.DEFAULT;
   }
 
   public List<Entry> getSearchResultEntriesForTag(Tag tag) {
