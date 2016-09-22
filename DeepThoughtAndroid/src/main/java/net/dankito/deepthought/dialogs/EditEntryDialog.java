@@ -59,6 +59,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
   protected List<FieldWithUnsavedChanges> editedFields = new ArrayList<>();
 
+
   protected RelativeLayout rlytEditAbstract;
 
   protected RelativeLayout rlytEditContent;
@@ -298,13 +299,7 @@ public class EditEntryDialog extends FullscreenDialog {
 
     setTagsPreview(entryEditedTags);
 
-    lstvwEditEntryTags.setAdapter(new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-      @Override
-      public void entryTagsChanged(List<Tag> entryTags) {
-        setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
-        setTagsPreview(entryTags);
-      }
-    }));
+    lstvwEditEntryTags.setAdapter(entryTagsAdapter);
   }
 
   protected void setEntryHasBeenEdited(FieldWithUnsavedChanges editedField, Object editedFieldValue) {
@@ -421,8 +416,8 @@ public class EditEntryDialog extends FullscreenDialog {
     }
 
     @Override
-    public void afterTextChanged(Editable s) {
-      ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).getFilter().filter(s.toString());
+    public void afterTextChanged(Editable editable) {
+      entryTagsAdapter.filterTags(editable.toString());
     }
   };
 
@@ -635,14 +630,22 @@ public class EditEntryDialog extends FullscreenDialog {
     }
   };
 
+
+  protected EntryTagsAdapter entryTagsAdapter = new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
+    @Override
+    public void entryTagsChanged(List<Tag> entryTags) {
+      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+      setTagsPreview(entryTags);
+    }
+  });
+
+
   @Override
   public void cleanUp() {
     AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
     AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
 
-    if(lstvwEditEntryTags.getAdapter() instanceof EntryTagsAdapter) {
-      ((EntryTagsAdapter) lstvwEditEntryTags.getAdapter()).cleanUp();
-    }
+    entryTagsAdapter.cleanUp();
 
     editEntityListener = null;
 
