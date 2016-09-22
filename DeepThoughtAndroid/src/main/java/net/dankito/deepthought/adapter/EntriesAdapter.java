@@ -11,6 +11,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
+import net.dankito.deepthought.ui.model.IEntityPreviewService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +31,8 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   protected List<Entry> searchResults = null;
 
   protected String lastSearchTerm = null;
+
+  protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
@@ -95,7 +98,7 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     Entry entry = (Entry)item;
 
     TextView txtvwListItemEntryReferencePreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryReferencePreview);
-    txtvwListItemEntryReferencePreview.setText(entry.getReferenceOrPersonsPreview());
+    txtvwListItemEntryReferencePreview.setText(previewService.getReferenceOrPersonsPreview(entry));
     txtvwListItemEntryReferencePreview.setVisibility(entry.hasPersonsOrIsAReferenceSet() ? View.VISIBLE : View.GONE);
 
     TextView txtvwPreview = (TextView)listItemView.findViewById(R.id.txtvwListItemEntryPreview);
