@@ -18,7 +18,7 @@ public interface IEntityPreviewService extends ICleanUp {
 
   String getPersonsPreview(Entry entry);
 
-  String createTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage);
+  String getTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage);
 
   String getReferenceBaseUrl(ReferenceBase referenceBase);
 

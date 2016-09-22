@@ -61,7 +61,7 @@ public class EntityPreviewService implements IEntityPreviewService {
 
 
   @Override
-  public String createTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage) {
+  public String getTagsPreview(Collection<Tag> tags, boolean showNoTagsSetMessage) {
     return tagPreviewService.createTagsPreview(tags, showNoTagsSetMessage);
   }
 

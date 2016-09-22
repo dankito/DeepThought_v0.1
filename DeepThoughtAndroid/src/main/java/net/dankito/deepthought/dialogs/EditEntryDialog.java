@@ -464,7 +464,7 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   protected void setTagsPreview(List<Tag> tags) {
-    txtvwEntryTagsPreview.setText(previewService.createTagsPreview(tags, true));
+    txtvwEntryTagsPreview.setText(previewService.getTagsPreview(tags, true));
   }
 
 

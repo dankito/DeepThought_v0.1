@@ -352,7 +352,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setTextViewEntryTagsPreview(Collection<Tag> tags) {
-    String tagsPreview = previewService.createTagsPreview(tags, true);
+    String tagsPreview = previewService.getTagsPreview(tags, true);
 
     txtvwViewEntryTagsPreview.setText(tagsPreview);
   }
