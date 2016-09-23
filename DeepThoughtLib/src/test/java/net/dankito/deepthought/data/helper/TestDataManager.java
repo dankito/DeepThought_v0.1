@@ -1,7 +1,6 @@
 package net.dankito.deepthought.data.helper;
 
 import net.dankito.deepthought.data.DefaultDataManager;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 
@@ -10,8 +9,8 @@ import net.dankito.deepthought.data.persistence.IEntityManager;
  */
 public class TestDataManager extends DefaultDataManager {
 
-  public TestDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
-    super(entityManager, entityChangesService);
+  public TestDataManager(IEntityManager entityManager) {
+    super(entityManager);
   }
 
   @Override
