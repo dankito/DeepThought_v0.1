@@ -36,8 +36,8 @@ public class DeepThoughtJsonWriterTest {
 //      }
 
       @Override
-      public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
-        return new DefaultDataManager(entityManager, entityChangesService) {
+      public IDataManager createDataManager(IEntityManager entityManager) {
+        return new DefaultDataManager(entityManager) {
           @Override
           public DeepThought retrieveDeepThoughtApplication() {
             this.application = DataHelper.createTestApplication();

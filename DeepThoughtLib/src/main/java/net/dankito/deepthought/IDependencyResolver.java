@@ -14,7 +14,6 @@ import net.dankito.deepthought.data.compare.IDataComparer;
 import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.html.IHtmlHelper;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
@@ -36,7 +35,7 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception;
 
-  IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService);
+  IDataManager createDataManager(IEntityManager entityManager);
 
   IPlatformTools createPlatformTools();
 

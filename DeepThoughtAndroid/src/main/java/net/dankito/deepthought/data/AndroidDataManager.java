@@ -2,7 +2,6 @@ package net.dankito.deepthought.data;
 
 import android.os.Environment;
 
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 
 import java.io.File;
@@ -12,8 +11,8 @@ import java.io.File;
  */
 public class AndroidDataManager extends DefaultDataManager {
 
-  public AndroidDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
-    super(entityManager, entityChangesService);
+  public AndroidDataManager(IEntityManager entityManager) {
+    super(entityManager);
     determineDataFolder();
   }
 

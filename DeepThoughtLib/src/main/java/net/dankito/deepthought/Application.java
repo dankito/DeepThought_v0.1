@@ -15,7 +15,6 @@ import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.listener.EntityChangesService;
 import net.dankito.deepthought.data.listener.IEntityChangesService;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
@@ -238,7 +237,7 @@ public class Application {
     Date startTime = new Date();
 
     try {
-      Application.dataManager = dependencyResolver.createDataManager(Application.entityManager, (IExternalCallableEntityChangesService)entityChangesService);
+      Application.dataManager = dependencyResolver.createDataManager(Application.entityManager);
       Application.dataManager.addApplicationListener(dataManagerListener);
       Application.dataManager.retrieveDeepThoughtApplication();
     } catch(Exception ex) {

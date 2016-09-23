@@ -4,7 +4,6 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
@@ -61,7 +60,7 @@ public class DefaultDataManager implements IDataManager {
   protected Timer persistUpdatedEntitiesTimer = null;
 
 
-  public DefaultDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
+  public DefaultDataManager(IEntityManager entityManager) {
     this.entityManager = entityManager; // TODO: how to set dataCollectionPersistencePath?
 
     File databasePath = new File(entityManager.getDatabasePath());

@@ -71,8 +71,8 @@ public class TestApplicationConfiguration extends DependencyResolverBase impleme
 
 
   @Override
-  public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
-    return new TestDataManager(entityManager, entityChangesService);
+  public IDataManager createDataManager(IEntityManager entityManager) {
+    return new TestDataManager(entityManager);
   }
 
   @Override

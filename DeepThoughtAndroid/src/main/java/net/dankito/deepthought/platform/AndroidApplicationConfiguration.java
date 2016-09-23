@@ -111,8 +111,8 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
   }
 
   @Override
-  public IDataManager createDataManager(IEntityManager entityManager, IExternalCallableEntityChangesService entityChangesService) {
-    return new AndroidDataManager(entityManager, entityChangesService);
+  public IDataManager createDataManager(IEntityManager entityManager) {
+    return new AndroidDataManager(entityManager);
   }
 
   @Override
