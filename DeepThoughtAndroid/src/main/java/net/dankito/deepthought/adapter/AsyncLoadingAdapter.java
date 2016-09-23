@@ -75,6 +75,10 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
   }
 
   protected void itemForListItemLoaded(final Object loadedItem, int position, final View listItemView) {
+    if(loadedItem == null) {
+      return; // TODO: what to do in this case?
+    }
+
     loadedItems.put(position, loadedItem);
 
     int currentItemPosition = (int)listItemView.getTag(R.id.ASYNC_ITEM_TO_LOAD_POSITION); // if list item should show another item in the mean time, tag for ITEM_TO_LOAD_POSITION_KEY has changed
