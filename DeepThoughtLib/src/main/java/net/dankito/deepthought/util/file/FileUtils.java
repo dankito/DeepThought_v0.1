@@ -722,7 +722,7 @@ public class FileUtils {
       return getDeepThoughtAndroidLibJarFile();
     }
     else {
-      return getDeepThoughtLibJarFile();
+      return getDeepThoughtJavaFxLibJarFile();
     }
   }
 
@@ -731,6 +731,16 @@ public class FileUtils {
       return new JarFile(getDeepThoughtLibJarFilePath());
     } catch(Exception ex) {
       log.error("Could not retrieve DeepThoughtLib's Jar file path", ex);
+    }
+
+    return null;
+  }
+
+  public static JarFile getDeepThoughtJavaFxLibJarFile() {
+    try {
+      return new JarFile(getDeepThoughtJavaFxLibJarFilePath());
+    } catch(Exception ex) {
+      log.error("Could not retrieve DeepThoughtJavaFxLib's Jar file path", ex);
     }
 
     return null;
@@ -752,10 +762,16 @@ public class FileUtils {
     return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtLib);
   }
 
-  public static String getDeepThoughtAndroidLibJarFilePath() {
-    String pathOfAnyResourceInDeepThoughtLib = "android_html_editor.txt"; // take the name of any Resource that's for sure there
+  public static String getDeepThoughtJavaFxLibJarFilePath() {
+    String pathOfAnyResourceInDeepThoughtJavaFxLib = "java_html_editor.txt"; // take the name of any Resource that's for sure there
 
-    return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtLib);
+    return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtJavaFxLib);
+  }
+
+  public static String getDeepThoughtAndroidLibJarFilePath() {
+    String pathOfAnyResourceInDeepThoughtAndroidLib = "android_html_editor.txt"; // take the name of any Resource that's for sure there
+
+    return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtAndroidLib);
   }
 
   public static String getJarFilePathOfResource(String pathOfResourceInJar) {
@@ -765,10 +781,12 @@ public class FileUtils {
       String jarPathString = url.toExternalForm();
       jarPathString = jarPathString.replace("!/" + pathOfResourceInJar, ""); // remove path of resource from path and last '!/' as well (file ends with '.jar!/'
 
-      if(jarPathString.startsWith("jar:")) // remove leading jar:
+      if(jarPathString.startsWith("jar:")) {// remove leading jar:
         jarPathString = jarPathString.substring(4);
-      if(jarPathString.startsWith("file:")) // remove leading file:
+      }
+      if(jarPathString.startsWith("file:")) { // remove leading file:
         jarPathString = jarPathString.substring(5);
+      }
 
       return jarPathString;
     } catch(Exception ex) {

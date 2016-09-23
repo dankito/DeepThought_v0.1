@@ -3,8 +3,8 @@ apply plugin: 'java'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
-sourceSets.test.output.resourcesDir = sourceSets.test.output.classesDir
+// do not set resourcesDir that way as otherwise extracting HtmlEditor won't work anymore (not in the way it is currently implemented)
+//sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
 
 
 dependencies {
