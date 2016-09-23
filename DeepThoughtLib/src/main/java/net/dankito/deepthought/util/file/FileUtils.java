@@ -717,6 +717,15 @@ public class FileUtils {
     return false;
   }
 
+  public static JarFile getJarFileForHtmlEditor() {
+    if(OsHelper.isRunningOnAndroid()) {
+      return getDeepThoughtAndroidLibJarFile();
+    }
+    else {
+      return getDeepThoughtLibJarFile();
+    }
+  }
+
   public static JarFile getDeepThoughtLibJarFile() {
     try {
       return new JarFile(getDeepThoughtLibJarFilePath());
@@ -727,13 +736,34 @@ public class FileUtils {
     return null;
   }
 
-  public static String getDeepThoughtLibJarFilePath() {
+  public static JarFile getDeepThoughtAndroidLibJarFile() {
     try {
-      String pathOfAnyResource = "Strings.properties"; // take the name of any Resource that's for save there
-      URL url = Application.class.getClassLoader().getResource(pathOfAnyResource);
+      return new JarFile(getDeepThoughtAndroidLibJarFilePath());
+    } catch(Exception ex) {
+      log.error("Could not retrieve DeepThoughtAndroidLib's Jar file path", ex);
+    }
+
+    return null;
+  }
+
+  public static String getDeepThoughtLibJarFilePath() {
+    String pathOfAnyResourceInDeepThoughtLib = "Strings.properties"; // take the name of any Resource that's for sure there
+
+    return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtLib);
+  }
+
+  public static String getDeepThoughtAndroidLibJarFilePath() {
+    String pathOfAnyResourceInDeepThoughtLib = "android_html_editor.txt"; // take the name of any Resource that's for sure there
+
+    return getJarFilePathOfResource(pathOfAnyResourceInDeepThoughtLib);
+  }
+
+  public static String getJarFilePathOfResource(String pathOfResourceInJar) {
+    try {
+      URL url = Application.class.getClassLoader().getResource(pathOfResourceInJar);
 
       String jarPathString = url.toExternalForm();
-      jarPathString = jarPathString.replace("!/" + pathOfAnyResource, ""); // remove path of resource from path and last '!/' as well (file ends with '.jar!/'
+      jarPathString = jarPathString.replace("!/" + pathOfResourceInJar, ""); // remove path of resource from path and last '!/' as well (file ends with '.jar!/'
 
       if(jarPathString.startsWith("jar:")) // remove leading jar:
         jarPathString = jarPathString.substring(4);

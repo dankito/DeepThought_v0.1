@@ -297,7 +297,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-//    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();
@@ -315,7 +315,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     try {
       String htmlEditorDirectory = Application.getDataFolderPath();
 
-      JarFile jar = FileUtils.getDeepThoughtLibJarFile();
+      JarFile jar = FileUtils.getJarFileForHtmlEditor();
       Enumeration enumEntries = jar.entries();
 
       while (enumEntries.hasMoreElements()) {
