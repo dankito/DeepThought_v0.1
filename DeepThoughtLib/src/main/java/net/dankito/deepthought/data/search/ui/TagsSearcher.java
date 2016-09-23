@@ -8,6 +8,7 @@ import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
+import net.dankito.deepthought.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,6 +109,26 @@ public class TagsSearcher {
 
     return TagSearchResultState.DEFAULT;
   }
+
+  public TagsSearcherButtonState getButtonStateForSearchResult() {
+    if(StringUtils.isNullOrEmpty(lastSearchTerm)) {
+      return TagsSearcherButtonState.DISABLED;
+    }
+    else if(lastSearchTagsResult != null) {
+      if(lastSearchTagsResult.hasLastResultExactMatch()) {
+        return TagsSearcherButtonState.TOGGLE_TAGS;
+      }
+      if(lastSearchTagsResult.getResults().size() > 1) {
+        return TagsSearcherButtonState.TOGGLE_TAGS;
+      }
+    }
+    else if(lastFilterTagsResult != null) {
+      // TODO: implement
+    }
+
+    return TagsSearcherButtonState.CREATE_TAG;
+  }
+
 
   public List<Entry> getSearchResultEntriesForTag(Tag tag) {
     if(lastFilterTagsResult != null) {
