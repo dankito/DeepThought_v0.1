@@ -38,26 +38,31 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     super(context, R.layout.list_item_entry);
 
-    if(entriesToShow instanceof List)
-      this.entriesToShow = (List<Entry>)entriesToShow;
-    else if(entriesToShow != null)
+    if(entriesToShow instanceof List) {
+      this.entriesToShow = (List<Entry>) entriesToShow;
+    }
+    else if(entriesToShow != null) {
       this.entriesToShow = new ArrayList<>(entriesToShow); // TODO: use a lazy loading list
+    }
   }
 
   @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
     if(this.deepThought != null) {
-      if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries())
+      if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries()) {
         entriesToShow = null;
+      }
     }
 
     this.deepThought = deepThought;
 
     if(deepThought != null && entriesToShow == null) {
-      if(deepThought.AllEntriesSystemTag().getEntries() instanceof List)
-        entriesToShow = (List<Entry>)deepThought.AllEntriesSystemTag().getEntries();
-      else
+      if(deepThought.AllEntriesSystemTag().getEntries() instanceof List) {
+        entriesToShow = (List<Entry>) deepThought.AllEntriesSystemTag().getEntries();
+      }
+      else {
         entriesToShow = new ArrayList<>(deepThought.AllEntriesSystemTag().getEntries()); // TODO: use a lazy loading list
+      }
     }
 
     previewService = Application.getEntityPreviewService();
@@ -68,11 +73,14 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
   @Override
   public int getCount() {
-    if(searchResults != null)
+    if(searchResults != null) {
       return searchResults.size();
+    }
 
-    if(entriesToShow != null)
+    if(entriesToShow != null) {
       return entriesToShow.size();
+    }
+
     return 0;
   }
 
@@ -112,8 +120,9 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     txtvwTags.setText(previewService.getTagsPreview(entry));
 
     txtvwTags.setVisibility(entry.hasTags() ? View.VISIBLE : View.GONE);
-    if(entry.hasTags() == false)
+    if(entry.hasTags() == false) {
       txtvwPreviewLines++;
+    }
 
     txtvwPreview.setLines(txtvwPreviewLines);
   }
@@ -133,11 +142,13 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
 
   public void searchEntries(String searchTerm) {
-    if(Application.isInstantiated() == false)
+    if(Application.isInstantiated() == false) {
       return;
+    }
 
-    if(entriesSearch != null && entriesSearch.isCompleted() == false)
+    if(entriesSearch != null && entriesSearch.isCompleted() == false) {
       entriesSearch.interrupt();
+    }
 
     lastSearchTerm = searchTerm;
 
@@ -145,22 +156,18 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     entriesSearch = new EntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
-        if(results instanceof List)
-          searchResults = (List<Entry>)results;
-        else
+        if(results instanceof List) {
+          searchResults = (List<Entry>) results;
+        }
+        else {
           searchResults = new ArrayList<>(results);
+        }
 
         notifyDataSetChangedThreadSafe();
       }
     });
 
     Application.getSearchEngine().searchEntries(entriesSearch);
-  }
-
-  public void showAllEntries() {
-    searchResults = null;
-    lastSearchTerm = null;
-    notifyDataSetChangedThreadSafe();
   }
 
   @Override
@@ -175,17 +182,13 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
   protected void checkIfAnEntryHasChanged(BaseEntity entity) {
     if(entity instanceof Entry /*|| entity instanceof Tag*/) {
-      if(lastSearchTerm != null) // reapply last search to update Entries
+      if(lastSearchTerm != null) { // reapply last search to update Entries
         searchEntries(lastSearchTerm);
-      else
+      }
+      else {
         notifyDataSetChangedThreadSafe();
+      }
     }
-  }
-
-  public void cleanUp() {
-    Application.getEntityChangesService().removeAllEntitiesListener(allEntitiesListener);
-
-    Application.removeApplicationListener(applicationListener);
   }
 
 }

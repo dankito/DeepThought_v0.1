@@ -3,6 +3,7 @@ package net.dankito.deepthought.adapter;
 import android.app.Activity;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -15,15 +16,23 @@ import java.util.Collection;
 /**
  * Created by ganymed on 21/09/16.
  */
-public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter {
+public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter implements ICleanUp {
 
   public AsyncLoadingEntityAdapter(Activity context, int listItemLayoutId) {
     super(context, listItemLayoutId);
 
     Application.addApplicationListener(applicationListener);
 
-    if(Application.getDeepThought() != null)
+    if(Application.getDeepThought() != null) {
       deepThoughtChanged(Application.getDeepThought());
+    }
+  }
+
+  @Override
+  public void cleanUp() {
+    Application.removeApplicationListener(applicationListener);
+
+    Application.getEntityChangesService().removeAllEntitiesListener(allEntitiesListener);
   }
 
 

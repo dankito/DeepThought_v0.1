@@ -59,14 +59,18 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
 
   @Override
   public int getCount() {
-    if(lastFilterTagsResult != null)
+    if(lastFilterTagsResult != null) {
       return lastFilterTagsResult.getTagsOnEntriesContainingFilteredTagsCount();
+    }
+
     return searchResults.size();
   }
 
   public Tag getTagAt(int position) {
-    if(lastFilterTagsResult != null)
+    if(lastFilterTagsResult != null) {
       return lastFilterTagsResult.getTagsOnEntriesContainingFilteredTagsAt(position);
+    }
+
     return searchResults.get(position);
   }
 
@@ -130,20 +134,24 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   public void searchTags(String searchTerm) {
     this.lastSearchTerm = searchTerm;
 
-    if(isTagsFilterApplied())
+    if(isTagsFilterApplied()) {
       filterTags();
+    }
     else {
-      if (tagsSearch != null && tagsSearch.isCompleted() == false)
+      if(tagsSearch != null && tagsSearch.isCompleted() == false) {
         tagsSearch.interrupt();
+      }
       lastFilterTagsResult = null;
 
       tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
         @Override
         public void completed(TagsSearchResults results) {
-          if (results.getRelevantMatchesSorted() instanceof List)
+          if (results.getRelevantMatchesSorted() instanceof List) {
             searchResults = (List<Tag>) results.getRelevantMatchesSorted();
-          else
+          }
+          else {
             searchResults = new ArrayList<>(results.getRelevantMatchesSorted()); // TODO: use lazy loading list
+          }
 
           notifyDataSetChangedThreadSafe();
         }
@@ -158,8 +166,9 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
   protected void filterTags() {
-    if(isTagsFilterApplied() == false)
+    if(isTagsFilterApplied() == false) {
       researchTagsWithLastSearchTerm();
+    }
     else {
       Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
         @Override
@@ -172,10 +181,12 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
   protected void toggleFilterTag(Tag tag) {
-    if(tagsFilter.contains(tag))
+    if(tagsFilter.contains(tag)) {
       tagsFilter.remove(tag);
-    else
+    }
+    else {
       tagsFilter.add(tag);
+    }
 
     filterTags();
   }
@@ -207,9 +218,4 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
     }
   }
 
-  public void cleanUp() {
-    Application.getEntityChangesService().removeAllEntitiesListener(allEntitiesListener);
-
-    Application.removeApplicationListener(applicationListener);
-  }
 }
