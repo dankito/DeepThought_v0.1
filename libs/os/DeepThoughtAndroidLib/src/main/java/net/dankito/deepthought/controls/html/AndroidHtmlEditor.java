@@ -1,6 +1,8 @@
 package net.dankito.deepthought.controls.html;
 
 import android.app.Activity;
+import android.content.Context;
+import android.util.AttributeSet;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
@@ -35,6 +37,20 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
 
   protected List<IJavaScriptBridge> javaScriptBridgesToCall = new ArrayList<>();
 
+  public AndroidHtmlEditor(Context context) {
+    super(context);
+    setupHtmlEditor(null);
+  }
+
+  public AndroidHtmlEditor(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    setupHtmlEditor(null);
+  }
+
+  public AndroidHtmlEditor(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    setupHtmlEditor(null);
+  }
 
   public AndroidHtmlEditor(Activity context, IHtmlEditorListener listener) {
     super(context);
