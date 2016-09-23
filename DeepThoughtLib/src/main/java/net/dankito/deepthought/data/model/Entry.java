@@ -442,7 +442,11 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
 
   public boolean hasTags() {
-    return getTags().size() > 0;
+    return getCountTags() > 0;
+  }
+
+  public int getCountTags() {
+    return getTags().size();
   }
 
   public Collection<Tag> getTags() {

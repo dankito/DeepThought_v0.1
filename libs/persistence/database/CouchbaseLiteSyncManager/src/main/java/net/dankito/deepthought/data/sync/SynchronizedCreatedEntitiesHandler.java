@@ -168,7 +168,7 @@ public class SynchronizedCreatedEntitiesHandler {
       if(entityId.equals(deepThought.getTopLevelEntry().getId()) == false) {
         // TODO: adjust entryIndex
         // TODO: also respect hierarchy
-        log.info("Entry with " + ((Entry)entity).getTags().size() + " Tags");
+        log.info("Entry with " + ((Entry)entity).getCountTags() + " Tags");
         return deepThought.addEntry((Entry)entity);
       }
     }
