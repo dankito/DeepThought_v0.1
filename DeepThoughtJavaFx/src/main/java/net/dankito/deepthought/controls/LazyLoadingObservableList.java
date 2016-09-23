@@ -99,7 +99,7 @@ public class LazyLoadingObservableList<T> extends ObservableListBase<T> implemen
         nextAdd(0, size());
       }
       else {
-        // TODO: what to do if previous underlyingCollection had more than one item?
+        nextAdd(0, 0);
       }
 
       endChange();
