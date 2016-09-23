@@ -5,8 +5,6 @@ import android.support.v7.widget.PopupMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
 
 import net.dankito.deepthought.Application;
@@ -29,13 +27,12 @@ import java.util.List;
 /**
  * Created by ganymed on 12/10/14.
  */
-public class EntryTagsAdapter extends BaseAdapter {
+public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
 
   public interface EntryTagsChangedListener {
     void entryTagsChanged(List<Tag> entryTags);
   }
 
-  protected Activity context;
   protected Entry entry;
   protected List<Tag> entryTags;
 
@@ -47,16 +44,13 @@ public class EntryTagsAdapter extends BaseAdapter {
 
 
   public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags) {
-    this.context = context;
+    super(context, R.layout.list_item_entry_tag);
     this.entry = entry;
     this.entryTags = entryTags;
 
     tagsSearcher = new TagsSearcher(Application.getSearchEngine());
     searchTagsResult = new ArrayList<>();
 
-    DeepThought deepThought = Application.getDeepThought();
-
-    deepThought.addEntityListener(deepThoughtListener);
     entry.addEntityListener(entryListener);
 
     searchTags("");
@@ -67,11 +61,11 @@ public class EntryTagsAdapter extends BaseAdapter {
     this.entryTagsChangedListener = entryTagsChangedListener;
   }
 
+  @Override
   public void cleanUp() {
     entry.removeEntityListener(entryListener);
 
-    if(Application.getDeepThought() != null)
-      Application.getDeepThought().removeEntityListener(deepThoughtListener);
+    super.cleanUp();
   }
 
   @Override
@@ -93,24 +87,33 @@ public class EntryTagsAdapter extends BaseAdapter {
     return position;
   }
 
+
   @Override
-  public View getView(int position, View convertView, ViewGroup parent) {
-    if(convertView == null) {
-      convertView = context.getLayoutInflater().inflate(R.layout.list_item_entry_tag, parent, false);
-    }
+  protected void customizeViewForItem(View listItemView, Object item) {
+    Tag tag = (Tag)item;
 
-    Tag tag = getTagAt(position);
+    CheckedTextView chktxtvwListItemEntryTag = (CheckedTextView)listItemView.findViewById(R.id.chktxtvwListItemEntryTag);
 
-    CheckedTextView chktxtvwListItemEntryTag = (CheckedTextView)convertView.findViewById(R.id.chktxtvwListItemEntryTag);
     chktxtvwListItemEntryTag.setText(tag.getName());
     chktxtvwListItemEntryTag.setChecked(entryTags.contains(tag));
     chktxtvwListItemEntryTag.setOnClickListener(chktxtvwListItemEntryTagOnClickListener);
     chktxtvwListItemEntryTag.setOnLongClickListener(chktxtvwListItemEntryTagOnLongClickListener);
     chktxtvwListItemEntryTag.setTag(tag);
 
-    setBackgroundColorForTag(tag, convertView);
+    setBackgroundColorForTag(tag, listItemView);
+  }
 
-    return convertView;
+  @Override
+  protected void showPlaceholderView(View listItemView) {
+    CheckedTextView chktxtvwListItemEntryTag = (CheckedTextView)listItemView.findViewById(R.id.chktxtvwListItemEntryTag);
+
+    chktxtvwListItemEntryTag.setText("");
+    chktxtvwListItemEntryTag.setChecked(false);
+    chktxtvwListItemEntryTag.setOnClickListener(null);
+    chktxtvwListItemEntryTag.setOnLongClickListener(null);
+    chktxtvwListItemEntryTag.setTag(null);
+
+    setBackgroundColorForTagState(TagSearchResultState.DEFAULT, listItemView);
   }
 
   protected void setBackgroundColorForTag(Tag tag, View itemView) {
@@ -228,30 +231,9 @@ public class EntryTagsAdapter extends BaseAdapter {
   };
 
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      collectionUpdated(collectionHolder, addedEntity);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-      collectionUpdated(collectionHolder, updatedEntity);
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      collectionUpdated(collectionHolder, removedEntity);
-    }
-  };
-
-  protected void collectionUpdated(BaseEntity collectionHolder, BaseEntity changedEntity) {
-    if(changedEntity instanceof Tag) {
+  @Override
+  protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
+    if(entity instanceof Tag) {
       tagsSearcher.researchTagsWithLastSearchTerm(searchResultListener);
     }
   }
