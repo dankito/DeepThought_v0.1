@@ -166,6 +166,21 @@ function resetHtmlChanged() {
     htmlChanged = false;
 }
 
+function showContextMenu(x, y) {
+    var toolbarHeight = 0;
+    var marginLeft = 0;
+    try {
+        var clientRect = CKEDITOR.instances.editor.ui.space('top').getClientRect();
+        toolbarHeight = clientRect.bottom;
+        marginLeft = clientRect.left;
+    } catch(e) { }
+
+    y -= toolbarHeight;
+    x -= marginLeft;
+
+    CKEDITOR.instances.editor.contextMenu.show(CKEDITOR.instances.editor.document.getBody(), null, x, y);
+}
+
 // for Android versions pre API 19: there was no built in function to get result of a JavaScript execution
 function androidGetHtml() {
 	if(typeof android !== 'undefined') {

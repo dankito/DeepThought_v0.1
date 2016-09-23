@@ -125,6 +125,10 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     htmlEditor.setHtmlHasBeenSaved();
   }
 
+  public void showContextMenuAtPosition(int x, int y) {
+    htmlEditor.showContextMenuAtPosition(x, y);
+  }
+
 
   public void reInitHtmlEditor(Activity context, IHtmlEditorListener listener) {
     this.activity = context;

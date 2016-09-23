@@ -190,6 +190,11 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
     scriptExecutor.executeScript("setHtmlHasBeenSaved()");
   }
 
+  public void showContextMenuAtPosition(int x, int y) {
+    scriptExecutor.executeScript("showContextMenu(" + x + ", " + y + ")");
+  }
+
+
   public IHtmlEditorListener getListener() {
     return listener;
   }
@@ -301,7 +306,7 @@ public class HtmlEditor implements IJavaScriptBridge, ICleanUp {
 
   public static void extractHtmlEditorIfNeeded() {
     File htmlEditorDirectory = new File(Application.getDataFolderPath(), HtmlEditorFolderName);
-    FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
+    //FileUtils.deleteFile(htmlEditorDirectory); // if CKEditor_start.html has been updated
 
     if(htmlEditorDirectory.exists() == false /*|| htmlEditorDirectory.*/) { // TODO: check if folder has correct size
       unzippedHtmlEditorFilePath = extractCKEditorToHtmlEditorFolder();

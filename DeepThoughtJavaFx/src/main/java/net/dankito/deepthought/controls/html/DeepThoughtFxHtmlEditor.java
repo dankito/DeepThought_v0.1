@@ -59,7 +59,8 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     webView.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
       @Override
       public void handle(ContextMenuEvent event) {
-        // TODO: send coordinates to to CKEditor and call contextMenu.show() there
+        // don't why these insets are needed, figured them out by trial an error
+        showContextMenuAtPosition((int)event.getX() - 14, (int)event.getY() - 12);
       }
     });
 
@@ -109,6 +110,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   public void setHtmlHasBeenSaved() {
     htmlEditor.setHtmlHasBeenSaved();
+  }
+
+  public void showContextMenuAtPosition(int x, int y) {
+    htmlEditor.showContextMenuAtPosition(x, y);
   }
 
 
