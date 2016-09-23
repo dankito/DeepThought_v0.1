@@ -9,6 +9,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -54,6 +55,14 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
     webView.setPrefHeight(Region.USE_COMPUTED_SIZE);
     webView.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
 
+    webView.setContextMenuEnabled(false);
+    webView.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
+      @Override
+      public void handle(ContextMenuEvent event) {
+        // TODO: send coordinates to to CKEditor and call contextMenu.show() there
+      }
+    });
+
     this.getChildren().add(webView);
     HBox.setHgrow(webView, Priority.ALWAYS);
     webView.prefHeightProperty().bind(this.heightProperty());
@@ -97,6 +106,11 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   public void setHtml(String html, boolean resetUndoStack) {
     htmlEditor.setHtml(html, resetUndoStack);
   }
+
+  public void setHtmlHasBeenSaved() {
+    htmlEditor.setHtmlHasBeenSaved();
+  }
+
 
   public void setListener(IHtmlEditorListener listener) {
     htmlEditor.setListener(listener);

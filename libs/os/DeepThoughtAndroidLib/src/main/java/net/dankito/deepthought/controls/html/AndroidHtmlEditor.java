@@ -121,6 +121,11 @@ public class AndroidHtmlEditor extends WebView implements IJavaScriptBridge, IJa
     htmlEditor.setHtml(html, resetUndoStack);
   }
 
+  public void setHtmlHasBeenSaved() {
+    htmlEditor.setHtmlHasBeenSaved();
+  }
+
+
   public void reInitHtmlEditor(Activity context, IHtmlEditorListener listener) {
     this.activity = context;
     htmlEditor.reInitHtmlEditor(listener);

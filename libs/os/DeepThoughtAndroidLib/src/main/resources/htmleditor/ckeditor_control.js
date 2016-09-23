@@ -57,7 +57,7 @@ function initializeCKEditor() {
 				app.htmlChanged();
 			}
 			else if(editor.undoManager.hasUndo == false) {
-				htmlChanged = false;
+				htmlChanged = false; // TODO: this is not true for all cases e.g. Html got saved in the mean time
 				app.htmlHasBeenReset();
 			}
 		}
@@ -155,7 +155,15 @@ function setHtml(html, shouldResetUndoStack) {
 	htmlHasBeenSetFromJavaApp = true;
 	resetUndoStack = shouldResetUndoStack;
 	editor.setData(html);
-	htmlChanged = false;
+	resetHtmlChanged();
+}
+
+function setHtmlHasBeenSaved() {
+    resetHtmlChanged();
+}
+
+function resetHtmlChanged() {
+    htmlChanged = false;
 }
 
 // for Android versions pre API 19: there was no built in function to get result of a JavaScript execution
