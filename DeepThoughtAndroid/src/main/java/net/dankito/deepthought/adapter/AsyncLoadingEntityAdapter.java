@@ -21,7 +21,12 @@ public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter impl
   public AsyncLoadingEntityAdapter(Activity context, int listItemLayoutId) {
     super(context, listItemLayoutId);
 
-    Application.addApplicationListener(applicationListener);
+    if(Application.isInstantiated()) {
+      addAllEntitiesListener();
+    }
+    else {
+      Application.addApplicationListener(applicationListener);
+    }
 
     if(Application.getDeepThought() != null) {
       deepThoughtChanged(Application.getDeepThought());
@@ -54,11 +59,15 @@ public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter impl
     @Override
     public void notification(Notification notification) {
       if(notification.getType() == NotificationType.ApplicationInstantiated) {
-        Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+        addAllEntitiesListener();
         applicationInstantiated();
       }
     }
   };
+
+  protected void addAllEntitiesListener() {
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
+  }
 
 
   protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
