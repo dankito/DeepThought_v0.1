@@ -97,8 +97,15 @@ public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter impl
     }
   };
 
-  protected abstract void checkIfRelevantEntityHasChanged(BaseEntity entity);
+  protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
+    if(collectionHolder instanceof DeepThought) {
+      checkIfRelevantEntityHasChanged(changedEntity);
+    }
+    else {
+      checkIfRelevantEntityHasChanged(collectionHolder);
+    }
+  }
 
-  protected abstract void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity);
+  protected abstract void checkIfRelevantEntityHasChanged(BaseEntity entity);
 
 }

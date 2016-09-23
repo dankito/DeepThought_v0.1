@@ -175,11 +175,6 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     checkIfAnEntryHasChanged(entity);
   }
 
-  @Override
-  protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
-    checkIfAnEntryHasChanged(collectionHolder);
-  }
-
   protected void checkIfAnEntryHasChanged(BaseEntity entity) {
     if(entity instanceof Entry /*|| entity instanceof Tag*/) {
       if(lastSearchTerm != null) { // reapply last search to update Entries

@@ -146,8 +146,8 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
       tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
         @Override
         public void completed(TagsSearchResults results) {
-          if (results.getRelevantMatchesSorted() instanceof List) {
-            searchResults = (List<Tag>) results.getRelevantMatchesSorted();
+          if(results.getRelevantMatchesSorted() instanceof List) {
+            searchResults = (List<Tag>)results.getRelevantMatchesSorted();
           }
           else {
             searchResults = new ArrayList<>(results.getRelevantMatchesSorted()); // TODO: use lazy loading list
@@ -205,11 +205,6 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   @Override
   protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
     checkIfATagHasChanged(entity);
-  }
-
-  @Override
-  protected void checkIfRelevantEntityOfCollectionHasChanged(BaseEntity collectionHolder, BaseEntity changedEntity) {
-    checkIfATagHasChanged(collectionHolder);
   }
 
   protected void checkIfATagHasChanged(BaseEntity entity) {
