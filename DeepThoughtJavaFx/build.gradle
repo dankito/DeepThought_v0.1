@@ -22,8 +22,6 @@ dependencies {
 
     compile project(':CouchbaseLiteSyncManager')
 
-    compile project(':jmDNSDevicesFinderJava'); // TODO: remove again
-
 //    compile project(':OnlineNewspaperContentExtractor')
 
     compile 'org.controlsfx:controlsfx:8.20.8'
