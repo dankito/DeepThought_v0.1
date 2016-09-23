@@ -69,6 +69,8 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     articlesOverviewAdapter.cleanUp();
     articlesOverviewAdapter = null;
     lstvwArticlesOverviewOnItemClickListener = null;
+
+    super.cleanUp();
   }
 
 
