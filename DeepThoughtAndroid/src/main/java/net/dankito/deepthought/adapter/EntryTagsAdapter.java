@@ -1,6 +1,9 @@
 package net.dankito.deepthought.adapter;
 
 import android.app.Activity;
+import android.support.v7.widget.PopupMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -8,6 +11,7 @@ import android.widget.CheckedTextView;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
@@ -101,6 +105,7 @@ public class EntryTagsAdapter extends BaseAdapter {
     chktxtvwListItemEntryTag.setText(tag.getName());
     chktxtvwListItemEntryTag.setChecked(entryTags.contains(tag));
     chktxtvwListItemEntryTag.setOnClickListener(chktxtvwListItemEntryTagOnClickListener);
+    chktxtvwListItemEntryTag.setOnLongClickListener(chktxtvwListItemEntryTagOnLongClickListener);
     chktxtvwListItemEntryTag.setTag(tag);
 
     setBackgroundColorForTag(tag, convertView);
@@ -155,6 +160,48 @@ public class EntryTagsAdapter extends BaseAdapter {
         entryTagsChangedListener.entryTagsChanged(entryTags);
     }
   };
+
+  View.OnLongClickListener chktxtvwListItemEntryTagOnLongClickListener = new View.OnLongClickListener() {
+    @Override
+    public boolean onLongClick(View view) {
+      showContextMenuPopup(view);
+      return true;
+    }
+  };
+
+  protected void showContextMenuPopup(final View view) {
+    PopupMenu popup = new PopupMenu(context, view);
+
+    MenuInflater inflater = popup.getMenuInflater();
+    inflater.inflate(R.menu.list_item_tag_context_menu, popup.getMenu());
+
+    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(MenuItem item) {
+        return contextMenuItemClicked(item, (Tag)view.getTag());
+      }
+    });
+
+    popup.show();
+  }
+
+  protected boolean contextMenuItemClicked(MenuItem menuItem, Tag tag) {
+    switch(menuItem.getItemId()) {
+      case R.id.list_item_tag_context_menu_edit:
+        editTag(tag);
+        return true;
+      case R.id.list_item_tag_context_menu_delete:
+        DeepThought deepThought = Application.getDeepThought();
+        deepThought.removeTag(tag);
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  protected void editTag(Tag tagToEdit) {
+    ActivityManager.getInstance().showEditTagAlert(context, tagToEdit);
+  }
 
 
   public void notifyDataSetChangedThreadSafe() {

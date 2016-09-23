@@ -11,6 +11,9 @@
         android:gravity="left|center_vertical"
         android:clickable="true"
         android:focusable="true"
+        android:longClickable="true"
         />
+    <!-- clickable and focusable are needed so that list item receives click events -->
+    <!-- longClickable is activated so that i can show Popup ContextMenu -->
 
 </RelativeLayout>
