@@ -1,9 +1,10 @@
 package net.dankito.deepthought.data.model.ui;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
-import net.dankito.deepthought.data.model.listener.EntityListener;
+import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.util.localization.Localization;
@@ -22,7 +23,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
   public EntriesWithoutTagsSystemTag(DeepThought deepThought) {
     super(deepThought);
 
-    deepThought.addEntityListener(deepThoughtListener);
+    Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
 
     Application.getSearchEngine().getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
       @Override
@@ -39,87 +40,81 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
     return ID;
   }
 
-  protected EntityListener deepThoughtListener = new EntityListener() {
+
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+    public void entityCreated(BaseEntity entity) {
+
+    }
+
+    @Override
+    public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+
+    }
+
+    @Override
+    public void entityDeleted(BaseEntity entity) {
 
     }
 
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      if(collection == deepThought.getEntries()) {
-        Entry entry = (Entry)addedEntity;
-        entry.addEntityListener(entryListener);
-
-        if(entry.hasTags() == false) {
-          if(filteredEntries instanceof List)
-            ((List) filteredEntries).add(0, entry);
-          else
-            filteredEntries.add(entry);
-          callEntityAddedListeners(filteredEntries, entry);
-        }
-      }
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
+      EntriesWithoutTagsSystemTag.this.entityAddedToCollection(collectionHolder, addedEntity);
     }
 
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      if(collection == deepThought.getEntries()) {
-        Entry entry = (Entry)removedEntity;
-        entry.removeEntityListener(entryListener);
-
-        if(entry.hasTags() == false) {
-          filteredEntries.remove(entry);
-          callEntityRemovedListeners(filteredEntries, entry);
-        }
-      }
+      EntriesWithoutTagsSystemTag.this.entityRemovedFromCollection(collectionHolder, removedEntity);
     }
   };
 
-
-  protected EntityListener entryListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      Entry entry = ((Entry)collectionHolder);
-      if(collection == entry.getTags()) {
-        if(entry.getTags().size() == 1) {
-          filteredEntries.remove(entry);
-          callEntityRemovedListeners(entries, entry);
-        }
+  protected void entityAddedToCollection(BaseEntity collectionHolder, BaseEntity addedEntity) {
+    if(collectionHolder instanceof Entry && addedEntity instanceof Tag) {
+      Entry entry = (Entry)collectionHolder;
+      if(entry.getCountTags() == 1) {
+        removeEntryFromFilteredEntries(entry);
       }
     }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      Entry entry = ((Entry)collectionHolder);
-      if(collection == entry.getTags()) {
-        if(entry.hasTags() == false) {
-          if(filteredEntries instanceof List)
-            ((List) filteredEntries).add(0, entry);
-          else
-            filteredEntries.add(entry);
-          callEntityAddedListeners(entries, entry);
-        }
+    else if(collectionHolder instanceof DeepThought && addedEntity instanceof Entry) {
+      Entry entry = (Entry)addedEntity;
+      if(entry.getCountTags() == 0) {
+        addEntryToFilteredEntries(entry);
       }
     }
-  };
+  }
+
+  protected void entityRemovedFromCollection(BaseEntity collectionHolder, BaseEntity removedEntity) {
+    if(collectionHolder instanceof Entry && removedEntity instanceof Tag) {
+      Entry entry = (Entry)collectionHolder;
+      if(entry.getCountTags() == 0) {
+        addEntryToFilteredEntries(entry);
+      }
+    }
+    else if(collectionHolder instanceof DeepThought && removedEntity instanceof Entry) {
+      removeEntryFromFilteredEntries((Entry)removedEntity);
+    }
+  }
+
+  protected void removeEntryFromFilteredEntries(Entry entry) {
+    filteredEntries.remove(entry);
+    callEntityRemovedListeners(entries, entry);
+  }
+
+  protected void addEntryToFilteredEntries(Entry entry) {
+    if(filteredEntries instanceof List) {
+      ((List) filteredEntries).add(0, entry);
+    }
+    else {
+      filteredEntries.add(entry);
+    }
+
+    callEntityAddedListeners(filteredEntries, entry);
+  }
+
 
   @Override
   protected String getSystemTagName() {
     return Localization.getLocalizedString("system.tag.entries.with.no.tags");
   }
+
 }
