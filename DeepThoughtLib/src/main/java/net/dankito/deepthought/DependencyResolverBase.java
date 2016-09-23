@@ -21,7 +21,6 @@ import net.dankito.deepthought.data.download.IFileDownloader;
 import net.dankito.deepthought.data.download.NoOpFileDownloader;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.data.html.JsoupHtmlHelper;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.merger.DefaultDataMerger;
 import net.dankito.deepthought.data.merger.IDataMerger;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;

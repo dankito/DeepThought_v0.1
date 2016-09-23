@@ -5,7 +5,6 @@ import net.dankito.deepthought.TestApplicationConfiguration;
 import net.dankito.deepthought.data.DefaultDataManager;
 import net.dankito.deepthought.data.IDataManager;
 import net.dankito.deepthought.data.helper.DataHelper;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.User;

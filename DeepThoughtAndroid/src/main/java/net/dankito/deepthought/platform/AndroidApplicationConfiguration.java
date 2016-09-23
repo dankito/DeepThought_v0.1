@@ -22,7 +22,6 @@ import net.dankito.deepthought.data.contentextractor.SueddeutscheContentExtracto
 import net.dankito.deepthought.data.contentextractor.SueddeutscheJetztContentExtractor;
 import net.dankito.deepthought.data.contentextractor.SueddeutscheMagazinContentExtractor;
 import net.dankito.deepthought.data.contentextractor.ZeitContentExtractor;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.persistence.AndroidCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;

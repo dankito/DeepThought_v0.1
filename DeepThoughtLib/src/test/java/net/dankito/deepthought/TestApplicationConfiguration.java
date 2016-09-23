@@ -8,7 +8,6 @@ import net.dankito.deepthought.data.backup.IBackupManager;
 import net.dankito.deepthought.data.helper.MockEntityManager;
 import net.dankito.deepthought.data.helper.NoOperationBackupManager;
 import net.dankito.deepthought.data.helper.TestDataManager;
-import net.dankito.deepthought.data.listener.IExternalCallableEntityChangesService;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
