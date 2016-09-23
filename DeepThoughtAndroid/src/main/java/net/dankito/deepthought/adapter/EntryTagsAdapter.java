@@ -152,15 +152,15 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
 
       chktxtvwListItemEntryTag.toggle();
 
-      if(chktxtvwListItemEntryTag.isChecked())
+      if(chktxtvwListItemEntryTag.isChecked()) {
         entryTags.add(tag);
-      else
+        Collections.sort(entryTags);
+      }
+      else {
         entryTags.remove(tag);
+      }
 
-      Collections.sort(entryTags);
-
-      if(entryTagsChangedListener != null)
-        entryTagsChangedListener.entryTagsChanged(entryTags);
+      callEntryTagsChangedListener();
     }
   };
 
@@ -231,10 +231,27 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
   };
 
 
+  protected void callEntryTagsChangedListener() {
+    if(entryTagsChangedListener != null) {
+      entryTagsChangedListener.entryTagsChanged(entryTags);
+    }
+  }
+
+
   @Override
   protected void checkIfRelevantEntityHasChanged(BaseEntity entity) {
     if(entity instanceof Tag) {
       tagsSearcher.researchTagsWithLastSearchTerm(searchResultListener);
+
+      Tag tag = (Tag)entity;
+
+      if(entryTags.contains(tag)) {
+        if(tag.isDeleted()) {
+          entryTags.remove(tag);
+        }
+
+        callEntryTagsChangedListener();
+      }
     }
   }
 

@@ -127,6 +127,7 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   }
 
   protected String getNameForSection(EditEntrySection section) {
+    // TODO: may load via values/strings.xml as sometimes Strings.properties cannot be loaded
     switch(section) {
       case Abstract:
         return Localization.getLocalizedString("abstract");
