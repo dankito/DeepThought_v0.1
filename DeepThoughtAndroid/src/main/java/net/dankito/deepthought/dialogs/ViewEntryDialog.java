@@ -236,7 +236,16 @@ public class ViewEntryDialog extends FullscreenDialog {
       entryCreationResult.saveCreatedEntities();
     }
 
-    entryCreationResultHasNowBeenSaved();
+    entryCreationResultHasNowBeenSavedOnUiThread();
+  }
+
+  protected void entryCreationResultHasNowBeenSavedOnUiThread() {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        entryCreationResultHasNowBeenSaved();
+      }
+    });
   }
 
   protected void entryCreationResultHasNowBeenSaved() {
@@ -425,7 +434,7 @@ public class ViewEntryDialog extends FullscreenDialog {
       isShowingEditEntryDialog = false;
 
       if(didSaveChanges && entryCreationResult != null) {
-        entryCreationResultHasNowBeenSaved();
+        entryCreationResultHasNowBeenSavedOnUiThread();
       }
     }
   };
