@@ -254,7 +254,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void resetEditedFieldsAndCloseDialog() {
-    if(hideOnClose == false) { // an instance of this Dialog is held somewhere
+    if(hideOnClose == true) { // an instance of this Dialog is held somewhere
       // TODO: unset controls with edited fields
     }
 

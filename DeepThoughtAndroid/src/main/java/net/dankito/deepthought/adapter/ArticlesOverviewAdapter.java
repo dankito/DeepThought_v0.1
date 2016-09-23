@@ -59,7 +59,6 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     extractorWithArticleOverview = null;
 
     articlesOverviewItems.clear();
-    articlesOverviewItems = null;
   }
 
 
