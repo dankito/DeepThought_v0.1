@@ -35,6 +35,7 @@ import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.search.ui.TagsSearcherButtonState;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.EditEntityListener;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
@@ -73,7 +74,10 @@ public class EditEntryDialog extends FullscreenDialog {
   protected AndroidHtmlEditor contentHtmlEditor = null;
 
   protected TextView txtvwEntryTagsPreview = null;
+
   protected ClearableEditText edtxtEditEntrySearchTag = null;
+  protected Button btnEditEntryCreateOrToggleTags = null;
+  protected TagsSearcherButtonState btnEditEntryCreateOrToggleTagsState = TagsSearcherButtonState.DISABLED;
 
   protected ListView lstvwEditEntryTags = null;
 
@@ -106,14 +110,21 @@ public class EditEntryDialog extends FullscreenDialog {
 
 
   protected void initEntryTagsAdapter(Entry entry) {
-    entryTagsAdapter = new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, new EntryTagsAdapter.EntryTagsChangedListener() {
-      @Override
-      public void entryTagsChanged(List<Tag> entryTags) {
-        setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
-        setTagsPreview(entryTags);
-      }
-    });
+    entryTagsAdapter = new EntryTagsAdapter(getActivity(), this.entry, entryEditedTags, entryTagsAdapterListener);
   }
+
+  protected EntryTagsAdapter.EntryTagsAdapterListener entryTagsAdapterListener = new EntryTagsAdapter.EntryTagsAdapterListener() {
+    @Override
+    public void entryTagsChanged(List<Tag> entryTags) {
+      setEntryHasBeenEdited(FieldWithUnsavedChanges.EntryTags, entryTags);
+      setTagsPreviewOnUiThread(entryTags);
+    }
+
+    @Override
+    public void tagsSearchDone(TagsSearcherButtonState buttonState) {
+      setBtnEditEntryNewTagStateOnUiThread(buttonState);
+    }
+  };
 
 
   public void setEntry(Entry entry) {
@@ -290,8 +301,8 @@ public class EditEntryDialog extends FullscreenDialog {
     edtxtEditEntrySearchTag.addTextChangedListener(edtxtEditEntrySearchTagTextChangedListener);
     edtxtEditEntrySearchTag.setOnEditorActionListener(edtxtEditEntrySearchTagActionListener);
 
-    Button btnEditEntryNewTag = (Button)rootView.findViewById(R.id.btnEditEntryNewTag);
-    btnEditEntryNewTag.setOnClickListener(btnEditEntryNewTagOnClickListener);
+    btnEditEntryCreateOrToggleTags = (Button)rootView.findViewById(R.id.btnEditEntryCreateOrToggleTags);
+    btnEditEntryCreateOrToggleTags.setOnClickListener(btnEditEntryCreateOrToggleTagsOnClickListener);
 
     lstvwEditEntryTags = (ListView)rootView.findViewById(R.id.lstvwEditEntryTags);
   }
@@ -449,7 +460,7 @@ public class EditEntryDialog extends FullscreenDialog {
   };
 
 
-  protected View.OnClickListener btnEditEntryNewTagOnClickListener = new View.OnClickListener() {
+  protected View.OnClickListener btnEditEntryCreateOrToggleTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       createNewTag();
@@ -473,8 +484,39 @@ public class EditEntryDialog extends FullscreenDialog {
     }
   }
 
+  protected void setTagsPreviewOnUiThread(final List<Tag> tags) {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setTagsPreview(tags);
+      }
+    });
+  }
+
   protected void setTagsPreview(List<Tag> tags) {
     txtvwEntryTagsPreview.setText(previewService.getTagsPreview(tags, true));
+  }
+
+  protected void setBtnEditEntryNewTagStateOnUiThread(final TagsSearcherButtonState state) {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setBtnEditEntryNewTagState(state);
+      }
+    });
+  }
+
+  protected void setBtnEditEntryNewTagState(TagsSearcherButtonState state) {
+    this.btnEditEntryCreateOrToggleTagsState = state;
+
+    btnEditEntryCreateOrToggleTags.setEnabled(state != TagsSearcherButtonState.DISABLED);
+
+    if(state == TagsSearcherButtonState.CREATE_TAG) {
+      btnEditEntryCreateOrToggleTags.setText(R.string.edit_entry_create_tag);
+    }
+    else if(state == TagsSearcherButtonState.TOGGLE_TAGS) {
+      btnEditEntryCreateOrToggleTags.setText(R.string.edit_entry_toggle_tags);
+    }
   }
 
 

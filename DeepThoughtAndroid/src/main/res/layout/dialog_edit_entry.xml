@@ -76,20 +76,21 @@
                 android:layout_height="@dimen/edit_entry_search_tags_height"
                 android:layout_below="@+id/txtvwEditEntryTagsPreview"
                 android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@+id/btnEditEntryNewTag"
+                android:layout_toLeftOf="@+id/btnEditEntryCreateOrToggleTags"
                 android:layout_marginRight="6dp"
                 android:textSize="@dimen/edit_entry_search_tags_text_size"
             />
 
             <Button
-                android:id="@+id/btnEditEntryNewTag"
+                android:id="@+id/btnEditEntryCreateOrToggleTags"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="70dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignBottom="@+id/edtxtEditEntrySearchTag"
                 android:textSize="@dimen/edit_entry_search_tags_text_size"
-                android:text="@string/edit_entry_button_new_tag_text"
+                android:text="@string/edit_entry_create_tag"
+                android:enabled="false"
             />
 
             <ListView

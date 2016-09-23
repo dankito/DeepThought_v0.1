@@ -18,6 +18,7 @@ import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.ui.TagSearchResultState;
 import net.dankito.deepthought.data.search.ui.TagsSearchResultListener;
 import net.dankito.deepthought.data.search.ui.TagsSearcher;
+import net.dankito.deepthought.data.search.ui.TagsSearcherButtonState;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +30,9 @@ import java.util.List;
  */
 public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
 
-  public interface EntryTagsChangedListener {
+  public interface EntryTagsAdapterListener {
     void entryTagsChanged(List<Tag> entryTags);
+    void tagsSearchDone(TagsSearcherButtonState buttonState);
   }
 
   protected Entry entry;
@@ -40,7 +42,7 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
 
   protected TagsSearcher tagsSearcher;
 
-  protected EntryTagsChangedListener entryTagsChangedListener = null;
+  protected EntryTagsAdapterListener entryTagsAdapterListener = null;
 
 
   public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags) {
@@ -56,9 +58,9 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
     searchTags("");
   }
 
-  public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags, EntryTagsChangedListener entryTagsChangedListener) {
+  public EntryTagsAdapter(Activity context, Entry entry, List<Tag> entryTags, EntryTagsAdapterListener entryTagsAdapterListener) {
     this(context, entry, entryTags);
-    this.entryTagsChangedListener = entryTagsChangedListener;
+    this.entryTagsAdapterListener = entryTagsAdapterListener;
   }
 
   @Override
@@ -217,6 +219,10 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
 
+  public TagsSearcherButtonState getButtonStateForSearchResult() {
+    return tagsSearcher.getButtonStateForSearchResult();
+  }
+
   public void searchTags(String searchTerm) {
     tagsSearcher.search(searchTerm, searchResultListener);
   }
@@ -227,13 +233,21 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
       searchTagsResult = searchResult;
 
       notifyDataSetChangedThreadSafe();
+
+      callTagsSearchDoneListeners(searchResult);
     }
   };
 
 
   protected void callEntryTagsChangedListener() {
-    if(entryTagsChangedListener != null) {
-      entryTagsChangedListener.entryTagsChanged(entryTags);
+    if(entryTagsAdapterListener != null) {
+      entryTagsAdapterListener.entryTagsChanged(entryTags);
+    }
+  }
+
+  protected void callTagsSearchDoneListeners(List<Tag> searchResult) {
+    if(entryTagsAdapterListener != null) {
+      entryTagsAdapterListener.tagsSearchDone(tagsSearcher.getButtonStateForSearchResult());
     }
   }
 
