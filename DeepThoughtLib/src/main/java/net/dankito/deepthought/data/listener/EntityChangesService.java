@@ -2,6 +2,7 @@ package net.dankito.deepthought.data.listener;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -16,6 +17,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class EntityChangesService implements IExternalCallableEntityChangesService {
 
   protected Set<AllEntitiesListener> allEntitiesListeners = new CopyOnWriteArraySet<>();
+
+  protected DeepThought currentDeepThought = null;
 
 
   public EntityChangesService() {
@@ -122,16 +125,47 @@ public class EntityChangesService implements IExternalCallableEntityChangesServi
   protected ApplicationListener applicationListener = new ApplicationListener() {
     @Override
     public void deepThoughtChanged(DeepThought deepThought) {
+      if(currentDeepThought != null) {
+        currentDeepThought.AllEntriesSystemTag().removeEntityListener(systemTagsEntityListener);
+        currentDeepThought.EntriesWithoutTagsSystemTag().removeEntityListener(systemTagsEntityListener);
+      }
 
+      currentDeepThought = deepThought;
+
+      if(deepThought != null) {
+        deepThought.AllEntriesSystemTag().addEntityListener(systemTagsEntityListener);
+        deepThought.EntriesWithoutTagsSystemTag().addEntityListener(systemTagsEntityListener);
+      }
     }
 
     @Override
     public void notification(Notification notification) {
       if(notification.getType() == NotificationType.ApplicationInstantiated) {
-        Application.removeApplicationListener(applicationListener);
-
         Application.getSyncManager().addSynchronizationListener(synchronizationListener);
       }
+    }
+  };
+
+
+  protected EntityListener systemTagsEntityListener = new EntityListener() {
+    @Override
+    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
+      callEntityUpdatedListeners(entity, propertyName, previousValue, newValue);
+    }
+
+    @Override
+    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+      callEntityAddedToCollectionListeners(collectionHolder, collection, addedEntity);
+    }
+
+    @Override
+    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
+
+    }
+
+    @Override
+    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+      callEntityRemovedFromCollectionListeners(collectionHolder, collection, removedEntity);
     }
   };
 
