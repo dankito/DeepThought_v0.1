@@ -22,42 +22,24 @@ public class AndroidHtmlEditorPool implements ICleanUp {
   private static final Logger log = LoggerFactory.getLogger(AndroidHtmlEditorPool.class);
 
 
-  protected static final int MaxHtmlEditorsToCache = 2;
+  protected static final int MAX_HTML_EDITORS_TO_CACHE = 2;
 
 
   protected static AndroidHtmlEditorPool instance = null;
 
-//  public static void init(Activity contextToPreloadHtmlEditors) {
-//    instance = new AndroidHtmlEditorPool(contextToPreloadHtmlEditors);
-//  }
-
   public static AndroidHtmlEditorPool getInstance() {
     if(instance == null) {
-      instance = new AndroidHtmlEditorPool(null);
+      instance = new AndroidHtmlEditorPool();
     }
+
     return instance;
   }
 
 
-//  protected Activity contextToPreloadHtmlEditors;
-
   protected Queue<AndroidHtmlEditor> availableHtmlEditors = new ConcurrentLinkedQueue<>();
 
 
-  private AndroidHtmlEditorPool(Activity contextToPreloadHtmlEditors) {
-//    this.contextToPreloadHtmlEditors = contextToPreloadHtmlEditors;
-//    preloadHtmlEditors(contextToPreloadHtmlEditors, MaxHtmlEditorsToCache);
-  }
-
-
   public AndroidHtmlEditor getHtmlEditor(Activity context, IHtmlEditorListener listener) {
-//    contextToPreloadHtmlEditors.runOnUiThread(new Runnable() {
-//      @Override
-//      public void run() {
-//        preloadHtmlEditors(contextToPreloadHtmlEditors, availableHtmlEditors.size() == 0 ? MaxHtmlEditorsToCache : MaxHtmlEditorsToCache - availableHtmlEditors.size() + 1);
-//      }
-//    });
-
     if(availableHtmlEditors.size() > 0) {
       AndroidHtmlEditor editor = availableHtmlEditors.poll();
       editor.reInitHtmlEditor(context, listener);
@@ -70,14 +52,17 @@ public class AndroidHtmlEditorPool implements ICleanUp {
 
   public void htmlEditorReleased(AndroidHtmlEditor htmlEditor) {
     htmlEditor.resetInstanceVariables();
-    if(htmlEditor.getParent() instanceof ViewGroup)
-      ((ViewGroup)htmlEditor.getParent()).removeView(htmlEditor);
+
+    if(htmlEditor.getParent() instanceof ViewGroup) {
+      ((ViewGroup) htmlEditor.getParent()).removeView(htmlEditor);
+    }
 
     // do not cache release HtmlEditors anymore, they are using to much Memory by time
-//    if(availableHtmlEditors.contains(htmlEditor) == false)
-//      availableHtmlEditors.offer(htmlEditor);
+    if(availableHtmlEditors.size() < MAX_HTML_EDITORS_TO_CACHE && availableHtmlEditors.contains(htmlEditor) == false) {
+      availableHtmlEditors.offer(htmlEditor);
+    }
 
-//    log.info("Released HtmlEditor. There are now " + availableHtmlEditors.size() + " available HtmlEditors in Pool.");
+    log.info("Released HtmlEditor. There are now " + availableHtmlEditors.size() + " available HtmlEditors in Pool.");
   }
 
   public void preloadHtmlEditors(Activity context, int numberOfHtmlEditors) {
@@ -122,8 +107,10 @@ public class AndroidHtmlEditorPool implements ICleanUp {
 
   @Override
   public void cleanUp() {
-    for(AndroidHtmlEditor editor : availableHtmlEditors)
+    for(AndroidHtmlEditor editor : availableHtmlEditors) {
       editor.cleanUp();
+    }
+
     instance = null;
   }
 }

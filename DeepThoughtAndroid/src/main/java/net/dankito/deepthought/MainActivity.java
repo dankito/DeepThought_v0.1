@@ -27,6 +27,7 @@ import net.dankito.deepthought.adapter.OnlineArticleContentExtractorsWithArticle
 import net.dankito.deepthought.application.AndroidApplicationLifeCycleService;
 import net.dankito.deepthought.communication.connected_device.ConnectedRegisteredDevicesListener;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.controls.html.AndroidHtmlEditorPool;
 import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IContentExtractor;
@@ -235,7 +236,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   }
 
   protected void applicationInstantiated() {
-//    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
+    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
 
     deviceRegistrationHandler = new DeviceRegistrationHandler(this, Application.getDeepThoughtConnector(), Application.getThreadPool(), Application.getEntityManager(),
         Application.getDeepThought(), Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
