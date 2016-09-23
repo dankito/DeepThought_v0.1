@@ -1,5 +1,5 @@
 include ':DeepThoughtLib'
-include ':DeepThoughtJavaFx'
+include ':DeepThoughtJavaFx', ':DeepThoughtJavaFxLib'
 include ':DeepThoughtAndroid', ':DeepThoughtAndroidLib'
 
 // TODO: remove again
@@ -29,11 +29,8 @@ include ':OpenOfficeDocumentsImporterExporter'
 //include ':YouTubeAndVimeoDownloader'
 //include ':YouTubeAndVimeoContentExtractor'
 
-//include ':JavaFxControls'
 
-//include ':SymmetricDSDataSyncManager', ':SymmetricDS-Core', ':SymmetricDS-CSV', ':SymmetricDS-IO', ':SymmetricDS-Util', ':SymmetricDS-DB', ':SymmetricDS-JDBC',
-//        /*':SymmetricDS-Wrapper',*/ ':SymmetricDS-FTP',':SymmetricDS-Mongo',/*':SymmetricDS-Mssql',':SymmetricDS-Oracle',*/':SymmetricDS-Postgres',':SymmetricDS-Client',
-//        ':SymmetricDS-Server'
+project(':DeepThoughtJavaFxLib').projectDir = new File('libs/os/DeepThoughtJavaFxLib')
 
 project(':DeepThoughtAndroidLib').projectDir = new File('libs/os/DeepThoughtAndroidLib')
 
