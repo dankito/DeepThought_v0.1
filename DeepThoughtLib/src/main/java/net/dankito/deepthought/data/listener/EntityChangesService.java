@@ -94,7 +94,7 @@ public class EntityChangesService implements IExternalCallableEntityChangesServi
   }
 
 
-  protected AllEntitiesListener synchronizationListener = new AllEntitiesListener() {
+  protected AllEntitiesListener allEntitiesListener = new AllEntitiesListener() {
     @Override
     public void entityCreated(BaseEntity entity) {
       callEntityCreatedListeners(entity);
@@ -141,7 +141,8 @@ public class EntityChangesService implements IExternalCallableEntityChangesServi
     @Override
     public void notification(Notification notification) {
       if(notification.getType() == NotificationType.ApplicationInstantiated) {
-        Application.getSyncManager().addSynchronizationListener(synchronizationListener);
+        Application.getSyncManager().addSynchronizationListener(allEntitiesListener);
+        Application.getDataManager().addAllEntitiesListener(allEntitiesListener);
       }
     }
   };

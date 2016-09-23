@@ -1,5 +1,6 @@
 package net.dankito.deepthought.data;
 
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
@@ -24,6 +25,9 @@ public interface IDataManager {
 
   boolean addApplicationListener(ApplicationListener listener);
   boolean removeApplicationListener(ApplicationListener listener);
+
+  boolean addAllEntitiesListener(AllEntitiesListener listener);
+  boolean removeAllEntitiesListener(AllEntitiesListener listener);
 
   void deleteExistingDataCollection();
   void replaceExistingDataCollectionWithData(DeepThoughtApplication data);
