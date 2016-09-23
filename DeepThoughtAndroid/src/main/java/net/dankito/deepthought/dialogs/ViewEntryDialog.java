@@ -165,7 +165,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     menu.clear();
-    inflater.inflate(R.menu.activity_edit_entry_menu, menu);
+    inflater.inflate(R.menu.dialog_view_entry_menu, menu);
 
     MenuItem mnitmActionShareEntry = menu.findItem(R.id.mnitmActionShareEntry);
 

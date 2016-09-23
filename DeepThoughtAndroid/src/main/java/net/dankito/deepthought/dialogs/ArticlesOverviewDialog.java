@@ -76,7 +76,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     menu.clear();
 
-    inflater.inflate(R.menu.activity_articles_overview_menu, menu);
+    inflater.inflate(R.menu.dialog_articles_overview_menu, menu);
   }
 
   @Override
