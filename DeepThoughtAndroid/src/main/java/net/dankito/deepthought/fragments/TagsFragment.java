@@ -3,7 +3,6 @@ package net.dankito.deepthought.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -27,7 +26,7 @@ import net.dankito.deepthought.data.model.Tag;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class TagsFragment extends Fragment {
+public class TagsFragment extends TabFragment {
 
 
   protected TagsAdapter tagsAdapter;
@@ -57,8 +56,9 @@ public class TagsFragment extends Fragment {
 
   @Override
   public void onDestroyView() {
-    if(tagsAdapter != null)
+    if(tagsAdapter != null) {
       tagsAdapter.cleanUp();
+    }
 
     super.onDestroyView();
   }
@@ -169,6 +169,12 @@ public class TagsFragment extends Fragment {
     }
   };
 
+  @Override
+  public void tabSelected() {
+    if(tagsAdapter != null) {
+      tagsAdapter.showAllTags();
+    }
+  }
 
   public boolean hasNavigatedToOtherFragment() {
     return hasNavigatedToOtherFragment;

@@ -28,7 +28,7 @@ import java.util.Collection;
 /**
  * Created by ganymed on 01/10/14.
  */
-public class EntriesFragment extends Fragment {
+public class EntriesFragment extends TabFragment {
 
 
   protected Collection<Entry> entriesToShow = null;
@@ -67,8 +67,9 @@ public class EntriesFragment extends Fragment {
 
   @Override
   public void onDestroyView() {
-    if(entriesAdapter != null)
+    if(entriesAdapter != null) {
       entriesAdapter.cleanUp();
+    }
 
     super.onDestroyView();
   }
@@ -165,4 +166,11 @@ public class EntriesFragment extends Fragment {
     }
   };
 
+
+  @Override
+  public void tabSelected() {
+    if(entriesAdapter != null) {
+      entriesAdapter.showAllEntries();
+    }
+  }
 }

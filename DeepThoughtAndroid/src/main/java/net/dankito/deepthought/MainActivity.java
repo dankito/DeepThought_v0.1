@@ -43,6 +43,7 @@ import net.dankito.deepthought.dialogs.DeviceRegistrationHandler;
 import net.dankito.deepthought.dialogs.EditEntryDialog;
 import net.dankito.deepthought.dialogs.ViewEntryDialog;
 import net.dankito.deepthought.fragments.EntriesFragment;
+import net.dankito.deepthought.fragments.TabFragment;
 import net.dankito.deepthought.fragments.TagsFragment;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.listener.AndroidImportFilesOrDoOcrListener;
@@ -572,11 +573,15 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   @Override
   public void onTabSelected(TabLayout.Tab tab) {
     mViewPager.setCurrentItem(tab.getPosition());
+
+    TabFragment fragment = (TabFragment)mSectionsPagerAdapter.getItem(tab.getPosition());
+    fragment.tabSelected();
   }
 
   @Override
   public void onTabUnselected(TabLayout.Tab tab) {
-
+    TabFragment fragment = (TabFragment)mSectionsPagerAdapter.getItem(tab.getPosition());
+    fragment.tabUnselected();
   }
 
   @Override

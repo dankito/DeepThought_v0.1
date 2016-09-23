@@ -45,7 +45,7 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
     this.deepThought = deepThought;
 
     if(Application.isInstantiated()) {
-      searchForAllTags();
+      showAllTags();
     }
   }
 
@@ -53,7 +53,7 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   protected void applicationInstantiated() {
     super.applicationInstantiated();
 
-    searchForAllTags();
+    showAllTags();
   }
 
 
@@ -123,7 +123,7 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
 
-  public void searchForAllTags() {
+  public void showAllTags() {
     searchTags(SearchBase.EmptySearchTerm);
   }
 

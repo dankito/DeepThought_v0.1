@@ -141,6 +141,10 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   }
 
 
+  public void showAllEntries() {
+    searchEntries("");
+  }
+
   public void searchEntries(String searchTerm) {
     if(Application.isInstantiated() == false) {
       return;
