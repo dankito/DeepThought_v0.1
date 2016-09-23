@@ -118,7 +118,7 @@ public class TagsSearcher {
       if(lastSearchTagsResult.hasLastResultExactMatch()) {
         return TagsSearcherButtonState.TOGGLE_TAGS;
       }
-      if(lastSearchTagsResult.getResults().size() > 1) {
+      if(lastSearchTagsResult.getResults().size() > 1 || lastSearchTerm.endsWith(",")) {
         return TagsSearcherButtonState.TOGGLE_TAGS;
       }
     }

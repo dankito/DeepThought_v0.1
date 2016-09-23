@@ -219,10 +219,6 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
 
-  public TagsSearcherButtonState getButtonStateForSearchResult() {
-    return tagsSearcher.getButtonStateForSearchResult();
-  }
-
   public void searchTags(String searchTerm) {
     tagsSearcher.search(searchTerm, searchResultListener);
   }
@@ -237,6 +233,22 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
       callTagsSearchDoneListeners(searchResult);
     }
   };
+
+
+  public void toggleTags() {
+    for(Tag foundTag : searchTagsResult) {
+      if(entryTags.contains(foundTag)) {
+        entryTags.remove(foundTag);
+      }
+      else {
+        entryTags.add(foundTag);
+      }
+    }
+
+    notifyDataSetChangedThreadSafe();
+
+    callEntryTagsChangedListener();
+  }
 
 
   protected void callEntryTagsChangedListener() {

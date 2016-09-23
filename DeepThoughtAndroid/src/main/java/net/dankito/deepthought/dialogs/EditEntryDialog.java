@@ -452,7 +452,7 @@ public class EditEntryDialog extends FullscreenDialog {
     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
       if (actionId == EditorInfo.IME_NULL
           && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-        createNewTag();
+        onSearchTagsControlAction();
         return true;
       }
       return false;
@@ -463,17 +463,28 @@ public class EditEntryDialog extends FullscreenDialog {
   protected View.OnClickListener btnEditEntryCreateOrToggleTagsOnClickListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-      createNewTag();
+      onSearchTagsControlAction();
     }
   };
+
+  protected void onSearchTagsControlAction() {
+    if(btnEditEntryCreateOrToggleTagsState == TagsSearcherButtonState.CREATE_TAG) {
+      createNewTag();
+    }
+    else if(btnEditEntryCreateOrToggleTagsState == TagsSearcherButtonState.TOGGLE_TAGS) {
+      entryTagsAdapter.toggleTags();
+    }
+  }
 
   protected void createNewTag() {
     String tagName = edtxtEditEntrySearchTag.getText().toString();
 
-    if(StringUtils.isNullOrEmpty(tagName))
+    if(StringUtils.isNullOrEmpty(tagName)) { // TODO: the first two options shouldn't be possible anymore
       Toast.makeText(getActivity(), getString(R.string.error_message_tag_name_must_be_a_non_empty_string), Toast.LENGTH_LONG).show();
-    else if(Application.getDeepThought().containsTagOfName(tagName))
+    }
+    else if(Application.getDeepThought().containsTagOfName(tagName)) {
       Toast.makeText(getActivity(), getString(R.string.error_message_tag_with_that_name_already_exists), Toast.LENGTH_LONG).show();
+    }
     else {
       Tag newTag = new Tag(tagName);
       Application.getDeepThought().addTag(newTag);
