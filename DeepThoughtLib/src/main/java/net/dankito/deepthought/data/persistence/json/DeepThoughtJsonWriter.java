@@ -121,9 +121,13 @@ public class DeepThoughtJsonWriter extends JsonWriter {
 
     while (i.hasNext())
     {
-      //writeCollectionElement(i.next());
-      BaseEntity item = (BaseEntity)i.next();
-      writeBaseEntityIdReference(item, showType, item.getClass());
+      Object item = i.next();
+      if(item instanceof BaseEntity) {
+        writeBaseEntityIdReference((BaseEntity)item, showType, item.getClass());
+      }
+      else {
+        writeCollectionElement(item);
+      }
 
       if (i.hasNext())
       {
@@ -159,8 +163,9 @@ public class DeepThoughtJsonWriter extends JsonWriter {
 
   @Override
   protected Long getReferenceId(Object obj) {
-    if(obj instanceof BaseEntity)
-      return ((BaseEntity)obj).getId();
+    // TODO
+//    if(obj instanceof BaseEntity)
+//      return ((BaseEntity)obj).getId();
 
     return super.getReferenceId(obj);
   }
