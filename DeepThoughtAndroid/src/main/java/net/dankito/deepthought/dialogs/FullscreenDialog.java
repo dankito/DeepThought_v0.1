@@ -322,7 +322,6 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   @Override
   public void cleanUp() {
-    activity = null;
     dialogListener = null;
   }
 
