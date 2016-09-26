@@ -100,12 +100,15 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
   }
 
 
-  protected <T> List<T> getListFromCollection(Collection<T> tagCollection) {
-    if(tagCollection instanceof List) {
-      return  (List<T>)tagCollection;
+  protected <T> List<T> getListFromCollection(Collection<T> collection) {
+    if(collection == null) {
+      return null;
+    }
+    else if(collection instanceof List) {
+      return  (List<T>)collection;
     }
     else {
-      return new ArrayList<T>(tagCollection); // TODO: use lazy loading list
+      return new ArrayList<T>(collection); // TODO: use lazy loading list
     }
   }
 
