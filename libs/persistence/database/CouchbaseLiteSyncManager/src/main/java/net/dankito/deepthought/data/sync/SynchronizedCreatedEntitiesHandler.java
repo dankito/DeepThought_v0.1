@@ -304,16 +304,21 @@ public class SynchronizedCreatedEntitiesHandler {
   };
 
   protected void entityAddedOrRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedOrRemovedEntity, boolean added) {
-    if(collectionHolder instanceof DeepThoughtApplication || collection instanceof DeepThought) {
-      updateEntityIds(collectionHolder, collection, addedOrRemovedEntity);
+    if(collectionHolder instanceof DeepThoughtApplication || collectionHolder instanceof DeepThought) {
+      handleEntityCreatedOrRemoved(collectionHolder, collection, addedOrRemovedEntity, added);
+    }
+  }
 
-      if(added) {
-        synchronizedEntities.add(addedOrRemovedEntity.getId());
-      }
+  protected void handleEntityCreatedOrRemoved(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedOrRemovedEntity, boolean added) {
+    updateEntityIds(collectionHolder, collection, addedOrRemovedEntity);
+
+    if(added) {
+      synchronizedEntities.add(addedOrRemovedEntity.getId());
     }
   }
 
   protected void updateEntityIds(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity entity) {
+    // TODO: a shorter way would be (if it's a EntitiesCollection): ((EntitiesCollection)collection).getTargetEntitiesIds()  and create a JsonArray String from it
     try {
       Class entityType = entity.getClass();
       String propertyName = getPropertyNameForEntity(entityType);
