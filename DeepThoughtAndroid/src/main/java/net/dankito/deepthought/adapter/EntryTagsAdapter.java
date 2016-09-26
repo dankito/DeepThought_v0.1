@@ -209,30 +209,29 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
 
-  public void notifyDataSetChangedThreadSafe() {
-    context.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        notifyDataSetChanged();
-      }
-    });
-  }
-
-
   public void searchTags(String searchTerm) {
     tagsSearcher.search(searchTerm, searchResultListener);
   }
 
   protected TagsSearchResultListener searchResultListener = new TagsSearchResultListener() {
     @Override
-    public void completed(List<Tag> searchResult) {
-      searchTagsResult = searchResult;
-
-      notifyDataSetChangedThreadSafe();
-
-      callTagsSearchDoneListeners(searchResult);
+    public void completed(final List<Tag> searchResult) {
+      context.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          searchingTagsDone(searchResult);
+        }
+      });
     }
   };
+
+  protected void searchingTagsDone(List<Tag> searchResult) {
+    searchTagsResult = searchResult;
+
+    notifyDataSetChanged();
+
+    callTagsSearchDoneListeners(searchResult);
+  }
 
 
   public void toggleTags() {
@@ -245,7 +244,7 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
       }
     }
 
-    notifyDataSetChangedThreadSafe();
+    notifyDataSetChanged();
 
     callEntryTagsChangedListener();
   }
