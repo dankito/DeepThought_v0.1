@@ -92,7 +92,7 @@ public class InitialSyncManager {
     entityManager.deleteEntity(userDefaultGroup);
     entityManager.deleteEntity(localDeepThought);
 
-    application.setId(remoteDeepThought.getDeepThoughtApplicationId()); // TODO: remove again, we should sync DTApplication Id
+    application.setId(remoteDeepThought.getDeepThoughtApplicationId()); // TODO: remove again, we should not sync DTApplication Id
 
     loggedOnUser.setId(remoteUser.getDatabaseId());
 
@@ -108,6 +108,8 @@ public class InitialSyncManager {
     entityManager.persistEntity(userDefaultGroup);
     entityManager.persistEntity(localDeepThought);
     entityManager.persistEntity(loggedOnUser);
+
+    entityManager.updateEntity(localDevice);
 
     entityManager.persistEntity(application); // TODO: remove again, we should not sync DTApplication Id
 //    entityManager.updateEntity(loggedOnUser.getApplication());

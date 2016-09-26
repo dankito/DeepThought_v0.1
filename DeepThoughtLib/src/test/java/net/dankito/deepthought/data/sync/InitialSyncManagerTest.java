@@ -197,6 +197,7 @@ public class InitialSyncManagerTest {
     assertDeepThoughtApplicationGotUpdatedCorrectlyInDb(deepThoughtApplication1, deepThoughtApplication2);
     assertUserGotUpdatedCorrectlyInDb(user1, user2);
     assertGroupGotUpdatedCorrectlyInDb(user1.getUsersDefaultGroup(), user2.getUsersDefaultGroup(), user2);
+    assertDeviceGotUpdatedCorrectlyInDb(localDevice1, localDevice2, user2);
     assertDeepThoughtGotUpdatedCorrectlyInDb(deepThought1, deepThought2);
   }
 
@@ -307,6 +308,18 @@ public class InitialSyncManagerTest {
 
     String userIds = (String)document.getProperty("users"); // TODO: JpaPropertyConfigurationReader doesn't return here correct column name
     Assert.assertTrue(userIds.contains(user2.getId()));
+  }
+
+  protected void assertDeviceGotUpdatedCorrectlyInDb(Device localDevice1, Device localDevice2, User user2) {
+    Assert.assertNotEquals(localDevice1.getId(), localDevice2.getId());
+
+    List<User> localDevice1Users = new ArrayList<>(localDevice1.getUsers());
+    Assert.assertEquals(1, localDevice1Users.size());
+    Assert.assertEquals(user2.getId(), localDevice1Users.get(0).getId());
+
+    List<Group> localDevice1Groups = new ArrayList<>(localDevice1.getGroups());
+    Assert.assertEquals(1, localDevice1Groups.size());
+    Assert.assertEquals(user2.getUsersDefaultGroup().getId(), localDevice1Groups.get(0).getId());
   }
 
   protected void assertDeepThoughtGotUpdatedCorrectlyInDb(DeepThought deepThought1, DeepThought deepThought2) throws SQLException {
