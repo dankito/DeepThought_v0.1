@@ -134,7 +134,7 @@ public class InitialSyncManager {
   }
 
   protected void persistConnectedDevices(IEntityManager entityManager, User loggedOnUser, UserInfo remoteUser) {
-    for(HostInfo connectedDevice : remoteUser.getConnectedDevices()) {
+    for(HostInfo connectedDevice : remoteUser.getRegisteredDevices()) {
       Device deserializedDevice = createDeviceFromHostInfo(connectedDevice);
       entityManager.persistEntity(deserializedDevice);
 

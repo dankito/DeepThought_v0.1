@@ -1,7 +1,11 @@
 package net.dankito.deepthought.communication.model;
 
+import net.dankito.deepthought.data.model.Device;
 import net.dankito.deepthought.data.model.User;
 import net.dankito.deepthought.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ganymed on 19/08/15.
@@ -17,6 +21,8 @@ public class UserInfo {
   protected String firstName = "";
 
   protected String lastName = "";
+
+  protected List<HostInfo> registeredDevices = new ArrayList<>();
 
 
   public UserInfo() {
@@ -77,9 +83,30 @@ public class UserInfo {
     return userInfo;
   }
 
+  public List<HostInfo> getRegisteredDevices() {
+    return registeredDevices;
+  }
+
+  public boolean addConnectedDevice(HostInfo connectedDevice) {
+    return registeredDevices.add(connectedDevice);
+  }
+
 
   public static UserInfo fromUser(User user) {
-    return new UserInfo(user.getId(), user.getUniversallyUniqueId(), user.getUserName(), user.getFirstName(), user.getLastName());
+    UserInfo userInfo = new UserInfo(user.getId(), user.getUniversallyUniqueId(), user.getUserName(), user.getFirstName(), user.getLastName());
+
+    addConnectedDevices(user, userInfo);
+
+    return userInfo;
+  }
+
+  protected static void addConnectedDevices(User user, UserInfo userInfo) {
+    Device localDevice = user.getApplication().getLocalDevice();
+    for(Device device : user.getDevices()) {
+      if(device.equals(localDevice) == false) {
+        userInfo.addConnectedDevice(HostInfo.fromUserAndDevice(user, device));
+      }
+    }
   }
 
 }
