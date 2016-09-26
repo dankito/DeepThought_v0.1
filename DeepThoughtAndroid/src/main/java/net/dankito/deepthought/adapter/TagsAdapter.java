@@ -146,19 +146,32 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
       tagsSearch = new TagsSearch(searchTerm, new SearchCompletedListener<TagsSearchResults>() {
         @Override
         public void completed(TagsSearchResults results) {
-          if(results.getRelevantMatchesSorted() instanceof List) {
-            searchResults = (List<Tag>)results.getRelevantMatchesSorted();
-          }
-          else {
-            searchResults = new ArrayList<>(results.getRelevantMatchesSorted()); // TODO: use lazy loading list
-          }
-
-          notifyDataSetChangedThreadSafe();
+          updateSearchResultsThreadSafe(results);
         }
       });
 
       Application.getSearchEngine().searchTags(tagsSearch);
     }
+  }
+
+  protected void updateSearchResultsThreadSafe(final TagsSearchResults results) {
+    context.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        updateSearchResults(results);
+      }
+    });
+  }
+
+  protected void updateSearchResults(TagsSearchResults results) {
+    if(results.getRelevantMatchesSorted() instanceof List) {
+      searchResults = (List<Tag>)results.getRelevantMatchesSorted();
+    }
+    else {
+      searchResults = new ArrayList<>(results.getRelevantMatchesSorted()); // TODO: use lazy loading list
+    }
+
+    notifyDataSetChanged();
   }
 
   protected boolean isTagsFilterApplied() {
@@ -172,9 +185,14 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
     else {
       Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, new SearchCompletedListener<FindAllEntriesHavingTheseTagsResult>() {
         @Override
-        public void completed(FindAllEntriesHavingTheseTagsResult results) {
-          lastFilterTagsResult = results;
-          notifyDataSetChangedThreadSafe();
+        public void completed(final FindAllEntriesHavingTheseTagsResult results) {
+          context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              lastFilterTagsResult = results;
+              notifyDataSetChanged();
+            }
+          });
         }
       });
     }
