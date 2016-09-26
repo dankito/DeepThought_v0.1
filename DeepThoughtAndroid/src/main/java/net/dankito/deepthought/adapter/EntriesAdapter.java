@@ -13,7 +13,6 @@ import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,12 +37,7 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     super(context, R.layout.list_item_entry);
 
-    if(entriesToShow instanceof List) {
-      this.entriesToShow = (List<Entry>) entriesToShow;
-    }
-    else if(entriesToShow != null) {
-      this.entriesToShow = new ArrayList<>(entriesToShow); // TODO: use a lazy loading list
-    }
+    this.entriesToShow = getListFromCollection(entriesToShow);
   }
 
   @Override
@@ -56,18 +50,26 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
     this.deepThought = deepThought;
 
-    if(deepThought != null && entriesToShow == null) {
-      if(deepThought.AllEntriesSystemTag().getEntries() instanceof List) {
-        entriesToShow = (List<Entry>) deepThought.AllEntriesSystemTag().getEntries();
-      }
-      else {
-        entriesToShow = new ArrayList<>(deepThought.AllEntriesSystemTag().getEntries()); // TODO: use a lazy loading list
-      }
-    }
-
     previewService = Application.getEntityPreviewService();
 
-    notifyDataSetChangedThreadSafe();
+    if(deepThought != null && entriesToShow == null) {
+      updateEntriesToShowThreadSafe(deepThought);
+    }
+  }
+
+  protected void updateEntriesToShowThreadSafe(final DeepThought deepThought) {
+    context.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        updateEntriesToShow(deepThought);
+      }
+    });
+  }
+
+  protected void updateEntriesToShow(DeepThought deepThought) {
+    entriesToShow = getListFromCollection(deepThought.AllEntriesSystemTag().getEntries());
+
+    notifyDataSetChanged();
   }
 
 
@@ -160,18 +162,26 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     entriesSearch = new EntriesSearch(searchTerm, true, true, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
-        if(results instanceof List) {
-          searchResults = (List<Entry>) results;
-        }
-        else {
-          searchResults = new ArrayList<>(results);
-        }
-
-        notifyDataSetChangedThreadSafe();
+        updateSearchResultsThreadSafe(results);
       }
     });
 
     Application.getSearchEngine().searchEntries(entriesSearch);
+  }
+
+  protected void updateSearchResultsThreadSafe(final Collection<Entry> results) {
+    context.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        updateSearchResults(results);
+      }
+    });
+  }
+
+  protected void updateSearchResults(Collection<Entry> results) {
+    searchResults = getListFromCollection(results);
+
+    notifyDataSetChanged();
   }
 
   @Override

@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,6 +97,16 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
 
   protected Object loadItemInBackgroundThread(int position) {
     return getItem(position);
+  }
+
+
+  protected <T> List<T> getListFromCollection(Collection<T> tagCollection) {
+    if(tagCollection instanceof List) {
+      return  (List<T>)tagCollection;
+    }
+    else {
+      return new ArrayList<T>(tagCollection); // TODO: use lazy loading list
+    }
   }
 
 
