@@ -31,4 +31,22 @@ android {
 
 dependencies {
     compile project(':DeepThoughtLib')
+
+    compile project(':AndroidCouchbaseLiteEntityManager')
+//    compile project(':AndroidOrmLiteEntityManager')
+
+    compile project(':CouchbaseLiteSyncManager')
+
+    compile project(':LuceneSearchEngine')
+    compile project(':OnlineNewspaperContentExtractor')
+
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+
+    compile 'com.github.clans:fab:1.6.3'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    compile 'org.slf4j:slf4j-android:1.7.12'
+    compile 'com.journeyapps:zxing-android-embedded:3.0.3@aar'
+    compile 'com.google.zxing:core:3.2.0'
 }
