@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Application.class)
@@ -58,6 +59,8 @@ public class InitialSyncManagerTest {
   public static final int COUNT_SERIES_TITLES_1 = 2;
   public static final int COUNT_REFERENCES_1 = 5;
   public static final int COUNT_REFERENCE_SUB_DIVISIONS_1 = 5;
+
+  public static final int COUNT_CONNECTED_DEVICES = 2;
 
 
   protected InitialSyncManager underTest;
@@ -76,6 +79,7 @@ public class InitialSyncManagerTest {
 
   protected Device localDevice1;
   protected Device localDevice2;
+  protected List<Device> connectedDevices = new ArrayList<>();
 
   protected List<Entry> localEntries = new ArrayList<>();
   protected List<Tag> localTags = new ArrayList<>();
@@ -123,6 +127,8 @@ public class InitialSyncManagerTest {
     user2.getUsersDefaultGroup().setDescription("Group description 2");
     localDevice2 = deepThoughtApplication2.getLocalDevice();
     deepThought2 = user2.getLastViewedDeepThought();
+
+    addTestConnectedDevices(deepThoughtApplication2, user2);
 
     entityManager2.persistEntity(deepThoughtApplication2);
   }
@@ -182,6 +188,8 @@ public class InitialSyncManagerTest {
     Assert.assertEquals(deepThought1.getTopLevelEntry().getId(), deepThought2.getTopLevelEntry().getId());
     Assert.assertEquals(deepThought1.getTopLevelCategory().getId(), deepThought2.getTopLevelCategory().getId());
 
+    testConnectedDevices(user1, user2);
+
     testDeepThoughtUserDataEntities(deepThought1, user2);
 
     testDeepThoughtExtensibleEnumerationEntities(deepThought1, deepThought2);
@@ -198,6 +206,7 @@ public class InitialSyncManagerTest {
     assertUserGotUpdatedCorrectlyInDb(user1, user2);
     assertGroupGotUpdatedCorrectlyInDb(user1.getUsersDefaultGroup(), user2.getUsersDefaultGroup(), user2);
     assertDeviceGotUpdatedCorrectlyInDb(localDevice1, localDevice2, user2);
+    assertConnectedDevicesGotUpdatedCorrectlyInDb(user1, user2);
     assertDeepThoughtGotUpdatedCorrectlyInDb(deepThought1, deepThought2);
   }
 
@@ -210,6 +219,16 @@ public class InitialSyncManagerTest {
     Assert.assertNotEquals(user1.getId(), user2.getId());
 
     Assert.assertNotEquals(user1.getUsersDefaultGroup().getId(), user2.getUsersDefaultGroup().getId());
+  }
+
+  protected void testConnectedDevices(User user1, User user2) {
+    Collection<String> devicesIds1 = extractIdsFromBaseEntities(new ArrayList<BaseEntity>(user1.getDevices()));
+
+    for(Device device2 : user2.getDevices()) {
+      if(device2.equals(deepThoughtApplication2.getLocalDevice()) == false) { // filter out local devices, only test connected devices
+        Assert.assertTrue(devicesIds1.contains(device2.getId()));
+      }
+    }
   }
 
   protected void testDeepThoughtUserDataEntities(DeepThought localDeepThought, User remoteUser) {
@@ -320,6 +339,18 @@ public class InitialSyncManagerTest {
     List<Group> localDevice1Groups = new ArrayList<>(localDevice1.getGroups());
     Assert.assertEquals(1, localDevice1Groups.size());
     Assert.assertEquals(user2.getUsersDefaultGroup().getId(), localDevice1Groups.get(0).getId());
+  }
+
+  protected void assertConnectedDevicesGotUpdatedCorrectlyInDb(User user1, User user2) throws SQLException {
+    Document document = entityManager1.getDatabase().getExistingDocument(user1.getId());
+    Dao dao = entityManager1.getDaoForClass(user1.getClass());
+    Collection<Object> user1DeviceIds = dao.parseJoinedEntityIdsFromJsonString((String)document.getProperty("devices"));// TODO: JpaPropertyConfigurationReader doesn't return here correct column names
+
+    for(Device device2 : user2.getDevices()) {
+      if(device2.equals(deepThoughtApplication2.getLocalDevice()) == false) { // filter out local devices, only test connected devices
+        Assert.assertTrue(user1DeviceIds.contains(device2.getId()));
+      }
+    }
   }
 
   protected void assertDeepThoughtGotUpdatedCorrectlyInDb(DeepThought deepThought1, DeepThought deepThought2) throws SQLException {
@@ -443,6 +474,18 @@ public class InitialSyncManagerTest {
     int randomIndex = random.nextInt(entities.size());
 
     return entities.get(randomIndex);
+  }
+
+
+  protected void addTestConnectedDevices(DeepThoughtApplication deepThoughtApplication, User user) {
+    for(int i = 0; i < COUNT_CONNECTED_DEVICES; i++) {
+      String indexString = "" + (i + 1);
+      Device connectedDevice = new Device(UUID.randomUUID().toString(), "Device" + indexString, "Platform" + indexString);
+
+      deepThoughtApplication.addDevice(connectedDevice);
+      user.addDevice(connectedDevice);
+      connectedDevices.add(connectedDevice);
+    }
   }
 
 }

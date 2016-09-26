@@ -105,6 +105,8 @@ public class InitialSyncManager {
     application.addGroup(userDefaultGroup);
     application.addUser(loggedOnUser);
 
+    persistConnectedDevices(entityManager, loggedOnUser, remoteUser);
+
     entityManager.persistEntity(userDefaultGroup);
     entityManager.persistEntity(localDeepThought);
     entityManager.persistEntity(loggedOnUser);
@@ -129,6 +131,25 @@ public class InitialSyncManager {
     updateAllUserDataEntities(loggedOnUser, entityManager);
 
     Application.notifyUser(new Notification(NotificationType.InitialDatabaseSynchronizationDone));
+  }
+
+  protected void persistConnectedDevices(IEntityManager entityManager, User loggedOnUser, UserInfo remoteUser) {
+    for(HostInfo connectedDevice : remoteUser.getConnectedDevices()) {
+      Device deserializedDevice = createDeviceFromHostInfo(connectedDevice);
+      entityManager.persistEntity(deserializedDevice);
+
+      loggedOnUser.addDevice(deserializedDevice);
+    }
+  }
+
+  protected Device createDeviceFromHostInfo(HostInfo hostInfo) {
+    Device device = new Device(hostInfo.getDeviceUniqueId(), hostInfo.getDeviceName(), hostInfo.getPlatform(), hostInfo.getOsVersion(), hostInfo.getPlatformArchitecture());
+
+    device.setId(hostInfo.getDeviceDatabaseId());
+    device.setDescription(hostInfo.getDeviceDescription());
+    device.setCountSynchronizingDevices(hostInfo.getCountSynchronizingDevice());
+
+    return device;
   }
 
   protected void updateExtensibleEnumerations(DeepThought localDeepThought, DeepThoughtInfo remoteDeepThought, IEntityManager entityManager) {
