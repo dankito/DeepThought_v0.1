@@ -302,7 +302,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   }
 
   protected void setFloatingActionButtonAddNewspaperArticleVisibility() {
-    if(Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview() == false) {
+    if(Application.getContentExtractorManager() != null && Application.getContentExtractorManager().hasOnlineArticleContentExtractorsWithArticleOverview() == false) {
       floatingActionButtonAddNewspaperArticle.setVisibility(View.GONE);
     }
     else if(floatingActionMenu.isOpened()) {
