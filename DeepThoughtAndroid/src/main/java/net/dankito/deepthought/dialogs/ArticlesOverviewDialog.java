@@ -89,7 +89,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
       return lastShownViewEntryDialog.onOptionsItemSelected(item);
     }
     else if(id == R.id.mnitmActionUpdateArticlesOverview) {
-      articlesOverviewAdapter.retrieveArticles();
+      articlesOverviewAdapter.retrieveArticlesOnUiThread();
       return true;
     }
 

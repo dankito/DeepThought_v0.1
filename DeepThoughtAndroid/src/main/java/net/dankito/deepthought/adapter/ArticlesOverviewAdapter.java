@@ -36,23 +36,27 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     this.context = context;
     this.extractorWithArticleOverview = extractorWithArticleOverview;
 
-    retrieveArticles();
+    retrieveArticlesOnUiThread();
   }
 
-  public void retrieveArticles() {
+  public void retrieveArticlesOnUiThread() {
     articlesOverviewItems.clear();
-    notifyDataSetChangedThreadSafe();
+    notifyDataSetChanged();
 
     extractorWithArticleOverview.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
       public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final Collection<ArticlesOverviewItem> items, boolean isDone) {
-        context.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            articlesOverviewItems.addAll(items);
-            notifyDataSetChanged();
-          }
-        });
+        updateArticlesOverviewItemsThreadSafe(items);
+      }
+    });
+  }
+
+  protected void updateArticlesOverviewItemsThreadSafe(final Collection<ArticlesOverviewItem> items) {
+    context.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        articlesOverviewItems.addAll(items);
+        notifyDataSetChanged();
       }
     });
   }
@@ -129,16 +133,6 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     }
 
     return convertView;
-  }
-
-
-  protected void notifyDataSetChangedThreadSafe() {
-    context.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        notifyDataSetChanged();
-      }
-    });
   }
 
 }
