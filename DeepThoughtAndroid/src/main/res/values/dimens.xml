@@ -18,7 +18,7 @@
 
     <dimen name="list_item_entry_tag_height">40dp</dimen>
 
-    <dimen name="view_entry_labels_text_size">13sp</dimen>
+    <dimen name="view_entry_labels_text_size">14sp</dimen>
     <dimen name="view_entry_dialog_icon_width">16dp</dimen>
 
     <dimen name="edit_entry_search_tags_height">44dp</dimen>

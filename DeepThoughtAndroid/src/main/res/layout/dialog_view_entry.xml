@@ -49,7 +49,7 @@
             android:layout_toRightOf="@+id/txtvwViewEntryAbstractLabel"
             android:gravity="center_vertical"
             android:singleLine="false"
-            android:maxLines="3"
+            android:maxLines="4"
             android:ellipsize="end"
             android:textSize="@dimen/view_entry_labels_text_size"
             />

@@ -120,7 +120,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
     WebSettings settings = wbvwViewEntryContent.getSettings();
     settings.setDefaultTextEncodingName("utf-8"); // otherwise non ASCII text doesn't get displayed correctly
-    settings.setDefaultFontSize(12); // default font is way to large
+    settings.setDefaultFontSize(11); // default font is way to large
     settings.setJavaScriptEnabled(true); // so that embedded videos etc. work
 
     wbvwViewEntryContent.setWebViewClient(webViewClient);
