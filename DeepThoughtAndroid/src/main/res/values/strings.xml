@@ -11,6 +11,7 @@
     <string name="search_hint_tags">Search Tags</string>
 
     <string name="title_section_entries">Entries</string>
+    <string name="title_section_abstract">Abstract</string>
     <string name="title_section_tags">Tags</string>
 
     <string name="floating_action_menu_add_entry">Entry</string>

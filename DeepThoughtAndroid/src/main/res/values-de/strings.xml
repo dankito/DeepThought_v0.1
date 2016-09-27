@@ -12,6 +12,7 @@
     <string name="search_hint_tags">Schlagworte suchen</string>
 
     <string name="title_section_entries">Einträge</string>
+    <string name="title_section_abstract">Zusammenfassung</string>
     <string name="title_section_tags">Schlagworte</string>
 
     <string name="floating_action_menu_add_entry">Eintrag</string>
