@@ -10,7 +10,6 @@ import android.widget.TextView;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
-import net.dankito.deepthought.util.localization.Localization;
 
 /**
  * Created by ganymed on 12/09/16.
@@ -127,14 +126,13 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   }
 
   protected String getNameForSection(EditEntrySection section) {
-    // TODO: may load via values/strings.xml as sometimes Strings.properties cannot be loaded
     switch(section) {
       case Abstract:
-        return Localization.getLocalizedString("abstract");
+        return context.getString(R.string.edit_entry_section_abstract);
       case Content:
-        return Localization.getLocalizedString("content");
+        return context.getString(R.string.edit_entry_section_content);
       case Tags:
-        return Localization.getLocalizedString("tags");
+        return context.getString(R.string.edit_entry_section_tags);
     }
 
     return "";

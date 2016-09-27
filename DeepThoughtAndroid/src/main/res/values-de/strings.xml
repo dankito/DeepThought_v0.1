@@ -12,7 +12,6 @@
     <string name="search_hint_tags">Schlagworte suchen</string>
 
     <string name="title_section_entries">Einträge</string>
-    <string name="title_section_abstract">Zusammenfassung</string>
     <string name="title_section_tags">Schlagworte</string>
 
     <string name="floating_action_menu_add_entry">Eintrag</string>
@@ -57,6 +56,9 @@
     <string name="edit_entry_toggle_tags">Tauschen</string>
     <string name="edit_entry_content_label">Eintrag</string>
     <string name="edit_entry_button_cancel_text">Abbrechen</string>
+    <string name="edit_entry_section_abstract">Zusammenfassung</string>
+    <string name="edit_entry_section_content">Inhalt</string>
+    <string name="edit_entry_section_tags">Schlagworte</string>
 
     <string name="alert_dialog_entry_has_unsaved_changes_text">Eintrag beinhaltet nicht gespeicherte Änderungen. Möchten Sie sie speichern?</string>
 
