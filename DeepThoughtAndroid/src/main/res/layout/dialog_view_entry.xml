@@ -28,25 +28,13 @@
             />
 
         <TextView
-            android:id="@+id/txtvwViewEntryAbstractLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/imgvwViewEntryAbstractIcon"
-            android:layout_alignBottom="@+id/txtvwViewEntryAbstractPreview"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:textSize="@dimen/view_entry_labels_text_size"
-            android:text="@string/view_entry_abstract_label"
-            />
-
-        <TextView
             android:id="@+id/txtvwViewEntryAbstractPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@+id/txtvwViewEntryAbstractLabel"
+            android:layout_toRightOf="@+id/imgvwViewEntryAbstractIcon"
+            android:layout_marginLeft="4dp"
             android:gravity="center_vertical"
             android:singleLine="false"
             android:maxLines="4"

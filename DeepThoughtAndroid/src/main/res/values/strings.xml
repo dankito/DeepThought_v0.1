@@ -45,7 +45,7 @@
     <string name="list_item_entry_context_menu_edit_title">Edit</string>
     <string name="list_item_entry_context_menu_delete_title">Delete</string>
 
-    <string name="view_entry_abstract_label">Abstract</string>
+    <string name="view_entry_abstract_preview">Abstract: %s</string>
     <string name="view_entry_tags_label">Tags:</string>
 
     <string name="edit_entry_action_bar_title_new_entry">Create new Entry</string>

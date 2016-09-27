@@ -46,7 +46,7 @@
     <string name="list_item_entry_context_menu_edit_title">Bearbeiten</string>
     <string name="list_item_entry_context_menu_delete_title">Löschen</string>
 
-    <string name="view_entry_abstract_label">Zusammenfassung</string>
+    <string name="view_entry_abstract_preview">Zusammenfassung: %s</string>
     <string name="view_entry_tags_label">Schlagworte:</string>
 
     <string name="edit_entry_action_bar_title_new_entry">Neuen Eintrag erstellen</string>
