@@ -47,6 +47,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected Entry entry = null;
   protected EntryCreationResult entryCreationResult = null;
+  protected boolean showSaveAction = false;
 
   protected boolean isShowingEditEntryDialog = false;
   protected EditEntryDialog editEntryDialog = null;
@@ -74,6 +75,7 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
     this.entryCreationResult = entryCreationResult;
+    this.showSaveAction = entryCreationResult != null;
   }
 
 
@@ -176,10 +178,23 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   @Override
   public void onPrepareOptionsMenu(Menu menu) {
-    mnitmActionSaveEntry.setVisible(entryCreationResult != null);
-    mnitmActionSaveEntry.setShowAsAction(entryCreationResult != null ? MenuItem.SHOW_AS_ACTION_ALWAYS : MenuItem.SHOW_AS_ACTION_NEVER);
-    
     super.onPrepareOptionsMenu(menu);
+
+    mnitmActionSaveEntry = menu.findItem(R.id.mnitmActionSaveEntry);
+
+    setMenuItemActionSaveEntryVisibility(mnitmActionSaveEntry);
+  }
+
+  protected void setMenuItemActionSaveEntryVisibility() {
+    setMenuItemActionSaveEntryVisibility(mnitmActionSaveEntry);
+  }
+
+  protected void setMenuItemActionSaveEntryVisibility(MenuItem mnitmActionSaveEntry) {
+    try {
+      mnitmActionSaveEntry.setVisible(showSaveAction);
+    } catch(Exception e) {
+      log.error("Could not set mnitmActionSaveEntry's visibility to " + showSaveAction, e);
+    }
   }
 
   @Override
@@ -250,8 +265,10 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected void entryCreationResultHasNowBeenSaved() {
     entryCreationResult = null;
+    showSaveAction = false;
 
-    mnitmActionSaveEntry.setVisible(false);
+    setMenuItemActionSaveEntryVisibility();
+
     if(activity != null) {
       activity.invalidateOptionsMenu();
     }
