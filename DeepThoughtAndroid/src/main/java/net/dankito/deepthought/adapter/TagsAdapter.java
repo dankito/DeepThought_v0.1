@@ -175,7 +175,7 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
   }
 
   protected boolean isTagsFilterApplied() {
-    return tagsFilter.size() > 0;
+    return tagsFilter != null && tagsFilter.size() > 0;
   }
 
   protected void filterTags() {
