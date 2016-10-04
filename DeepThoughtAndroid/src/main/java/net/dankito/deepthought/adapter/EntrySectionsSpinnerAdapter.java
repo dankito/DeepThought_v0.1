@@ -115,11 +115,11 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
   protected int getIconForSection(EditEntrySection section) {
     switch(section) {
       case Abstract:
-        return R.drawable.ic_abstract_white;
+        return R.drawable.ic_abstract_black;
       case Content:
-        return R.drawable.ic_content_white;
+        return R.drawable.ic_content_black;
       case Tags:
-        return R.drawable.ic_tag_white;
+        return R.drawable.ic_tag_black;
     }
 
     return 0;
