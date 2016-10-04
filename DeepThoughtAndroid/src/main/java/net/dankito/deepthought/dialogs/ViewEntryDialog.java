@@ -351,7 +351,8 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setAbstractPreview(String abstractPlainText) {
-    txtvwViewEntryAbstractPreview.setText(abstractPlainText);
+    String abstractPreview = getString(R.string.view_entry_abstract_preview, abstractPlainText);
+    txtvwViewEntryAbstractPreview.setText(abstractPreview);
   }
 
   protected void setContentHtmlThreadSafe(final String contentHtml) {
