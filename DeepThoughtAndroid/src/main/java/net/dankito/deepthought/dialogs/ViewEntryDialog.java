@@ -191,7 +191,9 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   protected void setMenuItemActionSaveEntryVisibility(MenuItem mnitmActionSaveEntry) {
     try {
-      mnitmActionSaveEntry.setVisible(showSaveAction);
+      if(mnitmActionSaveEntry != null) {
+        mnitmActionSaveEntry.setVisible(showSaveAction);
+      }
     } catch(Exception e) {
       log.error("Could not set mnitmActionSaveEntry's visibility to " + showSaveAction, e);
     }
