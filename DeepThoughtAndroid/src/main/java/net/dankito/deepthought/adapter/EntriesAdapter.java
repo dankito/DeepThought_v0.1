@@ -38,7 +38,12 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     super(context, R.layout.list_item_entry);
 
-    this.entriesToShow = getListFromCollection(entriesToShow);
+    if(entriesToShow != null) {
+      this.entriesToShow = getListFromCollection(entriesToShow);
+    }
+    else if(Application.getDeepThought() != null) {
+      deepThoughtChanged(Application.getDeepThought());
+    }
   }
 
   @Override
