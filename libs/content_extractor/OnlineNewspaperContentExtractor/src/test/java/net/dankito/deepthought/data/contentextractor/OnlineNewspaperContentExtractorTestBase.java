@@ -1,9 +1,7 @@
 package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.data.contentextractor.*;
 import net.dankito.deepthought.TestApplicationConfiguration;
-import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.util.StringUtils;
@@ -51,16 +49,6 @@ public abstract class OnlineNewspaperContentExtractorTestBase {
         periodicalTag = tag;
     }
     Assert.assertNotNull(periodicalTag);
-
-    Assert.assertTrue(result.getCategories().size() > 0);
-    Category periodicalCategory = null;
-    String newspaperName = contentExtractor.getNewspaperName().toLowerCase();
-    for(Category category : result.getCategories()) {
-      String categoryName = category.getName().toLowerCase();
-      if(categoryName.contains(newspaperName) || newspaperName.contains(categoryName)) // 'jetzt' Category Name is only contained in Newspaper Name 'SZ Jetzt'
-        periodicalCategory = category;
-    }
-    Assert.assertNotNull(periodicalCategory);
 
     Assert.assertNotNull(result.getSeriesTitle());
     Assert.assertEquals(contentExtractor.getNewspaperName(), result.getSeriesTitle().getTitle());
