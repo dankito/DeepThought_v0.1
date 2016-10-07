@@ -107,8 +107,10 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
+      boolean hasDeepThoughtPreviouslyBeenSetup = true;
       if(hasDeepThoughtBeenSetup == false) {
         hasDeepThoughtBeenSetup = true;
+        hasDeepThoughtPreviouslyBeenSetup = false;
 
         setupDeepThought();
       }
@@ -116,6 +118,10 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       setupUi();
 
       handleIntent(getIntent());
+
+      if(hasDeepThoughtPreviouslyBeenSetup) {
+        adjustControlsStateForPreviouslyInitializedDeepThought();
+      }
     }
 
   protected void setupDeepThought() {
@@ -171,11 +177,9 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       }
 //      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
 
-      // TODO: remove again, sample code only
       if(notification.getParameter() instanceof IOnlineArticleContentExtractor) {
         IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
-        if("heise.de".equals(contentExtractor.getSiteBaseUrl()) ||
-            ("sueddeutsche.de".equals(contentExtractor.getSiteBaseUrl().toLowerCase()) && notification.getNotificationMessage().contains("Magazin") == false)) {
+        if(isFavoriteContentExtractor(contentExtractor)) {
           addFavoriteContentExtractorFloatingActionButton(contentExtractor);
         }
       }
@@ -185,6 +189,12 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
     }
+  }
+
+  // TODO: implement logic to set favorite content extractors. This is only demo code
+  protected boolean isFavoriteContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
+    return "heise.de".equals(contentExtractor.getSiteBaseUrl()) ||
+        ("sueddeutsche.de".equals(contentExtractor.getSiteBaseUrl().toLowerCase()));
   }
 
   protected void addFavoriteContentExtractorFloatingActionButton(final IOnlineArticleContentExtractor contentExtractor) {
@@ -320,6 +330,18 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   public void hideFloatingActionMenu() {
 //    floatingActionMenu.setVisibility(View.INVISIBLE);
     floatingActionMenu.setAlpha(0.25f);
+  }
+
+  protected void adjustControlsStateForPreviouslyInitializedDeepThought() {
+    if(Application.getContentExtractorManager() != null) {
+      for(IOnlineArticleContentExtractor contentExtractor : Application.getContentExtractorManager().getOnlineArticleContentExtractors()) {
+        if(isFavoriteContentExtractor(contentExtractor)) {
+          addFavoriteContentExtractorFloatingActionButton(contentExtractor);
+        }
+      }
+    }
+
+    setFloatingActionButtonAddNewspaperArticleVisibility();
   }
 
 
