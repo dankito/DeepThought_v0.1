@@ -5,9 +5,12 @@ import net.dankito.deepthought.application.NoOperationApplicationLifeCycleServic
 import net.dankito.deepthought.clipboard.IClipboardHelper;
 import net.dankito.deepthought.clipboard.NoOpClipboardHelper;
 import net.dankito.deepthought.communication.DeepThoughtConnector;
+import net.dankito.deepthought.communication.ICommunicationConfigurationManager;
 import net.dankito.deepthought.communication.IDeepThoughtConnector;
 import net.dankito.deepthought.communication.IDevicesFinder;
 import net.dankito.deepthought.communication.UdpDevicesFinder;
+import net.dankito.deepthought.communication.connected_device.IConnectedRegisteredDevicesListenerManager;
+import net.dankito.deepthought.communication.connected_device.IDevicesFinderListenerManager;
 import net.dankito.deepthought.controls.html.IHtmlEditorPool;
 import net.dankito.deepthought.data.DefaultDataManager;
 import net.dankito.deepthought.data.IDataManager;
@@ -29,6 +32,8 @@ import net.dankito.deepthought.data.search.EntitiesSearcherAndCreator;
 import net.dankito.deepthought.data.search.IEntitiesSearcherAndCreator;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.InMemorySearchEngine;
+import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
+import net.dankito.deepthought.data.sync.NoOpSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
 import net.dankito.deepthought.platform.IPlatformTools;
 import net.dankito.deepthought.plugin.DefaultPluginManager;
@@ -169,6 +174,11 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   @Override
   public IDeepThoughtConnector createDeepThoughtConnector(IDevicesFinder devicesFinder, IThreadPool threadPool) {
     return new DeepThoughtConnector(devicesFinder, threadPool);
+  }
+
+  @Override
+  public IDeepThoughtSyncManager createSyncManager(IEntityManager entityManager, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager, IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager, IThreadPool threadPool) {
+    return new NoOpSyncManager();
   }
 
   @Override
