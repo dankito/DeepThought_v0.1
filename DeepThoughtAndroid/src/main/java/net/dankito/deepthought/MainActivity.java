@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
@@ -60,6 +61,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class MainActivity extends DialogParentActivity implements TabLayout.OnTabSelectedListener {
@@ -106,6 +109,8 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   @Override
     protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
+
+      Fabric.with(this, new Crashlytics());
 
       boolean hasDeepThoughtPreviouslyBeenSetup = true;
       if(hasDeepThoughtBeenSetup == false) {
