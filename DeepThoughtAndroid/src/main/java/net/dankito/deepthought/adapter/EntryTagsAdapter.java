@@ -216,12 +216,14 @@ public class EntryTagsAdapter extends AsyncLoadingEntityAdapter {
   protected TagsSearchResultListener searchResultListener = new TagsSearchResultListener() {
     @Override
     public void completed(final List<Tag> searchResult) {
-      context.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          searchingTagsDone(searchResult);
-        }
-      });
+      if(context != null) {
+        context.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            searchingTagsDone(searchResult);
+          }
+        });
+      }
     }
   };
 
