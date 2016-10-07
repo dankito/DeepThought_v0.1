@@ -13,6 +13,7 @@ import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,18 +43,22 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
   @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
-    if(this.deepThought != null) {
-      if(entriesToShow == this.deepThought.AllEntriesSystemTag().getEntries()) {
-        entriesToShow = null;
-      }
-    }
-
     this.deepThought = deepThought;
 
     previewService = Application.getEntityPreviewService();
 
-    if(deepThought != null && entriesToShow == null) {
+    if(deepThought != null) {
       updateEntriesToShowThreadSafe(deepThought);
+    }
+    else {
+      context.runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          entriesToShow = new ArrayList<Entry>(); // or set to null?
+          searchResults = null;
+          notifyDataSetChanged();
+        }
+      });
     }
   }
 
