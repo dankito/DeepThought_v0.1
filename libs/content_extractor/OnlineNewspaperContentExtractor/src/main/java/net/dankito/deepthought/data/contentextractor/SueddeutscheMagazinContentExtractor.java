@@ -43,7 +43,7 @@ public class SueddeutscheMagazinContentExtractor extends SueddeutscheContentExtr
 
   @Override
   public String getSiteBaseUrl() {
-    return "Sueddeutsche.de";
+    return "sz-magazin.sueddeutsche.de";
   }
 
   @Override
