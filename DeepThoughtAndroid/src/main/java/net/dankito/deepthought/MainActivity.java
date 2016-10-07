@@ -108,10 +108,9 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       super.onCreate(savedInstanceState);
 
       if(hasDeepThoughtBeenSetup == false) {
-        setupDeepThought();
-
-//        ActivityManager.createInstance();
         hasDeepThoughtBeenSetup = true;
+
+        setupDeepThought();
       }
 
       setupUi();
