@@ -581,14 +581,14 @@ public class EditEntryDialog extends FullscreenDialog {
       entryCreationResult = null;
     }
 
-    if(entry.isPersisted() == false) { // a new Entry
-      Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
-    }
-
     // TODO: why setting Tags here and not above before saving?
     if(editedFields.contains(FieldWithUnsavedChanges.EntryTags)) {
       entry.setTags(entryEditedTags);
       notifyEditEntryListener(entry, FieldWithUnsavedChanges.EntryTags, entryEditedTags);
+    }
+
+    if(entry.isPersisted() == false) { // a new Entry
+      Application.getDeepThought().addEntry(entry); // otherwise entry.id would be null when adding to Tags below
     }
 
     unsetEntryHasBeenEdited();
