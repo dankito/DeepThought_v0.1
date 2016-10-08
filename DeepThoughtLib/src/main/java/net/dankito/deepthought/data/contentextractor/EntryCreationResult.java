@@ -191,7 +191,6 @@ public class EntryCreationResult {
 
   public void saveCreatedEntities() {
     DeepThought deepThought = Application.getDeepThought();
-    deepThought.addEntry(createdEntry);
 
     for(Tag tag : entryTags) {
       if(tag.isPersisted() == false)
@@ -229,6 +228,8 @@ public class EntryCreationResult {
     createdEntry.setContent(handleEmbeddedImages(contentEmbeddedImages, createdEntry, createdEntry.getContent()));
 
     saveReferenceBases(deepThought);
+
+    deepThought.addEntry(createdEntry);
   }
 
   protected void saveReferenceBases(DeepThought deepThought) {
