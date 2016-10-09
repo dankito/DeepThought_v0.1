@@ -171,7 +171,7 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
 
     return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
         localHost.getDeviceUniqueId().equals(remoteHost.getDeviceUniqueId()) &&
-        localHost.getAddress().equals(remoteHost.getAddress());
+        localHost.getMessagesPort() == remoteHost.getMessagesPort();
   }
 
 
