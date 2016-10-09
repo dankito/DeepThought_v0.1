@@ -93,7 +93,11 @@ public class NetworkHelper {
 
     try {
       List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-      for (NetworkInterface anInterface : interfaces) {
+      for(NetworkInterface anInterface : interfaces) {
+        if(anInterface.isLoopback() || anInterface.isUp() == false) {
+          continue;
+        }
+
         List<InetAddress> interfaceAddresses = Collections.list(anInterface.getInetAddresses());
 
         for(InetAddress address : interfaceAddresses) {
@@ -104,7 +108,7 @@ public class NetworkHelper {
           }
         }
       }
-    } catch (Exception ex) { } // for now eat exceptions
+    } catch (Exception ignored) { } // for now eat exceptions
 
     return addresses;
   }
