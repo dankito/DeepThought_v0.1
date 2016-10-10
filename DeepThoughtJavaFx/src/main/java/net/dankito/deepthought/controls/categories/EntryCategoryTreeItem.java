@@ -46,8 +46,11 @@ public class EntryCategoryTreeItem extends TreeItem<Category> implements ICleanU
   }
 
   protected void addSubCategoriesTreeItems(Category category) {
-    for(Category subCategory : category.getSubCategories())
-      addSubCategoryItem(subCategory);
+    for(Category subCategory : category.getSubCategories()) {
+      if(subCategory != null) {
+        addSubCategoryItem(subCategory);
+      }
+    }
   }
 
   protected void addSubCategoryItem(Category subCategory) {

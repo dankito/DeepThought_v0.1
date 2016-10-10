@@ -1,6 +1,5 @@
 package net.dankito.deepthought.communication;
 
-import org.apache.http.conn.util.InetAddressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,24 +65,10 @@ public class NetworkHelper {
    * @return  address or empty string
    */
   public static InetAddress getIPAddress(boolean useIPv4) {
-    try {
-      List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-      for (NetworkInterface anInterface : interfaces) {
-        List<InetAddress> addresses = Collections.list(anInterface.getInetAddresses());
-
-        for (InetAddress address : addresses) {
-          if (!address.isLoopbackAddress()) {
-            String sAddr = address.getHostAddress().toUpperCase();
-            boolean isIPv4 = InetAddressUtils.isIPv4Address(sAddr);
-
-            if (useIPv4 && isIPv4)
-              return address;
-            else if (useIPv4 == false && isIPv4 == false)
-              return address;
-          }
-        }
-      }
-    } catch (Exception ex) { } // for now eat exceptions
+    List<InetAddress> addresses = getIPAddresses(useIPv4);
+    if(addresses.size() > 0) {
+      return addresses.get(0);
+    }
 
     return null;
   }

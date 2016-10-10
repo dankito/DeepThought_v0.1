@@ -170,7 +170,7 @@ public class EntryReferenceBaseLabel extends net.dankito.deepthought.controls.Co
     copyReferenceTextMenuItem.setOnAction(event -> Application.getClipboardHelper().copyStringToClipboard(getItemDisplayName()));
     contextMenu.getItems().add(copyReferenceTextMenuItem);
 
-    final String referenceUrl = getReferenceUrl();
+    final String referenceUrl = getReferenceUrl(); // TODO: probably wrong as Reference Url may gets set later after creating this ContextMenu
     if(referenceUrl != null) {
       MenuItem copyReferenceUrlMenuItem = new MenuItem(Localization.getLocalizedString("copy.reference.url.to.clipboard"));
       copyReferenceUrlMenuItem.setOnAction(event -> Application.getClipboardHelper().copyUrlToClipboard(referenceUrl));

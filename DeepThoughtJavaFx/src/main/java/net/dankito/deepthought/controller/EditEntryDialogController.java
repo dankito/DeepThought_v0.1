@@ -343,12 +343,12 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
   }
 
   protected void saveEditedFieldsOnEntry() {
-    if(hasAbstractChanged()) {
+    if(creationResult == null && hasAbstractChanged()) {
       entry.setAbstract(abstractListener.handleEditedEmbeddedFiles(entry.getAbstract(), htmledAbstract.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryAbstract);
     }
 
-    if(hasContentChanged()) {
+    if(creationResult == null && hasContentChanged()) {
       entry.setContent(contentListener.handleEditedEmbeddedFiles(entry.getContent(), htmledContent.getHtml()));
       fieldsWithUnsavedChanges.remove(FieldWithUnsavedChanges.EntryContent);
     }
@@ -437,6 +437,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
     btnApplyChanges.setDisable(true);
+
+    htmledAbstract.getHtmlEditor().setHtmlHasBeenSaved();
+    htmledContent.getHtmlEditor().setHtmlHasBeenSaved();
   }
 
   protected boolean hasAbstractChanged() {
