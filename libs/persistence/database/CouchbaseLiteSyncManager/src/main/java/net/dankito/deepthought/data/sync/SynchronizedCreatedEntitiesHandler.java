@@ -115,15 +115,12 @@ public class SynchronizedCreatedEntitiesHandler {
     if(synchronizedEntities.contains(entityId)) {
       return false;
     }
-    if(isRevisionIdHighEnoughForAddingEntity(change, entityType) == false) {
-      return false;
-    }
 
     synchronizedEntities.add(entityId);
 
     try {
       String entityIds = currentEntityIds.get(entityType);
-      if(entityIds != null && entityIds.contains(entityId) == false) {
+      if(entityIds != null && entityIds.contains(entityId) == false) { // check if Entity has been stored but just not loaded yet from DB
         BaseEntity entity = entityManager.getEntityById(entityType, entityId);
 
         if(addEntityToDeepThought(entity, entityType, entityId)) {
@@ -133,31 +130,6 @@ public class SynchronizedCreatedEntitiesHandler {
       }
     } catch(Exception e) {
       log.error("Could not handle changes as newly created entity", e);
-    }
-
-    return false;
-  }
-
-  protected boolean isRevisionIdHighEnoughForAddingEntity(DocumentChange change, Class entityType) {
-    // TODO: this is part of the same code in Dao.getDocumentVersion()
-    String revisionId = change.getRevisionId();
-    String versionString = revisionId.substring(0, revisionId.indexOf('-')); // Version and Revision UUID are separated by a '-'
-    Long version = Long.parseLong(versionString);
-
-    if(Entry.class.equals(entityType) || SeriesTitle.class.equals(entityType) || Reference.class.equals(entityType) || ReferenceSubDivision.class.equals(entityType)) {
-      if(version >= 3) { // it takes at least until version 3 till Tags are set
-        return true;
-      }
-    }
-    else if(Tag.class.equals(entityType)) {
-      if(version >= 2) {
-        return true;
-      }
-    }
-    else { // TODO: is this really true for all Entities?
-      if(version >= 2) {
-        return true;
-      }
     }
 
     return false;
