@@ -3,6 +3,7 @@ package net.dankito.deepthought;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.view.View;
 import com.crashlytics.android.Crashlytics;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.testfairy.TestFairy;
 
 import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.activities.DialogParentActivity;
@@ -53,6 +55,7 @@ import net.dankito.deepthought.listener.EntityEditedListener;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
+import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
@@ -61,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -110,7 +114,7 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
 
-      Fabric.with(this, new Crashlytics());
+      initializeCrashReporter();
 
       boolean hasDeepThoughtPreviouslyBeenSetup = true;
       if(hasDeepThoughtBeenSetup == false) {
@@ -128,6 +132,25 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
         adjustControlsStateForPreviouslyInitializedDeepThought();
       }
     }
+
+  protected void initializeCrashReporter() {
+    initializeTestFairy();
+
+    Fabric.with(this, new Crashlytics());
+  }
+
+  protected void initializeTestFairy() {
+    try {
+      Resources resources = this.getResources();
+      Properties testFairyProperties = new Properties();
+      testFairyProperties.load(resources.openRawResource(R.raw.testfairy));
+      String appToken = testFairyProperties.getProperty("app.token");
+
+      if(StringUtils.isNotNullOrEmpty(appToken)) {
+        TestFairy.begin(this, appToken);
+      }
+    } catch(Exception e) { log.error("Could not start TestFairy", e); }
+  }
 
   protected void setupDeepThought() {
     // TODO: unregister listeners again to avoid memory leaks

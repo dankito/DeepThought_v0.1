@@ -99,6 +99,8 @@ repositories {
 dependencies {
     compile project(':DeepThoughtAndroidLib')
 
+    compile 'testfairy:testfairy-android-sdk:1.+@aar'
+
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
