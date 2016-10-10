@@ -10,7 +10,11 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
-    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- for TestFairy -->
+    <uses-permission android:name="android.permission.READ_LOGS" android:required="false" />
+    <uses-permission android:name="android.permission.BATTERY_STATS" android:required="false" />
 
 
     <application
