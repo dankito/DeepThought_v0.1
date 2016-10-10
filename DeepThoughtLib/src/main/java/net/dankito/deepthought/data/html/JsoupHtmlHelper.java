@@ -178,7 +178,6 @@ public class JsoupHtmlHelper implements IHtmlHelper {
     // there is a bug in JSoup: calling imgElement.outerHtml() returns not real Element's Html. In this case <img> element ends with ' />', but outerHtml() returns '>'
     String outerHtml = imgElement.outerHtml();
     int startIndex = html.indexOf(outerHtml.substring(0, outerHtml.length() - 4));
-    String debug = outerHtml.substring(0, outerHtml.length() - 4);
 
     // TODO: sometimes the substring for startIndex cannot be found (even on - in my eyes - two identical <img> elements) -> find reason
     if(startIndex >= 0) {
