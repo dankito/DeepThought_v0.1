@@ -163,7 +163,7 @@ public class DeepThoughtConnector implements IDeepThoughtConnector {
 
   protected boolean isPortAlreadyInUseException(Exception exception) {
     return (exception instanceof BindException || exception instanceof SocketException) && (
-        "Address already in use".equals(exception.getMessage()) || "Socket is closed".equals(exception.getMessage()));
+        exception.getMessage().contains("Address already in use") || exception.getMessage().contains("Socket is closed"));
   }
 
   protected void stopMessagesReceiver() {
