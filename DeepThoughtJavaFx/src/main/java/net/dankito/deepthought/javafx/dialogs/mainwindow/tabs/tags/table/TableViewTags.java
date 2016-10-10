@@ -1,7 +1,9 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.Tag;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -18,6 +20,8 @@ import javafx.scene.input.KeyCode;
  * Created by ganymed on 03/01/16.
  */
 public class TableViewTags extends TableView<Tag> {
+
+  private static final Logger log = LoggerFactory.getLogger(TableViewTags.class);
 
 
   protected TableColumn<Tag, String> clmnTagName;
@@ -118,17 +122,12 @@ public class TableViewTags extends TableView<Tag> {
     if(tag == null) {
       getSelectionModel().clearSelection();
     }
-    else if(Application.getDeepThought() != null) {
-      // i don't know what happened, but after a Java update getSelectionModel().select(0) throws an Exception
-//      if(tag == Application.getDeepThought().AllEntriesSystemTag()) {
-//        getSelectionModel().select(0);
-//      }
-//      else if(tag == Application.getDeepThought().EntriesWithoutTagsSystemTag()) {
-//        getSelectionModel().select(1);
-//      }
-//      else {
+    else {
+      try {
         getSelectionModel().select(tag);
-//      }
+      } catch(Exception e) {
+        log.warn("Could not select Tag " + tag, e);
+      }
     }
   }
 
