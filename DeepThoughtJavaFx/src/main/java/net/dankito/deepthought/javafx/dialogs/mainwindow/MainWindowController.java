@@ -88,6 +88,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -448,6 +449,8 @@ public class MainWindowController implements Initializable {
 
   protected void setupMainMenu() {
     mnitmToolsLanguage.setOnShowing(event -> handleMenuToolsLanguageShowing(event));
+
+    chkmnitmViewShowQuickEditEntryPane.setAccelerator(new KeyCodeCombination(KeyCode.F4));
 
     ImageView newspaperIcon = new ImageView(Constants.NewspaperIconPath);
     newspaperIcon.setPreserveRatio(true);
