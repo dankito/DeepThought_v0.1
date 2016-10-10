@@ -276,7 +276,7 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected void handleSynchronizedChanges(List<DocumentChange> changes) {
     for(DocumentChange change : changes) {
-      dataMerger.synchronizedChange(change);
+      dataMerger.synchronizeChange(change);
     }
   }
 

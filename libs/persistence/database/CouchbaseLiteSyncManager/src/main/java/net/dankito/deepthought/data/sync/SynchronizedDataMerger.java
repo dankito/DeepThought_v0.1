@@ -55,7 +55,7 @@ public class SynchronizedDataMerger {
   }
 
 
-  public BaseEntity synchronizedChange(DocumentChange change) {
+  public BaseEntity synchronizeChange(DocumentChange change) {
       log.info("isCurrentRevision() = " + change.isCurrentRevision());
 //      if(change.isCurrentRevision()) {
     String entityTypeString = (String)change.getAddedRevision().getPropertyForKey(Dao.TYPE_COLUMN_NAME);
@@ -278,7 +278,7 @@ public class SynchronizedDataMerger {
     Object previousValue = dao.extractValueFromObject(cachedEntity, property);
 
     if(property.isCollectionProperty() == false) {
-      Object updatedValue = dao.deserializePersistedValue(property, currentRevision.getProperty(propertyName));
+      Object updatedValue = dao.deserializePersistedValue(cachedEntity, property, currentRevision.getProperty(propertyName));
       dao.setValueOnObject(cachedEntity, property, updatedValue);
 
       syncManager.callEntityUpdatedListeners(cachedEntity, propertyName, previousValue, updatedValue);
