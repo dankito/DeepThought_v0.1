@@ -124,7 +124,7 @@
                                 </items>
                               </Menu>
                               <SeparatorMenuItem mnemonicParsing="false" />
-                              <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" />
+                              <CheckMenuItem fx:id="chkmnitmViewShowCategories" mnemonicParsing="false" text="%show.categories" visible="false" />
                               <CheckMenuItem fx:id="chkmnitmViewShowQuickEditEntryPane" mnemonicParsing="false" text="%show.quick.edit.entry.pane" />
                           </items>
                         </Menu>
