@@ -6,6 +6,7 @@ import net.dankito.deepthought.TestEntityManagerConfiguration;
 import net.dankito.deepthought.communication.Constants;
 import net.dankito.deepthought.communication.NetworkHelper;
 import net.dankito.deepthought.communication.model.ConnectedDevice;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
@@ -108,11 +109,31 @@ public class CouchbaseLiteSyncManagerTest {
     final CountDownLatch synchronizationLatch = new CountDownLatch(1);
     final List<BaseEntity> synchronizedEntities = new ArrayList<>();
 
-    syncManager2.addSynchronizationListener(new ISynchronizationListener() {
+    syncManager2.addSynchronizationListener(new AllEntitiesListener() {
       @Override
-      public void entitySynchronized(BaseEntity entity) {
+      public void entityCreated(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
         synchronizedEntities.add(entity);
         synchronizationLatch.countDown();
+      }
+
+      @Override
+      public void entityDeleted(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+      }
+
+      @Override
+      public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
       }
     });
 
@@ -132,10 +153,30 @@ public class CouchbaseLiteSyncManagerTest {
   @Test
   public void createConflictInCollectionProperty_ConflictGetsResolved() {
     final CountDownLatch preliminaryLatch = new CountDownLatch(8);
-    syncManager2.addSynchronizationListener(new ISynchronizationListener() {
+    syncManager2.addSynchronizationListener(new AllEntitiesListener() {
       @Override
-      public void entitySynchronized(BaseEntity entity) {
+      public void entityCreated(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
         preliminaryLatch.countDown();
+      }
+
+      @Override
+      public void entityDeleted(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+      }
+
+      @Override
+      public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
       }
     });
 
@@ -177,10 +218,30 @@ public class CouchbaseLiteSyncManagerTest {
 
 
     final CountDownLatch resolveConflictLatch = new CountDownLatch(6);
-    syncManager2.addSynchronizationListener(new ISynchronizationListener() {
+    syncManager2.addSynchronizationListener(new AllEntitiesListener() {
       @Override
-      public void entitySynchronized(BaseEntity entity) {
+      public void entityCreated(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityUpdated(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
         resolveConflictLatch.countDown();
+      }
+
+      @Override
+      public void entityDeleted(BaseEntity entity) {
+
+      }
+
+      @Override
+      public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
+
+      }
+
+      @Override
+      public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
+
       }
     });
 
