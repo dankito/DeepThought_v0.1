@@ -132,10 +132,6 @@ public class TableViewTags extends TableView<Tag> {
     }
   }
 
-  public void selectTagAtIndex(int index) {
-    getSelectionModel().select(index);
-  }
-
   public int getTagsSize() {
     return tableViewTagsItems.size();
   }

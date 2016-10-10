@@ -88,10 +88,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     if(newDeepThought != null) {
       this.systemTags = Arrays.asList(new Tag[] { deepThought.AllEntriesSystemTag(), deepThought.EntriesWithoutTagsSystemTag() });
 
-      if (deepThought.getSettings().getLastViewedTag() != null) {
+      if(deepThought.getSettings().getLastViewedTag() != null) {
         setSelectedTag(deepThought.getSettings().getLastViewedTag());
       } else {
-        tblvwTags.selectTagAtIndex(0);
+        setSelectedTag(deepThought.AllEntriesSystemTag());
       }
     }
 
