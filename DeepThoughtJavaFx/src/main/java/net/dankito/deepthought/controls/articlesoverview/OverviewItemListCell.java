@@ -5,6 +5,9 @@ import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.util.localization.Localization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableSet;
@@ -36,6 +39,9 @@ import javafx.scene.layout.VBox;
  * Created by ganymed on 17/07/15.
  */
 public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> implements ICleanUp {
+
+  private static final Logger log = LoggerFactory.getLogger(OverviewItemListCell.class);
+
 
   public interface ItemSelectionChangedEventHandler {
     void itemSelectionChanged(ArticlesOverviewItem item, boolean isSelected);
@@ -211,7 +217,11 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
 
       imgvwItemPreviewImage.setVisible(item.hasPreviewImageUrl());
       if(item.hasPreviewImageUrl()) {
-        imgvwItemPreviewImage.setImage(new Image(item.getPreviewImageUrl(), true));
+        try {
+          imgvwItemPreviewImage.setImage(new Image(item.getPreviewImageUrl(), true));
+        } catch(Exception e) {
+          log.error("Could not load image with url " + item.getPreviewImageUrl(), e);
+        }
       }
 
       lblItemSubTitle.setVisible(item.hasSubTitle());
