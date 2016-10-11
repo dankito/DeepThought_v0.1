@@ -249,12 +249,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   protected void setupQuickEditEntrySection() {
     net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntryScrollPane);
 
-    txtfldEntryAbstract.textProperty().addListener((observable, oldValue, newValue) -> {
-      Entry selectedEntry = tblvwEntries.getSelectionModel().getSelectedItem();
-      if (selectedEntry != null)
-        selectedEntry.setAbstract(txtfldEntryAbstract.getText());
-    });
-
+    txtfldEntryAbstract.textProperty().addListener(txtfldEntryAbstractChangeListener);
 
     htmledEntryContent = new net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor(entryContentListener);
     htmledEntryContent.setMinHeight(250);
@@ -278,11 +273,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     pnQuickEditEntry.getChildren().add(1, currentEditedEntryTagsControl);
     currentEditedEntryTagsControl.setSearchAndSelectTagsControlHeight(190);
 
-    txtfldReferenceIndication.textProperty().addListener((observable, oldValue, newValue) -> {
-      Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
-      if (selectedEntry != null)
-        selectedEntry.setIndication(txtfldReferenceIndication.getText());
-    });
+    txtfldReferenceIndication.textProperty().addListener(txtfldReferenceIndicationChangeListener);
 
     net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
     net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReference);
@@ -374,7 +365,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
     if(selectedEntry != null) {
       selectedEntry.addEntityListener(currentlyEditedEntryListener);
-      txtfldEntryAbstract.setText(selectedEntry.getAbstractAsPlainText());
+      showAbstract(selectedEntry);
       txtfldEntryAbstract.positionCaret(0);
       htmledEntryContent.setHtml(selectedEntry.getContent(), true);
       txtfldEntryAbstract.selectAll();
@@ -386,6 +377,22 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
       htmledEntryContent.setHtml("", true);
       pnReferenceAndPersonsScrollPane.setVisible(false);
     }
+  }
+
+  protected void showAbstract(Entry entry) {
+    txtfldEntryAbstract.textProperty().removeListener(txtfldEntryAbstractChangeListener);
+
+    txtfldEntryAbstract.setText(entry.getAbstractAsPlainText());
+
+    txtfldEntryAbstract.textProperty().addListener(txtfldEntryAbstractChangeListener);
+  }
+
+  protected void showReferenceIndication(Entry entry) {
+    txtfldReferenceIndication.textProperty().removeListener(txtfldReferenceIndicationChangeListener);
+
+    txtfldReferenceIndication.setText(entry.getIndication());
+
+    txtfldReferenceIndication.textProperty().addListener(txtfldReferenceIndicationChangeListener);
   }
 
   protected void setPaneReferenceAndPersons(final Entry selectedEntry) {
@@ -404,7 +411,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
         pnReference.setMaxWidth(this.getWidth() - 30);
       pnSelectedReference.getChildren().add(new net.dankito.deepthought.controls.reference.EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), event -> selectedEntry.clearReferenceBases()));
     }
-    txtfldReferenceIndication.setText(selectedEntry.getIndication());
+    showReferenceIndication(selectedEntry);
 
     if(selectedEntry.hasPersons()) {
       pnReferenceAndPersonsScrollPane.setMinHeight(46);
@@ -493,11 +500,11 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     @Override
     public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
       if(propertyName.equals(TableConfig.EntryAbstractColumnName)) {
-        txtfldEntryAbstract.setText(((Entry) entity).getAbstractAsPlainText());
+        showAbstract((Entry)entity);
       }
       else if(propertyName.equals(TableConfig.EntryIndicationColumnName)) {
         if(txtfldReferenceIndication.getText().equals(((Entry) entity).getIndication()) == false) // don't update txtfldReferenceIndication if change has been committed by it
-          txtfldReferenceIndication.setText(((Entry) entity).getIndication());
+          showReferenceIndication((Entry) entity);
       }
       else if(propertyName.equals(TableConfig.EntryContentColumnName)) {
         if(htmledEntryContent.getHtml().equals(((Entry) entity).getContent()) == false) // don't update Html Control if change has been committed by it
@@ -559,6 +566,31 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
 
   protected net.dankito.deepthought.controls.html.EntryContentHtmlEditorListener entryContentListener = new net.dankito.deepthought.controls.html.EntryContentHtmlEditorListener();
+
+  protected ChangeListener<String> txtfldEntryAbstractChangeListener = new ChangeListener<String>() {
+    @Override
+    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+      Entry selectedEntry = getSelectedEntry();
+      if(selectedEntry != null) {
+        selectedEntry.setAbstract(txtfldEntryAbstract.getText());
+      }
+    }
+  };
+
+  protected ChangeListener txtfldReferenceIndicationChangeListener = new ChangeListener() {
+    @Override
+    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+      Entry selectedEntry = getSelectedEntry();
+      if(selectedEntry != null) {
+        selectedEntry.setIndication(txtfldReferenceIndication.getText());
+      }
+    }
+  };
+
+  protected Entry getSelectedEntry() {
+    return tblvwEntries.getSelectionModel().getSelectedItem();
+//    return deepThought.getSettings().getLastViewedEntry();
+  }
 
 
   @Override
