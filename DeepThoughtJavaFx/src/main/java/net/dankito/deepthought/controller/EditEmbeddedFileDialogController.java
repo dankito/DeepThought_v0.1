@@ -1,7 +1,6 @@
 package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controller.enums.FileLinkOptions;
 import net.dankito.deepthought.controls.Constants;
 import net.dankito.deepthought.controls.file.SearchAndSelectFilesControl;
@@ -10,15 +9,16 @@ import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.html.ImageElementData;
 import net.dankito.deepthought.data.model.FileLink;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.Alerts;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.JavaFxLocalization;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.file.FileNameSuggestion;
 import net.dankito.deepthought.util.file.FileUtils;
 import net.dankito.deepthought.util.file.enums.ExistingFileHandling;
 import net.dankito.deepthought.util.file.listener.FileOperationListener;
+import net.dankito.deepthought.util.localization.JavaFxLocalization;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

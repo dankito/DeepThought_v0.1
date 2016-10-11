@@ -1,5 +1,7 @@
 package net.dankito.deepthought.controls;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
+
 import javafx.application.Platform;
 import javafx.beans.DefaultProperty;
 import javafx.beans.property.BooleanProperty;
@@ -148,8 +150,8 @@ public class CollapsiblePane extends VBox {
   }
 
   protected void setupPane() {
-    setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
-    setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    setMaxHeight(FXUtils.SizeMaxValue);
+    setMaxWidth(FXUtils.SizeMaxValue);
 
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setFillHeight(true);
@@ -215,7 +217,7 @@ public class CollapsiblePane extends VBox {
       getContent().setVisible(isExpanded());
 
     if(isExpanded()) {
-      setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+      setMaxHeight(FXUtils.SizeMaxValue);
       expandButton.setText(ExpandedText);
     }
     else {
@@ -261,7 +263,7 @@ public class CollapsiblePane extends VBox {
     }
 
     if(newContent != null) {
-      net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(newContent);
+      FXUtils.ensureNodeOnlyUsesSpaceIfVisible(newContent);
       this.getChildren().add(newContent);
       VBox.setVgrow(newContent, Priority.ALWAYS);
 //      VBox.setMargin(newContent, new Insets(6, 0, 0, 0));

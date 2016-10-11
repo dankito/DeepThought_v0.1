@@ -2,6 +2,7 @@ package net.dankito.deepthought.controls.file;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.FileLink;
@@ -88,7 +89,7 @@ public class SearchAndSelectFilesControl extends VBox implements net.dankito.dee
 
     Application.addApplicationListener(applicationListener);
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "SearchAndSelectFilesControl")) {
+    if(FXUtils.loadControl(this, "SearchAndSelectFilesControl")) {
       setupControl();
 
       if(deepThought != null)
@@ -199,7 +200,7 @@ public class SearchAndSelectFilesControl extends VBox implements net.dankito.dee
     trtblvwSearchResults.setRoot(searchResultsRootTreeItem);
 
     setSearchPaneVisibility(false);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSearchFiles);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSearchFiles);
   }
 
   public void setSearchPaneVisibility(boolean isVisible) {

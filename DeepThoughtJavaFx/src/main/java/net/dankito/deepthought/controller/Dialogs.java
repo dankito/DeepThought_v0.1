@@ -4,6 +4,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controller.enums.DialogResult;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.html.HtmlEditor;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
@@ -20,9 +21,9 @@ import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.settings.WindowSettings;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
-import net.dankito.deepthought.util.localization.JavaFxLocalization;
 import net.dankito.deepthought.util.isbn.IsbnResolvingListener;
 import net.dankito.deepthought.util.isbn.ResolveIsbnResult;
+import net.dankito.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -649,7 +650,7 @@ public class Dialogs {
     Scene scene = new Scene(parent);
 
     stage.setScene(scene);
-    net.dankito.deepthought.controls.utils.FXUtils.applyWindowSettingsAndListenToChanges(stage, settings);
+    FXUtils.applyWindowSettingsAndListenToChanges(stage, settings);
     JavaFxLocalization.bindStageTitle(stage, windowTitle);
 
     return stage;

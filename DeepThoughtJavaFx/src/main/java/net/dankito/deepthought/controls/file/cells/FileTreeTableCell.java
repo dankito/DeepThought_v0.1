@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.file.cells;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.FileLink;
 
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class FileTreeTableCell extends TreeTableCell<FileLink, String> {
 
 //    graphicPane.getChildren().add(isOnEntityCheckBox);
 
-    fileNameLabel.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    fileNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(fileNameLabel);
 
     entryFileOptionsButtonsPane.setAlignment(Pos.CENTER_LEFT);

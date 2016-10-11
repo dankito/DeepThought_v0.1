@@ -6,6 +6,7 @@ import net.dankito.deepthought.controller.ChildWindowsControllerListener;
 import net.dankito.deepthought.controller.enums.DialogResult;
 import net.dankito.deepthought.controls.CollapsiblePane;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -13,8 +14,8 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
@@ -167,10 +168,10 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setPrefWidth(USE_COMPUTED_SIZE);
-    titlePane.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
 //    titlePane.setMinHeight(USE_PREF_SIZE);
-    titlePane.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
 
     lblCategories = new Label();
     net.dankito.deepthought.util.localization.JavaFxLocalization.bindLabeledText(lblCategories, "categories");
@@ -218,8 +219,8 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
     trvwCategories.setId("trvwCategories");
     trvwCategories.setMinHeight(230);
 //    trvwCategories.setMinHeight(268); // as long as there's not search bar, reise TreeView's min height to fit with EntryTag's Control height
-    trvwCategories.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
-    trvwCategories.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    trvwCategories.setMaxHeight(FXUtils.SizeMaxValue);
+    trvwCategories.setMaxWidth(FXUtils.SizeMaxValue);
     trvwCategories.setShowRoot(false);
     trvwCategories.setEditable(true);
 
@@ -286,7 +287,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
   }
 
   protected void clearEntryCategoryLabels() {
-    net.dankito.deepthought.controls.utils.FXUtils.cleanUpChildrenAndClearPane(pnSelectedCategoriesPreview);
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedCategoriesPreview);
   }
 
 
@@ -503,7 +504,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Category) {
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> handleCategoryAddedToEntry((Category) addedEntity));
+        FXUtils.runOnUiThread(() -> handleCategoryAddedToEntry((Category) addedEntity));
       }
     }
 
@@ -515,7 +516,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Category) {
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> handleCategoryRemovedFromEntry((Category) removedEntity));
+        FXUtils.runOnUiThread(() -> handleCategoryRemovedFromEntry((Category) removedEntity));
       }
     }
   };
@@ -546,7 +547,7 @@ public class EntryCategoriesControl extends CollapsiblePane implements net.danki
 //      checkIfCategoriesHaveBeenUpdated(collectionHolder, updatedEntity);
 
       if(updatedEntity instanceof Category && entry != null && ((Category)updatedEntity).getEntries().contains(entry)) {
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> showEntryCategories());
+        FXUtils.runOnUiThread(() -> showEntryCategories());
       }
     }
 

@@ -1,11 +1,11 @@
 package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditorListener;
 import net.dankito.deepthought.controls.html.IHtmlEditorListener;
 import net.dankito.deepthought.controls.person.SeriesTitlePersonsControl;
 import net.dankito.deepthought.controls.reference.SearchAndSelectReferenceControl;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Person;
@@ -23,9 +23,10 @@ import net.dankito.deepthought.data.model.settings.enums.Setting;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.search.specific.ReferenceBaseType;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
+import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.LanguageChangedListener;
 import net.dankito.deepthought.util.localization.Localization;
-import net.dankito.deepthought.util.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -307,9 +308,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
 
 
   protected void setupSeriesTitleControls() {
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitle);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwSeriesTitlePreviewImage);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwSeriesTitlePreviewImage);
 
     editedSeriesTitleAttachedFiles = new net.dankito.deepthought.controls.utils.EditedEntitiesHolder<>(seriesTitle.getAttachedFiles(), event -> fieldsWithUnsavedSeriesTitleChanges.add
         (FieldWithUnsavedChanges.SeriesTitleAttachedFiles), event -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleAttachedFiles));
@@ -319,7 +320,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     seriesTitleAbstractListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleAbstract);
     seriesTitleNotesListener = new DeepThoughtFxHtmlEditorListener(editedSeriesTitleEmbeddedFiles, fieldsWithUnsavedSeriesTitleChanges, FieldWithUnsavedChanges.SeriesTitleNotes);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleFields);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleFields);
     paneSeriesTitleFields.visibleProperty().bind(btnShowHideSeriesTitlePane.selectedProperty());
 
     btnShowHideSeriesTitlePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideSeriesTitlePaneText());
@@ -345,7 +346,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     });
 
     searchAndSelectSeriesTitleControl.setVisible(false);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectSeriesTitleControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectSeriesTitleControl);
     searchAndSelectSeriesTitleControl.visibleProperty().bind(btnShowHideSearchSeriesTitle.selectedProperty());
     searchAndSelectSeriesTitleControl.setMinHeight(190);
     searchAndSelectSeriesTitleControl.setMaxHeight(190);
@@ -357,20 +358,20 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         updateWindowTitle();
     });
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleSubTitle);
     txtfldSeriesTitleSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleSubTitle));
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneSeriesTitleOnlineAddress);
     txtfldSeriesTitleOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedSeriesTitleChanges.add(FieldWithUnsavedChanges.SeriesTitleOnlineAddress));
 
     htmledSeriesTitleAbstract = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("abstract", seriesTitleAbstractListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleAbstract);
     paneSeriesTitleValues.getChildren().add(3, htmledSeriesTitleAbstract);
     VBox.setMargin(htmledSeriesTitleAbstract, new Insets(6, 0, 0, 0));
     htmledSeriesTitleAbstract.setExpanded(false);
 
     htmledSeriesTitleTableOfContents = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("table.of.contents", seriesTitleTableOfContentsListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleTableOfContents);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleTableOfContents);
     paneSeriesTitleValues.getChildren().add(4, htmledSeriesTitleTableOfContents);
     VBox.setMargin(htmledSeriesTitleTableOfContents, new Insets(6, 0, 0, 0));
     htmledSeriesTitleTableOfContents.setExpanded(false);
@@ -382,20 +383,20 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     VBox.setMargin(seriesTitlePersonsControl, new Insets(6, 0, 0, 0));
     paneSeriesTitleValues.getChildren().add(5, seriesTitlePersonsControl);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitlePersonsControl);
     seriesTitlePersonsControl.setVisible(false);
 
     htmledSeriesTitleNotes = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("notes", seriesTitleNotesListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleNotes);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledSeriesTitleNotes);
     paneSeriesTitleValues.getChildren().add(6, htmledSeriesTitleNotes);
     VBox.setMargin(htmledSeriesTitleNotes, new Insets(6, 0, 0, 0));
     htmledSeriesTitleNotes.setExpanded(false);
 
     seriesTitleFilesControl = new net.dankito.deepthought.controls.file.FilesControl(editedSeriesTitleAttachedFiles);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(seriesTitleFilesControl);
     seriesTitleFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     seriesTitleFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    seriesTitleFilesControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    seriesTitleFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneSeriesTitleValues.getChildren().add(7, seriesTitleFilesControl);
     VBox.setMargin(seriesTitleFilesControl, new Insets(6, 0, 0, 0));
   }
@@ -417,7 +418,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceControls() {
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferencePreviewImage);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferencePreviewImage);
 
     editedReferenceAttachedFiles = new net.dankito.deepthought.controls.utils.EditedEntitiesHolder<>(reference.getAttachedFiles(), event -> fieldsWithUnsavedReferenceChanges.add
         (FieldWithUnsavedChanges.ReferenceAttachedFiles), event -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceAttachedFiles));
@@ -427,10 +428,10 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceTableOfContentsListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceTableOfContents);
     referenceNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceEmbeddedFiles, fieldsWithUnsavedReferenceChanges, FieldWithUnsavedChanges.ReferenceNotes);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnShowHideReferencePane);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceHintText);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnShowHideReferencePane);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblReferenceHintText);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceFields);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceFields);
     paneReferenceFields.visibleProperty().bind(btnShowHideReferencePane.selectedProperty());
 
     btnShowHideReferencePane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferencePaneText());
@@ -456,7 +457,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     });
 
     searchAndSelectReferenceControl.setVisible(false);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectReferenceControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(searchAndSelectReferenceControl);
     searchAndSelectReferenceControl.visibleProperty().bind(btnShowHideSearchReference.selectedProperty());
     searchAndSelectReferenceControl.setMinHeight(190);
     searchAndSelectReferenceControl.setMaxHeight(190);
@@ -468,27 +469,27 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         updateWindowTitle();
     });
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubTitle);
     txtfldReferenceSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceSubTitle));
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferencePublishingDate);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferencePublishingDate);
     txtfldReferenceIssueOrPublishingDate.textProperty().addListener((observable, oldValue, newValue) -> {
       fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceIssueOrPublishingDate);
     });
 
     dtpckReferencePublishingDate.valueProperty().addListener((observable, oldValue, newValue) -> setReferenceIssueTextFieldToDateSelectedInDatePicker());
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceOnlineAddress);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceOnlineAddress);
     txtfldReferenceOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceChanges.add(FieldWithUnsavedChanges.ReferenceOnlineAddress));
 
     htmledReferenceAbstract = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("abstract", referenceAbstractListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceAbstract);
     paneReferenceValues.getChildren().add(4, htmledReferenceAbstract);
     VBox.setMargin(htmledReferenceAbstract, new Insets(6, 0, 0, 0));
     htmledReferenceAbstract.setExpanded(false);
 
     htmledReferenceTableOfContents = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("table.of.contents", referenceTableOfContentsListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceTableOfContents);
     paneReferenceValues.getChildren().add(5, htmledReferenceTableOfContents);
     VBox.setMargin(htmledReferenceTableOfContents, new Insets(6, 0, 0, 0));
     htmledReferenceTableOfContents.setExpanded(false);
@@ -501,16 +502,16 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     paneReferenceValues.getChildren().add(6, referencePersonsControl);
 
     htmledReferenceNotes = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("notes", referenceNotesListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceNotes);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceNotes);
     paneReferenceValues.getChildren().add(7, htmledReferenceNotes);
     VBox.setMargin(htmledReferenceNotes, new Insets(6, 0, 0, 0));
     htmledReferenceNotes.setExpanded(false);
 
     referenceFilesControl = new net.dankito.deepthought.controls.file.FilesControl(editedReferenceAttachedFiles);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceFilesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceFilesControl);
     referenceFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    referenceFilesControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    referenceFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneReferenceValues.getChildren().add(8, referenceFilesControl);
     VBox.setMargin(referenceFilesControl, new Insets(6, 0, 0, 0));
   }
@@ -539,9 +540,9 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
   }
 
   protected void setupReferenceSubDivisionControls() {
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivision);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferenceSubDivisionPreviewImage);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(imgvwReferenceSubDivisionPreviewImage);
 
     editedReferenceSubDivisionAttachedFiles = new net.dankito.deepthought.controls.utils.EditedEntitiesHolder<>(referenceSubDivision.getAttachedFiles(), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add
         (FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles), event -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionAttachedFiles));
@@ -550,7 +551,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     referenceSubDivisionAbstractListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionAbstract);
     referenceSubDivisionNotesListener = new DeepThoughtFxHtmlEditorListener(editedReferenceSubDivisionEmbeddedFiles, fieldsWithUnsavedReferenceSubDivisionChanges, FieldWithUnsavedChanges.ReferenceSubDivisionNotes);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionFields);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionFields);
     paneReferenceSubDivisionFields.visibleProperty().bind(btnShowHideReferenceSubDivisionPane.selectedProperty());
 
     btnShowHideReferenceSubDivisionPane.selectedProperty().addListener((observable, oldValue, newValue) -> setButtonShowHideReferenceSubDivisionPaneText());
@@ -562,14 +563,14 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
         updateWindowTitle();
     });
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionSubTitle);
     txtfldReferenceSubDivisionSubTitle.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionSubTitle));
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(paneReferenceSubDivisionOnlineAddress);
     txtfldReferenceSubDivisionOnlineAddress.textProperty().addListener((observable, oldValue, newValue) -> fieldsWithUnsavedReferenceSubDivisionChanges.add(FieldWithUnsavedChanges.ReferenceSubDivisionOnlineAddress));
 
     htmledReferenceSubDivisionAbstract = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("abstract", referenceSubDivisionAbstractListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionAbstract);
     paneReferenceSubDivisionValues.getChildren().add(3, htmledReferenceSubDivisionAbstract);
     VBox.setMargin(htmledReferenceSubDivisionAbstract, new Insets(6, 0, 0, 0));
     htmledReferenceSubDivisionAbstract.setExpanded(false);
@@ -581,19 +582,19 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     VBox.setMargin(referenceSubDivisionPersonsControl, new Insets(6, 0, 0, 0));
     paneReferenceSubDivisionValues.getChildren().add(4, referenceSubDivisionPersonsControl);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionPersonsControl);
 
     htmledReferenceSubDivisionNotes = new net.dankito.deepthought.controls.html.CollapsibleHtmlEditor("notes", referenceSubDivisionNotesListener);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionNotes);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledReferenceSubDivisionNotes);
     paneReferenceSubDivisionValues.getChildren().add(5, htmledReferenceSubDivisionNotes);
     VBox.setMargin(htmledReferenceSubDivisionNotes, new Insets(6, 0, 0, 0));
     htmledReferenceSubDivisionNotes.setExpanded(false);
 
     referenceSubDivisionFilesControl = new net.dankito.deepthought.controls.file.FilesControl(editedReferenceSubDivisionAttachedFiles);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionFilesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(referenceSubDivisionFilesControl);
     referenceSubDivisionFilesControl.setMinHeight(Region.USE_PREF_SIZE);
     referenceSubDivisionFilesControl.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    referenceSubDivisionFilesControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    referenceSubDivisionFilesControl.setMaxHeight(FXUtils.SizeMaxValue);
     paneReferenceSubDivisionValues.getChildren().add(6, referenceSubDivisionFilesControl);
     VBox.setMargin(referenceSubDivisionFilesControl, new Insets(6, 0, 0, 0));
   }
@@ -880,7 +881,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
       fieldsWithUnsavedReferenceChanges.remove(FieldWithUnsavedChanges.ReferenceAbstract);
     }
     if(fieldsWithUnsavedReferenceChanges.contains(FieldWithUnsavedChanges.ReferenceTableOfContents) || htmledReferenceTableOfContents.getHtml().equals(reference.getTableOfContents()) == false) {
-      if(net.dankito.deepthought.controls.utils.FXUtils.HtmlEditorDefaultText.equals(htmledReferenceTableOfContents.getHtml())) {
+      if(FXUtils.HtmlEditorDefaultText.equals(htmledReferenceTableOfContents.getHtml())) {
         if(StringUtils.isNotNullOrEmpty(reference.getTableOfContents()))
           reference.setTableOfContents("");
       }
@@ -1249,7 +1250,7 @@ public class EditReferenceDialogController extends EntityDialogFrameController i
     if(referenceSubDivision.isPersisted())
       btnShowHideReferenceSubDivisionPane.setSelected(true);
 
-    net.dankito.deepthought.controls.utils.FXUtils.focusNode(nodeToFocus);
+    FXUtils.focusNode(nodeToFocus);
   }
 
   protected void applyUserSettings() {

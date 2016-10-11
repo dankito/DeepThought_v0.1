@@ -2,8 +2,8 @@ package net.dankito.deepthought.controls.categories;
 
 import net.dankito.deepthought.controller.Dialogs;
 import net.dankito.deepthought.controls.Constants;
-import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.listener.EntityListener;

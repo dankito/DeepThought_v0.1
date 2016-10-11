@@ -2,6 +2,7 @@ package net.dankito.deepthought.controls.entries;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
@@ -145,7 +146,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     this.mainWindowController = mainWindowController;
     deepThought = Application.getDeepThought();
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "EntriesOverviewControl"))
+    if(FXUtils.loadControl(this, "EntriesOverviewControl"))
       setupControl();
   }
 
@@ -155,12 +156,12 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     if(newDeepThought != null) {
       DeepThoughtSettings settings = deepThought.getSettings();
 
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnId, settings.getEntriesOverviewIdColumnSettings());
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnReferencePreview, settings.getEntriesOverviewReferenceColumnSettings());
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnEntryPreview, settings.getEntriesOverviewEntryPreviewColumnSettings());
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnTags, settings.getEntriesOverviewTagsColumnSettings());
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnCreated, settings.getEntriesOverviewCreatedColumnSettings());
-      net.dankito.deepthought.controls.utils.FXUtils.applyColumnSettingsAndListenToChanges(clmnModified, settings.getEntriesOverviewModifiedColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnId, settings.getEntriesOverviewIdColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnReferencePreview, settings.getEntriesOverviewReferenceColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnEntryPreview, settings.getEntriesOverviewEntryPreviewColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnTags, settings.getEntriesOverviewTagsColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnCreated, settings.getEntriesOverviewCreatedColumnSettings());
+      FXUtils.applyColumnSettingsAndListenToChanges(clmnModified, settings.getEntriesOverviewModifiedColumnSettings());
 
       if (settings.getLastViewedEntry() != null) {
         // no, don't set Entry, as TableView then iterates through all Entries in Table to find selected Entry -> would eventually load a lot of Entries from Database
@@ -194,9 +195,9 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
         txtfldSearchEntries.clear();
     });
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesAbstract);
     net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesAbstract, "search.entries.abstract.tool.tip");
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesContent);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesContent);
     net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesContent, "search.entries.content.tool.tip");
 
     btnRemoveSelectedEntries.setTextFill(net.dankito.deepthought.controls.Constants.RemoveEntityButtonTextColor);
@@ -247,13 +248,13 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   }
 
   protected void setupQuickEditEntrySection() {
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntryScrollPane);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnQuickEditEntryScrollPane);
 
     txtfldEntryAbstract.textProperty().addListener(txtfldEntryAbstractChangeListener);
 
     htmledEntryContent = new net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor(entryContentListener);
     htmledEntryContent.setMinHeight(250);
-    htmledEntryContent.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    htmledEntryContent.setMaxHeight(FXUtils.SizeMaxValue);
     VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
 
     pnQuickEditEntry.getChildren().remove(pnQuickEditEntry.getChildren().size() - 1); // remove HtmlEditor set in JavaFX Scene Builder
@@ -275,9 +276,9 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
     txtfldReferenceIndication.textProperty().addListener(txtfldReferenceIndicationChangeListener);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReference);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnPersons);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReferenceAndPersonsScrollPane);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnReference);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(pnPersons);
 
     this.widthProperty().addListener((observable, oldValue, newValue) -> pnReferenceAndPersonsScrollPane.setPrefWidth(this.getWidth()));
 
@@ -323,7 +324,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
       splpnEntries.getItems().remove(pnQuickEditEntryScrollPane);
       splpnEntries.setDividerPosition(0, 1);
       try {
-        net.dankito.deepthought.controls.utils.FXUtils.showSplitPaneDividers(splpnEntries, false);
+        FXUtils.showSplitPaneDividers(splpnEntries, false);
         splpnEntries.getDividers().remove(0);
 //        splpnEntries.getDividers().clear();
 //        splpnEntries.getDividers().removeAll(splpnEntries.getDividers());
@@ -347,7 +348,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   }
 
   protected void selectedEntryChanged(final Entry selectedEntry) {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> selectedEntryChangedOnUiThread(selectedEntry));
+    FXUtils.runOnUiThread(() -> selectedEntryChangedOnUiThread(selectedEntry));
   }
 
   protected void selectedEntryChangedOnUiThread(Entry selectedEntry) {
@@ -400,9 +401,9 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     pnReference.setVisible(selectedEntry.isAReferenceSet());
     pnPersons.setVisible(selectedEntry.hasPersons());
 
-    net.dankito.deepthought.controls.utils.FXUtils.cleanUpChildrenAndClearPane(pnSelectedReference);
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedReference);
     //txtfldReferenceIndication.setText("");
-    net.dankito.deepthought.controls.utils.FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersons);
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedPersons);
 
     if(selectedEntry.isAReferenceSet()) {
       if(selectedEntry.hasPersons())
@@ -548,7 +549,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
       tableViewEntriesItems.setUnderlyingCollection(unfilteredCurrentEntriesToShow);
     else {
       lastEntriesSearch = new EntriesSearch(txtfldSearchEntries.getText(), tglbtnSearchEntriesContent.isSelected(), tglbtnSearchEntriesAbstract.isSelected(), (results) -> {
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> {
+        FXUtils.runOnUiThread(() -> {
           tblvwEntries.getSelectionModel().clearSelection();
           tableViewEntriesItems.setUnderlyingCollection(results);
         });

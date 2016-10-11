@@ -1,5 +1,6 @@
 package net.dankito.deepthought.controls.person;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.listener.EntryPersonListener;
@@ -47,12 +48,12 @@ public class EntryPersonsControl extends PersonsControl {
   protected EntryPersonListener entryPersonListener = new EntryPersonListener() {
     @Override
     public void personAdded(Entry entry, Person addedPerson) {
-      net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
+      FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
     }
 
     @Override
     public void personRemoved(Entry entry, Person removedPerson) {
-      net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
+      FXUtils.runOnUiThread(() -> setEntityPersons(entry.getPersons()));
 
     }
   };

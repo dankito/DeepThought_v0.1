@@ -1,6 +1,7 @@
 package net.dankito.deepthought.controls.html;
 
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +51,10 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
   protected void setupHtmlEditor() {
     setMinHeight(200);
     setPrefHeight(Region.USE_COMPUTED_SIZE);
-    setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    setMaxHeight(FXUtils.SizeMaxValue);
     webView.setMinHeight(200);
     webView.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    webView.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    webView.setMaxHeight(FXUtils.SizeMaxValue);
 
     webView.setContextMenuEnabled(false);
     webView.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -200,7 +201,7 @@ public class DeepThoughtFxHtmlEditor extends HBox implements IJavaScriptExecutor
 
   @Override
   public void executeScript(final String javaScript, final ExecuteJavaScriptResultListener listener) {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> executeScriptOnUiThread(javaScript, listener));
+    FXUtils.runOnUiThread(() -> executeScriptOnUiThread(javaScript, listener));
   }
 
   public void executeScriptOnUiThread(String javaScript, ExecuteJavaScriptResultListener listener) {

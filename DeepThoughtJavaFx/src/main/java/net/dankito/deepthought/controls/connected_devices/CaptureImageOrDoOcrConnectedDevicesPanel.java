@@ -10,6 +10,7 @@ import net.dankito.deepthought.communication.model.DoOcrConfiguration;
 import net.dankito.deepthought.communication.model.ImportFilesConfiguration;
 import net.dankito.deepthought.communication.model.ImportFilesSource;
 import net.dankito.deepthought.communication.model.OcrSource;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public class CaptureImageOrDoOcrConnectedDevicesPanel extends ConnectedDevicesPa
   protected void initLabelDoOcrProgress() {
     lblDoOcrProgress = new Label();
     lblDoOcrProgress.setVisible(false);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblDoOcrProgress);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblDoOcrProgress);
 
     this.getChildren().add(0, lblDoOcrProgress);
 

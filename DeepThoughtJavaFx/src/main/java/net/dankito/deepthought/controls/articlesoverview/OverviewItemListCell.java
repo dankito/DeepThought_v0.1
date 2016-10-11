@@ -2,6 +2,7 @@ package net.dankito.deepthought.controls.articlesoverview;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -143,29 +144,29 @@ public class OverviewItemListCell extends ListCell<ArticlesOverviewItem> impleme
     imgvwItemPreviewImage.setFitWidth(120);
 
     graphicPane.add(lblItemCategoryOrLabel, 0, 1, 2, 1);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemCategoryOrLabel);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemCategoryOrLabel);
 
     graphicPane.add(itemTextLinesPane, 2, 0, 1, 2);
 
     GridPane.setMargin(itemTextLinesPane, new Insets(0, 0, 0, 6));
 
     itemTextLinesPane.setPrefHeight(VBox.USE_COMPUTED_SIZE);
-    itemTextLinesPane.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    itemTextLinesPane.setMaxHeight(FXUtils.SizeMaxValue);
     itemTextLinesPane.setAlignment(Pos.TOP_LEFT);
 
     itemTextLinesPane.getChildren().add(lblItemSubTitle);
     lblItemSubTitle.setMaxHeight(20);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSubTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSubTitle);
     VBox.setMargin(lblItemSubTitle, new Insets(0, 0, 6, 0));
 
     itemTextLinesPane.getChildren().add(lblItemTitle);
     lblItemTitle.setMaxHeight(20);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemTitle);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemTitle);
     VBox.setMargin(lblItemTitle, new Insets(0, 0, 6, 0));
 
     itemTextLinesPane.getChildren().add(lblItemSummary);
     VBox.setVgrow(lblItemSummary, Priority.ALWAYS);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSummary);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblItemSummary);
     lblItemSummary.setWrapText(true);
 
     setOnContextMenuRequested(event -> showContextMenu(event));

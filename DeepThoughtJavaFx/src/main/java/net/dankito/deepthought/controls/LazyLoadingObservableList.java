@@ -1,5 +1,7 @@
 package net.dankito.deepthought.controls;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +78,7 @@ public class LazyLoadingObservableList<T> extends ObservableListBase<T> implemen
 
   public void setUnderlyingCollection(final Collection<T> underlyingCollection) {
     // simply make sure that collection is set (or better: endChange() ) is called on UI Thread (otherwise a IllegalStateException would be thrown)
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> setUnderlyingCollectionOnUiThread(underlyingCollection));
+    FXUtils.runOnUiThread(() -> setUnderlyingCollectionOnUiThread(underlyingCollection));
   }
 
   protected void setUnderlyingCollectionOnUiThread(Collection<T> underlyingCollection) {

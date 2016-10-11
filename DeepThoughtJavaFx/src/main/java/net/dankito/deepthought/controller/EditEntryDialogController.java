@@ -2,7 +2,6 @@ package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controller.enums.DialogResult;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.categories.EntryCategoriesControl;
 import net.dankito.deepthought.controls.event.FieldChangedEvent;
 import net.dankito.deepthought.controls.file.FilesControl;
@@ -12,6 +11,7 @@ import net.dankito.deepthought.controls.person.EntryPersonsControl;
 import net.dankito.deepthought.controls.reference.EntryReferenceControl;
 import net.dankito.deepthought.controls.tag.EntryTagsControl;
 import net.dankito.deepthought.controls.utils.EditedEntitiesHolder;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -28,6 +28,7 @@ import net.dankito.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.dankito.deepthought.data.model.settings.enums.Setting;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,7 +130,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     abstractListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryAbstract);
     htmledAbstract = new CollapsibleHtmlEditor("abstract", abstractListener);
     htmledAbstract.setId("htmledAbstract");
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledAbstract);
     htmledAbstract.setExpanded(false);
     contentPane.getChildren().add(0, htmledAbstract);
     VBox.setVgrow(htmledAbstract, Priority.SOMETIMES);
@@ -138,7 +139,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     contentListener = new DeepThoughtFxHtmlEditorListener(editedEmbeddedFiles, fieldsWithUnsavedChanges, FieldWithUnsavedChanges.EntryContent);
     htmledContent = new CollapsibleHtmlEditor("content", contentListener);
     htmledContent.setId("htmledContent");
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(htmledContent);
     contentPane.getChildren().add(1, htmledContent);
     VBox.setVgrow(htmledContent, Priority.ALWAYS);
     VBox.setMargin(htmledContent, new Insets(6, 0, 0, 0));
@@ -148,7 +149,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryReferenceControl = new EntryReferenceControl(entry, event -> referenceControlFieldChanged(event));
     entryReferenceControl.setId("editEntryDialogReferenceControl");
     entryReferenceControl.setExpanded(false);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryReferenceControl);
     contentPane.getChildren().add(4, entryReferenceControl);
     VBox.setVgrow(entryReferenceControl, Priority.SOMETIMES);
     VBox.setMargin(entryReferenceControl, new Insets(6, 0, 0, 0));
@@ -158,7 +159,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryPersonsControl.setExpanded(false);
     entryPersonsControl.setPersonAddedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
     entryPersonsControl.setPersonRemovedEventHandler((event) -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryPersons));
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryPersonsControl);
     contentPane.getChildren().add(5, entryPersonsControl);
     VBox.setVgrow(entryPersonsControl, Priority.SOMETIMES);
     VBox.setMargin(entryPersonsControl, new Insets(6, 0, 0, 0));
@@ -170,9 +171,9 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 
     filesControl = new FilesControl(editedAttachedFiles);
     filesControl.setId("editEntryDialogFilesControl");
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(filesControl);
     filesControl.setMinHeight(Region.USE_PREF_SIZE);
-    filesControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    filesControl.setMaxHeight(FXUtils.SizeMaxValue);
     contentPane.getChildren().add(6, filesControl);
     VBox.setVgrow(filesControl, Priority.SOMETIMES);
     VBox.setMargin(filesControl, new Insets(6, 0, 0, 0));
@@ -186,7 +187,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryTagsControl.setTagRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryTags));
     entryTagsControl.setMinWidth(150);
     entryTagsControl.setPrefHeight(250);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryTagsControl);
     entryTagsControl.setExpanded(true);
     VBox.setVgrow(entryTagsControl, Priority.SOMETIMES);
     VBox.setMargin(entryTagsControl, new Insets(6, 0, 0, 0));
@@ -198,7 +199,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
     entryCategoriesControl.setCategoryRemovedEventHandler(event -> fieldsWithUnsavedChanges.add(FieldWithUnsavedChanges.EntryCategories));
     entryCategoriesControl.setMinWidth(150);
     entryTagsControl.setPrefHeight(250);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(entryCategoriesControl);
     entryCategoriesControl.setExpanded(true);
     VBox.setVgrow(entryCategoriesControl, Priority.SOMETIMES);
     VBox.setMargin(entryCategoriesControl, new Insets(6, 0, 0, 0));
@@ -517,7 +518,7 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
 //    contentPane.minHeightProperty().bind(windowStage.getScene().heightProperty().subtract(pnBottomBar.heightProperty()).subtract(8));
 
     // TODO: for a better user experience it would be better if Content editor is focused by default so that user can start editing Content right away, but that's not working with HtmlEditor
-    net.dankito.deepthought.controls.utils.FXUtils.focusNode(htmledContent);
+    FXUtils.focusNode(htmledContent);
   }
 
   public void setWindowStageAndEntryCreationResult(final Stage windowStage, EntryCreationResult creationResult) {

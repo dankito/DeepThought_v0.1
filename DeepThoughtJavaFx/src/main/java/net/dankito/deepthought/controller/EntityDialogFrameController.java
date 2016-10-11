@@ -2,18 +2,19 @@ package net.dankito.deepthought.controller;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controller.enums.DialogResult;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.CollapsiblePane;
 import net.dankito.deepthought.controls.ContextHelpControl;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.listener.SettingsChangedListener;
 import net.dankito.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.dankito.deepthought.data.model.settings.enums.Setting;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.Alerts;
-import net.dankito.deepthought.util.localization.JavaFxLocalization;
 import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.localization.JavaFxLocalization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +132,7 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
 
 
   protected void setupControls() {
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnChooseFieldsToShow);
     setButtonChooseFieldsToShowVisibility(false);
 
     tglbtnShowHideContextHelp.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -140,7 +141,7 @@ public abstract class EntityDialogFrameController extends ChildWindowsController
     contextHelpControl = new ContextHelpControl(getHelpTextResourceKeyPrefix());
     dialogPane.setRight(contextHelpControl);
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(contextHelpControl);
     contextHelpControl.visibleProperty().bind(tglbtnShowHideContextHelp.selectedProperty());
   }
 

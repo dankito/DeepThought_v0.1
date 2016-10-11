@@ -1,8 +1,9 @@
 package net.dankito.deepthought.controls.file.cells;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.FileLink;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.file.FileUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public abstract class FileTreeTableCellBase extends TreeTableCell<FileLink, Stri
     setAlignment(Pos.BASELINE_LEFT);
 
     graphicPane.setAlignment(Pos.CENTER_LEFT);
-    cellLabel.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    cellLabel.setMaxWidth(FXUtils.SizeMaxValue);
 
     graphicPane.getChildren().add(cellLabel);
     HBox.setHgrow(cellLabel, Priority.ALWAYS);
