@@ -1,6 +1,7 @@
 package net.dankito.deepthought.controls.person;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -96,7 +97,7 @@ public class PersonLabel extends net.dankito.deepthought.controls.CollectionItem
     ContextMenu contextMenu = new ContextMenu();
 
     MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
-    net.dankito.deepthought.controls.utils.FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
+    FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
     editMenuItem.setOnAction(event -> net.dankito.deepthought.controller.Dialogs.showEditPersonDialog(this.person));
     contextMenu.getItems().add(editMenuItem);
 

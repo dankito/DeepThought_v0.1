@@ -1,5 +1,6 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
@@ -95,7 +96,7 @@ public class TagFilterTableCell extends TableCell<Tag, Boolean> {
   }
 
   protected void setCellBackgroundColor() {
-    net.dankito.deepthought.controls.utils.FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
+    FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
   }
 
 }

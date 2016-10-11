@@ -4,6 +4,7 @@ import net.dankito.deepthought.controller.ChildWindowsController;
 import net.dankito.deepthought.controller.ChildWindowsControllerListener;
 import net.dankito.deepthought.controller.enums.DialogResult;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
@@ -97,15 +98,15 @@ public class ReferenceBaseListCell extends ListCell<ReferenceBase> implements IC
     graphicPane.setAlignment(Pos.CENTER_LEFT);
 
     referencePreviewLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
-    referencePreviewLabel.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    referencePreviewLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(referencePreviewLabel);
     HBox.setHgrow(referencePreviewLabel, Priority.ALWAYS);
     HBox.setMargin(referencePreviewLabel, new Insets(0, 6, 0, 0));
 
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnAddReferenceOrReferenceSubDivisionToReferenceBase);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(btnAddReferenceOrReferenceSubDivisionToReferenceBase);
     btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMinWidth(100);
     btnAddReferenceOrReferenceSubDivisionToReferenceBase.setPrefWidth(Region.USE_COMPUTED_SIZE);
-    btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    btnAddReferenceOrReferenceSubDivisionToReferenceBase.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(btnAddReferenceOrReferenceSubDivisionToReferenceBase);
     HBox.setMargin(btnAddReferenceOrReferenceSubDivisionToReferenceBase, new Insets(0, 6, 0, 0));
 

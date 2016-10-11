@@ -2,6 +2,7 @@ package net.dankito.deepthought.controls.reference;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Reference;
@@ -10,8 +11,8 @@ import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
-import net.dankito.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.dankito.deepthought.data.search.specific.ReferenceBaseType;
+import net.dankito.deepthought.data.search.specific.ReferenceBasesSearch;
 import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.Notification;
 
@@ -74,7 +75,7 @@ public class SearchAndSelectReferenceControl extends VBox implements ICleanUp {
 
     Application.addApplicationListener(applicationListener);
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "SearchAndSelectReferenceControl")) {
+    if(FXUtils.loadControl(this, "SearchAndSelectReferenceControl")) {
       setupControl();
 
       if(deepThought != null)

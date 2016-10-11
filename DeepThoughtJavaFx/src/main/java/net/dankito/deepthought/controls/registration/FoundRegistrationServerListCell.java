@@ -3,6 +3,7 @@ package net.dankito.deepthought.controls.registration;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.listener.AskForDeviceRegistrationResultListener;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.controls.utils.FXUtils;
 
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -69,11 +70,11 @@ public class FoundRegistrationServerListCell extends ListCell<HostInfo> {
 
     lblUserInfo.setMinHeight(26);
     lblUserInfo.setMaxHeight(26);
-    lblUserInfo.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    lblUserInfo.setMaxWidth(FXUtils.SizeMaxValue);
 
     lblDeviceInfo.setMinHeight(26);
     lblDeviceInfo.setMaxHeight(26);
-    lblDeviceInfo.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    lblDeviceInfo.setMaxWidth(FXUtils.SizeMaxValue);
 
     net.dankito.deepthought.util.localization.JavaFxLocalization.bindLabeledText(btnAskForRegistration, "ask.for.registration");
     btnAskForRegistration.setMinHeight(35);

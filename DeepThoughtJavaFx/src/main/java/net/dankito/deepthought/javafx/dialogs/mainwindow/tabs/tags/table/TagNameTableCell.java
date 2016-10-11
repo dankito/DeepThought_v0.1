@@ -1,6 +1,7 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.ui.SystemTag;
@@ -124,7 +125,7 @@ public class TagNameTableCell extends net.dankito.deepthought.controls.TextField
   }
 
   protected void setCellBackgroundColor() {
-    net.dankito.deepthought.controls.utils.FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
+    FXUtils.setTagCellBackgroundColor(tag, lastTagsSearchResults, this);
   }
 
 

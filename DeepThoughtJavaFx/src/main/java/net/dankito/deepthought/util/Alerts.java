@@ -4,6 +4,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.communication.messages.request.AskForDeviceRegistrationRequest;
 import net.dankito.deepthought.communication.messages.response.AskForDeviceRegistrationResponse;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.FileLink;
@@ -384,7 +385,7 @@ public class Alerts {
   protected static void setAlertContent(Alert alert, String content) {
     double maxWidth = Screen.getPrimary().getVisualBounds().getWidth();
     if(alert.getOwner() != null) {
-      Screen ownersScreen = net.dankito.deepthought.controls.utils.FXUtils.getScreenWindowLeftUpperCornerIsIn(alert.getOwner());
+      Screen ownersScreen = FXUtils.getScreenWindowLeftUpperCornerIsIn(alert.getOwner());
       if(ownersScreen != null)
         maxWidth = ownersScreen.getVisualBounds().getWidth();
     }
@@ -393,16 +394,16 @@ public class Alerts {
     Label contentLabel = new Label(content);
     contentLabel.setWrapText(true);
     contentLabel.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    contentLabel.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    contentLabel.setMaxHeight(FXUtils.SizeMaxValue);
     contentLabel.setMaxWidth(maxWidth);
 
     VBox contentPane = new VBox(contentLabel);
     contentPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-    contentPane.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    contentPane.setMaxHeight(FXUtils.SizeMaxValue);
     VBox.setVgrow(contentLabel, Priority.ALWAYS);
 
     alert.getDialogPane().setPrefHeight(Region.USE_COMPUTED_SIZE);
-    alert.getDialogPane().setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    alert.getDialogPane().setMaxHeight(FXUtils.SizeMaxValue);
     alert.getDialogPane().setMaxWidth(maxWidth);
     alert.getDialogPane().setContent(contentPane);
   }
@@ -419,13 +420,13 @@ public class Alerts {
     textArea.setEditable(false);
     textArea.setWrapText(true);
 
-    textArea.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
-    textArea.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    textArea.setMaxWidth(FXUtils.SizeMaxValue);
+    textArea.setMaxHeight(FXUtils.SizeMaxValue);
     GridPane.setVgrow(textArea, Priority.ALWAYS);
     GridPane.setHgrow(textArea, Priority.ALWAYS);
 
     GridPane expContent = new GridPane();
-    expContent.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    expContent.setMaxWidth(FXUtils.SizeMaxValue);
     expContent.add(label, 0, 0);
     expContent.add(textArea, 0, 1);
 

@@ -1,6 +1,7 @@
 package net.dankito.deepthought.controls.reference;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceBase;
@@ -8,9 +9,9 @@ import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.LanguageChangedListener;
 import net.dankito.deepthought.util.localization.Localization;
-import net.dankito.deepthought.util.StringUtils;
 
 import java.util.Collection;
 
@@ -160,7 +161,7 @@ public class EntryReferenceBaseLabel extends net.dankito.deepthought.controls.Co
     ContextMenu contextMenu = new ContextMenu();
 
     MenuItem editMenuItem = new MenuItem(Localization.getLocalizedString("edit"));
-    net.dankito.deepthought.controls.utils.FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
+    FXUtils.addStyleToCurrentStyle(editMenuItem, "-fx-font-weight: bold;");
     editMenuItem.setOnAction(event -> showEditReferenceDialog());
     contextMenu.getItems().add(editMenuItem);
 

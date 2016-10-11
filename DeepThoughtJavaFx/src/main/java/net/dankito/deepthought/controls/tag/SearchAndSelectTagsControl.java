@@ -1,9 +1,10 @@
 package net.dankito.deepthought.controls.tag;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.LazyLoadingObservableList;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Tag;
@@ -14,10 +15,10 @@ import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResult;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
 import net.dankito.deepthought.util.Alerts;
-import net.dankito.deepthought.util.localization.JavaFxLocalization;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.JavaFxLocalization;
 
 import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
 
     Application.addApplicationListener(applicationListener);
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "SearchAndSelectTagsControl")) {
+    if(FXUtils.loadControl(this, "SearchAndSelectTagsControl")) {
       setupControl();
 
       if(Application.getDeepThought() != null && this.deepThought == null) {
@@ -355,7 +356,7 @@ public class SearchAndSelectTagsControl extends VBox implements ICleanUp {
   }
 
   protected void resetListViewAllTagsItemsThreadSafe(final DeepThought deepThought) {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> resetListViewAllTagsItems(deepThought));
+    FXUtils.runOnUiThread(() -> resetListViewAllTagsItems(deepThought));
   }
 
   protected void resetListViewAllTagsItems(DeepThought deepThought) {

@@ -1,5 +1,6 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.filterpanel;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Tag;
 
 import org.controlsfx.control.textfield.CustomTextField;
@@ -40,7 +41,7 @@ public class TagsFilterPanel extends HBox {
     this.tagsFilter = tagsFilter;
     this.selectedTagsController = selectedTagsController;
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "TagsFilterPanel"))
+    if(FXUtils.loadControl(this, "TagsFilterPanel"))
       setupControl();
   }
 
@@ -120,7 +121,7 @@ public class TagsFilterPanel extends HBox {
   }
 
   protected void addNewTag() {
-    Point2D buttonCoordinates = net.dankito.deepthought.controls.utils.FXUtils.getNodeScreenCoordinates(btnAddTag);
+    Point2D buttonCoordinates = FXUtils.getNodeScreenCoordinates(btnAddTag);
 
     final double centerX = buttonCoordinates.getX() + btnAddTag.getWidth() / 2;
     final double y = buttonCoordinates.getY() + btnAddTag.getHeight() + 6;

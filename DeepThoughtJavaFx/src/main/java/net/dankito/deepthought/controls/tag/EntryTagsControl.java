@@ -1,9 +1,10 @@
 package net.dankito.deepthought.controls.tag;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.controls.CollapsiblePane;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
@@ -145,7 +146,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     searchAndSelectTagsControl = new SearchAndSelectTagsControl(this);
 //    searchAndSelectTagsControl.setPrefHeight(250);
 //    searchAndSelectTagsControl.setMaxHeight(200);
-    searchAndSelectTagsControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    searchAndSelectTagsControl.setMaxHeight(FXUtils.SizeMaxValue);
     this.setContent(searchAndSelectTagsControl);
 
     showEntryTags();
@@ -155,10 +156,10 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     HBox titlePane = new HBox();
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setPrefWidth(USE_COMPUTED_SIZE);
-    titlePane.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 //    titlePane.setPrefHeight(USE_COMPUTED_SIZE);
 //    titlePane.setMinHeight(USE_PREF_SIZE);
-    titlePane.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    titlePane.setMaxHeight(FXUtils.SizeMaxValue);
 
     btnShowHideSearchTagsToolWindow = new ToggleButton("", new ImageView(net.dankito.deepthought.controls.Constants.WindowIconPath));
     btnShowHideSearchTagsToolWindow.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -198,7 +199,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
   }
 
   protected void clearEntryTagLabels() {
-    net.dankito.deepthought.controls.utils.FXUtils.cleanUpChildrenAndClearPane(pnSelectedTagsPreview);
+    FXUtils.cleanUpChildrenAndClearPane(pnSelectedTagsPreview);
   }
 
 
@@ -325,7 +326,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(addedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought addedEntity is not a Tag?
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> handleEntityAddedToEntry(addedEntity));
+        FXUtils.runOnUiThread(() -> handleEntityAddedToEntry(addedEntity));
       }
     }
 
@@ -337,7 +338,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     @Override
     public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
       if(removedEntity instanceof Tag) { // TODO: is it ever useful / needed that showEntryTags() is called even thought removedEntity is not a Tag?
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> handleEntityRemovedFromEntry(removedEntity));
+        FXUtils.runOnUiThread(() -> handleEntityRemovedFromEntry(removedEntity));
       }
     }
   };
@@ -366,7 +367,7 @@ public class EntryTagsControl extends CollapsiblePane implements IEditedEntities
     @Override
     public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
       if(updatedEntity instanceof Tag && entry != null && editedTags.contains((Tag) updatedEntity)) {
-        net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> showEntryTags());
+        FXUtils.runOnUiThread(() -> showEntryTags());
       }
     }
 

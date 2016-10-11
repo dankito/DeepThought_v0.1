@@ -1,5 +1,6 @@
 package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Tag;
 
 import org.slf4j.Logger;
@@ -83,7 +84,7 @@ public class TableViewTags extends TableView<Tag> {
     clmnTagName.setResizable(true);
     clmnTagName.setMinWidth(10);
     clmnTagName.setPrefWidth(80);
-    clmnTagName.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    clmnTagName.setMaxWidth(FXUtils.SizeMaxValue);
 
     clmnTagName.setCellFactory(param -> new TagNameTableCell(tagsFilter));
   }

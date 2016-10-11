@@ -1,6 +1,7 @@
 package net.dankito.deepthought.controls.person;
 
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.listener.EntityListener;
@@ -122,7 +123,7 @@ public class PersonListCell extends ListCell<Person> implements ICleanUp {
     }
 
     personDisplayNameLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
-    personDisplayNameLabel.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    personDisplayNameLabel.setMaxWidth(FXUtils.SizeMaxValue);
     graphicPane.getChildren().add(personDisplayNameLabel);
 
     HBox.setHgrow(personDisplayNameLabel, Priority.ALWAYS);

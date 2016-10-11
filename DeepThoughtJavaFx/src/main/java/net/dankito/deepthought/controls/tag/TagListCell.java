@@ -1,7 +1,8 @@
 package net.dankito.deepthought.controls.tag;
 
-import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.controls.utils.IEditedEntitiesHolder;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -117,8 +118,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
     chkbxIsTagSelected.setId("chkbxIsTagSelected");
 
     lblTagName.setTextOverrun(OverrunStyle.ELLIPSIS);
-    lblTagName.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblTagName);
+    lblTagName.setMaxWidth(FXUtils.SizeMaxValue);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(lblTagName);
     graphicPane.getChildren().add(lblTagName);
     HBox.setHgrow(lblTagName, Priority.ALWAYS);
     HBox.setMargin(lblTagName, new Insets(0, 6, 0, 6));
@@ -165,7 +166,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
     if(isSelected == true)
       setBackground(net.dankito.deepthought.controls.Constants.TagCellSelectedBackground);
     else
-      net.dankito.deepthought.controls.utils.FXUtils.setTagCellBackgroundColor(tag, lastSearchResults, TagListCell.this);
+      FXUtils.setTagCellBackgroundColor(tag, lastSearchResults, TagListCell.this);
   }
 
   protected ChangeListener<Boolean> checkBoxIsTagSelectedChangeListener = new ChangeListener<Boolean>() {
@@ -193,7 +194,7 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
   }
 
   protected void tagUpdatedThreadSafe() {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> tagUpdated());
+    FXUtils.runOnUiThread(() -> tagUpdated());
   }
 
   protected void tagUpdated() {
@@ -247,8 +248,8 @@ public class TagListCell extends ListCell<Tag> implements ICleanUp {
 
     HBox.setHgrow(txtfldEditTagName, Priority.ALWAYS);
     HBox.setMargin(txtfldEditTagName, new Insets(0, 6, 0, 6));
-    txtfldEditTagName.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
-    net.dankito.deepthought.controls.utils.FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditTagName);
+    txtfldEditTagName.setMaxWidth(FXUtils.SizeMaxValue);
+    FXUtils.ensureNodeOnlyUsesSpaceIfVisible(txtfldEditTagName);
     graphicPane.getChildren().add(1, txtfldEditTagName);
 
     txtfldEditTagName.setOnKeyReleased(new EventHandler<KeyEvent>() {

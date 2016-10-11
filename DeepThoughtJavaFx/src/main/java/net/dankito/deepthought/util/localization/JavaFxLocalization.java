@@ -1,5 +1,6 @@
 package net.dankito.deepthought.util.localization;
 
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class JavaFxLocalization {
   }
 
   public static void setLocale(Locale locale) {
-    net.dankito.deepthought.controls.utils.FXUtils.runOnUiThread(() -> localeProperty().set(locale));
+    FXUtils.runOnUiThread(() -> localeProperty().set(locale));
   }
 
   public static void setLocaleForLanguage(ApplicationLanguage language) {

@@ -2,6 +2,7 @@ package net.dankito.deepthought.controls.person;
 
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Person;
@@ -68,7 +69,7 @@ public class SearchAndSelectPersonsControl extends VBox implements ICleanUp {
 
     Application.addApplicationListener(applicationListener);
 
-    if(net.dankito.deepthought.controls.utils.FXUtils.loadControl(this, "SearchAndSelectPersonsControl")) {
+    if(FXUtils.loadControl(this, "SearchAndSelectPersonsControl")) {
       setupControl();
 
       if(deepThought != null)

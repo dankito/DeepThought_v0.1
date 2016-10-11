@@ -5,10 +5,10 @@ import net.dankito.deepthought.controller.ChildWindowsController;
 import net.dankito.deepthought.controller.ChildWindowsControllerListener;
 import net.dankito.deepthought.controller.EditReferenceDialogController;
 import net.dankito.deepthought.controller.enums.DialogResult;
-import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.controls.CollapsiblePane;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.controls.event.FieldChangedEvent;
+import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -21,10 +21,11 @@ import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.search.specific.ReferenceBaseType;
-import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.ui.enums.FieldWithUnsavedChanges;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.isbn.IsbnResolvingListener;
 import net.dankito.deepthought.util.isbn.ResolveIsbnResult;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +205,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     setupTitle();
 
     searchAndSelectReferenceControl = new net.dankito.deepthought.controls.reference.SearchAndSelectReferenceControl(ReferenceBaseType.All, this);
-    searchAndSelectReferenceControl.setMaxHeight(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    searchAndSelectReferenceControl.setMaxHeight(FXUtils.SizeMaxValue);
     setContent(searchAndSelectReferenceControl);
   }
 
@@ -213,7 +214,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     titlePane.setAlignment(Pos.CENTER_LEFT);
     titlePane.setMinHeight(32);
     titlePane.setMaxHeight(32);
-    titlePane.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    titlePane.setMaxWidth(FXUtils.SizeMaxValue);
 
     Label lblReference = new Label();
     net.dankito.deepthought.util.localization.JavaFxLocalization.bindLabeledText(lblReference, "reference");
@@ -226,7 +227,7 @@ public class EntryReferenceControl extends CollapsiblePane implements ISelectedR
     paneSelectedReferenceBase = new HBox();
     paneSelectedReferenceBase.setAlignment(Pos.CENTER_LEFT);
     paneSelectedReferenceBase.setMinWidth(100);
-    paneSelectedReferenceBase.setMaxWidth(net.dankito.deepthought.controls.utils.FXUtils.SizeMaxValue);
+    paneSelectedReferenceBase.setMaxWidth(FXUtils.SizeMaxValue);
     titlePane.getChildren().add(paneSelectedReferenceBase);
 
     btnNewOrEditReference = new net.dankito.deepthought.controls.NewOrEditButton();
