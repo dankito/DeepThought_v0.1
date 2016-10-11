@@ -7,15 +7,6 @@
 	path = libs/persistence/database/couchbase-lite-jpa
 	url = https://github.com/dankito/couchbase-lite-jpa.git
 
-[submodule "libs/persistence/database/ormlite-jpa-core"]
-	path = libs/persistence/database/ormlite-jpa-core
-	url = https://github.com/dankito/ormlite-jpa-core.git
-[submodule "libs/persistence/database/ormlite-jpa-jdbc"]
-	path = libs/persistence/database/ormlite-jpa-jdbc
-	url = https://github.com/dankito/ormlite-jpa-jdbc.git
-[submodule "libs/persistence/database/ormlite-jpa-android"]
-	path = libs/persistence/database/ormlite-jpa-android
-	url = https://github.com/dankito/ormlite-jpa-android.git
 [submodule "libs/persistence/database/couchbase-lite-java-core"]
 	path = libs/persistence/database/couchbase-lite-java-core
 	url = https://github.com/dankito/couchbase-lite-java-core.git
