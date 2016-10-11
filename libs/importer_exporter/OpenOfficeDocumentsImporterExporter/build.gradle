@@ -30,5 +30,4 @@ dependencies {
     testCompile 'junit:junit:4.8.1'
     // to include test helper classes from DeepThoughtLib
     testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
-    testCompile project(':JavaSeOrmLiteEntityManager')
 }

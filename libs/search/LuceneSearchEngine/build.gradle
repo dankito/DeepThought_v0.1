@@ -25,7 +25,6 @@ dependencies {
 
     // to include test helper classes from DeepThoughtLib
     testCompile project(path: ':DeepThoughtLib', configuration: 'tests')
-    testCompile project(':JavaSeOrmLiteEntityManager')
 //    testCompile project(':WikipediaImporter')
 //    testCompile project(':OpenOfficeDocumentsImporterExporter')
 }
