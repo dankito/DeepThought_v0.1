@@ -11,7 +11,6 @@ include ':JavaCouchbaseLiteEntityManager', ':AndroidCouchbaseLiteEntityManager'
 include ':CouchbaseLiteSyncManager'
 
 include ':ormlite-jpa-core', ':ormlite-jpa-jdbc', ':ormlite-jpa-android'
-include ':EntityManagerTools'
 
 
 include ':json-io', ':DeepThoughtJson-io'
@@ -49,7 +48,6 @@ project(':ormlite-jpa-core').projectDir = new File('libs/persistence/database/or
 project(':ormlite-jpa-jdbc').projectDir = new File('libs/persistence/database/ormlite-jpa-jdbc')
 project(':ormlite-jpa-android').projectDir = new File('libs/persistence/database/ormlite-jpa-android')
 
-project(':EntityManagerTools').projectDir = new File('libs/persistence/database/EntityManagerTools')
 
 
 project(':json-io').projectDir = new File('libs/persistence/json/json-io')
