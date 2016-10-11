@@ -10,7 +10,6 @@ targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     compile project(':DeepThoughtLib')
     compile project(':JavaCouchbaseLiteEntityManager')
-    compile project(':JavaSeOrmLiteEntityManager')
     compile project(':LuceneSearchEngine')
     compile project(':WGetFileDownloader')
     compile project(':Boilerpipe')
