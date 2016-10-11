@@ -164,7 +164,7 @@ public class HostInfo {
 
   public static HostInfo fromUserAndDevice(User user, Device device) {
     return new HostInfo(user.getUniversallyUniqueId(), user.getUserName(), device.getId(), device.getUniversallyUniqueId(), device.getName(), device.getPlatform(),
-        device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
+        device.getOsVersion(), device.getPlatformArchitecture(), user.getDevices().size() - 1);
   }
 
 }

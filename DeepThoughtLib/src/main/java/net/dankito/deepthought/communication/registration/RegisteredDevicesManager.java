@@ -55,8 +55,6 @@ public class RegisteredDevicesManager implements IRegisteredDevicesManager {
     loggedOnUser.addDevice(peerDevice);
     loggedOnUser.getUsersDefaultGroup().addDevice(peerDevice);
 
-    application.getLocalDevice().incrementCountSynchronizingDevices();
-
     return true;
   }
 

@@ -93,7 +93,6 @@ public class TableConfig {
   public final static String DevicePlatformArchitectureColumnName = "platform_architecture";
   public final static String DeviceOsVersionColumnName = "os_version";
   public final static String DeviceLastKnownIpColumnName = "last_known_ip";
-  public final static String DeviceCountSynchronizingDevicesColumnName = "count_synchronizing_devices";
   public final static String DeviceIconColumnName = "device_icon";
   public final static String DeviceUserRegionColumnName = "user_region";
   public final static String DeviceUserLanguageColumnName = "user_language";

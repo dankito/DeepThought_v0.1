@@ -102,7 +102,7 @@ public class ConnectedDevice extends HostInfo {
 
   public static ConnectedDevice fromUserAndDevice(User user, Device device, String localHostIpAddress, int messagesPort, int synchronizationPort) {
     ConnectedDevice connectedDevice = new ConnectedDevice(user.getUniversallyUniqueId(), user.getUserName(), device.getId(), device.getUniversallyUniqueId(), device.getName(),
-        device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture(), device.getCountSynchronizingDevices());
+        device.getPlatform(), device.getOsVersion(), device.getPlatformArchitecture(), user.getDevices().size() - 1);
 
     connectedDevice.setAddress(localHostIpAddress);
     connectedDevice.setMessagesPort(messagesPort);

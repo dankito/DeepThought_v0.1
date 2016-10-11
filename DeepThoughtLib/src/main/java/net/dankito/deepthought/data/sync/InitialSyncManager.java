@@ -147,7 +147,6 @@ public class InitialSyncManager {
 
     device.setId(hostInfo.getDeviceDatabaseId());
     device.setDescription(hostInfo.getDeviceDescription());
-    device.setCountSynchronizingDevices(hostInfo.getCountSynchronizingDevice());
 
     return device;
   }
@@ -300,13 +299,15 @@ public class InitialSyncManager {
 
   public boolean shouldUseLocalDatabaseIds(DeepThought localDeepThought, User localUser, Device localDevice,
                                            DeepThoughtInfo remoteDeepThought, UserInfo remoteUser, HostInfo remoteDevice) throws IllegalStateException {
-    if(localDevice.getCountSynchronizingDevices() > 0 && remoteDevice.getCountSynchronizingDevice() == 0) {
+    int countSynchronizingDevices = localUser.getDevices().size();
+
+    if(countSynchronizingDevices > 0 && remoteDevice.getCountSynchronizingDevice() == 0) {
       return true;
     }
-    if(localDevice.getCountSynchronizingDevices() == 0 && remoteDevice.getCountSynchronizingDevice() > 0) {
+    if(countSynchronizingDevices == 0 && remoteDevice.getCountSynchronizingDevice() > 0) {
       return false;
     }
-    if(localDevice.getCountSynchronizingDevices() > 0 && remoteDevice.getCountSynchronizingDevice() > 0) {
+    if(countSynchronizingDevices > 0 && remoteDevice.getCountSynchronizingDevice() > 0) {
       if(isTheSameUser(localUser, remoteUser, localDeepThought, remoteDeepThought) == false) {
         // TODO: now we're in a Trap, this has to be urgently resolved:
         // Both devices have already synchronized their Database Ids with other Devices, so no matter which one we choose,
