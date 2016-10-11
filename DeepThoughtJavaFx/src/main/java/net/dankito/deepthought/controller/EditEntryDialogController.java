@@ -435,7 +435,10 @@ public class EditEntryDialogController extends EntityDialogFrameController imple
         log.warn("" + field);
     }
 
-    // if it's a new Entry e.g. created by a ContentExtractor, then btnApply was enabled without that fieldsWithUnsavedChanges contained unsaved fields. So disable Button now
+    entryHasBeenSaved();
+  }
+
+  protected void entryHasBeenSaved() {
     btnApplyChanges.setDisable(true);
 
     htmledAbstract.getHtmlEditor().setHtmlHasBeenSaved();
