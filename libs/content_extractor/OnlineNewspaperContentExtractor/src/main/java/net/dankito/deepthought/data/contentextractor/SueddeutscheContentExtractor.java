@@ -609,8 +609,8 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
 
   protected String extractImageUrlFromImgElement(Element imgElement) {
     if(imgElement.hasClass("lazyload") && imgElement.hasAttr("data-src"))
-      return imgElement.attr("data-src");
-    return imgElement.attr("src");
+      return makeLinkAbsolute(imgElement.attr("data-src"));
+    return makeLinkAbsolute(imgElement.attr("src"));
   }
 
   protected String extractImgElementHtml(Element imgElement) {
