@@ -19,10 +19,7 @@ public class JavaCouchbaseLiteEntityManager extends CouchbaseLiteEntityManagerBa
   @Override
   protected String adjustDatabasePath(Context context, EntityManagerConfiguration configuration) {
     // TODO: implement this in a better way as this uses implementation internal details
-    File databaseFolder = ((JavaContext)context).getRootDirectory();
-    databaseFolder = new File(databaseFolder, configuration.getDataFolder());
-
-    return new File(databaseFolder, configuration.getDataCollectionFileName() + ".cblite2").getAbsolutePath();
+    return new File(context.getFilesDir(), configuration.getDataCollectionFileName() + ".cblite2").getAbsolutePath();
   }
 
 }
