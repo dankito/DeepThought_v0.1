@@ -124,7 +124,6 @@ public class AndroidApplicationConfiguration extends DependencyResolverBase impl
     try {
       if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9)) {
           return new LuceneSearchEngine();
-//        return new LuceneAndDatabaseSearchEngine();
       }
     } catch (Exception ex) {
       log.error("Could not initialize LuceneSearchEngine", ex);

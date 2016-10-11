@@ -7,7 +7,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
-import net.dankito.deepthought.data.search.LuceneAndDatabaseSearchEngine;
+import net.dankito.deepthought.data.search.LuceneSearchEngine;
 import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.junit.Assert;
@@ -39,8 +39,7 @@ public class OpenOfficeDocumentsImporterExporterTest {
 
       @Override
       public ISearchEngine createSearchEngine() {
-//          return new LuceneSearchEngine();
-        return new LuceneAndDatabaseSearchEngine();
+          return new LuceneSearchEngine();
       }
     });
 
