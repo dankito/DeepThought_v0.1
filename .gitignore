@@ -12,6 +12,8 @@
 /plugins
 /res
 **/DeepThoughtFx.properties
+DeepThoughtJavaFx/data/
+libs/content_extractor/OnlineNewspaperContentExtractor/data/
 
 
 # Built application files
