@@ -1,5 +1,6 @@
 package net.dankito.deepthought.data.search;
 
+import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.listener.ApplicationListener;
@@ -35,6 +36,20 @@ public abstract class SearchEngineBase implements ISearchEngine {
     Application.removeApplicationListener(applicationListener);
     // nothing to do here, maybe in sub classes
   }
+
+
+  @Override
+  public void getEntriesForTagAsync(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        getEntriesForTag(tag, listener);
+      }
+    });
+  }
+
+  protected abstract void getEntriesForTag(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener);
+
 
   @Override
   public void searchTags(final TagsSearch search) {

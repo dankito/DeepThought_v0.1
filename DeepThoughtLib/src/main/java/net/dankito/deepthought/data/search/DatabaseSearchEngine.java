@@ -36,7 +36,7 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
 
   @Override
-  public void getEntriesWithTagAsync(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+  protected void getEntriesForTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
     if(tag instanceof EntriesWithoutTagsSystemTag) {
       getEntriesWithoutTags(listener);
     }

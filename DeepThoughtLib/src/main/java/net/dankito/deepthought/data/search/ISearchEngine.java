@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 public interface ISearchEngine {
 
-  void getEntriesWithTagAsync(Tag tag, final SearchCompletedListener<Collection<Entry>> listener);
+  void getEntriesForTagAsync(Tag tag, final SearchCompletedListener<Collection<Entry>> listener);
 
   void searchTags(TagsSearch search);
 

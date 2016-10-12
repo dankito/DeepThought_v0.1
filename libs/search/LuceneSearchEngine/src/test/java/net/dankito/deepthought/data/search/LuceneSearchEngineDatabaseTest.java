@@ -91,7 +91,7 @@ public class LuceneSearchEngineDatabaseTest {
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithTagAsync(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.getEntriesForTagAsync(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         entriesWithoutTags.addAll(results);

@@ -883,17 +883,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   /*        Search          */
 
-  @Override
-  public void getEntriesWithTagAsync(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        getEntriesWithTag(tag, listener);
-      }
-    });
-  }
-
-  protected void getEntriesWithTag(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+  protected void getEntriesForTag(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
     if(isInitialized) {
       queryForEntriesWithTag(tag, listener);
     }

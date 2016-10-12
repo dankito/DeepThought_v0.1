@@ -125,7 +125,7 @@ public abstract class SearchComparisonTestBase {
     final List<Entry> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithTagAsync(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.getEntriesForTagAsync(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         logOperationProcessTime("getEntriesWithoutTags");
