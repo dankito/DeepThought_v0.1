@@ -1,6 +1,5 @@
 package net.dankito.deepthought.data.search.ui;
 
-import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.SearchBase;
@@ -127,15 +126,6 @@ public class TagsSearcher {
     }
 
     return TagsSearcherButtonState.CREATE_TAG;
-  }
-
-
-  public List<Entry> getSearchResultEntriesForTag(Tag tag) {
-    if(lastFilterTagsResult != null) {
-      return createListFromCollection(lastFilterTagsResult.getEntriesHavingFilteredTags());
-    }
-
-    return createListFromCollection(tag.getEntries());
   }
 
 
