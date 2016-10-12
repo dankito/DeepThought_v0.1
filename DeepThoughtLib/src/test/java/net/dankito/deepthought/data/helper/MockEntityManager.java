@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by ganymed on 11/04/15.
@@ -44,9 +45,7 @@ public class MockEntityManager implements IEntityManager {
 
   protected IApplicationConfiguration configuration = new TestApplicationConfiguration();
 
-  protected Map<Class, Long> lastEntityIndices = new HashMap<>();
-
-  protected Map<Class, Map<Long, BaseEntity>> mapPersistedEntities = new HashMap<>();
+  protected Map<Class, Map<String, BaseEntity>> mapPersistedEntities = new HashMap<>();
 
 
   public MockEntityManager() {
@@ -68,25 +67,24 @@ public class MockEntityManager implements IEntityManager {
       entityClass = ReferenceBase.class;
 
     if(mapPersistedEntities.containsKey(entityClass) == false)
-      mapPersistedEntities.put(entityClass, new HashMap<Long, BaseEntity>());
-    if(lastEntityIndices.containsKey(entityClass) == false)
-      lastEntityIndices.put(entityClass, 0L);
+      mapPersistedEntities.put(entityClass, new HashMap<String, BaseEntity>());
 
     try {
       callPrePersistLifeCycleMethod(entity);
 
-      Long id = lastEntityIndices.get(entityClass);
-      id++;
-      lastEntityIndices.put(entityClass, id);
+      String id = UUID.randomUUID().toString();
       idField.set(entity, id);
       versionField.set(entity, 1L);
 
       mapPersistedEntities.get(entityClass).put(id, entity);
 
-      if(entity instanceof DeepThoughtApplication)
+      if(entity instanceof DeepThoughtApplication) {
         persistDeepThoughtApplication((DeepThoughtApplication) entity);
-      else if(entity instanceof DeepThought)
-        persistDeepThought((DeepThought)entity);
+      }
+      else if(entity instanceof DeepThought) {
+        persistDeepThought((DeepThought) entity);
+      }
+
       if(entity instanceof UserDataEntity) {
         createdByField.set(entity, Application.getLoggedOnUser());
         modifiedByField.set(entity, Application.getLoggedOnUser());
