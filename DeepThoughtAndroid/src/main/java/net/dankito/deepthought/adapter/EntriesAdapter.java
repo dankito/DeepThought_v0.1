@@ -53,7 +53,7 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     previewService = Application.getEntityPreviewService();
 
     if(deepThought != null) {
-      updateEntriesToShowThreadSafe(deepThought);
+      updateEntriesToShow(deepThought);
     }
     else {
       context.runOnUiThread(new Runnable() {
@@ -67,17 +67,22 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     }
   }
 
-  protected void updateEntriesToShowThreadSafe(final DeepThought deepThought) {
-    context.runOnUiThread(new Runnable() {
+  protected void updateEntriesToShow(final DeepThought deepThought) {
+    Application.getSearchEngine().getEntriesForTagAsync(deepThought.AllEntriesSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
-      public void run() {
-        updateEntriesToShow(deepThought);
+      public void completed(final Collection<Entry> results) {
+        context.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            retrievedEntriesToShow(results);
+          }
+        });
       }
     });
   }
 
-  protected void updateEntriesToShow(DeepThought deepThought) {
-    entriesToShow = getListFromCollection(deepThought.AllEntriesSystemTag().getEntries());
+  protected void retrievedEntriesToShow(Collection<Entry> entriesToShow) {
+    this.entriesToShow = getListFromCollection(entriesToShow);
 
     notifyDataSetChanged();
   }

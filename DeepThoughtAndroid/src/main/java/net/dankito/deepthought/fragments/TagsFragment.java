@@ -21,7 +21,11 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.adapter.TagsAdapter;
 import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.search.SearchCompletedListener;
+
+import java.util.Collection;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -70,12 +74,26 @@ public class TagsFragment extends TabFragment {
       if(tag.hasEntries() == false) // no Entries to show -> don't navigate
         return;
 
-      ActivityManager.getInstance().navigateToEntriesFragment(getActivity().getSupportFragmentManager(), tag.getEntries(), R.id.rlyFragmentTags);
-
-      hasNavigatedToOtherFragment = true;
-      getActivity().invalidateOptionsMenu();
+      Application.getSearchEngine().getEntriesForTagAsync(tag, new SearchCompletedListener<Collection<Entry>>() {
+        @Override
+        public void completed(final Collection<Entry> results) {
+          getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              entriesForTagRetrieved(results);
+            }
+          });
+        }
+      });
     }
   };
+
+  protected void entriesForTagRetrieved(Collection<Entry> entries) {
+    ActivityManager.getInstance().navigateToEntriesFragment(getActivity().getSupportFragmentManager(), entries, R.id.rlyFragmentTags);
+
+    hasNavigatedToOtherFragment = true;
+    getActivity().invalidateOptionsMenu();
+  }
 
   // TODO: this is almost the same code as in EntriesFragment -> merge
   // hide FloatingActionMenu while scrolling
