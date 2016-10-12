@@ -892,7 +892,28 @@ public class LuceneSearchEngine extends SearchEngineBase {
       }
     });
   }
-  public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+
+  protected void getEntriesWithTag(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    if(isInitialized) {
+      queryForEntriesWithTag(tag, listener);
+    }
+    else {
+      final Timer waitTillIndexIsReadyTimer = new Timer();
+      waitTillIndexIsReadyTimer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          if(isInitialized) {
+            this.cancel(); // stop Timer
+            waitTillIndexIsReadyTimer.purge();
+
+            queryForEntriesWithTag(tag, listener);
+          }
+        }
+      }, 200, 200);
+    }
+  }
+
+  protected void queryForEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
     if(tag instanceof EntriesWithoutTagsSystemTag) {
       getEntriesWithoutTags(listener);
     }
@@ -912,26 +933,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   protected void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
-    if(isInitialized) {
-      queryForEntriesWithoutTags(listener);
-    }
-    else {
-      final Timer waitTillIndexIsReadyTimer = new Timer();
-      waitTillIndexIsReadyTimer.schedule(new TimerTask() {
-        @Override
-        public void run() {
-          if(isInitialized) {
-            this.cancel(); // stop Timer
-            waitTillIndexIsReadyTimer.purge();
-
-            queryForEntriesWithoutTags(listener);
-          }
-        }
-      }, 200, 200);
-    }
-  }
-
-  protected void queryForEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
     final Query query = new TermQuery(new Term(FieldName.EntryNoTags, NoTagsFieldValue));
 
     Application.getThreadPool().runTaskAsync(new Runnable() {
