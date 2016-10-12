@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 public interface ISearchEngine {
 
-  void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener);
+  void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener);
 
   void searchTags(TagsSearch search);
 

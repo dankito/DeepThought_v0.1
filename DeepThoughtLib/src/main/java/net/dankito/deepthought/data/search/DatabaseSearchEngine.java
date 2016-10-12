@@ -4,6 +4,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.dankito.deepthought.data.persistence.IEntityManager;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.search.specific.CategoriesSearch;
@@ -35,7 +36,16 @@ public class DatabaseSearchEngine extends SearchEngineBase {
 
 
   @Override
-  public void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener) {
+  public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    if(tag instanceof EntriesWithoutTagsSystemTag) {
+      getEntriesWithoutTags(listener);
+    }
+    else {
+      // TODO
+    }
+  }
+
+  protected void getEntriesWithoutTags(SearchCompletedListener<Collection<Entry>> listener) {
 //    IEntityManager entityManager = Application.getEntityManager();
 
 //    try {

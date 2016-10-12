@@ -13,6 +13,11 @@ public class FieldName {
 
   public final static String EntryContent = "content";
 
+  public final static String EntryIndex = "entry_index";
+
+  public final static String EntryCreated = "created";
+  public final static String EntryModified = "modified";
+
   public final static String EntryTags = "tags";
   public final static String EntryTagsIds = "tags_ids";
   public final static String EntryNoTags = "no_tags";

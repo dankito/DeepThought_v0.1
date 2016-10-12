@@ -14,6 +14,8 @@ import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
+import net.dankito.deepthought.data.model.ui.AllEntriesSystemTag;
+import net.dankito.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.dankito.deepthought.data.persistence.LazyLoadingList;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
@@ -282,6 +284,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected void createDirectoryAndIndexSearcherAndWriterForDeepThought(DeepThought deepThought) {
     if(directories.size() > 0) { // on unit tests
+      isInitialized = true;
       return;
     }
     if(deepThought == null) { // there's nothing to create an index for
@@ -610,6 +613,11 @@ public class LuceneSearchEngine extends SearchEngineBase {
     doc.add(new Field(FieldName.EntryAbstract, entry.getAbstractAsPlainText(), TextField.TYPE_NOT_STORED));
     doc.add(new Field(FieldName.EntryContent, entry.getContentAsPlainText(), TextField.TYPE_NOT_STORED));
 
+    doc.add(new LongField(FieldName.EntryIndex, entry.getEntryIndex(), Field.Store.YES));
+
+    doc.add(new LongField(FieldName.EntryCreated, entry.getCreatedOn().getTime(), Field.Store.YES));
+    doc.add(new LongField(FieldName.EntryModified, entry.getModifiedOn().getTime(), Field.Store.YES));
+
     if(entry.hasTags()) {
       for (Tag tag : entry.getTags()) {
         doc.add(new StringField(FieldName.EntryTagsIds, tag.getId(), Field.Store.YES));
@@ -876,7 +884,26 @@ public class LuceneSearchEngine extends SearchEngineBase {
   /*        Search          */
 
   @Override
-  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
+  public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    if(tag instanceof EntriesWithoutTagsSystemTag) {
+      getEntriesWithoutTags(listener);
+    }
+    else {
+      Query query = null;
+
+      if(tag instanceof AllEntriesSystemTag) {
+        query = new WildcardQuery(new Term(FieldName.EntryId, "*"));
+      }
+      else {
+        query = new TermQuery(new Term(FieldName.EntryTagsIds, tag.getId()));
+      }
+
+      listener.completed(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Entry.class), query, Entry.class,
+          FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryCreated));
+    }
+  }
+
+  protected void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
     if(isInitialized) {
       queryForEntriesWithoutTags(listener);
     }
@@ -903,7 +930,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       @Override
       public void run() {
         try {
-          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryId));
+          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryIndex));
         } catch (Exception ex) {
           log.error("Could not search for Entries without Tags", ex);
         }
@@ -1112,7 +1139,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       query.add(termQuery, BooleanClause.Occur.MUST);
     }
 
-    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending, FieldName.EntryId);
+    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending, FieldName.EntryIndex);
   }
 
   @Override

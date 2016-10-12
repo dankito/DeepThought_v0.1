@@ -3,6 +3,7 @@ package net.dankito.deepthought.data.search;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.SeriesTitle;
+import net.dankito.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.dankito.deepthought.data.search.specific.CategoriesSearch;
 import net.dankito.deepthought.data.search.specific.FilesSearch;
 import net.dankito.deepthought.Application;
@@ -29,9 +30,17 @@ import java.util.Set;
  */
 public class InMemorySearchEngine extends SearchEngineBase {
 
-
   @Override
-  public void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
+  public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    if(tag instanceof EntriesWithoutTagsSystemTag) {
+      getEntriesWithoutTags(listener);
+    }
+    else {
+      // TODO
+    }
+  }
+
+  protected void getEntriesWithoutTags(final SearchCompletedListener<Collection<Entry>> listener) {
     Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
       public void run() {
