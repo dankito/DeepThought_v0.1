@@ -25,7 +25,7 @@ public class EntriesWithoutTagsSystemTag extends SystemTag {
 
     Application.getEntityChangesService().addAllEntitiesListener(allEntitiesListener);
 
-    Application.getSearchEngine().getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
+    Application.getSearchEngine().getEntriesWithTag(this, new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         filteredEntries = results;
