@@ -110,9 +110,13 @@ public class TableViewTags extends TableView<Tag> {
 
 
   public void setTags(Collection<Tag> tags) {
+    try {
 //    tableViewTagsItems.setUnderlyingCollection(tags);
-    tableViewTagsItems = new net.dankito.deepthought.controls.LazyLoadingObservableList<>(tags);
-    this.setItems(tableViewTagsItems);
+      tableViewTagsItems = new net.dankito.deepthought.controls.LazyLoadingObservableList<>(tags);
+      this.setItems(tableViewTagsItems);
+    } catch(Exception e) {
+      log.error("Could not set Tags of size " + tags.size(), e);
+    }
   }
 
   public void clearTags() {
