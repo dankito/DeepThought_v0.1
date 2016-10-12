@@ -16,27 +16,27 @@ import javax.persistence.Transient;
 /**
  * Created by ganymed on 03/01/15.
  */
-@Entity(name = TableConfig.EntriesLinkGroupTableName)
-public class EntriesLinkGroup extends UserDataEntity {
+@Entity(name = TableConfig.EntriesGroupTableName)
+public class EntriesGroup extends UserDataEntity {
 
   private static final long serialVersionUID = -1858952131697371548L;
 
 
-  @Column(name = TableConfig.EntriesLinkGroupGroupNameColumnName)
+  @Column(name = TableConfig.EntriesGroupGroupNameColumnName)
   protected String groupName;
 
-  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "linkGroups")
+  @ManyToMany(fetch = FetchType.LAZY, mappedBy = "entryGroups")
   protected Set<Entry> entries = new HashSet<>();
 
-  @Column(name = TableConfig.EntriesLinkGroupNotesColumnName)
+  @Column(name = TableConfig.EntriesGroupNotesColumnName)
   protected String notes;
 
 
-  public EntriesLinkGroup() {
+  public EntriesGroup() {
 
   }
 
-  public EntriesLinkGroup(String groupName) {
+  public EntriesGroup(String groupName) {
     this.groupName = groupName;
   }
 
@@ -88,12 +88,12 @@ public class EntriesLinkGroup extends UserDataEntity {
   @Override
   @Transient
   public String getTextRepresentation() {
-    return "Link " + getGroupName();
+    return "EntriesGroup " + getGroupName();
   }
 
   @Override
   public String toString() {
-    return "EntriesLinkGroup " + getGroupName();
+    return "EntriesGroup " + getGroupName();
   }
 
 }

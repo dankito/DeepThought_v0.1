@@ -10,7 +10,7 @@ import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.data.model.EntriesLinkGroup;
+import net.dankito.deepthought.data.model.EntriesGroup;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Group;
@@ -267,8 +267,8 @@ public class InitialSyncManager {
     for(Entry entry : deepThought.getEntries()) {
       entityManager.updateEntity(entry);
 
-      for(EntriesLinkGroup entriesLinkGroup : entry.getLinkGroups()) {
-        entityManager.updateEntity(entriesLinkGroup);
+      for(EntriesGroup entriesGroup : entry.getEntryGroups()) {
+        entityManager.updateEntity(entriesGroup);
       }
     }
   }

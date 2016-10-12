@@ -95,11 +95,11 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   @JoinTable(
-      name = TableConfig.EntryEntriesLinkGroupJoinTableName,
-      joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName/*, referencedColumnName = "id"*/) }
+      name = TableConfig.EntryEntriesGroupJoinTableName,
+      joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesGroupJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesGroupJoinTableLinkGroupIdColumnName/*, referencedColumnName = "id"*/) }
   )
-  protected Set<EntriesLinkGroup> linkGroups = new HashSet<>();
+  protected Set<EntriesGroup> entryGroups = new HashSet<>();
 
   @ManyToMany(fetch = FetchType.LAZY )
   @JoinTable(
@@ -634,31 +634,31 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
 
   public boolean hasLinkGroups() {
-    return getLinkGroups().size() > 0;
+    return getEntryGroups().size() > 0;
   }
 
-  public Set<EntriesLinkGroup> getLinkGroups() {
-    return linkGroups;
+  public Set<EntriesGroup> getEntryGroups() {
+    return entryGroups;
   }
 
-  public boolean addLinkGroup(EntriesLinkGroup link) {
-    if(linkGroups.contains(link))
+  public boolean addLinkGroup(EntriesGroup link) {
+    if(entryGroups.contains(link))
       return false;
 
-    boolean result = linkGroups.add(link);
+    boolean result = entryGroups.add(link);
     if(result) {
       link.addEntryToGroup(this);
-      callEntityAddedListeners(linkGroups, link);
+      callEntityAddedListeners(entryGroups, link);
     }
 
     return result;
   }
 
-  public boolean removeLinkGroup(EntriesLinkGroup link) {
-    boolean result = linkGroups.remove(link);
+  public boolean removeLinkGroup(EntriesGroup link) {
+    boolean result = entryGroups.remove(link);
     if(result) {
       link.removeEntryFromGroup(this);
-      callEntityRemovedListeners(linkGroups, link);
+      callEntityRemovedListeners(entryGroups, link);
     }
 
     return result;

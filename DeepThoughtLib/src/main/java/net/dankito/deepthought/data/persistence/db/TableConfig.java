@@ -198,20 +198,20 @@ public class TableConfig {
   public final static String EntryEmbeddedFilesJoinTableFileLinkIdColumnName = "file_id";
 
 
-  /*          Entry EntriesLinkGroup Join Table Config        */
+  /*          Entry EntriesGroup Join Table Config        */
 
-  public final static String EntryEntriesLinkGroupJoinTableName = "entry_link_group_join_table";
+  public final static String EntryEntriesGroupJoinTableName = "entries_group_join_table";
 
-  public final static String EntryEntriesLinkGroupJoinTableEntryIdColumnName = "entry_id";
-  public final static String EntryEntriesLinkGroupJoinTableLinkGroupIdColumnName = "link_group_id";
+  public final static String EntryEntriesGroupJoinTableEntryIdColumnName = "entry_id";
+  public final static String EntryEntriesGroupJoinTableLinkGroupIdColumnName = "entries_group_id";
 
 
-  /*          EntriesLinkGroup Config        */
+  /*          EntriesGroup Config        */
 
-  public final static String EntriesLinkGroupTableName = "entries_link_group";
+  public final static String EntriesGroupTableName = "entries_group";
 
-  public final static String EntriesLinkGroupGroupNameColumnName = "name";
-  public final static String EntriesLinkGroupNotesColumnName = "notes";
+  public final static String EntriesGroupGroupNameColumnName = "name";
+  public final static String EntriesGroupNotesColumnName = "notes";
 
 
   /*          Tag Table Config        */

@@ -3,7 +3,7 @@ package net.dankito.deepthought.data.persistence;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.Device;
-import net.dankito.deepthought.data.model.EntriesLinkGroup;
+import net.dankito.deepthought.data.model.EntriesGroup;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.EntryPersonAssociation;
 import net.dankito.deepthought.data.model.FileLink;
@@ -320,7 +320,7 @@ public class EntityManagerConfiguration {
         DeepThought.class,
         Category.class,
         Entry.class,
-        EntriesLinkGroup.class,
+        EntriesGroup.class,
         Tag.class,
         Person.class,
         EntryPersonAssociation.class,
