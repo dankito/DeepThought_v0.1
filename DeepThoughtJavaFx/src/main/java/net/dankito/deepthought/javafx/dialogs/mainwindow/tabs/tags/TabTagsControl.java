@@ -3,10 +3,11 @@ package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.IMainWindowControl;
 import net.dankito.deepthought.controls.tag.IDisplayedTagsChangedListener;
+import net.dankito.deepthought.controls.utils.FXUtils;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.settings.enums.SelectedTab;
 import net.dankito.deepthought.data.model.ui.SystemTag;
@@ -164,7 +165,9 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
         showEntriesForSelectedTagWithAppliedTagsFilter(tag);
       }
       else {
-        mainWindowController.showEntries(tag.getEntries());
+        Application.getSearchEngine().getEntriesWithTag(tag, results ->
+            FXUtils.runOnUiThread(() -> mainWindowController.showEntries(tag.getEntries()))
+        );
       }
     }
     else {
