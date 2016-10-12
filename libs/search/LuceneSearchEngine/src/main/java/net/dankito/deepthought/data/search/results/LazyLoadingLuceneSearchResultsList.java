@@ -2,6 +2,7 @@ package net.dankito.deepthought.data.search.results;
 
 import net.dankito.deepthought.data.persistence.LazyLoadingList;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.search.FieldName;
 import net.dankito.deepthought.data.search.SortOrder;
 
 import org.apache.lucene.document.Document;
@@ -86,8 +87,12 @@ public class LazyLoadingLuceneSearchResultsList<T extends BaseEntity> extends La
   }
 
   protected SortField.Type getFieldType(String sortFieldName) {
-    if(sortFieldName.endsWith("_id"))
+    if(sortFieldName.endsWith("_id")) {
       return SortField.Type.LONG;
+    }
+    else if(FieldName.EntryIndex.equals(sortFieldName) || FieldName.EntryCreated.equals(sortFieldName) || FieldName.EntryModified.equals(sortFieldName)) {
+      return SortField.Type.LONG;
+    }
 //    else if(FieldName.ReferencePublishingDate.equals(sortFieldName))
 //      return SortField.Type.LONG;
 
