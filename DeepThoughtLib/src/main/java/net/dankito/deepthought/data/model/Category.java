@@ -53,7 +53,6 @@ public class Category extends UserDataEntity {
   protected Collection<Category> subCategories = new ArrayList<>();
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
-  @OrderBy("entryIndex DESC")
   protected Collection<Entry> entries = new ArrayList<>();
 
 //  @JsonIgnore
