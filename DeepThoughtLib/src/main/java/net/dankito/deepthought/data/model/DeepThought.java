@@ -84,9 +84,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected Entry topLevelEntry;
 
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//  protected Set<Entry> entries = new HashSet<>();
-  @OrderBy("entryIndex DESC")
   protected List<Entry> entries = new ArrayList<>();
 
   @Column(name = TableConfig.DeepThoughtNextEntryIndexColumnName)

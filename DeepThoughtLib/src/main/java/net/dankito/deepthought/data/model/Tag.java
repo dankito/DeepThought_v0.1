@@ -15,7 +15,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 /**
@@ -34,7 +33,6 @@ public class Tag extends UserDataEntity implements Comparable<Tag>, Serializable
   protected String description = "";
 
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags") // TODO: has cascade also to be set to { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH } as in Entry?
-  @OrderBy("entryIndex DESC")
   protected Collection<Entry> entries = new ArrayList<>();
 
 //  @JsonIgnore
