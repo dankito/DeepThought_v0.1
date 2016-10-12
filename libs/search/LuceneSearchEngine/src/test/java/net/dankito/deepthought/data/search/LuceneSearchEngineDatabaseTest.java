@@ -1,7 +1,6 @@
 package net.dankito.deepthought.data.search;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.data.search.*;
 import net.dankito.deepthought.TestApplicationConfiguration;
 import net.dankito.deepthought.TestEntityManagerConfiguration;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -9,7 +8,7 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
-import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
+import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.store.RAMDirectory;
@@ -44,7 +43,7 @@ public class LuceneSearchEngineDatabaseTest {
     configuration = new TestEntityManagerConfiguration(true);
 //    FileUtils.deleteFile(configuration.getDataCollectionPersistencePath());
 
-    entityManager = new OrmLiteJavaSeEntityManager(configuration);
+    entityManager = new JavaCouchbaseLiteEntityManager(configuration);
 
     Application.instantiate(new TestApplicationConfiguration(entityManager));
     deepThought = Application.getDeepThought();

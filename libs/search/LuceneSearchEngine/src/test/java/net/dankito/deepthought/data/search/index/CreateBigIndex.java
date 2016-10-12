@@ -9,9 +9,9 @@ import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.LuceneSearchEngine;
-import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +47,7 @@ public class CreateBigIndex {
     Application.instantiate(new TestApplicationConfiguration("data/tests/big_data_new/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        return new OrmLiteJavaSeEntityManager(configuration);
+        return new JavaCouchbaseLiteEntityManager(configuration);
       }
 
       @Override

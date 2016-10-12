@@ -10,6 +10,7 @@ import net.dankito.deepthought.data.model.Person;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.persistence.EntityManagerConfiguration;
 import net.dankito.deepthought.data.persistence.IEntityManager;
+import net.dankito.deepthought.data.persistence.JavaCouchbaseLiteEntityManager;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.Search;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
@@ -17,7 +18,6 @@ import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResult;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
-import net.dankito.deepthought.javase.db.OrmLiteJavaSeEntityManager;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -70,7 +70,7 @@ public abstract class SearchComparisonTestBase {
 //    Application.instantiate(new TestApplicationConfiguration("data/tests/big_data_tests/data/") {
       @Override
       public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
-        entityManager = new OrmLiteJavaSeEntityManager(configuration);
+        entityManager = new JavaCouchbaseLiteEntityManager(configuration);
         SearchComparisonTestBase.entityManager = entityManager;
         return entityManager;
       }
@@ -125,7 +125,7 @@ public abstract class SearchComparisonTestBase {
     final List<Entry> searchResults = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.getEntriesWithTag(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         logOperationProcessTime("getEntriesWithoutTags");
