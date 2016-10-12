@@ -165,7 +165,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
         showEntriesForSelectedTagWithAppliedTagsFilter(tag);
       }
       else {
-        Application.getSearchEngine().getEntriesWithTag(tag, results ->
+        Application.getSearchEngine().getEntriesForTagAsync(tag, results ->
             FXUtils.runOnUiThread(() -> mainWindowController.showEntries(tag.getEntries()))
         );
       }
