@@ -98,15 +98,21 @@ public class MockEntityManager implements IEntityManager {
     return true;
   }
 
-  private void persistDeepThoughtApplication(DeepThoughtApplication application) {
-    for(User entity : application.getUsers())
+  protected void persistDeepThoughtApplication(DeepThoughtApplication application) {
+    for(User entity : application.getUsers()) {
       persistEntity(entity);
-    for(Group entity : application.getGroups())
+    }
+    for(Group entity : application.getGroups()) {
       persistEntity(entity);
-    for(Device entity : application.getDevices())
+    }
+    for(Device entity : application.getDevices()) {
       persistEntity(entity);
-    for(ApplicationLanguage entity : application.getApplicationLanguages())
+    }
+    for(ApplicationLanguage entity : application.getApplicationLanguages()) {
       persistEntity(entity);
+    }
+
+    persistEntity(application.getLastLoggedOnUser().getLastViewedDeepThought());
   }
 
   protected void persistDeepThought(DeepThought deepThought) {
