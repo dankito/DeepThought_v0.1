@@ -28,7 +28,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class LuceneSearchEngineDatabaseTest {
 
-  protected net.dankito.deepthought.data.search.LuceneSearchEngine searchEngine;
+  protected LuceneSearchEngine searchEngine;
 
   protected IEntityManager entityManager = null;
   protected EntityManagerConfiguration configuration = null;
@@ -38,14 +38,20 @@ public class LuceneSearchEngineDatabaseTest {
 
   @Before
   public void setup() throws Exception {
-    searchEngine = new net.dankito.deepthought.data.search.LuceneSearchEngine(new RAMDirectory());
+    searchEngine = new LuceneSearchEngine(new RAMDirectory());
 
     configuration = new TestEntityManagerConfiguration(true);
-//    FileUtils.deleteFile(configuration.getDataCollectionPersistencePath());
 
-    entityManager = new JavaCouchbaseLiteEntityManager(configuration);
+    Application.instantiate(new TestApplicationConfiguration() {
+      @Override
+      public IEntityManager createEntityManager(EntityManagerConfiguration configuration) throws Exception {
+        IEntityManager entityManager = new JavaCouchbaseLiteEntityManager(configuration);
+        LuceneSearchEngineDatabaseTest.this.entityManager = entityManager;
 
-    Application.instantiate(new TestApplicationConfiguration(entityManager));
+        return entityManager;
+      }
+    });
+
     deepThought = Application.getDeepThought();
   }
 
