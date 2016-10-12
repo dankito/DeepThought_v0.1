@@ -67,11 +67,9 @@ public class LuceneSearchEngineTest {
   public void setup() throws IOException {
     Localization.setLanguageLocale(Locale.ENGLISH); // for date handling
 
-//          FileUtils.deleteFile(new File(Application.getDataFolderPath(), "index"));
     searchEngine = new LuceneSearchEngine(new RAMDirectory());
 
     Application.instantiate(new TestApplicationConfiguration() {
-//    Application.instantiate(new TestApplicationConfiguration(new OrmLiteJavaSeEntityManager()) {
 
       @Override
       public ISearchEngine createSearchEngine() {
@@ -81,13 +79,11 @@ public class LuceneSearchEngineTest {
 
     deepThought = Application.getDeepThought();
 
-//    searchEngine.deleteIndex();
     searchEngine.setIndexUpdatedEntitiesAfterMilliseconds(0);
   }
 
   @After
   public void tearDown() {
-//    searchEngine.close();
     Application.shutdown();
   }
 
