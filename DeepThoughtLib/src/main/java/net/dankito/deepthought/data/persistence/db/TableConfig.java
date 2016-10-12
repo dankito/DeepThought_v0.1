@@ -203,7 +203,7 @@ public class TableConfig {
   public final static String EntryEntriesGroupJoinTableName = "entries_group_join_table";
 
   public final static String EntryEntriesGroupJoinTableEntryIdColumnName = "entry_id";
-  public final static String EntryEntriesGroupJoinTableLinkGroupIdColumnName = "entries_group_id";
+  public final static String EntryEntriesGroupJoinTableEntriesGroupIdColumnName = "entries_group_id";
 
 
   /*          EntriesGroup Config        */

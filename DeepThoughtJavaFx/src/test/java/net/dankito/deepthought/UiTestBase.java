@@ -710,7 +710,7 @@ public abstract class UiTestBase extends ApplicationTest {
 
     assertThat(entry.hasPersons(), is(false));
     assertThat(entry.hasNotes(), is(false));
-    assertThat(entry.hasLinkGroups(), is(false));
+    assertThat(entry.hasEntriesGroups(), is(false));
 
     assertThat(entry.hasAttachedFiles(), is(false));
     assertThat(entry.hasEmbeddedFiles(), is(false));

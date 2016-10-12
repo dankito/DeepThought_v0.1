@@ -97,7 +97,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   @JoinTable(
       name = TableConfig.EntryEntriesGroupJoinTableName,
       joinColumns = { @JoinColumn(name = TableConfig.EntryEntriesGroupJoinTableEntryIdColumnName/*, referencedColumnName = "id"*/) },
-      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesGroupJoinTableLinkGroupIdColumnName/*, referencedColumnName = "id"*/) }
+      inverseJoinColumns = { @JoinColumn(name = TableConfig.EntryEntriesGroupJoinTableEntriesGroupIdColumnName/*, referencedColumnName = "id"*/) }
   )
   protected Set<EntriesGroup> entryGroups = new HashSet<>();
 
@@ -633,15 +633,15 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
   }
 
 
-  public boolean hasLinkGroups() {
-    return getEntryGroups().size() > 0;
+  public boolean hasEntriesGroups() {
+    return getEntriesGroups().size() > 0;
   }
 
-  public Set<EntriesGroup> getEntryGroups() {
+  public Set<EntriesGroup> getEntriesGroups() {
     return entryGroups;
   }
 
-  public boolean addLinkGroup(EntriesGroup link) {
+  public boolean addEntriesGroup(EntriesGroup link) {
     if(entryGroups.contains(link))
       return false;
 
@@ -654,7 +654,7 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
     return result;
   }
 
-  public boolean removeLinkGroup(EntriesGroup link) {
+  public boolean removeEntriesGroup(EntriesGroup link) {
     boolean result = entryGroups.remove(link);
     if(result) {
       link.removeEntryFromGroup(this);

@@ -267,7 +267,7 @@ public class InitialSyncManager {
     for(Entry entry : deepThought.getEntries()) {
       entityManager.updateEntity(entry);
 
-      for(EntriesGroup entriesGroup : entry.getEntryGroups()) {
+      for(EntriesGroup entriesGroup : entry.getEntriesGroups()) {
         entityManager.updateEntity(entriesGroup);
       }
     }

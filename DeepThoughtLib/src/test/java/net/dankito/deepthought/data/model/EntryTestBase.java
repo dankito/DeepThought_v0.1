@@ -42,9 +42,9 @@ public abstract class EntryTestBase extends DataModelTestBase {
     return doIdsEqual(entryId, persistedEntryId);
   }
 
-  protected boolean doesEntryGroupLinkJoinTableEntryExist(String entryId, String linkGroupId) throws SQLException {
+  protected boolean doesEntryGroupLinkJoinTableEntryExist(String entryId, String entriesGroupId) throws SQLException {
     return doesJoinTableEntryExist(TableConfig.EntryEntriesGroupJoinTableName, TableConfig.EntryEntriesGroupJoinTableEntryIdColumnName, entryId,
-        TableConfig.EntryEntriesGroupJoinTableLinkGroupIdColumnName, linkGroupId);
+        TableConfig.EntryEntriesGroupJoinTableEntriesGroupIdColumnName, entriesGroupId);
   }
 
   protected boolean doesEntryAttachedFileJoinTableEntryExist(String entryId, String fileId) throws SQLException {
@@ -852,7 +852,7 @@ public abstract class EntryTestBase extends DataModelTestBase {
 
   @Test
   public void addEntryGroup_RelationGetsPersisted() throws Exception {
-    EntriesGroup linkGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
+    EntriesGroup entriesGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
     Entry entry1 = new Entry("test 1", "no content");
     Entry entry2 = new Entry("test 2", "no content");
 
@@ -860,17 +860,17 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry1);
     deepThought.addEntry(entry2);
 
-    entry1.addLinkGroup(linkGroup);
-    entry2.addLinkGroup(linkGroup);
+    entry1.addEntriesGroup(entriesGroup);
+    entry2.addEntriesGroup(entriesGroup);
 
-    // assert LinkGroup really got written to database
-    Assert.assertTrue(doesEntryGroupLinkJoinTableEntryExist(entry1.getId(), linkGroup.getId()));
-    Assert.assertTrue(doesEntryGroupLinkJoinTableEntryExist(entry2.getId(), linkGroup.getId()));
+    // assert EntriesGroup really got written to database
+    Assert.assertTrue(doesEntryGroupLinkJoinTableEntryExist(entry1.getId(), entriesGroup.getId()));
+    Assert.assertTrue(doesEntryGroupLinkJoinTableEntryExist(entry2.getId(), entriesGroup.getId()));
   }
 
   @Test
   public void addEntryGroup_EntitiesGetAddedToRelatedCollections() throws Exception {
-    EntriesGroup linkGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
+    EntriesGroup entriesGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
     Entry entry1 = new Entry("test 1", "no content");
     Entry entry2 = new Entry("test 2", "no content");
 
@@ -878,22 +878,22 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry1);
     deepThought.addEntry(entry2);
 
-    entry1.addLinkGroup(linkGroup);
-    entry2.addLinkGroup(linkGroup);
+    entry1.addEntriesGroup(entriesGroup);
+    entry2.addEntriesGroup(entriesGroup);
 
-    Assert.assertEquals(1, entry1.getEntryGroups().size());
-    Assert.assertTrue(entry1.getEntryGroups().contains(linkGroup));
-    Assert.assertEquals(1, entry2.getEntryGroups().size());
-    Assert.assertTrue(entry2.getEntryGroups().contains(linkGroup));
+    Assert.assertEquals(1, entry1.getEntriesGroups().size());
+    Assert.assertTrue(entry1.getEntriesGroups().contains(entriesGroup));
+    Assert.assertEquals(1, entry2.getEntriesGroups().size());
+    Assert.assertTrue(entry2.getEntriesGroups().contains(entriesGroup));
 
-    Assert.assertEquals(2, linkGroup.getEntries().size());
-    Assert.assertTrue(linkGroup.getEntries().contains(entry1));
-    Assert.assertTrue(linkGroup.getEntries().contains(entry2));
+    Assert.assertEquals(2, entriesGroup.getEntries().size());
+    Assert.assertTrue(entriesGroup.getEntries().contains(entry1));
+    Assert.assertTrue(entriesGroup.getEntries().contains(entry2));
   }
 
   @Test
   public void removeEntryGroup_RelationGetsDeleted() throws Exception {
-    EntriesGroup linkGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
+    EntriesGroup entriesGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
     Entry entry1 = new Entry("test 1", "no content");
     Entry entry2 = new Entry("test 2", "no content");
 
@@ -901,21 +901,21 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry1);
     deepThought.addEntry(entry2);
 
-    entry1.addLinkGroup(linkGroup);
-    entry2.addLinkGroup(linkGroup);
+    entry1.addEntriesGroup(entriesGroup);
+    entry2.addEntriesGroup(entriesGroup);
 
-    entry1.removeLinkGroup(linkGroup);
+    entry1.removeEntriesGroup(entriesGroup);
 
     // assert entry really got deleted from database
-    Assert.assertFalse(doesEntryGroupLinkJoinTableEntryExist(entry1.getId(), linkGroup.getId()));
+    Assert.assertFalse(doesEntryGroupLinkJoinTableEntryExist(entry1.getId(), entriesGroup.getId()));
 
     Assert.assertFalse(entry1.isDeleted());
-    Assert.assertFalse(linkGroup.isDeleted());
+    Assert.assertFalse(entriesGroup.isDeleted());
   }
 
   @Test
   public void removeEntryGroup_EntitiesGetRemovedFromRelatedCollections() throws Exception {
-    EntriesGroup linkGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
+    EntriesGroup entriesGroup = new EntriesGroup("Ich verbinde Welten (oder zumindest Entries)");
     Entry entry1 = new Entry("test 1", "no content");
     Entry entry2 = new Entry("test 2", "no content");
 
@@ -923,16 +923,16 @@ public abstract class EntryTestBase extends DataModelTestBase {
     deepThought.addEntry(entry1);
     deepThought.addEntry(entry2);
 
-    entry1.addLinkGroup(linkGroup);
-    entry2.addLinkGroup(linkGroup);
+    entry1.addEntriesGroup(entriesGroup);
+    entry2.addEntriesGroup(entriesGroup);
 
-    entry1.removeLinkGroup(linkGroup);
+    entry1.removeEntriesGroup(entriesGroup);
 
-    Assert.assertEquals(0, entry1.getEntryGroups().size());
-    Assert.assertFalse(entry1.getEntryGroups().contains(linkGroup));
+    Assert.assertEquals(0, entry1.getEntriesGroups().size());
+    Assert.assertFalse(entry1.getEntriesGroups().contains(entriesGroup));
 
-    Assert.assertEquals(1, linkGroup.getEntries().size());
-    Assert.assertFalse(linkGroup.getEntries().contains(entry1));
+    Assert.assertEquals(1, entriesGroup.getEntries().size());
+    Assert.assertFalse(entriesGroup.getEntries().contains(entry1));
   }
 
 

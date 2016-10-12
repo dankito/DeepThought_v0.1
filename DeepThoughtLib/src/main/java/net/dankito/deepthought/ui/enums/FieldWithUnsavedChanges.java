@@ -21,7 +21,7 @@ public enum FieldWithUnsavedChanges {
   EntrySubEntries,
   EntryLanguage,
   EntryNotes,
-  EntryLinkGroups,
+  EntriesGroups,
   EntryAttachedFiles,
   EntryEmbeddedFiles,
   EntryPreviewImage,

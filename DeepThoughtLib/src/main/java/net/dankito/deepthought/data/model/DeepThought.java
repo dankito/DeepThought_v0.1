@@ -289,8 +289,8 @@ public class DeepThought extends UserDataEntity implements Serializable {
     for(Note note : new ArrayList<>(entry.getNotes())) {
       entry.removeNote(note);
     }
-    for(EntriesGroup linkGroup : new ArrayList<>(entry.getEntryGroups())) {
-      entry.removeLinkGroup(linkGroup);
+    for(EntriesGroup entriesGroup : new ArrayList<>(entry.getEntriesGroups())) {
+      entry.removeEntriesGroup(entriesGroup);
     }
 
     for(FileLink attachedFile : new ArrayList<>(entry.getAttachedFiles())) {
