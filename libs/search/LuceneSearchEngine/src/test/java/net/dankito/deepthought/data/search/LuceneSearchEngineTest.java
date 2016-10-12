@@ -2507,6 +2507,91 @@ public class LuceneSearchEngineTest {
 
 
   @Test
+  public void getEntriesForTag_EntriesAreOrderedCorrectly() throws IOException, ParseException {
+    Tag tag1 = new Tag("tag1");
+    Tag tag2 = new Tag("tag2");
+    Tag tag3 = new Tag("tag3");
+    deepThought.addTag(tag1);
+    deepThought.addTag(tag2);
+    deepThought.addTag(tag3);
+
+    Entry entry1 = new Entry("One");
+    Entry entry2 = new Entry("Two");
+    Entry entry3 = new Entry("Three");
+    Entry entry4 = new Entry("Four");
+    deepThought.addEntry(entry1);
+    deepThought.addEntry(entry2);
+    deepThought.addEntry(entry3);
+    deepThought.addEntry(entry4);
+
+    entry1.addTag(tag1);
+    entry1.addTag(tag2);
+    entry2.addTag(tag2);
+    entry2.addTag(tag3);
+    entry3.addTag(tag1);
+    entry3.addTag(tag3);
+    entry4.addTag(tag1);
+    entry4.addTag(tag2);
+    entry4.addTag(tag3);
+
+    final List<Entry> entriesForTag1 = new ArrayList<>();
+    final CountDownLatch countDownLatch1 = new CountDownLatch(1);
+
+    searchEngine.getEntriesForTagAsync(tag1, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        entriesForTag1.addAll(results);
+        countDownLatch1.countDown();
+      }
+    });
+
+    try { countDownLatch1.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
+    Assert.assertEquals(3, entriesForTag1.size());
+
+    Assert.assertEquals(entry4, entriesForTag1.get(0));
+    Assert.assertEquals(entry3, entriesForTag1.get(1));
+    Assert.assertEquals(entry1, entriesForTag1.get(2));
+
+
+    final List<Entry> entriesForTag2 = new ArrayList<>();
+    final CountDownLatch countDownLatch2 = new CountDownLatch(1);
+
+    searchEngine.getEntriesForTagAsync(tag2, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        entriesForTag2.addAll(results);
+        countDownLatch2.countDown();
+      }
+    });
+
+    try { countDownLatch2.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
+    Assert.assertEquals(3, entriesForTag2.size());
+
+    Assert.assertEquals(entry4, entriesForTag2.get(0));
+    Assert.assertEquals(entry2, entriesForTag2.get(1));
+    Assert.assertEquals(entry1, entriesForTag2.get(2));
+
+
+    final List<Entry> entriesForTag3 = new ArrayList<>();
+    final CountDownLatch countDownLatch3 = new CountDownLatch(1);
+
+    searchEngine.getEntriesForTagAsync(tag3, new SearchCompletedListener<Collection<Entry>>() {
+      @Override
+      public void completed(Collection<Entry> results) {
+        entriesForTag3.addAll(results);
+        countDownLatch3.countDown();
+      }
+    });
+
+    try { countDownLatch3.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
+    Assert.assertEquals(3, entriesForTag3.size());
+
+    Assert.assertEquals(entry4, entriesForTag3.get(0));
+    Assert.assertEquals(entry3, entriesForTag3.get(1));
+    Assert.assertEquals(entry2, entriesForTag3.get(2));
+  }
+
+  @Test
   public void findAllEntriesWithoutTags() throws IOException, ParseException {
     Tag tag1 = new Tag("tag1");
     Tag tag2 = new Tag("tag2");
@@ -2531,13 +2616,6 @@ public class LuceneSearchEngineTest {
     entryWithTags1.addTag(tag2);
     entryWithTags2.addTag(tag2);
     entryWithTags2.addTag(tag3);
-
-    // TODO: is this really necessary?
-//    searchEngine.indexEntity(entryWithoutTags1);
-//    searchEngine.indexEntity(entryWithTags1);
-//    searchEngine.indexEntity(entryWithoutTags2);
-//    searchEngine.indexEntity(entryWithTags2);
-//    searchEngine.indexEntity(entryWithoutTags3);
 
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
