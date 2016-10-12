@@ -884,6 +884,14 @@ public class LuceneSearchEngine extends SearchEngineBase {
   /*        Search          */
 
   @Override
+  public void getEntriesWithTagAsync(final Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+    Application.getThreadPool().runTaskAsync(new Runnable() {
+      @Override
+      public void run() {
+        getEntriesWithTag(tag, listener);
+      }
+    });
+  }
   public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
     if(tag instanceof EntriesWithoutTagsSystemTag) {
       getEntriesWithoutTags(listener);
@@ -899,7 +907,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       }
 
       listener.completed(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Entry.class), query, Entry.class,
-          FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryCreated));
+          FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryIndex));
     }
   }
 

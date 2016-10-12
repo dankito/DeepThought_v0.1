@@ -31,7 +31,7 @@ import java.util.Set;
 public class InMemorySearchEngine extends SearchEngineBase {
 
   @Override
-  public void getEntriesWithTag(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
+  public void getEntriesWithTagAsync(Tag tag, final SearchCompletedListener<Collection<Entry>> listener) {
     if(tag instanceof EntriesWithoutTagsSystemTag) {
       getEntriesWithoutTags(listener);
     }

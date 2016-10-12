@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ganymed on 17/03/15.
@@ -90,7 +91,7 @@ public class LuceneSearchEngineDatabaseTest {
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithTag(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.getEntriesWithTagAsync(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         entriesWithoutTags.addAll(results);
@@ -98,7 +99,7 @@ public class LuceneSearchEngineDatabaseTest {
       }
     });
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(2, TimeUnit.SECONDS); } catch(Exception ex) { }
     Assert.assertEquals(3, entriesWithoutTags.size());
 
     Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1));
