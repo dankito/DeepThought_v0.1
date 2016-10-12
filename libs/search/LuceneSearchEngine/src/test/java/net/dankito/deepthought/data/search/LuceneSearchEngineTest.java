@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ganymed on 17/03/15.
@@ -54,6 +55,8 @@ import java.util.concurrent.CountDownLatch;
 public class LuceneSearchEngineTest {
 
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngineTest.class);
+
+  protected static final int DEFAULT_WAIT_TIME = 2;
 
 
   protected net.dankito.deepthought.data.search.LuceneSearchEngine searchEngine;
@@ -64,18 +67,14 @@ public class LuceneSearchEngineTest {
   public void setup() throws IOException {
     Localization.setLanguageLocale(Locale.ENGLISH); // for date handling
 
+//          FileUtils.deleteFile(new File(Application.getDataFolderPath(), "index"));
+    searchEngine = new LuceneSearchEngine(new RAMDirectory());
+
     Application.instantiate(new TestApplicationConfiguration() {
 //    Application.instantiate(new TestApplicationConfiguration(new OrmLiteJavaSeEntityManager()) {
 
       @Override
       public ISearchEngine createSearchEngine() {
-        try {
-          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine(new RAMDirectory());
-//          FileUtils.deleteFile(new File(Application.getDataFolderPath(), "index"));
-//          LuceneSearchEngineTest.this.searchEngine = new LuceneSearchEngine();
-        } catch(Exception ex) {
-          log.error("Could not create LuceneSearchEngine", ex);
-        }
         return LuceneSearchEngineTest.this.searchEngine;
       }
     });
@@ -109,7 +108,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newEntry, results.get(0));
@@ -133,7 +132,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newEntry, results.get(0));
@@ -150,7 +149,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -173,7 +172,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newEntry, results.get(0));
@@ -190,7 +189,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -222,7 +221,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesHavingTheseTags.size());
     Assert.assertEquals(newEntry, entriesHavingTheseTags.get(0));
@@ -355,7 +354,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { countDownLatch.await(); } catch(Exception ex) { }
+//    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(1, results.size());
 //    Assert.assertEquals(newEntry, results.get(0));
@@ -374,7 +373,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+//    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(0, results.size());
   }
@@ -407,7 +406,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { countDownLatch.await(); } catch(Exception ex) { }
+//    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(1, results.size());
 //    Assert.assertEquals(newEntry, results.get(0));
@@ -426,7 +425,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+//    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(0, results.size());
   }
@@ -459,7 +458,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { countDownLatch.await(); } catch(Exception ex) { }
+//    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(1, results.size());
 //    Assert.assertEquals(newEntry, results.get(0));
@@ -478,7 +477,7 @@ public class LuceneSearchEngineTest {
 //      }
 //    }));
 //
-//    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+//    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 //
 //    Assert.assertEquals(0, results.size());
   }
@@ -501,7 +500,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -528,7 +527,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size()); // only that one without Tags is found
     Assert.assertEquals(entryWithoutTag, results.get(0));
@@ -561,7 +560,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, results.size()); // only that one without Tags is found
     Assert.assertTrue(results.contains(entry1));
@@ -589,7 +588,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size()); // only that one without Tags is found
     Assert.assertFalse(results.contains(entry1));
@@ -617,7 +616,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size()); // only that one without Tags is found
     Assert.assertFalse(results.contains(entry1));
@@ -645,7 +644,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
     Assert.assertEquals(entry3, results.get(0)); // search results must be in reverse order than created order (newer ones being shown first)
@@ -669,7 +668,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size()); // ensure a search term with a German Umlaut gets found
     Assert.assertTrue(results.contains(entry));
@@ -685,7 +684,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { secondCountDownLatch.await(); } catch(Exception ex) { }
+    try { secondCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size()); // ensure a search term with its Umlaut equivalent doesn't get found
   }
@@ -707,7 +706,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newTag, results.get(0));
@@ -731,7 +730,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newTag, results.get(0));
@@ -748,7 +747,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -771,7 +770,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -793,7 +792,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newCategory, results.get(0));
@@ -817,7 +816,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newCategory, results.get(0));
@@ -834,7 +833,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -861,7 +860,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(4, results.size());
 
@@ -901,7 +900,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
 
@@ -984,7 +983,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, results.size());
 
@@ -1068,7 +1067,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1090,7 +1089,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newPerson, results.get(0));
@@ -1114,7 +1113,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newPerson, results.get(0));
@@ -1131,7 +1130,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1154,7 +1153,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newPerson, results.get(0));
@@ -1171,7 +1170,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1194,7 +1193,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newPerson, results.get(0));
@@ -1211,7 +1210,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1234,7 +1233,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1259,7 +1258,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
     Assert.assertEquals(person2, results.get(0));
@@ -1285,7 +1284,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, results.size());
     Assert.assertEquals(person2, results.get(0));
@@ -1310,7 +1309,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, results.size());
     Assert.assertEquals(person2, results.get(0));
@@ -1333,7 +1332,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(person, results.get(0));
@@ -1356,7 +1355,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSeriesTitle, results.get(0));
@@ -1380,7 +1379,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSeriesTitle, results.get(0));
@@ -1397,7 +1396,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1420,7 +1419,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSeriesTitle, results.get(0));
@@ -1437,7 +1436,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1460,7 +1459,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSeriesTitle, results.get(0));
@@ -1516,7 +1515,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newReference, results.get(0));
@@ -1540,7 +1539,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newReference, results.get(0));
@@ -1557,7 +1556,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1580,7 +1579,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newReference, results.get(0));
@@ -1597,7 +1596,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1620,7 +1619,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newReference, results.get(0));
@@ -1645,7 +1644,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newReference, results.get(0));
@@ -1751,7 +1750,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
     Assert.assertTrue(results.contains(guardian27031988));
@@ -1867,7 +1866,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSubDivision, results.get(0));
@@ -1894,7 +1893,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSubDivision, results.get(0));
@@ -1911,7 +1910,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1937,7 +1936,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSubDivision, results.get(0));
@@ -1954,7 +1953,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -1985,7 +1984,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newSubDivision1, results.get(0));
@@ -2043,7 +2042,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(seriesTitle, results.get(0));
@@ -2071,7 +2070,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(4, results.size());
     Assert.assertEquals(seriesTitleGandhiMahatma, results.get(0));
@@ -2100,7 +2099,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(reference, results.get(0));
@@ -2128,7 +2127,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(4, results.size());
     Assert.assertEquals(referenceGandhiMahatma, results.get(0));
@@ -2154,7 +2153,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(reference, results.get(0));
@@ -2180,7 +2179,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(subDivision, results.get(0));
@@ -2208,7 +2207,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(4, results.size());
     Assert.assertEquals(subDivisionGandhiMahatma, results.get(0));
@@ -2237,7 +2236,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
     Assert.assertTrue(results.contains(seriesTitle));
@@ -2265,7 +2264,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
 
@@ -2295,7 +2294,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
 
@@ -2325,7 +2324,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(3, results.size());
 
@@ -2388,7 +2387,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(11, results.size());
 
@@ -2481,7 +2480,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesHavingFilteredTags.size());
     Assert.assertEquals(entryWithTags1, new ArrayList<Entry>(entriesHavingFilteredTags).get(0));
@@ -2547,7 +2546,7 @@ public class LuceneSearchEngineTest {
     final List<Entry> entriesWithoutTags = new ArrayList<>();
     final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    searchEngine.getEntriesWithoutTags(new SearchCompletedListener<Collection<Entry>>() {
+    searchEngine.getEntriesWithTag(deepThought.EntriesWithoutTagsSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
       @Override
       public void completed(Collection<Entry> results) {
         entriesWithoutTags.addAll(results);
@@ -2555,7 +2554,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
     Assert.assertEquals(3, entriesWithoutTags.size());
 
     Assert.assertTrue(entriesWithoutTags.contains(entryWithoutTags1));
@@ -2612,7 +2611,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch1.await(); } catch(Exception ex) { }
+    try { countDownLatch1.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesWithTag1.size());
 
@@ -2635,7 +2634,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch2.await(); } catch(Exception ex) { }
+    try { countDownLatch2.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(2, entriesWithTag2.size());
 
@@ -2658,7 +2657,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch3.await(); } catch(Exception ex) { }
+    try { countDownLatch3.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesWithTag3.size());
 
@@ -2681,7 +2680,7 @@ public class LuceneSearchEngineTest {
       }
     });
 
-    try { countDownLatch4.await(); } catch(Exception ex) { }
+    try { countDownLatch4.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, entriesWithTags2And3.size());
 
@@ -2877,7 +2876,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
@@ -2902,7 +2901,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
@@ -2927,7 +2926,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
@@ -2953,7 +2952,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
@@ -2979,7 +2978,7 @@ public class LuceneSearchEngineTest {
     filesSearch.setInHtmlEmbeddableFilesOnly(true);
     searchEngine.searchFiles(filesSearch);
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(senseOfLifeResultPic, results.get(0));
@@ -3003,7 +3002,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(1, results.size());
     Assert.assertEquals(newFile, results.get(0));
@@ -3020,7 +3019,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { nextCountDownLatch.await(); } catch(Exception ex) { }
+    try { nextCountDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
@@ -3048,7 +3047,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(4, results.size());
 
@@ -3076,7 +3075,7 @@ public class LuceneSearchEngineTest {
       }
     }));
 
-    try { countDownLatch.await(); } catch(Exception ex) { }
+    try { countDownLatch.await(DEFAULT_WAIT_TIME, TimeUnit.SECONDS); } catch(Exception ex) { }
 
     Assert.assertEquals(0, results.size());
   }
