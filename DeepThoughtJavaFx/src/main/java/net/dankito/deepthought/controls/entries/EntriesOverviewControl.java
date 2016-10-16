@@ -26,6 +26,8 @@ import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
+import net.dankito.deepthought.data.search.ui.EntriesForTagRetrievedListener;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.JavaFxLocalization;
@@ -85,6 +87,8 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
 
   protected MainWindowController mainWindowController;
+
+  protected EntriesForTag entriesForTag;
 
 
   @FXML
@@ -153,12 +157,16 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
 
 
 
-  public EntriesOverviewControl(MainWindowController mainWindowController) {
+  public EntriesOverviewControl(MainWindowController mainWindowController, EntriesForTag entriesForTag) {
     this.mainWindowController = mainWindowController;
+    this.entriesForTag = entriesForTag;
+    entriesForTag.setEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
+
     deepThought = Application.getDeepThought();
 
-    if(FXUtils.loadControl(this, "EntriesOverviewControl"))
+    if(FXUtils.loadControl(this, "EntriesOverviewControl")) {
       setupControl();
+    }
   }
 
   public void deepThoughtChanged(DeepThought newDeepThought) {
@@ -610,4 +618,13 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
     htmledEntryContent.cleanUp();
     currentEditedEntryTagsControl.cleanUp();
   }
+
+
+  protected EntriesForTagRetrievedListener entriesForTagRetrievedListener = new EntriesForTagRetrievedListener() {
+    @Override
+    public void retrievedEntriesForTag(List<Entry> entries) {
+      showEntries(entries);
+    }
+  };
+
 }

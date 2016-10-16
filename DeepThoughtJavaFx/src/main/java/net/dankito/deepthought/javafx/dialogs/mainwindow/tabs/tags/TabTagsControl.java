@@ -3,13 +3,11 @@ package net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.controls.IMainWindowControl;
 import net.dankito.deepthought.controls.tag.IDisplayedTagsChangedListener;
-import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
-import net.dankito.deepthought.data.model.settings.enums.SelectedTab;
 import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -17,6 +15,7 @@ import net.dankito.deepthought.data.search.SearchBase;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.filterpanel.TagsFilterPanel;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,8 +44,6 @@ import javafx.scene.layout.VBox;
 public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFilter, ISelectedTagsController {
 
   private final static Logger log = LoggerFactory.getLogger(TabTagsControl.class);
-
-  protected static final HashSet<Entry> EntriesToShowIfNoTagIsSelected = new HashSet<>();
 
 
   protected Entry entry = null;
@@ -70,14 +66,18 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
   protected MainWindowController mainWindowController;
 
+  protected EntriesForTag entriesForTag;
+
   protected TagsFilterPanel filterPanel;
 
   protected TableViewTags tblvwTags;
 
 
 
-  public TabTagsControl(MainWindowController mainWindowController) {
+  public TabTagsControl(MainWindowController mainWindowController, EntriesForTag entriesForTag) {
     this.mainWindowController = mainWindowController;
+    this.entriesForTag = entriesForTag;
+
     deepThought = Application.getDeepThought();
 
     setupControl();
@@ -89,12 +89,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
     if(newDeepThought != null) {
       this.systemTags = Arrays.asList(new Tag[] { deepThought.AllEntriesSystemTag(), deepThought.EntriesWithoutTagsSystemTag() });
-
-      if(deepThought.getSettings().getLastViewedTag() != null) {
-        setSelectedTag(deepThought.getSettings().getLastViewedTag());
-      } else {
-        setSelectedTag(deepThought.AllEntriesSystemTag());
-      }
     }
 
     allTagsSearchResult = null;
@@ -166,13 +160,11 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
         showEntriesForSelectedTagWithAppliedTagsFilter(tag);
       }
       else {
-        Application.getSearchEngine().getEntriesForTagAsync(tag, results ->
-            FXUtils.runOnUiThread(() -> mainWindowController.showEntries(results))
-        );
+        entriesForTag.setTag(tag);
       }
     }
     else {
-      mainWindowController.showEntries(EntriesToShowIfNoTagIsSelected);
+      entriesForTag.setTag(tag);
     }
   }
 

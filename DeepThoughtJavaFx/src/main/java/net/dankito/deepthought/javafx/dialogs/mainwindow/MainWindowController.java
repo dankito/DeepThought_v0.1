@@ -38,6 +38,7 @@ import net.dankito.deepthought.data.model.settings.enums.DialogsFieldsDisplay;
 import net.dankito.deepthought.data.model.settings.enums.ReferencesDisplay;
 import net.dankito.deepthought.data.model.settings.enums.SelectedTab;
 import net.dankito.deepthought.data.model.settings.enums.Setting;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeCell;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.categories.CategoryTreeItem;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.TabTagsControl;
@@ -440,11 +441,13 @@ public class MainWindowController implements Initializable {
   protected void setupControls() {
     contentPane.setDisable(true); // don't enable controls as no DeepThought is received / deserialized yet
 
+    EntriesForTag entriesForTag = new EntriesForTag();
+
     setupMainMenu();
 
-    setupTabPaneOverview();
+    setupTabPaneOverview(entriesForTag);
 
-    setupEntriesOverviewSection();
+    setupEntriesOverviewSection(entriesForTag);
   }
 
   protected void setupMainMenu() {
@@ -462,11 +465,11 @@ public class MainWindowController implements Initializable {
 //    grdpnMainMenu.getColumnConstraints().get(1).setPrefWidth(0);
   }
 
-  private void setupTabPaneOverview() {
+  private void setupTabPaneOverview(EntriesForTag entriesForTag) {
     tbpnOverview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> tabpaneOverviewSelectedTabChanged(tbpnOverview.getSelectionModel()
         .getSelectedItem()));
 
-    setupTagsTab();
+    setupTagsTab(entriesForTag);
 
     setupCategoriesTab();
   }
@@ -505,8 +508,8 @@ public class MainWindowController implements Initializable {
     }
   }
 
-  protected void setupTagsTab() {
-    tabTagsControl = new TabTagsControl(this);
+  protected void setupTagsTab(EntriesForTag entriesForTag) {
+    tabTagsControl = new TabTagsControl(this, entriesForTag);
     tabTags.setContent(tabTagsControl);
   }
 
@@ -583,8 +586,8 @@ public class MainWindowController implements Initializable {
     return selectedCategories;
   }
 
-  protected void setupEntriesOverviewSection() {
-    entriesOverviewControl = new EntriesOverviewControl(this);
+  protected void setupEntriesOverviewSection(EntriesForTag entriesForTag) {
+    entriesOverviewControl = new EntriesOverviewControl(this, entriesForTag);
     contentPane.getItems().add(entriesOverviewControl);
 
 //    contentPane.setDividerPositions(0.26);
