@@ -39,18 +39,17 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
 
-  public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
+  public EntriesAdapter(Activity context, EntriesForTag entriesForTag) {
     super(context, R.layout.list_item_entry);
 
-    initializeEntriesForTag();
-    entriesForTag.addEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
+    this.entriesForTag = entriesForTag != null ? entriesForTag : new EntriesForTag();
+    this.entriesForTag.addEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
 
-    if(entriesToShow != null) {
-      this.entriesToShow = getListFromCollection(entriesToShow);
+    if(Application.getDeepThought() != null) {
+      initializeInstancesForChangedDeepThought(Application.getDeepThought());
     }
-    else if(Application.getDeepThought() != null) {
-      deepThoughtChanged(Application.getDeepThought());
-    }
+
+    retrievedEntriesToShow(this.entriesForTag.getEntriesForTag());
   }
 
   @Override
@@ -63,13 +62,9 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
   @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
-    this.deepThought = deepThought;
-
-    previewService = Application.getEntityPreviewService();
+    initializeInstancesForChangedDeepThought(deepThought);
 
     if(deepThought != null) {
-      initializeEntriesForTag();
-
       entriesForTag.setTag(deepThought.AllEntriesSystemTag());
     }
     else {
@@ -82,6 +77,12 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
         }
       });
     }
+  }
+
+  protected void initializeInstancesForChangedDeepThought(DeepThought deepThought) {
+    this.deepThought = deepThought;
+
+    previewService = Application.getEntityPreviewService();
   }
 
   protected void initializeEntriesForTag() {

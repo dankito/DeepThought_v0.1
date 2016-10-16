@@ -14,15 +14,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import net.dankito.deepthought.R;
-import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
 import net.dankito.deepthought.fragments.EntriesFragment;
 import net.dankito.deepthought.listener.EntityEditedListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 /**
  * Created by ganymed on 12/10/14.
@@ -52,8 +50,8 @@ public class ActivityManager {
 
 
 
-  public void navigateToEntriesFragment(FragmentManager fragmentManager, Collection<Entry> entries, int fragmentToReplace) {
-    Fragment entriesFragment = new EntriesFragment(entries);
+  public void navigateToEntriesFragment(FragmentManager fragmentManager, EntriesForTag entriesForTag, int fragmentToReplace) {
+    Fragment entriesFragment = new EntriesFragment(entriesForTag);
     FragmentTransaction transaction = fragmentManager.beginTransaction();
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 

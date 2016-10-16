@@ -3,7 +3,6 @@ package net.dankito.deepthought.fragments;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.SearchView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -22,8 +21,7 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.adapter.EntriesAdapter;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
-
-import java.util.Collection;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -31,7 +29,7 @@ import java.util.Collection;
 public class EntriesFragment extends TabFragment {
 
 
-  protected Collection<Entry> entriesToShow = null;
+  protected EntriesForTag entriesForTag = null;
 
   protected EntriesAdapter entriesAdapter;
 
@@ -40,8 +38,8 @@ public class EntriesFragment extends TabFragment {
 
   }
 
-  public EntriesFragment(Collection<Entry> entriesToShow) {
-    this.entriesToShow = entriesToShow;
+  public EntriesFragment(EntriesForTag entriesForTag) {
+    this.entriesForTag = entriesForTag;
   }
 
 
@@ -56,7 +54,7 @@ public class EntriesFragment extends TabFragment {
     View rootView = inflater.inflate(R.layout.fragment_entries, container, false);
 
     ListView lstvwEntries = (ListView)rootView.findViewById(R.id.lstvwEntries);
-    entriesAdapter = new EntriesAdapter(getActivity(), entriesToShow);
+    entriesAdapter = new EntriesAdapter(getActivity(), entriesForTag);
     lstvwEntries.setAdapter(entriesAdapter);
     registerForContextMenu(lstvwEntries);
     lstvwEntries.setOnItemClickListener(lstvwEntriesOnItemClickListener);

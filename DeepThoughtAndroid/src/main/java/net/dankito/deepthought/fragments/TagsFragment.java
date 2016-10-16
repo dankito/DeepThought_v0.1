@@ -21,11 +21,8 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.activities.ActivityManager;
 import net.dankito.deepthought.adapter.TagsAdapter;
 import net.dankito.deepthought.data.model.DeepThought;
-import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.search.SearchCompletedListener;
-
-import java.util.Collection;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
 
 /**
  * Created by ganymed on 01/10/14.
@@ -74,22 +71,20 @@ public class TagsFragment extends TabFragment {
       if(tag.hasEntries() == false) // no Entries to show -> don't navigate
         return;
 
-      Application.getSearchEngine().getEntriesForTagAsync(tag, new SearchCompletedListener<Collection<Entry>>() {
-        @Override
-        public void completed(final Collection<Entry> results) {
-          getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-              entriesForTagRetrieved(results);
-            }
-          });
-        }
-      });
+      getEntriesForTag(tag);
     }
   };
 
-  protected void entriesForTagRetrieved(Collection<Entry> entries) {
-    ActivityManager.getInstance().navigateToEntriesFragment(getActivity().getSupportFragmentManager(), entries, R.id.rlyFragmentTags);
+  protected void getEntriesForTag(Tag tag) {
+    EntriesForTag entriesForTag = new EntriesForTag();
+    entriesForTag.setFindAllEntriesHavingTheseTagsResult(tagsAdapter.getLastFilterTagsResult());
+    entriesForTag.setTag(tag);
+
+    navigateToEntriesFragment(entriesForTag);
+  }
+
+  protected void navigateToEntriesFragment(EntriesForTag entriesForTag) {
+    ActivityManager.getInstance().navigateToEntriesFragment(getActivity().getSupportFragmentManager(), entriesForTag, R.id.rlyFragmentTags);
 
     hasNavigatedToOtherFragment = true;
     getActivity().invalidateOptionsMenu();
