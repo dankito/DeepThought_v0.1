@@ -160,7 +160,7 @@ public class EntriesOverviewControl extends SplitPane implements IMainWindowCont
   public EntriesOverviewControl(MainWindowController mainWindowController, EntriesForTag entriesForTag) {
     this.mainWindowController = mainWindowController;
     this.entriesForTag = entriesForTag;
-    entriesForTag.setEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
+    entriesForTag.addEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
 
     deepThought = Application.getDeepThought();
 

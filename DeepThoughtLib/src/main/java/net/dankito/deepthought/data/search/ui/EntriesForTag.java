@@ -18,6 +18,7 @@ import net.dankito.deepthought.util.NotificationType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 16/10/16.
@@ -37,7 +38,7 @@ public class EntriesForTag {
 
   protected IEntityChangesService entityChangesService;
 
-  protected EntriesForTagRetrievedListener entriesForTagRetrievedListener;
+  protected List<EntriesForTagRetrievedListener> entriesForTagRetrievedListeners = new CopyOnWriteArrayList<>();
 
 
   public EntriesForTag() {
@@ -115,8 +116,8 @@ public class EntriesForTag {
   }
 
   protected void callEntriesForTagRetrievedListener(List<Entry> entriesForTag) {
-    if(entriesForTagRetrievedListener != null) {
-      entriesForTagRetrievedListener.retrievedEntriesForTag(entriesForTag);
+    for(EntriesForTagRetrievedListener listener : entriesForTagRetrievedListeners) {
+      listener.retrievedEntriesForTag(entriesForTag);
     }
   }
 
@@ -135,8 +136,12 @@ public class EntriesForTag {
   }
 
 
-  public void setEntriesForTagRetrievedListener(EntriesForTagRetrievedListener entriesForTagRetrievedListener) {
-    this.entriesForTagRetrievedListener = entriesForTagRetrievedListener;
+  public boolean addEntriesForTagRetrievedListener(EntriesForTagRetrievedListener entriesForTagRetrievedListener) {
+    return this.entriesForTagRetrievedListeners.add(entriesForTagRetrievedListener);
+  }
+
+  public boolean removeEntriesForTagRetrievedListener(EntriesForTagRetrievedListener entriesForTagRetrievedListener) {
+    return this.entriesForTagRetrievedListeners.remove(entriesForTagRetrievedListener);
   }
 
 
