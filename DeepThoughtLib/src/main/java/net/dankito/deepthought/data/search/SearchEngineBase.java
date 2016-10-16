@@ -106,12 +106,6 @@ public abstract class SearchEngineBase implements ISearchEngine {
 
   @Override
   public void searchEntries(final EntriesSearch search) {
-    if(StringUtils.isNullOrEmpty(search.getSearchTerm())) {
-      search.setResults(Application.getDeepThought().getEntries());
-      search.fireSearchCompleted();
-      return;
-    }
-
     String lowerCaseFilter = search.getSearchTerm().toLowerCase();
     final String[] termsToFilterFor = lowerCaseFilter.split(" ");
 
