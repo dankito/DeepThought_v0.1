@@ -21,11 +21,11 @@ public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter impl
   public AsyncLoadingEntityAdapter(Activity context, int listItemLayoutId) {
     super(context, listItemLayoutId);
 
+    Application.addApplicationListener(applicationListener);
+
     if(Application.isInstantiated()) {
       addAllEntitiesListener();
-    }
-    else {
-      Application.addApplicationListener(applicationListener);
+      applicationInstantiated();
     }
 
     if(Application.getDeepThought() != null) {
