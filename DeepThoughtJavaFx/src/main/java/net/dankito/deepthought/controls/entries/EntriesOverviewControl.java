@@ -1,7 +1,16 @@
 package net.dankito.deepthought.controls.entries;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.controller.Dialogs;
+import net.dankito.deepthought.controls.Constants;
 import net.dankito.deepthought.controls.ICleanUp;
+import net.dankito.deepthought.controls.IMainWindowControl;
+import net.dankito.deepthought.controls.LazyLoadingObservableList;
+import net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor;
+import net.dankito.deepthought.controls.html.EntryContentHtmlEditorListener;
+import net.dankito.deepthought.controls.person.PersonLabel;
+import net.dankito.deepthought.controls.reference.EntryReferenceBaseLabel;
+import net.dankito.deepthought.controls.tag.EntryTagsControl;
 import net.dankito.deepthought.controls.utils.FXUtils;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
@@ -17,7 +26,9 @@ import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
+import net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.JavaFxLocalization;
 
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
@@ -57,7 +68,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class EntriesOverviewControl extends SplitPane implements net.dankito.deepthought.controls.IMainWindowControl, ICleanUp {
+public class EntriesOverviewControl extends SplitPane implements IMainWindowControl, ICleanUp {
 
   private final static Logger log = LoggerFactory.getLogger(EntriesOverviewControl.class);
 
@@ -68,12 +79,12 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
   protected Collection<Entry> unfilteredCurrentEntriesToShow = new ArrayList<>();
 
-  protected net.dankito.deepthought.controls.LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
+  protected LazyLoadingObservableList<Entry> tableViewEntriesItems = null;
 
   protected EntriesSearch lastEntriesSearch = null;
 
 
-  protected net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController mainWindowController;
+  protected MainWindowController mainWindowController;
 
 
   @FXML
@@ -115,7 +126,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   @FXML
   protected TextField txtfldEntryAbstract;
 
-  protected net.dankito.deepthought.controls.tag.EntryTagsControl currentEditedEntryTagsControl = null;
+  protected EntryTagsControl currentEditedEntryTagsControl = null;
 
   @FXML
   ScrollPane pnReferenceAndPersonsScrollPane;
@@ -138,11 +149,11 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   @FXML
   Pane pnSelectedPersons;
 
-  protected net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor htmledEntryContent;
+  protected DeepThoughtFxHtmlEditor htmledEntryContent;
 
 
 
-  public EntriesOverviewControl(net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController mainWindowController) {
+  public EntriesOverviewControl(MainWindowController mainWindowController) {
     this.mainWindowController = mainWindowController;
     deepThought = Application.getDeepThought();
 
@@ -181,7 +192,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     hboxEntriesBar.getChildren().remove(txtfldSearchEntries);
     txtfldSearchEntries = (CustomTextField) TextFields.createClearableTextField();
     txtfldSearchEntries.setId("txtfldSearchEntries");
-    net.dankito.deepthought.util.localization.JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchEntries, "search.entries.prompt.text");
+    JavaFxLocalization.bindTextInputControlPromptText(txtfldSearchEntries, "search.entries.prompt.text");
     hboxEntriesBar.getChildren().add(1, txtfldSearchEntries);
     HBox.setHgrow(txtfldSearchEntries, Priority.ALWAYS);
     txtfldSearchEntries.textProperty().addListener(new ChangeListener<String>() {
@@ -196,16 +207,16 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     });
 
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesAbstract);
-    net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesAbstract, "search.entries.abstract.tool.tip");
+    JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesAbstract, "search.entries.abstract.tool.tip");
     FXUtils.ensureNodeOnlyUsesSpaceIfVisible(tglbtnSearchEntriesContent);
-    net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesContent, "search.entries.content.tool.tip");
+    JavaFxLocalization.bindControlToolTip(tglbtnSearchEntriesContent, "search.entries.content.tool.tip");
 
-    btnRemoveSelectedEntries.setTextFill(net.dankito.deepthought.controls.Constants.RemoveEntityButtonTextColor);
-    net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(btnRemoveSelectedEntries, "delete.selected.entries.tool.tip");
-    btnAddEntry.setTextFill(net.dankito.deepthought.controls.Constants.AddEntityButtonTextColor);
-    net.dankito.deepthought.util.localization.JavaFxLocalization.bindControlToolTip(btnAddEntry, "add.new.entry.tool.tip");
+    btnRemoveSelectedEntries.setTextFill(Constants.RemoveEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnRemoveSelectedEntries, "delete.selected.entries.tool.tip");
+    btnAddEntry.setTextFill(Constants.AddEntityButtonTextColor);
+    JavaFxLocalization.bindControlToolTip(btnAddEntry, "add.new.entry.tool.tip");
 
-    tableViewEntriesItems = new net.dankito.deepthought.controls.LazyLoadingObservableList<>();
+    tableViewEntriesItems = new LazyLoadingObservableList<>();
     tblvwEntries.setItems(tableViewEntriesItems);
 
     tblvwEntries.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -252,7 +263,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
 
     txtfldEntryAbstract.textProperty().addListener(txtfldEntryAbstractChangeListener);
 
-    htmledEntryContent = new net.dankito.deepthought.controls.html.DeepThoughtFxHtmlEditor(entryContentListener);
+    htmledEntryContent = new DeepThoughtFxHtmlEditor(entryContentListener);
     htmledEntryContent.setMinHeight(250);
     htmledEntryContent.setMaxHeight(FXUtils.SizeMaxValue);
     VBox.setVgrow(htmledEntryContent, Priority.ALWAYS);
@@ -260,7 +271,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
     pnQuickEditEntry.getChildren().remove(pnQuickEditEntry.getChildren().size() - 1); // remove HtmlEditor set in JavaFX Scene Builder
     pnQuickEditEntry.getChildren().add(htmledEntryContent);
 
-    currentEditedEntryTagsControl = new net.dankito.deepthought.controls.tag.EntryTagsControl();
+    currentEditedEntryTagsControl = new EntryTagsControl();
     currentEditedEntryTagsControl.setTagAddedEventHandler(event -> {
       Entry selectedEntry = deepThought.getSettings().getLastViewedEntry();
       if (selectedEntry != null)
@@ -410,14 +421,14 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
         pnReference.setMaxWidth(this.getWidth() * 2 / 3);
       else
         pnReference.setMaxWidth(this.getWidth() - 30);
-      pnSelectedReference.getChildren().add(new net.dankito.deepthought.controls.reference.EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), event -> selectedEntry.clearReferenceBases()));
+      pnSelectedReference.getChildren().add(new EntryReferenceBaseLabel(selectedEntry.getLowestReferenceBase(), event -> selectedEntry.clearReferenceBases()));
     }
     showReferenceIndication(selectedEntry);
 
     if(selectedEntry.hasPersons()) {
       pnReferenceAndPersonsScrollPane.setMinHeight(46);
       for(final Person person : new TreeSet<>(selectedEntry.getPersons())) {
-        net.dankito.deepthought.controls.person.PersonLabel label = new net.dankito.deepthought.controls.person.PersonLabel(person);
+        PersonLabel label = new PersonLabel(person);
         pnSelectedPersons.getChildren().add(label);
         HBox.setMargin(label, new Insets(0, 6, 0, 0));
 
@@ -493,7 +504,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   }
 
   protected void showEditEntryDialog(final Entry entry) {
-    net.dankito.deepthought.controller.Dialogs.showEditEntryDialog(entry);
+    Dialogs.showEditEntryDialog(entry);
   }
 
 
@@ -566,7 +577,7 @@ public class EntriesOverviewControl extends SplitPane implements net.dankito.dee
   }
 
 
-  protected net.dankito.deepthought.controls.html.EntryContentHtmlEditorListener entryContentListener = new net.dankito.deepthought.controls.html.EntryContentHtmlEditorListener();
+  protected EntryContentHtmlEditorListener entryContentListener = new EntryContentHtmlEditorListener();
 
   protected ChangeListener<String> txtfldEntryAbstractChangeListener = new ChangeListener<String>() {
     @Override
