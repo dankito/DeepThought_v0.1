@@ -43,6 +43,10 @@ public class EntriesForTag {
 
   public EntriesForTag() {
     Application.addApplicationListener(applicationListener);
+
+    if(Application.isInstantiated()) {
+      applicationInitialized(Application.getSearchEngine(), Application.getEntityChangesService());
+    }
   }
 
   protected void applicationInitialized(ISearchEngine searchEngine, IEntityChangesService entityChangesService) {
@@ -50,8 +54,9 @@ public class EntriesForTag {
     this.entityChangesService = entityChangesService;
 
     entityChangesService.addAllEntitiesListener(allEntitiesListener);
+  }
 
-    DeepThought deepThought = Application.getDeepThought();
+  protected void deepThoughtChanged(DeepThought deepThought) {
     if(deepThought.getSettings().getLastViewedTag() != null) {
       setTag(deepThought.getSettings().getLastViewedTag());
     }
@@ -65,14 +70,14 @@ public class EntriesForTag {
     this.currentTag = tag;
 
     if(currentTag != null) {
-      getEntriesForTag();
+      retrieveEntriesForTag();
     }
     else {
       receivedEntriesForTag(EntriesToShowIfNoTagIsSelected);
     }
   }
 
-  protected void getEntriesForTag() {
+  protected void retrieveEntriesForTag() {
     if(searchEngine == null) { // Application not initialized yet
       return;
     }
@@ -157,6 +162,8 @@ public class EntriesForTag {
         Application.removeApplicationListener(applicationListener);
 
         applicationInitialized(Application.getSearchEngine(), Application.getEntityChangesService());
+
+        deepThoughtChanged(Application.getDeepThought());
       }
     }
   };
@@ -167,7 +174,7 @@ public class EntriesForTag {
       if(entity instanceof Entry) {
         Entry entry = (Entry)entity;
         if(entry.hasTag(currentTag)) { // if an Entry is created with its Tags already set
-          getEntriesForTag();
+          retrieveEntriesForTag();
         }
       }
     }
@@ -196,10 +203,10 @@ public class EntriesForTag {
   protected void checkIfEntriesForTagChanged(BaseEntity collectionHolder, BaseEntity addedOrRemovedEntity) {
     if(addedOrRemovedEntity instanceof Entry) {
       if(collectionHolder == currentTag) {
-        getEntriesForTag();
+        retrieveEntriesForTag();
       }
       else if(collectionHolder instanceof DeepThought && currentTag instanceof SystemTag) {
-        getEntriesForTag();
+        retrieveEntriesForTag();
       }
     }
   }
@@ -207,6 +214,12 @@ public class EntriesForTag {
   public void setFindAllEntriesHavingTheseTagsResult(FindAllEntriesHavingTheseTagsResult lastFilterTagsResult) {
     this.lastFilterTagsResult = lastFilterTagsResult;
 
-    getEntriesForTag();
+    retrieveEntriesForTag();
   }
+
+
+  public List<Entry> getEntriesForTag() {
+    return entriesForTag;
+  }
+
 }
