@@ -193,11 +193,11 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
       if (tagsSearch != null && tagsSearch.isCompleted() == false)
         tagsSearch.interrupt();
 
-      doSearchTags(searchTerm);
+      searchTagsWithNoFilterApplied(searchTerm);
     }
   }
 
-  protected void doSearchTags(String searchTerm) {
+  protected void searchTagsWithNoFilterApplied(String searchTerm) {
     lastSearchTerm = searchTerm;
     lastFilterTagsResult = null;
 
