@@ -27,10 +27,6 @@ public abstract class AsyncLoadingEntityAdapter extends AsyncLoadingAdapter impl
       addAllEntitiesListener();
       applicationInstantiated();
     }
-
-    if(Application.getDeepThought() != null) {
-      deepThoughtChanged(Application.getDeepThought());
-    }
   }
 
   @Override

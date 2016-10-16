@@ -38,6 +38,10 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
 
   public TagsAdapter(Activity context) {
     super(context, R.layout.list_item_tag);
+
+    if(Application.getDeepThought() != null) {
+      deepThoughtChanged(Application.getDeepThought());
+    }
   }
 
   @Override
@@ -229,6 +233,11 @@ public class TagsAdapter extends AsyncLoadingEntityAdapter {
     if(entity instanceof Tag) {
       researchTagsWithLastSearchTerm();
     }
+  }
+
+
+  public FindAllEntriesHavingTheseTagsResult getLastFilterTagsResult() {
+    return lastFilterTagsResult;
   }
 
 }
