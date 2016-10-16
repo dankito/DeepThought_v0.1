@@ -17,6 +17,7 @@ import net.dankito.deepthought.data.search.SearchBase;
 import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.data.search.specific.TagsSearch;
 import net.dankito.deepthought.data.search.specific.TagsSearchResults;
+import net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.filterpanel.TagsFilterPanel;
 import net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.table.TableViewTags;
 import net.dankito.deepthought.util.Alerts;
@@ -42,7 +43,7 @@ import javafx.scene.layout.VBox;
 /**
  * Created by ganymed on 01/02/15.
  */
-public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFilter, net.dankito.deepthought.javafx.dialogs.mainwindow.tabs.tags.ISelectedTagsController {
+public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFilter, ISelectedTagsController {
 
   private final static Logger log = LoggerFactory.getLogger(TabTagsControl.class);
 
@@ -67,7 +68,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected ObservableSet<Tag> tagsFilter = FXCollections.observableSet();
 
 
-  protected net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController mainWindowController;
+  protected MainWindowController mainWindowController;
 
   protected TagsFilterPanel filterPanel;
 
@@ -75,7 +76,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
 
 
-  public TabTagsControl(net.dankito.deepthought.javafx.dialogs.mainwindow.MainWindowController mainWindowController) {
+  public TabTagsControl(MainWindowController mainWindowController) {
     this.mainWindowController = mainWindowController;
     deepThought = Application.getDeepThought();
 
