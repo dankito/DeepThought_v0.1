@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
-  protected EntriesForTag entriesForTag = new EntriesForTag();
+  protected EntriesForTag entriesForTag = null;
 
   protected List<Entry> entriesToShow = null;
 
@@ -42,6 +42,7 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     super(context, R.layout.list_item_entry);
 
+    initializeEntriesForTag();
     entriesForTag.addEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
 
     if(entriesToShow != null) {
@@ -67,6 +68,8 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     previewService = Application.getEntityPreviewService();
 
     if(deepThought != null) {
+      initializeEntriesForTag();
+
       entriesForTag.setTag(deepThought.AllEntriesSystemTag());
     }
     else {
@@ -78,6 +81,12 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
           notifyDataSetChanged();
         }
       });
+    }
+  }
+
+  protected void initializeEntriesForTag() {
+    if(entriesForTag == null) {
+      entriesForTag = new EntriesForTag();
     }
   }
 
