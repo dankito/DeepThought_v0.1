@@ -163,7 +163,7 @@ public class EntriesForTag {
 
         applicationInitialized(Application.getSearchEngine(), Application.getEntityChangesService());
 
-        deepThoughtChanged(Application.getDeepThought());
+        EntriesForTag.this.deepThoughtChanged(Application.getDeepThought());
       }
     }
   };
