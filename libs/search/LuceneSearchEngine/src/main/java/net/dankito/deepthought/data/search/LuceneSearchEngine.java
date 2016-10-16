@@ -1028,7 +1028,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     }
 
     try {
-      entriesHavingFilteredTags.addAll(getBaseEntitiesFromQuery(Entry.class, query, FieldName.EntryId));
+      entriesHavingFilteredTags.addAll(getBaseEntitiesFromQuery(Entry.class, query, FieldName.EntryId, SortOrder.Descending, FieldName.EntryCreated));
       for(Entry resultEntry : entriesHavingFilteredTags)
         tagsOnEntriesContainingFilteredTags.addAll(resultEntry.getTags()); // TODO: this is really bad as in this way all Entries of entriesHavingFilteredTags get loaded
 
@@ -1065,6 +1065,12 @@ public class LuceneSearchEngine extends SearchEngineBase {
 
   protected <T extends BaseEntity> List<T> getBaseEntitiesFromQuery(Class<T> type, Query query, String idFieldName) {
     Collection<String> ids = getEntityIdsFromQuery(type, query, idFieldName);
+
+    return getBaseEntitiesFromIds(type, ids);
+  }
+
+  protected <T extends BaseEntity> List<T> getBaseEntitiesFromQuery(Class<T> type, Query query, String idFieldName, SortOrder sortOrder, String... sortFieldNames) {
+    Collection<String> ids = getEntityIdsFromQuery(type, query, idFieldName, sortOrder, sortFieldNames);
 
     return getBaseEntitiesFromIds(type, ids);
   }
