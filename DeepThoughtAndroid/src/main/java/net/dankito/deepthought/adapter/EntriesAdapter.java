@@ -11,6 +11,8 @@ import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
 import net.dankito.deepthought.data.search.specific.EntriesSearch;
+import net.dankito.deepthought.data.search.ui.EntriesForTag;
+import net.dankito.deepthought.data.search.ui.EntriesForTagRetrievedListener;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
 
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.List;
  * Created by ganymed on 01/10/14.
  */
 public class EntriesAdapter extends AsyncLoadingEntityAdapter {
+
+  protected EntriesForTag entriesForTag = new EntriesForTag();
 
   protected List<Entry> entriesToShow = null;
 
@@ -38,6 +42,8 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   public EntriesAdapter(Activity context, Collection<Entry> entriesToShow) {
     super(context, R.layout.list_item_entry);
 
+    entriesForTag.addEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
+
     if(entriesToShow != null) {
       this.entriesToShow = getListFromCollection(entriesToShow);
     }
@@ -47,13 +53,21 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
   }
 
   @Override
+  public void cleanUp() {
+    entriesForTag.removeEntriesForTagRetrievedListener(entriesForTagRetrievedListener);
+    entriesForTag = null;
+
+    super.cleanUp();
+  }
+
+  @Override
   protected void deepThoughtChanged(DeepThought deepThought) {
     this.deepThought = deepThought;
 
     previewService = Application.getEntityPreviewService();
 
     if(deepThought != null) {
-      updateEntriesToShow(deepThought);
+      entriesForTag.setTag(deepThought.AllEntriesSystemTag());
     }
     else {
       context.runOnUiThread(new Runnable() {
@@ -65,20 +79,6 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
         }
       });
     }
-  }
-
-  protected void updateEntriesToShow(final DeepThought deepThought) {
-    Application.getSearchEngine().getEntriesForTagAsync(deepThought.AllEntriesSystemTag(), new SearchCompletedListener<Collection<Entry>>() {
-      @Override
-      public void completed(final Collection<Entry> results) {
-        context.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            retrievedEntriesToShow(results);
-          }
-        });
-      }
-    });
   }
 
   protected void retrievedEntriesToShow(Collection<Entry> entriesToShow) {
@@ -214,5 +214,20 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
       }
     }
   }
+
+
+  protected EntriesForTagRetrievedListener entriesForTagRetrievedListener = new EntriesForTagRetrievedListener() {
+    @Override
+    public void retrievedEntriesForTag(final List<Entry> entries) {
+      if(context != null) {
+        context.runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+            retrievedEntriesToShow(entries);
+          }
+        });
+      }
+    }
+  };
 
 }
