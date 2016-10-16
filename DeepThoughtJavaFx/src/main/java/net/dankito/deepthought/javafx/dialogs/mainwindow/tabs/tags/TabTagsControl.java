@@ -7,7 +7,6 @@ import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.CombinedLazyLoadingList;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
@@ -137,17 +136,10 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   public void selectedTagChanged(Tag selectedTag) {
     log.debug("Selected Tag changed to {}", selectedTag);
 
-    if(deepThought.getSettings().getLastViewedTag() != null)
-      deepThought.getSettings().getLastViewedTag().removeEntityListener(selectedTagListener);
-
     deepThought.getSettings().setLastViewedTag(selectedTag);
     setSelectedTag(selectedTag);
 
     filterPanel.disableButtonRemoveSelectedTag(selectedTag == null || selectedTag instanceof SystemTag);
-
-    if(selectedTag != null) {
-      selectedTag.addEntityListener(selectedTagListener);
-    }
 
     showEntriesForSelectedTag(selectedTag);
   }
@@ -433,38 +425,6 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected void checkIfTagsHaveToBeUpdated(BaseEntity entity) {
     if(entity instanceof Tag) {
       updateTags();
-    }
-  }
-
-  protected EntityListener selectedTagListener = new EntityListener() {
-    @Override
-    public void propertyChanged(BaseEntity entity, String propertyName, Object previousValue, Object newValue) {
-      researchTagsWithLastSearchTerm();
-    }
-
-    @Override
-    public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
-      checkIfTagsHaveToBeUpdated((Tag) collectionHolder, collection);
-    }
-
-    @Override
-    public void entityOfCollectionUpdated(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity updatedEntity) {
-
-    }
-
-    @Override
-    public void entityRemovedFromCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity removedEntity) {
-      checkIfTagsHaveToBeUpdated((Tag) collectionHolder, collection);
-    }
-  };
-
-  protected void checkIfTagsHaveToBeUpdated(Tag collectionHolder, Collection<? extends BaseEntity> collection) {
-    if(deepThought.getSettings().getLastSelectedTab() == SelectedTab.Tags && collection == collectionHolder.getEntries()) {
-      if(tblvwTags.getTagsSize() > 0) {
-        filterTags();
-      }
-
-      showEntriesForSelectedTag(collectionHolder);
     }
   }
 }
