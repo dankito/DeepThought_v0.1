@@ -918,7 +918,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       }
 
       listener.completed(new LazyLoadingLuceneSearchResultsList(getIndexSearcher(Entry.class), query, Entry.class,
-          FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryIndex));
+          FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryCreated));
     }
   }
 
@@ -929,7 +929,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
       @Override
       public void run() {
         try {
-          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000, SortOrder.Descending, FieldName.EntryIndex));
+          listener.completed(new LazyLoadingLuceneSearchResultsList<Entry>(getIndexSearcher(Entry.class), query, Entry.class, FieldName.EntryId, 100000,
+              SortOrder.Descending, FieldName.EntryCreated));
         } catch (Exception ex) {
           log.error("Could not search for Entries without Tags", ex);
         }
@@ -1138,7 +1139,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       query.add(termQuery, BooleanClause.Occur.MUST);
     }
 
-    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending, FieldName.EntryIndex);
+    executeQuery(search, query, Entry.class, FieldName.EntryId, SortOrder.Descending, FieldName.EntryCreated);
   }
 
   @Override
@@ -1418,7 +1419,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     @Override
     public void entityAddedToCollection(BaseEntity collectionHolder, Collection<? extends BaseEntity> collection, BaseEntity addedEntity) {
       if(collectionHolder instanceof Entry) {
-        if (isIndexedEntityOnEntry(addedEntity))
+        if(isIndexedEntityOnEntry(addedEntity))
           updateIndexForEntity((UserDataEntity)collectionHolder);
       }
       else if(collectionHolder instanceof Category && addedEntity instanceof Category) { // SubCategory Added
