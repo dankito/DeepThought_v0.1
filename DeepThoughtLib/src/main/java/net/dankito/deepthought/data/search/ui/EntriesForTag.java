@@ -11,6 +11,7 @@ import net.dankito.deepthought.data.model.ui.SystemTag;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.search.ISearchEngine;
 import net.dankito.deepthought.data.search.SearchCompletedListener;
+import net.dankito.deepthought.data.search.specific.FindAllEntriesHavingTheseTagsResult;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 
@@ -29,6 +30,8 @@ public class EntriesForTag {
   protected Tag currentTag;
 
   protected List<Entry> entriesForTag = new ArrayList<>();
+
+  protected FindAllEntriesHavingTheseTagsResult lastFilterTagsResult;
 
   protected ISearchEngine searchEngine;
 
@@ -73,12 +76,36 @@ public class EntriesForTag {
       return;
     }
 
-    searchEngine.getEntriesForTagAsync(currentTag, new SearchCompletedListener<Collection<Entry>>() {
+    if(lastFilterTagsResult == null) {
+      searchEngine.getEntriesForTagAsync(currentTag, new SearchCompletedListener<Collection<Entry>>() {
+        @Override
+        public void completed(Collection<Entry> results) {
+          receivedEntriesForTag(results);
+        }
+      });
+    }
+    else {
+      showEntriesForSelectedTagWithAppliedTagsFilter(currentTag);
+    }
+  }
+
+  protected void showEntriesForSelectedTagWithAppliedTagsFilter(Tag tag) {
+    List<Entry> filteredEntriesWithThisTag = new ArrayList<>();
+
+    Application.getThreadPool().runTaskAsync(new Runnable() {
       @Override
-      public void completed(Collection<Entry> results) {
-        receivedEntriesForTag(results);
+      public void run() {
+        Collection<Entry> debug = lastFilterTagsResult.getEntriesHavingFilteredTags();
+        if(debug.size() > 0) { }
       }
     });
+
+    for(Entry entry : lastFilterTagsResult.getEntriesHavingFilteredTags()) {
+      if(entry.hasTag(tag))
+        filteredEntriesWithThisTag.add(entry);
+    }
+
+    receivedEntriesForTag(filteredEntriesWithThisTag); // TODO: here can may be a problem when Entries are search. How to know about this filter?
   }
 
   protected void receivedEntriesForTag(Collection<Entry> entries) {
@@ -172,4 +199,9 @@ public class EntriesForTag {
     }
   }
 
+  public void setFindAllEntriesHavingTheseTagsResult(FindAllEntriesHavingTheseTagsResult lastFilterTagsResult) {
+    this.lastFilterTagsResult = lastFilterTagsResult;
+
+    getEntriesForTag();
+  }
 }

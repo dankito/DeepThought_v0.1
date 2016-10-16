@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -147,27 +145,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   protected void showEntriesForSelectedTag(Tag tag) {
     log.debug("showEntriesForSelectedTag() has been called for Tag {}", tag);
 
-    if(tag != null) {
-      if (isTagsFilterApplied() && lastFilterTagsResult != null) {
-        showEntriesForSelectedTagWithAppliedTagsFilter(tag);
-      }
-      else {
-        entriesForTag.setTag(tag);
-      }
-    }
-    else {
-      entriesForTag.setTag(tag);
-    }
-  }
-
-  protected void showEntriesForSelectedTagWithAppliedTagsFilter(Tag tag) {
-    Set<Entry> filteredEntriesWithThisTag = new TreeSet<>();
-    for (Entry tagEntry : tag.getEntries()) {
-      if (lastFilterTagsResult.getEntriesHavingFilteredTags().contains(tagEntry))
-        filteredEntriesWithThisTag.add(tagEntry);
-    }
-
-    mainWindowController.showEntries(filteredEntriesWithThisTag); // TODO: here can may be a problem when Entries are search. How to know about this filter?
+    entriesForTag.setTag(tag);
   }
 
 
@@ -199,7 +177,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
 
   protected void searchTagsWithNoFilterApplied(String searchTerm) {
     lastSearchTerm = searchTerm;
-    lastFilterTagsResult = null;
+    resetLastFilterTagsResult();
 
     if(StringUtils.isNullOrEmpty(filterPanel.getTagsSearchText()) && allTagsSearchResult != null) {
       setTableViewTagsItems(allTagsSearchResult);
@@ -239,7 +217,7 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
     }
     else {
       Application.getSearchEngine().findAllEntriesHavingTheseTags(tagsFilter, lastSearchTerm, results -> {
-        lastFilterTagsResult = results;
+        setLastFilterTagsResult(results);
         setTableViewTagsItems(results.getTagsOnEntriesContainingFilteredTags());
 
         if(tagToSelect != null) {
@@ -281,9 +259,19 @@ public class TabTagsControl extends VBox implements IMainWindowControl, ITagsFil
   @Override
   public void clearTagFilter() {
     tagsFilter.clear();
-    lastFilterTagsResult = null;
+    resetLastFilterTagsResult();
     setButtonRemoveTagsFilterDisabledState();
     searchTags();
+  }
+
+  protected void resetLastFilterTagsResult() {
+    lastFilterTagsResult = null;
+    entriesForTag.setFindAllEntriesHavingTheseTagsResult(lastFilterTagsResult);
+  }
+
+  protected void setLastFilterTagsResult(FindAllEntriesHavingTheseTagsResult results) {
+    lastFilterTagsResult = results;
+    entriesForTag.setFindAllEntriesHavingTheseTagsResult(lastFilterTagsResult);
   }
 
   @Override
