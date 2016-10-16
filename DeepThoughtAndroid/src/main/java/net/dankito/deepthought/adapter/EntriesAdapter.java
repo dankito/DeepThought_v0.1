@@ -85,12 +85,6 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     previewService = Application.getEntityPreviewService();
   }
 
-  protected void initializeEntriesForTag() {
-    if(entriesForTag == null) {
-      entriesForTag = new EntriesForTag();
-    }
-  }
-
   protected void retrievedEntriesToShow(Collection<Entry> entriesToShow) {
     this.entriesToShow = getListFromCollection(entriesToShow);
 
