@@ -21,6 +21,7 @@ import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.helper.AlertHelper;
@@ -89,7 +90,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
         if(contentExtractorUrl.equals(contentExtractor.getSiteBaseUrl())) {
           this.contentExtractor = contentExtractor;
 
-          articlesOverviewAdapter.setContentExtractor(contentExtractor);
+          retrieveArticles();
           break;
         }
       }
@@ -117,7 +118,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
               ArticlesOverviewDialog.this.contentExtractor = contentExtractor;
 
-              articlesOverviewAdapter.setContentExtractor(contentExtractor);
+              retrieveArticlesThreadSafe();
             }
           }
         }
@@ -135,13 +136,15 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   @Override
   protected void setupUi(View rootView) {
-    articlesOverviewAdapter = new ArticlesOverviewAdapter(getActivity(), contentExtractor);
+    articlesOverviewAdapter = new ArticlesOverviewAdapter(getActivity());
 
     lstvwArticlesOverview = (ListView)rootView.findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
     lstvwArticlesOverview.setOnItemClickListener(lstvwArticlesOverviewOnItemClickListener);
 
     registerForContextMenu(lstvwArticlesOverview);
+
+    retrieveArticles();
   }
 
   @Override
@@ -187,7 +190,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
       return lastShownViewEntryDialog.onOptionsItemSelected(item);
     }
     else if(id == R.id.mnitmActionUpdateArticlesOverview) {
-      articlesOverviewAdapter.retrieveArticlesOnUiThread();
+      retrieveArticles();
       return true;
     }
 
@@ -328,6 +331,39 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected boolean isViewEntryDialogVisible() {
     return lastShownViewEntryDialog != null && activity.isDialogVisible(lastShownViewEntryDialog);
+  }
+
+
+
+  protected void retrieveArticlesThreadSafe() {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        retrieveArticles();
+      }
+    });
+  }
+
+  protected void retrieveArticles() {
+    articlesOverviewAdapter.clearArticlesOverviewItems();
+
+    if(contentExtractor != null) {
+      contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
+        @Override
+        public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final List<ArticlesOverviewItem> items, boolean isDone) {
+          updateArticlesOverviewItemsThreadSafe(items);
+        }
+      });
+    }
+  }
+
+  protected void updateArticlesOverviewItemsThreadSafe(final List<ArticlesOverviewItem> items) {
+    activity.runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        articlesOverviewAdapter.appendArticlesOverviewItems(items);
+      }
+    });
   }
 
 }

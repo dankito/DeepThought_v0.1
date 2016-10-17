@@ -11,12 +11,9 @@ import com.squareup.picasso.Picasso;
 
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.controls.ICleanUp;
-import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
-import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,47 +24,17 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
 
   protected Activity context;
 
-  protected IOnlineArticleContentExtractor extractorWithArticleOverview;
-
   protected List<ArticlesOverviewItem> articlesOverviewItems = new ArrayList<>();
 
 
-  public ArticlesOverviewAdapter(Activity context, IOnlineArticleContentExtractor extractorWithArticleOverview) {
+  public ArticlesOverviewAdapter(Activity context) {
     this.context = context;
-    this.extractorWithArticleOverview = extractorWithArticleOverview;
-
-    retrieveArticlesOnUiThread();
-  }
-
-  public void retrieveArticlesOnUiThread() {
-    articlesOverviewItems.clear();
-    notifyDataSetChanged();
-
-    if(extractorWithArticleOverview != null) {
-      extractorWithArticleOverview.getArticlesOverviewAsync(new ArticlesOverviewListener() {
-        @Override
-        public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final Collection<ArticlesOverviewItem> items, boolean isDone) {
-          updateArticlesOverviewItemsThreadSafe(items);
-        }
-      });
-    }
-  }
-
-  protected void updateArticlesOverviewItemsThreadSafe(final Collection<ArticlesOverviewItem> items) {
-    context.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        articlesOverviewItems.addAll(items);
-        notifyDataSetChanged();
-      }
-    });
   }
 
 
   @Override
   public void cleanUp() {
     context = null;
-    extractorWithArticleOverview = null;
 
     articlesOverviewItems.clear();
   }
@@ -137,9 +104,15 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     return convertView;
   }
 
-  public void setContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
-    this.extractorWithArticleOverview = contentExtractor;
 
-    retrieveArticlesOnUiThread();
+  public void appendArticlesOverviewItems(List<ArticlesOverviewItem> articlesOverviewItems) {
+    this.articlesOverviewItems.addAll(articlesOverviewItems);
+    notifyDataSetChanged();
   }
+
+  public void clearArticlesOverviewItems() {
+    articlesOverviewItems.clear();
+    notifyDataSetChanged();
+  }
+
 }
