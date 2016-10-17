@@ -24,6 +24,9 @@ import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewIte
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
+import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
+import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
+import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
@@ -37,6 +40,8 @@ import java.util.List;
 public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected static final String CONTENT_EXTRACTOR_URL_BUNDLE_KEY = "ContentExtractorUrl";
+
+  protected static final String ARTICLE_OVERVIEW_ITEMS_BUNDLE_KEY = "ArticleOverviewItems";
 
 
   protected ListView lstvwArticlesOverview = null;
@@ -58,18 +63,38 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
       outState.putString(CONTENT_EXTRACTOR_URL_BUNDLE_KEY, contentExtractor.getSiteBaseUrl());
     }
 
+    SerializationResult result = JsonIoJsonHelper.generateJsonString(articlesOverviewAdapter.getArticlesOverviewItems());
+    if(result.successful()) {
+      outState.putString(ARTICLE_OVERVIEW_ITEMS_BUNDLE_KEY, result.getSerializationResult());
+    }
+
     super.onSaveInstanceState(outState);
   }
 
   @Override
   protected void restoreSavedInstance(Bundle savedInstanceState) {
     if(savedInstanceState != null) {
+      tryToRestoreArticleOverviewItems(savedInstanceState);
+
       String contentExtractorUrl = savedInstanceState.getString(CONTENT_EXTRACTOR_URL_BUNDLE_KEY);
 
       if(contentExtractorUrl != null) {
         tryToRestoreContentExtractorTitle(contentExtractorUrl);
 
         tryToRestoreContentExtractor(contentExtractorUrl);
+      }
+    }
+  }
+
+  protected void tryToRestoreArticleOverviewItems(Bundle savedInstanceState) {
+    String articleOverviewItemsJsonString = savedInstanceState.getString(ARTICLE_OVERVIEW_ITEMS_BUNDLE_KEY);
+
+    if(articleOverviewItemsJsonString != null) {
+      DeserializationResult<List> result = JsonIoJsonHelper.parseJsonString(articleOverviewItemsJsonString, List.class);
+
+      if(result.successful()) {
+        initializeArticlesOverviewAdapter();
+        articlesOverviewAdapter.appendArticlesOverviewItems((List<ArticlesOverviewItem>)result.getResult());
       }
     }
   }
@@ -136,7 +161,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   @Override
   protected void setupUi(View rootView) {
-    articlesOverviewAdapter = new ArticlesOverviewAdapter(getActivity());
+    initializeArticlesOverviewAdapter();
 
     lstvwArticlesOverview = (ListView)rootView.findViewById(R.id.lstvwArticlesOverview);
     lstvwArticlesOverview.setAdapter(articlesOverviewAdapter);
@@ -145,6 +170,12 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     registerForContextMenu(lstvwArticlesOverview);
 
     retrieveArticles();
+  }
+
+  protected void initializeArticlesOverviewAdapter() {
+    if(articlesOverviewAdapter == null) {
+      articlesOverviewAdapter = new ArticlesOverviewAdapter(getActivity());
+    }
   }
 
   @Override
