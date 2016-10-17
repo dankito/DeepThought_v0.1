@@ -58,7 +58,13 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   @Override
   protected void customizeToolbar(View rootView, ActionBar actionBar) {
-    actionBar.setTitle(contentExtractor.getSiteBaseUrl());
+    setActionBarTitle(actionBar);
+  }
+
+  protected void setActionBarTitle(ActionBar actionBar) {
+    if(contentExtractor != null) {
+      actionBar.setTitle(contentExtractor.getSiteBaseUrl());
+    }
   }
 
   @Override
