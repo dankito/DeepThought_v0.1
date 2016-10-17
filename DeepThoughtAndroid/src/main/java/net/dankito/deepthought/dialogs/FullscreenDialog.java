@@ -4,7 +4,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -62,16 +61,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
 
   @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialog);
-  }
-
-
-  @Override
-  public void onStart() {
-    super.onStart();
-
+  public void onResume() {
     Dialog dialog = getDialog();
     if(dialog != null) {
       int width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -81,10 +71,13 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
       WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
       attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
       dialog.getWindow().setAttributes(attrs);
+
+      // TODO: not working // Set to adjust screen height automatically, when soft keyboard appears on screen
+      dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
     }
+
+    super.onResume();
   }
-
-
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -279,7 +272,11 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 
     if(hasDialogPreviouslyBeenShown == false) { // on first display create EditEntryDialog and add it to transaction
-      transaction.add(android.R.id.content, this); // TODO: edit Tag
+      // i don't know why this makes such a huge difference: when adding to android.R.id.content soft keyboard hides toolbar, ...
+      transaction.add(android.R.id.content, this, getClass().getName());
+//      transaction.add(this, getClass().getName()); // ... but using this method instead dialog gets destroyed on back button press
+
+      this.setStyle(DialogFragment.STYLE_NORMAL, R.style.FullscreenDialog);
     }
     else { // on subsequent displays we only have to call show() on the then hidden Dialog
       transaction.show(this);
