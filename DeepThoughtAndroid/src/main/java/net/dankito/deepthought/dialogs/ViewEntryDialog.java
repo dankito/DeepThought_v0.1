@@ -2,6 +2,7 @@ package net.dankito.deepthought.dialogs;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.Menu;
@@ -18,15 +19,22 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
+import net.dankito.deepthought.data.listener.ApplicationListener;
+import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.Tag;
 import net.dankito.deepthought.data.model.listener.EntityListener;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
+import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
+import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
+import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
 import net.dankito.deepthought.dialogs.enums.EditEntrySection;
 import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.ui.model.IEntityPreviewService;
+import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.NotificationType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +50,12 @@ public class ViewEntryDialog extends FullscreenDialog {
 
   public final static int RequestCode = 1;
 
-  private final static Logger log = LoggerFactory.getLogger(ViewEntryDialog.class);
+  protected static final String ENTRY_ID_BUNDLE_KEY = "EntryId";
+
+  protected static final String ENTRY_CREATION_RESULT_BUNDLE_KEY = "EntryCreationResult";
+
+
+  private static final Logger log = LoggerFactory.getLogger(ViewEntryDialog.class);
 
 
   protected Entry entry = null;
@@ -433,6 +446,71 @@ public class ViewEntryDialog extends FullscreenDialog {
     }
 
     return editEntryDialog;
+  }
+
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    if(entry != null) {
+      outState.putString(ENTRY_ID_BUNDLE_KEY, entry.getId());
+    }
+
+    if(entryCreationResult != null) {
+      SerializationResult result = JsonIoJsonHelper.generateJsonString(entryCreationResult);
+      if(result.successful()) {
+        outState.putString(ENTRY_CREATION_RESULT_BUNDLE_KEY, result.getSerializationResult());
+      }
+    }
+
+    super.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void restoreSavedInstance(Bundle savedInstanceState) {
+    if(savedInstanceState != null) {
+      tryToRestoreEntry(savedInstanceState);
+
+      tryToRestoreEntryCreationResult(savedInstanceState);
+    }
+
+    super.restoreSavedInstance(savedInstanceState);
+  }
+
+  protected void tryToRestoreEntry(Bundle savedInstanceState) {
+    final String entryId = savedInstanceState.getString(ENTRY_ID_BUNDLE_KEY);
+
+    if(entryId != null) {
+      if(Application.getEntityManager() != null) {
+        Entry entry = Application.getEntityManager().getEntityById(Entry.class, entryId);
+        setEntry(entry);
+      }
+      else {
+        Application.addApplicationListener(new ApplicationListener() {
+          @Override
+          public void deepThoughtChanged(DeepThought deepThought) { }
+
+          @Override
+          public void notification(Notification notification) {
+            if(notification.getType() == NotificationType.ApplicationInstantiated) {
+              Application.removeApplicationListener(this);
+
+              Entry entry = Application.getEntityManager().getEntityById(Entry.class, entryId);
+              setEntry(entry);
+            }
+          }
+        });
+      }
+    }
+  }
+
+  protected void tryToRestoreEntryCreationResult(Bundle savedInstanceState) {
+    String entryCreationResultJsonString = savedInstanceState.getString(ENTRY_CREATION_RESULT_BUNDLE_KEY);
+    if(entryCreationResultJsonString != null) {
+      DeserializationResult<EntryCreationResult> result = JsonIoJsonHelper.parseJsonString(entryCreationResultJsonString, EntryCreationResult.class);
+      if(result.successful()) {
+        setEntryCreationResult(result.getResult());
+      }
+    }
   }
 
 
