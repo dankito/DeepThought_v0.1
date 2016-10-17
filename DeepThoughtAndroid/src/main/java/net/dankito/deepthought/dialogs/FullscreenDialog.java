@@ -81,6 +81,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    restoreSavedInstance(savedInstanceState);
+
     View rootView = inflater.inflate(getLayoutId(), container, false);
 
     // don't know why but when placing Dialog in android.R.id.content, the Dialog's content starts below the system status bar -> set a top margin in height of status bar
@@ -96,6 +98,10 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     setupUi(rootView);
 
     return rootView;
+  }
+
+  protected void restoreSavedInstance(Bundle savedInstanceState) {
+
   }
 
   protected abstract int getLayoutId();
