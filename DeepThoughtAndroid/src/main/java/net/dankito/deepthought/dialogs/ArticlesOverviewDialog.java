@@ -1,7 +1,9 @@
 package net.dankito.deepthought.dialogs;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,15 +18,20 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.adapter.ArticlesOverviewAdapter;
 import net.dankito.deepthought.data.contentextractor.CreateEntryListener;
 import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
+import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.helper.AlertHelper;
 import net.dankito.deepthought.util.localization.Localization;
 
+import java.util.List;
+
 /**
  * Created by ganymed on 25/09/15.
  */
 public class ArticlesOverviewDialog extends FullscreenDialog {
+
+  protected static final String CONTENT_EXTRACTOR_URL_BUNDLE_KEY = "ContentExtractorUrl";
 
 
   protected ListView lstvwArticlesOverview = null;
@@ -37,6 +44,52 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   public void setContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
     this.contentExtractor = contentExtractor;
+  }
+
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    if(contentExtractor != null) {
+      outState.putString(CONTENT_EXTRACTOR_URL_BUNDLE_KEY, contentExtractor.getSiteBaseUrl());
+    }
+
+    super.onSaveInstanceState(outState);
+  }
+
+  @Override
+  protected void restoreSavedInstance(Bundle savedInstanceState) {
+    if(savedInstanceState != null) {
+      String contentExtractorUrl = savedInstanceState.getString(CONTENT_EXTRACTOR_URL_BUNDLE_KEY);
+
+      if(contentExtractorUrl != null) {
+        tryToRestoreContentExtractorTitle(contentExtractorUrl);
+
+        tryToRestoreContentExtractor(contentExtractorUrl);
+      }
+    }
+  }
+
+  protected void tryToRestoreContentExtractorTitle(String contentExtractorUrl) {
+    ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+    if(actionBar != null) {
+      setActionBarTitle(actionBar, contentExtractorTitle);
+    }
+  }
+
+  protected void tryToRestoreContentExtractor(String contentExtractorUrl) {
+    IContentExtractorManager contentExtractorManager = Application.getContentExtractorManager();
+    if(contentExtractorManager != null) {
+      List<IOnlineArticleContentExtractor> onlineArticleContentExtractors = contentExtractorManager.getOnlineArticleContentExtractors();
+
+      for(IOnlineArticleContentExtractor contentExtractor : onlineArticleContentExtractors) {
+        if(contentExtractorUrl.equals(contentExtractor.getSiteBaseUrl())) {
+          this.contentExtractor = contentExtractor;
+
+          articlesOverviewAdapter.setContentExtractor(contentExtractor);
+          break;
+        }
+      }
+    }
   }
 
 
@@ -63,8 +116,12 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected void setActionBarTitle(ActionBar actionBar) {
     if(contentExtractor != null) {
-      actionBar.setTitle(contentExtractor.getSiteBaseUrl());
+      setActionBarTitle(actionBar, contentExtractor.getSiteBaseUrl());
     }
+  }
+
+  protected void setActionBarTitle(ActionBar actionBar, String contentExtractorTitle) {
+    actionBar.setTitle(contentExtractorTitle);
   }
 
   @Override

@@ -137,4 +137,9 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     return convertView;
   }
 
+  public void setContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
+    this.extractorWithArticleOverview = contentExtractor;
+
+    retrieveArticlesOnUiThread();
+  }
 }
