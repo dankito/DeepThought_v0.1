@@ -1,5 +1,6 @@
 package net.dankito.deepthought.dialogs;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -274,31 +275,29 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   }
 
   protected void showSuccessfullySavedArticleMessage(final ArticlesOverviewItem article) {
-    if(activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if(activity != null) {
-            String successfullySavedMessage = activity.getString(R.string.articles_overview_article_saved, article.getTitle());
-            Toast.makeText(activity, successfullySavedMessage, Toast.LENGTH_LONG).show();
-          }
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Activity activity = getDialogOrParentActivity();
+        if(activity != null) {
+          String successfullySavedMessage = activity.getString(R.string.articles_overview_article_saved, article.getTitle());
+          Toast.makeText(activity, successfullySavedMessage, Toast.LENGTH_LONG).show();
         }
-      });
-    }
+      }
+    });
   }
 
   protected void showCouldNotExtractArticleMessage(final EntryCreationResult creationResult, final ArticlesOverviewItem article) {
-    if(activity != null) {
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if(activity != null) {
-            String couldNotExtractArticleMessage = activity.getString(R.string.articles_overview_could_not_extract_article, article.getTitle(), creationResult.getError());
-            Toast.makeText(activity, couldNotExtractArticleMessage, Toast.LENGTH_LONG).show();
-          }
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        Activity activity = getDialogOrParentActivity();
+        if(activity != null) {
+          String couldNotExtractArticleMessage = activity.getString(R.string.articles_overview_could_not_extract_article, article.getTitle(), creationResult.getError());
+          Toast.makeText(activity, couldNotExtractArticleMessage, Toast.LENGTH_LONG).show();
         }
-      });
-    }
+      }
+    });
   }
 
 
@@ -318,20 +317,26 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
           if (creationResult.successful()) {
             showViewEntryDialog(creationResult);
           }
-        else
-          AlertHelper.showErrorMessage(activity, creationResult.getError(),
-              Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
+          else {
+            final Activity activity = getDialogOrParentActivity();
+            if(activity != null) {
+              AlertHelper.showErrorMessage(activity, creationResult.getError(),
+                  Localization.getLocalizedString("can.not.create.entry.from", creationResult.getSource()));
+            }
+          }
         }
       });
     }
   };
 
   protected void showViewEntryDialog(EntryCreationResult creationResult) {
-    ViewEntryDialog viewEntryDialog = createViewEntryDialog();
+    if(activity != null) {
+      ViewEntryDialog viewEntryDialog = createViewEntryDialog();
 
-    viewEntryDialog.showDialog(activity, creationResult);
+      viewEntryDialog.showDialog(activity, creationResult);
 
-    lastShownViewEntryDialog = viewEntryDialog;
+      lastShownViewEntryDialog = viewEntryDialog;
+    }
   }
 
   protected ViewEntryDialog createViewEntryDialog() {
@@ -361,13 +366,13 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   }
 
   protected boolean isViewEntryDialogVisible() {
-    return lastShownViewEntryDialog != null && activity.isDialogVisible(lastShownViewEntryDialog);
+    return lastShownViewEntryDialog != null && activity != null && activity.isDialogVisible(lastShownViewEntryDialog);
   }
 
 
 
   protected void retrieveArticlesThreadSafe() {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         retrieveArticles();
@@ -389,7 +394,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   }
 
   protected void updateArticlesOverviewItemsThreadSafe(final List<ArticlesOverviewItem> items) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         articlesOverviewAdapter.appendArticlesOverviewItems(items);

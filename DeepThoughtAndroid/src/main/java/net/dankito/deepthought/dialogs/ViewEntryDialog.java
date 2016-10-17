@@ -257,7 +257,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void entryCreationResultHasNowBeenSavedOnUiThread() {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         entryCreationResultHasNowBeenSaved();
@@ -340,7 +340,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setAbstractPreviewFromHtmlThreadSafe(final String abstractHtml) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setAbstractPreviewFromHtml(abstractHtml);
@@ -358,7 +358,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setContentHtmlThreadSafe(final String contentHtml) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setContentHtml(contentHtml);
@@ -372,7 +372,7 @@ public class ViewEntryDialog extends FullscreenDialog {
   }
 
   protected void setTextViewEntryTagsPreviewThreadSafe(final Collection<Tag> tags) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setTextViewEntryTagsPreview(tags);
@@ -414,9 +414,11 @@ public class ViewEntryDialog extends FullscreenDialog {
       editEntryDialog = createEditEntryDialog();
     }
 
-    editEntryDialog.showDialog(this.activity, sectionToEdit);
+    if(activity != null) {
+      editEntryDialog.showDialog(activity, sectionToEdit);
 
-    isShowingEditEntryDialog = true;
+      isShowingEditEntryDialog = true;
+    }
   }
 
   protected EditEntryDialog createEditEntryDialog() {

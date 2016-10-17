@@ -1,10 +1,12 @@
 package net.dankito.deepthought.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -179,33 +181,36 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void askUserIfChangesShouldBeSaved() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-    TextView view = new TextView(activity);
-    view.setText(getAlertMessageIfChangesShouldGetSaved());
-    builder.setView(view);
+    Activity activity = getDialogOrParentActivity();
+    if(activity != null) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+      TextView view = new TextView(activity);
+      view.setText(getAlertMessageIfChangesShouldGetSaved());
+      builder.setView(view);
 
-    builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
+      builder.setNeutralButton(R.string.cancel, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
 
-      }
-    });
+        }
+      });
 
-    builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        resetEditedFieldsAndCloseDialog();
-      }
-    });
+      builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+          resetEditedFieldsAndCloseDialog();
+        }
+      });
 
-    builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialogInterface, int i) {
-        saveEntryAndCloseDialog();
-      }
-    });
+      builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+          saveEntryAndCloseDialog();
+        }
+      });
 
-    builder.create().show();
+      builder.create().show();
+    }
   }
 
   protected int getAlertMessageIfChangesShouldGetSaved() {
@@ -238,7 +243,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
       public void run() {
         saveEntity();
 
-        activity.runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
           @Override
           public void run() {
             closeDialogAndMayCleanUp(true);
@@ -296,29 +301,41 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void closeDialog(boolean hasEntryBeenSaved) {
-    FragmentManager fragmentManager = activity.getSupportFragmentManager();
-    FragmentTransaction transaction = fragmentManager.beginTransaction();
-    transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-
-    if(hideOnClose) {
-      transaction.hide(this); // only hide Dialog so that it quickly can be redisplayed later on
-    }
-    else {
-      transaction.remove(this);
-    }
-
-    transaction.commit();
-
     if(activity != null) {
-      activity.dialogHidden(this);
-    }
+      FragmentManager fragmentManager = activity.getSupportFragmentManager();
+      FragmentTransaction transaction = fragmentManager.beginTransaction();
+      transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 
-    callDialogBecameHiddenListener(hasEntryBeenSaved);
+      if(hideOnClose) {
+        transaction.hide(this); // only hide Dialog so that it quickly can be redisplayed later on
+      }
+      else {
+        transaction.remove(this);
+      }
+
+      transaction.commit();
+
+      activity.dialogHidden(this);
+
+      callDialogBecameHiddenListener(hasEntryBeenSaved);
+    }
   }
 
   protected void callDialogBecameHiddenListener(boolean hasEntryBeenSaved) {
     if(dialogListener != null) {
       dialogListener.dialogBecameHidden(hasEntryBeenSaved);
+    }
+  }
+
+
+  protected FragmentActivity getDialogOrParentActivity() {
+    return this.activity != null ? this.activity : getActivity();
+  }
+
+  protected void runOnUiThread(Runnable runnable) {
+    Activity activity = getDialogOrParentActivity();
+    if(activity != null) {
+      activity.runOnUiThread(runnable);
     }
   }
 

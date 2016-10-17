@@ -496,7 +496,7 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   protected void setTagsPreviewOnUiThread(final List<Tag> tags) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setTagsPreview(tags);
@@ -509,7 +509,7 @@ public class EditEntryDialog extends FullscreenDialog {
   }
 
   protected void setBtnEditEntryNewTagStateOnUiThread(final TagsSearcherButtonState state) {
-    activity.runOnUiThread(new Runnable() {
+    runOnUiThread(new Runnable() {
       @Override
       public void run() {
         setBtnEditEntryNewTagState(state);

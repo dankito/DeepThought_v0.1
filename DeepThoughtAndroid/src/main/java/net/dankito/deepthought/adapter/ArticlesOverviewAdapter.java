@@ -61,8 +61,9 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
-    if(convertView == null)
+    if(convertView == null) {
       convertView = context.getLayoutInflater().inflate(R.layout.list_item_articles_overview_item, parent, false);
+    }
 
     ArticlesOverviewItem article = getArticleAt(position);
 
@@ -104,6 +105,10 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
     return convertView;
   }
 
+
+  public List<ArticlesOverviewItem> getArticlesOverviewItems() {
+    return articlesOverviewItems;
+  }
 
   public void appendArticlesOverviewItems(List<ArticlesOverviewItem> articlesOverviewItems) {
     this.articlesOverviewItems.addAll(articlesOverviewItems);
