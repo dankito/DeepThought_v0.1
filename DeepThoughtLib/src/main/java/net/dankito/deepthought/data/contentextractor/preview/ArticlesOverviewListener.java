@@ -2,13 +2,13 @@ package net.dankito.deepthought.data.contentextractor.preview;
 
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by ganymed on 17/07/15.
  */
 public interface ArticlesOverviewListener {
 
-  public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone);
+  void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, List<ArticlesOverviewItem> items, boolean isDone);
 
 }

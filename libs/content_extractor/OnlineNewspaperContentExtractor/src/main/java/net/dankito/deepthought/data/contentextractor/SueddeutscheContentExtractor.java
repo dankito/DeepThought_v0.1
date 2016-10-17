@@ -513,7 +513,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     return items;
   }
 
-  protected Collection<ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
+  protected List<ArticlesOverviewItem> extractTeaserItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
     Elements teasers = frontPage.body().getElementsByClass("teaser");
@@ -550,7 +550,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
   }
 
 
-  protected Collection<ArticlesOverviewItem> extractTeaserElementsItems(Document frontPage) {
+  protected List<ArticlesOverviewItem> extractTeaserElementsItems(Document frontPage) {
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
     Elements teaserElements = frontPage.body().getElementsByClass("teaserElement");
@@ -677,7 +677,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     }
   }
 
-  protected Collection<ArticlesOverviewItem> extractTileItems(Document frontPage) {
+  protected List<ArticlesOverviewItem> extractTileItems(Document frontPage) {
     List<ArticlesOverviewItem> extractedItems = new ArrayList<>();
 
     Elements tileElements = frontPage.body().getElementsByClass("tile-teaser-content");

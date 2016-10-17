@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +111,7 @@ public class HeiseContentExtractorTest extends GermanOnlineNewspaperContentExtra
 
     contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, List<ArticlesOverviewItem> items, boolean isDone) {
         partialItemsExtractionCall.incrementAndGet();
         allItems.addAll(items);
 

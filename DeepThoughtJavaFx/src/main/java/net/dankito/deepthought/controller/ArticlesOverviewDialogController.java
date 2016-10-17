@@ -116,7 +116,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
     this.articleContentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final Collection<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final List<ArticlesOverviewItem> items, boolean isDone) {
         Platform.runLater(() -> {
           if (articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
             articlesOverviewUpdateStarted.set(false);

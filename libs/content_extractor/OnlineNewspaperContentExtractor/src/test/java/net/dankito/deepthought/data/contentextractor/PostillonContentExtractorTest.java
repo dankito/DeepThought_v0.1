@@ -65,7 +65,7 @@ public class PostillonContentExtractorTest extends GermanOnlineNewspaperContentE
 
     contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, Collection<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, List<ArticlesOverviewItem> items, boolean isDone) {
         partialItemsExtractionCall.incrementAndGet();
         allItems.addAll(items);
 
