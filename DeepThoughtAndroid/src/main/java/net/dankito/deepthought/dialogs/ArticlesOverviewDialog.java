@@ -21,7 +21,11 @@ import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
+import net.dankito.deepthought.data.listener.ApplicationListener;
+import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.util.Notification;
+import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.localization.Localization;
 
 import java.util.List;
@@ -72,7 +76,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   protected void tryToRestoreContentExtractorTitle(String contentExtractorUrl) {
     ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
     if(actionBar != null) {
-      setActionBarTitle(actionBar, contentExtractorTitle);
+      setActionBarTitle(actionBar, contentExtractorUrl);
     }
   }
 
@@ -89,7 +93,38 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
           break;
         }
       }
+
+      if(this.contentExtractor == null) {
+        tryToRestoreContentExtractorByApplicationListener(contentExtractorUrl);
+      }
     }
+  }
+
+  protected void tryToRestoreContentExtractorByApplicationListener(final String contentExtractorUrl) {
+    ApplicationListener listener = new ApplicationListener() {
+      @Override
+      public void deepThoughtChanged(DeepThought deepThought) {
+
+      }
+
+      @Override
+      public void notification(Notification notification) {
+        if(notification.getType() == NotificationType.PluginLoaded) {
+          if(notification.getParameter() instanceof IOnlineArticleContentExtractor) {
+            IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
+            if(contentExtractorUrl.equals(contentExtractor.getSiteBaseUrl())) {
+              Application.removeApplicationListener(this);
+
+              ArticlesOverviewDialog.this.contentExtractor = contentExtractor;
+
+              articlesOverviewAdapter.setContentExtractor(contentExtractor);
+            }
+          }
+        }
+      }
+    };
+
+    Application.addApplicationListener(listener);
   }
 
 
