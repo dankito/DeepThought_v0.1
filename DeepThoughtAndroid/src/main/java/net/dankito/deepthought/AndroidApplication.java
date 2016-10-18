@@ -45,7 +45,8 @@ public class AndroidApplication extends android.app.Application {
 
   @Override
   public void onTrimMemory(int level) {
-    log.error("onTrimMemory() called with level " + level + " (Background = " + TRIM_MEMORY_BACKGROUND + ", UI Hidden = " + TRIM_MEMORY_UI_HIDDEN + ")");
+    log.error("onTrimMemory() called with level " + level + " (Complete = " + TRIM_MEMORY_COMPLETE + ", Background = " + TRIM_MEMORY_BACKGROUND + ", UI Hidden = " +
+        TRIM_MEMORY_UI_HIDDEN + ")");
 
     super.onTrimMemory(level);
   }
