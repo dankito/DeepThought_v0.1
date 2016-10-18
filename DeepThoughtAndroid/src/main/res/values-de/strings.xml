@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Deep Thought</string>
-
     <!--TODO: -->
     <string name="navigation_drawer_open">Öffne Navigationsleiste</string>
     <string name="navigation_drawer_close">Schließe Navigationsleiste</string>
