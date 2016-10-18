@@ -149,6 +149,8 @@ public class ViewEntryDialog extends EntryDialogBase {
 
 
   protected void setEntryValues() {
+    previewService = Application.getEntityPreviewService(); // as when restoring Dialog, Application.getEntityPreviewService() hasn't been instantiated yet
+
     List<Tag> entryEditedTags = new ArrayList<>(0);
 
     if(entry != null) {
