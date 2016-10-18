@@ -200,7 +200,6 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     lstvwArticlesOverview.setOnItemClickListener(null);
 
     articlesOverviewAdapter.cleanUp();
-    articlesOverviewAdapter = null;
     lstvwArticlesOverviewOnItemClickListener = null;
 
     super.cleanUp();
