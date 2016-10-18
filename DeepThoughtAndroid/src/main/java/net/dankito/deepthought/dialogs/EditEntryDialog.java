@@ -52,12 +52,8 @@ import java.util.List;
 /**
  * Created by ganymed on 06/09/16.
  */
-public class EditEntryDialog extends FullscreenDialog {
+public class EditEntryDialog extends EntryDialogBase {
 
-
-  protected Entry entry;
-
-  protected EntryCreationResult entryCreationResult = null;
 
   protected List<FieldWithUnsavedChanges> editedFields = new ArrayList<>();
 
@@ -127,12 +123,9 @@ public class EditEntryDialog extends FullscreenDialog {
   };
 
 
-  public void setEntry(Entry entry) {
-    this.entry = entry;
-  }
-
+  @Override
   public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
-    this.entryCreationResult = entryCreationResult;
+    super.setEntryCreationResult(entryCreationResult);
 
     setEntry(entryCreationResult.getCreatedEntry());
   }
