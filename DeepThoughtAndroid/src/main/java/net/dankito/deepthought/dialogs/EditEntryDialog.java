@@ -124,6 +124,15 @@ public class EditEntryDialog extends EntryDialogBase {
 
 
   @Override
+  public void setEntry(Entry entry) {
+    super.setEntry(entry);
+
+    if(hasViewBeenCreated && entry != null) {
+      setEntryFieldValues(entry);
+    }
+  }
+
+  @Override
   public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
     super.setEntryCreationResult(entryCreationResult);
 

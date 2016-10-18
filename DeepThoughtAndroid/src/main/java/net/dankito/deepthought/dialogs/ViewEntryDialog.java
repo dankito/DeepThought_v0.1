@@ -46,6 +46,8 @@ public class ViewEntryDialog extends EntryDialogBase {
   private static final Logger log = LoggerFactory.getLogger(ViewEntryDialog.class);
 
 
+  protected boolean hasViewBeenCreated = false;
+
   protected boolean showSaveAction = false;
 
   protected boolean isShowingEditEntryDialog = false;
@@ -69,10 +71,23 @@ public class ViewEntryDialog extends EntryDialogBase {
 
 
   @Override
+  public void setEntry(Entry entry) {
+    super.setEntry(entry);
+
+    if(hasViewBeenCreated) {
+      setEntryValues();
+    }
+  }
+
+  @Override
   public void setEntryCreationResult(EntryCreationResult entryCreationResult) {
     super.setEntryCreationResult(entryCreationResult);
 
     this.showSaveAction = entryCreationResult != null;
+
+    if(hasViewBeenCreated) {
+      setEntryValues();
+    }
   }
 
 
@@ -103,6 +118,8 @@ public class ViewEntryDialog extends EntryDialogBase {
     setupTagsSection(rootView);
 
     setEntryValues();
+
+    hasViewBeenCreated = true;
   }
 
   protected void setupAbstractSection(View rootView) {
