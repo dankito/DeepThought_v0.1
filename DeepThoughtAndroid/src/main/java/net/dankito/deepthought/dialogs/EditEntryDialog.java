@@ -124,11 +124,16 @@ public class EditEntryDialog extends EntryDialogBase {
 
 
   @Override
-  public void setEntry(Entry entry) {
+  public void setEntry(final Entry entry) {
     super.setEntry(entry);
 
     if(hasViewBeenCreated && entry != null) {
-      setEntryFieldValues(entry);
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          setEntryFieldValues(entry);
+        }
+      });
     }
   }
 

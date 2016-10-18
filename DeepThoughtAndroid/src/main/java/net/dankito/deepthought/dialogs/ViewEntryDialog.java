@@ -73,7 +73,7 @@ public class ViewEntryDialog extends EntryDialogBase {
     super.setEntry(entry);
 
     if(hasViewBeenCreated) {
-      setEntryValues();
+      setEntryValuesThreadSafe();
     }
   }
 
@@ -84,8 +84,17 @@ public class ViewEntryDialog extends EntryDialogBase {
     this.showSaveAction = entryCreationResult != null;
 
     if(hasViewBeenCreated) {
-      setEntryValues();
+      setEntryValuesThreadSafe();
     }
+  }
+
+  protected void setEntryValuesThreadSafe() {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        setEntryValues();
+      }
+    });
   }
 
 
