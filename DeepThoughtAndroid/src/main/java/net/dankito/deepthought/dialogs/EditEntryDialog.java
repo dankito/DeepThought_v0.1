@@ -507,6 +507,8 @@ public class EditEntryDialog extends EntryDialogBase {
   }
 
   protected void setTagsPreview(List<Tag> tags) {
+    previewService = Application.getEntityPreviewService(); // as when restoring Dialog, Application.getEntityPreviewService() hasn't been instantiated yet
+
     txtvwEntryTagsPreview.setText(previewService.getTagsPreview(tags, true));
   }
 
