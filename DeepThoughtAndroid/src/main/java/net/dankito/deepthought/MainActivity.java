@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.crashlytics.android.Crashlytics;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.testfairy.TestFairy;
@@ -65,8 +64,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
-
-import io.fabric.sdk.android.Fabric;
 
 
 public class MainActivity extends DialogParentActivity implements TabLayout.OnTabSelectedListener {
@@ -135,8 +132,6 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
 
   protected void initializeCrashReporter() {
     initializeTestFairy();
-
-    Fabric.with(this, new Crashlytics());
   }
 
   protected void initializeTestFairy() {
