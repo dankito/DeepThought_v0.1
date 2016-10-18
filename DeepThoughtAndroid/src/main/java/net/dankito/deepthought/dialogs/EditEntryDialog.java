@@ -710,10 +710,17 @@ public class EditEntryDialog extends EntryDialogBase {
 
   @Override
   public void cleanUp() {
-    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
-    AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    if(abstractHtmlEditor != null) {
+      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(abstractHtmlEditor);
+    }
 
-    entryTagsAdapter.cleanUp();
+    if(contentHtmlEditor != null) {
+      AndroidHtmlEditorPool.getInstance().htmlEditorReleased(contentHtmlEditor);
+    }
+
+    if(entryTagsAdapter != null) {
+      entryTagsAdapter.cleanUp();
+    }
 
     editEntityListener = null;
 
