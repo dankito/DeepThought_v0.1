@@ -301,6 +301,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   }
 
   protected void closeDialog(boolean hasEntryBeenSaved) {
+    FragmentActivity activity = getDialogOrParentActivity();
     if(activity != null) {
       FragmentManager fragmentManager = activity.getSupportFragmentManager();
       FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -315,7 +316,9 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
       transaction.commit();
 
-      activity.dialogHidden(this);
+      if(this.activity != null) {
+        this.activity.dialogHidden(this);
+      }
 
       callDialogBecameHiddenListener(hasEntryBeenSaved);
     }
