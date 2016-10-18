@@ -67,8 +67,6 @@ public class ViewEntryDialog extends EntryDialogBase {
 
   protected IEntityPreviewService previewService = Application.getEntityPreviewService();
 
-  protected IEntityPreviewService entityPreviewService = Application.getEntityPreviewService();
-
 
   @Override
   public void setEntry(Entry entry) {
@@ -325,7 +323,7 @@ public class ViewEntryDialog extends EntryDialogBase {
       referenceInfo += "\r\n\r\n(" + entryReference.getTextRepresentation(); // TODO: for entryCreationResult this returns only entryReference's text representation, not
       // including its parent references' text representation (e.g. Reference and SeriesTitle)
 
-      String referenceUrl = entityPreviewService.getReferenceBaseUrl(entryReference);
+      String referenceUrl = previewService.getReferenceBaseUrl(entryReference);
       if(referenceUrl != null) {
         referenceInfo += ": " + referenceUrl;
       }
