@@ -426,7 +426,9 @@ public class ViewEntryDialog extends EntryDialogBase {
       editEntryDialog = null;
     }
 
-    entry.removeEntityListener(entryListener);
+    if(entry != null) {
+      entry.removeEntityListener(entryListener);
+    }
 
     super.cleanUp();
   }
