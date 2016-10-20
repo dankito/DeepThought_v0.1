@@ -7,7 +7,7 @@ import java.net.DatagramPacket;
  */
 public class ReceivedUdpDevicesFinderPacket {
 
-  protected byte[] buffer;
+  protected byte[] receivedData;
 
   protected DatagramPacket packet;
 
@@ -18,8 +18,8 @@ public class ReceivedUdpDevicesFinderPacket {
   protected IDevicesFinderListener listener;
 
 
-  public ReceivedUdpDevicesFinderPacket(byte[] buffer, DatagramPacket packet, String senderAddress, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
-    this.buffer = buffer;
+  public ReceivedUdpDevicesFinderPacket(byte[] receivedData, DatagramPacket packet, String senderAddress, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
+    this.receivedData = receivedData;
     this.packet = packet;
     this.senderAddress = senderAddress;
     this.messagesCreator = messagesCreator;
@@ -27,8 +27,8 @@ public class ReceivedUdpDevicesFinderPacket {
   }
 
 
-  public byte[] getBuffer() {
-    return buffer;
+  public byte[] getReceivedData() {
+    return receivedData;
   }
 
   public DatagramPacket getPacket() {

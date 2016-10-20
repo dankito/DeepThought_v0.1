@@ -154,13 +154,13 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected ConsumerListener<ReceivedUdpDevicesFinderPacket> receivedPacketsHandler = new ConsumerListener<ReceivedUdpDevicesFinderPacket>() {
     @Override
     public void consumeItem(ReceivedUdpDevicesFinderPacket receivedPacket) {
-      handleReceivedPacket(receivedPacket.getBuffer(), receivedPacket.getPacket(), receivedPacket.getSenderAddress(), receivedPacket.getMessagesCreator(), receivedPacket.getListener());
+      handleReceivedPacket(receivedPacket.getReceivedData(), receivedPacket.getPacket(), receivedPacket.getSenderAddress(), receivedPacket.getMessagesCreator(), receivedPacket.getListener());
     }
   };
 
-  protected void handleReceivedPacket(byte[] buffer, DatagramPacket packet, String senderAddress, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
-    if(messagesCreator.isSearchingForDevicesMessage(buffer, buffer.length)) {
-      HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, senderAddress);
+  protected void handleReceivedPacket(byte[] receivedData, DatagramPacket packet, String senderAddress, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
+    if(messagesCreator.isSearchingForDevicesMessage(receivedData, receivedData.length)) {
+      HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(receivedData, senderAddress);
       remoteHost.setAddress(senderAddress);
 
       if(isSelfSentPacket(remoteHost, messagesCreator) == false) {

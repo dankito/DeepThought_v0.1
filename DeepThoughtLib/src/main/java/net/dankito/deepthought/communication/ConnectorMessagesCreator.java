@@ -89,12 +89,12 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
     return receivedMessage.startsWith(SearchingForDevicesMessage);
   }
 
-  public HostInfo getHostInfoFromMessage(byte[] receivedBytes, DatagramPacket packet) {
-    String messageBody = getMessageBodyFromMessage(receivedBytes, packet.getLength());
+  public HostInfo getHostInfoFromMessage(byte[] receivedBytes, String senderAddress) {
+    String messageBody = getMessageBodyFromMessage(receivedBytes, receivedBytes.length);
     DeserializationResult<HostInfo> result = JsonIoJsonHelper.parseJsonString(messageBody, HostInfo.class);
     if(result.successful()) {
       HostInfo hostInfo = result.getResult();
-      hostInfo.setAddress(packet.getAddress().getHostAddress());
+      hostInfo.setAddress(senderAddress);
       return hostInfo;
     }
 
