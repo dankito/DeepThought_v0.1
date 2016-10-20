@@ -50,7 +50,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
 
   @Override
-  protected void unregisteredDeviceFound(final HostInfo device) {
+  protected void askUserToSyncDataWithDevice(final HostInfo device) {
     mainActivity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
@@ -89,6 +89,8 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
       @Override
       public void onDismissed(Snackbar snackbar, int event) {
         resetSnackbar();
+
+        addDeviceToListDoNotAskAnymoreToSyncDataWith(device);
       }
     });
 

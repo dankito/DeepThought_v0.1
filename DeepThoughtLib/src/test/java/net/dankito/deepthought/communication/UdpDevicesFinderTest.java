@@ -75,7 +75,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
 //    devicesFinder.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
 //      @Override
-//      public void unregisteredDeviceFound(HostInfo hostInfo) {
+//      public void askUserToSyncDataWithDevice(HostInfo hostInfo) {
 //
 //      }
 //
@@ -100,7 +100,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
 //    devicesFinder.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
 //      @Override
-//      public void unregisteredDeviceFound(HostInfo hostInfo) {
+//      public void askUserToSyncDataWithDevice(HostInfo hostInfo) {
 //
 //      }
 //
@@ -130,7 +130,7 @@ public class UdpDevicesFinderTest extends CommunicationTestBase {
 
 //    devicesFinder.openUserDeviceRegistrationServer(new IUnregisteredDevicesListener() {
 //      @Override
-//      public void unregisteredDeviceFound(HostInfo hostInfo) {
+//      public void askUserToSyncDataWithDevice(HostInfo hostInfo) {
 //
 //      }
 //

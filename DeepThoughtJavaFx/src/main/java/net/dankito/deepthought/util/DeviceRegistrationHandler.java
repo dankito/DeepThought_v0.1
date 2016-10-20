@@ -42,7 +42,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
 
   @Override
-  protected void unregisteredDeviceFound(HostInfo device) {
+  protected void askUserToSyncDataWithDevice(HostInfo device) {
     FXUtils.runOnUiThread(() -> showNotificationUnregisteredDeviceFound(device)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
   }
 
@@ -64,7 +64,13 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
 
     Optional<ButtonType> result = unregisteredDeviceFoundAlert.showAndWait();
-    boolean likesToConnectWithDevice = result.get() == ButtonType.YES;
+    ButtonType chosenOption = result.get();
+
+    if(chosenOption == ButtonType.NO) {
+      addDeviceToListDoNotAskAnymoreToSyncDataWith(device);
+    }
+
+    boolean likesToConnectWithDevice = chosenOption == ButtonType.YES;
 
     unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).remove(device.getUserUniqueId());
     if(unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).size() == 0) {

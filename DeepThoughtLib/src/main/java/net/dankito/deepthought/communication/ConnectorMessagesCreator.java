@@ -167,11 +167,13 @@ public class ConnectorMessagesCreator implements ICommunicationConfigurationMana
   }
 
   public boolean equalsLocalHostDevice(HostInfo remoteHost) {
-    ConnectedDevice localHost = getLocalHostDevice();
+    return doDevicesEqual(getLocalHostDevice(), remoteHost);
+  }
 
-    return localHost.getUserUniqueId().equals(remoteHost.getUserUniqueId()) &&
-        localHost.getDeviceUniqueId().equals(remoteHost.getDeviceUniqueId()) &&
-        localHost.getMessagesPort() == remoteHost.getMessagesPort();
+  public boolean doDevicesEqual(HostInfo firstDevice, HostInfo secondDevice) {
+    return firstDevice.getUserUniqueId().equals(secondDevice.getUserUniqueId()) &&
+        firstDevice.getDeviceUniqueId().equals(secondDevice.getDeviceUniqueId()) &&
+        firstDevice.getMessagesPort() == secondDevice.getMessagesPort();
   }
 
 

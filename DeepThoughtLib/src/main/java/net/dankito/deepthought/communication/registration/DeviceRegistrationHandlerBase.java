@@ -19,6 +19,9 @@ import net.dankito.deepthought.data.sync.InitialSyncManager;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.localization.Localization;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 /**
  * Created by ganymed on 07/09/16.
  */
@@ -33,6 +36,8 @@ public abstract class DeviceRegistrationHandlerBase {
   protected IRegisteredDevicesManager registeredDevicesManager;
 
   protected ConnectorMessagesCreator messagesCreator;
+
+  protected List<HostInfo> listDevicesDoNotAskAnymoreToSyncData = new CopyOnWriteArrayList<>();
 
   protected DeepThought deepThought;
   protected User loggedOnUser;
@@ -56,7 +61,7 @@ public abstract class DeviceRegistrationHandlerBase {
   }
 
 
-  protected abstract void unregisteredDeviceFound(HostInfo device);
+  protected abstract void askUserToSyncDataWithDevice(HostInfo device);
 
   protected abstract void deviceIsAskingForRegistration(AskForDeviceRegistrationRequest request);
 
@@ -92,6 +97,31 @@ public abstract class DeviceRegistrationHandlerBase {
       mayHideInfoUnregisteredDeviceFound(device);
     }
   };
+
+
+  protected void unregisteredDeviceFound(HostInfo device) {
+    if(doNotAskToSyncDataWithDevice(device) == false) {
+      askUserToSyncDataWithDevice(device);
+    }
+  }
+
+  protected boolean doNotAskToSyncDataWithDevice(HostInfo device) {
+    synchronized(listDevicesDoNotAskAnymoreToSyncData) {
+      for(HostInfo deviceNotToAskAnymore : listDevicesDoNotAskAnymoreToSyncData) {
+        if(messagesCreator.doDevicesEqual(device, deviceNotToAskAnymore)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  protected void addDeviceToListDoNotAskAnymoreToSyncDataWith(HostInfo device) {
+    synchronized(listDevicesDoNotAskAnymoreToSyncData) {
+      listDevicesDoNotAskAnymoreToSyncData.add(device);
+    }
+  }
 
 
   protected void askForRegistration(HostInfo device) {
