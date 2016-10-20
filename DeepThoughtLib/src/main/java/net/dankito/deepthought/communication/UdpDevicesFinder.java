@@ -7,6 +7,7 @@ import net.dankito.deepthought.util.IThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -238,14 +239,23 @@ public class UdpDevicesFinder implements IDevicesFinder {
       broadcastSocket.setSoTimeout(10000);
 
       while (areBroadcastSocketsOpened) {
-        DatagramPacket searchDevicesPacket = messagesCreator.getSearchDevicesDatagramPacket(broadcastAddress, searchDevicesPort);
-        broadcastSocket.send(searchDevicesPacket);
-
-        try { Thread.sleep(Constants.SendWeAreAliveMessageInterval); } catch(Exception ignored) { }
+        try {
+          sendBroadcastOnSocket(broadcastSocket, broadcastAddress, searchDevicesPort, messagesCreator);
+        } catch(Exception e) {
+          log.error("Could not send Broadcast to Address " + broadcastAddress, e);
+          startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
+        }
       }
     } catch (Exception ex) {
       log.error("An error occurred trying to find Devices", ex);
     }
+  }
+
+  protected void sendBroadcastOnSocket(DatagramSocket broadcastSocket, InetAddress broadcastAddress, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) throws IOException {
+    DatagramPacket searchDevicesPacket = messagesCreator.getSearchDevicesDatagramPacket(broadcastAddress, searchDevicesPort);
+    broadcastSocket.send(searchDevicesPacket);
+
+    try { Thread.sleep(Constants.SendWeAreAliveMessageInterval); } catch(Exception ignored) { }
   }
 
 
