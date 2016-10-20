@@ -196,12 +196,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void deviceFound(HostInfo device, IDevicesFinderListener listener) {
-    log.info("DeviceSync: Found remote host " + device.getDeviceDatabaseId() + ", " + device.getDeviceUniqueId());
-    log.info("foundDevices");
-    for(HostInfo foundDevice : foundDevices) {
-      log.info("DeviceSync: Found device " + foundDevice.getDeviceDatabaseId() + ", " + foundDevice.getDeviceUniqueId());
-    }
-
     if(foundDevices.size() == 1) {
       startConnectionsAliveWatcher(listener);
     }
@@ -276,7 +270,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void sendBroadcastOnSocket(DatagramSocket broadcastSocket, InetAddress broadcastAddress, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) throws IOException {
-    log.info("Sending Broadcast to Address " + broadcastAddress.toString());
     DatagramPacket searchDevicesPacket = messagesCreator.getSearchDevicesDatagramPacket(broadcastAddress, searchDevicesPort);
     broadcastSocket.send(searchDevicesPacket);
 
