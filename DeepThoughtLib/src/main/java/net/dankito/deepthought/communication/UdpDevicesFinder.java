@@ -181,7 +181,9 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected boolean hasDeviceAlreadyBeenFound(HostInfo hostInfo) {
-    for(HostInfo foundDevice : foundDevices) {
+    List<HostInfo> foundDevicesCopy = new ArrayList<>(foundDevices);
+
+    for(HostInfo foundDevice : foundDevicesCopy) {
       // i removed check for user unique id as after initial synchronization this one changes so we would ask user again if she/he likes to connect to this device?
       if(hostInfo.getAddress().equals(foundDevice.getAddress()) &&
           hostInfo.getDeviceUniqueId().equals(foundDevice.getDeviceUniqueId()) &&
