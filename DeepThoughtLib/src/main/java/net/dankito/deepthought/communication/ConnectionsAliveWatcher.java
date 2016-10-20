@@ -78,6 +78,8 @@ public class ConnectionsAliveWatcher {
 
     for(final HostInfo connectedDevice : foundDevices) {
       if(hasDeviceExpired(connectedDevice, now)) {
+        log.info("Device " + connectedDevice + " has disconnected, last message received at " +
+            new Date(lastMessageReceivedFromDeviceTimestamps.get(getDeviceKey(connectedDevice))) + ", now = " + new Date(now));
         deviceDisconnected(connectedDevice, listener);
       }
     }
