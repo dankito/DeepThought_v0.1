@@ -268,10 +268,10 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
   }
 
   protected void applicationInstantiated() {
-    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
-
     deviceRegistrationHandler = new DeviceRegistrationHandler(this, Application.getDeepThoughtConnector(), Application.getThreadPool(), Application.getEntityManager(),
         Application.getDeepThought(), Application.getLoggedOnUser(), Application.getApplication().getLocalDevice());
+
+    AndroidHtmlEditorPool.getInstance().preloadHtmlEditors(this, 2);
   }
 
   protected void setupUi() {
