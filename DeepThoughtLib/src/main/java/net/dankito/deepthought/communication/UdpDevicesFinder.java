@@ -2,6 +2,8 @@ package net.dankito.deepthought.communication;
 
 import net.dankito.deepthought.communication.model.ConnectedDevice;
 import net.dankito.deepthought.communication.model.HostInfo;
+import net.dankito.deepthought.util.AsyncProducerConsumerQueue;
+import net.dankito.deepthought.util.ConsumerListener;
 import net.dankito.deepthought.util.IThreadPool;
 
 import org.slf4j.Logger;
@@ -35,13 +37,15 @@ public class UdpDevicesFinder implements IDevicesFinder {
   protected List<DatagramSocket> openedBroadcastSockets = new ArrayList<>();
   protected boolean areBroadcastSocketsOpened = false;
 
+  protected AsyncProducerConsumerQueue<ReceivedUdpDevicesFinderPacket> receivedPacketsQueue;
+
   protected List<HostInfo> foundDevices = new CopyOnWriteArrayList<>();
 
 
   public UdpDevicesFinder(IThreadPool threadPool) {
     this.threadPool = threadPool;
     // * 3.5 = from 3 messages one must be received to be still valued as 'connected'
-    this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 3.5));
+    this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 8.5));
   }
 
 
@@ -54,6 +58,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
   public void startAsync(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
     log.info("Starting UdpDevicesFinder ...");
 
+    receivedPacketsQueue = new AsyncProducerConsumerQueue(3, receivedPacketsHandler);
+
     startListenerAsync(localHost, searchDevicesPort, messagesCreator, listener);
 
     startBroadcastAsync(localHost, searchDevicesPort, messagesCreator);
@@ -62,6 +68,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
   @Override
   public void stop() {
     log.info("Stopping UdpDevicesFinder ...");
+
+    receivedPacketsQueue.cleanUp();
 
     connectionsAliveWatcher.stopWatching();
 
@@ -136,10 +144,23 @@ public class UdpDevicesFinder implements IDevicesFinder {
     return NetworkHelper.isSocketCloseException(ex);
   }
 
+
   protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, HostInfo localHost, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
-    if(messagesCreator.isSearchingForDevicesMessage(buffer, packet.getLength())) {
-      HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, packet);
-      remoteHost.setAddress(packet.getAddress().getHostAddress());
+    receivedPacketsQueue.add(new ReceivedUdpDevicesFinderPacket(buffer, packet, packet.getAddress().getHostAddress(), messagesCreator, listener));
+  }
+
+
+  protected ConsumerListener<ReceivedUdpDevicesFinderPacket> receivedPacketsHandler = new ConsumerListener<ReceivedUdpDevicesFinderPacket>() {
+    @Override
+    public void consumeItem(ReceivedUdpDevicesFinderPacket receivedPacket) {
+      handleReceivedPacket(receivedPacket.getBuffer(), receivedPacket.getPacket(), receivedPacket.getSenderAddress(), receivedPacket.getMessagesCreator(), receivedPacket.getListener());
+    }
+  };
+
+  protected void handleReceivedPacket(byte[] buffer, DatagramPacket packet, String senderAddress, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
+    if(messagesCreator.isSearchingForDevicesMessage(buffer, buffer.length)) {
+      HostInfo remoteHost = messagesCreator.getHostInfoFromMessage(buffer, senderAddress);
+      remoteHost.setAddress(senderAddress);
 
       if(isSelfSentPacket(remoteHost, messagesCreator) == false) {
         if(hasDeviceAlreadyBeenFound(remoteHost) == false) {
@@ -252,6 +273,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void sendBroadcastOnSocket(DatagramSocket broadcastSocket, InetAddress broadcastAddress, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) throws IOException {
+    log.info("Sending Broadcast to Address " + broadcastAddress.toString());
     DatagramPacket searchDevicesPacket = messagesCreator.getSearchDevicesDatagramPacket(broadcastAddress, searchDevicesPort);
     broadcastSocket.send(searchDevicesPacket);
 
