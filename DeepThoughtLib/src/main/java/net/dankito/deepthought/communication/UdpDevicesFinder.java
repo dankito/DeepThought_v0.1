@@ -16,6 +16,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -146,7 +147,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
 
   protected void listenerReceivedPacket(byte[] buffer, DatagramPacket packet, HostInfo localHost, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
-    receivedPacketsQueue.add(new ReceivedUdpDevicesFinderPacket(buffer, packet, packet.getAddress().getHostAddress(), messagesCreator, listener));
+    receivedPacketsQueue.add(new ReceivedUdpDevicesFinderPacket(Arrays.copyOf(buffer, packet.getLength()), packet, packet.getAddress().getHostAddress(), messagesCreator, listener));
   }
 
 
