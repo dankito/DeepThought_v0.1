@@ -22,13 +22,17 @@ public class AsyncProducerConsumerQueue<T> implements ICleanUp {
 
   protected ConsumerListener<T> consumerListener;
 
-  protected Thread consumerThread;
+  protected List<Thread> consumerThreads = new ArrayList<>();
 
 
   public AsyncProducerConsumerQueue(ConsumerListener<T> consumerListener) {
+    this(1, consumerListener);
+  }
+
+  public AsyncProducerConsumerQueue(int countThreadsToUse, ConsumerListener<T> consumerListener) {
     this.consumerListener = consumerListener;
 
-    startConsumerThread();
+    startConsumerThreads(countThreadsToUse);
   }
 
   @Override
@@ -36,7 +40,7 @@ public class AsyncProducerConsumerQueue<T> implements ICleanUp {
     List<T> remainingItemsInQueue = new ArrayList<>(producedItemsQueue);
     producedItemsQueue.clear();
 
-    if(consumerThread != null) {
+    for(Thread consumerThread : consumerThreads) {
       try { consumerThread.join(100); } catch(Exception ignored) { }
     }
 
@@ -47,13 +51,21 @@ public class AsyncProducerConsumerQueue<T> implements ICleanUp {
   }
 
 
+  protected void startConsumerThreads(int countThreads) {
+    for(int i = 0; i < countThreads; i++) {
+      startConsumerThread();
+    }
+  }
+
   protected void startConsumerThread() {
-    consumerThread = new Thread(new Runnable() {
+    Thread consumerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         consumerThread();
       }
-    });
+    }, "AsyncProducerConsumerQueue" + consumerThreads.size());
+
+    consumerThreads.add(consumerThread);
 
     consumerThread.start();
   }
