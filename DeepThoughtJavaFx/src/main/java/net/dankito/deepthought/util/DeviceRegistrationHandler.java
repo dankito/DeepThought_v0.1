@@ -72,9 +72,12 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
     boolean likesToConnectWithDevice = chosenOption == ButtonType.YES;
 
-    unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).remove(device.getUserUniqueId());
-    if(unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).size() == 0) {
-      unregisteredDeviceFoundAlerts.remove(device.getDeviceUniqueId());
+    Map<String, Alert> alertsForDeviceId = unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId());
+    if(alertsForDeviceId != null) {
+      alertsForDeviceId.remove(device.getUserUniqueId());
+      if(unregisteredDeviceFoundAlerts.get(device.getDeviceUniqueId()).size() == 0) {
+        unregisteredDeviceFoundAlerts.remove(device.getDeviceUniqueId());
+      }
     }
 
     if(likesToConnectWithDevice) {
