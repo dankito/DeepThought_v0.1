@@ -46,7 +46,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
   public UdpDevicesFinder(IThreadPool threadPool) {
     this.threadPool = threadPool;
     // * 3.5 = from 3 messages one must be received to be still valued as 'connected'
-    this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 8.5));
+    this.connectionsAliveWatcher = new ConnectionsAliveWatcher((int)(Constants.SendWeAreAliveMessageInterval * 10.5));
   }
 
 
