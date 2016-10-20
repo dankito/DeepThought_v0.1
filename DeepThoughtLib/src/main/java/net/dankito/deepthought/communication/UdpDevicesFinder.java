@@ -165,6 +165,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
       if(isSelfSentPacket(remoteHost, messagesCreator) == false) {
         if(hasDeviceAlreadyBeenFound(remoteHost) == false) {
+          foundDevices.add(remoteHost);
+
           deviceFound(remoteHost, listener);
         }
         else {
@@ -197,8 +199,6 @@ public class UdpDevicesFinder implements IDevicesFinder {
     for(HostInfo foundDevice : foundDevices) {
       log.info("DeviceSync: Found device " + foundDevice.getDeviceDatabaseId() + ", " + foundDevice.getDeviceUniqueId());
     }
-
-    foundDevices.add(device);
 
     if(foundDevices.size() == 1) {
       startConnectionsAliveWatcher(listener);
