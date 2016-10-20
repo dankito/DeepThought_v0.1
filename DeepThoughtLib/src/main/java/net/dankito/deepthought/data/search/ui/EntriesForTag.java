@@ -98,14 +98,6 @@ public class EntriesForTag {
   protected void showEntriesForSelectedTagWithAppliedTagsFilter(Tag tag) {
     List<Entry> filteredEntriesWithThisTag = new ArrayList<>();
 
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        Collection<Entry> debug = lastFilterTagsResult.getEntriesHavingFilteredTags();
-        if(debug.size() > 0) { }
-      }
-    });
-
     for(Entry entry : lastFilterTagsResult.getEntriesHavingFilteredTags()) {
       if(entry.hasTag(tag))
         filteredEntriesWithThisTag.add(entry);
