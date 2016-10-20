@@ -19,6 +19,8 @@ import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.DeepThoughtApplication;
 import net.dankito.deepthought.data.model.enums.ApplicationLanguage;
 import net.dankito.deepthought.data.persistence.CouchbaseLiteEntityManagerBase;
+import net.dankito.deepthought.util.AsyncProducerConsumerQueue;
+import net.dankito.deepthought.util.ConsumerListener;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.jpa.couchbaselite.Dao;
@@ -63,6 +65,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
 
   protected SynchronizedDataMerger dataMerger;
 
+  protected AsyncProducerConsumerQueue<Database.ChangeEvent> changeQueue;
+
 
   public CouchbaseLiteSyncManager(CouchbaseLiteEntityManagerBase entityManager, IThreadPool threadPool, IConnectedRegisteredDevicesListenerManager connectedDevicesListenerManager,
                                   IDevicesFinderListenerManager devicesFinderListenerManager, ICommunicationConfigurationManager configurationManager) {
@@ -80,6 +84,8 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
     this.alsoUsePullReplication = alsoUsePullReplication;
 
     this.dataMerger = new SynchronizedDataMerger(this, entityManager, database);
+
+    this.changeQueue = new AsyncProducerConsumerQueue<>(synchronizationChangesHandler);
 
     setReplicationFilter(database);
   }
@@ -264,13 +270,16 @@ public class CouchbaseLiteSyncManager extends SyncManagerBase {
       logChanges(event); // TODO: remove again
 
       if(event.isExternal()) {
-        threadPool.runTaskAsync(new Runnable() {
-          @Override
-          public void run() {
-            handleSynchronizedChanges(event.getChanges());
-          }
-        });
+        changeQueue.add(event);
       }
+    }
+  };
+
+
+  protected ConsumerListener<Database.ChangeEvent> synchronizationChangesHandler = new ConsumerListener<Database.ChangeEvent>() {
+    @Override
+    public void consumeItem(Database.ChangeEvent item) {
+      handleSynchronizedChanges(item.getChanges());
     }
   };
 
