@@ -1,7 +1,6 @@
 package net.dankito.deepthought.data.persistence;
 
 import com.couchbase.lite.Context;
-import com.couchbase.lite.JavaContext;
 
 import java.io.File;
 
@@ -12,7 +11,7 @@ public class JavaCouchbaseLiteEntityManager extends CouchbaseLiteEntityManagerBa
 
 
   public JavaCouchbaseLiteEntityManager(EntityManagerConfiguration configuration) throws Exception {
-    super(new JavaContext(configuration.getDataFolder()), configuration);
+    super(new DeepThoughtJavaContext(configuration.getDataFolder()), configuration);
   }
 
 
