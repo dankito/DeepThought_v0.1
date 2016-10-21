@@ -65,7 +65,9 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
     initializeInstancesForChangedDeepThought(deepThought);
 
     if(deepThought != null) {
-      entriesForTag.setTag(deepThought.AllEntriesSystemTag());
+      if(entriesForTag != null) {
+        entriesForTag.setTag(deepThought.AllEntriesSystemTag());
+      }
     }
     else {
       context.runOnUiThread(new Runnable() {
