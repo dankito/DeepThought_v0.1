@@ -76,11 +76,7 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
     connectionsAliveWatcher.stopWatching();
 
-    if(isListenerSocketOpened) {
-      listenerSocket.close();
-      listenerSocket = null;
-      isListenerSocketOpened = false;
-    }
+    stopListener();
 
     synchronized(this) {
       areBroadcastSocketsOpened = false;
@@ -115,6 +111,12 @@ public class UdpDevicesFinder implements IDevicesFinder {
       try { listenerThread.join(100); } catch(Exception ignored) { }
 
       listenerThread = null;
+    }
+
+    if(isListenerSocketOpened) {
+      listenerSocket.close();
+      listenerSocket = null;
+      isListenerSocketOpened = false;
     }
   }
 
