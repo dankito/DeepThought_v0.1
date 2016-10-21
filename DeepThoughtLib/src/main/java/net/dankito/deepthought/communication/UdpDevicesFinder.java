@@ -32,6 +32,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected IThreadPool threadPool;
 
+  protected Thread listenerThread = null;
+
   protected DatagramSocket listenerSocket = null;
   protected boolean isListenerSocketOpened = false;
 
@@ -96,12 +98,24 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
 
   protected void startListenerAsync(final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator, final IDevicesFinderListener listener) {
-    threadPool.runTaskAsync(new Runnable() {
+    stopListener();
+
+    listenerThread = new Thread(new Runnable() {
       @Override
       public void run() {
         startListener(localHost, searchDevicesPort, messagesCreator, listener);
       }
     });
+
+    listenerThread.start();
+  }
+
+  protected void stopListener() {
+    if(listenerThread != null) {
+      try { listenerThread.join(100); } catch(Exception ignored) { }
+
+      listenerThread = null;
+    }
   }
 
   protected void startListener(HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator, IDevicesFinderListener listener) {
