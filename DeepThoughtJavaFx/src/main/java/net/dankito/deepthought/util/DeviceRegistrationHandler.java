@@ -43,7 +43,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   @Override
   protected void askUserToSyncDataWithDevice(HostInfo device) {
-    FXUtils.runOnUiThread(() -> showNotificationUnregisteredDeviceFound(device)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
+    FXUtils.runOnUiThread(() -> showNotificationAskingUserToSyncDataWithDevice(device)); // Alert has to run on UI thread but listener method for sure is not called on UI thread
   }
 
   @Override
@@ -54,8 +54,8 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   protected Map<String, Map<String, Alert>> unregisteredDeviceFoundAlerts = new ConcurrentHashMap<>();
 
-  protected void showNotificationUnregisteredDeviceFound(HostInfo device) {
-    Alert unregisteredDeviceFoundAlert = Alerts.createUnregisteredDeviceFoundAlert(device, stage);
+  protected void showNotificationAskingUserToSyncDataWithDevice(HostInfo device) {
+    Alert unregisteredDeviceFoundAlert = Alerts.createAskUserToSyncDataWithDeviceAlert(device, stage);
 
     if(unregisteredDeviceFoundAlerts.containsKey(device.getDeviceUniqueId()) == false) {
       unregisteredDeviceFoundAlerts.put(device.getDeviceUniqueId(), new ConcurrentHashMap<>());
