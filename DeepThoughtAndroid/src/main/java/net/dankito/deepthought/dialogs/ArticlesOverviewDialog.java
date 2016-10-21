@@ -29,11 +29,13 @@ import net.dankito.deepthought.data.persistence.deserializer.DeserializationResu
 import net.dankito.deepthought.data.persistence.json.JsonIoJsonHelper;
 import net.dankito.deepthought.data.persistence.serializer.SerializationResult;
 import net.dankito.deepthought.helper.AlertHelper;
+import net.dankito.deepthought.listener.DialogListener;
 import net.dankito.deepthought.util.Notification;
 import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.localization.Localization;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by ganymed on 25/09/15.
@@ -50,7 +52,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected IOnlineArticleContentExtractor contentExtractor = null;
 
-  protected ViewEntryDialog lastShownViewEntryDialog = null;
+  protected List<ViewEntryDialog> activatedViewEntryDialogs = new CopyOnWriteArrayList<>();
 
 
   public void setContentExtractor(IOnlineArticleContentExtractor contentExtractor) {
@@ -217,7 +219,8 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   public boolean onOptionsItemSelected(MenuItem item) {
     int id = item.getItemId();
 
-    if(isViewEntryDialogVisible()) {
+    ViewEntryDialog lastShownViewEntryDialog = getLastShownViewEntryDialog();
+    if(lastShownViewEntryDialog != null) {
       return lastShownViewEntryDialog.onOptionsItemSelected(item);
     }
     else if(id == R.id.mnitmActionUpdateArticlesOverview) {
@@ -329,25 +332,35 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
   };
 
   protected void showViewEntryDialog(EntryCreationResult creationResult) {
-    if(activity != null) {
-      ViewEntryDialog viewEntryDialog = createViewEntryDialog();
+    synchronized(activatedViewEntryDialogs) {
+      if (activity != null) {
+        ViewEntryDialog viewEntryDialog = createViewEntryDialog();
 
-      viewEntryDialog.showDialog(activity, creationResult);
+        viewEntryDialog.showDialog(activity, creationResult);
 
-      lastShownViewEntryDialog = viewEntryDialog;
+        activatedViewEntryDialogs.add(0, viewEntryDialog);
+      }
     }
   }
 
   protected ViewEntryDialog createViewEntryDialog() {
-    ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
+    final ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
 //    viewEntryDialog.setHideOnClose(true);
+
+    viewEntryDialog.setDialogListener(new DialogListener() {
+      @Override
+      public void dialogBecameHidden(boolean didSaveChanges) {
+        activatedViewEntryDialogs.remove(viewEntryDialog);
+      }
+    });
 
     return viewEntryDialog;
   }
 
   @Override
   public boolean canHandleActivityResult(int requestCode, int resultCode, Intent data) {
-    if(isViewEntryDialogVisible()) {
+    ViewEntryDialog lastShownViewEntryDialog = getLastShownViewEntryDialog();
+    if(lastShownViewEntryDialog != null) {
       return lastShownViewEntryDialog.canHandleActivityResult(requestCode, resultCode, data);
     }
 
@@ -356,7 +369,8 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   @Override
   public void onBackPressed() {
-    if(isViewEntryDialogVisible()) {
+    ViewEntryDialog lastShownViewEntryDialog = getLastShownViewEntryDialog();
+    if(lastShownViewEntryDialog != null) {
       lastShownViewEntryDialog.onBackPressed();
     }
     else {
@@ -364,8 +378,15 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     }
   }
 
-  protected boolean isViewEntryDialogVisible() {
-    return lastShownViewEntryDialog != null && activity != null && activity.isDialogVisible(lastShownViewEntryDialog);
+  protected ViewEntryDialog getLastShownViewEntryDialog() {
+    synchronized(activatedViewEntryDialogs) {
+      if(activatedViewEntryDialogs.size() > 0) {
+        // TODO: may also check: activity != null && activity.isDialogVisible(lastShownViewEntryDialog)
+        return activatedViewEntryDialogs.get(0);
+      }
+    }
+
+    return null;
   }
 
 
