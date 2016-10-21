@@ -69,18 +69,27 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
   }
 
 
+
+  protected transient Map<String, Category> cachedTopLevelCategories = new HashMap<>();
+
   @Override
   public Category findOrCreateTopLevelCategoryForName(String name) {
-    Category existingCategory = findTopLevelCategoryForName(name);
-    if(existingCategory != null)
-      return existingCategory;
+    synchronized(cachedTopLevelCategories) {
+      Category existingCategory = findTopLevelCategoryForName(name);
+      if(existingCategory != null)
+        return existingCategory;
 
-    Category newCategory = new Category(name);
+      Category newCategory = new Category(name);
+      cachedTopLevelCategories.put(name, newCategory);
 
-    return newCategory;
+      return newCategory;
+    }
   }
 
   protected Category findTopLevelCategoryForName(String name) {
+    if(cachedTopLevelCategories.containsKey(name))
+      return cachedTopLevelCategories.get(name);
+
     final ObjectHolder<Collection<Category>> searchResults = new ObjectHolder<>();
     final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
 
@@ -102,19 +111,32 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
     return null;
   }
 
+
+  protected transient Map<Category, Map<String, Category>> cachedSubCategories = new HashMap<>();
+
   @Override
   public Category findOrCreateSubCategoryForName(Category parentCategory, String subCategoryName) {
-    Category existingCategory = findSubCategoryForName(parentCategory, subCategoryName);
-    if(existingCategory != null)
-      return existingCategory;
+    synchronized(cachedSubCategories) {
+      Category existingCategory = findSubCategoryForName(parentCategory, subCategoryName);
+      if(existingCategory != null)
+        return existingCategory;
 
-    Category newCategory = new Category(subCategoryName);
-    parentCategory.addSubCategory(newCategory);
+      Category newCategory = new Category(subCategoryName);
+      parentCategory.addSubCategory(newCategory);
+      cacheSubCategory(parentCategory, subCategoryName, newCategory);
 
-    return newCategory;
+      return newCategory;
+    }
   }
 
   protected Category findSubCategoryForName(Category parentCategory, String subCategoryName) {
+    if(cachedSubCategories.containsKey(parentCategory)) {
+      Map<String, Category> categorysCachedSubCategories = cachedSubCategories.get(parentCategory);
+      if(categorysCachedSubCategories.containsKey(subCategoryName)) {
+        return categorysCachedSubCategories.get(subCategoryName);
+      }
+    }
+
     final ObjectHolder<Collection<Category>> searchResults = new ObjectHolder<>();
     final CountDownLatch waitForSearchResultsLatch = new CountDownLatch(1);
 
@@ -130,10 +152,20 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
 
     Collection<Category> results = searchResults.get();
     if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
-      return new ArrayList<Category>(results).get(0);
+      Category foundSubCategory = new ArrayList<Category>(results).get(0);
+      cacheSubCategory(parentCategory, subCategoryName, foundSubCategory);
+      return foundSubCategory;
     }
 
     return null;
+  }
+
+  protected void cacheSubCategory(Category parentCategory, String subCategoryName, Category subCategory) {
+    if(cachedSubCategories.containsKey(parentCategory) == false) {
+      cachedSubCategories.put(parentCategory, new HashMap<String, Category>());
+    }
+
+    cachedSubCategories.get(parentCategory).put(subCategoryName, subCategory);
   }
 
 
