@@ -231,12 +231,12 @@ public class Alerts {
   }
 
 
-  public static Alert createUnregisteredDeviceFoundAlert(HostInfo device, Stage windowStage) {
+  public static Alert createAskUserToSyncDataWithDeviceAlert(HostInfo device, Stage windowStage) {
     windowStage.show();
     windowStage.requestFocus();
     windowStage.toFront();
 
-    String message = Localization.getLocalizedString("alert.message.unregistered.device.found");
+    String message = Localization.getLocalizedString("alert.message.ask.synchronize.data.with.device");
     if(StringUtils.isNotNullOrEmpty(device.getUserName())) {
       message += Localization.getLocalizedString("user.info", device.getUserName());
     }
@@ -244,14 +244,8 @@ public class Alerts {
 
     message += Localization.getLocalizedString("ip.address", device.getAddress());
 
-//    String logoPath = IconManager.getInstance().getLogoForOperatingSystem(item.getPlatform(), item.getOsVersion(), item.getPlatformArchitecture());
-//    if(logoPath != null)
-//      imgvwOsLogo.setImage(new Image(logoPath));
-//    else
-//      imgvwOsLogo.setVisible(false);
-
     return createConfirmationDialog(message,
-        Localization.getLocalizedString("alert.title.unregistered.device.found"), windowStage);
+        Localization.getLocalizedString("alert.title.ask.synchronize.data.with.device"), windowStage);
   }
 
   public static boolean showDeviceAsksForRegistrationAlert(AskForDeviceRegistrationRequest request, Stage windowStage) {
