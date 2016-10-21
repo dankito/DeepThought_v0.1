@@ -16,7 +16,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        applicationId "net.dankito.deepthought.test"
+        applicationId "net.dankito.deepthought.beta"
         minSdkVersion 14 // com.github.clans.fab needs minimum API level 14 (ZXing lib needs at minimum API level 9)
         targetSdkVersion 15
         versionCode 1
