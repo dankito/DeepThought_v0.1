@@ -9,10 +9,6 @@ import android.widget.TextView;
 
 import net.dankito.deepthought.R;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
-import net.dankito.deepthought.util.IconManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,8 +16,6 @@ import java.util.List;
  * Created by ganymed on 25/09/15.
  */
 public class OnlineArticleContentExtractorsWithArticleOverviewAdapter extends BaseAdapter {
-
-  private final static Logger log = LoggerFactory.getLogger(OnlineArticleContentExtractorsWithArticleOverviewAdapter.class);
 
 
   protected Activity context;
@@ -62,12 +56,12 @@ public class OnlineArticleContentExtractorsWithArticleOverviewAdapter extends Ba
     IOnlineArticleContentExtractor extractor = getExtractorAt(position);
 
     ImageView imgvwExtractorIcon = (ImageView) convertView.findViewById(R.id.imgvwExtractorIcon);
-    if(IOnlineArticleContentExtractor.NoIcon.equals(extractor.getIconUrl()) == false) {
-      IconManager.getInstance().setImageViewToImageFromUrl(imgvwExtractorIcon, extractor.getIconUrl(), true);
-    }
-    else {
+//    if(IOnlineArticleContentExtractor.NoIcon.equals(extractor.getIconUrl()) == false) {
+//      IconManager.getInstance().setImageViewToImageFromUrl(imgvwExtractorIcon, extractor.getIconUrl(), true);
+//    }
+//    else {
       imgvwExtractorIcon.setImageBitmap(null);
-    }
+//    }
 
     TextView txtvwExtractorName = (TextView)convertView.findViewById(R.id.txtvwExtractorName);
     txtvwExtractorName.setText(extractor.getSiteBaseUrl());
