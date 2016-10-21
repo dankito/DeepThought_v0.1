@@ -69,7 +69,7 @@
     <string name="device_registration_server_allowed_registration">Server allowed registration</string>
     <string name="device_registration_server_denied_registration">Server denied registration</string>
     <string name="device_registration_successfully_registered_device">Successfully registered device %s</string>
-    <string name="connect_with_this_device">Connect with this device?</string>
+    <string name="synchronize_data_with_this_device">Synchronize data with</string>
     <string name="never_ask_again">Never ask again</string>
 
     <string name="add_image">Add Image</string>

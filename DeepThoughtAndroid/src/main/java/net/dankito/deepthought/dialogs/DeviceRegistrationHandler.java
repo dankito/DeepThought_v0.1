@@ -32,7 +32,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
 
   protected MainActivity mainActivity;
 
-  protected Snackbar snackbarAskRegisterUnknownDevice = null;
+  protected Snackbar snackbarAskToSyncDataWithDevice = null;
 
   protected String deviceIdShowingSnackbarFor = null;
 
@@ -54,7 +54,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
     mainActivity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        notifyUnregisteredDeviceFound(device);
+        askUserToSyncDataWithDeviceOnMainThread(device);
       }
     });
   }
@@ -79,13 +79,13 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
     });
   }
 
-  protected void notifyUnregisteredDeviceFound(final HostInfo device) {
+  protected void askUserToSyncDataWithDeviceOnMainThread(final HostInfo device) {
     // TODO: may always show Snackbar in active Activity, see http://stackoverflow.com/a/29786451/119733
     View rootView = mainActivity.findViewById(R.id.pager); // has to be Pager otherwise Snackbar cannot be dismissed anymore by User
-    snackbarAskRegisterUnknownDevice = Snackbar.make(rootView, "", Snackbar.LENGTH_INDEFINITE);
+    snackbarAskToSyncDataWithDevice = Snackbar.make(rootView, "", Snackbar.LENGTH_INDEFINITE);
     deviceIdShowingSnackbarFor = device.getDeviceUniqueId();
 
-    snackbarAskRegisterUnknownDevice.setCallback(new Snackbar.Callback() {
+    snackbarAskToSyncDataWithDevice.setCallback(new Snackbar.Callback() {
       @Override
       public void onDismissed(Snackbar snackbar, int event) {
         resetSnackbar();
@@ -94,7 +94,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
       }
     });
 
-    snackbarAskRegisterUnknownDevice.setAction(R.string.ok, new View.OnClickListener() {
+    snackbarAskToSyncDataWithDevice.setAction(R.string.ok, new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         askForRegistration(device);
@@ -104,19 +104,19 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
     // Warning: Actually a Snackbar's Design should not be manipulated:
     // "Don't customize the Snackbar. It should not contain any more elements than a short text and one action. See Google Material design guidelines."
     // Code found at: http://stackoverflow.com/questions/32453946/how-to-customize-snackbars-layout
-    customizeSnackbar(device, rootView.getWidth());
+    customizeAskToSyncDataWithDeviceSnackbar(device, rootView.getWidth());
 
-    snackbarAskRegisterUnknownDevice.show();
+    snackbarAskToSyncDataWithDevice.show();
   }
 
-  protected void customizeSnackbar(HostInfo device, int windowWidth) {
-    Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbarAskRegisterUnknownDevice.getView();
+  protected void customizeAskToSyncDataWithDeviceSnackbar(HostInfo device, int windowWidth) {
+    Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbarAskToSyncDataWithDevice.getView();
 
     TextView txtvwSnackbarStandardText = (TextView) layout.findViewById(android.support.design.R.id.snackbar_text);
     txtvwSnackbarStandardText.setVisibility(View.INVISIBLE);
 
     // Inflate our custom view
-    View snackView = mainActivity.getLayoutInflater().inflate(R.layout.snackbar_unregistered_device_found, null);
+    View snackView = mainActivity.getLayoutInflater().inflate(R.layout.snackbar_ask_sync_data_with_device, null);
 
 // Configure the view
     ImageView imageView = (ImageView) snackView.findViewById(R.id.imgvwDeviceIcon);
@@ -128,11 +128,11 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
     imageView.setImageResource(getOsLogoId(device));
 
     TextView txtvwDeviceAddress = (TextView) snackView.findViewById(R.id.txtvwDeviceAddress);
-    txtvwDeviceAddress.setText(device.getAddress());
+    txtvwDeviceAddress.setText(device.getAddress() + "?"); // TODO: not that good, create a string resource and include question mark (e.g. Spanish uses two)
     txtvwDeviceAddress.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
 
-    TextView txtvwAskToYouWantToConnectTo = (TextView) snackView.findViewById(R.id.txtvwAskToYouWantToConnectTo);
-    txtvwAskToYouWantToConnectTo.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
+    TextView txtvwAskSynchronizeDataWithThisDevice = (TextView) snackView.findViewById(R.id.txtvwAskSynchronizeDataWithThisDevice);
+    txtvwAskSynchronizeDataWithThisDevice.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
 
     CheckBox chkbxNeverAskAgainToConnectWithThisDevice = (CheckBox) snackView.findViewById(R.id.chkbxNeverAskAgainToConnectWithThisDevice);
     chkbxNeverAskAgainToConnectWithThisDevice.setTextColor(txtvwSnackbarStandardText.getCurrentTextColor());
@@ -142,7 +142,7 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   protected void resetSnackbar() {
-    snackbarAskRegisterUnknownDevice = null;
+    snackbarAskToSyncDataWithDevice = null;
     deviceIdShowingSnackbarFor = null;
   }
 
@@ -193,8 +193,8 @@ public class DeviceRegistrationHandler extends DeviceRegistrationHandlerBase {
   }
 
   protected void mayHideInfoUnregisteredDeviceFoundOnMainThread(HostInfo device) {
-    if(snackbarAskRegisterUnknownDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(device.getDeviceUniqueId())) {
-      snackbarAskRegisterUnknownDevice.dismiss();
+    if(snackbarAskToSyncDataWithDevice != null && deviceIdShowingSnackbarFor != null && deviceIdShowingSnackbarFor.equals(device.getDeviceUniqueId())) {
+      snackbarAskToSyncDataWithDevice.dismiss();
       resetSnackbar();
     }
   }

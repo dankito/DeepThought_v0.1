@@ -69,7 +69,7 @@
     <string name="device_registration_server_allowed_registration">Gerät wurde erfolgreich registiert</string>
     <string name="device_registration_server_denied_registration">Der Server hat die Registrierung nicht gestattet</string>
     <string name="device_registration_successfully_registered_device">Gerät %s wurde erfolgreich registriert</string>
-    <string name="connect_with_this_device">Mit diesem Gerät verbinden?</string>
+    <string name="synchronize_data_with_this_device">Daten synchronisieren mit</string>
     <string name="never_ask_again">Nicht mehr fragen</string>
 
     <string name="add_image">Bild einfügen</string>
