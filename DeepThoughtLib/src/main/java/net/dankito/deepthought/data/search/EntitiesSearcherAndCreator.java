@@ -31,18 +31,20 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
 
   @Override
   public Tag findOrCreateTagForName(String name) {
-    Tag existingTag = findTagForName(name);
-    if(existingTag != null)
-      return existingTag;
+    synchronized(cachedTags) {
+      Tag existingTag = findTagForName(name);
+      if(existingTag != null)
+        return existingTag;
 
-    Tag newTag = new Tag(name);
-    cachedTags.put(name, newTag);
+      Tag newTag = new Tag(name);
+      cachedTags.put(name, newTag);
 
-    return newTag;
+      return newTag;
+    }
   }
 
   protected Tag findTagForName(String name) {
-    if (cachedTags.containsKey(name))
+    if(cachedTags.containsKey(name))
       return cachedTags.get(name);
 
     final ObjectHolder<TagsSearchResults> searchResults = new ObjectHolder<>();
@@ -173,18 +175,20 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
 
   @Override
   public SeriesTitle findOrCreateSeriesTitleForTitle(String title) {
-    SeriesTitle existingSeriesTitle = findSeriesTitleForTitle(title);
-    if(existingSeriesTitle != null)
-      return existingSeriesTitle;
+    synchronized(cachedSeriesTitles) {
+      SeriesTitle existingSeriesTitle = findSeriesTitleForTitle(title);
+      if(existingSeriesTitle != null)
+        return existingSeriesTitle;
 
-    SeriesTitle newSeriesTitle = new SeriesTitle(title);
-    cachedSeriesTitles.put(title, newSeriesTitle);
+      SeriesTitle newSeriesTitle = new SeriesTitle(title);
+      cachedSeriesTitles.put(title, newSeriesTitle);
 
-    return newSeriesTitle;
+      return newSeriesTitle;
+    }
   }
 
   protected SeriesTitle findSeriesTitleForTitle(String title) {
-    if (cachedSeriesTitles.containsKey(title))
+    if(cachedSeriesTitles.containsKey(title))
       return cachedSeriesTitles.get(title);
 
     final ObjectHolder<Collection<ReferenceBase>> searchResults = new ObjectHolder<>();
@@ -215,18 +219,20 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
 
   @Override
   public Reference findOrCreateReferenceForTitle(String title) {
-    Reference existingReference = findReferenceForTitle(title);
-    if(existingReference != null)
-      return existingReference;
+    synchronized(cachedReferences) {
+      Reference existingReference = findReferenceForTitle(title);
+      if(existingReference != null)
+        return existingReference;
 
-    Reference newReference = new Reference(title);
-    cachedReferences.put(title, newReference);
+      Reference newReference = new Reference(title);
+      cachedReferences.put(title, newReference);
 
-    return newReference;
+      return newReference;
+    }
   }
 
   protected Reference findReferenceForTitle(String title) {
-    if (cachedReferences.containsKey(title))
+    if(cachedReferences.containsKey(title))
       return cachedReferences.get(title);
 
     final ObjectHolder<Collection<ReferenceBase>> searchResults = new ObjectHolder<>();
@@ -257,15 +263,20 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
 
   @Override
   public Reference findOrCreateReferenceForDate(SeriesTitle series, String articleDate) {
-    Reference existingReference = findReferenceForDate(series, articleDate);
-    if(existingReference != null) {
-      return existingReference;
+    synchronized(cachedReferencesForDate) {
+      Reference existingReference = findReferenceForDate(series, articleDate);
+      if(existingReference != null) {
+        return existingReference;
+      }
+
+      Reference newReference = new Reference();
+      newReference.setIssueOrPublishingDate(articleDate);
+
+      String seriesTitleTitle = series == null ? null : series.getTitle();
+      addReferenceForDateToCache(articleDate, seriesTitleTitle, newReference);
+
+      return newReference;
     }
-
-    Reference newReference = new Reference();
-    newReference.setIssueOrPublishingDate(articleDate);
-
-    return newReference;
   }
 
   protected Reference findReferenceForDate(SeriesTitle series, String articleDate) {
@@ -292,15 +303,19 @@ public class EntitiesSearcherAndCreator implements IEntitiesSearcherAndCreator {
     if(results != null && results.size() == 1) { // TODO: what to do if size() is greater one?
       Reference reference = (Reference)new ArrayList<Reference>(results).get(0);
 
-      if(cachedReferencesForDate.containsKey(seriesTitleTitle) == false) {
-        cachedReferencesForDate.put(seriesTitleTitle, new HashMap<String, Reference>());
-      }
-      cachedReferencesForDate.get(seriesTitleTitle).put(articleDate, reference);
+      addReferenceForDateToCache(articleDate, seriesTitleTitle, reference);
 
       return reference;
     }
 
     return null;
+  }
+
+  protected void addReferenceForDateToCache(String articleDate, String seriesTitleTitle, Reference reference) {
+    if(cachedReferencesForDate.containsKey(seriesTitleTitle) == false) {
+      cachedReferencesForDate.put(seriesTitleTitle, new HashMap<String, Reference>());
+    }
+    cachedReferencesForDate.get(seriesTitleTitle).put(articleDate, reference);
   }
 
 }
