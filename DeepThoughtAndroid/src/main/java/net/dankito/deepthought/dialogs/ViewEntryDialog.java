@@ -1,5 +1,6 @@
 package net.dankito.deepthought.dialogs;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.view.MenuItemCompat;
@@ -294,6 +295,7 @@ public class ViewEntryDialog extends EntryDialogBase {
 
     setMenuItemActionSaveEntryVisibility();
 
+    Activity activity = getDialogOrParentActivity();
     if(activity != null) {
       activity.invalidateOptionsMenu();
     }
