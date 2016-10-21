@@ -299,7 +299,7 @@ public class InitialSyncManager {
 
   public boolean shouldUseLocalDatabaseIds(DeepThought localDeepThought, User localUser, Device localDevice,
                                            DeepThoughtInfo remoteDeepThought, UserInfo remoteUser, HostInfo remoteDevice) throws IllegalStateException {
-    int countSynchronizingDevices = localUser.getDevices().size();
+    int countSynchronizingDevices = localUser.getDevices().size() - 1;
 
     if(countSynchronizingDevices > 0 && remoteDevice.getCountSynchronizingDevice() == 0) {
       return true;
