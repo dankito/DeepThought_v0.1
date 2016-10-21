@@ -10,7 +10,9 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 /**
@@ -30,6 +32,10 @@ public class EntriesGroup extends UserDataEntity {
 
   @Column(name = TableConfig.EntriesGroupNotesColumnName)
   protected String notes;
+
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = TableConfig.EntriesGroupDeepThoughtJoinColumnName)
+  protected DeepThought deepThought;
 
 
   public EntriesGroup() {
@@ -73,6 +79,17 @@ public class EntriesGroup extends UserDataEntity {
 
   public void setNotes(String notes) {
     this.notes = notes;
+  }
+
+
+  public DeepThought getDeepThought() {
+    return deepThought;
+  }
+
+  protected void setDeepThought(DeepThought deepThought) {
+    Object previousValue = this.deepThought;
+    this.deepThought = deepThought;
+    callPropertyChangedListeners(TableConfig.EntriesGroupDeepThoughtJoinColumnName, previousValue, deepThought);
   }
 
 

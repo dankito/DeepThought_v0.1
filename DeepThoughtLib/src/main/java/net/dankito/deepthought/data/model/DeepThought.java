@@ -120,6 +120,9 @@ public class DeepThought extends UserDataEntity implements Serializable {
   @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
   protected Set<FileLink> files = new HashSet<>();
 
+  @OneToMany(mappedBy = "deepThought", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  protected Set<EntriesGroup> entriesGroups = new HashSet<>();
+
 
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "deepThought", cascade = CascadeType.PERSIST)
   @OrderBy(value = "sortOrder")
@@ -767,6 +770,39 @@ public class DeepThought extends UserDataEntity implements Serializable {
     }
 
     return null;
+  }
+
+
+  public int getCountEntriesGroups() {
+    return entriesGroups.size();
+  }
+
+  public Set<EntriesGroup> getEntriesGroups() {
+    return entriesGroups;
+  }
+
+  public boolean addEntriesGroup(EntriesGroup entriesGroup) {
+    if(entriesGroups.add(entriesGroup)) {
+      entriesGroup.setDeepThought(this);
+
+      callEntityAddedListeners(entriesGroups, entriesGroup);
+      return true;
+    }
+
+    return false;
+  }
+
+  public boolean removeEntriesGroup(EntriesGroup entriesGroup) {
+    if(entriesGroups.remove(entriesGroup)) {
+      entriesGroup.setDeepThought(null);
+      for(Entry entry : new ArrayList<>(entriesGroup.getEntries()))
+        entriesGroup.removeEntryFromGroup(entry);
+
+      callEntityRemovedListeners(entriesGroups, entriesGroup);
+      return true;
+    }
+
+    return false;
   }
 
 

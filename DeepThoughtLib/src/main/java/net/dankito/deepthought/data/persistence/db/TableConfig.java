@@ -212,6 +212,7 @@ public class TableConfig {
 
   public final static String EntriesGroupGroupNameColumnName = "name";
   public final static String EntriesGroupNotesColumnName = "notes";
+  public final static String EntriesGroupDeepThoughtJoinColumnName = "deep_thought_id";
 
 
   /*          Tag Table Config        */
