@@ -18,6 +18,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -36,6 +38,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected DatagramSocket listenerSocket = null;
   protected boolean isListenerSocketOpened = false;
+
+  protected Map<String, Thread> broadcastThreads = new ConcurrentHashMap<>();
 
   protected List<DatagramSocket> openedBroadcastSockets = new ArrayList<>();
   protected boolean areBroadcastSocketsOpened = false;
@@ -78,12 +82,26 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
     stopListener();
 
-    synchronized(this) {
+    stopBroadcast();
+  }
+
+  protected void stopBroadcast() {
+    synchronized(broadcastThreads) {
       areBroadcastSocketsOpened = false;
 
-      for (DatagramSocket clientSocket : openedBroadcastSockets) {
+      for(String broadcastAddress : new ArrayList<>(broadcastThreads.keySet())) {
+        Thread broadcastThread = broadcastThreads.get(broadcastAddress);
+        try { broadcastThread.join(100); } catch(Exception ignored) { }
+
+        broadcastThreads.remove(broadcastAddress);
+        log.info("Stopped broadcasting for Address " + broadcastAddress);
+      }
+
+      for(DatagramSocket clientSocket : openedBroadcastSockets) {
         clientSocket.close();
       }
+
+      openedBroadcastSockets.clear();
     }
   }
 
@@ -253,19 +271,25 @@ public class UdpDevicesFinder implements IDevicesFinder {
   }
 
   protected void startBroadcastForBroadcastAddressAsync(final InetAddress broadcastAddress, final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator) {
-    threadPool.runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
-      }
-    });
+    synchronized(broadcastThreads) {
+      Thread broadcastThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+          startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
+        }
+      });
+
+      broadcastThreads.put(broadcastAddress.getHostAddress(), broadcastThread);
+
+      broadcastThread.start();
+    }
   }
 
   protected void startBroadcastForBroadcastAddress(InetAddress broadcastAddress, HostInfo localHost, int searchDevicesPort, ConnectorMessagesCreator messagesCreator) {
     try {
       DatagramSocket broadcastSocket = new DatagramSocket();
 
-      synchronized(this) {
+      synchronized(broadcastThreads) {
         openedBroadcastSockets.add(broadcastSocket);
         areBroadcastSocketsOpened = true;
       }
