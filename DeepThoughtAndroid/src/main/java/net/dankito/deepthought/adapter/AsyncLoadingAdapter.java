@@ -5,8 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.R;
+import net.dankito.deepthought.adapter.model.LoadItemQueueItem;
+import net.dankito.deepthought.util.AsyncProducerConsumerQueue;
+import net.dankito.deepthought.util.ConsumerListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,12 +25,16 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
 
   protected int listItemLayoutId;
 
+  protected AsyncProducerConsumerQueue<LoadItemQueueItem> loadItemsQueue;
+
   protected Map<Integer, Object> loadedItems = new ConcurrentHashMap<>();
 
 
   public AsyncLoadingAdapter(Activity context, int listItemLayoutId) {
     this.context = context;
     this.listItemLayoutId = listItemLayoutId;
+
+    this.loadItemsQueue = new AsyncProducerConsumerQueue<>(loadItemHandler);
   }
 
 
@@ -68,14 +74,19 @@ public abstract class AsyncLoadingAdapter extends BaseAdapter {
   protected void loadItemAsync(final int position, final View listItemView) {
     listItemView.setTag(R.id.ASYNC_ITEM_TO_LOAD_POSITION, position);
 
-    Application.getThreadPool().runTaskAsync(new Runnable() {
-      @Override
-      public void run() {
-        final Object loadedItem = loadItemInBackgroundThread(position);
-        itemForListItemLoaded(loadedItem, position, listItemView);
-      }
-    });
+    loadItemsQueue.add(new LoadItemQueueItem(position, listItemView));
   }
+
+  protected ConsumerListener<LoadItemQueueItem> loadItemHandler = new ConsumerListener<LoadItemQueueItem>() {
+    @Override
+    public void consumeItem(LoadItemQueueItem item) {
+      int position = item.getPosition();
+      View listItemView = item.getListItemView();
+
+      Object loadedItem = loadItemInBackgroundThread(position);
+      itemForListItemLoaded(loadedItem, position, listItemView);
+    }
+  };
 
   protected void itemForListItemLoaded(final Object loadedItem, int position, final View listItemView) {
     if(loadedItem == null) {
