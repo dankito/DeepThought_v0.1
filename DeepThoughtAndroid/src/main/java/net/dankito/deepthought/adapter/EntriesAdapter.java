@@ -47,6 +47,10 @@ public class EntriesAdapter extends AsyncLoadingEntityAdapter {
 
     if(Application.getDeepThought() != null) {
       initializeInstancesForChangedDeepThought(Application.getDeepThought());
+
+      if(entriesForTag == null) {
+        this.entriesForTag.setTag(Application.getDeepThought().AllEntriesSystemTag());
+      }
     }
 
     retrievedEntriesToShow(this.entriesForTag.getEntriesForTag());
