@@ -1,6 +1,8 @@
 package net.dankito.deepthought.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 
 import net.dankito.deepthought.dialogs.FullscreenDialog;
@@ -14,6 +16,8 @@ import java.util.List;
 public class DialogParentActivity extends AppCompatActivity {
 
   protected List<FullscreenDialog> visibleDialogs = new ArrayList<>();
+
+  protected boolean hasOnSaveInstanceBeenCalled = false;
 
 
   public void dialogShown(final FullscreenDialog dialog) {
@@ -48,4 +52,18 @@ public class DialogParentActivity extends AppCompatActivity {
     return false;
   }
 
+
+  @Override
+  protected void onResume() {
+    this.hasOnSaveInstanceBeenCalled = false;
+
+    super.onResume();
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    this.hasOnSaveInstanceBeenCalled = true;
+
+    super.onSaveInstanceState(outState, outPersistentState);
+  }
 }
