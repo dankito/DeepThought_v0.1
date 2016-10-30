@@ -76,7 +76,7 @@ public class EntriesFragment extends TabFragment {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
       Entry entry = (Entry)parent.getItemAtPosition(position);
-      showEditEntryDialog(entry);
+      showViewEntryDialog(entry);
     }
   };
 
@@ -146,8 +146,12 @@ public class EntriesFragment extends TabFragment {
     }
   }
 
-  protected void showEditEntryDialog(Entry entryToEdit) {
+  protected void showViewEntryDialog(Entry entryToEdit) {
     ((MainActivity)getActivity()).showViewEntryDialog(entryToEdit);
+  }
+
+  protected void showEditEntryDialog(Entry entryToEdit) {
+    ((MainActivity)getActivity()).showEditEntryDialog(entryToEdit);
   }
 
 
