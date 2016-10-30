@@ -15,7 +15,7 @@ public class DialogParentActivity extends AppCompatActivity {
 
   protected List<FullscreenDialog> visibleDialogs = new ArrayList<>();
 
-  protected boolean hasOnSaveInstanceBeenCalled = false;
+  protected boolean hasOnStartBeenCalled = false;
 
 
   public void dialogShown(final FullscreenDialog dialog) {
@@ -52,15 +52,15 @@ public class DialogParentActivity extends AppCompatActivity {
 
 
   @Override
-  protected void onResume() {
-    this.hasOnSaveInstanceBeenCalled = false;
+  protected void onStart() {
+    this.hasOnStartBeenCalled = false;
 
-    super.onResume();
+    super.onStart();
   }
 
   @Override
   protected void onStop() {
-    this.hasOnSaveInstanceBeenCalled = true;
+    this.hasOnStartBeenCalled = true;
 
     super.onStop();
   }
