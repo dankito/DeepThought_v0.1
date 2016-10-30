@@ -441,7 +441,7 @@ public class ViewEntryDialog extends EntryDialogBase {
       editEntryDialog = createEditEntryDialog();
     }
 
-    if(activity != null) {
+    if(activity != null && hasOnSaveInstanceBeenCalled == false) {
       editEntryDialog.showDialog(activity, sectionToEdit);
 
       isShowingEditEntryDialog = true;
