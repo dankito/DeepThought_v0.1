@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -26,6 +28,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Created by ganymed on 05/06/16.
  */
 public class UdpDevicesFinder implements IDevicesFinder {
+
+  protected static final int DELAY_BEFORE_RESTARTING_BROADCAST_FOR_ADDRESS_MILLIS = 5000;
 
   private final static Logger log = LoggerFactory.getLogger(UdpDevicesFinder.class);
 
@@ -43,6 +47,8 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
   protected List<DatagramSocket> openedBroadcastSockets = new ArrayList<>();
   protected boolean areBroadcastSocketsOpened = false;
+
+  protected Timer timerToRestartBroadcastForBroadcastAddress = null;
 
   protected AsyncProducerConsumerQueue<ReceivedUdpDevicesFinderPacket> receivedPacketsQueue;
 
@@ -296,12 +302,20 @@ public class UdpDevicesFinder implements IDevicesFinder {
 
       broadcastSocket.setSoTimeout(10000);
 
-      while (areBroadcastSocketsOpened) {
+      while(broadcastSocket.isClosed() == false) {
         try {
           sendBroadcastOnSocket(broadcastSocket, broadcastAddress, searchDevicesPort, messagesCreator);
         } catch(Exception e) {
           log.error("Could not send Broadcast to Address " + broadcastAddress, e);
-          startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
+
+          synchronized(broadcastThreads) {
+            openedBroadcastSockets.remove(broadcastSocket);
+          }
+          broadcastSocket.close();
+
+          restartBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
+
+          break;
         }
       }
     } catch (Exception ex) {
@@ -314,6 +328,20 @@ public class UdpDevicesFinder implements IDevicesFinder {
     broadcastSocket.send(searchDevicesPacket);
 
     try { Thread.sleep(Constants.SendWeAreAliveMessageInterval); } catch(Exception ignored) { }
+  }
+
+  protected void restartBroadcastForBroadcastAddress(final InetAddress broadcastAddress, final HostInfo localHost, final int searchDevicesPort, final ConnectorMessagesCreator messagesCreator) {
+    if(timerToRestartBroadcastForBroadcastAddress == null) {
+      timerToRestartBroadcastForBroadcastAddress = new Timer(true);
+    }
+
+    // TODO: a problem about using Timer is, that then broadcasts are send on Timer thread and not on broadcastThread
+    timerToRestartBroadcastForBroadcastAddress.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        startBroadcastForBroadcastAddress(broadcastAddress, localHost, searchDevicesPort, messagesCreator);
+      }
+    }, DELAY_BEFORE_RESTARTING_BROADCAST_FOR_ADDRESS_MILLIS);
   }
 
 
