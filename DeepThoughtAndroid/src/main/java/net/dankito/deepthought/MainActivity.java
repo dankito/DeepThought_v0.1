@@ -389,7 +389,9 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     ArticlesOverviewDialog articlesOverviewDialog = new ArticlesOverviewDialog();
     articlesOverviewDialog.setContentExtractor(contentExtractor);
 
-    articlesOverviewDialog.showDialog(this);
+    if(hasOnSaveInstanceBeenCalled == false) {
+      articlesOverviewDialog.showDialog(this);
+    }
   }
 
   protected void setControlsEnabledState(boolean enable) {
@@ -561,14 +563,18 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
     ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
     viewEntryDialog.setEntryCreationResult(creationResult);
 
-    viewEntryDialog.showDialog(this);
+    if(hasOnSaveInstanceBeenCalled == false) {
+      viewEntryDialog.showDialog(this);
+    }
   }
 
   public void showViewEntryDialog(Entry entry) {
     ViewEntryDialog viewEntryDialog = new ViewEntryDialog();
     viewEntryDialog.setEntry(entry);
 
-    viewEntryDialog.showDialog(this);
+    if(hasOnSaveInstanceBeenCalled == false) {
+      viewEntryDialog.showDialog(this);
+    }
   }
 
   protected void handleReceivedHtmlText(Intent intent) {
@@ -611,7 +617,9 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
 
     editEntryDialog.setEntry(entry);
 
-    editEntryDialog.showDialog(this);
+    if(hasOnSaveInstanceBeenCalled == false) {
+      editEntryDialog.showDialog(this);
+    }
   }
 
 
