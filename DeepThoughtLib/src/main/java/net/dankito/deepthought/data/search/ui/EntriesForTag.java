@@ -17,9 +17,9 @@ import net.dankito.deepthought.util.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Created by ganymed on 16/10/16.
@@ -39,7 +39,7 @@ public class EntriesForTag {
 
   protected IEntityChangesService entityChangesService;
 
-  protected Set<EntriesForTagRetrievedListener> entriesForTagRetrievedListeners = new ConcurrentSkipListSet<>();
+  protected Set<EntriesForTagRetrievedListener> entriesForTagRetrievedListeners = new HashSet<>();
 
 
   public EntriesForTag() {
