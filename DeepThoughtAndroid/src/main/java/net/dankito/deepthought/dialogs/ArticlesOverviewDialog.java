@@ -333,12 +333,14 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected void showViewEntryDialog(EntryCreationResult creationResult) {
     synchronized(activatedViewEntryDialogs) {
-      if (activity != null) {
+      if(activity != null) {
         ViewEntryDialog viewEntryDialog = createViewEntryDialog();
 
-        viewEntryDialog.showDialog(activity, creationResult);
+        if(hasOnSaveInstanceBeenCalled == false) {
+          viewEntryDialog.showDialog(activity, creationResult);
 
-        activatedViewEntryDialogs.add(0, viewEntryDialog);
+          activatedViewEntryDialogs.add(0, viewEntryDialog);
+        }
       }
     }
   }
