@@ -38,6 +38,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   protected boolean hasDialogPreviouslyBeenShown = false;
 
+  protected boolean hasOnSaveInstanceBeenCalled = false;
+
   protected DialogListener dialogListener = null;
 
 
@@ -104,6 +106,13 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   protected void restoreSavedInstance(Bundle savedInstanceState) {
 
+  }
+
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    this.hasOnSaveInstanceBeenCalled = true;
+
+    super.onSaveInstanceState(outState);
   }
 
   protected abstract int getLayoutId();
