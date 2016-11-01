@@ -15,7 +15,6 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="4dp"
         android:focusable="false"
         android:layout_marginTop="6dp"
         android:visibility="gone"
@@ -30,6 +29,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginLeft="4dp"
         android:gravity="center|left"
         android:textSize="@dimen/list_item_online_article_content_extractor_name_text_size"
         />
