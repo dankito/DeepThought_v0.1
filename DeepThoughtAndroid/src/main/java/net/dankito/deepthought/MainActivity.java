@@ -198,19 +198,23 @@ public class MainActivity extends DialogParentActivity implements TabLayout.OnTa
       if(floatingActionButtonAddNewspaperArticle != null) { // on start floatingActionButtonAddNewspaperArticle can be null
         setFloatingActionButtonAddNewspaperArticleVisibility();
       }
-//      AlertHelper.showInfoMessage(notification); // TODO: show info in same way to user
+//      AlertHelper.showInfoMessage(notification); // TODO: show info in some way to user
 
-      if(notification.getParameter() instanceof IOnlineArticleContentExtractor) {
-        IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
-        if(isFavoriteContentExtractor(contentExtractor)) {
-          addFavoriteContentExtractorFloatingActionButton(contentExtractor);
-        }
-      }
+      checkIfIsFavoriteContentExtractor(notification);
     }
     else if(notification.getType() == NotificationType.DeepThoughtsConnectorStarted) {
       importFilesOrDoOcrListener = new AndroidImportFilesOrDoOcrListener(this);
       Application.getDeepThoughtConnector().addConnectedDevicesListener(connectedDevicesListener);
       Application.getDeepThoughtConnector().addImportFilesOrDoOcrListener(importFilesOrDoOcrListener);
+    }
+  }
+
+  protected void checkIfIsFavoriteContentExtractor(Notification notification) {
+    if(notification.getParameter() instanceof IOnlineArticleContentExtractor) {
+      IOnlineArticleContentExtractor contentExtractor = (IOnlineArticleContentExtractor)notification.getParameter();
+      if(isFavoriteContentExtractor(contentExtractor)) {
+        addFavoriteContentExtractorFloatingActionButton(contentExtractor);
+      }
     }
   }
 
