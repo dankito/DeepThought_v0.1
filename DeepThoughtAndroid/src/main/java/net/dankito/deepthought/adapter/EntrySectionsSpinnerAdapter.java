@@ -30,7 +30,7 @@ public class EntrySectionsSpinnerAdapter extends BaseAdapter {
 
 
   public boolean showsAbstractSection() {
-    return shouldShowAbstractSection || entry.hasAbstract();
+    return shouldShowAbstractSection || (entry != null && entry.hasAbstract());
   }
 
   @Override
