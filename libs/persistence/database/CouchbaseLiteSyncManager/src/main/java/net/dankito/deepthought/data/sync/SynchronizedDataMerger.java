@@ -271,6 +271,10 @@ public class SynchronizedDataMerger {
         }
       }
     }
+
+    if(cachedEntity.isDeleted()) {
+      syncManager.callEntityDeletedListeners(cachedEntity);
+    }
   }
 
   protected void updateProperty(BaseEntity cachedEntity, String propertyName, Dao dao, EntityConfig entityConfig, SavedRevision currentRevision, Map<String, Object> detectedChanges) throws SQLException {
