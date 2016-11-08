@@ -69,6 +69,7 @@ public class ArticlesOverviewAdapter extends BaseAdapter implements ICleanUp {
 
     ImageView imgvwArticlePreviewImage = (ImageView) convertView.findViewById(R.id.imgvwArticlePreviewImage);
     if(article.hasPreviewImageUrl()) {
+      imgvwArticlePreviewImage.setVisibility(View.VISIBLE);
       Picasso.with(context)
           .load(article.getPreviewImageUrl())
           .into(imgvwArticlePreviewImage);
