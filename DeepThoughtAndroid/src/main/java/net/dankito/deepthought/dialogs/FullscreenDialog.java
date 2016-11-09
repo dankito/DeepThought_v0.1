@@ -39,6 +39,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
   protected boolean hasOnSaveInstanceBeenCalled = false;
 
+  protected AndroidBug5497Workaround bug5497Workaround = null;
+
   protected DialogListener dialogListener = null;
 
 
@@ -81,7 +83,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
     setupUi(rootView);
 
-    AndroidBug5497Workaround.assistContentView(rootView);
+    bug5497Workaround = new AndroidBug5497Workaround(rootView);
 
     return rootView;
   }
@@ -337,6 +339,11 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
   @Override
   public void cleanUp() {
     dialogListener = null;
+
+    if(bug5497Workaround != null) {
+      bug5497Workaround.cleanUp();
+      bug5497Workaround = null;
+    }
   }
 
 }
