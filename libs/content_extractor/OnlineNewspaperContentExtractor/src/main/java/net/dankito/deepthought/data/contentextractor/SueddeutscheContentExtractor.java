@@ -622,7 +622,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     if(lazyLoadElement.hasClass("lazyload")) {
       if(lazyLoadElement.hasAttr("data-src")) {
         lazyLoadElement.attr("src", lazyLoadElement.attr("data-src"));
-        lazyLoadElement.removeAttr("data-src");
+        try { lazyLoadElement.removeAttr("data-src"); } catch(Exception ignored) { } // may causes concurrent modification
       }
 
 //      lazyLoadElement.removeClass("lazyload");
