@@ -27,7 +27,7 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
 
   static {
     if(OsHelper.isRunningOnJavaSeOrOnAndroidApiLevelAtLeastOf(9))
-      CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE)); // maybe it helps so that Sueddeutsche cookies don't get set
+      CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_NONE));
   }
 
 
