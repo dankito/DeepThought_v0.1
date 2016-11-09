@@ -1,7 +1,6 @@
 package net.dankito.deepthought.dialogs;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -63,26 +61,6 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     this.dialogListener = dialogListener;
   }
 
-
-
-  @Override
-  public void onResume() {
-    Dialog dialog = getDialog();
-    if(dialog != null) {
-      int width = ViewGroup.LayoutParams.MATCH_PARENT;
-      int height = ViewGroup.LayoutParams.MATCH_PARENT;
-      dialog.getWindow().setLayout(width, height);
-
-      WindowManager.LayoutParams attrs = dialog.getWindow().getAttributes();
-      attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
-      dialog.getWindow().setAttributes(attrs);
-
-      // TODO: not working // Set to adjust screen height automatically, when soft keyboard appears on screen
-      dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-    }
-
-    super.onResume();
-  }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
