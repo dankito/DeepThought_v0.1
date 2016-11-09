@@ -25,6 +25,7 @@ import net.dankito.deepthought.platform.IPlatformTools;
 import net.dankito.deepthought.plugin.IPluginManager;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.isbn.IIsbnResolver;
+import net.dankito.deepthought.util.web.IWebClient;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -53,7 +54,9 @@ public interface IDependencyResolver<THtmlEditor> {
 
   IEntitiesSearcherAndCreator createEntitiesSearcherAndCreator();
 
-  IHtmlHelper createHtmlHelper();
+  IWebClient createWebClient();
+
+  IHtmlHelper createHtmlHelper(IWebClient webClient);
 
   IFileDownloader createDownloader();
 

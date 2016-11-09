@@ -35,16 +35,16 @@ import net.dankito.deepthought.data.search.InMemorySearchEngine;
 import net.dankito.deepthought.data.sync.IDeepThoughtSyncManager;
 import net.dankito.deepthought.data.sync.NoOpSyncManager;
 import net.dankito.deepthought.language.ILanguageDetector;
+import net.dankito.deepthought.language.NoOpLanguageDetector;
 import net.dankito.deepthought.platform.IPlatformTools;
 import net.dankito.deepthought.plugin.DefaultPluginManager;
 import net.dankito.deepthought.plugin.IPluginManager;
 import net.dankito.deepthought.util.IThreadPool;
+import net.dankito.deepthought.util.ThreadPool;
 import net.dankito.deepthought.util.isbn.IIsbnResolver;
 import net.dankito.deepthought.util.isbn.MultiImplementationsIsbnResolver;
-import net.dankito.deepthought.language.NoOpLanguageDetector;
-import net.dankito.deepthought.util.ThreadPool;
-import net.dankito.deepthought.util.web.ApacheHttpClientWebClient;
 import net.dankito.deepthought.util.web.IWebClient;
+import net.dankito.deepthought.util.web.OkHttpWebClient;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -149,7 +149,7 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
 
   @Override
   public IWebClient createWebClient() {
-    return new ApacheHttpClientWebClient(new ThreadPool());
+    return new OkHttpWebClient();
   }
 
   @Override
