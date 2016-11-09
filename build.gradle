@@ -15,7 +15,7 @@ buildscript {
     }
     dependencies {
 //        classpath 'com.android.tools.build:gradle:1.0.0'
-        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         //classpath 'com.android.tools.build:gradle-experimental:0.2.0'
 
         // for SonarQube Gradle plugin
