@@ -26,6 +26,7 @@ import net.dankito.deepthought.R;
 import net.dankito.deepthought.activities.DialogParentActivity;
 import net.dankito.deepthought.controls.ICleanUp;
 import net.dankito.deepthought.listener.DialogListener;
+import net.dankito.deepthought.util.AndroidBug5497Workaround;
 
 /**
  * Created by ganymed on 06/09/16.
@@ -101,6 +102,8 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
 
     setupUi(rootView);
+
+    AndroidBug5497Workaround.assistContentView(rootView);
 
     return rootView;
   }
