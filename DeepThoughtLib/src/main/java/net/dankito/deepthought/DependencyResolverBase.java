@@ -43,6 +43,8 @@ import net.dankito.deepthought.util.isbn.IIsbnResolver;
 import net.dankito.deepthought.util.isbn.MultiImplementationsIsbnResolver;
 import net.dankito.deepthought.language.NoOpLanguageDetector;
 import net.dankito.deepthought.util.ThreadPool;
+import net.dankito.deepthought.util.web.ApacheHttpClientWebClient;
+import net.dankito.deepthought.util.web.IWebClient;
 
 /**
  * Created by ganymed on 05/01/15.
@@ -146,9 +148,14 @@ public abstract class DependencyResolverBase<THtmlEditor> implements IDependency
   }
 
   @Override
-  public IHtmlHelper createHtmlHelper() {
+  public IWebClient createWebClient() {
+    return new ApacheHttpClientWebClient(new ThreadPool());
+  }
+
+  @Override
+  public IHtmlHelper createHtmlHelper(IWebClient webClient) {
     if(htmlHelper == null)
-      htmlHelper = new JsoupHtmlHelper();
+      htmlHelper = new JsoupHtmlHelper(webClient);
     return htmlHelper;
   }
 

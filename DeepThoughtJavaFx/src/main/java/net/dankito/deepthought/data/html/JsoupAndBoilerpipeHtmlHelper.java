@@ -4,6 +4,8 @@ import com.kohlschutter.boilerpipe.extractors.CanolaExtractor;
 import com.kohlschutter.boilerpipe.extractors.ExtractorBase;
 import com.kohlschutter.boilerpipe.sax.HTMLHighlighter;
 
+import net.dankito.deepthought.util.web.IWebClient;
+
 import org.jsoup.nodes.Document;
 
 import java.net.URL;
@@ -17,7 +19,12 @@ public class JsoupAndBoilerpipeHtmlHelper extends JsoupHtmlHelper {
 
   protected ExtractorBase extractor = null;
 
-  
+
+  public JsoupAndBoilerpipeHtmlHelper(IWebClient webClient) {
+    super(webClient);
+  }
+
+
   @Override
   public boolean canExtractPlainText() {
     return true;

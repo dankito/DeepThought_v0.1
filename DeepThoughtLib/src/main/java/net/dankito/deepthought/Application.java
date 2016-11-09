@@ -40,6 +40,7 @@ import net.dankito.deepthought.util.NotificationType;
 import net.dankito.deepthought.util.file.FileUtils;
 import net.dankito.deepthought.util.isbn.IIsbnResolver;
 import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.util.web.IWebClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +90,7 @@ public class Application {
 
   protected static IEntitiesSearcherAndCreator entitiesSearcherAndCreator = null;
 
+  protected static IWebClient webClient = null;
   protected static IHtmlHelper htmlHelper = null;
   protected static IEntityPreviewService entityPreviewService;
 
@@ -146,7 +148,8 @@ public class Application {
 
     Application.entityManagerConfiguration = applicationConfiguration.getEntityManagerConfiguration();
 
-    Application.htmlHelper = dependencyResolver.createHtmlHelper();
+    Application.webClient = dependencyResolver.createWebClient();
+    Application.htmlHelper = dependencyResolver.createHtmlHelper(webClient);
     Application.entityPreviewService = new EntityPreviewService(entityChangesService, htmlHelper);
     Application.downloader = dependencyResolver.createDownloader();
 
@@ -433,6 +436,10 @@ public class Application {
 
   public static IEntitiesSearcherAndCreator getEntitiesSearcherAndCreator() {
     return entitiesSearcherAndCreator;
+  }
+
+  public static IWebClient getWebClient() {
+    return webClient;
   }
 
   public static IHtmlHelper getHtmlHelper() {

@@ -1,11 +1,11 @@
 package net.dankito.deepthought.data.html;
 
-import org.jsoup.Connection;
+import net.dankito.deepthought.util.web.HttpMethod;
+
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by ganymed on 07/04/15.
@@ -17,7 +17,7 @@ public interface IHtmlHelper {
   boolean canExtractPlainText();
 
   Document retrieveOnlineDocument(String webPageUrl) throws IOException;
-  Document retrieveOnlineDocument(String webPageUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException;
+  Document retrieveOnlineDocument(String webPageUrl, String userAgent, String body, HttpMethod method) throws IOException;
 
   String extractPlainTextFromHtmlBody(String html);
 

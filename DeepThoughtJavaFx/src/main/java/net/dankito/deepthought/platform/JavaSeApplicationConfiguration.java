@@ -28,6 +28,7 @@ import net.dankito.deepthought.plugin.IPlugin;
 import net.dankito.deepthought.util.IThreadPool;
 import net.dankito.deepthought.util.JavaFxClipboardHelper;
 import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.util.web.IWebClient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,8 +139,8 @@ public class JavaSeApplicationConfiguration extends DependencyResolverBase<DeepT
   }
 
   @Override
-  public IHtmlHelper createHtmlHelper() {
-    return new JsoupAndBoilerpipeHtmlHelper();
+  public IHtmlHelper createHtmlHelper(IWebClient webClient) {
+    return new JsoupAndBoilerpipeHtmlHelper(webClient);
   }
 
   @Override

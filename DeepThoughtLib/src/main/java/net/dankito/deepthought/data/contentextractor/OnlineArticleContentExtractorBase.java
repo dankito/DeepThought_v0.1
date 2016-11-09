@@ -3,10 +3,10 @@ package net.dankito.deepthought.data.contentextractor;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.OsHelper;
+import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.util.web.HttpMethod;
 
-import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.util.Map;
 
 /**
  * Created by ganymed on 20/06/15.
@@ -105,8 +104,8 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
     return htmlHelper.retrieveOnlineDocument(articleUrl);
   }
 
-  protected Document retrieveOnlineDocument(String articleUrl, String userAgent, Map<String, String> data, Connection.Method method) throws IOException {
-    return htmlHelper.retrieveOnlineDocument(articleUrl, userAgent, data, method);
+  protected Document retrieveOnlineDocument(String articleUrl, String userAgent, String body, HttpMethod method) throws IOException {
+    return htmlHelper.retrieveOnlineDocument(articleUrl, userAgent, body, method);
   }
 
   protected abstract EntryCreationResult parseHtmlToEntry(String articleUrl, Document document);

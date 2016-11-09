@@ -9,8 +9,8 @@ import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.StringUtils;
 import net.dankito.deepthought.util.localization.Localization;
+import net.dankito.deepthought.util.web.HttpMethod;
 
-import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
@@ -25,9 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBase {
 
@@ -83,9 +81,10 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     try {
       if(document.body().getElementById("singlePageForm") != null) { // an article with multiple pages
         try {
-          Map<String, String> data = new HashMap<>();
-          data.put("article.singlePage", "true");
-          return parseHtmlToEntry(articleUrl, retrieveOnlineDocument(articleUrl, DefaultUserAgent, data, Connection.Method.POST));
+//          Map<String, String> data = new HashMap<>();
+//          data.put("article.singlePage", "true");
+          String body = "article.singlePage=true";
+          return parseHtmlToEntry(articleUrl, retrieveOnlineDocument(articleUrl, DefaultUserAgent, body, HttpMethod.POST));
         } catch(Exception ex) { log.error("Could not get Html Document for Sueddeutsche Article with multiple pages of Url " + articleUrl, ex); }
       }
 
