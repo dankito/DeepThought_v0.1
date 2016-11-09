@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class JsoupHtmlHelper implements IHtmlHelper {
 
-  public final static String DefaultUserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0";
+  public static final String DefaultUserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0";
 
 
   private final static Logger log = LoggerFactory.getLogger(JsoupHtmlHelper.class);
@@ -72,7 +72,9 @@ public class JsoupHtmlHelper implements IHtmlHelper {
     if(response != null && response.isSuccessful()) {
       return Jsoup.parse(response.getBody(), webPageUrl);
     }
-    return null;
+    else {
+      throw new IOException(response != null ? response.getError() : "Could not get Html for Url " + webPageUrl);
+    }
   }
 
 
