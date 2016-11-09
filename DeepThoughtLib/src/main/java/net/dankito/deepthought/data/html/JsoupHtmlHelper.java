@@ -5,8 +5,6 @@ import net.dankito.deepthought.util.web.IWebClient;
 import net.dankito.deepthought.util.web.RequestParameters;
 import net.dankito.deepthought.util.web.responses.WebClientResponse;
 
-import org.apache.http.client.CookieStore;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -61,9 +59,6 @@ public class JsoupHtmlHelper implements IHtmlHelper {
     if(body != null) {
       parameters.setBody(body);
     }
-
-    CookieStore cookieStore = new BasicCookieStore();
-    cookieStore.clear();
 
     WebClientResponse response = null;
 
