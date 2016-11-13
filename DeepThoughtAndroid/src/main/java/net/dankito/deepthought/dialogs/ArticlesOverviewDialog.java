@@ -427,7 +427,7 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
 
   protected void articlesOverviewItemsResponseRetrieved(GetArticlesOverviewItemsResponse response) {
     if(response.isSuccessful() == false) {
-      // TODO: show error message
+      AlertHelper.showErrorMessage(activity, response.getError(), Localization.getLocalizedString("alert.title.could.not.get.articles.overview"));
     }
     else {
       updateArticlesOverviewItems(response.getItems());
