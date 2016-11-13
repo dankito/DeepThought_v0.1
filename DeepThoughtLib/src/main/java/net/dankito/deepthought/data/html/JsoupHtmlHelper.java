@@ -58,6 +58,7 @@ public class JsoupHtmlHelper implements IHtmlHelper {
     RequestParameters parameters = new RequestParameters(webPageUrl);
     parameters.setUserAgent(userAgent);
     parameters.setConnectionTimeoutMillis(DEFAULT_CONNECTION_TIMEOUT_MILLIS);
+    parameters.setCountConnectionRetries(2);
 
     if(body != null) {
       parameters.setBody(body);
