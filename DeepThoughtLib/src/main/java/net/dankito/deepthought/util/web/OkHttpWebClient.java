@@ -130,15 +130,22 @@ public class OkHttpWebClient implements IWebClient {
   }
 
   protected Response executeRequest(final RequestParameters parameters, Request request) throws Exception {
-    return client.newCall(request).execute();
+    Response response = client.newCall(request).execute();
+
+    if(response.isSuccessful() == false && parameters.getCountConnectionRetries() > 0) {
+      parameters.decrementCountConnectionRetries();
+      return executeRequest(parameters, request);
+    }
+    else {
+      return response;
+    }
   }
 
   protected void executeRequestAsync(final RequestParameters parameters, Request request, final RequestCallback callback) {
     client.newCall(request).enqueue(new Callback() {
       @Override
       public void onFailure(Request request, IOException e) {
-        log.error("Failure on Request to " + request.urlString(), e);
-        callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+        asyncRequestFailed(parameters, request, e, callback);
       }
 
       @Override
@@ -146,6 +153,21 @@ public class OkHttpWebClient implements IWebClient {
         callback.completed(getResponse(parameters, response));
       }
     });
+  }
+
+  protected void asyncRequestFailed(RequestParameters parameters, Request request, IOException e, RequestCallback callback) {
+    if(isConnectionException(e) && parameters.getCountConnectionRetries() > 0) {
+      parameters.decrementCountConnectionRetries();
+      executeRequestAsync(parameters, request, callback);
+    }
+    else {
+      log.error("Failure on Request to " + request.urlString(), e);
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected boolean isConnectionException(IOException e) {
+    return true;
   }
 
   protected WebClientResponse getResponse(RequestParameters parameters, Response response) throws IOException {
