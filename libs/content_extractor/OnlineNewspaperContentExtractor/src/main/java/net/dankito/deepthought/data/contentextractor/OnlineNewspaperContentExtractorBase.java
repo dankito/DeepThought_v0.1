@@ -1,8 +1,6 @@
 package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
-import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
@@ -72,24 +70,6 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
 
   public boolean hasArticlesOverview() {
     return false;
-  }
-
-  @Override
-  public void getArticlesOverviewAsync(final ArticlesOverviewListener listener) {
-    if(hasArticlesOverview()) {
-      Application.getThreadPool().runTaskAsync(new Runnable() {
-        @Override
-        public void run() {
-          getArticlesOverview(listener);
-        }
-      });
-    }
-    else
-      listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, Localization.getLocalizedString("no.articles.overview.extractor.implemented")));
-  }
-
-  protected void getArticlesOverview(ArticlesOverviewListener listener) {
-    // may be overwritten in subclass (if hasArticlesOverview() is set to true)
   }
 
   @Override

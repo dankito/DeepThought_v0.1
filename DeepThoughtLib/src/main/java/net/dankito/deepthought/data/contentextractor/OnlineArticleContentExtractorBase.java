@@ -1,6 +1,8 @@
 package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.html.IHtmlHelper;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.OsHelper;
@@ -109,6 +111,29 @@ public abstract class OnlineArticleContentExtractorBase implements IOnlineArticl
   }
 
   protected abstract EntryCreationResult parseHtmlToEntry(String articleUrl, Document document);
+
+
+  @Override
+  public void getArticlesOverviewAsync(final ArticlesOverviewListener listener) {
+    if(hasArticlesOverview()) {
+      Application.getThreadPool().runTaskAsync(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            getArticlesOverview(listener);
+          } catch(Exception e) {
+            listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(OnlineArticleContentExtractorBase.this, e.getLocalizedMessage()));
+          }
+        }
+      });
+    }
+    else
+      listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, Localization.getLocalizedString("no.articles.overview.extractor.implemented")));
+  }
+
+  protected void getArticlesOverview(ArticlesOverviewListener listener) {
+    // may be overwritten in subclass (if hasArticlesOverview() is set to true)
+  }
 
 
   /**
