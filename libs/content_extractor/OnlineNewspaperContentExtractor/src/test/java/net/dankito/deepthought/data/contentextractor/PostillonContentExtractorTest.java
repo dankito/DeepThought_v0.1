@@ -2,6 +2,7 @@ package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,14 +66,14 @@ public class PostillonContentExtractorTest extends GermanOnlineNewspaperContentE
 
     contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, List<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response) {
         partialItemsExtractionCall.incrementAndGet();
-        allItems.addAll(items);
+        allItems.addAll(response.getItems());
 
         Assert.assertNotNull(contentExtractor);
-        Assert.assertFalse(items.size() == 0);
+        Assert.assertFalse(response.getItems().size() == 0);
 
-        if (isDone)
+        if(response.isDone())
           getArticlesOverviewLatch.countDown();
       }
     });

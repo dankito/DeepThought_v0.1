@@ -2,6 +2,7 @@ package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Reference;
 
 import org.junit.Assert;
@@ -69,14 +70,14 @@ public class DerFreitagContentExtractorTest extends GermanOnlineNewspaperContent
 
     contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, List<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response) {
         partialItemsExtractionCall.incrementAndGet();
-        allItems.addAll(items);
+        allItems.addAll(response.getItems());
 
         Assert.assertNotNull(contentExtractor);
-        Assert.assertFalse(items.size() == 0);
+        Assert.assertFalse(response.getItems().size() == 0);
 
-        if (isDone)
+        if(response.isDone())
           getArticlesOverviewLatch.countDown();
       }
     });

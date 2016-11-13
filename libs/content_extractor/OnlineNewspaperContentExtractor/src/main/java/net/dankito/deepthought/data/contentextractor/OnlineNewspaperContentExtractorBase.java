@@ -1,8 +1,8 @@
 package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.Application;
-import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
@@ -21,7 +21,6 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleContentExtractorBase implements IPlugin {
@@ -86,7 +85,7 @@ public abstract class OnlineNewspaperContentExtractorBase extends OnlineArticleC
       });
     }
     else
-      listener.overviewItemsRetrieved(this, new ArrayList<ArticlesOverviewItem>(), true);
+      listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, Localization.getLocalizedString("no.articles.overview.extractor.implemented")));
   }
 
   protected void getArticlesOverview(ArticlesOverviewListener listener) {

@@ -4,6 +4,7 @@ import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverview;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
@@ -504,9 +505,9 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
     List<ArticlesOverviewItem> items = new ArrayList<>();
 
 //    listener.overviewItemsRetrieved(this, extractSocialModuleItems(frontPage), false);
-    listener.overviewItemsRetrieved(this, extractTeaserItems(frontPage), false);
-    listener.overviewItemsRetrieved(this, extractTileItems(frontPage), false);
-    listener.overviewItemsRetrieved(this, extractTeaserElementsItems(frontPage), true);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractTeaserItems(frontPage), false));
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractTileItems(frontPage), false));
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractTeaserElementsItems(frontPage), true));
     // TODO: also parse flyout teasers (<ul class="flyout-teasers">) ?
 
     return items;

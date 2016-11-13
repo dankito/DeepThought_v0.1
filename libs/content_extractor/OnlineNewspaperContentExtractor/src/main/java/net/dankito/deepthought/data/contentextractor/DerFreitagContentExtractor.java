@@ -2,13 +2,14 @@ package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.FileLink;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -292,15 +293,15 @@ public class DerFreitagContentExtractor extends OnlineNewspaperContentExtractorB
   protected void extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
     Set<String> extractedArticleUrls = new HashSet<>();
 
-    listener.overviewItemsRetrieved(this, extractGalleryItems(frontPage, extractedArticleUrls), false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractGalleryItems(frontPage, extractedArticleUrls), false));
 
-    listener.overviewItemsRetrieved(this, extractProductTeasersItems(frontPage, extractedArticleUrls), false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractProductTeasersItems(frontPage, extractedArticleUrls), false));
 
-    listener.overviewItemsRetrieved(this, extractClusterArticleItems(frontPage, extractedArticleUrls), false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractClusterArticleItems(frontPage, extractedArticleUrls), false));
 
-    listener.overviewItemsRetrieved(this, extractLinkCycleArticles(frontPage, extractedArticleUrls), false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractLinkCycleArticles(frontPage, extractedArticleUrls), false));
 
-    listener.overviewItemsRetrieved(this, extractSidekickArticles(frontPage, extractedArticleUrls), true);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, extractSidekickArticles(frontPage, extractedArticleUrls), true));
   }
 
 

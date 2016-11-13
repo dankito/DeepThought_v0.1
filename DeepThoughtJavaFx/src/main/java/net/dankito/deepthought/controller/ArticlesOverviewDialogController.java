@@ -5,6 +5,7 @@ import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -116,9 +117,9 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
 
     this.articleContentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
       @Override
-      public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final List<ArticlesOverviewItem> items, boolean isDone) {
+      public void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response) {
         Platform.runLater(() -> {
-          if (articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
+          if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
             articlesOverviewUpdateStarted.set(false);
             lstvwArticleOverviewItems.getItems().clear();
             clearSelectedItems();
@@ -126,7 +127,7 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
           // TODO: show error message if retrieving Article Overview Items failed
 
           lblLastUpdateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
-          addOverviewItemsToListView(items);
+          addOverviewItemsToListView(response.getItems());
         });
       }
     });

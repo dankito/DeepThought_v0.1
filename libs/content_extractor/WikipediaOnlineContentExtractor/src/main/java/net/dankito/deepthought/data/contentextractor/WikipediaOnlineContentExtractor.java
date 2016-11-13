@@ -3,6 +3,7 @@ package net.dankito.deepthought.data.contentextractor;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.SeriesTitle;
@@ -68,11 +69,6 @@ public class WikipediaOnlineContentExtractor extends OnlineArticleContentExtract
   @Override
   public boolean hasArticlesOverview() {
     return false;
-  }
-
-  @Override
-  public void getArticlesOverviewAsync(ArticlesOverviewListener listener) {
-    listener.overviewItemsRetrieved(this, new ArrayList<ArticlesOverviewItem>(), true);
   }
 
   @Override

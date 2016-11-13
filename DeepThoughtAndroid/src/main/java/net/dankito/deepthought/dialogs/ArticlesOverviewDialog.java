@@ -23,6 +23,7 @@ import net.dankito.deepthought.data.contentextractor.IContentExtractorManager;
 import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtractor;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.listener.ApplicationListener;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.persistence.deserializer.DeserializationResult;
@@ -408,20 +409,33 @@ public class ArticlesOverviewDialog extends FullscreenDialog {
     if(contentExtractor != null) {
       contentExtractor.getArticlesOverviewAsync(new ArticlesOverviewListener() {
         @Override
-        public void overviewItemsRetrieved(IOnlineArticleContentExtractor contentExtractor, final List<ArticlesOverviewItem> items, boolean isDone) {
-          updateArticlesOverviewItemsThreadSafe(items);
+        public void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response) {
+          articlesOverviewItemsResponseRetrievedThreadSafe(response);
         }
       });
     }
   }
 
-  protected void updateArticlesOverviewItemsThreadSafe(final List<ArticlesOverviewItem> items) {
+  protected void articlesOverviewItemsResponseRetrievedThreadSafe(final GetArticlesOverviewItemsResponse response) {
     runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        articlesOverviewAdapter.appendArticlesOverviewItems(items);
+        articlesOverviewItemsResponseRetrieved(response);
       }
     });
+  }
+
+  protected void articlesOverviewItemsResponseRetrieved(GetArticlesOverviewItemsResponse response) {
+    if(response.isSuccessful() == false) {
+      // TODO: show error message
+    }
+    else {
+      updateArticlesOverviewItems(response.getItems());
+    }
+  }
+
+  protected void updateArticlesOverviewItems(final List<ArticlesOverviewItem> items) {
+    articlesOverviewAdapter.appendArticlesOverviewItems(items);
   }
 
 }

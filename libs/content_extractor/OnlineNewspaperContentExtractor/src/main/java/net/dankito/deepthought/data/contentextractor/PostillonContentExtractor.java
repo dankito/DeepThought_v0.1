@@ -3,6 +3,7 @@ package net.dankito.deepthought.data.contentextractor;
 import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
@@ -246,7 +247,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
         items.add(item);
     }
 
-    listener.overviewItemsRetrieved(this, items, false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, items, false));
   }
 
   protected ArticlesOverviewItem extractOverviewItemFromPostElement(Element postElement) {
@@ -309,7 +310,7 @@ public class PostillonContentExtractor extends OnlineNewspaperContentExtractorBa
         items.add(item);
     }
 
-    listener.overviewItemsRetrieved(this, items, true);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, items, true));
   }
 
   protected ArticlesOverviewItem extractOverviewItemFromArchiveArticleElement(Element archiveArticleElement) {

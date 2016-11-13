@@ -2,11 +2,12 @@ package net.dankito.deepthought.data.contentextractor;
 
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
+import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.util.DeepThoughtError;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -208,11 +209,11 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   protected void extractArticlesOverviewItemsFromFrontPage(Document frontPage, ArticlesOverviewListener listener) {
     List<ArticlesOverviewItem> overviewItems = new ArrayList<>();
     extractTopTeaserItems(frontPage, overviewItems);
-    listener.overviewItemsRetrieved(this, overviewItems, false);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, overviewItems, false));
 
     List<ArticlesOverviewItem> indexItems = new ArrayList<>();
     extractIndexItems(frontPage, indexItems);
-    listener.overviewItemsRetrieved(this, indexItems, true);
+    listener.overviewItemsRetrieved(new GetArticlesOverviewItemsResponse(this, indexItems, true));
   }
 
   protected void extractTopTeaserItems(Document frontPage, List<ArticlesOverviewItem> overviewItems) {
