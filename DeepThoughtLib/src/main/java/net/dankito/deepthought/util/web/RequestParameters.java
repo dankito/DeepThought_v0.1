@@ -94,6 +94,10 @@ public class RequestParameters {
     this.connectionTimeoutMillis = connectionTimeoutMillis;
   }
 
+  public boolean isCountConnectionRetriesSet() {
+    return countConnectionRetries > 0;
+  }
+
   public int getCountConnectionRetries() {
     return countConnectionRetries;
   }

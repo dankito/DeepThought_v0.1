@@ -50,7 +50,7 @@ public class OkHttpWebClient implements IWebClient {
 
       return getResponse(parameters, response);
     } catch(Exception e) {
-      return new WebClientResponse(e.getLocalizedMessage());
+      return getRequestFailed(parameters, e);
     }
   }
 
@@ -60,7 +60,7 @@ public class OkHttpWebClient implements IWebClient {
 
       executeRequestAsync(parameters, request, callback);
     } catch(Exception e) {
-      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+      asyncGetRequestFailed(parameters, e, callback);
     }
   }
 
@@ -81,7 +81,7 @@ public class OkHttpWebClient implements IWebClient {
 
       return getResponse(parameters, response);
     } catch(Exception e) {
-      return new WebClientResponse(e.getLocalizedMessage());
+      return postRequestFailed(parameters, e);
     }
   }
 
@@ -91,7 +91,7 @@ public class OkHttpWebClient implements IWebClient {
 
       executeRequestAsync(parameters, request, callback);
     } catch(Exception e) {
-      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+      asyncPostRequestFailed(parameters, e, callback);
     }
   }
 
@@ -132,7 +132,7 @@ public class OkHttpWebClient implements IWebClient {
   protected Response executeRequest(final RequestParameters parameters, Request request) throws Exception {
     Response response = client.newCall(request).execute();
 
-    if(response.isSuccessful() == false && parameters.getCountConnectionRetries() > 0) {
+    if(response.isSuccessful() == false && parameters.isCountConnectionRetriesSet()) {
       parameters.decrementCountConnectionRetries();
       return executeRequest(parameters, request);
     }
@@ -155,8 +155,48 @@ public class OkHttpWebClient implements IWebClient {
     });
   }
 
-  protected void asyncRequestFailed(RequestParameters parameters, Request request, IOException e, RequestCallback callback) {
-    if(isConnectionException(e) && parameters.getCountConnectionRetries() > 0) {
+  protected WebClientResponse getRequestFailed(RequestParameters parameters, Exception e) {
+    if(shouldRetryConnection(parameters, e)) {
+      parameters.decrementCountConnectionRetries();
+      return get(parameters);
+    }
+    else {
+      return new WebClientResponse(e.getLocalizedMessage());
+    }
+  }
+
+  protected void asyncGetRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
+      parameters.decrementCountConnectionRetries();
+      getAsync(parameters, callback);
+    }
+    else {
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected WebClientResponse postRequestFailed(RequestParameters parameters, Exception e) {
+    if(shouldRetryConnection(parameters, e)) {
+      parameters.decrementCountConnectionRetries();
+      return post(parameters);
+    }
+    else {
+      return new WebClientResponse(e.getLocalizedMessage());
+    }
+  }
+
+  protected void asyncPostRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
+      parameters.decrementCountConnectionRetries();
+      postAsync(parameters, callback);
+    }
+    else {
+      callback.completed(new WebClientResponse(e.getLocalizedMessage()));
+    }
+  }
+
+  protected void asyncRequestFailed(RequestParameters parameters, Request request, Exception e, RequestCallback callback) {
+    if(shouldRetryConnection(parameters, e)) {
       parameters.decrementCountConnectionRetries();
       executeRequestAsync(parameters, request, callback);
     }
@@ -166,8 +206,12 @@ public class OkHttpWebClient implements IWebClient {
     }
   }
 
-  protected boolean isConnectionException(IOException e) {
-    return true;
+  protected boolean shouldRetryConnection(RequestParameters parameters, Exception e) {
+    return parameters.isCountConnectionRetriesSet() && isConnectionException(e);
+  }
+
+  protected boolean isConnectionException(Exception e) {
+    return e.getMessage().toLowerCase().contains("timeout");
   }
 
   protected WebClientResponse getResponse(RequestParameters parameters, Response response) throws IOException {
