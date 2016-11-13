@@ -6,6 +6,7 @@ import net.dankito.deepthought.data.contentextractor.IOnlineArticleContentExtrac
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewItem;
 import net.dankito.deepthought.data.contentextractor.preview.ArticlesOverviewListener;
 import net.dankito.deepthought.data.contentextractor.preview.GetArticlesOverviewItemsResponse;
+import net.dankito.deepthought.util.Alerts;
 import net.dankito.deepthought.util.DeepThoughtError;
 import net.dankito.deepthought.util.localization.Localization;
 
@@ -119,18 +120,33 @@ public class ArticlesOverviewDialogController extends ChildWindowsController imp
       @Override
       public void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response) {
         Platform.runLater(() -> {
-          if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
-            articlesOverviewUpdateStarted.set(false);
-            lstvwArticleOverviewItems.getItems().clear();
-            clearSelectedItems();
-          }
-          // TODO: show error message if retrieving Article Overview Items failed
-
-          lblLastUpdateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
-          addOverviewItemsToListView(response.getItems());
+          ArticlesOverviewDialogController.this.overviewItemsRetrieved(response, articlesOverviewUpdateStarted);
         });
       }
     });
+  }
+
+  protected void overviewItemsRetrieved(GetArticlesOverviewItemsResponse response, AtomicBoolean articlesOverviewUpdateStarted) {
+    if(articlesOverviewUpdateStarted.get() == true) { // if articles are being updated, don't clear previous articles till new ones are retrieved. Else in case of error an empty ListView would be shown
+      articlesOverviewUpdateStarted.set(false);
+
+      if(response.isSuccessful()) {
+        lstvwArticleOverviewItems.getItems().clear();
+        clearSelectedItems();
+      }
+    }
+
+    if(response.isSuccessful() == false) {
+      showCouldNotRetrieveArticlesOverviewError(response);
+    }
+    else {
+      lblLastUpdateTime.setText(DateFormat.getDateTimeInstance().format(new Date()));
+      addOverviewItemsToListView(response.getItems());
+    }
+  }
+
+  protected void showCouldNotRetrieveArticlesOverviewError(GetArticlesOverviewItemsResponse response) {
+    Alerts.showErrorMessage(windowStage, response.getError(), Localization.getLocalizedString("alert.title.could.not.get.articles.overview"));
   }
 
   protected void addOverviewItemsToListView(Collection<ArticlesOverviewItem> items) {
