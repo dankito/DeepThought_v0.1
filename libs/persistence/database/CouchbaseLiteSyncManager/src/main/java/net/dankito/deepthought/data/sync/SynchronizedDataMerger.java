@@ -51,7 +51,7 @@ public class SynchronizedDataMerger {
     this.entityManager = entityManager;
     this.database = database;
 
-    createdEntitiesHandler = new SynchronizedCreatedEntitiesHandler(entityManager, database);
+    createdEntitiesHandler = new SynchronizedCreatedEntitiesHandler(syncManager, entityManager, database);
   }
 
 
@@ -255,8 +255,33 @@ public class SynchronizedDataMerger {
       }
     }
 
+    if(isEntityDeleted(cachedEntity, change)) {
+      if(cachedEntity == null) {
+        cachedEntity = entityManager.getEntityById(entityType, change.getDocumentId());
+      }
+
+      createdEntitiesHandler.entityDeleted(cachedEntity, entityType);
+    }
+
     return cachedEntity;
   }
+
+
+  protected boolean isEntityDeleted(BaseEntity cachedEntity, DocumentChange change) {
+    if(cachedEntity != null) {
+      return cachedEntity.isDeleted();
+    }
+    else {
+      try {
+        return (Boolean) change.getAddedRevision().getPropertyForKey(TableConfig.BaseEntityDeletedColumnName);
+      } catch(Exception ignored) {
+        String debug = ignored.getMessage();
+      }
+    }
+
+    return false;
+  }
+
 
   protected void updateCachedEntity(BaseEntity cachedEntity, Dao dao, SavedRevision currentRevision) throws SQLException {
     EntityConfig entityConfig = dao.getEntityConfig();
@@ -270,10 +295,6 @@ public class SynchronizedDataMerger {
           log.error("Could not update Property " + propertyName + " on synchronized Object " + cachedEntity, e);
         }
       }
-    }
-
-    if(cachedEntity.isDeleted()) {
-      syncManager.callEntityDeletedListeners(cachedEntity);
     }
   }
 
@@ -435,6 +456,7 @@ public class SynchronizedDataMerger {
 
     return false; // cachedEntityTargetEntityIds contains all targetEntityIds of currentRevisionTargetEntityIds
   }
+
 
   protected Map<String, Object> getChanges(DocumentChange change, SavedRevision previousRevision) {
     Map<String, Object> detectedChanges = new HashMap<>();

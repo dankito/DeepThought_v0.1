@@ -49,6 +49,8 @@ public class SynchronizedCreatedEntitiesHandler {
   private static final Logger log = LoggerFactory.getLogger(SynchronizedCreatedEntitiesHandler.class);
 
 
+  protected CouchbaseLiteSyncManager syncManager;
+
   protected CouchbaseLiteEntityManagerBase entityManager;
 
   protected Database database;
@@ -66,7 +68,8 @@ public class SynchronizedCreatedEntitiesHandler {
   protected Map<Class, String> currentEntityIds = new ConcurrentHashMap<>();
 
 
-  public SynchronizedCreatedEntitiesHandler(CouchbaseLiteEntityManagerBase entityManager, Database database) {
+  public SynchronizedCreatedEntitiesHandler(CouchbaseLiteSyncManager syncManager, CouchbaseLiteEntityManagerBase entityManager, Database database) {
+    this.syncManager = syncManager;
     this.entityManager = entityManager;
     this.database = database;
 
@@ -245,6 +248,64 @@ public class SynchronizedCreatedEntitiesHandler {
 
   protected String getIdsOfProperty(Document document, String propertyName) {
     return (String)document.getProperty(propertyName);
+  }
+
+
+  public boolean entityDeleted(BaseEntity entity, Class entityType) {
+    if(Entry.class.equals(entityType)) {
+      return deepThought.addEntry((Entry)entity);
+    }
+    else if(Category.class.equals(entityType)) {
+      return deepThought.addCategory((Category)entity);
+    }
+    else if(Tag.class.equals(entityType)) {
+      return deepThought.addTag((Tag)entity);
+    }
+    else if(SeriesTitle.class.equals(entityType)) {
+      return deepThought.addSeriesTitle((SeriesTitle)entity);
+    }
+    else if(Reference.class.equals(entityType)) {
+      return deepThought.addReference((Reference)entity);
+    }
+    else if(ReferenceSubDivision.class.equals(entityType)) {
+      return deepThought.addReferenceSubDivision((ReferenceSubDivision)entity);
+    }
+    else if(Person.class.equals(entityType)) {
+      return deepThought.addPerson((Person)entity);
+    }
+    else if(FileLink.class.equals(entityType)) {
+      return deepThought.addFile((FileLink)entity);
+    }
+    else if(Note.class.equals(entityType)) {
+      return deepThought.addNote((Note)entity);
+    }
+
+    else if(Language.class.equals(entityType)) {
+      return deepThought.addLanguage((Language)entity);
+    }
+    else if(FileType.class.equals(entityType)) {
+      return deepThought.addFileType((FileType)entity);
+    }
+    else if(NoteType.class.equals(entityType)) {
+      return deepThought.addNoteType((NoteType)entity);
+    }
+    else if(BackupFileServiceType.class.equals(entityType)) {
+      return deepThought.addBackupFileServiceType((BackupFileServiceType)entity);
+    }
+
+    else if(User.class.equals(entityType)) {
+      return deepThoughtApplication.addUser((User)entity);
+    }
+    else if(Device.class.equals(entityType)) {
+      return deepThoughtApplication.addDevice((Device)entity);
+    }
+    else if(Group.class.equals(entityType)) {
+      return deepThoughtApplication.addGroup((Group) entity);
+    }
+    else {
+      syncManager.callEntityDeletedListeners(entity);
+      return false;
+    }
   }
 
 
