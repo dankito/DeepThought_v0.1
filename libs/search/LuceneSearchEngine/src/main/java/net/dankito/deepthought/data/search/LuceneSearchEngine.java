@@ -1498,8 +1498,10 @@ public class LuceneSearchEngine extends SearchEngineBase {
     String idFieldName = getIdFieldNameForEntity(removedEntity);
     IndexWriter indexWriter = getIndexWriter(removedEntity.getClass());
     try {
-      if(idFieldName != null && indexWriter != null)
+      if(idFieldName != null && indexWriter != null) {
         indexWriter.deleteDocuments(new Term(idFieldName, removedEntity.getId()));
+        indexWriter.commit();
+      }
     } catch(Exception ex) {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
     }
