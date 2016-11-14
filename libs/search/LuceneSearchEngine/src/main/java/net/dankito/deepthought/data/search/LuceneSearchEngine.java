@@ -201,9 +201,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
   }
 
   public void close() {
-    timer.cancel();
-    timer = null;
-
     closeIndexSearchersAndWriters();
 
     super.close();
@@ -607,8 +604,6 @@ public class LuceneSearchEngine extends SearchEngineBase {
       indicesWithUnsavedChanges.clear();
     }
   }
-
-  protected Timer timer = new Timer("IndexEntryTimer");
 
 
   public void indexEntity(UserDataEntity entity) {
