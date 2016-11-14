@@ -133,7 +133,7 @@ public class OkHttpWebClient implements IWebClient {
     Response response = client.newCall(request).execute();
 
     if(response.isSuccessful() == false && parameters.isCountConnectionRetriesSet()) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       return executeRequest(parameters, request);
     }
     else {
@@ -157,7 +157,7 @@ public class OkHttpWebClient implements IWebClient {
 
   protected WebClientResponse getRequestFailed(RequestParameters parameters, Exception e) {
     if(shouldRetryConnection(parameters, e)) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       return get(parameters);
     }
     else {
@@ -167,7 +167,7 @@ public class OkHttpWebClient implements IWebClient {
 
   protected void asyncGetRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
     if(shouldRetryConnection(parameters, e)) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       getAsync(parameters, callback);
     }
     else {
@@ -177,7 +177,7 @@ public class OkHttpWebClient implements IWebClient {
 
   protected WebClientResponse postRequestFailed(RequestParameters parameters, Exception e) {
     if(shouldRetryConnection(parameters, e)) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       return post(parameters);
     }
     else {
@@ -187,7 +187,7 @@ public class OkHttpWebClient implements IWebClient {
 
   protected void asyncPostRequestFailed(RequestParameters parameters, Exception e, RequestCallback callback) {
     if(shouldRetryConnection(parameters, e)) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       postAsync(parameters, callback);
     }
     else {
@@ -197,13 +197,18 @@ public class OkHttpWebClient implements IWebClient {
 
   protected void asyncRequestFailed(RequestParameters parameters, Request request, Exception e, RequestCallback callback) {
     if(shouldRetryConnection(parameters, e)) {
-      parameters.decrementCountConnectionRetries();
+      prepareConnectionRetry(parameters);
       executeRequestAsync(parameters, request, callback);
     }
     else {
       log.error("Failure on Request to " + request.urlString(), e);
       callback.completed(new WebClientResponse(e.getLocalizedMessage()));
     }
+  }
+
+  protected void prepareConnectionRetry(RequestParameters parameters) {
+    parameters.decrementCountConnectionRetries();
+    log.info("Going to retry to connect to " + parameters.getUrl() + " (count tries left: " + parameters.getCountConnectionRetries() + ")");
   }
 
   protected boolean shouldRetryConnection(RequestParameters parameters, Exception e) {
