@@ -86,35 +86,35 @@ public class LuceneSearchEngine extends SearchEngineBase {
   public static final String BooleanFieldFalseValue = "false";
   public static final String BooleanFieldTrueValue = "true";
 
-  public final static String NoTagsFieldValue = "notags";
-  public final static String NoCategoriesFieldValue = "nocategories";
-  public final static String NoPersonsFieldValue = "nopersons";
-  public final static String NoNotesFieldValue = "nonotes";
-  public final static String NoSeriesFieldValue = "noseries";
-  public final static String NoReferenceFieldValue = "noreference";
-  public final static String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
+  public static final String NoTagsFieldValue = "notags";
+  public static final String NoCategoriesFieldValue = "nocategories";
+  public static final String NoPersonsFieldValue = "nopersons";
+  public static final String NoNotesFieldValue = "nonotes";
+  public static final String NoSeriesFieldValue = "noseries";
+  public static final String NoReferenceFieldValue = "noreference";
+  public static final String NoReferenceSubDivisionFieldValue = "noreferencesubdivision";
 
-  public final static String NoParentCategoryNameFieldValue = "noparentcategory";
-  public final static String NoParentCategoryIdFieldValue = "-42";
+  public static final String NoParentCategoryNameFieldValue = "noparentcategory";
+  public static final String NoParentCategoryIdFieldValue = "-42";
 
-  public final static int SeriesTitleReferenceBaseType = 1;
-  public final static int ReferenceReferenceBaseType = 2;
-  public final static int ReferenceSubDivisionReferenceBaseType = 3;
+  public static final int SeriesTitleReferenceBaseType = 1;
+  public static final int ReferenceReferenceBaseType = 2;
+  public static final int ReferenceSubDivisionReferenceBaseType = 3;
 
   public static BytesRef SeriesTitleReferenceBaseTypeIntRef;
   public static BytesRef ReferenceReferenceBaseTypeIntRef;
   public static BytesRef ReferenceSubDivisionReferenceBaseTypeIntRef;
 
-  private static final int WAIT_TIME_BEFORE_COMMITTING_INDICES_MILLIS = 1500;
+
+  private static final Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
 
 
-  private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
-
-
-  protected final static List<Class> ClassesWithOwnIndexDirectories = Arrays.asList(new Class[] { Entry.class, Tag.class, ReferenceBase.class, Person.class,
+  protected static final List<Class> ClassesWithOwnIndexDirectories = Arrays.asList(new Class[] { Entry.class, Tag.class, ReferenceBase.class, Person.class,
                                                                                                   Category.class, Note.class, FileLink.class });
 
-  protected final static Class DefaultIndexDirectoryClass = UserDataEntity.class;
+  protected static final Class DefaultIndexDirectoryClass = UserDataEntity.class;
+
+  protected static final int WAIT_TIME_BEFORE_COMMITTING_INDICES_MILLIS = 1500;
 
 
   protected Map<Class, Directory> directories = new HashMap<>();
