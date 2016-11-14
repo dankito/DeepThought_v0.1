@@ -23,7 +23,7 @@ public class JsoupHtmlHelper implements IHtmlHelper {
 
   public static final String DefaultUserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0";
 
-  protected static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 4000;
+  protected static final int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 2000;
 
 
   private final static Logger log = LoggerFactory.getLogger(JsoupHtmlHelper.class);
