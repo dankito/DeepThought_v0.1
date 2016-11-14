@@ -1,6 +1,7 @@
 package net.dankito.deepthought.data.search;
 
 import net.dankito.deepthought.Application;
+import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.Category;
 import net.dankito.deepthought.data.model.DeepThought;
 import net.dankito.deepthought.data.model.Entry;
@@ -13,7 +14,6 @@ import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.data.model.ReferenceSubDivision;
 import net.dankito.deepthought.data.model.SeriesTitle;
 import net.dankito.deepthought.data.model.Tag;
-import net.dankito.deepthought.data.listener.AllEntitiesListener;
 import net.dankito.deepthought.data.model.ui.AllEntriesSystemTag;
 import net.dankito.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
 import net.dankito.deepthought.data.persistence.LazyLoadingList;
@@ -76,11 +76,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LuceneSearchEngine extends SearchEngineBase {
 
@@ -105,6 +104,8 @@ public class LuceneSearchEngine extends SearchEngineBase {
   public static BytesRef SeriesTitleReferenceBaseTypeIntRef;
   public static BytesRef ReferenceReferenceBaseTypeIntRef;
   public static BytesRef ReferenceSubDivisionReferenceBaseTypeIntRef;
+
+  private static final int WAIT_TIME_BEFORE_COMMITTING_INDICES_MILLIS = 1500;
 
 
   private final static Logger log = LoggerFactory.getLogger(LuceneSearchEngine.class);
@@ -134,6 +135,9 @@ public class LuceneSearchEngine extends SearchEngineBase {
   protected int indexUpdatedEntitiesAfterMilliseconds = 1000;
   protected Queue<UserDataEntity> updatedEntitiesToIndex = new ConcurrentLinkedQueue<>();
   protected Timer indexUpdatedEntitiesTimer = null;
+
+  protected List<IndexWriter> indicesWithUnsavedChanges = new CopyOnWriteArrayList<>();
+  protected Timer commitIndicesTimer = null;
 
 
   public LuceneSearchEngine() {
@@ -560,7 +564,50 @@ public class LuceneSearchEngine extends SearchEngineBase {
     markIndexHasBeenUpdated();
   }
 
-  protected Set<Entry> entriesToIndex = new CopyOnWriteArraySet<>();
+
+  /**
+   * Calling commit() is a costly operation
+   * -> don't call it on each update / deletion, wait some time before commit accumulated changes.
+   * @param indexWriter
+   */
+  protected void addWriterToCommitQueue(IndexWriter indexWriter) {
+    synchronized(indicesWithUnsavedChanges) {
+      indicesWithUnsavedChanges.add(indexWriter);
+    }
+
+    startCommitIndicesTimer();
+  }
+
+  protected synchronized void startCommitIndicesTimer() {
+    if(commitIndicesTimer != null) { // timer already started
+      return;
+    }
+
+    commitIndicesTimer = new Timer("Commit Indices Timer");
+
+    commitIndicesTimer.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        commitIndicesTimer = null;
+        commitUnsavedChanges();
+      }
+    }, WAIT_TIME_BEFORE_COMMITTING_INDICES_MILLIS);
+  }
+
+  protected void commitUnsavedChanges() {
+    synchronized(indicesWithUnsavedChanges) {
+      for(IndexWriter indexWriter : indicesWithUnsavedChanges) {
+        try {
+          indexWriter.commit();
+        } catch (Exception e) {
+          log.error("Could not commit Index " + indexWriter.getDirectory(), e);
+        }
+      }
+
+      indicesWithUnsavedChanges.clear();
+    }
+  }
+
   protected Timer timer = new Timer("IndexEntryTimer");
 
 
@@ -872,7 +919,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
       log.info("Indexing document {}", doc);
       IndexWriter indexWriter = getIndexWriter(entityClass);
       indexWriter.addDocument(doc);
-      indexWriter.commit();
+      addWriterToCommitQueue(indexWriter);
     } catch(Exception ex) {
       log.error("Could not index Document " + doc, ex);
     }
@@ -1500,7 +1547,7 @@ public class LuceneSearchEngine extends SearchEngineBase {
     try {
       if(idFieldName != null && indexWriter != null) {
         indexWriter.deleteDocuments(new Term(idFieldName, removedEntity.getId()));
-        indexWriter.commit();
+        addWriterToCommitQueue(indexWriter);
       }
     } catch(Exception ex) {
       log.error("Could not delete Document for removed entity " + removedEntity, ex);
