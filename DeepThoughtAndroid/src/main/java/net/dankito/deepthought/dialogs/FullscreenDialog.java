@@ -71,10 +71,7 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
     View rootView = inflater.inflate(getLayoutId(), container, false);
 
-    // don't know why but when placing Dialog in android.R.id.content, the Dialog's content starts below the system status bar -> set a top margin in height of status bar
-    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)rootView.getLayoutParams();
-    params.setMargins(0, getStatusBarHeight(), 0, 0);
-    rootView.setLayoutParams(params);
+    adjustDialogToShowStatusBar(rootView);
 
     setupToolbar(rootView);
 
@@ -86,6 +83,13 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
     bug5497Workaround = new AndroidBug5497Workaround(rootView);
 
     return rootView;
+  }
+
+  protected void adjustDialogToShowStatusBar(View rootView) {
+    // don't know why but when placing Dialog in android.R.id.content, the Dialog's content starts below the system status bar -> set a top margin in height of status bar
+    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)rootView.getLayoutParams();
+    params.setMargins(0, getStatusBarHeight(), 0, 0);
+    rootView.setLayoutParams(params);
   }
 
   protected void restoreSavedInstance(Bundle savedInstanceState) {
