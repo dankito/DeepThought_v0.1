@@ -65,8 +65,13 @@ public abstract class FullscreenDialog extends DialogFragment implements ICleanU
 
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+  public void onResume() {
     hasOnSaveInstanceBeenCalled = false;
+    super.onResume();
+  }
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     restoreSavedInstance(savedInstanceState);
 
     View rootView = inflater.inflate(getLayoutId(), container, false);
