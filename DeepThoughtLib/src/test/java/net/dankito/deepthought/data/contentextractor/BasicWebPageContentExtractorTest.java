@@ -1,10 +1,9 @@
 package net.dankito.deepthought.data.contentextractor;
 
-import net.dankito.deepthought.data.contentextractor.BasicWebPageContentExtractor;
-import net.dankito.deepthought.data.contentextractor.EntryCreationResult;
 import net.dankito.deepthought.data.html.JsoupHtmlHelper;
 import net.dankito.deepthought.data.model.Entry;
 import net.dankito.deepthought.data.model.Reference;
+import net.dankito.deepthought.util.web.OkHttpWebClient;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,7 +20,7 @@ public class BasicWebPageContentExtractorTest {
 
   @Before
   public void setup() {
-    webPageContentExtractor = new BasicWebPageContentExtractor(new JsoupHtmlHelper());
+    webPageContentExtractor = new BasicWebPageContentExtractor(new JsoupHtmlHelper(new OkHttpWebClient()));
   }
 
 

@@ -6,9 +6,7 @@ import net.dankito.deepthought.data.model.Reference;
 import net.dankito.deepthought.data.model.ReferenceBase;
 import net.dankito.deepthought.util.ObjectHolder;
 import net.dankito.deepthought.util.ThreadPool;
-import net.dankito.deepthought.util.isbn.IsbnResolvingListener;
-import net.dankito.deepthought.util.isbn.OpenIsbnIsbnResolver;
-import net.dankito.deepthought.util.isbn.ResolveIsbnResult;
+import net.dankito.deepthought.util.web.OkHttpWebClient;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,7 +34,7 @@ public class OpenIsbnIsbnResolverTest {
 
   @Before
   public void setup() {
-    resolver = new OpenIsbnIsbnResolver(new JsoupHtmlHelper(), new ThreadPool());
+    resolver = new OpenIsbnIsbnResolver(new JsoupHtmlHelper(new OkHttpWebClient()), new ThreadPool());
 
     resultHolder = new ObjectHolder<>();
     waitLatch = new CountDownLatch(1);
