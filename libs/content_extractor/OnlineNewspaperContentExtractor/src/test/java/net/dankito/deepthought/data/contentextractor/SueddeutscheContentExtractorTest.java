@@ -212,6 +212,13 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   }
 
   @Test
+  public void importChristianSchmidtDerKalauerndeMinister_DoesNotGetExtracted() {
+    EntryCreationResult creationResult = testImportArticle("https://www.sueddeutsche.de/wirtschaft/landwirtschaftsminister-christian-schmidt-der-kalauernde-minister-1.3312336");
+    testImportedArticleValues(creationResult, 3022, "28.12.16", "Christian Schmidt, der kalauernde Minister", "Landwirtschaftsminister",
+        "Der Landwirtschaftsminister plädiert für mehr Schweinefleisch an Schulen und will \"vegane Schnitzel\" verbieten. Er setzt damit sehr eigene Prioritäten - und offenbart einen Hang zu unfreiwilliger Komik.");
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
     EntryCreationResult zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     EntryCreationResult one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");

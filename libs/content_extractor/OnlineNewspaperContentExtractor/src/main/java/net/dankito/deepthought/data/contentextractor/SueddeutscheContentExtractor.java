@@ -187,7 +187,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
             content += parseInlineImageGallery(bodyChild);
           }
         }
-        else if(bodyChild.hasClass("teaserable-layout--teaser") == false) { // filter out teasers
+        else if(bodyChild.hasClass("teaserable-layout--teaser") == false && bodyChild.hasClass("teaserable-layout--image") == false) { // filter out teasers
           content += extractImageFromFigureNode(bodyChild);
         }
       }
