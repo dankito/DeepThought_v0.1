@@ -223,7 +223,7 @@ public class HeiseContentExtractor extends OnlineNewspaperContentExtractorBase {
   }
 
   protected void createOverviewItemFromTeaserItem(List<ArticlesOverviewItem> overviewItems, Element teaserItem) {
-    if(teaserItem.children().size() == 1 && "a".equals(teaserItem.child(0).tagName())) {
+    if(teaserItem.children().size() >= 1 && "a".equals(teaserItem.child(0).tagName())) {
       overviewItems.add(createOverviewItemFromTeaserAnchorElement(teaserItem.child(0)));
     }
     else {
