@@ -205,6 +205,13 @@ public class SueddeutscheContentExtractorTest extends GermanOnlineNewspaperConte
   }
 
   @Test
+  public void importPopMomenteDesJahres_AuthorInfoDoesNotGetExtracted() {
+    EntryCreationResult creationResult = testImportArticle("http://www.sueddeutsche.de/kultur/musikjahr-das-sind-die-pop-momente-des-jahres-1.3291238");
+    testImportedArticleValues(creationResult, 21630, "27.12.16", "Das sind die Pop-Momente des Jahres", "Musikjahr 2016",
+        "Bowie ist tot, Beyoncé marschiert beim Super Bowl auf und Kanye West feiert die größte Laptop-Party der Geschichte. Poptechnisch geht ein Wahnsinnsjahr zu Ende. Zeit, Bilanz zu ziehen.");
+  }
+
+  @Test
   public void testIfOnly10ArticlesPerWeekRestrictionWillBeCircumvented() {
     EntryCreationResult zero = testImportArticle("http://www.sueddeutsche.de/politik/belauscht-in-vietnam-angela-merkels-reiselustiger-schatten-1.2546772");
     EntryCreationResult one = testImportArticle("http://www.sueddeutsche.de/politik/missbrauch-durch-un-soldaten-was-der-krieg-mit-kindern-macht-1.2529407");

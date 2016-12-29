@@ -284,7 +284,7 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       if(descriptionElements.size() > 0) {
         Element textElement = getElementByClassAndNodeName(descriptionElements.get(0), "div", "text");
         if(textElement != null)
-          imageHtml += "<br />" + textElement.html();
+          imageHtml += "<br />" + cleanImageCaptionHtml(textElement);
         else // inline image gallery
           imageHtml += extractTextFromElementChildren(descriptionElements.get(0), null);
       }
@@ -296,6 +296,15 @@ public class SueddeutscheContentExtractor extends SueddeutscheContentExtractorBa
       log.warn("Could not extract Image from figure node " + figureNode.outerHtml());
 
     return imageHtml;
+  }
+
+  protected String cleanImageCaptionHtml(Element textElement) {
+    Element authorsDiv = textElement.select("div.authors").first();
+    if(authorsDiv != null) {
+      authorsDiv.remove();
+    }
+
+    return textElement.html();
   }
 
   protected EntryCreationResult createEntryFromImageGalleryArticle(String articleUrl, Element articleElement, Element articleBodyElement) {
