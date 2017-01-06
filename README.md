@@ -20,7 +20,7 @@ or clone and run
 
 
 To start the Desktop Application go to
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought  
 , right click on 'DeepThoughtFx' and choose Debug or Run.
 
 
