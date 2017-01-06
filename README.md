@@ -12,8 +12,7 @@ be synchronized to your Laptop as soon as they are in the same local network.
 
 
 To init submodules, clone with
-
-git clone --recursive https://github.com/dankito/DeepThought.git
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone --recursive https://github.com/dankito/DeepThought.git
 
 or clone and run
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule init
@@ -22,7 +21,7 @@ or clone and run
 
 To start the Desktop Application go to
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought
-, right click on 'DeepThoughtFx' and choose Debug or Run
+, right click on 'DeepThoughtFx' and choose Debug or Run.
 
 
-For running the Java Desktop Application you at least need Java 8_u40
+For running the Java Desktop Application you at least need Java 8_u40.
