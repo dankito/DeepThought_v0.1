@@ -11,15 +11,15 @@ You can sync your data between all your devices, e.g. your Android device and yo
 be synchronized to your Laptop as soon as they are in the same local network.
 
 
-To init submodules, clone with
+To init submodules, clone with  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git clone --recursive https://github.com/dankito/DeepThought.git
 
-or clone and run
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule init
+or clone and run  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule init  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule update
 
 
-To start the Desktop Application go to
+To start the Desktop Application go to  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought  
 , right click on 'DeepThoughtFx' and choose Debug or Run.
 
