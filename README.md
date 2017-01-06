@@ -1,3 +1,5 @@
+# DeepThought #
+
 A knowledge management system to easily store and quickly re-find all your data.
 
 Data retrieval is done via the integrated full text search engine or Tags you add to your entries.
@@ -14,13 +16,12 @@ To init submodules, clone with
 git clone --recursive https://github.com/dankito/DeepThought.git
 
 or clone and run
-
-   git submodule init
-   git submodule update
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule init
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;git submodule update
 
 
 To start the Desktop Application go to
-   DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeepThoughtJavaFx -> src -> main -> java -> net -> deepthought
 , right click on 'DeepThoughtFx' and choose Debug or Run
 
 
