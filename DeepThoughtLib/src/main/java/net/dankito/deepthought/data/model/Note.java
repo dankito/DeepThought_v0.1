@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
@@ -19,7 +18,6 @@ import javax.persistence.Transient;
 public class Note extends UserDataEntity {
 
   @Column(name = TableConfig.NoteNoteColumnName)
-  @Lob
   protected String note;
 
   @ManyToOne(fetch = FetchType.EAGER)

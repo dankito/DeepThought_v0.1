@@ -1,12 +1,12 @@
 package net.dankito.deepthought.data.model;
 
+import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.listener.SettingsChangedListener;
 import net.dankito.deepthought.data.model.settings.SettingsBase;
-import net.dankito.deepthought.data.model.settings.enums.Setting;
-import net.dankito.deepthought.data.persistence.db.TableConfig;
-import net.dankito.deepthought.Application;
 import net.dankito.deepthought.data.model.settings.UserDeviceSettings;
+import net.dankito.deepthought.data.model.settings.enums.Setting;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.util.localization.Localization;
 
 import org.slf4j.Logger;
@@ -23,7 +23,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -64,7 +63,6 @@ public class User extends BaseEntity implements Serializable {
   protected transient UserDeviceSettings settings;
 
   @Column(name = TableConfig.UserUserDeviceSettingsColumnName)
-  @Lob
   protected String settingsString = "";
 
   @OneToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST } )

@@ -1,8 +1,8 @@
 package net.dankito.deepthought.data.model;
 
 import net.dankito.deepthought.data.persistence.db.TableConfig;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -56,7 +55,6 @@ public class Reference extends ReferenceBase implements Comparable<Reference> {
 
 
   @Column(name = TableConfig.ReferenceTableOfContentsColumnName)
-  @Lob
   protected String tableOfContents;
 
   @Column(name = TableConfig.ReferenceIssueOrPublishingDateColumnName)

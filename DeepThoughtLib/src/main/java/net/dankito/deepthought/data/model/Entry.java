@@ -5,8 +5,8 @@ import net.dankito.deepthought.data.model.enums.Language;
 import net.dankito.deepthought.data.model.listener.EntryPersonListener;
 import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
-import net.dankito.deepthought.util.localization.Localization;
 import net.dankito.deepthought.util.StringUtils;
+import net.dankito.deepthought.util.localization.Localization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +22,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -51,14 +50,12 @@ public class Entry extends UserDataEntity implements Serializable, Comparable<En
 
   //  @Column(name = TableConfig.EntryAbstractColumnName, length = 2048)
   @Column(name = TableConfig.EntryAbstractColumnName)
-  @Lob
   protected String abstractString = ""; // field cannot be named 'abstract' as this is a Java Keyword. So i named field abstractString but getter is called getAbstract()
 
   protected transient String plainTextAbstract = null;
 
   @Column(name = TableConfig.EntryContentColumnName)
 //  @Column(name = TableConfig.EntryContentColumnName, columnDefinition = "clob") // Derby needs explicitly clob column definition
-  @Lob
   protected String content = "";
 
   protected transient String plainTextContent = null;

@@ -11,10 +11,10 @@ import net.dankito.deepthought.data.model.settings.SettingsBase;
 import net.dankito.deepthought.data.model.settings.enums.Setting;
 import net.dankito.deepthought.data.model.ui.AllEntriesSystemTag;
 import net.dankito.deepthought.data.model.ui.EntriesWithoutTagsSystemTag;
-import net.dankito.deepthought.data.persistence.db.TableConfig;
-import net.dankito.deepthought.util.file.FileUtils;
 import net.dankito.deepthought.data.persistence.db.BaseEntity;
+import net.dankito.deepthought.data.persistence.db.TableConfig;
 import net.dankito.deepthought.data.persistence.db.UserDataEntity;
+import net.dankito.deepthought.util.file.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -149,7 +148,6 @@ public class DeepThought extends UserDataEntity implements Serializable {
   protected transient DeepThoughtSettings settings;
 
   @Column(name = TableConfig.DeepThoughtDeepThoughtSettingsColumnName)
-  @Lob
   protected String settingsString = "";
 
 
